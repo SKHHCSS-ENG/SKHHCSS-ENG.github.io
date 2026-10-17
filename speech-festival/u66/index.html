@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>U66 Solo Verse — Late Home V1.4 | Practice Guide</title>
+<title>U66 Solo Verse — Late Home V1.5 | Practice Guide</title>
 <style>
  :root {
  --bg: #F5EDE0;
@@ -518,7 +518,7 @@
 
  <div class="stanza-list" id="stanzaContainer">
 
- <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="6.4" data-yt-end="11.0">
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="6.3" data-yt-end="11.1">
  <div class="st-header">
  <span class="st-tag">Exchange 1 · Opening</span>
  <div class="badge-row"><span class="cue-badge">👩 Mum sharp</span><span class="cue-badge">👦 cut off</span></div>
@@ -537,7 +537,7 @@
  </div>
  </div>
 
- <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="11.2" data-yt-end="15.2">
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="11.1" data-yt-end="15.5">
  <div class="st-header">
  <span class="st-tag">Exchange 2 · Straight home</span>
  <div class="badge-row"><span class="cue-badge">✂ cut-offs</span><span class="cue-badge">⚡ overlap</span></div>
@@ -555,7 +555,7 @@
  </div>
  </div>
 
- <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="15.5" data-yt-end="22.9">
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="15.5" data-yt-end="24.0">
  <div class="st-header">
  <span class="st-tag">Exchange 3 · Don’t listen</span>
  <div class="badge-row"><span class="cue-badge">👩 steamroller</span><span class="cue-badge">🔊 rising</span></div>
@@ -580,7 +580,7 @@
  </div>
  </div>
 
- <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="25.1" data-yt-end="31.5">
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-model-skip="1" data-yt-start="" data-yt-end="">
  <div class="st-header">
  <span class="st-tag">Exchange 4 · Chores &amp; tea</span>
  <div class="badge-row"><span class="cue-badge">👩 orders</span><span class="cue-badge">👦 still trying</span></div>
@@ -601,11 +601,11 @@
  <canvas class="hw-canvas" data-hw="3" aria-hidden="true"></canvas>
  </div>
  <div class="cues">
- Mum lists orders like a checklist. Keep Boy polite. (This Model clip is short here — tap nearby exchanges too if a line is missing from the recording.)
+ Mum lists orders like a checklist. Keep Boy polite. <strong>Model audio skips this exchange</strong> (chores / tea / homework not in the clip) — practise from the script; tap Ex. 5 for the next recorded beat.
  </div>
  </div>
 
- <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="31.5" data-yt-end="34.5">
+ <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="24.0" data-yt-end="31.2">
  <div class="st-header">
  <span class="st-tag">Exchange 5 · Please listen</span>
  <div class="badge-row"><span class="cue-badge">👦 urgent</span><span class="cue-badge">👩 final order</span></div>
@@ -624,7 +624,7 @@
  </div>
  </div>
 
- <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="34.5" data-yt-end="42.0">
+ <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="31.0" data-yt-end="42.0">
  <div class="st-header">
  <span class="st-tag">Exchange 6 · Mrs Wilson!!!!!</span>
  <div class="badge-row"><span class="cue-badge">💥 breakthrough</span><span class="cue-badge">😮 pause</span></div>
@@ -644,7 +644,7 @@
  </div>
  </div>
 
- <div class="stanza" role="button" tabindex="0" data-arc="punch" data-yt-start="42.0" data-yt-end="55.2">
+ <div class="stanza" role="button" tabindex="0" data-arc="punch" data-yt-start="42.0" data-yt-end="55.5">
  <div class="st-header">
  <span class="st-tag">Exchange 7 · Reveal</span>
  <div class="badge-row"><span class="cue-badge">😄 punchline</span><span class="cue-badge">⏱ timing</span></div>
@@ -826,6 +826,11 @@ document.querySelectorAll(".stanza").forEach(st => {
  if (document.body.classList.contains("hw-on") && ev.target.closest(".hw-canvas")) return;
  document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
  st.classList.add("focused", "playing");
+ if (st.dataset.modelSkip === "1") {
+  if (typeof setYtStatus === "function") setYtStatus("Model skips Ex. 4 (chores/tea) — practise from the script · 示範錄音略過此段");
+  if (typeof stopYt === "function") stopYt();
+  return;
+ }
  const a = +st.dataset.ytStart, b = +st.dataset.ytEnd;
  if (!Number.isNaN(a) && !Number.isNaN(b)) playYtRange(a, b, st.querySelector(".st-tag")?.textContent || "Exchange");
  };
