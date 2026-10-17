@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>U66 Solo Verse — Late Home V1.4 | Practice Guide</title>
+<style>
+ :root {
+ --bg: #F5EDE0;
+ --panel: #FFF8EE;
+ --card: #FBF3E6;
+ --text: #2C2926;
+ --muted: #6B6560;
+ --gold: #C45C26;
+ --sky: #CA8A04;
+ --mum: #B45309;
+ --boy: #1D4ED8;
+ --punch: #15803D;
+ --heat: #C2410C;
+ --cool: #2563EB;
+ --sharp: #15803D;
+ --ok: #3D7A5A;
+ --danger: #B91C1C;
+ --asphalt: #1C1917;
+ --border: #C4B8A8;
+ }
+ * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+ body {
+ margin: 0;
+ /* Room for tools dock (~72px) + fixed Model play bar (~56px) + gap */
+ padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
+ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+ background: var(--bg);
+ color: var(--text);
+ line-height: 1.45;
+ overflow-x: hidden;
+ }
+ body.dock-mini-timer-on { padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px)); }
+ body.dock-open { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
+ body.dock-open.dock-mini-timer-on { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
+
+ header {
+ position: sticky; top: 0; z-index: 40;
+ background: rgba(245, 237, 224, 0.94);
+ backdrop-filter: blur(12px);
+ -webkit-backdrop-filter: blur(12px);
+ border-bottom: 1px solid var(--border);
+ padding: 10px 14px 8px;
+ }
+ .top-row {
+ display: flex; justify-content: space-between; align-items: center; gap: 8px;
+ }
+ .title-block { min-width: 0; flex: 1; }
+ .app-title {
+ font-size: 1.05rem; font-weight: 800; margin: 0;
+ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+ }
+ .app-title span { color: var(--gold); }
+ .poet-byline {
+ margin: 2px 0 0;
+ font-size: .78rem;
+ font-weight: 600;
+ color: var(--muted);
+ letter-spacing: .02em;
+ }
+ .sub-badge {
+ font-size: .72rem; background: rgba(196,92,38,.14); color: var(--gold);
+ padding: 3px 8px; border-radius: 99px; font-weight: 700; flex-shrink: 0;
+ }
+
+ .nav-tabs {
+ display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+ margin-top: 8px; background: #EDE4D4; padding: 4px; border-radius: 10px;
+ }
+ .tab-btn {
+ border: none; background: transparent; color: var(--muted);
+ padding: 8px 2px; border-radius: 8px; font-weight: 700; font-size: .75rem;
+ cursor: pointer; transition: .15s; text-align: center; white-space: nowrap;
+ }
+ .tab-btn.active {
+ background: var(--panel); color: var(--asphalt); box-shadow: 0 2px 6px rgba(44,41,38,.12);
+ border: 1px solid var(--border);
+ }
+ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, label:focus-within {
+ outline: 3px solid var(--gold); outline-offset: 3px;
+ }
+ @media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+ }
+
+ .quick-toggles {
+ display: flex; gap: 6px; padding: 10px 14px 4px; overflow-x: auto;
+ scrollbar-width: none;
+ }
+ .quick-toggles::-webkit-scrollbar { display: none; }
+ .chip-toggle {
+ border: 1px solid var(--border); background: var(--panel);
+ color: var(--muted); padding: 6px 11px; border-radius: 99px;
+ font-size: .76rem; font-weight: 700; white-space: nowrap; cursor: pointer;
+ }
+ .chip-toggle.on {
+ background: rgba(196,92,38,.16); border-color: var(--gold); color: var(--heat);
+ }
+
+ main { max-width: 680px; margin: 0 auto; padding: 8px 14px; }
+ .view-section { display: none; }
+ .view-section.active { display: block; }
+
+ details.arc-card {
+ background: var(--panel); border-radius: 12px; padding: 10px 14px;
+ margin-bottom: 12px; border: 1px solid var(--border);
+ }
+ details.arc-card summary {
+ font-weight: 700; font-size: .86rem; color: var(--gold); cursor: pointer;
+ list-style: none; display: flex; justify-content: space-between; align-items: center;
+ }
+ details.arc-card summary::after { content: "▼"; font-size: .7rem; color: var(--muted); }
+ details[open].arc-card summary::after { content: "▲"; }
+ .arc-body { margin-top: 8px; font-size: .83rem; color: var(--text); }
+ .arc-grid {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;
+ }
+ .arc-pill {
+ padding: 8px 10px; border-radius: 10px; font-size: .76rem; font-weight: 800;
+ border: 2px solid; border-left-width: 6px; line-height: 1.25;
+ box-shadow: 0 1px 4px rgba(44,41,38,.08);
+ }
+ .arc-pill small { display: block; margin-top: 2px; font-weight: 600; opacity: .9; }
+ .arc-mum { background: #FDE68A; border-color: #CA8A04; color: #713F12; }
+ .arc-build { background: #E9D5FF; border-color: #7C3AED; color: #5B21B6; }
+ .arc-boy { background: #BFDBFE; border-color: #2563EB; color: #1E3A8A; }
+ .arc-punch { background: #BBF7D0; border-color: #15803D; color: #14532D; }
+
+ .practice-note { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--gold); background: var(--panel); color: var(--text); font-size: .83rem; }
+ .stanza-list { display: flex; flex-direction: column; gap: 10px; }
+ .stanza {
+ border-radius: 14px; padding: 12px 14px;
+ box-shadow: 0 2px 8px rgba(44,41,38,.08);
+ border: 1.5px solid var(--border);
+ border-left: 8px solid var(--sky);
+ transition: background .15s, box-shadow .15s;
+ }
+ .stanza.focused { outline: 2px solid var(--gold); box-shadow: 0 0 0 3px rgba(196,92,38,.2); }
+ .stanza[data-arc="mum"] {
+ background: #FEF3C7;
+ border-color: #F6D060;
+ border-left-color: #CA8A04;
+ }
+ .stanza[data-arc="build"] {
+ background: #F5F3FF;
+ border-color: #DDD6FE;
+ border-left-color: #7C3AED;
+ }
+ .stanza[data-arc="boy"] {
+ background: #DBEAFE;
+ border-color: #93C5FD;
+ border-left-color: #2563EB;
+ }
+ .stanza[data-arc="punch"] {
+ background: #DCFCE7;
+ border-color: #86EFAC;
+ border-left-color: #15803D;
+ }
+ .stanza[data-arc="mum"].focused { background: #FDE68A; }
+ .stanza[data-arc="build"].focused { background: #E9D5FF; }
+ .stanza[data-arc="boy"].focused { background: #BFDBFE; }
+ .stanza[data-arc="punch"].focused { background: #BBF7D0; }
+
+ .st-header {
+ display: flex; justify-content: space-between; align-items: center;
+ margin-bottom: 6px;
+ }
+ .st-tag {
+ font-size: .72rem; font-weight: 800;
+ text-transform: uppercase; letter-spacing: .05em;
+ }
+ .stanza[data-arc="mum"] .st-tag { color: #713F12; }
+ .stanza[data-arc="build"] .st-tag { color: #5B21B6; }
+ .stanza[data-arc="boy"] .st-tag { color: #1E3A8A; }
+ .stanza[data-arc="punch"] .st-tag { color: #14532D; }
+ .badge-row { display: flex; flex-wrap: wrap; gap: 5px; }
+ .cue-badge {
+ font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+ background: rgba(196,92,38,.12); color: var(--asphalt);
+ }
+
+ .poem-lines {
+ font-family: Georgia, "Times New Roman", serif;
+ font-size: 1.12rem; line-height: 1.68; color: var(--asphalt);
+ margin: 4px 0 8px;
+ }
+ .stress {
+ color: var(--asphalt); font-weight: 800;
+ text-decoration: underline rgba(28,25,23,.85);
+ text-underline-offset: 3px;
+ text-decoration-thickness: 2px;
+ }
+ .hide-stress .stress { color: inherit; font-weight: inherit; text-decoration: none; }
+
+ .runon {
+ display: inline-block; margin-left: 4px; padding: 1px 6px;
+ border-radius: 5px; background: rgba(91, 138, 138, 0.18);
+ color: #2F5555; font-family: -apple-system, sans-serif;
+ font-size: .7rem; font-weight: 800; vertical-align: middle;
+ border: 1px solid rgba(91,138,138,.35);
+ }
+ .hide-runon .runon { display: none; }
+
+ .zh-gloss {
+ display: inline-block;
+ font-family: -apple-system, "PingFang HK", "Microsoft JhengHei", sans-serif;
+ font-size: .74rem; font-weight: 600; color: #3F5F5A;
+ background: rgba(107, 143, 138, 0.16); border: 1px solid rgba(107, 143, 138, 0.35);
+ padding: 0 5px; margin: 0 2px; border-radius: 5px; vertical-align: baseline; line-height: 1.35;
+ }
+ .hide-zh .zh-gloss { display: none; }
+
+ .cues {
+ font-size: .82rem; color: #4A453F; background: rgba(196,184,168,.28);
+ padding: 8px 10px; border-radius: 9px; border-top: 1px solid var(--border);
+ }
+ .hide-cues .cues, .hide-cues .badge-row { display: none; }
+ .eye-cue { color: #3D6666; display: block; margin-top: 4px; font-size: .78rem; }
+
+ /* Pronunciation Tab */
+ .pron-card { background: var(--panel); border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); }
+ .pron-display {
+ display: none;
+ position: sticky; top: 108px; z-index: 20;
+ background: #FFF8EE; border: 1.5px solid var(--gold); border-radius: 12px;
+ padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 6px 18px rgba(44,41,38,.12);
+ }
+ .pron-display.has-content { display: block; }
+ .pron-display .word-title { font-size: 1.1rem; font-weight: 800; color: var(--asphalt); }
+ .pron-display .ipa { color: var(--gold); font-family: monospace; font-size: .95rem; margin-left: 6px; }
+ .pron-display .zh-tag { color: #3F5F5A; font-size: .88rem; margin-left: 6px; font-weight: 700; }
+ .pron-display .tip { font-size: .84rem; color: var(--text); margin-top: 4px; }
+
+ .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+ .vocab-chip {
+ background: var(--card); border: 1px solid var(--border);
+ color: var(--asphalt); padding: 10px 12px; border-radius: 10px;
+ text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 3px;
+ }
+ .vocab-chip:active { transform: scale(.98); border-color: var(--gold); }
+ .vocab-chip strong { font-size: .92rem; display: flex; justify-content: space-between; }
+ .vocab-chip .chip-sub { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+ .vocab-chip .ipa-txt { color: var(--gold); font-size: .74rem; font-family: monospace; }
+ .vocab-chip .zh-txt { color: #3F5F5A; font-size: .74rem; font-weight: 600; }
+
+ /* YouTube Sample Model Speech Tab */
+ .model-card {
+ background: var(--panel); border-radius: 14px; padding: 16px; margin-bottom: 12px;
+ border: 1px solid var(--border);
+ }
+ .model-card h3 { margin: 0 0 6px; color: var(--gold); font-size: 1.05rem; }
+ .model-card p { font-size: .84rem; color: var(--muted); margin: 0 0 12px; }
+ .video-container {
+ position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+ border-radius: 10px; overflow: hidden; background: #2C2926; margin-bottom: 12px;
+ }
+ .video-container iframe {
+ position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+ }
+ .btn-yt-ext {
+ display: block; text-align: center; background: rgba(196,92,38,.14); color: #9A3412;
+ border: 1px solid var(--gold); padding: 10px; border-radius: 10px; font-weight: 700;
+ font-size: .84rem; text-decoration: none; margin-bottom: 12px;
+ }
+
+ .model-tips {
+ font-size: .84rem; background: rgba(196,184,168,.28);
+ padding: 12px; border-radius: 10px; border-left: 3px solid var(--sky);
+ }
+ .model-tips ul { margin: 6px 0 0; padding-left: 18px; color: var(--text); }
+ .model-tips li { margin-bottom: 6px; }
+
+ /* Self-Check Tab */
+ .check-card { background: var(--panel); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+ .check-item {
+ display: flex; gap: 10px; align-items: flex-start;
+ padding: 10px 8px; border-bottom: 1px solid var(--border);
+ font-size: .88rem; cursor: pointer;
+ }
+ .check-item:last-child { border-bottom: none; }
+ .check-item input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--ok); flex-shrink: 0; }
+
+ /* Sticky Bottom Dock (collapsible tools) */
+ .bottom-dock {
+ position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+ background: rgba(255, 248, 238, 0.97);
+ backdrop-filter: blur(14px);
+ -webkit-backdrop-filter: blur(14px);
+ border-top: 2px solid var(--gold);
+ padding: 4px 12px calc(6px + env(safe-area-inset-bottom));
+ box-shadow: 0 -4px 20px rgba(44,41,38,.12);
+ }
+ .dock-inner {
+ max-width: 680px; margin: 0 auto;
+ display: flex; flex-direction: column; gap: 6px;
+ }
+ .dock-chrome {
+ display: flex; align-items: center; gap: 8px; min-height: 36px;
+ }
+ .dock-toggle {
+ border: 1px solid var(--border); background: var(--panel);
+ color: var(--asphalt); font-size: .78rem; font-weight: 800;
+ padding: 7px 12px; border-radius: 99px; cursor: pointer;
+ display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+ }
+ .dock-toggle .chev { display: inline-block; transition: transform .15s ease; font-size: .7rem; }
+ body.dock-open .dock-toggle .chev { transform: rotate(180deg); }
+ .dock-mini-timer {
+ display: none; flex: 1; align-items: center; gap: 8px; min-width: 0;
+ }
+ body.dock-mini-timer-on:not(.dock-open) .dock-mini-timer { display: flex; }
+ .dock-mini-timer .timer-pill {
+ min-width: 72px; padding: 6px 10px; font-size: .98rem;
+ }
+ .dock-mini-timer .dock-btn { padding: 8px 12px; font-size: .8rem; }
+ .dock-body {
+ display: none; flex-direction: column; gap: 7px;
+ padding-top: 2px;
+ }
+ body.dock-open .dock-body { display: flex; }
+ .dock-modes {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+ background: #EDE4D4; padding: 3px; border-radius: 9px;
+ }
+ .mode-tab {
+ border: none; background: transparent; color: var(--muted);
+ font-size: .76rem; font-weight: 800; padding: 5px 8px; border-radius: 7px; cursor: pointer;
+ }
+ .mode-tab.active { background: var(--panel); color: var(--gold); border: 1px solid var(--border); }
+ .dock-pane { display: none; align-items: center; gap: 8px; }
+ .dock-pane.active { display: flex; }
+ .timer-pill {
+ background: var(--card); border: 1px solid var(--border);
+ border-radius: 10px; padding: 8px 12px; min-width: 82px; text-align: center;
+ font-family: monospace; font-size: 1.08rem; font-weight: 800; color: var(--gold);
+ }
+ .pace-hint { font-size: .72rem; color: var(--muted); line-height: 1.2; flex: 1; }
+ .dock-btn {
+ border: none; border-radius: 10px; padding: 10px 14px;
+ font-weight: 800; font-size: .84rem; cursor: pointer;
+ display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;
+ }
+ .btn-start { background: var(--gold); color: #FFF8EE; }
+ .btn-start.running { background: var(--heat); color: #fff; }
+ .btn-reset { background: var(--card); color: var(--muted); border: 1px solid var(--border); padding: 10px 11px; }
+ .btn-native {
+ flex: 1; background: linear-gradient(135deg, #3D7A5A, #2F5F46); color: #F5EDE0;
+ font-weight: 800; padding: 11px 14px;
+ }
+ .audio-bar { display: none; width: 100%; align-items: center; gap: 8px; background: rgba(196,184,168,.35); padding: 4px 8px; border-radius: 10px; }
+ .audio-bar.show { display: flex; }
+ .audio-help { display: none; font-size: .7rem; color: var(--muted); line-height: 1.25; }
+ .audio-help.active { display: block; }
+ .audio-bar audio { flex: 1; height: 34px; min-width: 0; }
+ .btn-mini {
+ background: var(--card); color: var(--asphalt); border: 1px solid var(--border);
+ font-size: .72rem; font-weight: 700; padding: 7px 9px; border-radius: 7px; cursor: pointer; white-space: nowrap; text-decoration: none;
+ }
+
+ /* Handwrite layer */
+ .stanza { position: relative; }
+ .hw-wrap {
+  position: relative;
+ }
+ .hw-canvas {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  z-index: 6;
+  pointer-events: none;
+  touch-action: none;
+  display: none;
+  border-radius: 4px;
+ }
+ body.hw-on .hw-canvas {
+  display: block;
+  pointer-events: auto;
+  cursor: crosshair;
+ }
+ body.hw-erase .hw-canvas { cursor: cell; }
+ .hw-bar {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0 2px;
+  border-bottom: 1px dashed rgba(196,92,38,.35);
+  margin-bottom: 2px;
+ }
+ .hw-bar.show { display: flex; }
+ .hw-chip {
+  border: 1px solid var(--border); background: var(--panel);
+  color: var(--muted); padding: 5px 9px; border-radius: 99px;
+  font-size: .72rem; font-weight: 800; white-space: nowrap; cursor: pointer;
+ }
+ .hw-chip.on {
+  background: rgba(196,92,38,.16); border-color: var(--gold); color: var(--heat);
+ }
+ .hw-chip.tool-on {
+  background: rgba(28,25,23,.9); border-color: var(--asphalt); color: #FFF8EE;
+ }
+ .hw-chip.danger-chip {
+  background: rgba(185,28,28,.08); border-color: rgba(185,28,28,.35); color: var(--danger);
+ }
+
+ .yt-persist {
+  position: fixed; left: 10px; right: 10px; bottom: 78px; z-index: 45;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(44,41,38,.18); overflow: hidden;
+  display: flex; flex-direction: column; max-width: 520px; margin: 0 auto;
+ }
+ body.dock-open .yt-persist { bottom: 248px; }
+ body.dock-mini-timer-on:not(.dock-open) .yt-persist { bottom: 102px; }
+ .yt-persist.compact .yt-frame-wrap {
+  display: none !important; height: 0 !important; max-height: 0 !important;
+  aspect-ratio: auto !important; opacity: 0; pointer-events: none; overflow: hidden;
+ }
+ .yt-persist.compact { flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; min-height: 44px; }
+ .yt-persist.expanded { bottom: auto; top: auto; position: relative; left: auto; right: auto;
+  margin: 0 0 12px; max-width: none; box-shadow: none; }
+ .yt-persist.expanded .yt-frame-wrap { height: auto; opacity: 1; pointer-events: auto; }
+ .yt-frame-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; transition: .15s; }
+ .yt-frame-wrap iframe, .yt-frame-wrap > div { position: absolute; inset: 0; width: 100%; height: 100%; }
+ .yt-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; flex: 1; min-width: 0; }
+ .yt-persist.expanded .yt-bar { border-top: 1px solid var(--border); }
+ .yt-status { font-size: .78rem; font-weight: 700; color: var(--asphalt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+ .yt-status span { color: var(--gold); }
+ .yt-ctrl { border: 1px solid var(--border); background: var(--card); border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: .75rem; cursor: pointer; color: var(--asphalt); }
+ .yt-ctrl:disabled { opacity: .45; cursor: default; }
+ .stanza.playing { outline: 2px solid var(--cool); box-shadow: 0 0 0 3px rgba(37,99,235,.18); }
+ .title-block { cursor: pointer; border-radius: 8px; }
+ .title-block:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+ .tap-hint { font-size: .72rem; color: var(--muted); padding: 0 14px 6px; margin: 0; }
+ #modelAudio { display: none; }
+
+ .arc-mum { background: #FED7AA; border-color: #B45309; color: #7C2D12; }
+ .arc-boy { background: #BFDBFE; border-color: #1D4ED8; color: #1E3A8A; }
+ .arc-build { background: #E9D5FF; border-color: #7C3AED; color: #5B21B6; }
+ .arc-punch { background: #BBF7D0; border-color: #15803D; color: #14532D; }
+ .stanza[data-arc="mum"] {
+ background: #FFF1E0; border-color: #F0B27A; border-left-color: #B45309;
+ }
+ .stanza[data-arc="boy"] {
+ background: #DBEAFE; border-color: #93C5FD; border-left-color: #1D4ED8;
+ }
+ .stanza[data-arc="build"] {
+ background: #F5F3FF; border-color: #DDD6FE; border-left-color: #7C3AED;
+ }
+ .stanza[data-arc="punch"] {
+ background: #DCFCE7; border-color: #86EFAC; border-left-color: #15803D;
+ }
+ .stanza[data-arc="mum"].focused { background: #FED7AA; }
+ .stanza[data-arc="boy"].focused { background: #BFDBFE; }
+ .stanza[data-arc="build"].focused { background: #E9D5FF; }
+ .stanza[data-arc="punch"].focused { background: #BBF7D0; }
+ .stanza[data-arc="mum"] .st-tag { color: #7C2D12; }
+ .stanza[data-arc="boy"] .st-tag { color: #1E3A8A; }
+ .stanza[data-arc="build"] .st-tag { color: #5B21B6; }
+ .stanza[data-arc="punch"] .st-tag { color: #14532D; }
+ .who {
+ display: inline-block; min-width: 3.2em; font-family: -apple-system, sans-serif;
+ font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+ margin-right: 6px; vertical-align: baseline;
+ }
+ .who-mum { color: #B45309; }
+ .who-boy { color: #1D4ED8; }
+ .line { display: block; margin: 2px 0; }
+ .cut { opacity: .9; }
+
+
+ .school-brand {
+  text-align: center;
+  font-size: .68rem;
+  color: var(--muted, #64748b);
+  padding: 10px 14px 18px;
+  margin: 0;
+  border-top: 1px solid var(--border, #e2e8f0);
+ }
+ .school-brand a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+ <div class="top-row">
+ <div class="title-block" id="titlePlay" role="button" tabindex="0" data-yt-start="1" data-yt-end="6.2" title="Play title and poet">
+ <h1 class="app-title">🎭 <span>Late Home</span></h1>
+ <p class="poet-byline">Gervase Phinn</p>
+ </div>
+ <span class="sub-badge">U66 · S3 Boys</span>
+ </div>
+ <nav class="nav-tabs" aria-label="Lesson sections">
+ <button type="button" class="tab-btn active" data-tab="viewPoem" aria-current="page">📜 Poem</button>
+ <button type="button" class="tab-btn" data-tab="viewPron">🔊 Pronounce</button>
+ <button type="button" class="tab-btn" data-tab="viewSample">🎧 Model</button>
+ <button type="button" class="tab-btn" data-tab="viewCheck">✅ Check</button>
+ </nav>
+</header>
+
+<div class="quick-toggles" id="poemToggles">
+ <button type="button" class="chip-toggle on" id="togRunon" aria-pressed="true">↪ Cut-offs</button>
+ <button type="button" class="chip-toggle on" id="togStress" aria-pressed="true">★ Stress</button>
+ <button type="button" class="chip-toggle on" id="togZh" aria-pressed="true">譯 中文</button>
+ <button type="button" class="chip-toggle on" id="togCues" aria-pressed="true">💡 Notes</button>
+</div>
+<p class="tap-hint" id="tapHint">Tap an exchange (or the title) to hear that part of the Model — audio plays from this page · 點一節即可聽該段示範（本頁音訊）. Use <strong>Show</strong> if you want to watch the YouTube video · 要看影片請按 Show. From Downloads (file://), use the https Pages link for audio.</p>
+
+<main>
+ <!-- TAB 1: POEM & CUES -->
+ <section id="viewPoem" class="view-section active">
+
+ <details class="arc-card">
+ <summary>📖 Story arc · 故事弧線 (Tap to view)</summary>
+ <div class="arc-body">
+ Comic mistaken-identity dialogue: a Mum scolds a boy for coming home late — but he is the neighbour’s son. Humour lands on the reveal.
+ <br>喜劇認錯人：媽媽一直罵「兒子」晚歸，其實他是隔壁的男孩。笑點在結局揭曉。
+ <div class="arc-grid">
+ <div class="arc-pill arc-mum">Ex. 1 · Opening<br><small>Mum’s question · football</small></div>
+ <div class="arc-pill arc-mum">Ex. 2–4 · Interrupt build<br><small>Mum steamrolls · Boy cut off</small></div>
+ <div class="arc-pill arc-boy">Ex. 5–6 · Boy’s push<br><small>Listen · Mrs Wilson!!!!!</small></div>
+ <div class="arc-pill arc-punch">Ex. 7 · Reveal<br><small>Not your son · next door</small></div>
+ </div>
+ </div>
+ </details>
+
+ <p class="practice-note"><strong>Two voices:</strong> Mum = sharp, fast, rising irritation · Boy = patient, then urgent. Practise cut-offs on the Boy’s unfinished lines. · <strong>兩種聲線：</strong>媽媽快而硬；男孩先忍後急。男孩被打斷的句子要「讀到一半就停」。</p>
+
+ <div class="stanza-list" id="stanzaContainer">
+
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="6.4" data-yt-end="11.0">
+ <div class="st-header">
+ <span class="st-tag">Exchange 1 · Opening</span>
+ <div class="badge-row"><span class="cue-badge">👩 Mum sharp</span><span class="cue-badge">👦 cut off</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="0">
+ <div class="poem-lines">
+ <span class="line"><span class="who who-mum">Mum</span> And where have you been until this <span class="stress">time</span>?</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> I was… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Playing <span class="stress">football</span>, I bet.</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="0" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ Mum: crisp question — rising irritation already. Boy: start “I was…” then stop — Mum jumps in.
+ <span class="eye-cue">👀 Mum faces “son”; Boy half-raises a hand to speak.</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="11.2" data-yt-end="15.2">
+ <div class="st-header">
+ <span class="st-tag">Exchange 2 · Straight home</span>
+ <div class="badge-row"><span class="cue-badge">✂ cut-offs</span><span class="cue-badge">⚡ overlap</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="1">
+ <div class="poem-lines">
+ <span class="line cut"><span class="who who-boy">Boy</span> No, I was <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> When you should have come <span class="stress">straight home</span>.</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> If I could explain… <span class="runon">✂</span></span>
+ </div>
+ <canvas class="hw-canvas" data-hw="1" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ Boy never finishes. Mum’s “straight home” is firm — she has said this many times.
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="15.5" data-yt-end="22.9">
+ <div class="st-header">
+ <span class="st-tag">Exchange 3 · Don’t listen</span>
+ <div class="badge-row"><span class="cue-badge">👩 steamroller</span><span class="cue-badge">🔊 rising</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="2">
+ <div class="poem-lines">
+ <span class="line cut"><span class="who who-mum">Mum</span> The times I tell you… <span class="runon">✂</span></span>
+ <span class="line cut"><span class="who who-boy">Boy</span> You see, I was… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> To come <span class="stress">straight home</span>.</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> But… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> You just don’t <span class="stress">listen</span>, do you?</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> I do, but… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> In one ear and out the other.</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> But… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> No more <span class="stress">buts</span>, young man.</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="2" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ Mum talks over him — a little faster each time. Boy’s “But…” / “I was…” stay soft and unfinished. (Model may condense some lines — still practise the full script.)
+ <span class="eye-cue">👀 Mum barely looks at him; Boy leans in to be heard.</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="mum" data-yt-start="25.1" data-yt-end="31.5">
+ <div class="st-header">
+ <span class="st-tag">Exchange 4 · Chores &amp; tea</span>
+ <div class="badge-row"><span class="cue-badge">👩 orders</span><span class="cue-badge">👦 still trying</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="3">
+ <div class="poem-lines">
+ <span class="line cut"><span class="who who-boy">Boy</span> You see… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Now, go and <span class="stress">wash</span> your hands.</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> I’m trying to tell you… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Tea will be on the table in five minutes.</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> The thing is…. <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Have you any <span class="stress">homework</span><span class="zh-gloss">功課</span>?</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> Yes, I have, but… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Well, after tea it’s up to your room.</span>
+ <span class="line cut"><span class="who who-boy">Boy</span> Could I explain… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> And no <span class="stress">television</span><span class="zh-gloss">電視</span> tonight.</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="3" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ Mum lists orders like a checklist. Keep Boy polite. (This Model clip is short here — tap nearby exchanges too if a line is missing from the recording.)
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="31.5" data-yt-end="34.5">
+ <div class="st-header">
+ <span class="st-tag">Exchange 5 · Please listen</span>
+ <div class="badge-row"><span class="cue-badge">👦 urgent</span><span class="cue-badge">👩 final order</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="4">
+ <div class="poem-lines">
+ <span class="line cut"><span class="who who-boy">Boy</span> I’m trying to tell you… <span class="runon">✂</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Don’t just stand there.</span>
+ <span class="line"><span class="who who-boy">Boy</span> Will you <span class="stress">listen</span>, please?</span>
+ <span class="line"><span class="who who-mum">Mum</span> Do as you’re <span class="stress">told</span>!</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="4" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ Boy’s “Will you listen, please?” is clearer and more urgent. Mum’s last order is sharp.
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="boy" data-yt-start="34.5" data-yt-end="42.0">
+ <div class="st-header">
+ <span class="st-tag">Exchange 6 · Mrs Wilson!!!!!</span>
+ <div class="badge-row"><span class="cue-badge">💥 breakthrough</span><span class="cue-badge">😮 pause</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="5">
+ <div class="poem-lines">
+ <span class="line"><span class="who who-boy">Boy</span> <span class="stress">Mrs Wilson!!!!!</span></span>
+ <span class="line"><span class="who who-mum">Mum</span> Pardon<span class="zh-gloss">吓？</span>?</span>
+ <span class="line"><span class="who who-boy">Boy</span> I’ve been trying to tell you!</span>
+ <span class="line"><span class="who who-mum">Mum</span> What?</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="5" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ “Mrs Wilson!!!!!” — clear, loud energy without screaming. Tiny beat before Mum’s “Pardon?”
+ <span class="eye-cue">👀 Freeze a second after the name — then Mum’s confused face.</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="punch" data-yt-start="42.0" data-yt-end="55.2">
+ <div class="st-header">
+ <span class="st-tag">Exchange 7 · Reveal</span>
+ <div class="badge-row"><span class="cue-badge">😄 punchline</span><span class="cue-badge">⏱ timing</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="6">
+ <div class="poem-lines">
+ <span class="line"><span class="who who-boy">Boy</span> That I am <span class="stress">not</span> your son and you’re <span class="stress">not</span> my mum.</span>
+ <span class="line"><span class="who who-mum">Mum</span> Oh!</span>
+ <span class="line"><span class="who who-boy">Boy</span> I live <span class="stress">next door</span>.</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="6" aria-hidden="true"></canvas>
+ </div>
+ <div class="cues">
+ Punchline: clear stress on <em>not</em> / <em>not</em>. Mum’s “Oh!” = tiny shocked beat. “I live next door” — calm, then hold eye contact ~2 seconds.
+ <span class="eye-cue">👀 Smile only after “next door” lands.</span>
+ </div>
+ </div>
+
+ </div>
+
+ </section>
+
+ <!-- TAB 2: PRONUNCIATION COACH -->
+ <section id="viewPron" class="view-section">
+ <div class="pron-display" id="pronBox" aria-live="polite">
+ </div>
+ <div class="pron-card">
+ <div class="vocab-grid" id="vocabGrid"></div>
+ </div>
+ </section>
+
+ <!-- TAB 3: YOUTUBE SAMPLE MODEL SPEECH -->
+ <section id="viewSample" class="view-section">
+ <div class="model-card">
+ <h3>🎧 Model</h3>
+ <div class="video-container" id="ytModelSlot">
+ <!-- YouTube player mounts in #ytPersist -->
+ </div>
+
+ <a href="https://www.youtube.com/watch?v=tAj0KvDTwJs" target="_blank" rel="noopener noreferrer" class="btn-yt-ext">
+ ↗ Open Video directly in YouTube App
+ </a>
+
+ <div class="model-tips">
+ <strong>💡 Listen for these contrasts:</strong>
+ <ul>
+ <li><strong>Mum vs Boy:</strong> Mum is faster and interrupts; Boy’s lines often stop mid-sentence.</li>
+ <li><strong>Build:</strong> Boy gets more urgent toward “Will you listen, please?”</li>
+ <li><strong>Punchline:</strong> Clear “Mrs Wilson!!!!!” then a pause — then the calm reveal.</li>
+ <li><strong>Ending:</strong> “I live next door” should land clearly — hold for a beat.</li>
+ </ul>
+ </div>
+ </div>
+ </section>
+
+ <!-- TAB 4: SELF-CHECKLIST -->
+ <section id="viewCheck" class="view-section">
+ <div class="check-card">
+ <h3 style="margin:0 0 8px;color:var(--gold);font-size:1rem;">Self-check after recording</h3>
+ <p style="margin:0 0 10px;font-size:.8rem;color:var(--muted);">Listen back and tick what you can hear. Practice guide only — not official marks.</p>
+ <label class="check-item"><input type="checkbox"> <span><strong>1. Two clear voices:</strong> Mum sounds sharper / faster; Boy sounds more patient, then urgent. I did not read both in the same flat voice.</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>2. Cut-offs:</strong> On Boy’s unfinished lines (“I was…”, “But…”, “I’m trying…”), I stopped mid-thought instead of finishing politely.</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>3. Interruptions:</strong> Mum comes in quickly after Boy starts — little or no long gap (except where the Model pauses).</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>4. Mrs Wilson!!!!!</strong> Clear name + energy; then a short pause before Mum’s “Pardon?”</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>5. Punchline timing:</strong> “not your son / not my mum” is clear; “Oh!” is a shocked beat; “I live next door” is calm and held.</span></label>
+ </div>
+ </section>
+</main>
+
+<!-- Collapsible tools dock: Handwrite + Timer / Recording -->
+<div class="bottom-dock" id="bottomDock">
+ <div class="dock-inner">
+ <div class="dock-chrome">
+ <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="false" aria-controls="dockBody" title="Tools">
+ <span class="chev" aria-hidden="true">▴</span> 工具 · Tools
+ </button>
+ <div class="dock-mini-timer" id="dockMiniTimer" aria-live="polite">
+ <div class="timer-pill" id="timerDisplayMini">00:00</div>
+ <button type="button" class="dock-btn btn-start" id="btnTimerToggleMini">▶ Start</button>
+ </div>
+ </div>
+ <div class="dock-body" id="dockBody">
+ <!-- Handwrite controls (Poem tab only) -->
+ <div class="hw-bar" id="hwBar" aria-label="Handwrite tools">
+ <button type="button" class="hw-chip" id="togHandwrite" aria-pressed="false">✏️ Handwrite</button>
+ <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" disabled>🖊️ Pen</button>
+ <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" disabled>🧹 Eraser</button>
+ <button type="button" class="hw-chip" id="hwColour" title="Ink colour" disabled>🔴</button>
+ <button type="button" class="hw-chip danger-chip" id="hwClearExchange" disabled>Clear exchange</button>
+ <button type="button" class="hw-chip danger-chip" id="hwClearAll" disabled>Clear all</button>
+ </div>
+ <div class="dock-modes">
+ <button type="button" class="mode-tab active" id="modeTimerBtn" aria-pressed="true" aria-controls="paneTimer">⏱ Practice Timer</button>
+ <button type="button" class="mode-tab" id="modeAudioBtn" aria-pressed="false" aria-controls="paneAudio">🎧 Listen to a Take</button>
+ </div>
+
+ <!-- PANE 1: TIMER -->
+ <div class="dock-pane active" id="paneTimer">
+ <div class="timer-pill" id="timerDisplay">00:00</div>
+ <div class="pace-hint" id="paceHint" aria-live="polite">Use the timer to compare takes;<br><strong style="color:var(--asphalt)">two voices first.</strong></div>
+ <button type="button" class="dock-btn btn-start" id="btnTimerToggle">▶ Start</button>
+ <button type="button" class="dock-btn btn-reset" id="btnTimerReset" title="Reset">🔄</button>
+ </div>
+
+ <!-- PANE 2: AUDIO RECORDER -->
+ <div class="dock-pane" id="paneAudio">
+ <label class="dock-btn btn-native" id="lblNativeRec" role="button" tabindex="0">
+ 📲 Record or Choose a Voice Memo
+ <input type="file" id="nativeAudioInput" accept="audio/*" capture style="display:none" aria-label="Choose an audio recording from your device" />
+ </label>
+ <div class="audio-bar" id="audioBar">
+ <audio id="audioPlayer" controls playsinline></audio>
+ <button type="button" class="btn-mini" id="btnChangeTake">🔄 New</button>
+ </div>
+ </div>
+ <div class="audio-help" id="audioHelp">Your device may offer recording or file selection. This page plays the selected take locally; it does not save or upload it.</div>
+ </div>
+ </div>
+</div>
+
+
+<!-- Hidden local model audio (primary stanza play on https Pages) -->
+<audio id="modelAudio" src="u66.m4a" preload="auto" playsinline></audio>
+
+<!-- Persistent YouTube host (visual Model / Show — not required for stanza sound) -->
+<div class="yt-persist compact" id="ytPersist" aria-label="Model recital player">
+ <div class="yt-frame-wrap">
+ <div id="ytPlayer" title="U66 Late Home Model"></div>
+ </div>
+ <div class="yt-bar">
+ <div class="yt-status" id="ytStatus">🎧 Tap an exchange to play</div>
+ <button type="button" class="yt-ctrl" id="ytExpandBtn" title="Show video">Show</button>
+ <button type="button" class="yt-ctrl" id="ytStopBtn" disabled>Stop</button>
+ </div>
+</div>
+
+<script>
+// 1. Navigation Tabs
+const tabBtns = document.querySelectorAll(".tab-btn");
+const views = document.querySelectorAll(".view-section");
+const poemToggles = document.getElementById("poemToggles");
+
+tabBtns.forEach(btn => {
+ btn.onclick = () => {
+ tabBtns.forEach(b => b.classList.remove("active"));
+ views.forEach(v => v.classList.remove("active"));
+ btn.classList.add("active");
+ const target = btn.dataset.tab;
+ document.getElementById(target).classList.add("active");
+ tabBtns.forEach(b => b.setAttribute("aria-current", b === btn ? "page" : "false"));
+ poemToggles.style.display = target === "viewPoem" ? "flex" : "none";
+ const tapHint = document.getElementById("tapHint");
+ if (tapHint) tapHint.style.display = target === "viewPoem" ? "block" : "none";
+ const hwBarEl = document.getElementById("hwBar");
+ if (hwBarEl) hwBarEl.classList.toggle("show", target === "viewPoem");
+ if (target === "viewPoem") requestAnimationFrame(() => window.hwResize && window.hwResize());
+ syncYtLayout(target);
+ window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+ };
+});
+
+// 2. Toggles
+const container = document.getElementById("stanzaContainer");
+function bindToggle(btnId, className) {
+ const btn = document.getElementById(btnId);
+ btn.onclick = () => {
+ const isHidden = container.classList.toggle(className);
+ btn.classList.toggle("on", !isHidden);
+ btn.setAttribute("aria-pressed", String(!isHidden));
+ };
+}
+bindToggle("togRunon", "hide-runon");
+bindToggle("togStress", "hide-stress");
+bindToggle("togZh", "hide-zh");
+bindToggle("togCues", "hide-cues");
+
+document.querySelectorAll(".stanza").forEach(st => {
+ st.onclick = (ev) => {
+ if (document.body.classList.contains("hw-on") && ev.target.closest(".hw-canvas")) return;
+ document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
+ st.classList.add("focused", "playing");
+ const a = +st.dataset.ytStart, b = +st.dataset.ytEnd;
+ if (!Number.isNaN(a) && !Number.isNaN(b)) playYtRange(a, b, st.querySelector(".st-tag")?.textContent || "Exchange");
+ };
+ st.onkeydown = event => {
+ if (event.key === "Enter" || event.key === " ") {
+ event.preventDefault();
+ st.click();
+ }
+ };
+});
+
+const titlePlay = document.getElementById("titlePlay");
+if (titlePlay) {
+ titlePlay.onclick = () => {
+ document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
+ playYtRange(+titlePlay.dataset.ytStart, +titlePlay.dataset.ytEnd, "Title + poet");
+ };
+ titlePlay.onkeydown = (event) => {
+ if (event.key === "Enter" || event.key === " ") { event.preventDefault(); titlePlay.click(); }
+ };
+}
+
+// 3. Pronunciation Coach
+const VOCAB_TRAPS = [
+ { word: "Wilson", zh: "姓氏", ipa: "/ˈwɪl.sən/", tip: "WIL-suhn — clear /w/; stress on first syllable. Shout it cleanly in ‘Mrs Wilson!!!!!’" },
+ { word: "homework", zh: "功課", ipa: "/ˈhəʊm.wɜːk/", tip: "HOME-work — two clear parts; British /əʊ/ in home." },
+ { word: "television", zh: "電視", ipa: "/ˈtel.ɪ.vɪʒ.ən/", tip: "TEL-ih-vizh-uhn — 4 syllables; stress on TEL." },
+ { word: "explain", zh: "解釋", ipa: "/ɪkˈspleɪn/", tip: "ik-SPLAIN — stress on second syllable." },
+ { word: "pardon", zh: "吓？", ipa: "/ˈpɑː.dən/", tip: "PAH-duhn — British long /ɑː/; surprised, not angry." },
+ { word: "straight", zh: "直接", ipa: "/streɪt/", tip: "strait — clear /str/; in ‘straight home’." },
+ { word: "listen", zh: "聽", ipa: "/ˈlɪs.ən/", tip: "LIS-uhn — keep /s/ clear." },
+ { word: "football", zh: "足球", ipa: "/ˈfʊt.bɔːl/", tip: "FOOT-ball — short /ʊ/; British round /ɔː/ in ball." }
+];
+
+const grid = document.getElementById("vocabGrid");
+const pronBox = document.getElementById("pronBox");
+
+VOCAB_TRAPS.forEach(item => {
+ const btn = document.createElement("button");
+ btn.type = "button";
+ btn.className = "vocab-chip";
+ btn.innerHTML = `
+ <strong>${item.word} <span>🔊</span></strong>
+ <div class="chip-sub">
+ <span class="ipa-txt">${item.ipa}</span>
+ <span class="zh-txt">${item.zh}</span>
+ </div>
+ `;
+ btn.onclick = () => {
+ pronBox.innerHTML = `
+ <div class="word-title">${item.word} <span class="ipa">${item.ipa}</span> <span class="zh-tag">${item.zh}</span></div>
+ <div class="tip">${item.tip}</div>
+ `;
+ pronBox.classList.add("has-content");
+ if ("speechSynthesis" in window) {
+ window.speechSynthesis.cancel();
+ const u = new SpeechSynthesisUtterance(item.word);
+ u.lang = "en-GB";
+ u.rate = 0.85;
+ window.speechSynthesis.speak(u);
+ }
+ };
+ grid.appendChild(btn);
+});
+
+// 4. Bottom Dock Mode Switcher
+const modeTimerBtn = document.getElementById("modeTimerBtn");
+const modeAudioBtn = document.getElementById("modeAudioBtn");
+const paneTimer = document.getElementById("paneTimer");
+const paneAudio = document.getElementById("paneAudio");
+const audioHelp = document.getElementById("audioHelp");
+
+modeTimerBtn.onclick = () => {
+ modeTimerBtn.classList.add("active");
+ modeAudioBtn.classList.remove("active");
+ modeTimerBtn.setAttribute("aria-pressed", "true");
+ modeAudioBtn.setAttribute("aria-pressed", "false");
+ paneTimer.classList.add("active");
+ paneAudio.classList.remove("active");
+ audioHelp.classList.remove("active");
+};
+
+modeAudioBtn.onclick = () => {
+ modeAudioBtn.classList.add("active");
+ modeTimerBtn.classList.remove("active");
+ modeTimerBtn.setAttribute("aria-pressed", "false");
+ modeAudioBtn.setAttribute("aria-pressed", "true");
+ paneAudio.classList.add("active");
+ paneTimer.classList.remove("active");
+ audioHelp.classList.add("active");
+};
+
+// Timer state (declared early so dock mini-strip can read running state)
+let timerInt = null;
+let elapsedMs = 0;
+let startedAt = 0;
+let seconds = 0;
+
+// 4b. Collapsible tools dock (Handwrite + Timer/Recording)
+const DOCK_KEY = "u66-late-home-dock-open-v1";
+const dockToggle = document.getElementById("dockToggle");
+const timerDisplayMini = document.getElementById("timerDisplayMini");
+const btnTimerToggleMini = document.getElementById("btnTimerToggleMini");
+let dockOpen = false;
+
+function loadDockOpen() {
+ try {
+ const v = localStorage.getItem(DOCK_KEY);
+ if (v === "1") return true;
+ if (v === "0") return false;
+ } catch (e) { /* private mode */ }
+ return false; // collapsed by default — more poem space
+}
+function saveDockOpen(on) {
+ try { localStorage.setItem(DOCK_KEY, on ? "1" : "0"); } catch (e) { /* */ }
+}
+function syncMiniTimerStrip() {
+ // Reed soft-lock: when collapsed and timer running, keep clock + Pause visible
+ const running = !!timerInt;
+ document.body.classList.toggle("dock-mini-timer-on", running && !dockOpen);
+}
+function setDockOpen(on, persist) {
+ dockOpen = !!on;
+ document.body.classList.toggle("dock-open", dockOpen);
+ if (dockToggle) {
+ dockToggle.setAttribute("aria-expanded", String(dockOpen));
+ }
+ syncMiniTimerStrip();
+ if (persist !== false) saveDockOpen(dockOpen);
+}
+window.u66ExpandDock = function () { setDockOpen(true, true); };
+if (dockToggle) {
+ dockToggle.onclick = () => setDockOpen(!dockOpen, true);
+}
+setDockOpen(loadDockOpen(), false);
+
+// 5. Stopwatch Timer
+const timerDisplay = document.getElementById("timerDisplay");
+const btnTimerToggle = document.getElementById("btnTimerToggle");
+const btnTimerReset = document.getElementById("btnTimerReset");
+const paceHint = document.getElementById("paceHint");
+
+function formatTimer(sec) {
+ const m = String(Math.floor(sec / 60)).padStart(2, "0");
+ const s = String(sec % 60).padStart(2, "0");
+ return `${m}:${s}`;
+}
+function syncTimerButtons() {
+ const running = !!timerInt;
+ const label = running ? "⏸ Pause" : (elapsedMs > 0 || seconds > 0 ? "▶ Resume" : "▶ Start");
+ [btnTimerToggle, btnTimerToggleMini].forEach(btn => {
+ if (!btn) return;
+ btn.classList.toggle("running", running);
+ btn.textContent = label;
+ });
+}
+function updateTimerUI() {
+ seconds = Math.floor((elapsedMs + (timerInt ? performance.now() - startedAt : 0)) / 1000);
+ const text = formatTimer(seconds);
+ if (timerDisplay) timerDisplay.textContent = text;
+ if (timerDisplayMini) timerDisplayMini.textContent = text;
+ syncMiniTimerStrip();
+}
+
+function evaluatePace() {
+ if (seconds === 0) {
+ paceHint.innerHTML = `Use the timer to compare takes;<br><strong style="color:var(--asphalt)">two voices first.</strong>`;
+ } else {
+ paceHint.innerHTML = `Listen back: did Mum interrupt<br><strong style="color:#3F5F5A">and the punchline land?</strong>`;
+ }
+}
+
+function toggleTimer() {
+ if (timerInt) {
+ elapsedMs += performance.now() - startedAt;
+ clearInterval(timerInt);
+ timerInt = null;
+ updateTimerUI();
+ syncTimerButtons();
+ evaluatePace();
+ } else {
+ startedAt = performance.now();
+ paceHint.innerHTML = `Reciting...<br><strong style="color:var(--gold)">Watch cut-offs!</strong>`;
+ timerInt = setInterval(updateTimerUI, 250);
+ syncTimerButtons();
+ syncMiniTimerStrip();
+ }
+}
+
+btnTimerToggle.onclick = toggleTimer;
+if (btnTimerToggleMini) btnTimerToggleMini.onclick = toggleTimer;
+
+btnTimerReset.onclick = () => {
+ if (timerInt) {
+ clearInterval(timerInt);
+ timerInt = null;
+ }
+ elapsedMs = 0;
+ seconds = 0;
+ updateTimerUI();
+ syncTimerButtons();
+ evaluatePace();
+};
+
+// 6. Device audio chooser and local playback (recording availability varies by device)
+const nativeAudioInput = document.getElementById("nativeAudioInput");
+const lblNativeRec = document.getElementById("lblNativeRec");
+const audioBar = document.getElementById("audioBar");
+const audioPlayer = document.getElementById("audioPlayer");
+const btnChangeTake = document.getElementById("btnChangeTake");
+let audioUrl = null;
+lblNativeRec.onkeydown = event => {
+ if (event.key === "Enter" || event.key === " ") {
+ event.preventDefault();
+ nativeAudioInput.click();
+ }
+};
+
+nativeAudioInput.onchange = e => {
+ const file = e.target.files && e.target.files[0];
+ if (!file) return;
+ audioPlayer.pause();
+ if (audioUrl) URL.revokeObjectURL(audioUrl);
+ audioUrl = URL.createObjectURL(file);
+ audioPlayer.src = audioUrl;
+ lblNativeRec.style.display = "none";
+ audioBar.classList.add("show");
+};
+
+btnChangeTake.onclick = () => {
+ nativeAudioInput.value = "";
+ nativeAudioInput.click();
+};
+window.addEventListener("pagehide", () => {
+ if (audioUrl) URL.revokeObjectURL(audioUrl);
+});
+
+// 7. Handwrite layer (local strokes on poem lines)
+(function () {
+ const HW_KEY = "u66-late-home-handwrite-v1";
+ const COLOURS = [
+ { id: "heat", hex: "#C2410C", emoji: "🔴" },
+ { id: "asphalt", hex: "#1C1917", emoji: "⚫" },
+ { id: "cool", hex: "#2563EB", emoji: "🔵" }
+ ];
+ let colourIdx = 0;
+ let tool = "pen"; // pen | erase
+ let enabled = false;
+ let strokes = {}; // stanzaId -> [{colour, width, erase, points:[{x,y,p}]}]  coords 0..1
+ let drawing = false;
+ let current = null;
+ let activeCanvas = null;
+
+ const hwBar = document.getElementById("hwBar");
+ const tog = document.getElementById("togHandwrite");
+ const btnPen = document.getElementById("hwPen");
+ const btnEraser = document.getElementById("hwEraser");
+ const btnColour = document.getElementById("hwColour");
+ const btnClearSt = document.getElementById("hwClearExchange");
+ const btnClearAll = document.getElementById("hwClearAll");
+ const wraps = Array.from(document.querySelectorAll(".hw-wrap"));
+ const canvases = Array.from(document.querySelectorAll(".hw-canvas"));
+
+ // Show bar on Poem tab by default
+ if (hwBar) hwBar.classList.add("show");
+
+ function load() {
+ try {
+ const raw = localStorage.getItem(HW_KEY);
+ if (raw) {
+ const data = JSON.parse(raw);
+ if (data && typeof data === "object" && data.strokes) strokes = data.strokes;
+ else if (data && typeof data === "object") strokes = data;
+ }
+ } catch (e) { strokes = {}; }
+ }
+ function save() {
+ try {
+ localStorage.setItem(HW_KEY, JSON.stringify({ v: 1, strokes }));
+ } catch (e) { /* quota / private mode */ }
+ }
+ function setToolsEnabled(on) {
+ [btnPen, btnEraser, btnColour, btnClearSt, btnClearAll].forEach(b => {
+ if (b) b.disabled = !on;
+ });
+ }
+ function setEnabled(on) {
+ enabled = on;
+ document.body.classList.toggle("hw-on", on);
+ document.body.classList.toggle("hw-erase", on && tool === "erase");
+ tog.classList.toggle("on", on);
+ tog.setAttribute("aria-pressed", String(on));
+ setToolsEnabled(on);
+ canvases.forEach(c => {
+ c.style.display = on ? "block" : "none";
+ c.style.pointerEvents = on ? "auto" : "none";
+ });
+ if (on) {
+ // Prefer: Handwrite ON expands tools so Pen / Eraser are reachable
+ if (typeof window.u66ExpandDock === "function") window.u66ExpandDock();
+ resizeAll();
+ } else {
+ redrawAll(); // still redraw when turning off? hidden anyway
+ }
+ }
+ function setTool(t) {
+ tool = t;
+ document.body.classList.toggle("hw-erase", enabled && tool === "erase");
+ btnPen.classList.toggle("tool-on", tool === "pen");
+ btnEraser.classList.toggle("tool-on", tool === "erase");
+ btnPen.setAttribute("aria-pressed", String(tool === "pen"));
+ btnEraser.setAttribute("aria-pressed", String(tool === "erase"));
+ }
+ function cycleColour() {
+ colourIdx = (colourIdx + 1) % COLOURS.length;
+ btnColour.textContent = COLOURS[colourIdx].emoji;
+ btnColour.title = "Ink: " + COLOURS[colourIdx].id;
+ }
+
+ function sizeCanvas(canvas) {
+ const wrap = canvas.parentElement;
+ if (!wrap) return;
+ const rect = wrap.getBoundingClientRect();
+ const dpr = Math.min(window.devicePixelRatio || 1, 2);
+ const cssW = Math.max(1, Math.round(rect.width));
+ const cssH = Math.max(1, Math.round(rect.height));
+ if (canvas._cssW === cssW && canvas._cssH === cssH && canvas._dpr === dpr) return;
+ canvas._cssW = cssW;
+ canvas._cssH = cssH;
+ canvas._dpr = dpr;
+ canvas.width = Math.round(cssW * dpr);
+ canvas.height = Math.round(cssH * dpr);
+ canvas.style.width = cssW + "px";
+ canvas.style.height = cssH + "px";
+ const ctx = canvas.getContext("2d");
+ ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ redrawCanvas(canvas);
+ }
+
+ function redrawCanvas(canvas) {
+ const id = canvas.dataset.hw;
+ const ctx = canvas.getContext("2d");
+ const w = canvas._cssW || canvas.clientWidth;
+ const h = canvas._cssH || canvas.clientHeight;
+ ctx.clearRect(0, 0, w, h);
+ const list = strokes[id] || [];
+ for (const stroke of list) {
+ if (!stroke.points || stroke.points.length < 1) continue;
+ ctx.save();
+ if (stroke.erase) {
+ ctx.globalCompositeOperation = "destination-out";
+ ctx.strokeStyle = "rgba(0,0,0,1)";
+ } else {
+ ctx.globalCompositeOperation = "source-over";
+ ctx.strokeStyle = stroke.colour || COLOURS[0].hex;
+ }
+ ctx.lineCap = "round";
+ ctx.lineJoin = "round";
+ ctx.lineWidth = stroke.width || 2.0;
+ ctx.beginPath();
+ stroke.points.forEach((pt, i) => {
+ const x = pt.x * w;
+ const y = pt.y * h;
+ if (i === 0) ctx.moveTo(x, y);
+ else ctx.lineTo(x, y);
+ });
+ if (stroke.points.length === 1) {
+ const pt = stroke.points[0];
+ ctx.arc(pt.x * w, pt.y * h, (stroke.width || 2.0) / 2, 0, Math.PI * 2);
+ ctx.fillStyle = stroke.erase ? "rgba(0,0,0,1)" : (stroke.colour || COLOURS[0].hex);
+ if (stroke.erase) ctx.globalCompositeOperation = "destination-out";
+ ctx.fill();
+ } else {
+ ctx.stroke();
+ }
+ ctx.restore();
+ }
+ }
+
+ function redrawAll() {
+ canvases.forEach(redrawCanvas);
+ }
+
+ function resizeAll() {
+ canvases.forEach(sizeCanvas);
+ }
+ window.hwResize = resizeAll;
+
+ function posNorm(canvas, clientX, clientY) {
+ const rect = canvas.getBoundingClientRect();
+ const w = rect.width || 1;
+ const h = rect.height || 1;
+ return {
+ x: Math.min(1, Math.max(0, (clientX - rect.left) / w)),
+ y: Math.min(1, Math.max(0, (clientY - rect.top) / h))
+ };
+ }
+
+ function startDraw(canvas, e) {
+ if (!enabled) return;
+ e.preventDefault();
+ drawing = true;
+ activeCanvas = canvas;
+ const id = canvas.dataset.hw;
+ if (!strokes[id]) strokes[id] = [];
+ const p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+ const pt = posNorm(canvas, e.clientX, e.clientY);
+ pt.p = p;
+ const width = tool === "erase" ? 12 + p * 8 : 1.5 + p * 1.0;
+ current = {
+ colour: COLOURS[colourIdx].hex,
+ width,
+ erase: tool === "erase",
+ points: [pt]
+ };
+ strokes[id].push(current);
+ redrawCanvas(canvas);
+ }
+
+ function moveDraw(e) {
+ if (!drawing || !activeCanvas || !current) return;
+ e.preventDefault();
+ const p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+ const pt = posNorm(activeCanvas, e.clientX, e.clientY);
+ pt.p = p;
+ current.points.push(pt);
+ if (!current.erase) {
+ current.width = 1.5 + p * 1.0;
+ }
+ redrawCanvas(activeCanvas);
+ }
+
+ function endDraw() {
+ if (!drawing) return;
+ drawing = false;
+ current = null;
+ activeCanvas = null;
+ save();
+ }
+
+ canvases.forEach(canvas => {
+ canvas.addEventListener("pointerdown", e => {
+ if (e.button !== undefined && e.button !== 0) return;
+ canvas.setPointerCapture(e.pointerId);
+ startDraw(canvas, e);
+ });
+ canvas.addEventListener("pointermove", moveDraw);
+ canvas.addEventListener("pointerup", endDraw);
+ canvas.addEventListener("pointercancel", endDraw);
+ canvas.addEventListener("lostpointercapture", endDraw);
+ });
+
+ tog.onclick = () => setEnabled(!enabled);
+ btnPen.onclick = () => setTool("pen");
+ btnEraser.onclick = () => setTool("erase");
+ btnColour.onclick = () => cycleColour();
+
+ btnClearSt.onclick = () => {
+ const focused = document.querySelector(".stanza.focused .hw-canvas");
+ const target = focused || (document.querySelector(".hw-canvas"));
+ if (!target) return;
+ const id = target.dataset.hw;
+ if (!strokes[id] || !strokes[id].length) return;
+ if (!confirm("Clear handwriting on this exchange? / 清除這一組的手寫？")) return;
+ strokes[id] = [];
+ save();
+ redrawCanvas(target);
+ };
+
+ btnClearAll.onclick = () => {
+ const any = Object.values(strokes).some(a => a && a.length);
+ if (!any) return;
+ if (!confirm("Clear ALL handwriting notes? / 清除全部手寫筆記？")) return;
+ strokes = {};
+ save();
+ redrawAll();
+ };
+
+ // When toggles change poem height, resize canvases
+ ["togRunon", "togStress", "togZh", "togCues"].forEach(id => {
+ const b = document.getElementById(id);
+ if (!b) return;
+ b.addEventListener("click", () => {
+ requestAnimationFrame(() => setTimeout(resizeAll, 50));
+ });
+ });
+
+ let resizeTimer = null;
+ window.addEventListener("resize", () => {
+ clearTimeout(resizeTimer);
+ resizeTimer = setTimeout(resizeAll, 120);
+ });
+ window.addEventListener("orientationchange", () => setTimeout(resizeAll, 200));
+
+ load();
+ setTool("pen");
+ setEnabled(false); // OFF by default — scribbles hidden
+ // Size canvases even when off so restore is ready when turned on
+ resizeAll();
+ // Ensure restored ink is ready under the hood
+ canvases.forEach(c => { c.style.display = "none"; c.style.pointerEvents = "none"; });
+})();
+
+
+// --- V22: local HTML5 audio for stanza cues; YouTube optional (Show / Model tab) ---
+const YT_ID = "tAj0KvDTwJs";
+const MODEL_AUDIO_SRC = "u66.m4a";
+const ytPersist = document.getElementById("ytPersist");
+const ytStatus = document.getElementById("ytStatus");
+const ytStopBtn = document.getElementById("ytStopBtn");
+const ytExpandBtn = document.getElementById("ytExpandBtn");
+const ytModelSlot = document.getElementById("ytModelSlot");
+const modelAudio = document.getElementById("modelAudio");
+let ytForceExpand = false;
+let ytPlayingLabel = "";
+let ytPlayer = null;
+let ytApiReady = false;
+let ytPendingPlay = null; // unused for https audio path; kept for file:// popup only
+let ytPollTimer = null;
+let ytRangeEnd = 0;
+let audioEndTimer = null;
+let audioRangeEnd = 0;
+let audioLabel = "";
+
+function setYtStatus(label) {
+ if (ytStatus) ytStatus.innerHTML = "🎧 <span>" + label + "</span>";
+}
+
+function idleYtTip() {
+ return isFilePage
+  ? "Tap an exchange · opens YouTube window · 點對話（本機檔會開小窗）"
+  : "Tap an exchange to play · audio from this page · 點對話聽示範（本頁音訊）";
+}
+
+function ytEmbedUrl(start, end, autoplay) {
+ const s = Math.max(0, Math.floor(start));
+ const e = Math.max(s + 1, Math.floor(end));
+ let u = "https://www.youtube.com/embed/" + YT_ID +
+  "?start=" + s + "&end=" + e + "&rel=0&modestbranding=1&playsinline=1&enablejsapi=1";
+ if (autoplay) u += "&autoplay=1";
+ return u;
+}
+
+function syncYtLayout(tab) {
+ if (!ytPersist) return;
+ const wantExpand = ytForceExpand || tab === "viewSample";
+ if (wantExpand && ytModelSlot && tab === "viewSample") {
+  ytPersist.classList.remove("compact");
+  ytPersist.classList.add("expanded");
+  ytModelSlot.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Hide";
+ } else if (wantExpand && tab !== "viewSample") {
+  ytPersist.classList.remove("compact");
+  ytPersist.classList.add("expanded");
+  const dock = document.getElementById("bottomDock");
+  if (dock && dock.parentNode) dock.parentNode.insertBefore(ytPersist, dock);
+  else document.body.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Hide";
+ } else {
+  ytPersist.classList.add("compact");
+  ytPersist.classList.remove("expanded");
+  const dock = document.getElementById("bottomDock");
+  if (dock && dock.parentNode) dock.parentNode.insertBefore(ytPersist, dock);
+  else document.body.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Show";
+ }
+}
+
+const isFilePage = (location.protocol === "file:");
+let ytPopup = null;
+
+function clearYtTimers() {
+ if (ytPollTimer) { clearInterval(ytPollTimer); ytPollTimer = null; }
+}
+
+function clearAudioTimers() {
+ if (audioEndTimer) { clearTimeout(audioEndTimer); audioEndTimer = null; }
+}
+
+function pauseYtQuiet() {
+ clearYtTimers();
+ if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+  try { ytPlayer.pauseVideo(); } catch (e) {}
+ }
+}
+
+function pauseModelAudioQuiet() {
+ clearAudioTimers();
+ if (modelAudio) {
+  try { modelAudio.pause(); } catch (e) {}
+ }
+}
+
+function finishAudioRange() {
+ clearAudioTimers();
+ if (modelAudio) {
+  try { modelAudio.pause(); } catch (e) {}
+ }
+ document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ if (ytStopBtn) ytStopBtn.disabled = true;
+ ytPlayingLabel = "";
+ audioLabel = "";
+ setYtStatus(idleYtTip());
+}
+
+function onModelTimeUpdate() {
+ if (!modelAudio) return;
+ if (audioRangeEnd > 0 && modelAudio.currentTime >= audioRangeEnd - 0.05) {
+  finishAudioRange();
+ }
+}
+
+function playWithLocalAudio(start, end, label) {
+ if (!modelAudio) {
+  setYtStatus("Audio missing — use https Pages link · 請用網頁連結");
+  return;
+ }
+ const s = Math.max(0, Number(start) || 0);
+ const e = Math.max(s + 0.5, Number(end) || s + 1);
+ const rangeTxt = Math.floor(s) + "s–" + Math.floor(e) + "s";
+ pauseYtQuiet();
+ clearAudioTimers();
+ audioRangeEnd = e;
+ audioLabel = label || "Playing";
+ ytPlayingLabel = audioLabel;
+ setYtStatus(audioLabel + " · " + rangeTxt);
+ if (ytStopBtn) ytStopBtn.disabled = false;
+
+ const startPlay = () => {
+  try {
+   modelAudio.currentTime = s;
+  } catch (err) {}
+  const p = modelAudio.play();
+  if (p && typeof p.then === "function") {
+   p.then(() => {
+    // schedule a backup stop in case timeupdate is sparse
+    const ms = Math.max(200, (e - s) * 1000 + 150);
+    clearAudioTimers();
+    audioEndTimer = setTimeout(() => {
+     if (modelAudio && !modelAudio.paused && modelAudio.currentTime >= e - 0.15) {
+      finishAudioRange();
+     }
+    }, ms);
+   }).catch(() => {
+    setYtStatus("Could not play audio — tap again · 請再點一次");
+    if (ytStopBtn) ytStopBtn.disabled = true;
+   });
+  } else {
+   const ms = Math.max(200, (e - s) * 1000 + 150);
+   clearAudioTimers();
+   audioEndTimer = setTimeout(() => {
+    if (modelAudio && !modelAudio.paused && modelAudio.currentTime >= e - 0.15) {
+     finishAudioRange();
+    }
+   }, ms);
+  }
+ };
+
+ // Seek then play inside the user-gesture handler
+ if (modelAudio.readyState >= 1) {
+  startPlay();
+ } else {
+  const once = () => { modelAudio.removeEventListener("loadedmetadata", once); startPlay(); };
+  modelAudio.addEventListener("loadedmetadata", once);
+  try { modelAudio.load(); } catch (e2) {}
+  // Still attempt play immediately (iOS often needs play() in the gesture)
+  startPlay();
+ }
+}
+
+function onYtStateChange(ev) {
+ // 1 = PLAYING — pause local audio so they don't overlap
+ if (ev.data === 1) {
+  pauseModelAudioQuiet();
+  document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ }
+ if (ev.data === 0) {
+  clearYtTimers();
+  document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+  if (ytStopBtn) ytStopBtn.disabled = true;
+  ytPlayingLabel = "";
+  setYtStatus(idleYtTip());
+ }
+}
+
+function playYtRange(start, end, label) {
+ ytPlayingLabel = label || "Playing";
+ const rangeTxt = Math.floor(start) + "s–" + Math.floor(end) + "s";
+ if (ytStopBtn) ytStopBtn.disabled = false;
+
+ // file:// : relative m4a usually won't load — keep YouTube popup fallback
+ if (isFilePage) {
+  pauseModelAudioQuiet();
+  const url = ytEmbedUrl(start, end, true);
+  try {
+   if (ytPopup && !ytPopup.closed) {
+    ytPopup.location.href = url;
+    ytPopup.focus();
+   } else {
+    ytPopup = window.open(url, "u66ModelPlayer", "popup=yes,width=560,height=320");
+   }
+   if (!ytPopup) {
+    setYtStatus("Allow pop-ups once, then tap again · 請允許彈出式視窗 — or open the https Pages link for audio");
+    return;
+   }
+   setYtStatus(ytPlayingLabel + " · " + rangeTxt + " · YouTube window");
+  } catch (e) {
+   setYtStatus("Use https Pages for audio · 請用網頁連結聽音訊");
+  }
+  return;
+ }
+
+ // https / http: local HTML5 audio (user-gesture seek+play) — no YouTube autoplay needed
+ playWithLocalAudio(start, end, label);
+}
+
+function stopYt() {
+ clearYtTimers();
+ clearAudioTimers();
+ ytPendingPlay = null;
+ pauseModelAudioQuiet();
+ if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+  try { ytPlayer.pauseVideo(); } catch (e) {}
+ }
+ if (ytPopup && !ytPopup.closed) {
+  try { ytPopup.close(); } catch (e) {}
+ }
+ ytPopup = null;
+ ytPlayingLabel = "";
+ audioLabel = "";
+ audioRangeEnd = 0;
+ if (ytStopBtn) ytStopBtn.disabled = true;
+ document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ setYtStatus(idleYtTip());
+}
+
+if (modelAudio) {
+ modelAudio.addEventListener("timeupdate", onModelTimeUpdate);
+ modelAudio.addEventListener("ended", finishAudioRange);
+}
+
+ytStopBtn && (ytStopBtn.onclick = (ev) => { ev.stopPropagation(); stopYt(); });
+ytExpandBtn && (ytExpandBtn.onclick = (ev) => {
+ ev.stopPropagation();
+ ytForceExpand = !ytForceExpand;
+ const tab = document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem";
+ syncYtLayout(tab);
+});
+
+// Tap the status bar itself → play title+poet (open cue)
+ytPersist && ytPersist.querySelector(".yt-bar")?.addEventListener("click", (ev) => {
+ if (ev.target.closest("button")) return;
+ const titlePlay = document.getElementById("titlePlay");
+ if (titlePlay) titlePlay.click();
+});
+
+window.onYouTubeIframeAPIReady = function () {
+ ytApiReady = true;
+ if (isFilePage) return;
+ if (document.getElementById("ytPlayer") == null && !ytPlayer) return;
+ const playerVars = {
+  playsinline: 1,
+  rel: 0,
+  modestbranding: 1,
+  enablejsapi: 1,
+  origin: (location.protocol === "https:" || location.protocol === "http:") ? location.origin : undefined
+ };
+ if (!playerVars.origin) delete playerVars.origin;
+ const host = document.getElementById("ytPlayer");
+ if (!host && ytPlayer) return;
+ ytPlayer = new YT.Player(host || "ytPlayer", {
+  videoId: YT_ID,
+  width: "100%",
+  height: "100%",
+  playerVars: playerVars,
+  events: {
+   onReady: function (ev) {
+    ytPlayer = ev.target;
+   },
+   onStateChange: onYtStateChange,
+   onError: function () {
+    setYtStatus("Video error — audio still works from stanza taps · 影片出錯，點對話仍可聽音訊");
+   }
+  }
+ });
+};
+
+// Load YouTube API only for visual Model / Show (not required for stanza sound)
+if (!isFilePage) {
+ const tag = document.createElement("script");
+ tag.src = "https://www.youtube.com/iframe_api";
+ const firstScript = document.getElementsByTagName("script")[0];
+ firstScript.parentNode.insertBefore(tag, firstScript);
+}
+
+if (isFilePage) {
+ setYtStatus(idleYtTip());
+ const hint = document.getElementById("tapHint");
+ if (hint) hint.innerHTML = "Local file mode: exchange audio needs the https Pages site (relative m4a will not load from Downloads). Each exchange can open a YouTube window instead — allow pop-ups once. · 本機檔聽不到本頁音訊，請用網頁連結；或允許彈出式視窗開 YouTube。";
+} else {
+ setYtStatus(idleYtTip());
+}
+syncYtLayout(document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem");
+
+</script>
+
+<p class="school-brand"><a href="../../">SKH Holy Carpenter Secondary School · English</a></p>
+</body>
+</html>

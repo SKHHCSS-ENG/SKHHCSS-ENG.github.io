@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>U47 Solo Verse — One Moment in Summer V22 | Practice Guide</title>
+<style>
+ :root {
+ --bg: #F5EDE0;
+ --panel: #FFF8EE;
+ --card: #FBF3E6;
+ --text: #2C2926;
+ --muted: #6B6560;
+ --gold: #C45C26;
+ --sky: #CA8A04;
+ --heat: #C2410C;
+ --cool: #2563EB;
+ --sharp: #15803D;
+ --ok: #3D7A5A;
+ --danger: #B91C1C;
+ --asphalt: #1C1917;
+ --border: #C4B8A8;
+ }
+ * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+ body {
+ margin: 0;
+ /* Room for tools dock (~72px) + fixed Model play bar (~56px) + gap */
+ padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
+ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+ background: var(--bg);
+ color: var(--text);
+ line-height: 1.45;
+ overflow-x: hidden;
+ }
+ body.dock-mini-timer-on { padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px)); }
+ body.dock-open { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
+ body.dock-open.dock-mini-timer-on { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
+
+ header {
+ position: sticky; top: 0; z-index: 40;
+ background: rgba(245, 237, 224, 0.94);
+ backdrop-filter: blur(12px);
+ -webkit-backdrop-filter: blur(12px);
+ border-bottom: 1px solid var(--border);
+ padding: 10px 14px 8px;
+ }
+ .top-row {
+ display: flex; justify-content: space-between; align-items: center; gap: 8px;
+ }
+ .title-block { min-width: 0; flex: 1; }
+ .app-title {
+ font-size: 1.05rem; font-weight: 800; margin: 0;
+ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+ }
+ .app-title span { color: var(--gold); }
+ .poet-byline {
+ margin: 2px 0 0;
+ font-size: .78rem;
+ font-weight: 600;
+ color: var(--muted);
+ letter-spacing: .02em;
+ }
+ .sub-badge {
+ font-size: .72rem; background: rgba(196,92,38,.14); color: var(--gold);
+ padding: 3px 8px; border-radius: 99px; font-weight: 700; flex-shrink: 0;
+ }
+
+ .nav-tabs {
+ display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+ margin-top: 8px; background: #EDE4D4; padding: 4px; border-radius: 10px;
+ }
+ .tab-btn {
+ border: none; background: transparent; color: var(--muted);
+ padding: 8px 2px; border-radius: 8px; font-weight: 700; font-size: .75rem;
+ cursor: pointer; transition: .15s; text-align: center; white-space: nowrap;
+ }
+ .tab-btn.active {
+ background: var(--panel); color: var(--asphalt); box-shadow: 0 2px 6px rgba(44,41,38,.12);
+ border: 1px solid var(--border);
+ }
+ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, label:focus-within {
+ outline: 3px solid var(--gold); outline-offset: 3px;
+ }
+ @media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+ }
+
+ .quick-toggles {
+ display: flex; gap: 6px; padding: 10px 14px 4px; overflow-x: auto;
+ scrollbar-width: none;
+ }
+ .quick-toggles::-webkit-scrollbar { display: none; }
+ .chip-toggle {
+ border: 1px solid var(--border); background: var(--panel);
+ color: var(--muted); padding: 6px 11px; border-radius: 99px;
+ font-size: .76rem; font-weight: 700; white-space: nowrap; cursor: pointer;
+ }
+ .chip-toggle.on {
+ background: rgba(196,92,38,.16); border-color: var(--gold); color: var(--heat);
+ }
+
+ main { max-width: 680px; margin: 0 auto; padding: 8px 14px; }
+ .view-section { display: none; }
+ .view-section.active { display: block; }
+
+ details.arc-card {
+ background: var(--panel); border-radius: 12px; padding: 10px 14px;
+ margin-bottom: 12px; border: 1px solid var(--border);
+ }
+ details.arc-card summary {
+ font-weight: 700; font-size: .86rem; color: var(--gold); cursor: pointer;
+ list-style: none; display: flex; justify-content: space-between; align-items: center;
+ }
+ details.arc-card summary::after { content: "▼"; font-size: .7rem; color: var(--muted); }
+ details[open].arc-card summary::after { content: "▲"; }
+ .arc-body { margin-top: 8px; font-size: .83rem; color: var(--text); }
+ .arc-grid {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;
+ }
+ .arc-pill {
+ padding: 8px 10px; border-radius: 10px; font-size: .76rem; font-weight: 800;
+ border: 2px solid; border-left-width: 6px; line-height: 1.25;
+ box-shadow: 0 1px 4px rgba(44,41,38,.08);
+ }
+ .arc-pill small { display: block; margin-top: 2px; font-weight: 600; opacity: .9; }
+ .arc-sky { background: #FDE68A; border-color: #CA8A04; color: #713F12; }
+ .arc-heat { background: #F8D4B8; border-color: #C2410C; color: #7C2D12; }
+ .arc-cool { background: #BFDBFE; border-color: #2563EB; color: #1E3A8A; }
+ .arc-sharp { background: #BBF7D0; border-color: #15803D; color: #14532D; }
+
+ .practice-note { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--gold); background: var(--panel); color: var(--text); font-size: .83rem; }
+ .stanza-list { display: flex; flex-direction: column; gap: 10px; }
+ .stanza {
+ border-radius: 14px; padding: 12px 14px;
+ box-shadow: 0 2px 8px rgba(44,41,38,.08);
+ border: 1.5px solid var(--border);
+ border-left: 8px solid var(--sky);
+ transition: background .15s, box-shadow .15s;
+ }
+ .stanza.focused { outline: 2px solid var(--gold); box-shadow: 0 0 0 3px rgba(196,92,38,.2); }
+ .stanza[data-arc="sky"] {
+ background: #FEF3C7;
+ border-color: #F6D060;
+ border-left-color: #CA8A04;
+ }
+ .stanza[data-arc="heat"] {
+ background: #FDEBDC;
+ border-color: #E8B48A;
+ border-left-color: #C2410C;
+ }
+ .stanza[data-arc="cool"] {
+ background: #DBEAFE;
+ border-color: #93C5FD;
+ border-left-color: #2563EB;
+ }
+ .stanza[data-arc="sharp"] {
+ background: #DCFCE7;
+ border-color: #86EFAC;
+ border-left-color: #15803D;
+ }
+ .stanza[data-arc="sky"].focused { background: #FDE68A; }
+ .stanza[data-arc="heat"].focused { background: #FAD9BC; }
+ .stanza[data-arc="cool"].focused { background: #BFDBFE; }
+ .stanza[data-arc="sharp"].focused { background: #BBF7D0; }
+
+ .st-header {
+ display: flex; justify-content: space-between; align-items: center;
+ margin-bottom: 6px;
+ }
+ .st-tag {
+ font-size: .72rem; font-weight: 800;
+ text-transform: uppercase; letter-spacing: .05em;
+ }
+ .stanza[data-arc="sky"] .st-tag { color: #713F12; }
+ .stanza[data-arc="heat"] .st-tag { color: #7C2D12; }
+ .stanza[data-arc="cool"] .st-tag { color: #1E3A8A; }
+ .stanza[data-arc="sharp"] .st-tag { color: #14532D; }
+ .badge-row { display: flex; flex-wrap: wrap; gap: 5px; }
+ .cue-badge {
+ font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+ background: rgba(196,92,38,.12); color: var(--asphalt);
+ }
+
+ .poem-lines {
+ font-family: Georgia, "Times New Roman", serif;
+ font-size: 1.12rem; line-height: 1.68; color: var(--asphalt);
+ margin: 4px 0 8px;
+ }
+ .stress {
+ color: var(--asphalt); font-weight: 800;
+ text-decoration: underline rgba(28,25,23,.85);
+ text-underline-offset: 3px;
+ text-decoration-thickness: 2px;
+ }
+ .hide-stress .stress { color: inherit; font-weight: inherit; text-decoration: none; }
+
+ .runon {
+ display: inline-block; margin-left: 4px; padding: 1px 6px;
+ border-radius: 5px; background: rgba(91, 138, 138, 0.18);
+ color: #2F5555; font-family: -apple-system, sans-serif;
+ font-size: .7rem; font-weight: 800; vertical-align: middle;
+ border: 1px solid rgba(91,138,138,.35);
+ }
+ .hide-runon .runon { display: none; }
+
+ .zh-gloss {
+ display: inline-block;
+ font-family: -apple-system, "PingFang HK", "Microsoft JhengHei", sans-serif;
+ font-size: .74rem; font-weight: 600; color: #3F5F5A;
+ background: rgba(107, 143, 138, 0.16); border: 1px solid rgba(107, 143, 138, 0.35);
+ padding: 0 5px; margin: 0 2px; border-radius: 5px; vertical-align: baseline; line-height: 1.35;
+ }
+ .hide-zh .zh-gloss { display: none; }
+
+ .cues {
+ font-size: .82rem; color: #4A453F; background: rgba(196,184,168,.28);
+ padding: 8px 10px; border-radius: 9px; border-top: 1px solid var(--border);
+ }
+ .hide-cues .cues, .hide-cues .badge-row { display: none; }
+ .eye-cue { color: #3D6666; display: block; margin-top: 4px; font-size: .78rem; }
+
+ /* Pronunciation Tab */
+ .pron-card { background: var(--panel); border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); }
+ .pron-display {
+ display: none;
+ position: sticky; top: 108px; z-index: 20;
+ background: #FFF8EE; border: 1.5px solid var(--gold); border-radius: 12px;
+ padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 6px 18px rgba(44,41,38,.12);
+ }
+ .pron-display.has-content { display: block; }
+ .pron-display .word-title { font-size: 1.1rem; font-weight: 800; color: var(--asphalt); }
+ .pron-display .ipa { color: var(--gold); font-family: monospace; font-size: .95rem; margin-left: 6px; }
+ .pron-display .zh-tag { color: #3F5F5A; font-size: .88rem; margin-left: 6px; font-weight: 700; }
+ .pron-display .tip { font-size: .84rem; color: var(--text); margin-top: 4px; }
+
+ .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+ .vocab-chip {
+ background: var(--card); border: 1px solid var(--border);
+ color: var(--asphalt); padding: 10px 12px; border-radius: 10px;
+ text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 3px;
+ }
+ .vocab-chip:active { transform: scale(.98); border-color: var(--gold); }
+ .vocab-chip strong { font-size: .92rem; display: flex; justify-content: space-between; }
+ .vocab-chip .chip-sub { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+ .vocab-chip .ipa-txt { color: var(--gold); font-size: .74rem; font-family: monospace; }
+ .vocab-chip .zh-txt { color: #3F5F5A; font-size: .74rem; font-weight: 600; }
+
+ /* YouTube Sample Model Speech Tab */
+ .model-card {
+ background: var(--panel); border-radius: 14px; padding: 16px; margin-bottom: 12px;
+ border: 1px solid var(--border);
+ }
+ .model-card h3 { margin: 0 0 6px; color: var(--gold); font-size: 1.05rem; }
+ .model-card p { font-size: .84rem; color: var(--muted); margin: 0 0 12px; }
+ .video-container {
+ position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+ border-radius: 10px; overflow: hidden; background: #2C2926; margin-bottom: 12px;
+ }
+ .video-container iframe {
+ position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+ }
+ .btn-yt-ext {
+ display: block; text-align: center; background: rgba(196,92,38,.14); color: #9A3412;
+ border: 1px solid var(--gold); padding: 10px; border-radius: 10px; font-weight: 700;
+ font-size: .84rem; text-decoration: none; margin-bottom: 12px;
+ }
+
+ .model-tips {
+ font-size: .84rem; background: rgba(196,184,168,.28);
+ padding: 12px; border-radius: 10px; border-left: 3px solid var(--sky);
+ }
+ .model-tips ul { margin: 6px 0 0; padding-left: 18px; color: var(--text); }
+ .model-tips li { margin-bottom: 6px; }
+
+ /* Self-Check Tab */
+ .check-card { background: var(--panel); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+ .check-item {
+ display: flex; gap: 10px; align-items: flex-start;
+ padding: 10px 8px; border-bottom: 1px solid var(--border);
+ font-size: .88rem; cursor: pointer;
+ }
+ .check-item:last-child { border-bottom: none; }
+ .check-item input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--ok); flex-shrink: 0; }
+
+ /* Sticky Bottom Dock (collapsible tools) */
+ .bottom-dock {
+ position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+ background: rgba(255, 248, 238, 0.97);
+ backdrop-filter: blur(14px);
+ -webkit-backdrop-filter: blur(14px);
+ border-top: 2px solid var(--gold);
+ padding: 4px 12px calc(6px + env(safe-area-inset-bottom));
+ box-shadow: 0 -4px 20px rgba(44,41,38,.12);
+ }
+ .dock-inner {
+ max-width: 680px; margin: 0 auto;
+ display: flex; flex-direction: column; gap: 6px;
+ }
+ .dock-chrome {
+ display: flex; align-items: center; gap: 8px; min-height: 36px;
+ }
+ .dock-toggle {
+ border: 1px solid var(--border); background: var(--panel);
+ color: var(--asphalt); font-size: .78rem; font-weight: 800;
+ padding: 7px 12px; border-radius: 99px; cursor: pointer;
+ display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+ }
+ .dock-toggle .chev { display: inline-block; transition: transform .15s ease; font-size: .7rem; }
+ body.dock-open .dock-toggle .chev { transform: rotate(180deg); }
+ .dock-mini-timer {
+ display: none; flex: 1; align-items: center; gap: 8px; min-width: 0;
+ }
+ body.dock-mini-timer-on:not(.dock-open) .dock-mini-timer { display: flex; }
+ .dock-mini-timer .timer-pill {
+ min-width: 72px; padding: 6px 10px; font-size: .98rem;
+ }
+ .dock-mini-timer .dock-btn { padding: 8px 12px; font-size: .8rem; }
+ .dock-body {
+ display: none; flex-direction: column; gap: 7px;
+ padding-top: 2px;
+ }
+ body.dock-open .dock-body { display: flex; }
+ .dock-modes {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+ background: #EDE4D4; padding: 3px; border-radius: 9px;
+ }
+ .mode-tab {
+ border: none; background: transparent; color: var(--muted);
+ font-size: .76rem; font-weight: 800; padding: 5px 8px; border-radius: 7px; cursor: pointer;
+ }
+ .mode-tab.active { background: var(--panel); color: var(--gold); border: 1px solid var(--border); }
+ .dock-pane { display: none; align-items: center; gap: 8px; }
+ .dock-pane.active { display: flex; }
+ .timer-pill {
+ background: var(--card); border: 1px solid var(--border);
+ border-radius: 10px; padding: 8px 12px; min-width: 82px; text-align: center;
+ font-family: monospace; font-size: 1.08rem; font-weight: 800; color: var(--gold);
+ }
+ .pace-hint { font-size: .72rem; color: var(--muted); line-height: 1.2; flex: 1; }
+ .dock-btn {
+ border: none; border-radius: 10px; padding: 10px 14px;
+ font-weight: 800; font-size: .84rem; cursor: pointer;
+ display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;
+ }
+ .btn-start { background: var(--gold); color: #FFF8EE; }
+ .btn-start.running { background: var(--heat); color: #fff; }
+ .btn-reset { background: var(--card); color: var(--muted); border: 1px solid var(--border); padding: 10px 11px; }
+ .btn-native {
+ flex: 1; background: linear-gradient(135deg, #3D7A5A, #2F5F46); color: #F5EDE0;
+ font-weight: 800; padding: 11px 14px;
+ }
+ .audio-bar { display: none; width: 100%; align-items: center; gap: 8px; background: rgba(196,184,168,.35); padding: 4px 8px; border-radius: 10px; }
+ .audio-bar.show { display: flex; }
+ .audio-help { display: none; font-size: .7rem; color: var(--muted); line-height: 1.25; }
+ .audio-help.active { display: block; }
+ .audio-bar audio { flex: 1; height: 34px; min-width: 0; }
+ .btn-mini {
+ background: var(--card); color: var(--asphalt); border: 1px solid var(--border);
+ font-size: .72rem; font-weight: 700; padding: 7px 9px; border-radius: 7px; cursor: pointer; white-space: nowrap; text-decoration: none;
+ }
+
+ /* Handwrite layer */
+ .stanza { position: relative; }
+ .hw-wrap {
+  position: relative;
+ }
+ .hw-canvas {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  z-index: 6;
+  pointer-events: none;
+  touch-action: none;
+  display: none;
+  border-radius: 4px;
+ }
+ body.hw-on .hw-canvas {
+  display: block;
+  pointer-events: auto;
+  cursor: crosshair;
+ }
+ body.hw-erase .hw-canvas { cursor: cell; }
+ .hw-bar {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0 2px;
+  border-bottom: 1px dashed rgba(196,92,38,.35);
+  margin-bottom: 2px;
+ }
+ .hw-bar.show { display: flex; }
+ .hw-chip {
+  border: 1px solid var(--border); background: var(--panel);
+  color: var(--muted); padding: 5px 9px; border-radius: 99px;
+  font-size: .72rem; font-weight: 800; white-space: nowrap; cursor: pointer;
+ }
+ .hw-chip.on {
+  background: rgba(196,92,38,.16); border-color: var(--gold); color: var(--heat);
+ }
+ .hw-chip.tool-on {
+  background: rgba(28,25,23,.9); border-color: var(--asphalt); color: #FFF8EE;
+ }
+ .hw-chip.danger-chip {
+  background: rgba(185,28,28,.08); border-color: rgba(185,28,28,.35); color: var(--danger);
+ }
+
+ .yt-persist {
+  position: fixed; left: 10px; right: 10px; bottom: 78px; z-index: 45;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(44,41,38,.18); overflow: hidden;
+  display: flex; flex-direction: column; max-width: 520px; margin: 0 auto;
+ }
+ body.dock-open .yt-persist { bottom: 248px; }
+ body.dock-mini-timer-on:not(.dock-open) .yt-persist { bottom: 102px; }
+ .yt-persist.compact .yt-frame-wrap {
+  display: none !important; height: 0 !important; max-height: 0 !important;
+  aspect-ratio: auto !important; opacity: 0; pointer-events: none; overflow: hidden;
+ }
+ .yt-persist.compact { flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; min-height: 44px; }
+ .yt-persist.expanded { bottom: auto; top: auto; position: relative; left: auto; right: auto;
+  margin: 0 0 12px; max-width: none; box-shadow: none; }
+ .yt-persist.expanded .yt-frame-wrap { height: auto; opacity: 1; pointer-events: auto; }
+ .yt-frame-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; transition: .15s; }
+ .yt-frame-wrap iframe, .yt-frame-wrap > div { position: absolute; inset: 0; width: 100%; height: 100%; }
+ .yt-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; flex: 1; min-width: 0; }
+ .yt-persist.expanded .yt-bar { border-top: 1px solid var(--border); }
+ .yt-status { font-size: .78rem; font-weight: 700; color: var(--asphalt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+ .yt-status span { color: var(--gold); }
+ .yt-ctrl { border: 1px solid var(--border); background: var(--card); border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: .75rem; cursor: pointer; color: var(--asphalt); }
+ .yt-ctrl:disabled { opacity: .45; cursor: default; }
+ .stanza.playing { outline: 2px solid var(--cool); box-shadow: 0 0 0 3px rgba(37,99,235,.18); }
+ .title-block { cursor: pointer; border-radius: 8px; }
+ .title-block:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+ .tap-hint { font-size: .72rem; color: var(--muted); padding: 0 14px 6px; margin: 0; }
+ #modelAudio { display: none; }
+
+ .school-brand {
+  text-align: center;
+  font-size: .68rem;
+  color: var(--muted, #64748b);
+  padding: 10px 14px 18px;
+  margin: 0;
+  border-top: 1px solid var(--border, #e2e8f0);
+ }
+ .school-brand a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+ <div class="top-row">
+ <div class="title-block" id="titlePlay" role="button" tabindex="0" data-yt-start="0" data-yt-end="9" title="Play title and poet">
+ <h1 class="app-title">🎭 <span>One Moment in Summer</span></h1>
+ <p class="poet-byline">David Harmer</p>
+ </div>
+ <span class="sub-badge">U47 · S5 Girls</span>
+ </div>
+ <nav class="nav-tabs" aria-label="Lesson sections">
+ <button type="button" class="tab-btn active" data-tab="viewPoem" aria-current="page">📜 Poem</button>
+ <button type="button" class="tab-btn" data-tab="viewPron">🔊 Pronounce</button>
+ <button type="button" class="tab-btn" data-tab="viewSample">🎧 Model</button>
+ <button type="button" class="tab-btn" data-tab="viewCheck">✅ Check</button>
+ </nav>
+</header>
+
+<div class="quick-toggles" id="poemToggles">
+ <button type="button" class="chip-toggle on" id="togRunon" aria-pressed="true">↪ Run-on</button>
+ <button type="button" class="chip-toggle on" id="togStress" aria-pressed="true">★ Stress</button>
+ <button type="button" class="chip-toggle on" id="togZh" aria-pressed="true">譯 中文</button>
+ <button type="button" class="chip-toggle on" id="togCues" aria-pressed="true">💡 Notes</button>
+</div>
+<p class="tap-hint" id="tapHint">Tap a stanza (or the title) to hear that part of the Model — audio plays from this page · 點一節即可聽該段示範（本頁音訊）. Use <strong>Show</strong> if you want to watch the YouTube video · 要看影片請按 Show. From Downloads (file://), use the https Pages link for audio.</p>
+
+<main>
+ <!-- TAB 1: POEM & CUES -->
+ <section id="viewPoem" class="view-section active">
+ <details class="arc-card">
+ <summary>📖 詩意與情感弧線 (Tap to view overall arc)</summary>
+ <div class="arc-body">
+ 炎夏排隊買雪糕時，燕子從頭上掠過；路上塞滿悶熱的汽車。女孩們慢慢舔着冰涼的雪糕，車裏的人卻熱得「快要沸騰」。結尾燕子一閃而過，夏天像箭一樣射向我們——抓住短暫而鮮明的一刻。
+ <div class="arc-grid">
+ <div class="arc-pill arc-sky">St. 1–2 · Playful<br><small>Swallows & Queue</small></div>
+ <div class="arc-pill arc-heat">St. 3–6 · Sticky Heat<br><small>Trapped Traffic</small></div>
+ <div class="arc-pill arc-cool">St. 7–8 · Cool Relief<br><small>Savouring Ice Cream</small></div>
+ <div class="arc-pill arc-sharp">St. 9–10 · Sharp End<br><small>Boiling Cars & Arrow</small></div>
+ </div>
+ </div>
+ </details>
+
+ <div class="stanza-list" id="stanzaContainer">
+ <!-- Stanza 1 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="sky" data-yt-start="9" data-yt-end="15">
+ <div class="st-header">
+ <span class="st-tag">Stanza 1</span>
+ <div class="badge-row"><span class="cue-badge">🔉 中等音量</span><span class="cue-badge">✨ 輕快活潑</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="0">
+ <div class="poem-lines">
+ The house is <span class="stress">dropping</span> swallows<span class="zh-gloss">燕子</span> <span class="runon">↪</span><br>
+ <span class="stress">one</span> by <span class="stress">one</span> from under the gutter<span class="zh-gloss">屋簷排水溝</span>
+ </div>
+ <canvas class="hw-canvas" data-hw="0" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 在 <em>"one · by · one"</em> 之間稍頓。由 <em>swallows</em> 直連第2行，不要突然降調。
+ <span class="eye-cue">👀 視線略抬高於觀眾（想像屋簷排水溝）。</span>
+ </div>
+ </div>
+
+ <!-- Stanza 2 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="sky" data-yt-start="15" data-yt-end="21">
+ <div class="st-header">
+ <span class="st-tag">Stanza 2</span>
+ <div class="badge-row"><span class="cue-badge">⚡ 第1行較快</span><span class="cue-badge">😌 平靜收結</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="1">
+ <div class="poem-lines">
+ they <span class="stress">swoop</span><span class="zh-gloss">俯衝</span> and <span class="stress">fall</span> <span class="runon">↪</span><br>
+ on our heads as we queue<span class="zh-gloss">排隊</span> <span class="runon">↪</span><br>
+ for <span class="stress">ice cream</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="1" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 享受 <em>swoop</em> 與 <em>fall</em> 的動態感。氣息貫穿第1–3行；以平靜語氣收在 <em>"ice cream"</em>。
+ </div>
+ </div>
+
+ <!-- Stanza 3 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="heat" data-yt-start="21" data-yt-end="30">
+ <div class="st-header">
+ <span class="st-tag">Stanza 3</span>
+ <div class="badge-row"><span class="cue-badge">🔊 熱意漸強</span><span class="cue-badge">🔥 黏膩語氣</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="2">
+ <div class="poem-lines">
+ It is <span class="stress">so hot</span> <span class="runon">↪</span><br>
+ that the long line of cars <span class="stress">clogging</span><span class="zh-gloss">堵塞</span> the road <span class="runon">↪</span><br>
+ <span class="stress">hums</span><span class="zh-gloss">發出嗡嗡聲</span> like a line of <span class="stress">electric fires</span><span class="zh-gloss">電暖爐</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="2" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 把 <em>hu<b>mm</b>s</em> 的 <em>/m/</em> 拉長；<em>clogging</em> 與 <em>electric</em> 的 <em>/k/</em> 要乾脆。用較沉重的聲線表現黏膩熱氣。
+ <span class="eye-cue">👀 視線直視前方塞住的馬路。</span>
+ </div>
+ </div>
+
+ <!-- Stanza 4 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="heat" data-yt-start="30" data-yt-end="42">
+ <div class="st-header">
+ <span class="st-tag">Stanza 4</span>
+ <div class="badge-row"><span class="cue-badge">🔊 中至大聲</span><span class="cue-badge">⏱ 第2行較慢</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="3">
+ <div class="poem-lines">
+ They <span class="stress">shine</span> and <span class="stress">shimmer</span><span class="zh-gloss">閃爍微光</span>, <span class="stress">stink</span><span class="zh-gloss">發惡臭</span> of oil and warm seats <span class="runon">↪</span><br>
+ the children <span class="stress">gaze out</span><span class="zh-gloss">凝望窗外</span> from their <span class="stress">misted windows</span><span class="zh-gloss">起霧的車窗</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="3" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>"stink of oil"</em> 帶厭惡感；<em>"gaze out… misted windows"</em> 放慢、放柔，帶同情。
+ <span class="eye-cue">👀 視線略高於觀眾，像隔着玻璃望出去。</span>
+ </div>
+ </div>
+
+ <!-- Stanza 5 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="heat" data-yt-start="42" data-yt-end="51">
+ <div class="st-header">
+ <span class="st-tag">Stanza 5</span>
+ <div class="badge-row"><span class="cue-badge">🔊 熱意高峰</span><span class="cue-badge">😮‍💨 令人窒息</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="4">
+ <div class="poem-lines">
+ <span class="stress">Trapped</span><span class="zh-gloss">被困住</span> under glass<br>
+ hair <span class="stress">plastered</span><span class="zh-gloss">濕貼着</span> down with sweat<br>
+ <span class="stress">gasping</span><span class="zh-gloss">喘氣</span> for air like <span class="stress">frogs under ice</span><span class="zh-gloss">冰層下的青蛙</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="4" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 這是熱意半段最強的一節。<em>"gasping for air"</em> 用緊繃、受壓的聲線（不要喊叫，也不要假裝喘氣）。
+ </div>
+ </div>
+
+ <!-- Stanza 6 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="heat" data-yt-start="51" data-yt-end="59">
+ <div class="st-header">
+ <span class="st-tag">Stanza 6</span>
+ <div class="badge-row"><span class="cue-badge">⏱ 緩慢卡住</span><span class="cue-badge">😮‍💨 疲累</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="5">
+ <div class="poem-lines">
+ The cars <span class="stress">crawl</span><span class="zh-gloss">緩慢爬行</span> round the <span class="stress">curve</span><span class="zh-gloss">彎道</span> <span class="runon">↪</span><br>
+ of the road, <span class="stress">stuck</span><span class="zh-gloss">卡住動彈不得</span> in between the shop <span class="runon">↪</span><br>
+ and the café.
+ </div>
+ <canvas class="hw-canvas" data-hw="5" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 把 <em>crawl</em> 與 <em>curve</em> 的元音拉長。音量保持中等（疲累，不是憤怒）。<strong>讀完 café 後，平靜地換一口氣再繼續！</strong>
+ </div>
+ </div>
+
+ <!-- Stanza 7 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="cool" data-yt-start="59" data-yt-end="68">
+ <div class="st-header">
+ <span class="st-tag">Stanza 7</span>
+ <div class="badge-row"><span class="cue-badge">🔉 較柔</span><span class="cue-badge">😊 聲中帶笑</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="6">
+ <div class="poem-lines">
+ My ice cream is <span class="stress">butterscotch</span><span class="zh-gloss">奶油酥糖味</span> and <span class="stress">almond</span><span class="zh-gloss">杏仁</span><br>
+ <span class="stress">Lizzie’s</span> is chocolate, <span class="stress">Harriet’s</span> vanilla<span class="zh-gloss">雲呢拿/香草</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="6" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 立刻轉為清涼舒緩！語氣溫暖友善。練習時 <em>almond</em> 的 l 不發音（<code>/ˈɑː.mənd/</code>）；口音會有差異。<em>chocolate</em> 只讀兩個音節。
+ <span class="eye-cue">👀 放鬆肩膀；與觀眾有溫暖眼神接觸。</span>
+ </div>
+ </div>
+
+ <!-- Stanza 8 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="cool" data-yt-start="68" data-yt-end="83">
+ <div class="st-header">
+ <span class="st-tag">Stanza 8</span>
+ <div class="badge-row"><span class="cue-badge">🔉 最柔</span><span class="cue-badge">⏱ 很慢</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="7">
+ <div class="poem-lines">
+ They are so <span class="stress">delicious</span> and <span class="stress">cold</span><br>
+ we lick them <span class="stress">slowly</span>, letting the <span class="stress">long, cool</span> flavours<span class="zh-gloss">味道</span> <span class="runon">↪</span><br>
+ <span class="stress">slide</span><span class="zh-gloss">滑落</span> down our tongues.
+ </div>
+ <canvas class="hw-canvas" data-hw="7" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 細味每個帶流暢 <em>/l/</em> 的詞（<em>lick, slowly, letting, long, cool, slide</em>），與前面的熱意形成對比。
+ </div>
+ </div>
+
+ <!-- Stanza 9 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="sharp" data-yt-start="83" data-yt-end="90">
+ <div class="st-header">
+ <span class="st-tag">Stanza 9</span>
+ <div class="badge-row"><span class="cue-badge">🔊 較響</span><span class="cue-badge">😏 諷刺對比</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="8">
+ <div class="poem-lines">
+ Inside the cars, the <span class="stress">red-faced</span><span class="zh-gloss">滿臉通紅的</span> people <span class="runon">↪</span><br>
+ begin to <span class="stress">boil</span><span class="zh-gloss">沸騰/熱得發滾</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="8" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>people</em> 之後不要停頓。把 <b>b</b>egin to <b>b</b>oil 的 <i>/b/</i> 彈出來，然後在句號處稍頓一拍。
+ </div>
+ </div>
+
+ <!-- Stanza 10 -->
+ <div class="stanza" role="button" tabindex="0" data-arc="sharp" data-yt-start="90" data-yt-end="100">
+ <div class="st-header">
+ <span class="st-tag">Stanza 10</span>
+ <div class="badge-row"><span class="cue-badge">⚡ 較快</span><span class="cue-badge">🎯 有力收結</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="9">
+ <div class="poem-lines">
+ The swallows <span class="stress">flit</span><span class="zh-gloss">飛快掠過</span> and <span class="stress">dart</span><span class="zh-gloss">猛衝</span><br>
+ rapid <span class="stress">specks</span><span class="zh-gloss">小斑點</span> of blue, black and white<br>
+ the summer <span class="stress">flies</span> at us <span class="runon">↪</span><br>
+ like an <span class="stress">arrow</span><span class="zh-gloss">箭</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="9" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>flit, dart, specks, black, white</em> 的字尾 <em>/t/</em> 與 <em>/k/</em> 要乾脆。在 <b>arrow</b> 有力收結，並保持眼神接觸約 2 秒！
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- TAB 2: PRONUNCIATION COACH -->
+ <section id="viewPron" class="view-section">
+ <div class="pron-display" id="pronBox" aria-live="polite">
+ </div>
+ <div class="pron-card">
+ <div class="vocab-grid" id="vocabGrid"></div>
+ </div>
+ </section>
+
+ <!-- TAB 3: YOUTUBE SAMPLE MODEL SPEECH -->
+ <section id="viewSample" class="view-section">
+ <div class="model-card">
+ <h3>🎧 Model</h3>
+ <div class="video-container" id="ytModelSlot">
+ <!-- YouTube player mounts in #ytPersist -->
+ </div>
+
+ <a href="https://www.youtube.com/watch?v=m6QuyxwFZcU" target="_blank" rel="noopener noreferrer" class="btn-yt-ext">
+ ↗ Open Video directly in YouTube App
+ </a>
+
+ <div class="model-tips">
+ <strong>💡 聽聽這些對比：</strong>
+ <ul>
+ <li><strong>第1–2節：</strong>語氣輕快、有彈性，行末不要「斬斷」語氣。</li>
+ <li><strong>第3–5節：</strong>聲調明顯下降；談及炎熱與被困的車輛時，共鳴更重、更沉。</li>
+ <li><strong>第7–8節：</strong>音量即時放柔——語氣溫暖、帶笑意，拉長流暢的 <em>/l/</em> 音。</li>
+ <li><strong>第9–10節：</strong>在 <em>"boil"</em> 帶尖銳諷刺的爆發感，再推向 <em>"arrow"</em> 有力而穩妥的收束。</li>
+ </ul>
+ </div>
+ </div>
+ </section>
+
+ <!-- TAB 4: SELF-CHECKLIST -->
+ <section id="viewCheck" class="view-section">
+ <div class="check-card">
+ <h3 style="margin:0 0 8px;color:var(--gold);font-size:1rem;">錄音後自我檢查</h3>
+ <p style="margin:0 0 10px;font-size:.8rem;color:var(--muted);">請重聽你的錄音，並勾選你做得到／聽得到的項目。這是練習指引，並非正式評分準則。</p>
+ <label class="check-item"><input type="checkbox"> <span><strong>1. 順暢的跨行連續（<code>↪</code>）：</strong> 我把意思連貫地讀過標示的行末：第1節第1行；第2節第1–2行；第3節第1–2行；第4節第1行；第6節第1–2行；第8節第2行；第9節第1行；第10節第3行。這些地方我沒有讀成句號停頓。</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>2. 清楚的冷熱對比：</strong> 第7–8節（雪糕）明顯比第3–5節（交通／塞車）更柔、更慢、更溫暖。</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>3. Almond 與 chocolate：</strong> 在第7節，我用了練習時的讀法 <em>AH-muhnd</em>（<code>/ˈɑː.mənd/</code>），以及兩個音節的 <em>CHOCK-luht</em>（<code>/ˈtʃɒk.lət/</code>）。</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>4. 字尾輔音聽得清楚：</strong> <em>trapped, misted, plastered, stuck, flit, dart, specks</em> 的 <em>-ed</em> 以及字尾 <em>/t/、/k/</em> 讀得乾脆、清楚。</span></label>
+ <label class="check-item"><input type="checkbox"> <span><strong>5. 收束有控制，並有自己的選擇：</strong> 我有變化聲線而沒有整首朗讀都喊叫；<em>"arrow"</em> 收得清楚；而且至少能解釋一個我自己決定的重音或語氣選擇。</span></label>
+ </div>
+ </section>
+</main>
+
+<!-- Collapsible tools dock: Handwrite + Timer / Recording -->
+<div class="bottom-dock" id="bottomDock">
+ <div class="dock-inner">
+ <div class="dock-chrome">
+ <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="false" aria-controls="dockBody" title="Tools">
+ <span class="chev" aria-hidden="true">▴</span> 工具 · Tools
+ </button>
+ <div class="dock-mini-timer" id="dockMiniTimer" aria-live="polite">
+ <div class="timer-pill" id="timerDisplayMini">00:00</div>
+ <button type="button" class="dock-btn btn-start" id="btnTimerToggleMini">▶ Start</button>
+ </div>
+ </div>
+ <div class="dock-body" id="dockBody">
+ <!-- Handwrite controls (Poem tab only) -->
+ <div class="hw-bar" id="hwBar" aria-label="Handwrite tools">
+ <button type="button" class="hw-chip" id="togHandwrite" aria-pressed="false">✏️ Handwrite</button>
+ <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" disabled>🖊️ Pen</button>
+ <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" disabled>🧹 Eraser</button>
+ <button type="button" class="hw-chip" id="hwColour" title="Ink colour" disabled>🔴</button>
+ <button type="button" class="hw-chip danger-chip" id="hwClearStanza" disabled>Clear stanza</button>
+ <button type="button" class="hw-chip danger-chip" id="hwClearAll" disabled>Clear all</button>
+ </div>
+ <div class="dock-modes">
+ <button type="button" class="mode-tab active" id="modeTimerBtn" aria-pressed="true" aria-controls="paneTimer">⏱ Practice Timer</button>
+ <button type="button" class="mode-tab" id="modeAudioBtn" aria-pressed="false" aria-controls="paneAudio">🎧 Listen to a Take</button>
+ </div>
+
+ <!-- PANE 1: TIMER -->
+ <div class="dock-pane active" id="paneTimer">
+ <div class="timer-pill" id="timerDisplay">00:00</div>
+ <div class="pace-hint" id="paceHint" aria-live="polite">Use the timer to compare takes;<br><strong style="color:var(--asphalt)">clarity comes first.</strong></div>
+ <button type="button" class="dock-btn btn-start" id="btnTimerToggle">▶ Start</button>
+ <button type="button" class="dock-btn btn-reset" id="btnTimerReset" title="Reset">🔄</button>
+ </div>
+
+ <!-- PANE 2: AUDIO RECORDER -->
+ <div class="dock-pane" id="paneAudio">
+ <label class="dock-btn btn-native" id="lblNativeRec" role="button" tabindex="0">
+ 📲 Record or Choose a Voice Memo
+ <input type="file" id="nativeAudioInput" accept="audio/*" capture style="display:none" aria-label="Choose an audio recording from your device" />
+ </label>
+ <div class="audio-bar" id="audioBar">
+ <audio id="audioPlayer" controls playsinline></audio>
+ <button type="button" class="btn-mini" id="btnChangeTake">🔄 New</button>
+ </div>
+ </div>
+ <div class="audio-help" id="audioHelp">Your device may offer recording or file selection. This page plays the selected take locally; it does not save or upload it.</div>
+ </div>
+ </div>
+</div>
+
+
+<!-- Hidden local model audio (primary stanza play on https Pages) -->
+<audio id="modelAudio" src="u47.m4a" preload="auto" playsinline></audio>
+
+<!-- Persistent YouTube host (visual Model / Show — not required for stanza sound) -->
+<div class="yt-persist compact" id="ytPersist" aria-label="Model recital player">
+ <div class="yt-frame-wrap">
+ <div id="ytPlayer" title="U47 One Moment in Summer Model"></div>
+ </div>
+ <div class="yt-bar">
+ <div class="yt-status" id="ytStatus">🎧 Tap a stanza to play</div>
+ <button type="button" class="yt-ctrl" id="ytExpandBtn" title="Show video">Show</button>
+ <button type="button" class="yt-ctrl" id="ytStopBtn" disabled>Stop</button>
+ </div>
+</div>
+
+<script>
+// 1. Navigation Tabs
+const tabBtns = document.querySelectorAll(".tab-btn");
+const views = document.querySelectorAll(".view-section");
+const poemToggles = document.getElementById("poemToggles");
+
+tabBtns.forEach(btn => {
+ btn.onclick = () => {
+ tabBtns.forEach(b => b.classList.remove("active"));
+ views.forEach(v => v.classList.remove("active"));
+ btn.classList.add("active");
+ const target = btn.dataset.tab;
+ document.getElementById(target).classList.add("active");
+ tabBtns.forEach(b => b.setAttribute("aria-current", b === btn ? "page" : "false"));
+ poemToggles.style.display = target === "viewPoem" ? "flex" : "none";
+ const tapHint = document.getElementById("tapHint");
+ if (tapHint) tapHint.style.display = target === "viewPoem" ? "block" : "none";
+ const hwBarEl = document.getElementById("hwBar");
+ if (hwBarEl) hwBarEl.classList.toggle("show", target === "viewPoem");
+ if (target === "viewPoem") requestAnimationFrame(() => window.hwResize && window.hwResize());
+ syncYtLayout(target);
+ window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+ };
+});
+
+// 2. Toggles
+const container = document.getElementById("stanzaContainer");
+function bindToggle(btnId, className) {
+ const btn = document.getElementById(btnId);
+ btn.onclick = () => {
+ const isHidden = container.classList.toggle(className);
+ btn.classList.toggle("on", !isHidden);
+ btn.setAttribute("aria-pressed", String(!isHidden));
+ };
+}
+bindToggle("togRunon", "hide-runon");
+bindToggle("togStress", "hide-stress");
+bindToggle("togZh", "hide-zh");
+bindToggle("togCues", "hide-cues");
+
+document.querySelectorAll(".stanza").forEach(st => {
+ st.onclick = (ev) => {
+ if (document.body.classList.contains("hw-on") && ev.target.closest(".hw-canvas")) return;
+ document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
+ st.classList.add("focused", "playing");
+ const a = +st.dataset.ytStart, b = +st.dataset.ytEnd;
+ if (!Number.isNaN(a) && !Number.isNaN(b)) playYtRange(a, b, st.querySelector(".st-tag")?.textContent || "Stanza");
+ };
+ st.onkeydown = event => {
+ if (event.key === "Enter" || event.key === " ") {
+ event.preventDefault();
+ st.click();
+ }
+ };
+});
+
+const titlePlay = document.getElementById("titlePlay");
+if (titlePlay) {
+ titlePlay.onclick = () => {
+ document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
+ playYtRange(+titlePlay.dataset.ytStart, +titlePlay.dataset.ytEnd, "Title + poet");
+ };
+ titlePlay.onkeydown = (event) => {
+ if (event.key === "Enter" || event.key === " ") { event.preventDefault(); titlePlay.click(); }
+ };
+}
+
+// 3. Pronunciation Coach
+const VOCAB_TRAPS = [
+ { word: "almond", zh: "杏仁", ipa: "/ˈɑː.mənd/", tip: "練習時按我們的讀法：l 不發音，讀成 AH-muhnd（/ˈɑː.mənd/）。不同口音讀法會有分別。" },
+ { word: "chocolate", zh: "朱古力", ipa: "/ˈtʃɒk.lət/", tip: "只讀兩個音節 CHOCK-luht，不要讀成三個音節 choc-o-late。" },
+ { word: "butterscotch", zh: "奶油酥糖味", ipa: "/ˈbʌt.ə.skɒtʃ/", tip: "中間母音要輕；字尾用清脆的 /tʃ/ 收結。" },
+ { word: "vanilla", zh: "雲呢拿/香草", ipa: "/vəˈnɪl.ə/", tip: "開頭的 /v/ 要下唇輕咬上齒（不要讀成 wa-nilla）。" },
+ { word: "swallows", zh: "燕子", ipa: "/ˈswɒl.əʊz/", tip: "/sw/ 滑音要清楚，字尾 /əʊz/ 要圓潤。" },
+ { word: "gutter", zh: "屋簷排水溝", ipa: "/ˈɡʌt.ər/", tip: "第一音節用短母音 /ʌ/；/t/ 要乾脆。" },
+ { word: "swoop", zh: "俯衝", ipa: "/swuːp/", tip: "/sw/ 滑音要順，接長母音 /uː/，字尾 /p/ 輕輕收。" },
+ { word: "queue", zh: "排隊", ipa: "/kjuː/", tip: "長母音 /uː/；和下文 for ice cream 要連讀得順。" },
+ { word: "clogging", zh: "堵塞", ipa: "/ˈklɒɡ.ɪŋ/", tip: "/kl/ 要咬清楚，聽起來才像塞車卡住。" },
+ { word: "shimmer", zh: "閃爍微光", ipa: "/ˈʃɪm.ər/", tip: "用柔和的 /ʃ/ 摩擦音，帶出熱氣閃爍的感覺。" },
+ { word: "misted", zh: "起霧的", ipa: "/ˈmɪs.tɪd/", tip: "mist 的 /t/ 之後，-ed 讀成 /ɪd/：mist + /ɪd/。" },
+ { word: "plastered", zh: "濕貼着", ipa: "/ˈplɑː.stəd/", tip: "長母音 /ɑː/ + 清楚的 /st/，字尾 /d/ 要聽得到。" },
+ { word: "flit and dart", zh: "飛快掠過與猛衝", ipa: "/flɪt ænd dɑːt/", tip: "flit 用短而快的母音；兩個字的字尾 /t/ 都要清脆。" },
+ { word: "specks", zh: "小斑點", ipa: "/speks/", tip: "字尾 /s/ 前要保留 /k/，讀成 /ks/。" }
+];
+
+const grid = document.getElementById("vocabGrid");
+const pronBox = document.getElementById("pronBox");
+
+VOCAB_TRAPS.forEach(item => {
+ const btn = document.createElement("button");
+ btn.type = "button";
+ btn.className = "vocab-chip";
+ btn.innerHTML = `
+ <strong>${item.word} <span>🔊</span></strong>
+ <div class="chip-sub">
+ <span class="ipa-txt">${item.ipa}</span>
+ <span class="zh-txt">${item.zh}</span>
+ </div>
+ `;
+ btn.onclick = () => {
+ pronBox.innerHTML = `
+ <div class="word-title">${item.word} <span class="ipa">${item.ipa}</span> <span class="zh-tag">${item.zh}</span></div>
+ <div class="tip">${item.tip}</div>
+ `;
+ pronBox.classList.add("has-content");
+ if ("speechSynthesis" in window) {
+ window.speechSynthesis.cancel();
+ const u = new SpeechSynthesisUtterance(item.word);
+ u.lang = "en-GB";
+ u.rate = 0.85;
+ window.speechSynthesis.speak(u);
+ }
+ };
+ grid.appendChild(btn);
+});
+
+// 4. Bottom Dock Mode Switcher
+const modeTimerBtn = document.getElementById("modeTimerBtn");
+const modeAudioBtn = document.getElementById("modeAudioBtn");
+const paneTimer = document.getElementById("paneTimer");
+const paneAudio = document.getElementById("paneAudio");
+const audioHelp = document.getElementById("audioHelp");
+
+modeTimerBtn.onclick = () => {
+ modeTimerBtn.classList.add("active");
+ modeAudioBtn.classList.remove("active");
+ modeTimerBtn.setAttribute("aria-pressed", "true");
+ modeAudioBtn.setAttribute("aria-pressed", "false");
+ paneTimer.classList.add("active");
+ paneAudio.classList.remove("active");
+ audioHelp.classList.remove("active");
+};
+
+modeAudioBtn.onclick = () => {
+ modeAudioBtn.classList.add("active");
+ modeTimerBtn.classList.remove("active");
+ modeTimerBtn.setAttribute("aria-pressed", "false");
+ modeAudioBtn.setAttribute("aria-pressed", "true");
+ paneAudio.classList.add("active");
+ paneTimer.classList.remove("active");
+ audioHelp.classList.add("active");
+};
+
+// Timer state (declared early so dock mini-strip can read running state)
+let timerInt = null;
+let elapsedMs = 0;
+let startedAt = 0;
+let seconds = 0;
+
+// 4b. Collapsible tools dock (Handwrite + Timer/Recording)
+const DOCK_KEY = "u47-summer-dock-open-v1";
+const dockToggle = document.getElementById("dockToggle");
+const timerDisplayMini = document.getElementById("timerDisplayMini");
+const btnTimerToggleMini = document.getElementById("btnTimerToggleMini");
+let dockOpen = false;
+
+function loadDockOpen() {
+ try {
+ const v = localStorage.getItem(DOCK_KEY);
+ if (v === "1") return true;
+ if (v === "0") return false;
+ } catch (e) { /* private mode */ }
+ return false; // collapsed by default — more poem space
+}
+function saveDockOpen(on) {
+ try { localStorage.setItem(DOCK_KEY, on ? "1" : "0"); } catch (e) { /* */ }
+}
+function syncMiniTimerStrip() {
+ // Reed soft-lock: when collapsed and timer running, keep clock + Pause visible
+ const running = !!timerInt;
+ document.body.classList.toggle("dock-mini-timer-on", running && !dockOpen);
+}
+function setDockOpen(on, persist) {
+ dockOpen = !!on;
+ document.body.classList.toggle("dock-open", dockOpen);
+ if (dockToggle) {
+ dockToggle.setAttribute("aria-expanded", String(dockOpen));
+ }
+ syncMiniTimerStrip();
+ if (persist !== false) saveDockOpen(dockOpen);
+}
+window.u47ExpandDock = function () { setDockOpen(true, true); };
+if (dockToggle) {
+ dockToggle.onclick = () => setDockOpen(!dockOpen, true);
+}
+setDockOpen(loadDockOpen(), false);
+
+// 5. Stopwatch Timer
+const timerDisplay = document.getElementById("timerDisplay");
+const btnTimerToggle = document.getElementById("btnTimerToggle");
+const btnTimerReset = document.getElementById("btnTimerReset");
+const paceHint = document.getElementById("paceHint");
+
+function formatTimer(sec) {
+ const m = String(Math.floor(sec / 60)).padStart(2, "0");
+ const s = String(sec % 60).padStart(2, "0");
+ return `${m}:${s}`;
+}
+function syncTimerButtons() {
+ const running = !!timerInt;
+ const label = running ? "⏸ Pause" : (elapsedMs > 0 || seconds > 0 ? "▶ Resume" : "▶ Start");
+ [btnTimerToggle, btnTimerToggleMini].forEach(btn => {
+ if (!btn) return;
+ btn.classList.toggle("running", running);
+ btn.textContent = label;
+ });
+}
+function updateTimerUI() {
+ seconds = Math.floor((elapsedMs + (timerInt ? performance.now() - startedAt : 0)) / 1000);
+ const text = formatTimer(seconds);
+ if (timerDisplay) timerDisplay.textContent = text;
+ if (timerDisplayMini) timerDisplayMini.textContent = text;
+ syncMiniTimerStrip();
+}
+
+function evaluatePace() {
+ if (seconds === 0) {
+ paceHint.innerHTML = `Use the timer to compare takes;<br><strong style="color:var(--asphalt)">clarity comes first.</strong>`;
+ } else {
+ paceHint.innerHTML = `Listen back: did the images<br><strong style="color:#3F5F5A">have room to breathe?</strong>`;
+ }
+}
+
+function toggleTimer() {
+ if (timerInt) {
+ elapsedMs += performance.now() - startedAt;
+ clearInterval(timerInt);
+ timerInt = null;
+ updateTimerUI();
+ syncTimerButtons();
+ evaluatePace();
+ } else {
+ startedAt = performance.now();
+ paceHint.innerHTML = `Reciting...<br><strong style="color:var(--gold)">Watch your contrasts!</strong>`;
+ timerInt = setInterval(updateTimerUI, 250);
+ syncTimerButtons();
+ syncMiniTimerStrip();
+ }
+}
+
+btnTimerToggle.onclick = toggleTimer;
+if (btnTimerToggleMini) btnTimerToggleMini.onclick = toggleTimer;
+
+btnTimerReset.onclick = () => {
+ if (timerInt) {
+ clearInterval(timerInt);
+ timerInt = null;
+ }
+ elapsedMs = 0;
+ seconds = 0;
+ updateTimerUI();
+ syncTimerButtons();
+ evaluatePace();
+};
+
+// 6. Device audio chooser and local playback (recording availability varies by device)
+const nativeAudioInput = document.getElementById("nativeAudioInput");
+const lblNativeRec = document.getElementById("lblNativeRec");
+const audioBar = document.getElementById("audioBar");
+const audioPlayer = document.getElementById("audioPlayer");
+const btnChangeTake = document.getElementById("btnChangeTake");
+let audioUrl = null;
+lblNativeRec.onkeydown = event => {
+ if (event.key === "Enter" || event.key === " ") {
+ event.preventDefault();
+ nativeAudioInput.click();
+ }
+};
+
+nativeAudioInput.onchange = e => {
+ const file = e.target.files && e.target.files[0];
+ if (!file) return;
+ audioPlayer.pause();
+ if (audioUrl) URL.revokeObjectURL(audioUrl);
+ audioUrl = URL.createObjectURL(file);
+ audioPlayer.src = audioUrl;
+ lblNativeRec.style.display = "none";
+ audioBar.classList.add("show");
+};
+
+btnChangeTake.onclick = () => {
+ nativeAudioInput.value = "";
+ nativeAudioInput.click();
+};
+window.addEventListener("pagehide", () => {
+ if (audioUrl) URL.revokeObjectURL(audioUrl);
+});
+
+// 7. Handwrite layer (local strokes on poem lines)
+(function () {
+ const HW_KEY = "u47-summer-handwrite-v1";
+ const COLOURS = [
+ { id: "heat", hex: "#C2410C", emoji: "🔴" },
+ { id: "asphalt", hex: "#1C1917", emoji: "⚫" },
+ { id: "cool", hex: "#2563EB", emoji: "🔵" }
+ ];
+ let colourIdx = 0;
+ let tool = "pen"; // pen | erase
+ let enabled = false;
+ let strokes = {}; // stanzaId -> [{colour, width, erase, points:[{x,y,p}]}]  coords 0..1
+ let drawing = false;
+ let current = null;
+ let activeCanvas = null;
+
+ const hwBar = document.getElementById("hwBar");
+ const tog = document.getElementById("togHandwrite");
+ const btnPen = document.getElementById("hwPen");
+ const btnEraser = document.getElementById("hwEraser");
+ const btnColour = document.getElementById("hwColour");
+ const btnClearSt = document.getElementById("hwClearStanza");
+ const btnClearAll = document.getElementById("hwClearAll");
+ const wraps = Array.from(document.querySelectorAll(".hw-wrap"));
+ const canvases = Array.from(document.querySelectorAll(".hw-canvas"));
+
+ // Show bar on Poem tab by default
+ if (hwBar) hwBar.classList.add("show");
+
+ function load() {
+ try {
+ const raw = localStorage.getItem(HW_KEY);
+ if (raw) {
+ const data = JSON.parse(raw);
+ if (data && typeof data === "object" && data.strokes) strokes = data.strokes;
+ else if (data && typeof data === "object") strokes = data;
+ }
+ } catch (e) { strokes = {}; }
+ }
+ function save() {
+ try {
+ localStorage.setItem(HW_KEY, JSON.stringify({ v: 1, strokes }));
+ } catch (e) { /* quota / private mode */ }
+ }
+ function setToolsEnabled(on) {
+ [btnPen, btnEraser, btnColour, btnClearSt, btnClearAll].forEach(b => {
+ if (b) b.disabled = !on;
+ });
+ }
+ function setEnabled(on) {
+ enabled = on;
+ document.body.classList.toggle("hw-on", on);
+ document.body.classList.toggle("hw-erase", on && tool === "erase");
+ tog.classList.toggle("on", on);
+ tog.setAttribute("aria-pressed", String(on));
+ setToolsEnabled(on);
+ canvases.forEach(c => {
+ c.style.display = on ? "block" : "none";
+ c.style.pointerEvents = on ? "auto" : "none";
+ });
+ if (on) {
+ // Prefer: Handwrite ON expands tools so Pen / Eraser are reachable
+ if (typeof window.u47ExpandDock === "function") window.u47ExpandDock();
+ resizeAll();
+ } else {
+ redrawAll(); // still redraw when turning off? hidden anyway
+ }
+ }
+ function setTool(t) {
+ tool = t;
+ document.body.classList.toggle("hw-erase", enabled && tool === "erase");
+ btnPen.classList.toggle("tool-on", tool === "pen");
+ btnEraser.classList.toggle("tool-on", tool === "erase");
+ btnPen.setAttribute("aria-pressed", String(tool === "pen"));
+ btnEraser.setAttribute("aria-pressed", String(tool === "erase"));
+ }
+ function cycleColour() {
+ colourIdx = (colourIdx + 1) % COLOURS.length;
+ btnColour.textContent = COLOURS[colourIdx].emoji;
+ btnColour.title = "Ink: " + COLOURS[colourIdx].id;
+ }
+
+ function sizeCanvas(canvas) {
+ const wrap = canvas.parentElement;
+ if (!wrap) return;
+ const rect = wrap.getBoundingClientRect();
+ const dpr = Math.min(window.devicePixelRatio || 1, 2);
+ const cssW = Math.max(1, Math.round(rect.width));
+ const cssH = Math.max(1, Math.round(rect.height));
+ if (canvas._cssW === cssW && canvas._cssH === cssH && canvas._dpr === dpr) return;
+ canvas._cssW = cssW;
+ canvas._cssH = cssH;
+ canvas._dpr = dpr;
+ canvas.width = Math.round(cssW * dpr);
+ canvas.height = Math.round(cssH * dpr);
+ canvas.style.width = cssW + "px";
+ canvas.style.height = cssH + "px";
+ const ctx = canvas.getContext("2d");
+ ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ redrawCanvas(canvas);
+ }
+
+ function redrawCanvas(canvas) {
+ const id = canvas.dataset.hw;
+ const ctx = canvas.getContext("2d");
+ const w = canvas._cssW || canvas.clientWidth;
+ const h = canvas._cssH || canvas.clientHeight;
+ ctx.clearRect(0, 0, w, h);
+ const list = strokes[id] || [];
+ for (const stroke of list) {
+ if (!stroke.points || stroke.points.length < 1) continue;
+ ctx.save();
+ if (stroke.erase) {
+ ctx.globalCompositeOperation = "destination-out";
+ ctx.strokeStyle = "rgba(0,0,0,1)";
+ } else {
+ ctx.globalCompositeOperation = "source-over";
+ ctx.strokeStyle = stroke.colour || COLOURS[0].hex;
+ }
+ ctx.lineCap = "round";
+ ctx.lineJoin = "round";
+ ctx.lineWidth = stroke.width || 2.0;
+ ctx.beginPath();
+ stroke.points.forEach((pt, i) => {
+ const x = pt.x * w;
+ const y = pt.y * h;
+ if (i === 0) ctx.moveTo(x, y);
+ else ctx.lineTo(x, y);
+ });
+ if (stroke.points.length === 1) {
+ const pt = stroke.points[0];
+ ctx.arc(pt.x * w, pt.y * h, (stroke.width || 2.0) / 2, 0, Math.PI * 2);
+ ctx.fillStyle = stroke.erase ? "rgba(0,0,0,1)" : (stroke.colour || COLOURS[0].hex);
+ if (stroke.erase) ctx.globalCompositeOperation = "destination-out";
+ ctx.fill();
+ } else {
+ ctx.stroke();
+ }
+ ctx.restore();
+ }
+ }
+
+ function redrawAll() {
+ canvases.forEach(redrawCanvas);
+ }
+
+ function resizeAll() {
+ canvases.forEach(sizeCanvas);
+ }
+ window.hwResize = resizeAll;
+
+ function posNorm(canvas, clientX, clientY) {
+ const rect = canvas.getBoundingClientRect();
+ const w = rect.width || 1;
+ const h = rect.height || 1;
+ return {
+ x: Math.min(1, Math.max(0, (clientX - rect.left) / w)),
+ y: Math.min(1, Math.max(0, (clientY - rect.top) / h))
+ };
+ }
+
+ function startDraw(canvas, e) {
+ if (!enabled) return;
+ e.preventDefault();
+ drawing = true;
+ activeCanvas = canvas;
+ const id = canvas.dataset.hw;
+ if (!strokes[id]) strokes[id] = [];
+ const p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+ const pt = posNorm(canvas, e.clientX, e.clientY);
+ pt.p = p;
+ const width = tool === "erase" ? 12 + p * 8 : 1.5 + p * 1.0;
+ current = {
+ colour: COLOURS[colourIdx].hex,
+ width,
+ erase: tool === "erase",
+ points: [pt]
+ };
+ strokes[id].push(current);
+ redrawCanvas(canvas);
+ }
+
+ function moveDraw(e) {
+ if (!drawing || !activeCanvas || !current) return;
+ e.preventDefault();
+ const p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+ const pt = posNorm(activeCanvas, e.clientX, e.clientY);
+ pt.p = p;
+ current.points.push(pt);
+ if (!current.erase) {
+ current.width = 1.5 + p * 1.0;
+ }
+ redrawCanvas(activeCanvas);
+ }
+
+ function endDraw() {
+ if (!drawing) return;
+ drawing = false;
+ current = null;
+ activeCanvas = null;
+ save();
+ }
+
+ canvases.forEach(canvas => {
+ canvas.addEventListener("pointerdown", e => {
+ if (e.button !== undefined && e.button !== 0) return;
+ canvas.setPointerCapture(e.pointerId);
+ startDraw(canvas, e);
+ });
+ canvas.addEventListener("pointermove", moveDraw);
+ canvas.addEventListener("pointerup", endDraw);
+ canvas.addEventListener("pointercancel", endDraw);
+ canvas.addEventListener("lostpointercapture", endDraw);
+ });
+
+ tog.onclick = () => setEnabled(!enabled);
+ btnPen.onclick = () => setTool("pen");
+ btnEraser.onclick = () => setTool("erase");
+ btnColour.onclick = () => cycleColour();
+
+ btnClearSt.onclick = () => {
+ const focused = document.querySelector(".stanza.focused .hw-canvas");
+ const target = focused || (document.querySelector(".hw-canvas"));
+ if (!target) return;
+ const id = target.dataset.hw;
+ if (!strokes[id] || !strokes[id].length) return;
+ if (!confirm("Clear handwriting on this stanza? / 清除這一節的手寫？")) return;
+ strokes[id] = [];
+ save();
+ redrawCanvas(target);
+ };
+
+ btnClearAll.onclick = () => {
+ const any = Object.values(strokes).some(a => a && a.length);
+ if (!any) return;
+ if (!confirm("Clear ALL handwriting notes? / 清除全部手寫筆記？")) return;
+ strokes = {};
+ save();
+ redrawAll();
+ };
+
+ // When toggles change poem height, resize canvases
+ ["togRunon", "togStress", "togZh", "togCues"].forEach(id => {
+ const b = document.getElementById(id);
+ if (!b) return;
+ b.addEventListener("click", () => {
+ requestAnimationFrame(() => setTimeout(resizeAll, 50));
+ });
+ });
+
+ let resizeTimer = null;
+ window.addEventListener("resize", () => {
+ clearTimeout(resizeTimer);
+ resizeTimer = setTimeout(resizeAll, 120);
+ });
+ window.addEventListener("orientationchange", () => setTimeout(resizeAll, 200));
+
+ load();
+ setTool("pen");
+ setEnabled(false); // OFF by default — scribbles hidden
+ // Size canvases even when off so restore is ready when turned on
+ resizeAll();
+ // Ensure restored ink is ready under the hood
+ canvases.forEach(c => { c.style.display = "none"; c.style.pointerEvents = "none"; });
+})();
+
+
+// --- V22: local HTML5 audio for stanza cues; YouTube optional (Show / Model tab) ---
+const YT_ID = "m6QuyxwFZcU";
+const MODEL_AUDIO_SRC = "u47.m4a";
+const ytPersist = document.getElementById("ytPersist");
+const ytStatus = document.getElementById("ytStatus");
+const ytStopBtn = document.getElementById("ytStopBtn");
+const ytExpandBtn = document.getElementById("ytExpandBtn");
+const ytModelSlot = document.getElementById("ytModelSlot");
+const modelAudio = document.getElementById("modelAudio");
+let ytForceExpand = false;
+let ytPlayingLabel = "";
+let ytPlayer = null;
+let ytApiReady = false;
+let ytPendingPlay = null; // unused for https audio path; kept for file:// popup only
+let ytPollTimer = null;
+let ytRangeEnd = 0;
+let audioEndTimer = null;
+let audioRangeEnd = 0;
+let audioLabel = "";
+
+function setYtStatus(label) {
+ if (ytStatus) ytStatus.innerHTML = "🎧 <span>" + label + "</span>";
+}
+
+function idleYtTip() {
+ return isFilePage
+  ? "Tap a stanza · opens YouTube window · 點詩節（本機檔會開小窗）"
+  : "Tap a stanza to play · audio from this page · 點詩節聽示範（本頁音訊）";
+}
+
+function ytEmbedUrl(start, end, autoplay) {
+ const s = Math.max(0, Math.floor(start));
+ const e = Math.max(s + 1, Math.floor(end));
+ let u = "https://www.youtube.com/embed/" + YT_ID +
+  "?start=" + s + "&end=" + e + "&rel=0&modestbranding=1&playsinline=1&enablejsapi=1";
+ if (autoplay) u += "&autoplay=1";
+ return u;
+}
+
+function syncYtLayout(tab) {
+ if (!ytPersist) return;
+ const wantExpand = ytForceExpand || tab === "viewSample";
+ if (wantExpand && ytModelSlot && tab === "viewSample") {
+  ytPersist.classList.remove("compact");
+  ytPersist.classList.add("expanded");
+  ytModelSlot.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Hide";
+ } else if (wantExpand && tab !== "viewSample") {
+  ytPersist.classList.remove("compact");
+  ytPersist.classList.add("expanded");
+  const dock = document.getElementById("bottomDock");
+  if (dock && dock.parentNode) dock.parentNode.insertBefore(ytPersist, dock);
+  else document.body.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Hide";
+ } else {
+  ytPersist.classList.add("compact");
+  ytPersist.classList.remove("expanded");
+  const dock = document.getElementById("bottomDock");
+  if (dock && dock.parentNode) dock.parentNode.insertBefore(ytPersist, dock);
+  else document.body.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Show";
+ }
+}
+
+const isFilePage = (location.protocol === "file:");
+let ytPopup = null;
+
+function clearYtTimers() {
+ if (ytPollTimer) { clearInterval(ytPollTimer); ytPollTimer = null; }
+}
+
+function clearAudioTimers() {
+ if (audioEndTimer) { clearTimeout(audioEndTimer); audioEndTimer = null; }
+}
+
+function pauseYtQuiet() {
+ clearYtTimers();
+ if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+  try { ytPlayer.pauseVideo(); } catch (e) {}
+ }
+}
+
+function pauseModelAudioQuiet() {
+ clearAudioTimers();
+ if (modelAudio) {
+  try { modelAudio.pause(); } catch (e) {}
+ }
+}
+
+function finishAudioRange() {
+ clearAudioTimers();
+ if (modelAudio) {
+  try { modelAudio.pause(); } catch (e) {}
+ }
+ document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ if (ytStopBtn) ytStopBtn.disabled = true;
+ ytPlayingLabel = "";
+ audioLabel = "";
+ setYtStatus(idleYtTip());
+}
+
+function onModelTimeUpdate() {
+ if (!modelAudio) return;
+ if (audioRangeEnd > 0 && modelAudio.currentTime >= audioRangeEnd - 0.05) {
+  finishAudioRange();
+ }
+}
+
+function playWithLocalAudio(start, end, label) {
+ if (!modelAudio) {
+  setYtStatus("Audio missing — use https Pages link · 請用網頁連結");
+  return;
+ }
+ const s = Math.max(0, Number(start) || 0);
+ const e = Math.max(s + 0.5, Number(end) || s + 1);
+ const rangeTxt = Math.floor(s) + "s–" + Math.floor(e) + "s";
+ pauseYtQuiet();
+ clearAudioTimers();
+ audioRangeEnd = e;
+ audioLabel = label || "Playing";
+ ytPlayingLabel = audioLabel;
+ setYtStatus(audioLabel + " · " + rangeTxt);
+ if (ytStopBtn) ytStopBtn.disabled = false;
+
+ const startPlay = () => {
+  try {
+   modelAudio.currentTime = s;
+  } catch (err) {}
+  const p = modelAudio.play();
+  if (p && typeof p.then === "function") {
+   p.then(() => {
+    // schedule a backup stop in case timeupdate is sparse
+    const ms = Math.max(200, (e - s) * 1000 + 150);
+    clearAudioTimers();
+    audioEndTimer = setTimeout(() => {
+     if (modelAudio && !modelAudio.paused && modelAudio.currentTime >= e - 0.15) {
+      finishAudioRange();
+     }
+    }, ms);
+   }).catch(() => {
+    setYtStatus("Could not play audio — tap again · 請再點一次");
+    if (ytStopBtn) ytStopBtn.disabled = true;
+   });
+  } else {
+   const ms = Math.max(200, (e - s) * 1000 + 150);
+   clearAudioTimers();
+   audioEndTimer = setTimeout(() => {
+    if (modelAudio && !modelAudio.paused && modelAudio.currentTime >= e - 0.15) {
+     finishAudioRange();
+    }
+   }, ms);
+  }
+ };
+
+ // Seek then play inside the user-gesture handler
+ if (modelAudio.readyState >= 1) {
+  startPlay();
+ } else {
+  const once = () => { modelAudio.removeEventListener("loadedmetadata", once); startPlay(); };
+  modelAudio.addEventListener("loadedmetadata", once);
+  try { modelAudio.load(); } catch (e2) {}
+  // Still attempt play immediately (iOS often needs play() in the gesture)
+  startPlay();
+ }
+}
+
+function onYtStateChange(ev) {
+ // 1 = PLAYING — pause local audio so they don't overlap
+ if (ev.data === 1) {
+  pauseModelAudioQuiet();
+  document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ }
+ if (ev.data === 0) {
+  clearYtTimers();
+  document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+  if (ytStopBtn) ytStopBtn.disabled = true;
+  ytPlayingLabel = "";
+  setYtStatus(idleYtTip());
+ }
+}
+
+function playYtRange(start, end, label) {
+ ytPlayingLabel = label || "Playing";
+ const rangeTxt = Math.floor(start) + "s–" + Math.floor(end) + "s";
+ if (ytStopBtn) ytStopBtn.disabled = false;
+
+ // file:// : relative m4a usually won't load — keep YouTube popup fallback
+ if (isFilePage) {
+  pauseModelAudioQuiet();
+  const url = ytEmbedUrl(start, end, true);
+  try {
+   if (ytPopup && !ytPopup.closed) {
+    ytPopup.location.href = url;
+    ytPopup.focus();
+   } else {
+    ytPopup = window.open(url, "u47ModelPlayer", "popup=yes,width=560,height=320");
+   }
+   if (!ytPopup) {
+    setYtStatus("Allow pop-ups once, then tap again · 請允許彈出式視窗 — or open the https Pages link for audio");
+    return;
+   }
+   setYtStatus(ytPlayingLabel + " · " + rangeTxt + " · YouTube window");
+  } catch (e) {
+   setYtStatus("Use https Pages for audio · 請用網頁連結聽音訊");
+  }
+  return;
+ }
+
+ // https / http: local HTML5 audio (user-gesture seek+play) — no YouTube autoplay needed
+ playWithLocalAudio(start, end, label);
+}
+
+function stopYt() {
+ clearYtTimers();
+ clearAudioTimers();
+ ytPendingPlay = null;
+ pauseModelAudioQuiet();
+ if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+  try { ytPlayer.pauseVideo(); } catch (e) {}
+ }
+ if (ytPopup && !ytPopup.closed) {
+  try { ytPopup.close(); } catch (e) {}
+ }
+ ytPopup = null;
+ ytPlayingLabel = "";
+ audioLabel = "";
+ audioRangeEnd = 0;
+ if (ytStopBtn) ytStopBtn.disabled = true;
+ document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ setYtStatus(idleYtTip());
+}
+
+if (modelAudio) {
+ modelAudio.addEventListener("timeupdate", onModelTimeUpdate);
+ modelAudio.addEventListener("ended", finishAudioRange);
+}
+
+ytStopBtn && (ytStopBtn.onclick = (ev) => { ev.stopPropagation(); stopYt(); });
+ytExpandBtn && (ytExpandBtn.onclick = (ev) => {
+ ev.stopPropagation();
+ ytForceExpand = !ytForceExpand;
+ const tab = document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem";
+ syncYtLayout(tab);
+});
+
+// Tap the status bar itself → play title+poet (open cue)
+ytPersist && ytPersist.querySelector(".yt-bar")?.addEventListener("click", (ev) => {
+ if (ev.target.closest("button")) return;
+ const titlePlay = document.getElementById("titlePlay");
+ if (titlePlay) titlePlay.click();
+});
+
+window.onYouTubeIframeAPIReady = function () {
+ ytApiReady = true;
+ if (isFilePage) return;
+ if (document.getElementById("ytPlayer") == null && !ytPlayer) return;
+ const playerVars = {
+  playsinline: 1,
+  rel: 0,
+  modestbranding: 1,
+  enablejsapi: 1,
+  origin: (location.protocol === "https:" || location.protocol === "http:") ? location.origin : undefined
+ };
+ if (!playerVars.origin) delete playerVars.origin;
+ const host = document.getElementById("ytPlayer");
+ if (!host && ytPlayer) return;
+ ytPlayer = new YT.Player(host || "ytPlayer", {
+  videoId: YT_ID,
+  width: "100%",
+  height: "100%",
+  playerVars: playerVars,
+  events: {
+   onReady: function (ev) {
+    ytPlayer = ev.target;
+   },
+   onStateChange: onYtStateChange,
+   onError: function () {
+    setYtStatus("Video error — audio still works from stanza taps · 影片出錯，點詩節仍可聽音訊");
+   }
+  }
+ });
+};
+
+// Load YouTube API only for visual Model / Show (not required for stanza sound)
+if (!isFilePage) {
+ const tag = document.createElement("script");
+ tag.src = "https://www.youtube.com/iframe_api";
+ const firstScript = document.getElementsByTagName("script")[0];
+ firstScript.parentNode.insertBefore(tag, firstScript);
+}
+
+if (isFilePage) {
+ setYtStatus(idleYtTip());
+ const hint = document.getElementById("tapHint");
+ if (hint) hint.innerHTML = "Local file mode: stanza audio needs the https Pages site (relative m4a will not load from Downloads). Each stanza can open a YouTube window instead — allow pop-ups once. · 本機檔聽不到本頁音訊，請用網頁連結；或允許彈出式視窗開 YouTube。";
+} else {
+ setYtStatus(idleYtTip());
+}
+syncYtLayout(document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem");
+
+</script>
+
+<p class="school-brand"><a href="../../">SKH Holy Carpenter Secondary School · English</a></p>
+</body>
+</html>

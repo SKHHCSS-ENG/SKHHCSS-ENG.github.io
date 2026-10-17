@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>English Learning Materials · SKH Holy Carpenter Secondary School</title>
+<meta name="description" content="English Language learning materials for SKH Holy Carpenter Secondary School.">
+<style>
+  :root {
+    --navy: #0f3d5e;
+    --teal: #0d7377;
+    --teal-soft: #e6f4f4;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --card: #ffffff;
+    --bg: #f4f7f9;
+    --border: #d8e2ea;
+    --shadow: 0 4px 16px rgba(15, 61, 94, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 18px 48px;
+  }
+  header {
+    background: linear-gradient(135deg, var(--navy), var(--teal));
+    color: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+  }
+  .school {
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    opacity: .9;
+    margin: 0 0 8px;
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .subject {
+    margin: 0;
+    font-size: .95rem;
+    opacity: .92;
+  }
+  .note {
+    margin: 22px 0 16px;
+    color: var(--muted);
+    font-size: .92rem;
+  }
+  .cards {
+    display: grid;
+    gap: 14px;
+  }
+  a.card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    box-shadow: var(--shadow);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  a.card:hover, a.card:focus-visible {
+    border-color: var(--teal);
+    outline: none;
+    transform: translateY(-1px);
+  }
+  .card-kicker {
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin: 0 0 6px;
+  }
+  .card h2 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    color: var(--navy);
+  }
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  .card-arrow {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--teal);
+  }
+  footer {
+    margin-top: 36px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: .78rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  @media print {
+    body { background: #fff; }
+    header { box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    a.card { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="school">SKH Holy Carpenter Secondary School</p>
+      <h1>English Learning Materials</h1>
+      <p class="subject">English Language</p>
+    </header>
+
+    <p class="note">Practice pages and teaching materials for the English panel. More subject materials will be added here over time.</p>
+
+    <div class="cards">
+      <a class="card" href="speech-festival/">
+        <p class="card-kicker">Competition practice</p>
+        <h2>Speech Festival</h2>
+        <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
+        <span class="card-arrow">Open →</span>
+      </a>
+    </div>
+
+    <footer>
+      SKH Holy Carpenter Secondary School · English Department<br>
+      Materials for school use
+    </footer>
+  </div>
+</body>
+</html>
