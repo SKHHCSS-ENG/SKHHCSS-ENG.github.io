@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<!-- saved from url=(0063)file:///Users/manheichik/Downloads/github-pages-site/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Speech Festival Solo Verse Speaking</title>
+<script src="./Speech Festival Solo Verse Speaking_files/saved_resource"></script>
+<script src="./Speech Festival Solo Verse Speaking_files/player-0.1.0.min.js"></script>
+<style>
+.word-matched{color:#15803d;font-weight:600;background:#dcfce7;padding:1px 4px;border-radius:3px}
+.word-missed{color:#b91c1c;font-weight:600;background:#fee2e2;padding:1px 4px;border-radius:3px;text-decoration:line-through}
+.stress-word{color:#4338ca;font-weight:800;text-decoration:underline decoration-indigo-400 decoration-2}
+.pause-mark{color:#d97706;font-weight:900;margin:0 4px}
+.runon-mark{color:#2563eb;font-weight:700;font-size:.82em;background:#eff6ff;padding:1px 4px;border-radius:4px;border:1px solid #bfdbfe}
+.intonation-up{color:#059669;font-weight:800}
+.intonation-down{color:#dc2626;font-weight:800}
+.stanza-card-active{border-color:#e11d48!important;background:#fff1f2!important;box-shadow:0 0 0 3px rgba(225,29,72,.15)}
+.stanza-btn-active{background:#e11d48!important;color:#fff!important;border-color:#be123c!important}
+.line-row-active{background:#fef3c7!important;border-color:#f59e0b!important}
+@keyframes eqPulse{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+.eq-bar{display:inline-block;width:3px;height:13px;background:currentColor;margin:0 1px;border-radius:2px;animation:eqPulse .65s infinite ease-in-out}
+.eq-bar:nth-child(2){animation-delay:.16s}.eq-bar:nth-child(3){animation-delay:.32s}
+.yt-oneclick-wrap{position:relative;overflow:hidden;display:inline-flex}
+.yt-oneclick-iframe{position:absolute;top:50%;left:50%;width:300px;height:200px;transform:translate(-50%,-50%) scale(6.2,1.35);transform-origin:center center;opacity:.001;z-index:20;border:0;cursor:pointer;pointer-events:auto}
+.yt-oneclick-wrap:hover>button{filter:brightness(1.06)}
+</style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.bottom-5{bottom:1.25rem}.right-5{right:1.25rem}.left-0{left:0px}.right-0{right:0px}.top-0{top:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mb-2\.5{margin-bottom:0.625rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-1\.5{height:0.375rem}.h-3{height:0.75rem}.h-full{height:100%}.h-1{height:0.25rem}.max-h-52{max-height:13rem}.max-h-\[90vh\]{max-height:90vh}.min-h-\[360px\]{min-height:360px}.min-h-\[90px\]{min-height:90px}.min-h-screen{min-height:100vh}.w-0{width:0px}.w-3{width:0.75rem}.w-full{width:100%}.w-5{width:1.25rem}.max-w-4xl{max-width:56rem}.max-w-5xl{max-width:64rem}.max-w-sm{max-width:24rem}.max-w-xs{max-width:20rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.select-none{-webkit-user-select:none;user-select:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-2\.5{gap:0.625rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-slate-200 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(226 232 240 / var(--tw-divide-opacity, 1))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.whitespace-pre-line{white-space:pre-line}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded-md{border-radius:0.375rem}.rounded-t-2xl{border-top-left-radius:1rem;border-top-right-radius:1rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-t{border-top-width:1px}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138 / var(--tw-border-opacity, 1))}.border-indigo-300{--tw-border-opacity:1;border-color:rgb(165 180 252 / var(--tw-border-opacity, 1))}.border-indigo-600{--tw-border-opacity:1;border-color:rgb(79 70 229 / var(--tw-border-opacity, 1))}.border-red-200{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-transparent{border-color:transparent}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-amber-50\/70{background-color:rgb(255 251 235 / 0.7)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-red-600{--tw-bg-opacity:1;background-color:rgb(220 38 38 / var(--tw-bg-opacity, 1))}.bg-rose-500{--tw-bg-opacity:1;background-color:rgb(244 63 94 / var(--tw-bg-opacity, 1))}.bg-rose-600{--tw-bg-opacity:1;background-color:rgb(225 29 72 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/50{background-color:rgb(15 23 42 / 0.5)}.bg-slate-900\/70{background-color:rgb(15 23 42 / 0.7)}.bg-slate-950{--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-indigo-700{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.bg-slate-50\/70{background-color:rgb(248 250 252 / 0.7)}.bg-transparent{background-color:transparent}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-1\.5{padding:0.375rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.pb-2{padding-bottom:0.5rem}.pb-3{padding-bottom:0.75rem}.pt-1{padding-top:0.25rem}.pt-3{padding-top:0.75rem}.text-left{text-align:left}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.font-serif{font-family:ui-serif, Georgia, Cambria, "Times New Roman", Times, serif}.font-sans{font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.text-amber-900{--tw-text-opacity:1;color:rgb(120 53 15 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-indigo-300{--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-indigo-800{--tw-text-opacity:1;color:rgb(55 48 163 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-indigo-200{--tw-text-opacity:1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-150{transition-duration:150ms}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:bg-red-700:hover{--tw-bg-opacity:1;background-color:rgb(185 28 28 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-700:hover{--tw-bg-opacity:1;background-color:rgb(190 18 60 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-300:hover{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-900:hover{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-200:hover{--tw-bg-opacity:1;background-color:rgb(199 210 254 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-600:hover{--tw-bg-opacity:1;background-color:rgb(225 29 72 / var(--tw-bg-opacity, 1))}.hover\:text-indigo-600:hover{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}}@media (min-width: 768px){.md\:col-span-2{grid-column:span 2 / span 2}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-end{align-items:flex-end}}@media (min-width: 1024px){.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:grid-cols-6{grid-template-columns:repeat(6, minmax(0, 1fr))}}</style></head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+<div id="appToast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3">
+  <span id="appToastMsg"></span>
+  <button onclick="hideToast()" class="text-slate-400 hover:text-white">✕</button>
+</div>
+
+<div id="confirmModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-200 space-y-3">
+    <h3 class="text-sm font-bold text-slate-900">Clear Practice History?</h3>
+    <div class="flex justify-end gap-2 pt-1">
+      <button onclick="closeConfirmModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Cancel</button>
+      <button onclick="confirmClearHistory()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-700 text-white">Clear</button>
+    </div>
+  </div>
+</div>
+
+<div id="codeExportModal" class="fixed inset-0 z-50 hidden bg-slate-900/70 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-4xl w-full p-5 shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] space-y-3">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+      <h3 class="text-sm font-bold text-slate-900">Website HTML Code</h3>
+      <div class="flex items-center gap-2">
+        <button onclick="copySourceCode()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white">Copy Code</button>
+        <button onclick="exportHtmlFile()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Download .HTML</button>
+        <button onclick="closeCodeModal()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-700">Close</button>
+      </div>
+    </div>
+    <textarea id="sourceCodeTextarea" readonly="" class="w-full flex-1 min-h-[360px] p-3 font-mono text-xs bg-slate-950 text-emerald-300 rounded-xl border border-slate-800 focus:outline-none"></textarea>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 py-5">
+  <header class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-5 flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-xl font-extrabold text-indigo-700">Speech Festival Solo Verse Speaking</h1>
+    <div class="flex flex-wrap items-center gap-2">
+      <select id="categorySelect" onchange="filterCategory()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+        <option value="ALL">All Categories (26)</option>
+        <option value="Boys S1">Boys S1</option>
+        <option value="Boys S2">Boys S2</option>
+        <option value="Boys S3">Boys S3</option>
+        <option value="Boys S4">Boys S4</option>
+        <option value="Boys S5">Boys S5</option>
+        <option value="Girls S1">Girls S1</option>
+        <option value="Girls S2">Girls S2</option>
+        <option value="Girls S3">Girls S3</option>
+        <option value="Girls S4">Girls S4</option>
+        <option value="Girls S5">Girls S5</option>
+        <option value="Girls S6">Girls S6</option>
+      </select>
+      <select id="poemSelect" onchange="switchPoem()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold max-w-xs truncate"><option value="0">U65 - Limpet</option><option value="1">U66 - Late Home</option></select>
+      <button onclick="exportHtmlFile()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">⬇ Download HTML</button>
+      <button onclick="openCodeModal()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white">Code</button>
+    </div>
+  </header>
+
+  <div class="flex border-b border-slate-200 mb-5 space-x-2 overflow-x-auto">
+    <button onclick="switchTab(&#39;listen&#39;)" id="tab-listen" class="px-4 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap">1. Poem &amp; Audio</button>
+    <button onclick="switchTab(&#39;vocab&#39;)" id="tab-vocab" class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 whitespace-nowrap">2. Vocabulary</button>
+    <button onclick="switchTab(&#39;practice&#39;)" id="tab-practice" class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 whitespace-nowrap">3. Mic Practice</button>
+    <button onclick="switchTab(&#39;history&#39;)" id="tab-history" class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 whitespace-nowrap">4. History</button>
+  </div>
+
+  <div id="view-listen" class="space-y-5">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <div class="bg-slate-900 text-white rounded-xl p-3.5 mb-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <div id="wrap-main-FULL" class="yt-oneclick-wrap rounded-lg">
+              <button onclick="playCurrentPoem()" id="playFullPoemBtn" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5">▶ Play Full Poem</button>
+              <div id="mount-main-FULL"><iframe id="yt-slot-main-FULL" data-slot-id="main-FULL" src="./Speech Festival Solo Verse Speaking_files/media.html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Full Poem"></iframe></div>
+            </div>
+            <button onclick="stopAudio()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-3 py-1.5 rounded-lg text-xs border border-slate-700">⏹ Stop</button>
+            <button onclick="toggleLoopStanza()" id="loopStanzaBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3 py-1.5 rounded-lg text-xs">🔁 <span id="loopStanzaText">Loop: OFF</span></button>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span id="ytNowPlayingLabel" class="font-semibold text-emerald-300 truncate max-w-xs">Ready</span>
+            <span id="ytTimeCounter" class="font-mono font-bold text-indigo-300">0:08 / 1:41</span>
+          </div>
+        </div>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+          <div id="ytStanzaProgressBar" class="bg-rose-500 h-full w-0 transition-all duration-150" style="width: 0%;"></div>
+        </div>
+        <div id="stanzaVoiceoverButtons" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2"><div id="wrap-top-0" class="yt-oneclick-wrap w-full rounded-lg"><button id="top-stanza-btn-0" onclick="playStanzaVoiceover(0)" class="w-full px-2.5 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-rose-600 text-white border border-slate-700 flex items-center justify-between gap-1.5 transition"><span>🔊 Stanza 1</span><span class="text-[10px] font-mono text-indigo-200">0:08–0:31</span></button><div id="mount-top-0"><iframe id="yt-slot-top-0" data-slot-id="top-0" src="./Speech Festival Solo Verse Speaking_files/media(1).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 1"></iframe></div></div><div id="wrap-top-1" class="yt-oneclick-wrap w-full rounded-lg"><button id="top-stanza-btn-1" onclick="playStanzaVoiceover(1)" class="w-full px-2.5 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-rose-600 text-white border border-slate-700 flex items-center justify-between gap-1.5 transition"><span>🔊 Stanza 2</span><span class="text-[10px] font-mono text-indigo-200">0:31–0:58</span></button><div id="mount-top-1"><iframe id="yt-slot-top-1" data-slot-id="top-1" src="./Speech Festival Solo Verse Speaking_files/media(2).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 2"></iframe></div></div><div id="wrap-top-2" class="yt-oneclick-wrap w-full rounded-lg"><button id="top-stanza-btn-2" onclick="playStanzaVoiceover(2)" class="w-full px-2.5 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-rose-600 text-white border border-slate-700 flex items-center justify-between gap-1.5 transition"><span>🔊 Stanza 3</span><span class="text-[10px] font-mono text-indigo-200">0:58–1:21</span></button><div id="mount-top-2"><iframe id="yt-slot-top-2" data-slot-id="top-2" src="./Speech Festival Solo Verse Speaking_files/media(3).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 3"></iframe></div></div><div id="wrap-top-3" class="yt-oneclick-wrap w-full rounded-lg"><button id="top-stanza-btn-3" onclick="playStanzaVoiceover(3)" class="w-full px-2.5 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-rose-600 text-white border border-slate-700 flex items-center justify-between gap-1.5 transition"><span>🔊 Stanza 4</span><span class="text-[10px] font-mono text-indigo-200">1:21–1:41</span></button><div id="mount-top-3"><iframe id="yt-slot-top-3" data-slot-id="top-3" src="./Speech Festival Solo Verse Speaking_files/media(4).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 4"></iframe></div></div></div>
+      </div>
+
+      <div class="mb-4 pb-3 border-b flex flex-col md:flex-row justify-between md:items-end gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="poemCategoryBadge" class="text-[11px] font-bold bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full">Boys S3</span>
+            <span id="poemAuthorHeading" class="text-xs font-medium text-slate-500">Gervase Phinn</span>
+          </div>
+          <h2 id="poemTitleHeading" class="text-xl font-serif font-bold text-slate-900 mt-1">U66 • Late Home</h2>
+        </div>
+        <div class="bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-[11px] flex flex-wrap gap-3 text-slate-600">
+          <span><strong class="stress-word">STRESS</strong> Emphasis</span>
+          <span><span class="pause-mark">||</span> Pause</span>
+          <span><span class="runon-mark">⤷</span> Run-on</span>
+          <span><span class="intonation-up">↗</span>/<span class="intonation-down">↘</span> Pitch</span>
+        </div>
+      </div>
+
+      <div id="adjudicatorAdvice" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 mb-5"><strong>Adjudicator Note:</strong> Humorous dialogue poem! Distinctly differentiate between the scolding, fast-paced mother voice and the hesitant, frustrated boy voice.</div>
+      <div id="poemContainer" class="text-base leading-relaxed space-y-4 font-serif text-slate-800"><div id="stanza-card-0" class="relative bg-slate-50/70 rounded-2xl border border-slate-200 p-4 transition">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-transparent overflow-hidden rounded-t-2xl"><div id="stanza-prog-0" class="h-full bg-rose-500 w-0 transition-all duration-150" style="width: 0%;"></div></div>
+        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80 font-sans">
+          <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-700 text-white">Stanza 1</span>
+          <div id="wrap-card-0" class="yt-oneclick-wrap rounded-xl">
+            <button id="card-yt-btn-0" onclick="playStanzaVoiceover(0)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition">🔊 Play Stanza 1 (0:08–0:31)</button>
+            <div id="mount-card-0"><iframe id="yt-slot-card-0" data-slot-id="card-0" src="./Speech Festival Solo Verse Speaking_files/media(5).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 1"></iframe></div>
+          </div>
+        </div>
+        <div class="space-y-1"><div id="poem-line-row-0" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">1</span><div class="flex-1">Mum: And where have you been <span class="stress-word">until</span> this time? <span class="intonation-up">↗</span></div></div><div id="poem-line-row-1" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">2</span><div class="flex-1">Boy: I <span class="stress-word">was...</span></div></div><div id="poem-line-row-2" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">3</span><div class="flex-1">Mum: Playing <span class="stress-word">football</span>, <span class="pause-mark">||</span> I bet. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-3" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">4</span><div class="flex-1">Boy: No, <span class="pause-mark">||</span> I <span class="stress-word">was</span> <span class="runon-mark">⤷</span></div></div><div id="poem-line-row-4" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">5</span><div class="flex-1">Mum: When you should have come <span class="stress-word">straight</span> home. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-5" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">6</span><div class="flex-1">Boy: If I could <span class="stress-word">explain</span>...</div></div><div id="poem-line-row-6" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">7</span><div class="flex-1">Mum: The <span class="stress-word">times</span> I tell you...</div></div><div id="poem-line-row-7" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">8</span><div class="flex-1">Boy: You see, <span class="pause-mark">||</span> I <span class="stress-word">was..</span> <span class="intonation-down">↘</span></div></div><div id="poem-line-row-8" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">9</span><div class="flex-1">Mum: To come <span class="stress-word">straight</span> home. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-9" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">10</span><div class="flex-1">Boy: <span class="stress-word">But...</span></div></div></div>
+      </div><div id="stanza-card-1" class="relative bg-slate-50/70 rounded-2xl border border-slate-200 p-4 transition">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-transparent overflow-hidden rounded-t-2xl"><div id="stanza-prog-1" class="h-full bg-rose-500 w-0 transition-all duration-150" style="width: 0%;"></div></div>
+        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80 font-sans">
+          <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-700 text-white">Stanza 2</span>
+          <div id="wrap-card-1" class="yt-oneclick-wrap rounded-xl">
+            <button id="card-yt-btn-1" onclick="playStanzaVoiceover(1)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition">🔊 Play Stanza 2 (0:31–0:58)</button>
+            <div id="mount-card-1"><iframe id="yt-slot-card-1" data-slot-id="card-1" src="./Speech Festival Solo Verse Speaking_files/media(6).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 2"></iframe></div>
+          </div>
+        </div>
+        <div class="space-y-1"><div id="poem-line-row-10" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">11</span><div class="flex-1">Mum: You just don't <span class="stress-word">listen</span>, <span class="pause-mark">||</span> do you? <span class="intonation-up">↗</span></div></div><div id="poem-line-row-11" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">12</span><div class="flex-1">Boy: I do, <span class="pause-mark">||</span> <span class="stress-word">but...</span></div></div><div id="poem-line-row-12" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">13</span><div class="flex-1">Mum: In one ear and out the <span class="stress-word">other</span>. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-13" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">14</span><div class="flex-1">Boy: <span class="stress-word">But...</span></div></div><div id="poem-line-row-14" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">15</span><div class="flex-1">Mum: No more buts, <span class="pause-mark">||</span> <span class="stress-word">young</span> man. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-15" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">16</span><div class="flex-1">Boy: You <span class="stress-word">see...</span></div></div><div id="poem-line-row-16" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">17</span><div class="flex-1">Mum: Now, <span class="pause-mark">||</span> go and wash your <span class="stress-word">hands</span>. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-17" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">18</span><div class="flex-1">Boy: I'm <span class="stress-word">trying</span> to tell you...</div></div><div id="poem-line-row-18" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">19</span><div class="flex-1">Mum: Tea will be on the table in five <span class="stress-word">minutes</span>. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-19" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">20</span><div class="flex-1">Boy: The <span class="stress-word">thing</span> is....</div></div></div>
+      </div><div id="stanza-card-2" class="relative bg-slate-50/70 rounded-2xl border border-slate-200 p-4 transition">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-transparent overflow-hidden rounded-t-2xl"><div id="stanza-prog-2" class="h-full bg-rose-500 w-0 transition-all duration-150" style="width: 0%;"></div></div>
+        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80 font-sans">
+          <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-700 text-white">Stanza 3</span>
+          <div id="wrap-card-2" class="yt-oneclick-wrap rounded-xl">
+            <button id="card-yt-btn-2" onclick="playStanzaVoiceover(2)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition">🔊 Play Stanza 3 (0:58–1:21)</button>
+            <div id="mount-card-2"><iframe id="yt-slot-card-2" data-slot-id="card-2" src="./Speech Festival Solo Verse Speaking_files/media(7).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 3"></iframe></div>
+          </div>
+        </div>
+        <div class="space-y-1"><div id="poem-line-row-20" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">21</span><div class="flex-1">Mum: Have you any <span class="stress-word">homework</span>? <span class="intonation-up">↗</span></div></div><div id="poem-line-row-21" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">22</span><div class="flex-1">Boy: Yes, <span class="pause-mark">||</span> I have, <span class="stress-word">but...</span></div></div><div id="poem-line-row-22" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">23</span><div class="flex-1">Mum: Well, <span class="pause-mark">||</span> <span class="stress-word">after</span> tea it's up to your room. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-23" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">24</span><div class="flex-1">Boy: Could I <span class="stress-word">explain</span>...</div></div><div id="poem-line-row-24" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">25</span><div class="flex-1">Mum: And no television <span class="stress-word">tonight</span>. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-25" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">26</span><div class="flex-1">Boy: I'm <span class="stress-word">trying</span> to tell you...</div></div><div id="poem-line-row-26" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">27</span><div class="flex-1">Mum: Don't just <span class="stress-word">stand</span> there. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-27" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">28</span><div class="flex-1">Boy: Will you listen, <span class="pause-mark">||</span> <span class="stress-word">please</span>? <span class="intonation-up">↗</span></div></div><div id="poem-line-row-28" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">29</span><div class="flex-1">Mum: Do as you're told! <span class="intonation-up">↗</span></div></div></div>
+      </div><div id="stanza-card-3" class="relative bg-slate-50/70 rounded-2xl border border-slate-200 p-4 transition">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-transparent overflow-hidden rounded-t-2xl"><div id="stanza-prog-3" class="h-full bg-rose-500 w-0 transition-all duration-150" style="width: 0%;"></div></div>
+        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80 font-sans">
+          <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-700 text-white">Stanza 4</span>
+          <div id="wrap-card-3" class="yt-oneclick-wrap rounded-xl">
+            <button id="card-yt-btn-3" onclick="playStanzaVoiceover(3)" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition">🔊 Play Stanza 4 (1:21–1:41)</button>
+            <div id="mount-card-3"><iframe id="yt-slot-card-3" data-slot-id="card-3" src="./Speech Festival Solo Verse Speaking_files/media(8).html" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="Stanza 4"></iframe></div>
+          </div>
+        </div>
+        <div class="space-y-1"><div id="poem-line-row-29" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">30</span><div class="flex-1">Boy: Mrs <span class="stress-word">Wilson</span>!!!!! <span class="intonation-up">↗</span></div></div><div id="poem-line-row-30" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">31</span><div class="flex-1">Mum: <span class="stress-word">Pardon</span>? <span class="intonation-up">↗</span></div></div><div id="poem-line-row-31" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">32</span><div class="flex-1">Boy: I've been <span class="stress-word">trying</span> to tell you! <span class="intonation-up">↗</span></div></div><div id="poem-line-row-32" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">33</span><div class="flex-1">Mum: <span class="stress-word">What?</span> <span class="intonation-up">↗</span></div></div><div id="poem-line-row-33" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">34</span><div class="flex-1">Boy: That I am not your son and you're not my mum. <span class="intonation-down">↘</span></div></div><div id="poem-line-row-34" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">35</span><div class="flex-1">Mum: <span class="stress-word">Oh!</span> <span class="intonation-up">↗</span></div></div><div id="poem-line-row-35" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">36</span><div class="flex-1">Boy: I live next <span class="stress-word">door.</span> <span class="intonation-down">↘</span></div></div></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div id="view-vocab" class="hidden">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <h2 id="vocabPoemTitle" class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b">U66 • Late Home</h2>
+      <div id="vocabList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"><div class="p-3.5 border rounded-xl bg-slate-50 space-y-1"><div class="flex justify-between items-center"><h3 class="font-bold text-sm text-indigo-700">straight</h3><button onclick="speakSingleWord(&#39;straight&#39;)" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold hover:bg-indigo-200">🔊</button></div><p class="text-xs font-mono text-slate-500">/streɪt/</p><p class="text-xs text-slate-800">直接地 / 徑直地</p></div><div class="p-3.5 border rounded-xl bg-slate-50 space-y-1"><div class="flex justify-between items-center"><h3 class="font-bold text-sm text-indigo-700">explain</h3><button onclick="speakSingleWord(&#39;explain&#39;)" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold hover:bg-indigo-200">🔊</button></div><p class="text-xs font-mono text-slate-500">/ɪkˈspleɪn/</p><p class="text-xs text-slate-800">解釋 / 說明</p></div><div class="p-3.5 border rounded-xl bg-slate-50 space-y-1"><div class="flex justify-between items-center"><h3 class="font-bold text-sm text-indigo-700">pardon</h3><button onclick="speakSingleWord(&#39;pardon&#39;)" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold hover:bg-indigo-200">🔊</button></div><p class="text-xs font-mono text-slate-500">/ˈpɑːr.dən/</p><p class="text-xs text-slate-800">什麼？/ 請再說一遍</p></div><div class="p-3.5 border rounded-xl bg-slate-50 space-y-1"><div class="flex justify-between items-center"><h3 class="font-bold text-sm text-indigo-700">homework</h3><button onclick="speakSingleWord(&#39;homework&#39;)" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold hover:bg-indigo-200">🔊</button></div><p class="text-xs font-mono text-slate-500">/ˈhoʊm.wɝːk/</p><p class="text-xs text-slate-800">功課 / 作業</p></div></div>
+    </div>
+  </div>
+
+  <div id="view-practice" class="hidden space-y-4">
+    <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+      <h3 id="practicePoemHeader" class="text-sm font-bold text-slate-800">U66 • Late Home</h3>
+      <div class="flex flex-wrap items-center gap-2">
+        <select id="practiceStanzaScope" onchange="updatePracticeScope()" class="bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800"><option value="FULL">Full Poem</option><option value="0">Stanza 1</option><option value="1">Stanza 2</option><option value="2">Stanza 3</option><option value="3">Stanza 4</option></select>
+        <button id="toggleScriptBtn" onclick="toggleScriptDisplay()" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-300 text-indigo-700 bg-indigo-50">👁️ <span id="toggleScriptText">Hide Script</span></button>
+      </div>
+    </div>
+    <div id="practiceScriptContainer" class="bg-amber-50/70 border border-amber-200 p-4 rounded-2xl">
+      <div id="practiceScriptBody" class="text-sm leading-relaxed font-serif text-slate-800 whitespace-pre-line max-h-52 overflow-y-auto">Mum: And where have you been until this time?<br>Boy: I was...<br>Mum: Playing football, I bet.<br>Boy: No, I was<br>Mum: When you should have come straight home.<br>Boy: If I could explain...<br>Mum: The times I tell you...<br>Boy: You see, I was..<br>Mum: To come straight home.<br>Boy: But...<br>Mum: You just don't listen, do you?<br>Boy: I do, but...<br>Mum: In one ear and out the other.<br>Boy: But...<br>Mum: No more buts, young man.<br>Boy: You see...<br>Mum: Now, go and wash your hands.<br>Boy: I'm trying to tell you...<br>Mum: Tea will be on the table in five minutes.<br>Boy: The thing is....<br>Mum: Have you any homework?<br>Boy: Yes, I have, but...<br>Mum: Well, after tea it's up to your room.<br>Boy: Could I explain...<br>Mum: And no television tonight.<br>Boy: I'm trying to tell you...<br>Mum: Don't just stand there.<br>Boy: Will you listen, please?<br>Mum: Do as you're told!<br>Boy: Mrs Wilson!!!!!<br>Mum: Pardon?<br>Boy: I've been trying to tell you!<br>Mum: What?<br>Boy: That I am not your son and you're not my mum.<br>Mum: Oh!<br>Boy: I live next door.</div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <button id="recBtn" onclick="toggleRecording()" class="w-full py-3 px-4 rounded-xl font-bold text-xs text-white bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-white animate-pulse"></span>
+          <span id="recText">Start Recording</span>
+        </button>
+        <p id="recStatus" class="text-xs text-center text-slate-500">Ready</p>
+        <div class="border-t pt-3 flex justify-between text-xs">
+          <span class="text-slate-500">Duration:</span>
+          <span id="timerVal" class="font-mono font-bold text-slate-800">00:00</span>
+        </div>
+      </div>
+      <div class="md:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="p-3 bg-slate-50 rounded-xl border"><p class="text-[10px] font-semibold text-slate-500 uppercase">Accuracy</p><p id="accuracyScore" class="text-2xl font-black text-indigo-600 mt-0.5">--%</p></div>
+          <div class="p-3 bg-slate-50 rounded-xl border"><p class="text-[10px] font-semibold text-slate-500 uppercase">Pace (WPM)</p><p id="wpmScore" class="text-2xl font-black text-slate-800 mt-0.5">--</p></div>
+          <div class="p-3 bg-slate-50 rounded-xl border"><p class="text-[10px] font-semibold text-slate-500 uppercase">Flow</p><p id="flowScore" class="text-xl font-black text-emerald-600 mt-1">--</p></div>
+        </div>
+        <div id="diffOutput" class="p-4 bg-slate-50 rounded-xl min-h-[90px] text-sm leading-relaxed font-serif border border-slate-200 text-slate-400">Complete a recording to view word alignment.</div>
+        <div id="coachingTips" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-history" class="hidden">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-sm font-bold text-slate-900">Practice History</h2>
+        <button onclick="clearHistory()" class="text-xs text-red-600 font-semibold border border-red-200 px-2.5 py-1 rounded">Clear</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-600">
+          <thead class="bg-slate-100 uppercase text-slate-500 font-semibold">
+            <tr><th class="p-2.5">#</th><th class="p-2.5">Time</th><th class="p-2.5">Poem</th><th class="p-2.5">Accuracy</th><th class="p-2.5">WPM</th><th class="p-2.5">Delta</th></tr>
+          </thead>
+          <tbody id="historyTableBody" class="divide-y divide-slate-200"><tr><td colspan="6" class="p-3 text-center text-slate-400">No records yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $id = id => document.getElementById(id);
+const rawPoems = [["b1","Boys S1","Laughter Rap in Plastic Town","John Agard","One day as I was passing through plastic town\nI happened to pass a school playground\nyet I couldn't hear one laughing sound.\nCan you imagine a school playground\nand not a single laughing sound?\nBut that's how it was in plastic town.\nFor though they were playing as children play,\nplastic children do so in a most unusual way.\nNot one was laughing, not one I say.\nEvery move they made was made of plastic\nit was sad to see children so robotic.\nThey could do with a touch of my laughing magic.\nSo I reached for my hip-hop cap\ngot into my egg-leg tap\nbroke into my laughing rap.\nChildren, children of plastic town\nit makes me sad to see you frown.\nCracking up with laughter is the thing to do.\ncracking up with laughter makes you feel brand-new.\nSo give me a crick, give me a crack.\njust throw yourself into the laughing act.\nI promise my magic will bring you right back.","Deliver this poem with a strong rhythmic rap cadence! Use a bouncy, upbeat tone when entering the 'laughing rap'. Do NOT pause at the end of line 1 (run-on line).",[["passing through","/ˈpæs.ɪŋ θruː/","經過 / 穿過"],["unusual","/ʌnˈjuː.ʒu.əl/","不尋常的 / 特別的"],["robotic","/roʊˈbɑː.t̬ɪk/","機器人般的 / 機械化的"],["magic","/ˈmædʒ.ɪk/","魔法 / 魅力"],["hip-hop","/ˈhɪp.hɑːp/","嘻哈風格"],["frown","/fraʊn/","皺眉 / 愁眉不展"],["cracking up","/ˈkræk.ɪŋ ʌp/","捧腹大笑"],["brand-new","/ˌbrænd ˈnuː/","煥然一新的"]],"sUJhbRB1AKQ","U61",9,117,[[9,23,0,2],[23,38,3,5],[38,58,6,8],[58,75,9,11],[75,87,12,14],[87,104,15,18],[104,117,19,21]]],["b2","Boys S1","Rain Falls Down","Margot Henderson","The clouds begin to rub together\nsoft as the stroke of a silky feather\nthen the rain begins to fall\nthe rain falls down\nlike tip tip tapping\nthe rain falls down\nlike clap clap clapping\nand the rain comes falling down\nthe rain falls down\ntumbling under\nthe rain falls down\nlike the sound of thunder\nand the rain comes falling down\nthe rain comes down\nlike the sound of thunder\nthe rain falls down\ntumbling under\nand the rain comes falling down\nthe rain falls down\nlike the sound of clapping\nthe rain falls down\nlike tip tap tapping\nand the rain comes falling down\nthe clouds begin to rub together\nsoft as the stroke of a silky feather\nand the SUN comes out again","Build sound imagery using your vocal dynamics! Start softly on 'silky feather', crescendo during 'thunder', then soften as the rain recedes.",[["stroke","/stroʊk/","撫摸 / 輕觸"],["silky","/ˈsɪl.ki/","絲綢般柔滑的"],["feather","/ˈfeð.ɚ/","羽毛"],["tapping","/ˈtæp.ɪŋ/","滴答輕敲"],["tumbling","/ˈtʌm.bəl.ɪŋ/","跌落 / 滾動"],["thunder","/ˈθʌn.dɚ/","雷聲 / 雷鳴"]],"85-P5dgHRA4","U62",8,105,[[8,21,0,2],[21,41,3,7],[41,57,8,12],[57,71,13,17],[71,91,18,22],[91,105,23,25]]],["b3","Boys S2","Let No One Steal Your Dreams","Paul Cookson","Let no one steal your dreams\nLet no one tear apart\nThe burning of ambition\nThat tires the drive inside your heart\nLet no one steal your dreams\nLet no one tell you that you can't\nLet no one hold you back\nLet no one tell you that you won't\nSet your sights and keep them fixed\nSet your sights on high\nLet no one steal your dreams\nYour only limit is the sky\nLet no one steal your dreams\nFollow your heart\nFollow your soul\nFor only when you follow them\nWill you feel truly whole\nSet your sights and keep them fixed\nSet your sights on high\nLet no one steal your dreams\nYour only limit is the sky","Project inspiration and resolute determination! 'Let no one steal your dreams' is your repeating refrain—speak it with conviction each time.",[["ambition","/æmˈbɪʃ.ən/","雄心 / 抱負"],["drive","/draɪv/","驅動力 / 激情"],["sights","/saɪts/","志向 / 目標"],["fixed","/fɪkst/","堅定不移的"],["limit","/ˈlɪm.ɪt/","極限 / 頂點"],["truly whole","/ˈtruː.li hoʊl/","真正充實圓滿"]],"T2mviy1QeBQ","U63",10,83,[[10,25,0,3],[25,40,4,7],[40,54,8,11],[54,68,12,16],[68,83,17,20]]],["b4","Boys S2","The Boy Who Broke Things","Brian Patten","The boy kept breaking things.\nHe broke the one window through which the world\nlooked bright.\nHe broke bottles.\nHe broke promises.\nHe broke his mother's heart.\nHe broke the lock on the cupboard in which she kept\nthe sky,\nAnd so she floated off,\nAnd was lost amongst clouds forever.\nHe broke the lock on the box in which his father kept\nthe ocean.\nHis father was swept away and drowned,\nAnd the boy never saw him again.\nAngry, he stomped on the earth and tried to break it,\nBut it was a tough nut, the earth -\nFar tougher than him.\nAnd his anger grew,\nUntil it became a tree inside him,\nAnd all its leaves were poisonous, and nothing sang,\nAnd all its branches were empty.\nThe boy was angry.\nHe tore the curtain that separated life from death.\nAnd so he could no longer tell\nWhat was living and what was dead inside him.\nHe smashed the clues we use to separate fact\nfrom fiction,\nThey became one thing to him.\nHis anger was like a nasty giant.\nHe was angry, but he could not say why.\nThe answer to his anger stuck in his throat\nIt was a secret he did not want to keep, but could\nnot get rid of,\nAnd the bottled up pain inside him was like a\nmad genie.\nAnd he wept, and he wept and he wept.","Build dark emotional intensity. Contrast the boy's violent stomping actions with the tragic, quiet repetition of 'and he wept' at the climax.",[["floated","/ˈfloʊ.t̬ɪd/","漂浮 / 飄走"],["stomped","/stɑːmpt/","重踏 / 跺腳"],["poisonous","/ˈpɔɪ.zən.əs/","有毒的 / 惡意的"],["fiction","/ˈfɪk.ʃən/","虛構 / 小說"],["nasty","/ˈnæsti/","惡劣的 / 脾氣暴躁的"],["genie","/ˈdʒiː.ni/","精靈 / 魔神"]],"PEqKTeWXBc4","U64",10,181,[[10,45,0,9],[45,64,10,13],[64,101,14,20],[101,136,21,27],[136,181,28,35]]],["b5","Boys S3","Limpet","Chrissie Gittins","I am a Cornish limpet,\nbeen here for a hundred years,\nsucking and gripping and sticking to this stone\nwith a hundred thousand fears.\nWhat if I get put in a bucket\nand dumped in the boot of a car,\nwith wellies and jellies and a windbreaker\nand a shell in the shape of a star?\nI'd miss my chats with the ancient crab,\nthe swell and wash of the tide,\nthe soothing stroke of anemones,\nthe storms when the fish come and hide.\nBut I hang on tight and hope for the best,\nI avoid anyone with a spade,\nwhen the sun beats down in a glisten\non the sea, my fears begin to fade.","Expressive persona poem! Adopt a clinging, nervous character voice for the limpet that transforms into peaceful serenity in the final stanza.",[["limpet","/ˈlɪm.pɪt/","帽貝（緊附於岩石上的軟體動物）"],["gripping","/ˈɡrɪp.ɪŋ/","緊握 / 抓緊"],["wellies","/ˈwel.iz/","長筒雨靴"],["windbreaker","/ˈwɪndˌbreɪ.kɚ/","防風夾克"],["anemones","/əˈnem.ə.niːz/","海葵"],["glisten","/ˈɡlɪs.ən/","閃耀 / 閃光"]],"hUO3OrMMan8","U65",8,75,[[8,24,0,3],[24,40,4,7],[40,55,8,11],[55,75,12,15]]],["b6","Boys S3","Late Home","Gervase Phinn","Mum: And where have you been until this time?\nBoy: I was...\nMum: Playing football, I bet.\nBoy: No, I was\nMum: When you should have come straight home.\nBoy: If I could explain...\nMum: The times I tell you...\nBoy: You see, I was..\nMum: To come straight home.\nBoy: But...\nMum: You just don't listen, do you?\nBoy: I do, but...\nMum: In one ear and out the other.\nBoy: But...\nMum: No more buts, young man.\nBoy: You see...\nMum: Now, go and wash your hands.\nBoy: I'm trying to tell you...\nMum: Tea will be on the table in five minutes.\nBoy: The thing is....\nMum: Have you any homework?\nBoy: Yes, I have, but...\nMum: Well, after tea it's up to your room.\nBoy: Could I explain...\nMum: And no television tonight.\nBoy: I'm trying to tell you...\nMum: Don't just stand there.\nBoy: Will you listen, please?\nMum: Do as you're told!\nBoy: Mrs Wilson!!!!!\nMum: Pardon?\nBoy: I've been trying to tell you!\nMum: What?\nBoy: That I am not your son and you're not my mum.\nMum: Oh!\nBoy: I live next door.","Humorous dialogue poem! Distinctly differentiate between the scolding, fast-paced mother voice and the hesitant, frustrated boy voice.",[["straight","/streɪt/","直接地 / 徑直地"],["explain","/ɪkˈspleɪn/","解釋 / 說明"],["pardon","/ˈpɑːr.dən/","什麼？/ 請再說一遍"],["homework","/ˈhoʊm.wɝːk/","功課 / 作業"]],"HsDHzd8O8O4","U66",8,101,[[8,31,0,9],[31,58,10,19],[58,81,20,28],[81,101,29,35]]],["b7","Boys S4","I Remember, I Remember","Thomas Hood","I remember, I remember,\nThe house where I was born,\nThe little window where the sun\nCame peeping in at morn;\nHe never came a wink too soon,\nNor brought too long a day,\nBut now, I often wish the night\nHad borne my breath away.\n\nI remember, I remember,\nThe roses, red and white;\nThe violets, and the lily-cups,\nThose flowers made of light!\nThe lilacs where the robin built,\nAnd where my brother set\nThe laburnum on his birthday\nThe tree is living yet!\n\nI remember, I remember,\nWhere I was used to swing;\nAnd thought the air must rush as fresh\nTo swallows on the wing:\nMy spirit flew in feathers then,\nThat is so heavy now,\nAnd summer pools could hardly cool\nThe fever on my brow!\n\nI remember, I remember,\nThe fir trees dark and high;\nI used to think their slender tops\nWere close against the sky:\nIt was a childish ignorance,\nBut now 'tis little joy\nTo know I'm farther off from Heav'n\nThan when I was a boy.","Reflective nostalgia! Contrast the innocent joy of childhood memories with the solemn melancholic tone of the present day.",[["peeping","/ˈpiːp.ɪŋ/","窺視 / 隱現"],["borne","/bɔːrn/","帶走 / 承受"],["laburnum","/ləˈbɜːr.nəm/","金鏈花樹"],["swallows","/ˈswɑː.loʊz/","燕子"],["slender","/ˈslen.dɚ/","纖細的"],["ignorance","/ˈɪɡ.nər.əns/","無知 / 天真"]],"9ZJBZIuRlts","U67",8,109,[[8,36,0,7],[36,60,8,15],[60,85,16,23],[85,109,24,31]]],["b8","Boys S4","Sea Fever","John Masefield","I must go down to the seas again, to the lonely sea and the sky,\nAnd all I ask is a tall ship and a star to steer her by;\nAnd the wheel's kick and the wind's song and the white sail's shaking,\nAnd a grey mist on the sea's face, and a grey dawn breaking.\n\nI must go down to the seas again, for the call of the running tide\nIs a wild call and a clear call that may not be denied;\nAnd all I ask is a windy day with the white clouds flying,\nAnd the flung spray and the blown spume, and the sea-gulls crying.\n\nI must go down to the seas again, to the vagrant gypsy life,\nTo the gull's way and the whale's way where the wind's like a whetted knife;\nAnd all I ask is a merry yarn from a laughing fellow-rover,\nAnd quiet sleep and a sweet dream when the long trick's over.","Master the rolling heptameter rhythm! Mimic the ebb and flow of ocean waves. Maintain long rolling phrases without choppy pauses.",[["steer","/stɪr/","掌舵 / 引航"],["denied","/dɪˈnaɪd/","拒絕 / 否認"],["flung spray","/flʌŋ spreɪ/","飛濺的浪花"],["blown spume","/bloʊn spjuːm/","吹散的泡沫"],["vagrant","/ˈveɪ.ɡrənt/","流浪的 / 漂泊的"],["whetted","/ˈwet.ɪd/","磨尖鋒利的"],["fellow-rover","/ˈfel.oʊ ˈroʊ.vɚ/","水手同伴"]],"YcjwPNFhcSo","U68",8,86,[[8,36,0,3],[36,62,4,7],[62,86,8,11]]],["b9","Boys S5","The First Men on the Moon","J. Patrick Lewis","'The Eagle has landed!' - Apollo 11 Commander Neil A. Armstrong\n'A magnificent desolation!' - Air Force Colonel Edwin E. 'Buzz' Aldrin, Jr.\nJuly 20, 1969\n\nThat afternoon in mid-July,\nTwo pilgrims watched from distant space\nThe moon ballooning in the sky.\nThey rose to meet it face-to-face.\n\nTheir spidery spaceship, Eagle, dropped\nDown gently on the lunar sand.\nAnd when the module's engines stopped,\nRapt silence fell across the land.\n\nThe first man down the ladder, Neil,\nSpoke words that we remember now -\n'One small step...' It made us feel\nAs if we were there too, somehow.\n\nWhen Neil planted the flag and Buzz\nCollected lunar rocks and dust,\nThey hopped like kangaroos because\nOf gravity. Or wanderlust?\n\nA quarter million miles away,\nOne small blue planet watched in awe.\nAnd no one who was there that day\nWill soon forget the sight they saw.","Heroic narrative tone! Evoke the solemn wonder of the 1969 moon landing with awe-struck pauses.",[["pilgrims","/ˈpɪl.ɡrɪmz/","朝聖者 / 遠行者"],["desolation","/ˌdes.əˈleɪ.ʃən/","荒涼 / 寂療"],["spidery","/ˈspaɪ.dɚ.i/","細長的"],["lunar","/ˈluː.nɚ/","月球的"],["rapt","/ræpt/","全神貫注的"],["wanderlust","/ˈwɑːn.dɚ.lʌst/","漫遊渴望"]],"XKx_cC553VM","U69",10,117,[[10,47,0,6],[47,65,7,10],[65,82,11,14],[82,97,15,18],[97,117,19,22]]],["b10","Boys S5","The Christmas Shed","Wes Magee","It was late afternoon on Christmas Day\nwith light fading and flakes falling\nwhen the three of us raced through the copse\nwhere rhododendrons and holly bushes\nbent low under their burden of fresh snow.\nGasping, we skidded to a stop\nat the edge of the estate's allotments.\nA bitter, whining wind made us shiver\nas it whipped across the frozen earth.\n\"No one's about.\nCome on!\"\nSlipping and skating we dashed for Jacko's shed\nand at the back crawled through a hole\nwhere the old boards had rotted away.\nInside it was dry. The air was still.\nWe peered as daylight filtered dimly\nthrough the fly-spattered, cobwebbed window,\nand breathed the shed's special smell\nof pine, creosote, paraffin, and sawdust.\nFear of discovery made us whisper.\n\"Let's see if they're\nstill there.\"\nCarefully we moved garden implements\nthat were stacked in a corner.\nDried soil fell and crunched beneath our boots\nas we shifted rakes, forks, spades, and hoes,\nand there was Smoky and her four kittens\nwarm in a bed of worn gloves and jerseys.\nLike the Three Kings we knelt and offered\nour Christmas gifts - turkey scraps, ham, a sausage.\nSmoky arched and purred and ate hungrily.\n\"The kittens\nare still blind.\"\nThe food vanished. We watched in silence\nas the grey cat lay down and her mewling kittens\nguzzled greedily at the milk bar.\n\"It's late.\"\nWe replaced the implements\nand crept out of Jacko's old shed.\nLike shadows we hared for the cover of the copse.\nChilled to the bone we reached our estate\nwhere Christmas lights were flashing. We split.\n\"Same time tomorrow?\"\n\"Yeah.\"\n\"See you.\"","Create atmospheric suspense through whispered conspiratorial dialogue contrasted with the biting cold outdoor environment.",[["copse","/kɑːps/","小樹林 / 灌木叢"],["allotments","/əˈlɑːt.mənts/","社區租用園圃"],["creosote","/ˈkriː.ə.soʊt/","木材防腐漆"],["implements","/ˈɪm.plə.mənts/","農具 / 工具"],["mewling","/ˈmjuː.lɪŋ/","咪咪叫喚的"],["guzzled","/ˈɡʌz.əld/","狼吞虎嚥"]],"O8uHRXU0yUY","U70",7,205,[[7,53,0,10],[53,105,11,21],[105,159,22,32],[159,205,33,44]]],["g1","Girls S1","Midnight Meeting","Mike Jubb","On soft, silent, padded paws,\nall cats are grey in the night;\nthis is their time.\nA shadow walking in shadows,\nPrometheus is on the prowl.\nOther toms keep their distance,\nand a fox crosses the road\nto avoid him;\nbut the mouse saw nothing,\nheard nothing,\nknew nothing.\nOn wings without a whisper,\nold Tawny perches\non the chimney pot,\nin time to see the cat\nsnatch his prey.\nTheir eyes meet,\nthe owl and the pussycat,\nthe staring match of all time.\nPrometheus looks away first.\nAfter all,\nhe has the mouse.","Create a tense, mysterious nocturnal atmosphere. Use soft, sibilant whispers ('soft, silent, padded paws') contrasted with sudden dramatic pauses.",[["padded paws","/ˈpæd.ɪd pɔːz/","肉墊貓爪"],["prowl","/praʊl/","潛行尋獵"],["avoid","/əˈvɔɪd/","避開 / 躲避"],["perches","/ˈpɝː.tʃɪz/","棲息高處"],["snatch","/snætʃ/","迅捷抓取"],["prey","/preɪ/","獵物"],["staring match","/ˈster.ɪŋ mætʃ/","凝視對決"]],"wBf4XQCy2ww","U35",8,90,[[8,24,0,2],[24,52,3,10],[52,67,11,15],[67,90,16,21]]],["g2","Girls S1","Entering a Castle","Brian Moses","Don't enter a castle quietly\nor timidly.\ndon't enter it anxiously,\nready to bolt\nat the slightest sound.\nDon't enter it stealthily\ntaking slow and thoughtful steps,\nconsidering with each footfall\nthe mystery of history.\nDon't be meek\nor frightened to speak.\nFor when you enter a castle\nyou should charge through the gate\nand signal your arrival with a SHOUT!\nYou should play the invading army\nand barge a way through.\nYou should swagger up to the door\nthen shove it aside and announce,\n'Here I am! This is mine!'\nThis castle is here, it is waiting for you,\nand today,\nit is yours for the taking!","Bold, commanding delivery! Contrast timid, quiet warnings in the first half with loud, triumphant energy in the second.",[["timidly","/ˈtɪm.ɪd.li/","膽小地"],["stealthily","/ˈstel.θə.li/","悄悄地"],["meek","/miːk/","溫順的"],["swagger","/ˈswæɡ.ɚ/","昂首闊步"],["shove","/ʃʌv/","推開"]],"lXA17LAhgFI","U36",8,83,[[8,23,0,4],[23,43,5,10],[43,60,11,15],[60,83,16,21]]],["g3","Girls S1","My Stepdad Is an Alien","Roger Stevens","I'd suspected for some time.\nI finally got up the courage\nto talk to him about it.\nI think you're an alien, I told him.\nNonsense, he said. Why do you think that?\nYou're bald. You don't have any hair\nanywhere.\nThat's not that unusual, he said.\nWell, you've got one green eye\nand one blue one.\nThat doesn't make me an alien, he replied.\nYou can make the toaster work\nwithout turning it on.\nThat's just a trick, he smiled.\nSometimes I hear you\ntalking to Mum in a weird alien language.\nI'm learning Greek\nand Mum lets me practise on her.\nWhat about your bright blue tail?\nAh, he said thoughtfully.\nYou're right, of course.\nSo, the tail gave it away, did it?","Playful comic timing! Build up innocent accusations until the humorous punchline ending.",[["suspected","/səˈspek.tɪd/","懷疑"],["courage","/ˈkɝː.ɪdʒ/","勇氣"],["alien","/ˈeɪ.li.ən/","外星人"],["unusual","/ʌnˈjuː.ʒu.əl/","不尋常的"],["thoughtfully","/ˈθɑːt.fəl.i/","若有所思地"]],"-NYIggrsK_c","U37",10,103,[[10,35,0,4],[35,59,5,10],[59,85,11,17],[85,103,18,21]]],["g4","Girls S2","The First Bit","Coral Rumble","I love the first bit of the morning,\nThe bit of the day that no one has used yet,\nThe part that is so clean\nYou must wipe your feet before you walk out into it.\nThe bit that smells like rose petals and cut grass\nAnd dampens your clothes with dew.\nIf you go out, you will bump into secrets,\nDiscover miracles usually covered by bus fumes.\nYou will hear pure echoes, whispers and scuttling.\nI love the first bit of the morning\nWhen the sun has only one eye open\nAnd the day is like a clean shirt,\nUncreased and ready to put on;\nThe part that gets your attention\nBy being so quiet.","Soft, delicate imagery delivery! Capture the quiet stillness of early dawn.",[["dampens","/ˈdæm.pənz/","使濕潤"],["dew","/duː/","露水"],["miracles","/ˈmɪr.ə.kəlz/","奇蹟"],["scuttling","/ˈskʌt.əl.ɪŋ/","碎步聲"],["uncreased","/ʌnˈkriːst/","無皺褶的"]],"soKICmu-xXA","U38",8,84,[[8,40,0,5],[40,58,6,8],[58,84,9,14]]],["g5","Girls S2","At the End of a School Day","Wes Magee","It is the end of a school day\nand down the long drive\ncome bag-swinging, shouting children.\nDeafened, the sky winces.\nThe sun gapes in surprise.\nSuddenly the runners skid to a stop,\nstand still and stare\nat a small hedgehog\ncurled-up on the tarmac\nlike an old, frayed cricket ball.\nA girl dumps her bag, tiptoes forward\nand gingerly, so gingerly\ncarries the creature\nto the safety of a shady hedge.\nThen steps back, watching.\nGirl, children, sky and sun\nhold their breath.\nThere is a silence,\na moment to remember\non this warm afternoon in June.","Dynamic contrast! Transition smoothly from noisy schoolyard shouting to gentle, breathtaking silence around the hedgehog.",[["winces","/ˈwɪn.sɪz/","畏縮 / 皺眉"],["gapes","/ɡeɪps/","張口目瞪"],["tarmac","/ˈtɑːr.mæk/","柏油路"],["frayed","/freɪd/","磨損的"],["gingerly","/ˈdʒɪn.dʒɚ.li/","小心翼翼地"]],"MhpNv3E5duk","U39",9,85,[[9,27,0,4],[27,45,5,9],[45,65,10,14],[65,85,15,19]]],["g6","Girls S2","Marmalade","Peter Dixon","He's buried in the bushes,\nwith dockleaves round his grave,\nA crimecat desperado\nand his name was Marmalade.\nHe's the cat that caught the pigeon,\nthat stole the neighbour's meat\nand tore the velvet curtains\nand stained the satin seat.\nHe's the cat that spoilt the laundry,\nhe's the cat that spilt the stew,\nand chased the lady's poodle\nand scratched her daughter too.\nBut -\nNo more we'll hear his cat flap,\nor scratches at the door,\nor see him at the window,\nor hear his catnap snore.\nSo-\nRing his grave with pebbles,\nerect a noble sign -\nFor here lies Marmalade\nand Marmalade was MINE.","Mischievous tribute poem! Recite Marmalade's naughty adventures with pride and affection.",[["desperado","/ˌdes.pəˈrɑː.doʊ/","亡命之徒 / 淘氣鬼"],["velvet","/ˈvel.vɪt/","天鵝絨"],["satin","/ˈsæt.ən/","緞子"],["catnap","/ˈkæt.næp/","打盹"],["erect","/ɪˈrekt/","樹立"]],"QVeJ8qG7Abs","U40",8,78,[[8,21,0,3],[21,34,4,7],[34,48,8,11],[48,63,12,16],[63,78,17,21]]],["g7","Girls S3","Last Day","Clare Bevan","This class was special.\nNo one was particularly clever,\nParticularly naughty,\nParticularly messy,\nParticularly anything.\nNothing miraculous happened,\nNothing stunning,\nOr funny, or frightening, or strange.\nEach day was much like another\nAs the year crept softly by,\nLeaving its ordinary debris\nOf drawings and stories\nAnd small successes\nAnd unremarkable memories.\nYet something hung between us,\nSomething that glittered like chalk dust\nOn a sunny day.\nIt was nothing you could touch,\nOr capture,\nOr exactly define,\nBut when I see the scattered offerings\nLeft on my desk\nA necklace of shells,\nA giant pot of talcum\nSmelling of yesterday,\nA limp bunch of yellow flowers,\nA crumpled card\nSigned with love -\nI can hardly bear\nTo walk away.\nThis class was special.","Tender, nostalgic emotion! Reflect on the simple schoolyard gifts left on the desk with genuine affection.",[["miraculous","/məˈræk.jə.ləs/","奇蹟般的"],["debris","/dəˈbriː/","殘留物"],["unremarkable","/ˌʌn.rɪˈmɑːr.kə.bəl/","平淡無奇的"],["talcum","/ˈtæl.kəm/","爽身粉"],["crumpled","/ˈkrʌm.pəld/","皺巴巴的"]],"gTc918Co0Qc","U41",8,105,[[8,34,0,7],[34,54,8,13],[54,74,14,19],[74,105,20,30]]],["g8","Girls S3","Lost, One Siamese Cat","Moira Andrew","Like a stripped-down\nengine, all his\nworking parts\nare visible.\nHe wears his skin\nlike a speed-skater's suit,\ngazes out from\nblackcurrant eyes.\nHis face is all\ntriangles, black patent\nnose, ears like\ncorner flags.\nHis whiskers sprout\nfrom peppered holes;\nyawning, his tongue is\na curling flame.\nThe most elegant\nof cats, he steps with\nNureyev grace, purrs like\na thunderbox.\nHe pours himself\nlike cream from\nwindow sill to puddle\nof sunlight.\nHe has a voice\nof a banshee, answers to\nSam. If found, return\nto Jones, number 76,\nPLEASE.","Vivid feline description! Portray the sleek, elegant movement of the Siamese cat.",[["visible","/ˈvɪz.ə.bəl/","可見的"],["patent","/ˈpæt.ənt/","漆皮光亮"],["elegant","/ˈel.ə.ɡənt/","優雅的"],["thunderbox","/ˈθʌn.dɚ.bɑːks/","雷鳴箱"],["banshee","/ˈbæn.ʃiː/","尖聲女妖"]],"BBNLizpKAO8","U42",9,84,[[9,28,0,7],[28,49,8,15],[49,67,16,23],[67,84,24,28]]],["g9","Girls S3","Stage Directions for Bluebells","Dinah Hendry","OK. Everyone else off-stage -\nwe'll just have bluebells for this one.\nLilac? Don't fire your torches yet.\nDaisies? Just stay folded, will you?\nNow. Bluebells. Can we all be up-\nstanding? That's it. Spread yourselves\nabout a bit. Use the whole stage.\nWhat d'you think we've got all this green\nfoliage for? Nice! Nice! Now families\nover on the right, please. And you two\ncould you appear to be in conversation,\nor at least on nodding acquaintance? No,\nthere's no need to be facetious. You don't\nhave to ring. Solitaries? Nestle in the shade\namong the ferns and ivies. No, you can't\nhave extra lighting. It's contrast we're after.\nOK. You shy, flirty ones - over by the wall.\nPeep through the peonies. Can you tremble?\nVery nice! Miss Precocious? By the rose.\nNow. You extras. All right, all righty,\nindividuals. We're running out of space here.\nDo what you can with the cracks in the path.\nYes, I realize you might get trampled on\nthat's just a risk you've got to take.\nLovely! Lovely! You all look very picturesque.\nOK. That's it! Hold it! Hold it!\nWe'll call it 'Late April in England, with\nbluebells'.","Animated theatrical director role-play! Address different sections of flowers around the imaginary stage with crisp projection.",[["foliage","/ˈfoʊ.li.ədʒ/","樹葉"],["acquaintance","/əˈkweɪn.təns/","相識"],["facetious","/fəˈsiː.ʃəs/","開玩笑的"],["precocious","/prəˈkoʊ.ʃəs/","早熟的"],["picturesque","/ˌpɪk.tʃəˈresk/","如畫美的"]],"gC6Iw7DmiUk","U43",9,120,[[9,44,0,8],[44,71,9,15],[71,93,16,20],[93,120,21,27]]],["g10","Girls S4","The Song of Wandering Aengus","W.B. Yeats","I went out to the hazel wood,\nBecause a fire was in my head,\nAnd cut and peeled a hazel wand,\nAnd hooked a berry to a thread;\nAnd when white moths were on the wing,\nAnd moth-like stars were flickering out,\nI dropped the berry in a stream\nAnd caught a little silver trout.\n\nWhen I had laid it on the floor\nI went to blow the fire a-flame,\nBut something rustled on the floor,\nAnd someone called me by my name:\nIt had become a glimmering girl\nWith apple blossom in her hair\nWho called me by my name and ran\nAnd faded through the brightening air.\n\nThough I am old with wandering\nThrough hollow lands and hilly lands,\nI will find out where she has gone,\nAnd kiss her lips and take her hands;\nAnd walk among long dappled grass,\nAnd pluck till time and times are done\nThe silver apples of the moon,\nThe golden apples of the sun.","Lyrical, mystical tone! Express the timeless search for magical beauty with romantic musicality.",[["hazel wand","/ˈheɪ.zəl wɑːnd/","榛木枝"],["flickering","/ˈflɪk.ɚ.ɪŋ/","閃爍的"],["glimmering","/ˈɡlɪm.ɚ.ɪŋ/","微光閃爍"],["dappled","/ˈdæp.əld/","斑駁光影"]],"Szbj4HFX3CA","U44",9,93,[[9,35,0,7],[35,64,8,15],[64,93,16,23]]],["g11","Girls S4","My First Dog","Patricia Leighton","Prince was my dog,\nno one else's.\nI couldn't remember a time\nwhen he wasn't there.\nWe grew up together,\nroamed together,\ngot into trouble together,\nwinked at each other\nand took our tellings-off\ntogether.\nHe was my black-and-tan shadow,\nsleeking along at my heels\ntongue out,\nchasing down the green hill\nand the alleyway\nto the corner shop.\nHe was my talisman;\nwith him I was safe.\nHe was my freedom,\nhis soft coat the cushion\nof my dreams as I lay\ntracing cloud\npatterns\nin\nthe\nsky.\nAnd when he gashed his leg\non a rusted railing,\nwhen my mother quietly told me\nhe had been put down,\nhe was the first black hole\nof my young life.\nThe loneliness\nof empty arms\nand no warm neck\nto put them round.","Emotional progression from childhood joy and loyalty to poignant heartbreak.",[["roamed","/roʊmd/","漫遊"],["sleeking","/sliːk.ɪŋ/","敏捷滑行"],["talisman","/ˈtæl.ɪz.mən/","護身符"],["gashed","/ɡæʃt/","割傷深口"]],"JpRQ8eFNZ4Q","U45",9,120,[[9,41,0,9],[41,60,10,15],[60,84,16,25],[84,120,26,35]]],["g12","Girls S4","Blackberry-Picking","Seamus Heaney","Late August, given heavy rain and sun\nFor a full week, the blackberries would ripen.\nAt first, just one, a glossy purple clot\nAmong others, red, green, hard as a knot.\nYou ate that first one and its flesh was sweet\nLike thickened wine: summer's blood was in it\nLeaving stains upon the tongue and lust for\nPicking. Then red ones inked up and that hunger\nSent us out with milk cans, pea tins, jam pots\nWhere briars scratched and wet grass bleached our boots\nRound hayfields, cornfields and potato drills\nWe trekked and picked until the cans were full,\nUntil the tinkling bottom had been covered\nWith green ones, and on top big dark blobs burned\nLike a plate of eyes. Our hands were peppered\nWith thorn pricks, our palms sticky as Bluebeard's.\nWe hoarded the fresh berries in the byre\nBut when the bath was filled we found a fur,\nA rat-grey fungus, glutting on our cache.\nThe juice was stinking too. Once off the bush\nThe fruit fermented, the sweet flesh would turn sour.\nI always felt like crying. It wasn't fair\nThat all the lovely canfuls smelt of rot.\nEach year I hoped they'd keep, knew they would not.","Sensuous tactile descriptions! Capture both the sweet anticipation of picking and the bitter disappointment of rot.",[["glossy","/ˈɡlɑː.si/","光澤美麗的"],["briars","/ˈbraɪ.ɚz/","刺籬 / 刺藤"],["hoarded","/ˈhɔːr.dɪd/","囤積珍藏"],["fermented","/fɚˈmen.tɪd/","發酵"]],"_kP-1bljhno","U46",9,133,[[9,42,0,7],[42,86,8,15],[86,133,16,23]]],["g13","Girls S5","One Moment in Summer","David Harmer","The house is dropping swallows\none by one from under the gutter\nthey swoop and fall\non our heads as we queue\nfor ice cream.\nIt is so hot\nthat the long line of cars clogging the road\nhum like a line of electric fires.\nThey shine and shimmer, stink of oil and warm seats\nthe children gaze out from their misted windows.\nTrapped under glass\nhair plastered down with sweat\ngasping for breath like frogs under ice.\nThe cars crawl round the curve\nof the road, stuck in between the shop\nand the cafe.\nMy ice cream is butterscotch and almond\nLizzie's is chocolate, Harriet's vanilla.\nThey are so delicious and cold\nwe lick them slowly, letting the long, cool flavours\nslide down our tongues.\nInside the cars, the red-faced people\nbegin to boil.\nThe swallows flit and dart\nrapid specks of blueblack and white\nthe summer flies at us\nlike an arrow.","Evoke sweltering summer heat contrasted with the refreshing cool taste of ice cream.",[["swoop","/swuːp/","俯衝"],["clogging","/ˈklɑː.ɡɪŋ/","堵塞"],["shimmer","/ˈʃɪm.ɚ/","微光閃爍"]],"m6QuyxwFZcU","U47",9,101,[[9,20,0,4],[20,50,5,12],[50,82,13,20],[82,101,21,26]]],["g14","Girls S5","Hide and Seek","Vernon Scannell","Call out. Call loud: 'I'm ready! Come and find me!'\nThe sacks in the toolshed smell like the seaside.\nThey'll never find you in this salty dark,\nBut be careful that your feet aren't sticking out.\nWiser not to risk another shout.\nThe floor is cold. They'll probably be searching\nThe bushes near the swing. Whatever happens\nYou mustn't sneeze when they come prowling in.\nAnd here they are, whispering at the door;\nYou've never heard them sound so hushed before.\nDon't breathe. Don't move. Stay dumb. Hide in your\nblindness.\nThey're moving closer, someone stumbles, mutters;\nTheir words and laughter scuffle, and they're gone.\nBut don't come out just yet; they'll try the lane\nAnd then the greenhouse and back here again.\nThey must be thinking that you're very clever,\nGetting more puzzled as they search all over.\nIt seems a long time since they went away.\nYour legs are stiff, the cold bites through your coat;\nThe dark damp smell of sand moves in your throat.\nIt's time to let them know that you're the winner.\nPush of the sacks. Uncurl and stretch. That's better!\nOut off the shed and call to them: 'I've won!\nHere I am! Come and own up I've caught you!'\nThe darkening garden watches. Nothing stirs.\nThe bushes hold their breath; the sun is gone.\nYes, here you are. But where are they who sought you?","Dramatic suspense! Build from intense excitement in hiding to the quiet, eerie realization of abandonment at the end.",[["prowling","/ˈpraʊ.lɪŋ/","潛行搜尋"],["hushed","/hʌʃt/","肅靜壓低的"],["sought","/sɔːt/","尋找"]],"tNNfw0V8VOg","U48",7,155,[[7,47,0,7],[47,86,8,15],[86,112,16,20],[112,155,21,27]]],["g15","Girls S6","Follower","Seamus Heaney","My father worked with a horse-plough,\nHis shoulders globed like a full sail strung\nBetween the shafts and the furrow.\nThe horses strained at his clicking tongue.\nAn expert. He would set the wing\nAnd fit the bright steel-pointed sock.\nThe sod rolled over without breaking.\nAt the headrig, with a single pluck\nOf reins, the sweating team turned round\nAnd back into the land. His eye\nNarrowed and angled at the ground,\nMapping the furrow exactly.\nI stumbled in his hobnailed wake,\nFell sometimes on the polished sod;\nSometimes he rode me on his back\nDipping and rising to his plod.\nI wanted to grow up and plough,\nTo close one eye, stiffen my arm.\nAll I ever did was follow\nIn his broad shadow round the farm.\nI was a nuisance, tripping, falling,\nYapping always. But today\nIt is my father who keeps stumbling\nBehind me, and will not go away.","Reflective maturity! Contrast admiration for the father's masterly skill with the poignant role reversal in adulthood.",[["globed","/ɡloʊbd/","球狀弓起的"],["furrow","/ˈfɝː.oʊ/","犁溝"],["hobnailed","/ˈhɑːb.neɪld/","釘鞋靴"],["nuisance","/ˈnuː.səns/","討厭鬼"]],"36wP0pRv-2Y","U49",7,113,[[7,24,0,3],[24,40,4,7],[40,56,8,11],[56,72,12,15],[72,90,16,19],[90,113,20,23]]],["g16","Girls S6","Dragon","Dave Calder","The dragon's face is wrinkled and the deep lines shape a\nmad grin\nIt bobs up and down on poles outside the door of the Ma\nBo cafe\nThe great red and golden head nods and shakes towards\nthe pressing\ncrowd of people like a bull tossing away annoying flies,\nhis tail ripples and sways above the knobbly mass of their\nheads\nas if he was slithering through a bank of pebbles, a riverbed.\nIn the window hangs a row of red cooked chickens and at\nthe door\nthe cook and his customers lean out and yell encouragment:\nthe dragon makes up his mind, lifts his head to the crowd's\nroar,\nrises to the bait, the dangling strings of red paper money,\nthe green packets of rice parcelled neatly in leaves,\nand taking the gifts gives good luck for the next year.\nSo everyone cheers, and the cymbals crash louder than ever\nas he heaves\nand surges onward, and the curled crackers crackle in a\nfearful ear-\nsplitting rat-tat-tat like machine-gunfire. And through the\nthunderous sea\nthe dragon of good fortune dances forward with fierce glee.","Energetic spectacle! Convey the noisy excitement, cymbal crashes, and crackling fireworks of the dragon dance.",[["knobbly","/ˈnɑː.bəl.i/","崎嶇多節的"],["slithering","/ˈslɪð.ɚ.ɪŋ/","蜿蜒滑行"],["cymbals","/ˈsɪm.bəlz/","鈸"],["glee","/ɡliː/","歡欣喜悅"]],"aFi2UYsEcbU","U50",7,113,[[7,47,0,9],[47,82,10,17],[82,113,18,24]]]];
+const allPoems = rawPoems.map(r => ({
+  id: r[0], category: r[1], title: r[2], author: r[3], content: r[4],
+  adjudicatorAdvice: "<strong>Adjudicator Note:</strong> " + r[5],
+  vocab: r[6].map(v => ({ word: v[0], phonetics: v[1], meaning: v[2] })),
+  youtubeId: r[7], youtubeCode: r[8], youtubeStart: r[9], youtubeEnd: r[10], stanzas: r[11]
+}));
+
+function autoMarkupLine(line, idx, total) {
+  let s = line.trim();
+  if (!s) return s;
+  const isRunon = !/[.!?;:—\-]$/.test(s) && !s.endsWith('...') && !s.endsWith('"') && !s.endsWith("'") && (idx < total - 1);
+  const isUp = s.endsWith('?') || s.endsWith('!');
+  const isDown = s.endsWith('.') && !s.endsWith('...');
+  if (s.includes(', ')) s = s.replace(', ', ', <span class="pause-mark">||</span> ');
+  else if (s.includes('; ')) s = s.replace('; ', '; <span class="pause-mark">||</span> ');
+  const stop = new Set(['the','and','for','that','with','from','this','have','were','they','their','what','when','where','into','upon','like','just','very','some','more','only','over','down','away','back','then','than','them','your','will','would','could','should','about','there','here']);
+  const words = s.split(' ');
+  let stressed = false;
+  for (let i = words.length - 1; i >= 0; i--) {
+    const cleanW = words[i].replace(/[^a-zA-Z]/g, '').toLowerCase();
+    if (cleanW.length >= 5 && !stop.has(cleanW) && !words[i].includes('class=')) {
+      words[i] = words[i].replace(/^([^a-zA-Z]*)([a-zA-Z]+)([^a-zA-Z]*)$/, '$1<span class="stress-word">$2</span>$3');
+      stressed = true; break;
+    }
+  }
+  if (!stressed && words.length > 0) words[words.length - 1] = `<span class="stress-word">${words[words.length - 1]}</span>`;
+  s = words.join(' ');
+  if (isUp) s += ' <span class="intonation-up">↗</span>';
+  else if (isDown) s += ' <span class="intonation-down">↘</span>';
+  if (isRunon) s += ' <span class="runon-mark">⤷</span>';
+  return s;
+}
+
+allPoems.forEach(p => {
+  const rawLines = p.content.split('\n').map(l => l.trim()).filter(Boolean);
+  p.markup = rawLines.map((l, idx) => autoMarkupLine(l, idx, rawLines.length));
+  p.stanzas = (p.stanzas || []).map((st, idx) => ({
+    index: idx, label: `Stanza ${idx + 1}`,
+    start: st[0], end: st[1], lineStart: st[2], lineEnd: st[3],
+    lines: rawLines.slice(st[2], st[3] + 1), markupLines: p.markup.slice(st[2], st[3] + 1)
+  }));
+});
+
+let filteredPoems = [...allPoems], currentPoemIndex = 0, attempts = [];
+try { attempts = JSON.parse(localStorage.getItem('sf_attempts_v7') || '[]'); } catch (e) { attempts = []; }
+let synth = window.speechSynthesis, recognition = null, isRecording = false, startTime = 0, timerInterval = null, recordedTranscript = "", isScriptVisible = true;
+let activeSlotId = null, activeStanzaIndex = null, loopStanzaEnabled = false, ytMonitorInterval = null, simulatedCurrentTime = 0, slotMetaMap = {};
+
+function fmt(sec) {
+  const s = Math.max(0, Math.floor(sec || 0));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+function showToast(msg) {
+  const t = $id('appToast'), m = $id('appToastMsg');
+  if (!t || !m) return;
+  m.innerText = msg; t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3500);
+}
+function hideToast() { $id('appToast')?.classList.add('hidden'); }
+
+function buildEmbedlyYouTubeUrl(videoId, startSec, endSec, autoplay = 0, slotUid = '') {
+  const s = Math.max(0, Math.floor(startSec || 0)), e = Math.max(s + 1, Math.ceil(endSec || s + 30));
+  const ytEmbed = `https://www.youtube.com/embed/${videoId}?feature=oembed&enablejsapi=1&autoplay=${autoplay}&start=${s}&end=${e}&rel=0&modestbranding=1&playsinline=1`;
+  const uid = slotUid ? `&_uid=${encodeURIComponent(slotUid)}` : '';
+  return `https://cdn.embedly.com/widgets/media.html?src=${encodeURIComponent(ytEmbed)}&display_name=YouTube&url=${encodeURIComponent('https://www.youtube.com/watch?v=' + videoId)}&image=${encodeURIComponent('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')}&type=text%2Fhtml&schema=youtube${uid}`;
+}
+
+function mountOneClickSlotIframe(slotId, videoId, startSec, endSec, labelText, stanzaIdx, lineStart, linesCount) {
+  slotMetaMap[slotId] = { slotId, videoId, start: startSec, end: endSec, label: labelText, stanzaIdx, lineStart: lineStart || 0, linesCount: linesCount || 1 };
+  const mountEl = $id(`mount-${slotId}`);
+  if (!mountEl) return;
+  const cueUrl = buildEmbedlyYouTubeUrl(videoId, startSec, endSec, 0, `${slotId}_${Date.now()}`);
+  mountEl.innerHTML = `<iframe id="yt-slot-${slotId}" data-slot-id="${slotId}" src="${cueUrl}" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="${labelText}"></iframe>`;
+}
+
+function mountAllOneClickOverlays() {
+  const poem = filteredPoems[currentPoemIndex];
+  if (!poem) return;
+  slotMetaMap = {};
+  const allLines = poem.content.split('\n').map(l => l.trim()).filter(Boolean);
+  mountOneClickSlotIframe('main-FULL', poem.youtubeId, poem.youtubeStart, poem.youtubeEnd, 'Full Poem', 'FULL', 0, allLines.length);
+  (poem.stanzas || []).forEach((st, sIdx) => {
+    const lCount = Math.max((st.lines || []).length, 1);
+    mountOneClickSlotIframe(`top-${sIdx}`, poem.youtubeId, st.start, st.end, st.label, sIdx, st.lineStart, lCount);
+    mountOneClickSlotIframe(`card-${sIdx}`, poem.youtubeId, st.start, st.end, st.label, sIdx, st.lineStart, lCount);
+  });
+}
+
+function checkActiveIframeFocus() {
+  const activeEl = document.activeElement;
+  if (!activeEl || activeEl.tagName !== 'IFRAME') return;
+  const slotId = activeEl.getAttribute('data-slot-id');
+  if (slotId && slotMetaMap[slotId] && activeSlotId !== slotId) onOneClickSlotActivated(slotId);
+}
+window.addEventListener('blur', () => { setTimeout(checkActiveIframeFocus, 15); setTimeout(checkActiveIframeFocus, 80); });
+setInterval(checkActiveIframeFocus, 120);
+
+function onOneClickSlotActivated(slotId) {
+  const meta = slotMetaMap[slotId];
+  if (!meta) return;
+  if (activeSlotId && activeSlotId !== slotId && slotMetaMap[activeSlotId]) {
+    const p = slotMetaMap[activeSlotId];
+    mountOneClickSlotIframe(activeSlotId, p.videoId, p.start, p.end, p.label, p.stanzaIdx, p.lineStart, p.linesCount);
+  }
+  activeSlotId = slotId; activeStanzaIndex = meta.stanzaIdx; simulatedCurrentTime = meta.start;
+  highlightActiveStanzaUI(meta.stanzaIdx, meta.label, meta.start, meta.end);
+  setTimeout(() => {
+    if (activeSlotId === slotId) {
+      const ifr = $id(`yt-slot-${slotId}`);
+      if (ifr) ifr.style.pointerEvents = 'none';
+      try { window.focus(); } catch (e) {}
+    }
+  }, 650);
+  startStanzaProgressMonitor(meta);
+}
+
+function startStanzaProgressMonitor(meta) {
+  if (ytMonitorInterval) clearInterval(ytMonitorInterval);
+  const totalDur = Math.max(meta.end - meta.start, 1);
+  ytMonitorInterval = setInterval(() => {
+    if (activeSlotId !== meta.slotId) return;
+    simulatedCurrentTime += 0.25;
+    const elapsed = Math.max(0, simulatedCurrentTime - meta.start);
+    const pct = Math.min(100, Math.round((elapsed / totalDur) * 100));
+    if ($id('ytStanzaProgressBar')) $id('ytStanzaProgressBar').style.width = `${pct}%`;
+    if (typeof meta.stanzaIdx === 'number' && $id(`stanza-prog-${meta.stanzaIdx}`)) $id(`stanza-prog-${meta.stanzaIdx}`).style.width = `${pct}%`;
+    if ($id('ytTimeCounter')) $id('ytTimeCounter').innerText = `${fmt(Math.min(simulatedCurrentTime, meta.end))} / ${fmt(meta.end)}`;
+    const estLocalIdx = Math.min(meta.linesCount - 1, Math.floor((elapsed / totalDur) * meta.linesCount));
+    const globalIdx = meta.lineStart + estLocalIdx;
+    document.querySelectorAll('.poem-line-row').forEach(el => el.classList.remove('line-row-active'));
+    $id(`poem-line-row-${globalIdx}`)?.classList.add('line-row-active');
+    if (simulatedCurrentTime >= meta.end + 0.5) {
+      if (loopStanzaEnabled) {
+        const ifr = $id(`yt-slot-${meta.slotId}`);
+        if (ifr && window.playerjs) {
+          try { const p = new playerjs.Player(ifr); p.setCurrentTime(meta.start); p.play(); simulatedCurrentTime = meta.start; return; } catch (e) {}
+        }
+      }
+      stopAudio();
+    }
+  }, 250);
+}
+
+function highlightActiveStanzaUI(stanzaIdx, labelText, startSec, endSec) {
+  if ($id('ytNowPlayingLabel')) $id('ytNowPlayingLabel').innerText = `🔊 ${labelText} (${fmt(startSec)}–${fmt(endSec)})`;
+  const poem = filteredPoems[currentPoemIndex];
+  if (!poem || !poem.stanzas) return;
+  poem.stanzas.forEach((st, idx) => {
+    const card = $id(`stanza-card-${idx}`), topBtn = $id(`top-stanza-btn-${idx}`), cardYtBtn = $id(`card-yt-btn-${idx}`);
+    if (idx === stanzaIdx) {
+      card?.classList.add('stanza-card-active');
+      if (topBtn) { topBtn.classList.add('stanza-btn-active'); topBtn.innerHTML = `<span><span class="eq-bar"></span><span class="eq-bar"></span> ${st.label}</span><span class="text-[10px] font-mono">${fmt(st.start)}–${fmt(st.end)}</span>`; }
+      if (cardYtBtn) { cardYtBtn.classList.add('stanza-btn-active'); cardYtBtn.innerHTML = `<span class="eq-bar"></span><span class="eq-bar"></span> <span>Stop ${st.label} (${fmt(st.start)}–${fmt(st.end)})</span>`; }
+    } else {
+      card?.classList.remove('stanza-card-active');
+      if (topBtn) { topBtn.classList.remove('stanza-btn-active'); topBtn.innerHTML = `<span>🔊 ${st.label}</span><span class="text-[10px] font-mono text-indigo-200">${fmt(st.start)}–${fmt(st.end)}</span>`; }
+      if (cardYtBtn) { cardYtBtn.classList.remove('stanza-btn-active'); cardYtBtn.innerHTML = `🔊 Play ${st.label} (${fmt(st.start)}–${fmt(st.end)})`; }
+    }
+  });
+}
+
+function resetStanzaUI() {
+  const poem = filteredPoems[currentPoemIndex];
+  if ($id('ytNowPlayingLabel')) $id('ytNowPlayingLabel').innerText = 'Ready';
+  if ($id('ytStanzaProgressBar')) $id('ytStanzaProgressBar').style.width = '0%';
+  if (poem && $id('ytTimeCounter')) $id('ytTimeCounter').innerText = `${fmt(poem.youtubeStart)} / ${fmt(poem.youtubeEnd)}`;
+  document.querySelectorAll('.poem-line-row').forEach(el => el.classList.remove('line-row-active'));
+  if (!poem || !poem.stanzas) return;
+  poem.stanzas.forEach((st, idx) => {
+    $id(`stanza-card-${idx}`)?.classList.remove('stanza-card-active');
+    const topBtn = $id(`top-stanza-btn-${idx}`), cardYtBtn = $id(`card-yt-btn-${idx}`);
+    if (topBtn) { topBtn.classList.remove('stanza-btn-active'); topBtn.innerHTML = `<span>🔊 ${st.label}</span><span class="text-[10px] font-mono text-indigo-200">${fmt(st.start)}–${fmt(st.end)}</span>`; }
+    if (cardYtBtn) { cardYtBtn.classList.remove('stanza-btn-active'); cardYtBtn.innerHTML = `🔊 Play ${st.label} (${fmt(st.start)}–${fmt(st.end)})`; }
+    if ($id(`stanza-prog-${idx}`)) $id(`stanza-prog-${idx}`).style.width = '0%';
+  });
+}
+
+function playStanzaVoiceover(stanzaIdx) {
+  if (activeStanzaIndex === stanzaIdx) { stopAudio(); return; }
+}
+function playCurrentPoem() {
+  if (activeStanzaIndex === 'FULL') { stopAudio(); return; }
+}
+
+function toggleLoopStanza() {
+  loopStanzaEnabled = !loopStanzaEnabled;
+  if ($id('loopStanzaText')) $id('loopStanzaText').innerText = loopStanzaEnabled ? "Loop: ON" : "Loop: OFF";
+}
+
+function initSpeechRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recognition = new SR(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-GB';
+  recognition.onresult = (event) => {
+    let t = "";
+    for (let i = 0; i < event.results.length; i++) t += event.results[i][0].transcript + " ";
+    recordedTranscript = t.trim();
+  };
+}
+
+window.onload = () => { initSpeechRecognition(); filterCategory(); renderHistoryTable(); };
+
+function filterCategory() {
+  const cat = $id('categorySelect').value;
+  filteredPoems = cat === 'ALL' ? [...allPoems] : allPoems.filter(p => p.category === cat);
+  currentPoemIndex = 0; loadPoemSelector(); renderCurrentPoem();
+}
+function loadPoemSelector() {
+  $id('poemSelect').innerHTML = filteredPoems.map((p, idx) => `<option value="${idx}">${p.youtubeCode} - ${p.title}</option>`).join('');
+}
+function switchPoem() { stopAudio(false); currentPoemIndex = parseInt($id('poemSelect').value); renderCurrentPoem(); }
+
+function renderCurrentPoem() {
+  const poem = filteredPoems[currentPoemIndex];
+  if (!poem) return;
+  $id('poemTitleHeading').innerText = `${poem.youtubeCode} • ${poem.title}`;
+  $id('poemAuthorHeading').innerText = poem.author;
+  $id('poemCategoryBadge').innerText = poem.category;
+  $id('adjudicatorAdvice').innerHTML = poem.adjudicatorAdvice;
+  $id('ytTimeCounter').innerText = `${fmt(poem.youtubeStart)} / ${fmt(poem.youtubeEnd)}`;
+
+  if ($id('stanzaVoiceoverButtons') && poem.stanzas) {
+    $id('stanzaVoiceoverButtons').innerHTML = poem.stanzas.map((st, sIdx) => `<div id="wrap-top-${sIdx}" class="yt-oneclick-wrap w-full rounded-lg"><button id="top-stanza-btn-${sIdx}" onclick="playStanzaVoiceover(${sIdx})" class="w-full px-2.5 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-rose-600 text-white border border-slate-700 flex items-center justify-between gap-1.5 transition"><span>🔊 ${st.label}</span><span class="text-[10px] font-mono text-indigo-200">${fmt(st.start)}–${fmt(st.end)}</span></button><div id="mount-top-${sIdx}"></div></div>`).join('');
+  }
+
+  if (poem.stanzas && poem.stanzas.length > 0) {
+    $id('poemContainer').innerHTML = poem.stanzas.map((st, sIdx) => {
+      const linesHTML = st.markupLines.map((lineMarkup, localIdx) => {
+        const gIdx = st.lineStart + localIdx;
+        return `<div id="poem-line-row-${gIdx}" class="poem-line-row flex items-start gap-2.5 p-1.5 rounded-lg border border-transparent"><span class="text-[11px] font-sans font-semibold text-slate-400 w-5 shrink-0 select-none">${gIdx + 1}</span><div class="flex-1">${lineMarkup}</div></div>`;
+      }).join('');
+      return `<div id="stanza-card-${sIdx}" class="relative bg-slate-50/70 rounded-2xl border border-slate-200 p-4 transition">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-transparent overflow-hidden rounded-t-2xl"><div id="stanza-prog-${sIdx}" class="h-full bg-rose-500 w-0 transition-all duration-150"></div></div>
+        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80 font-sans">
+          <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-700 text-white">${st.label}</span>
+          <div id="wrap-card-${sIdx}" class="yt-oneclick-wrap rounded-xl">
+            <button id="card-yt-btn-${sIdx}" onclick="playStanzaVoiceover(${sIdx})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition">🔊 Play ${st.label} (${fmt(st.start)}–${fmt(st.end)})</button>
+            <div id="mount-card-${sIdx}"></div>
+          </div>
+        </div>
+        <div class="space-y-1">${linesHTML}</div>
+      </div>`;
+    }).join('');
+  }
+
+  mountAllOneClickOverlays();
+  $id('vocabPoemTitle').innerText = `${poem.youtubeCode} • ${poem.title}`;
+  $id('vocabList').innerHTML = (poem.vocab || []).map(v => `<div class="p-3.5 border rounded-xl bg-slate-50 space-y-1"><div class="flex justify-between items-center"><h3 class="font-bold text-sm text-indigo-700">${v.word}</h3><button onclick="speakSingleWord('${v.word.replace(/'/g, "\\'")}')" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold hover:bg-indigo-200">🔊</button></div><p class="text-xs font-mono text-slate-500">${v.phonetics}</p><p class="text-xs text-slate-800">${v.meaning}</p></div>`).join('');
+  $id('practicePoemHeader').innerText = `${poem.youtubeCode} • ${poem.title}`;
+  if ($id('practiceStanzaScope') && poem.stanzas) {
+    $id('practiceStanzaScope').innerHTML = `<option value="FULL">Full Poem</option>` + poem.stanzas.map((st, idx) => `<option value="${idx}">${st.label}</option>`).join('');
+  }
+  updatePracticeScope();
+}
+
+function updatePracticeScope() {
+  const poem = filteredPoems[currentPoemIndex];
+  if (!poem) return;
+  const val = $id('practiceStanzaScope')?.value || 'FULL';
+  $id('practiceScriptBody').innerText = (val === 'FULL' || !poem.stanzas) ? poem.content : (poem.stanzas[parseInt(val)]?.lines.join('\n') || poem.content);
+}
+
+function speakSingleWord(word) {
+  if (!synth) return;
+  try { synth.cancel(); synth.resume(); } catch (e) {}
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'en-GB'; u.rate = 0.85; synth.speak(u);
+}
+
+function stopAudio(reCueActive = true) {
+  if (ytMonitorInterval) { clearInterval(ytMonitorInterval); ytMonitorInterval = null; }
+  const prevSlot = activeSlotId;
+  activeSlotId = null; activeStanzaIndex = null; resetStanzaUI();
+  if (reCueActive && prevSlot && slotMetaMap[prevSlot]) {
+    const m = slotMetaMap[prevSlot];
+    mountOneClickSlotIframe(prevSlot, m.videoId, m.start, m.end, m.label, m.stanzaIdx, m.lineStart, m.linesCount);
+  }
+}
+
+function toggleScriptDisplay() {
+  isScriptVisible = !isScriptVisible;
+  $id('practiceScriptContainer').classList.toggle('hidden', !isScriptVisible);
+  $id('toggleScriptText').innerText = isScriptVisible ? "Hide Script" : "Show Script";
+}
+
+function switchTab(tab) {
+  stopAudio();
+  ['listen', 'vocab', 'practice', 'history'].forEach(t => {
+    $id(`view-${t}`).classList.toggle('hidden', t !== tab);
+    $id(`tab-${t}`).className = t === tab ? "px-4 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap" : "px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 whitespace-nowrap";
+  });
+}
+
+function toggleRecording() { if (!isRecording) startRecording(); else stopRecording(); }
+function startRecording() {
+  if (!recognition) { showToast("Use Chrome or Edge for microphone recognition."); return; }
+  recordedTranscript = ""; try { recognition.start(); } catch (e) {}
+  isRecording = true; startTime = Date.now();
+  $id('recText').innerText = "Stop & Analyze";
+  $id('recBtn').classList.replace('bg-red-600', 'bg-slate-900');
+  $id('recStatus').innerText = "Recording...";
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const el = Math.floor((Date.now() - startTime) / 1000);
+    $id('timerVal').innerText = `${String(Math.floor(el / 60)).padStart(2, '0')}:${String(el % 60).padStart(2, '0')}`;
+  }, 1000);
+}
+function stopRecording() {
+  if (!recognition) return;
+  try { recognition.stop(); } catch (e) {}
+  isRecording = false; clearInterval(timerInterval);
+  $id('recText').innerText = "Start Recording";
+  $id('recBtn').classList.replace('bg-slate-900', 'bg-red-600');
+  $id('recStatus').innerText = "Analyzing...";
+  setTimeout(analyzeSpeech, 600);
+}
+function analyzeSpeech() {
+  const poem = filteredPoems[currentPoemIndex], val = $id('practiceStanzaScope')?.value || 'FULL';
+  let targetText = poem.content, scopeLabel = "";
+  if (val !== 'FULL' && poem.stanzas && poem.stanzas[parseInt(val)]) {
+    const st = poem.stanzas[parseInt(val)];
+    targetText = st.lines.join(' '); scopeLabel = ` (${st.label})`;
+  }
+  const targetWords = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+  const spokenWords = recordedTranscript.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+  const wpm = Math.round((spokenWords.length / Math.max((Date.now() - startTime) / 1000, 1)) * 60);
+  let matched = 0;
+  $id('diffOutput').innerHTML = targetWords.map(w => {
+    if (spokenWords.includes(w)) { matched++; return `<span class="word-matched">${w}</span>`; }
+    return `<span class="word-missed">${w}</span>`;
+  }).join(' ');
+  const acc = Math.round((matched / Math.max(targetWords.length, 1)) * 100);
+  $id('accuracyScore').innerText = `${acc}%`; $id('wpmScore').innerText = wpm;
+  $id('flowScore').innerText = (acc >= 85 && wpm >= 80 && wpm <= 110) ? "Excellent" : (acc < 65 ? "Needs Work" : "Good");
+  const tips = $id('coachingTips'); tips.classList.remove('hidden');
+  tips.innerHTML = wpm > 115 ? `Fast pace (${wpm} WPM). Pause clearly at punctuation.` : (wpm < 75 ? `Slow pace (${wpm} WPM). Keep steady flow.` : `Good pace (${wpm} WPM).`);
+  $id('recStatus').innerText = "Done";
+  attempts.unshift({ id: Date.now(), poemTitle: poem.title + scopeLabel, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }), accuracy: acc, wpm });
+  try { localStorage.setItem('sf_attempts_v7', JSON.stringify(attempts)); } catch (e) {}
+  renderHistoryTable();
+}
+
+function renderHistoryTable() {
+  const tbody = $id('historyTableBody');
+  if (attempts.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">No records yet.</td></tr>`; return; }
+  tbody.innerHTML = attempts.map((att, idx) => {
+    const prev = attempts.slice(idx + 1).find(a => a.poemTitle === att.poemTitle);
+    let delta = '-';
+    if (prev) {
+      const d = att.accuracy - prev.accuracy;
+      delta = d > 0 ? `<span class="text-emerald-600 font-bold">+${d}%</span>` : (d < 0 ? `<span class="text-red-500 font-bold">${d}%</span>` : '0%');
+    }
+    return `<tr class="hover:bg-slate-50"><td class="p-2.5 font-semibold">#${attempts.length - idx}</td><td class="p-2.5">${att.date}</td><td class="p-2.5 font-medium text-slate-900">${att.poemTitle}</td><td class="p-2.5 font-bold text-indigo-700">${att.accuracy}%</td><td class="p-2.5">${att.wpm}</td><td class="p-2.5">${delta}</td></tr>`;
+  }).join('');
+}
+
+function clearHistory() { $id('confirmModal')?.classList.remove('hidden'); }
+function closeConfirmModal() { $id('confirmModal')?.classList.add('hidden'); }
+function confirmClearHistory() {
+  attempts = []; try { localStorage.removeItem('sf_attempts_v7'); } catch (e) {}
+  renderHistoryTable(); closeConfirmModal(); showToast("Cleared.");
+}
+
+function getStandaloneHtmlSource() { return '<!DOCTYPE html>\n' + document.documentElement.outerHTML; }
+function openCodeModal() {
+  if ($id('sourceCodeTextarea')) $id('sourceCodeTextarea').value = getStandaloneHtmlSource();
+  $id('codeExportModal')?.classList.remove('hidden');
+}
+function closeCodeModal() { $id('codeExportModal')?.classList.add('hidden'); }
+function copySourceCode() {
+  const ta = $id('sourceCodeTextarea');
+  const code = ta ? ta.value : getStandaloneHtmlSource();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => showToast("Code copied!")).catch(() => { if (ta) { ta.select(); document.execCommand('copy'); showToast("Code copied!"); } });
+  } else if (ta) { ta.select(); document.execCommand('copy'); showToast("Code copied!"); }
+}
+function exportHtmlFile() {
+  const blob = new Blob([getStandaloneHtmlSource()], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'speech-festival-platform.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+</script>
+
+
+</body></html>
