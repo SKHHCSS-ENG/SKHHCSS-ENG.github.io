@@ -67,6 +67,9 @@
       foldBtn.textContent = '🛠';
     }
     try { localStorage.setItem(DOCK_KEY, open ? '1' : '0'); } catch (e) {}
+    if (typeof window.hwSyncCanvasPointer === 'function') {
+      window.hwSyncCanvasPointer();
+    }
     if (typeof window.hwResize === 'function') {
       requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
     }
@@ -208,6 +211,15 @@
       if (btnUndo) btnUndo.disabled = !enabled || undoStack.length === 0;
       if (btnRedo) btnRedo.disabled = !enabled || redoStack.length === 0;
     }
+    function syncCanvasPointer() {
+      /* Ink stays visible whenever Handwrite is ON; drawing only with dock open */
+      var draw = enabled && document.body.classList.contains('dock-open');
+      canvases.forEach(function (c) {
+        c.style.display = enabled ? 'block' : 'none';
+        c.style.pointerEvents = draw ? 'auto' : 'none';
+      });
+    }
+    window.hwSyncCanvasPointer = syncCanvasPointer;
     function setEnabled(on) {
       enabled = on;
       document.body.classList.toggle('hw-on', on);
@@ -219,10 +231,7 @@
         if (on) hwBar.removeAttribute('hidden');
         else hwBar.setAttribute('hidden', '');
       }
-      canvases.forEach(function (c) {
-        c.style.display = on ? 'block' : 'none';
-        c.style.pointerEvents = on ? 'auto' : 'none';
-      });
+      syncCanvasPointer();
       if (on) {
         if (typeof window.sfExpandDock === 'function') window.sfExpandDock();
         resizeAll();

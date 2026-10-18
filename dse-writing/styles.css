@@ -420,8 +420,13 @@ body.hw-on .hw-canvas {
   pointer-events: auto;
   cursor: crosshair;
 }
-body.hw-erase .hw-canvas { cursor: cell; }
-body.hw-highlight .hw-canvas { cursor: copy; }
+/* Dock collapsed: keep stroke ink visible, but let page scroll */
+body.hw-on:not(.dock-open) .hw-canvas {
+  pointer-events: none !important;
+  cursor: auto;
+}
+body.hw-erase.dock-open .hw-canvas { cursor: cell; }
+body.hw-highlight.dock-open .hw-canvas { cursor: copy; }
 
 section.block {
   background: var(--card);
