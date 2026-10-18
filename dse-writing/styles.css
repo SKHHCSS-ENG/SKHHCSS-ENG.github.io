@@ -87,7 +87,7 @@ header.hero {
   border-bottom: 1px solid var(--border);
 }
 .brand img {
-  height: 40px;
+  height: 58px;
   width: auto;
   max-width: 100%;
   aspect-ratio: 784 / 165;
