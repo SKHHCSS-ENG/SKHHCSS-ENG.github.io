@@ -2,7 +2,7 @@
  * Speech Festival — sticky Tools dock (U47 / U66)
  * 譯 (Chinese gloss) + Handwrite (Colour · Pen · Highlighter · Eraser · Undo · Redo · Clear)
  * + Record (device file / voice memo, local playback only)
- * Collapsible dock (🛠 chip default). Canvas overlays stanzas — no blank spacer.
+ * Collapsible dock (🛠 toggles expand/collapse; always bottom-right). Canvas overlays stanzas — no blank spacer.
  * Adapted from dse-writing/tools-dock.js; does not load on Solo Verse.
  */
 (function () {
@@ -64,7 +64,7 @@
       foldBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       foldBtn.setAttribute('aria-label', open ? 'Collapse tools' : 'Expand tools');
       foldBtn.title = open ? 'Collapse tools' : 'Tools';
-      foldBtn.textContent = open ? '▾' : '🛠';
+      foldBtn.textContent = '🛠';
     }
     try { localStorage.setItem(DOCK_KEY, open ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
