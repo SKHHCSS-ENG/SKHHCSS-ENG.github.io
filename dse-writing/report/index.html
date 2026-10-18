@@ -123,19 +123,24 @@ Prepared by: [Name]</pre>
   </div>
 
   <div class="bottom-dock" id="bottomDock" role="toolbar" aria-label="Tools">
-    <div class="dock-inner">
+    <button type="button" class="dock-fold" id="dockFold" aria-expanded="false" aria-controls="dockInner" aria-label="Expand tools" title="Tools / 工具">工具</button>
+    <div class="dock-inner" id="dockInner">
       <div class="dock-chrome">
-        <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false">Chinese</button>
-        <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false">Handwrite</button>
+        <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false" aria-label="Chinese gloss" title="Chinese gloss">中文</button>
+        <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false" aria-label="Handwrite" title="Handwrite">✍️</button>
       </div>
       <div class="hw-bar" id="hwBar" aria-label="Handwrite tools" hidden>
-        <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true">Pen</button>
-        <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false">Eraser</button>
-        <button type="button" class="hw-chip" id="hwColour" title="Ink colour">Colour</button>
-        <button type="button" class="hw-chip" id="hwHighlight" aria-pressed="false">Highlighter</button>
-        <button type="button" class="hw-chip danger-chip" id="hwClearAll">Clear all</button>
-        <button type="button" class="hw-chip" id="hwUndo" disabled>Undo</button>
-        <button type="button" class="hw-chip" id="hwRedo" disabled>Redo</button>
+        <div class="hw-row" role="group" aria-label="Draw tools">
+          <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" aria-label="Pen" title="Pen">✏️</button>
+          <button type="button" class="hw-chip" id="hwHighlight" aria-pressed="false" aria-label="Highlighter" title="Highlighter">🖍</button>
+          <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" aria-label="Eraser" title="Eraser">🩹</button>
+          <button type="button" class="hw-chip hw-colour-btn" id="hwColour" title="Ink colour" aria-label="Colour: teal"></button>
+        </div>
+        <div class="hw-row" role="group" aria-label="Edit tools">
+          <button type="button" class="hw-chip" id="hwUndo" aria-label="Undo" title="Undo" disabled>↶</button>
+          <button type="button" class="hw-chip" id="hwRedo" aria-label="Redo" title="Redo" disabled>↷</button>
+          <button type="button" class="hw-chip danger-chip" id="hwClearAll" aria-label="Clear all" title="Clear all">🗑</button>
+        </div>
       </div>
     </div>
   </div>
