@@ -2,69 +2,94 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>English Learning Materials · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="English Language learning materials for SKH Holy Carpenter Secondary School.">
 <style>
   :root {
-    --navy: #0f3d5e;
-    --teal: #0d7377;
-    --teal-soft: #e6f4f4;
+    --accent: #5bbad5;
+    --accent-deep: #2a8fad;
+    --accent-ink: #0c5a70;
+    --accent-soft: #e8f7fb;
+    --navy: #123a4d;
     --ink: #1e293b;
     --muted: #64748b;
     --card: #ffffff;
-    --bg: #f4f7f9;
-    --border: #d8e2ea;
-    --shadow: 0 4px 16px rgba(15, 61, 94, 0.08);
+    --bg: #f5fafc;
+    --border: #d3e8ef;
+    --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0;
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100dvh;
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
     color: var(--ink);
     background: var(--bg);
     line-height: 1.5;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .wrap {
     max-width: 720px;
     margin: 0 auto;
-    padding: 28px 18px 48px;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 18px 48px;
   }
-  header {
-    background: linear-gradient(135deg, var(--navy), var(--teal));
-    color: #fff;
+  header.hero {
+    background: var(--card);
     border-radius: 16px;
-    padding: 28px 24px;
+    border: 1px solid var(--border);
     box-shadow: var(--shadow);
+    overflow: hidden;
   }
-  .school {
-    font-size: .78rem;
-    font-weight: 700;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    opacity: .9;
-    margin: 0 0 8px;
+  .hero-accent {
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent-deep), var(--accent));
   }
-  h1 {
-    margin: 0 0 6px;
-    font-size: 1.55rem;
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .school-zh {
+    margin: 0;
+    font-size: 1.1rem;
     font-weight: 800;
+    color: var(--navy);
+    line-height: 1.3;
+  }
+  .school-en {
+    margin: 2px 0 0;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--accent-ink);
+  }
+  .hero-body { padding: 14px 20px 18px; }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--navy);
     line-height: 1.25;
   }
   .subject {
     margin: 0;
     font-size: .95rem;
-    opacity: .92;
+    color: var(--muted);
   }
   .note {
-    margin: 22px 0 16px;
+    margin: 20px 0 16px;
     color: var(--muted);
     font-size: .92rem;
   }
-  .cards {
-    display: grid;
-    gap: 14px;
-  }
+  .cards { display: grid; gap: 14px; }
   a.card {
     display: block;
     text-decoration: none;
@@ -74,19 +99,21 @@
     border-radius: 14px;
     padding: 18px 18px 16px;
     box-shadow: var(--shadow);
-    transition: border-color .15s ease, transform .15s ease;
+    min-height: 44px;
+    transition: border-color .15s ease, box-shadow .15s ease;
   }
   a.card:hover, a.card:focus-visible {
-    border-color: var(--teal);
+    border-color: var(--accent);
     outline: none;
-    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(91, 186, 213, 0.22);
   }
+  a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   .card-kicker {
     font-size: .72rem;
     font-weight: 800;
     letter-spacing: .05em;
     text-transform: uppercase;
-    color: var(--teal);
+    color: var(--accent-ink);
     margin: 0 0 6px;
   }
   .card h2 {
@@ -104,7 +131,7 @@
     margin-top: 10px;
     font-size: .85rem;
     font-weight: 700;
-    color: var(--teal);
+    color: var(--accent-ink);
   }
   footer {
     margin-top: 36px;
@@ -116,17 +143,25 @@
   }
   @media print {
     body { background: #fff; }
-    header { box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     a.card { box-shadow: none; break-inside: avoid; }
   }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <p class="school">SKH Holy Carpenter Secondary School</p>
-      <h1>English Learning Materials</h1>
-      <p class="subject">English Language</p>
+    <header class="hero">
+      <div class="hero-accent" aria-hidden="true"></div>
+      <div class="brand">
+        <img src="https://www.hcs.edu.hk/template/app/img/logo.png" width="56" height="56" alt="SKH Holy Carpenter Secondary School logo">
+        <div class="brand-text">
+          <p class="school-zh">聖公會聖匠中學</p>
+          <p class="school-en">SKH Holy Carpenter Secondary School</p>
+        </div>
+      </div>
+      <div class="hero-body">
+        <h1>English Learning Materials</h1>
+        <p class="subject">English Language · 英國語文</p>
+      </div>
     </header>
 
     <p class="note">Practice pages and teaching materials for the English panel. More subject materials will be added here over time.</p>
@@ -138,10 +173,16 @@
         <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
         <span class="card-arrow">Open →</span>
       </a>
+      <a class="card" href="dse-writing/">
+        <p class="card-kicker">Senior / DSE</p>
+        <h2>DSE Writing Formats</h2>
+        <p>Letter to the editor, Article, Proposal, Report, Speech — PAT, structure, skeleton &amp; useful phrases.</p>
+        <span class="card-arrow">Open →</span>
+      </a>
     </div>
 
     <footer>
-      SKH Holy Carpenter Secondary School · English Department<br>
+      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
       Materials for school use
     </footer>
   </div>
