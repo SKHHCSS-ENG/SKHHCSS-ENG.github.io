@@ -147,21 +147,16 @@ a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   color: var(--accent-ink);
 }
 
-/* Type page toolbar — slim sticky bar; ≥44px tap on the button only */
+/* Type page toolbar — chip only on phone (non-sticky); sticky+hint on wider screens */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   margin: 0 0 12px;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: rgba(245, 250, 252, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 2px 0;
-  border-bottom: 1px solid transparent;
+  padding: 0;
+  background: transparent;
+  border-bottom: none;
 }
 .zh-toggle {
   display: inline-flex;
@@ -169,12 +164,12 @@ a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   justify-content: center;
   gap: 8px;
   min-height: 44px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 2px solid var(--accent);
   background: var(--card);
   color: var(--accent-ink);
-  font-size: .9rem;
+  font-size: .88rem;
   font-weight: 800;
   cursor: pointer;
   line-height: 1.2;
@@ -196,9 +191,43 @@ a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   flex: 1;
   min-width: 140px;
 }
-/* On phone the button label is enough — keep sticky bar ~one control tall */
-@media (max-width: 520px) {
-  .zh-hint { display: none; }
+/* Phone / tablet portrait: no sticky overlay, hide hint, full-width chip */
+@media (max-width: 700px) {
+  .toolbar {
+    position: static;
+    z-index: auto;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: transparent;
+    padding: 0;
+    margin: 0 0 10px;
+    flex-wrap: nowrap;
+  }
+  .zh-hint {
+    display: none !important;
+  }
+  .zh-toggle {
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+}
+/* Wider screens: slim sticky bar OK; leave room so content never sits under it */
+@media (min-width: 701px) {
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(245, 250, 252, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 4px 0;
+    margin: 0 0 12px;
+  }
+  html {
+    scroll-padding-top: calc(56px + env(safe-area-inset-top, 0px));
+  }
 }
 
 section.block {
