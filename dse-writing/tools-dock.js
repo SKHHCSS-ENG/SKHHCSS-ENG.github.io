@@ -1,7 +1,7 @@
 /**
  * DSE Writing — sticky Tools dock
  * Chinese gloss + Handwrite (✏️ 🖍 🩹 colour-ball / ↶ ↷ 🗑)
- * Collapsible dock (工具 chip default). Canvas overlays cards — no blank spacer.
+ * Collapsible dock (Tools chip default). Canvas overlays cards — no blank spacer.
  */
 (function () {
   var ZH_KEY = 'dse-writing-zh-on';
@@ -38,7 +38,7 @@
   }
 
 
-  /* ---------- Dock collapse (default collapsed = 工具 chip) ---------- */
+  /* ---------- Dock collapse (default collapsed = Tools chip) ---------- */
   var DOCK_KEY = 'dse-writing-dock-open';
   var foldBtn = document.getElementById('dockFold');
   function setDockOpen(open) {
@@ -47,8 +47,8 @@
     if (foldBtn) {
       foldBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       foldBtn.setAttribute('aria-label', open ? 'Collapse tools' : 'Expand tools');
-      foldBtn.title = open ? 'Collapse tools' : 'Tools / 工具';
-      foldBtn.textContent = open ? '▾' : '工具';
+      foldBtn.title = open ? 'Collapse tools' : 'Tools';
+      foldBtn.textContent = open ? '▾' : 'Tools';
     }
     try { localStorage.setItem(DOCK_KEY, open ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
@@ -60,7 +60,9 @@
   /* Default collapsed; only open if user previously expanded */
   setDockOpen(dockSaved === '1');
   if (foldBtn) {
-    foldBtn.addEventListener('click', function () {
+    foldBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
       setDockOpen(!document.body.classList.contains('dock-open'));
     });
   }
