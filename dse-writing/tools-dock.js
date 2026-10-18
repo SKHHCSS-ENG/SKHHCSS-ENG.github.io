@@ -1,6 +1,6 @@
 /**
  * DSE Writing — sticky Tools dock
- * Chinese gloss + Handwrite (✏️ 🖍 🧽 colour-ball / ↶ ↷ 🗑)
+ * Chinese gloss + Handwrite (✏️ 🖍 colour-ball 🩹 / ↶ ↷ 🗑) — 1 tools row
  * Collapsible dock (Tools chip default). Canvas overlays cards — no blank spacer.
  */
 (function () {

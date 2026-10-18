@@ -21,7 +21,7 @@ html {
   scroll-padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
 html.dock-open {
-  scroll-padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+  scroll-padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
 }
 body {
   margin: 0;
@@ -38,11 +38,11 @@ body.tools-page {
 }
 body.tools-page.dock-open {
   /* compact fold strip + Chinese|Handwrite row */
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
 }
 body.tools-page.dock-open.hw-on {
-  /* fold + chrome + 2 compact hw rows */
-  padding-bottom: calc(148px + env(safe-area-inset-bottom, 0px));
+  /* fold + chrome + 1 tools row */
+  padding-bottom: calc(124px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Page shell + school brand (restored — was dropped in e549619) */
@@ -198,7 +198,7 @@ body.dock-open .bottom-dock {
   -webkit-backdrop-filter: blur(14px);
   border-top: 2px solid var(--accent);
   box-shadow: 0 -4px 20px rgba(18, 58, 77, 0.12);
-  padding: 0 8px calc(4px + env(safe-area-inset-bottom, 0px));
+  padding: 0 6px calc(2px + env(safe-area-inset-bottom, 0px));
 }
 .dock-fold {
   position: relative;
@@ -257,8 +257,8 @@ body.dock-open .dock-inner {
 .dock-chrome {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 44px;
+  gap: 4px;
+  min-height: 40px;
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
@@ -273,14 +273,14 @@ body.dock-open .dock-inner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 14px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 4px 12px;
   border-radius: 999px;
   border: 1.5px solid var(--accent);
   background: var(--card);
   color: var(--accent-ink);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
@@ -296,7 +296,7 @@ body.dock-open .dock-inner {
 .hw-bar {
   display: none;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
   padding: 0 0 2px;
 }
 body.hw-on .hw-bar {
@@ -312,9 +312,9 @@ body.hw-on .hw-bar:not([hidden]) {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-evenly;
-  gap: 4px;
-  min-height: 44px;
+  justify-content: space-between;
+  gap: 2px;
+  min-height: 40px;
 }
 .hw-chip {
   border: 1px solid var(--border);
@@ -323,17 +323,18 @@ body.hw-on .hw-bar:not([hidden]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 8px;
+  min-width: 40px;
+  min-height: 40px;
+  height: 40px;
+  padding: 4px 2px;
   border-radius: 999px;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
   flex: 1 1 0;
-  max-width: 96px;
+  max-width: none;
 }
 .hw-chip:disabled {
   opacity: .4;
@@ -354,6 +355,7 @@ body.hw-on .hw-bar:not([hidden]) {
   border-color: #fed7aa;
   color: var(--warn);
   flex: 1 1 0;
+  max-width: none;
 }
 .dock-chip,
 .hw-chip {
@@ -367,17 +369,17 @@ body.hw-on .hw-bar:not([hidden]) {
 }
 /* Colour = filled ball of current ink (no "Colour" label) */
 .hw-chip.hw-colour-btn {
-  width: 44px;
-  min-width: 44px;
-  max-width: 44px;
-  height: 44px;
-  min-height: 44px;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  min-height: 40px;
   padding: 0;
   border-radius: 50%;
   border: 2px solid #fff;
   box-shadow: 0 0 0 1.5px var(--border);
   background: #0e6b7a;
-  flex: 0 0 44px;
+  flex: 0 0 40px;
   font-size: 0;
   line-height: 0;
   color: transparent;
