@@ -1,7 +1,7 @@
 /**
  * DSE Writing — sticky Tools dock
  * 譯 (Chinese gloss) + Handwrite (✏️ 🖍 colour-ball 🩹 / ↶ ↷ 🗑) — 1 tools row
- * Collapsible dock (🧰 chip default). Canvas overlays cards — no blank spacer.
+ * Collapsible dock (🛠 chip default). Canvas overlays cards — no blank spacer.
  */
 (function () {
   var ZH_KEY = 'dse-writing-zh-on';
@@ -38,7 +38,7 @@
   }
 
 
-  /* ---------- Dock collapse (default collapsed = 🧰 chip) ---------- */
+  /* ---------- Dock collapse (default collapsed = 🛠 chip) ---------- */
   var DOCK_KEY = 'dse-writing-dock-open';
   var foldBtn = document.getElementById('dockFold');
   function setDockOpen(open) {
@@ -48,7 +48,7 @@
       foldBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       foldBtn.setAttribute('aria-label', open ? 'Collapse tools' : 'Expand tools');
       foldBtn.title = open ? 'Collapse tools' : 'Tools';
-      foldBtn.textContent = open ? '▾' : '🧰';
+      foldBtn.textContent = open ? '▾' : '🛠';
     }
     try { localStorage.setItem(DOCK_KEY, open ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
