@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="stylesheet" href="../tools-dock.css?v=20261018g">
 <title>U47 Solo Verse — One Moment in Summer V22 | Practice Guide</title>
 <style>
  :root {
@@ -32,9 +33,6 @@
  line-height: 1.45;
  overflow-x: hidden;
  }
- body.dock-mini-timer-on { padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px)); }
- body.dock-open { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
- body.dock-open.dock-mini-timer-on { padding-bottom: calc(320px + env(safe-area-inset-bottom, 0px)); }
 
  header {
  position: sticky; top: 0; z-index: 40;
@@ -290,128 +288,7 @@
  .check-item:last-child { border-bottom: none; }
  .check-item input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--ok); flex-shrink: 0; }
 
- /* Sticky Bottom Dock (collapsible tools) */
- .bottom-dock {
- position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
- background: rgba(255, 248, 238, 0.97);
- backdrop-filter: blur(14px);
- -webkit-backdrop-filter: blur(14px);
- border-top: 2px solid var(--gold);
- padding: 4px 12px calc(6px + env(safe-area-inset-bottom));
- box-shadow: 0 -4px 20px rgba(44,41,38,.12);
- }
- .dock-inner {
- max-width: 680px; margin: 0 auto;
- display: flex; flex-direction: column; gap: 6px;
- }
- .dock-chrome {
- display: flex; align-items: center; gap: 8px; min-height: 36px;
- }
- .dock-toggle {
- border: 1px solid var(--border); background: var(--panel);
- color: var(--asphalt); font-size: .78rem; font-weight: 800;
- padding: 7px 12px; border-radius: 99px; cursor: pointer;
- display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
- }
- .dock-toggle .chev { display: inline-block; transition: transform .15s ease; font-size: .7rem; }
- body.dock-open .dock-toggle .chev { transform: rotate(180deg); }
- .dock-mini-timer {
- display: none; flex: 1; align-items: center; gap: 8px; min-width: 0;
- }
- body.dock-mini-timer-on:not(.dock-open) .dock-mini-timer { display: flex; }
- .dock-mini-timer .timer-pill {
- min-width: 72px; padding: 6px 10px; font-size: .98rem;
- }
- .dock-mini-timer .dock-btn { padding: 8px 12px; font-size: .8rem; }
- .dock-body {
- display: none; flex-direction: column; gap: 7px;
- padding-top: 2px;
- }
- body.dock-open .dock-body { display: flex; }
- .dock-modes {
- display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
- background: #EDE4D4; padding: 3px; border-radius: 9px;
- }
- .mode-tab {
- border: none; background: transparent; color: var(--muted);
- font-size: .76rem; font-weight: 800; padding: 5px 8px; border-radius: 7px; cursor: pointer;
- }
- .mode-tab.active { background: var(--panel); color: var(--gold); border: 1px solid var(--border); }
- .dock-pane { display: none; align-items: center; gap: 8px; }
- .dock-pane.active { display: flex; }
- .timer-pill {
- background: var(--card); border: 1px solid var(--border);
- border-radius: 10px; padding: 8px 12px; min-width: 82px; text-align: center;
- font-family: monospace; font-size: 1.08rem; font-weight: 800; color: var(--gold);
- }
- .pace-hint { font-size: .72rem; color: var(--muted); line-height: 1.2; flex: 1; }
- .dock-btn {
- border: none; border-radius: 10px; padding: 10px 14px;
- font-weight: 800; font-size: .84rem; cursor: pointer;
- display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;
- }
- .btn-start { background: var(--gold); color: #FFF8EE; }
- .btn-start.running { background: var(--heat); color: #fff; }
- .btn-reset { background: var(--card); color: var(--muted); border: 1px solid var(--border); padding: 10px 11px; }
- .btn-native {
- flex: 1; background: linear-gradient(135deg, #3D7A5A, #2F5F46); color: #F5EDE0;
- font-weight: 800; padding: 11px 14px;
- }
- .audio-bar { display: none; width: 100%; align-items: center; gap: 8px; background: rgba(196,184,168,.35); padding: 4px 8px; border-radius: 10px; }
- .audio-bar.show { display: flex; }
- .audio-help { display: none; font-size: .7rem; color: var(--muted); line-height: 1.25; }
- .audio-help.active { display: block; }
- .audio-bar audio { flex: 1; height: 34px; min-width: 0; }
- .btn-mini {
- background: var(--card); color: var(--asphalt); border: 1px solid var(--border);
- font-size: .72rem; font-weight: 700; padding: 7px 9px; border-radius: 7px; cursor: pointer; white-space: nowrap; text-decoration: none;
- }
-
- /* Handwrite layer */
- .stanza { position: relative; }
- .hw-wrap {
-  position: relative;
- }
- .hw-canvas {
-  position: absolute;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  z-index: 6;
-  pointer-events: none;
-  touch-action: none;
-  display: none;
-  border-radius: 4px;
- }
- body.hw-on .hw-canvas {
-  display: block;
-  pointer-events: auto;
-  cursor: crosshair;
- }
- body.hw-erase .hw-canvas { cursor: cell; }
- .hw-bar {
-  display: none;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 0 2px;
-  border-bottom: 1px dashed rgba(196,92,38,.35);
-  margin-bottom: 2px;
- }
- .hw-bar.show { display: flex; }
- .hw-chip {
-  border: 1px solid var(--border); background: var(--panel);
-  color: var(--muted); padding: 5px 9px; border-radius: 99px;
-  font-size: .72rem; font-weight: 800; white-space: nowrap; cursor: pointer;
- }
- .hw-chip.on {
-  background: rgba(196,92,38,.16); border-color: var(--gold); color: var(--heat);
- }
- .hw-chip.tool-on {
-  background: rgba(28,25,23,.9); border-color: var(--asphalt); color: #FFF8EE;
- }
- .hw-chip.danger-chip {
-  background: rgba(185,28,28,.08); border-color: rgba(185,28,28,.35); color: var(--danger);
- }
+ /* Bottom dock + handwrite chrome: see ../tools-dock.css */
 
  .yt-persist {
   position: fixed; left: 10px; right: 10px; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); z-index: 45;
@@ -419,8 +296,6 @@
   box-shadow: 0 8px 24px rgba(44,41,38,.18); overflow: hidden;
   display: flex; flex-direction: column; max-width: 520px; margin: 0 auto;
  }
- body.dock-open .yt-persist { bottom: calc(220px + env(safe-area-inset-bottom, 0px)); }
- body.dock-mini-timer-on:not(.dock-open) .yt-persist { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
  .yt-persist.compact .yt-frame-wrap {
   display: none !important; height: 0 !important; max-height: 0 !important;
   aspect-ratio: auto !important; opacity: 0; pointer-events: none; overflow: hidden;
@@ -737,44 +612,29 @@
  </section>
 </main>
 
-<!-- Collapsible tools dock: Handwrite + Timer / Recording -->
-<div class="bottom-dock" id="bottomDock">
- <div class="dock-inner">
+<!-- Collapsible Tools dock: 中文 · Handwrite · Record (DSE pattern; no timer) -->
+<div class="bottom-dock" id="bottomDock" role="toolbar" aria-label="Tools">
+ <button type="button" class="dock-fold" id="dockFold" aria-expanded="false" aria-controls="dockInner" aria-label="Expand tools" title="Tools">Tools</button>
+ <div class="dock-inner" id="dockInner">
  <div class="dock-chrome">
- <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="false" aria-controls="dockBody" title="Tools">
- <span class="chev" aria-hidden="true">▴</span> 工具 · Tools
- </button>
- <div class="dock-mini-timer" id="dockMiniTimer" aria-live="polite">
- <div class="timer-pill" id="timerDisplayMini">00:00</div>
- <button type="button" class="dock-btn btn-start" id="btnTimerToggleMini">▶ Start</button>
+ <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false" aria-label="Chinese gloss" title="Chinese gloss">中文</button>
+ <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false" aria-label="Handwrite" title="Handwrite">✍️</button>
+ <button type="button" class="dock-chip" id="togRecord" aria-pressed="false" aria-label="Record" title="Record or choose a voice memo">🎙</button>
+ </div>
+ <div class="hw-bar" id="hwBar" aria-label="Handwrite tools" hidden>
+ <div class="hw-row" role="group" aria-label="Handwrite tools">
+ <button type="button" class="hw-chip hw-colour-btn" id="hwColour" title="Ink colour" aria-label="Colour: heat"></button>
+ <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" aria-label="Pen" title="Pen">✏️</button>
+ <button type="button" class="hw-chip" id="hwHighlight" aria-pressed="false" aria-label="Highlighter" title="Highlighter">🖍</button>
+ <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" aria-label="Eraser" title="Eraser">🩹</button>
+ <button type="button" class="hw-chip" id="hwUndo" aria-label="Undo" title="Undo" disabled>↶</button>
+ <button type="button" class="hw-chip" id="hwRedo" aria-label="Redo" title="Redo" disabled>↷</button>
+ <button type="button" class="hw-chip danger-chip" id="hwClearAll" aria-label="Clear all" title="Clear all">🗑</button>
  </div>
  </div>
- <div class="dock-body" id="dockBody">
- <!-- Handwrite controls (Poem tab only) -->
- <div class="hw-bar" id="hwBar" aria-label="Handwrite tools">
- <button type="button" class="hw-chip" id="togHandwrite" aria-pressed="false">✏️ Handwrite</button>
- <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" disabled>🖊️ Pen</button>
- <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" disabled>🧹 Eraser</button>
- <button type="button" class="hw-chip" id="hwColour" title="Ink colour" disabled>🔴</button>
- <button type="button" class="hw-chip danger-chip" id="hwClearStanza" disabled>Clear stanza</button>
- <button type="button" class="hw-chip danger-chip" id="hwClearAll" disabled>Clear all</button>
- </div>
- <div class="dock-modes">
- <button type="button" class="mode-tab active" id="modeTimerBtn" aria-pressed="true" aria-controls="paneTimer">⏱ Practice Timer</button>
- <button type="button" class="mode-tab" id="modeAudioBtn" aria-pressed="false" aria-controls="paneAudio">🎧 Listen to a Take</button>
- </div>
-
- <!-- PANE 1: TIMER -->
- <div class="dock-pane active" id="paneTimer">
- <div class="timer-pill" id="timerDisplay">00:00</div>
- <div class="pace-hint" id="paceHint" aria-live="polite">Use the timer to compare takes;<br><strong style="color:var(--asphalt)">clarity comes first.</strong></div>
- <button type="button" class="dock-btn btn-start" id="btnTimerToggle">▶ Start</button>
- <button type="button" class="dock-btn btn-reset" id="btnTimerReset" title="Reset">🔄</button>
- </div>
-
- <!-- PANE 2: AUDIO RECORDER -->
- <div class="dock-pane" id="paneAudio">
- <label class="dock-btn btn-native" id="lblNativeRec" role="button" tabindex="0">
+ <div class="rec-bar" id="recBar" aria-label="Recording" hidden>
+ <div class="rec-row">
+ <label class="btn-native" id="lblNativeRec" role="button" tabindex="0">
  📲 Record or Choose a Voice Memo
  <input type="file" id="nativeAudioInput" accept="audio/*" style="display:none" aria-label="Choose an audio recording from your device" />
  </label>
@@ -787,6 +647,7 @@
  </div>
  </div>
 </div>
+
 
 
 <!-- Hidden local model audio (primary stanza play on https Pages) -->
@@ -821,8 +682,6 @@ tabBtns.forEach(btn => {
  poemToggles.style.display = target === "viewPoem" ? "flex" : "none";
  const tapHint = document.getElementById("tapHint");
  if (tapHint) tapHint.style.display = target === "viewPoem" ? "block" : "none";
- const hwBarEl = document.getElementById("hwBar");
- if (hwBarEl) hwBarEl.classList.toggle("show", target === "viewPoem");
  if (target === "viewPoem") requestAnimationFrame(() => window.hwResize && window.hwResize());
  syncYtLayout(target);
  window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
@@ -841,7 +700,6 @@ function bindToggle(btnId, className) {
 }
 bindToggle("togRunon", "hide-runon");
 bindToggle("togStress", "hide-stress");
-bindToggle("togZh", "hide-zh");
 bindToggle("togCues", "hide-cues");
 
 document.querySelectorAll(".stanza").forEach(st => {
@@ -921,444 +779,8 @@ VOCAB_TRAPS.forEach(item => {
  grid.appendChild(btn);
 });
 
-// 4. Bottom Dock Mode Switcher
-const modeTimerBtn = document.getElementById("modeTimerBtn");
-const modeAudioBtn = document.getElementById("modeAudioBtn");
-const paneTimer = document.getElementById("paneTimer");
-const paneAudio = document.getElementById("paneAudio");
-const audioHelp = document.getElementById("audioHelp");
-
-modeTimerBtn.onclick = () => {
- modeTimerBtn.classList.add("active");
- modeAudioBtn.classList.remove("active");
- modeTimerBtn.setAttribute("aria-pressed", "true");
- modeAudioBtn.setAttribute("aria-pressed", "false");
- paneTimer.classList.add("active");
- paneAudio.classList.remove("active");
- audioHelp.classList.remove("active");
-};
-
-modeAudioBtn.onclick = () => {
- modeAudioBtn.classList.add("active");
- modeTimerBtn.classList.remove("active");
- modeTimerBtn.setAttribute("aria-pressed", "false");
- modeAudioBtn.setAttribute("aria-pressed", "true");
- paneAudio.classList.add("active");
- paneTimer.classList.remove("active");
- audioHelp.classList.add("active");
-};
-
-// Timer state (declared early so dock mini-strip can read running state)
-let timerInt = null;
-let elapsedMs = 0;
-let startedAt = 0;
-let seconds = 0;
-
-// 4b. Collapsible tools dock (Handwrite + Timer/Recording)
-const DOCK_KEY = "u47-summer-dock-open-v1";
-const dockToggle = document.getElementById("dockToggle");
-const timerDisplayMini = document.getElementById("timerDisplayMini");
-const btnTimerToggleMini = document.getElementById("btnTimerToggleMini");
-let dockOpen = false;
-
-function loadDockOpen() {
- try {
- const v = localStorage.getItem(DOCK_KEY);
- if (v === "1") return true;
- if (v === "0") return false;
- } catch (e) { /* private mode */ }
- return false; // collapsed by default — more poem space
-}
-function saveDockOpen(on) {
- try { localStorage.setItem(DOCK_KEY, on ? "1" : "0"); } catch (e) { /* */ }
-}
-function syncMiniTimerStrip() {
- // Reed soft-lock: when collapsed and timer running, keep clock + Pause visible
- const running = !!timerInt;
- document.body.classList.toggle("dock-mini-timer-on", running && !dockOpen);
-}
-function setDockOpen(on, persist) {
- dockOpen = !!on;
- document.body.classList.toggle("dock-open", dockOpen);
- if (dockToggle) {
- dockToggle.setAttribute("aria-expanded", String(dockOpen));
- }
- syncMiniTimerStrip();
- if (persist !== false) saveDockOpen(dockOpen);
-}
-window.u47ExpandDock = function () { setDockOpen(true, true); };
-if (dockToggle) {
- dockToggle.onclick = () => setDockOpen(!dockOpen, true);
-}
-setDockOpen(loadDockOpen(), false);
-
-// 5. Stopwatch Timer
-const timerDisplay = document.getElementById("timerDisplay");
-const btnTimerToggle = document.getElementById("btnTimerToggle");
-const btnTimerReset = document.getElementById("btnTimerReset");
-const paceHint = document.getElementById("paceHint");
-
-function formatTimer(sec) {
- const m = String(Math.floor(sec / 60)).padStart(2, "0");
- const s = String(sec % 60).padStart(2, "0");
- return `${m}:${s}`;
-}
-function syncTimerButtons() {
- const running = !!timerInt;
- const label = running ? "⏸ Pause" : (elapsedMs > 0 || seconds > 0 ? "▶ Resume" : "▶ Start");
- [btnTimerToggle, btnTimerToggleMini].forEach(btn => {
- if (!btn) return;
- btn.classList.toggle("running", running);
- btn.textContent = label;
- });
-}
-function updateTimerUI() {
- seconds = Math.floor((elapsedMs + (timerInt ? performance.now() - startedAt : 0)) / 1000);
- const text = formatTimer(seconds);
- if (timerDisplay) timerDisplay.textContent = text;
- if (timerDisplayMini) timerDisplayMini.textContent = text;
- syncMiniTimerStrip();
-}
-
-function evaluatePace() {
- if (seconds === 0) {
- paceHint.innerHTML = `Use the timer to compare takes;<br><strong style="color:var(--asphalt)">clarity comes first.</strong>`;
- } else {
- paceHint.innerHTML = `Listen back: did the images<br><strong style="color:#3F5F5A">have room to breathe?</strong>`;
- }
-}
-
-function toggleTimer() {
- if (timerInt) {
- elapsedMs += performance.now() - startedAt;
- clearInterval(timerInt);
- timerInt = null;
- updateTimerUI();
- syncTimerButtons();
- evaluatePace();
- } else {
- startedAt = performance.now();
- paceHint.innerHTML = `Reciting...<br><strong style="color:var(--gold)">Watch your contrasts!</strong>`;
- timerInt = setInterval(updateTimerUI, 250);
- syncTimerButtons();
- syncMiniTimerStrip();
- }
-}
-
-btnTimerToggle.onclick = toggleTimer;
-if (btnTimerToggleMini) btnTimerToggleMini.onclick = toggleTimer;
-
-btnTimerReset.onclick = () => {
- if (timerInt) {
- clearInterval(timerInt);
- timerInt = null;
- }
- elapsedMs = 0;
- seconds = 0;
- updateTimerUI();
- syncTimerButtons();
- evaluatePace();
-};
-
-// 6. Device audio chooser and local playback (recording availability varies by device)
-const nativeAudioInput = document.getElementById("nativeAudioInput");
-const lblNativeRec = document.getElementById("lblNativeRec");
-const audioBar = document.getElementById("audioBar");
-const audioPlayer = document.getElementById("audioPlayer");
-const btnChangeTake = document.getElementById("btnChangeTake");
-let audioUrl = null;
-lblNativeRec.onkeydown = event => {
- if (event.key === "Enter" || event.key === " ") {
- event.preventDefault();
- nativeAudioInput.click();
- }
-};
-
-nativeAudioInput.onchange = e => {
- const file = e.target.files && e.target.files[0];
- if (!file) return;
- audioPlayer.pause();
- if (audioUrl) URL.revokeObjectURL(audioUrl);
- audioUrl = URL.createObjectURL(file);
- audioPlayer.src = audioUrl;
- lblNativeRec.style.display = "none";
- audioBar.classList.add("show");
-};
-
-btnChangeTake.onclick = () => {
- nativeAudioInput.value = "";
- nativeAudioInput.click();
-};
-window.addEventListener("pagehide", () => {
- if (audioUrl) URL.revokeObjectURL(audioUrl);
-});
-
-// 7. Handwrite layer (local strokes on poem lines)
-(function () {
- const HW_KEY = "u47-summer-handwrite-v1";
- const COLOURS = [
- { id: "heat", hex: "#C2410C", emoji: "🔴" },
- { id: "asphalt", hex: "#1C1917", emoji: "⚫" },
- { id: "cool", hex: "#2563EB", emoji: "🔵" }
- ];
- let colourIdx = 0;
- let tool = "pen"; // pen | erase
- let enabled = false;
- let strokes = {}; // stanzaId -> [{colour, width, erase, points:[{x,y,p}]}]  coords 0..1
- let drawing = false;
- let current = null;
- let activeCanvas = null;
-
- const hwBar = document.getElementById("hwBar");
- const tog = document.getElementById("togHandwrite");
- const btnPen = document.getElementById("hwPen");
- const btnEraser = document.getElementById("hwEraser");
- const btnColour = document.getElementById("hwColour");
- const btnClearSt = document.getElementById("hwClearStanza");
- const btnClearAll = document.getElementById("hwClearAll");
- const wraps = Array.from(document.querySelectorAll(".hw-wrap"));
- const canvases = Array.from(document.querySelectorAll(".hw-canvas"));
-
- // Show bar on Poem tab by default
- if (hwBar) hwBar.classList.add("show");
-
- function load() {
- try {
- const raw = localStorage.getItem(HW_KEY);
- if (raw) {
- const data = JSON.parse(raw);
- if (data && typeof data === "object" && data.strokes) strokes = data.strokes;
- else if (data && typeof data === "object") strokes = data;
- }
- } catch (e) { strokes = {}; }
- }
- function save() {
- try {
- localStorage.setItem(HW_KEY, JSON.stringify({ v: 1, strokes }));
- } catch (e) { /* quota / private mode */ }
- }
- function setToolsEnabled(on) {
- [btnPen, btnEraser, btnColour, btnClearSt, btnClearAll].forEach(b => {
- if (b) b.disabled = !on;
- });
- }
- function setEnabled(on) {
- enabled = on;
- document.body.classList.toggle("hw-on", on);
- document.body.classList.toggle("hw-erase", on && tool === "erase");
- tog.classList.toggle("on", on);
- tog.setAttribute("aria-pressed", String(on));
- setToolsEnabled(on);
- canvases.forEach(c => {
- c.style.display = on ? "block" : "none";
- c.style.pointerEvents = on ? "auto" : "none";
- });
- if (on) {
- // Prefer: Handwrite ON expands tools so Pen / Eraser are reachable
- if (typeof window.u47ExpandDock === "function") window.u47ExpandDock();
- resizeAll();
- } else {
- redrawAll(); // still redraw when turning off? hidden anyway
- }
- }
- function setTool(t) {
- tool = t;
- document.body.classList.toggle("hw-erase", enabled && tool === "erase");
- btnPen.classList.toggle("tool-on", tool === "pen");
- btnEraser.classList.toggle("tool-on", tool === "erase");
- btnPen.setAttribute("aria-pressed", String(tool === "pen"));
- btnEraser.setAttribute("aria-pressed", String(tool === "erase"));
- }
- function cycleColour() {
- colourIdx = (colourIdx + 1) % COLOURS.length;
- btnColour.textContent = COLOURS[colourIdx].emoji;
- btnColour.title = "Ink: " + COLOURS[colourIdx].id;
- }
-
- function sizeCanvas(canvas) {
- const wrap = canvas.parentElement;
- if (!wrap) return;
- const rect = wrap.getBoundingClientRect();
- const dpr = Math.min(window.devicePixelRatio || 1, 2);
- const cssW = Math.max(1, Math.round(rect.width));
- const cssH = Math.max(1, Math.round(rect.height));
- if (canvas._cssW === cssW && canvas._cssH === cssH && canvas._dpr === dpr) return;
- canvas._cssW = cssW;
- canvas._cssH = cssH;
- canvas._dpr = dpr;
- canvas.width = Math.round(cssW * dpr);
- canvas.height = Math.round(cssH * dpr);
- canvas.style.width = cssW + "px";
- canvas.style.height = cssH + "px";
- const ctx = canvas.getContext("2d");
- ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
- redrawCanvas(canvas);
- }
-
- function redrawCanvas(canvas) {
- const id = canvas.dataset.hw;
- const ctx = canvas.getContext("2d");
- const w = canvas._cssW || canvas.clientWidth;
- const h = canvas._cssH || canvas.clientHeight;
- ctx.clearRect(0, 0, w, h);
- const list = strokes[id] || [];
- for (const stroke of list) {
- if (!stroke.points || stroke.points.length < 1) continue;
- ctx.save();
- if (stroke.erase) {
- ctx.globalCompositeOperation = "destination-out";
- ctx.strokeStyle = "rgba(0,0,0,1)";
- } else {
- ctx.globalCompositeOperation = "source-over";
- ctx.strokeStyle = stroke.colour || COLOURS[0].hex;
- }
- ctx.lineCap = "round";
- ctx.lineJoin = "round";
- ctx.lineWidth = stroke.width || 2.0;
- ctx.beginPath();
- stroke.points.forEach((pt, i) => {
- const x = pt.x * w;
- const y = pt.y * h;
- if (i === 0) ctx.moveTo(x, y);
- else ctx.lineTo(x, y);
- });
- if (stroke.points.length === 1) {
- const pt = stroke.points[0];
- ctx.arc(pt.x * w, pt.y * h, (stroke.width || 2.0) / 2, 0, Math.PI * 2);
- ctx.fillStyle = stroke.erase ? "rgba(0,0,0,1)" : (stroke.colour || COLOURS[0].hex);
- if (stroke.erase) ctx.globalCompositeOperation = "destination-out";
- ctx.fill();
- } else {
- ctx.stroke();
- }
- ctx.restore();
- }
- }
-
- function redrawAll() {
- canvases.forEach(redrawCanvas);
- }
-
- function resizeAll() {
- canvases.forEach(sizeCanvas);
- }
- window.hwResize = resizeAll;
-
- function posNorm(canvas, clientX, clientY) {
- const rect = canvas.getBoundingClientRect();
- const w = rect.width || 1;
- const h = rect.height || 1;
- return {
- x: Math.min(1, Math.max(0, (clientX - rect.left) / w)),
- y: Math.min(1, Math.max(0, (clientY - rect.top) / h))
- };
- }
-
- function startDraw(canvas, e) {
- if (!enabled) return;
- e.preventDefault();
- drawing = true;
- activeCanvas = canvas;
- const id = canvas.dataset.hw;
- if (!strokes[id]) strokes[id] = [];
- const p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
- const pt = posNorm(canvas, e.clientX, e.clientY);
- pt.p = p;
- const width = tool === "erase" ? 12 + p * 8 : 1.5 + p * 1.0;
- current = {
- colour: COLOURS[colourIdx].hex,
- width,
- erase: tool === "erase",
- points: [pt]
- };
- strokes[id].push(current);
- redrawCanvas(canvas);
- }
-
- function moveDraw(e) {
- if (!drawing || !activeCanvas || !current) return;
- e.preventDefault();
- const p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
- const pt = posNorm(activeCanvas, e.clientX, e.clientY);
- pt.p = p;
- current.points.push(pt);
- if (!current.erase) {
- current.width = 1.5 + p * 1.0;
- }
- redrawCanvas(activeCanvas);
- }
-
- function endDraw() {
- if (!drawing) return;
- drawing = false;
- current = null;
- activeCanvas = null;
- save();
- }
-
- canvases.forEach(canvas => {
- canvas.addEventListener("pointerdown", e => {
- if (e.button !== undefined && e.button !== 0) return;
- canvas.setPointerCapture(e.pointerId);
- startDraw(canvas, e);
- });
- canvas.addEventListener("pointermove", moveDraw);
- canvas.addEventListener("pointerup", endDraw);
- canvas.addEventListener("pointercancel", endDraw);
- canvas.addEventListener("lostpointercapture", endDraw);
- });
-
- tog.onclick = () => setEnabled(!enabled);
- btnPen.onclick = () => setTool("pen");
- btnEraser.onclick = () => setTool("erase");
- btnColour.onclick = () => cycleColour();
-
- btnClearSt.onclick = () => {
- const focused = document.querySelector(".stanza.focused .hw-canvas");
- const target = focused || (document.querySelector(".hw-canvas"));
- if (!target) return;
- const id = target.dataset.hw;
- if (!strokes[id] || !strokes[id].length) return;
- if (!confirm("Clear handwriting on this stanza? / 清除這一節的手寫？")) return;
- strokes[id] = [];
- save();
- redrawCanvas(target);
- };
-
- btnClearAll.onclick = () => {
- const any = Object.values(strokes).some(a => a && a.length);
- if (!any) return;
- if (!confirm("Clear ALL handwriting notes? / 清除全部手寫筆記？")) return;
- strokes = {};
- save();
- redrawAll();
- };
-
- // When toggles change poem height, resize canvases
- ["togRunon", "togStress", "togZh", "togCues"].forEach(id => {
- const b = document.getElementById(id);
- if (!b) return;
- b.addEventListener("click", () => {
- requestAnimationFrame(() => setTimeout(resizeAll, 50));
- });
- });
-
- let resizeTimer = null;
- window.addEventListener("resize", () => {
- clearTimeout(resizeTimer);
- resizeTimer = setTimeout(resizeAll, 120);
- });
- window.addEventListener("orientationchange", () => setTimeout(resizeAll, 200));
-
- load();
- setTool("pen");
- setEnabled(false); // OFF by default — scribbles hidden
- // Size canvases even when off so restore is ready when turned on
- resizeAll();
- // Ensure restored ink is ready under the hood
- canvases.forEach(c => { c.style.display = "none"; c.style.pointerEvents = "none"; });
-})();
-
+// 4–7. Tools dock (中文 · Handwrite · Record) — see ../tools-dock.js
+// Timer removed per How Ch (2026-10-18).
 
 // --- V22: local HTML5 audio for stanza cues; YouTube optional (Show / Model tab) ---
 const YT_ID = "m6QuyxwFZcU";
@@ -1663,5 +1085,6 @@ syncYtLayout(document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem
 </script>
 
 <p class="school-brand"><a href="../../">SKH Holy Carpenter Secondary School · English</a></p>
+<script src="../tools-dock.js?v=20261018g"></script>
 </body>
 </html>

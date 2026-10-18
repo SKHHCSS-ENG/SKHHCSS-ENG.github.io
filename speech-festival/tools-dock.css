@@ -1,0 +1,384 @@
+/* Speech Festival — DSE-style sticky Tools dock (U47 / U66)
+   Compact: Tools chip collapsed by default; expand → 中文 · ✍️ · 🎙 + hw row.
+   Warm SF palette (--gold / --asphalt). Does not affect Solo Verse. */
+:root {
+  --sf-dock-accent: #C45C26;
+  --sf-dock-accent-on: #9a4519;
+  --sf-dock-ink: #1C1917;
+  --sf-dock-muted: #6B6560;
+  --sf-dock-panel: #FFF8EE;
+  --sf-dock-card: #FBF3E6;
+  --sf-dock-bg: #F5EDE0;
+  --sf-dock-border: #C4B8A8;
+  --sf-dock-warn: #B91C1C;
+}
+
+/* Body padding for dock — override page defaults when tools-dock is present */
+body.sf-tools {
+  padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
+}
+body.sf-tools.dock-open {
+  padding-bottom: calc(200px + env(safe-area-inset-bottom, 0px));
+}
+body.sf-tools.dock-open.hw-on {
+  padding-bottom: calc(240px + env(safe-area-inset-bottom, 0px));
+}
+body.sf-tools.dock-open.rec-on {
+  padding-bottom: calc(250px + env(safe-area-inset-bottom, 0px));
+}
+body.sf-tools.dock-open.hw-on.rec-on {
+  padding-bottom: calc(290px + env(safe-area-inset-bottom, 0px));
+}
+
+html.sf-tools {
+  scroll-padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
+}
+html.sf-tools.dock-open {
+  scroll-padding-bottom: calc(220px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Sticky Tools dock — hug chip when collapsed (iOS-safe taps) */
+.bottom-dock {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: auto;
+  width: auto;
+  max-width: 100%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  pointer-events: auto;
+  background: transparent;
+  border-top: none;
+  box-shadow: none;
+}
+body.dock-open .bottom-dock {
+  left: 0;
+  right: 0;
+  width: auto;
+  align-items: stretch;
+  background: rgba(255, 248, 238, 0.97);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: none;
+  box-shadow: 0 -4px 20px rgba(44, 41, 38, 0.12);
+  padding: 0 6px calc(2px + env(safe-area-inset-bottom, 0px));
+}
+.dock-fold {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--sf-dock-accent);
+  background: var(--sf-dock-accent-on);
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(44, 41, 38, 0.18);
+  margin: 0;
+  font-family: inherit;
+}
+.dock-fold:focus-visible {
+  outline: 3px solid var(--sf-dock-ink);
+  outline-offset: 2px;
+}
+body.dock-open .dock-fold {
+  display: flex;
+  align-self: center;
+  position: relative;
+  width: 42%;
+  max-width: 160px;
+  min-width: 88px;
+  min-height: 44px;
+  height: 44px;
+  margin: 0 auto;
+  padding: 14px 0 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  color: var(--sf-dock-muted);
+  box-shadow: none;
+  font-size: .95rem;
+  font-weight: 700;
+}
+body.dock-open .dock-fold::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--sf-dock-accent);
+  pointer-events: none;
+}
+.dock-inner {
+  display: none;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+body.dock-open .dock-inner {
+  display: flex;
+}
+.dock-chrome {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dock-chrome::-webkit-scrollbar { display: none; }
+.dock-chip:focus-visible,
+.hw-chip:focus-visible {
+  outline: 3px solid var(--sf-dock-ink);
+  outline-offset: 2px;
+}
+.dock-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--sf-dock-accent);
+  background: var(--sf-dock-panel);
+  color: var(--sf-dock-accent);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.1;
+  font-family: "Segoe UI", system-ui, -apple-system, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "PingFang HK", "Noto Sans TC", sans-serif;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.dock-chip.on,
+.dock-chip[aria-pressed="true"] {
+  background: var(--sf-dock-accent-on);
+  color: #fff;
+  border-color: #7a3612;
+}
+
+/* Handwrite tools row */
+.hw-bar {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 0 2px;
+}
+body.hw-on .hw-bar {
+  display: flex;
+}
+.hw-bar[hidden] {
+  display: none !important;
+}
+body.hw-on .hw-bar:not([hidden]) {
+  display: flex;
+}
+.hw-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  min-height: 40px;
+}
+.hw-chip {
+  border: 1px solid var(--sf-dock-border);
+  background: var(--sf-dock-bg);
+  color: var(--sf-dock-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  height: 40px;
+  padding: 4px 2px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  flex: 1 1 0;
+  max-width: none;
+  font-family: "Segoe UI", system-ui, -apple-system, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "PingFang HK", "Noto Sans TC", sans-serif;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.hw-chip:disabled {
+  opacity: .4;
+  cursor: default;
+}
+.hw-chip.on {
+  background: rgba(196, 92, 38, 0.14);
+  border-color: var(--sf-dock-accent);
+  color: var(--sf-dock-accent);
+}
+.hw-chip.tool-on {
+  background: var(--sf-dock-ink);
+  border-color: var(--sf-dock-ink);
+  color: #FFF8EE;
+}
+.hw-chip.danger-chip {
+  background: rgba(185, 28, 28, 0.08);
+  border-color: rgba(185, 28, 28, 0.35);
+  color: var(--sf-dock-warn);
+  flex: 1 1 0;
+  max-width: none;
+}
+.hw-chip.hw-colour-btn {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--sf-dock-border);
+  background: #C2410C;
+  flex: 0 0 40px;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+/* Record row (file picker + local playback — no upload) */
+.rec-bar {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 0 4px;
+}
+body.rec-on .rec-bar {
+  display: flex;
+}
+.rec-bar[hidden] {
+  display: none !important;
+}
+body.rec-on .rec-bar:not([hidden]) {
+  display: flex;
+}
+.rec-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.btn-native {
+  flex: 1;
+  min-width: 0;
+  background: linear-gradient(135deg, #3D7A5A, #2F5F46);
+  color: #F5EDE0;
+  font-weight: 800;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: .84rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.audio-bar {
+  display: none;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  background: rgba(196, 184, 168, 0.35);
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+.audio-bar.show { display: flex; }
+.audio-bar audio { flex: 1; height: 34px; min-width: 0; }
+.btn-mini {
+  background: var(--sf-dock-card);
+  color: var(--sf-dock-ink);
+  border: 1px solid var(--sf-dock-border);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 7px 9px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: inherit;
+}
+.audio-help {
+  display: none;
+  font-size: .7rem;
+  color: var(--sf-dock-muted);
+  line-height: 1.25;
+}
+body.rec-on .audio-help { display: block; }
+
+/* Handwrite overlay — absolute over stanzas; never inserts spacer */
+.hw-wrap { position: relative; }
+.hw-canvas {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  z-index: 6;
+  pointer-events: none;
+  touch-action: none;
+  display: none;
+  border-radius: 4px;
+}
+body.hw-on .hw-canvas {
+  display: block;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+body.hw-erase .hw-canvas { cursor: cell; }
+body.hw-highlight .hw-canvas { cursor: copy; }
+
+/* Model play bar sits above Tools dock */
+.yt-persist {
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.dock-open .yt-persist {
+  bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.dock-open.hw-on .yt-persist {
+  bottom: calc(148px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.dock-open.rec-on .yt-persist {
+  bottom: calc(160px + env(safe-area-inset-bottom, 0px)) !important;
+}
+body.dock-open.hw-on.rec-on .yt-persist {
+  bottom: calc(200px + env(safe-area-inset-bottom, 0px)) !important;
+}
+.yt-persist.expanded {
+  bottom: auto !important;
+}
+
+@media print {
+  .bottom-dock { display: none !important; }
+  .hw-canvas { display: none !important; }
+}
