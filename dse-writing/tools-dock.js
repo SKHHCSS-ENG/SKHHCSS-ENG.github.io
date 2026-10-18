@@ -1,7 +1,7 @@
 /**
  * DSE Writing — sticky Tools dock
- * Chinese gloss + Handwrite (✏️ 🖍 colour-ball 🩹 / ↶ ↷ 🗑) — 1 tools row
- * Collapsible dock (Tools chip default). Canvas overlays cards — no blank spacer.
+ * 譯 (Chinese gloss) + Handwrite (✏️ 🖍 colour-ball 🩹 / ↶ ↷ 🗑) — 1 tools row
+ * Collapsible dock (🧰 chip default). Canvas overlays cards — no blank spacer.
  */
 (function () {
   var ZH_KEY = 'dse-writing-zh-on';
@@ -21,7 +21,7 @@
       zhBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
       zhBtn.setAttribute('aria-label', on ? 'Chinese gloss: ON' : 'Chinese gloss: OFF');
       zhBtn.classList.toggle('on', on);
-      zhBtn.textContent = '中文';
+      zhBtn.textContent = '譯';
     }
     try { localStorage.setItem(ZH_KEY, on ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
@@ -38,7 +38,7 @@
   }
 
 
-  /* ---------- Dock collapse (default collapsed = Tools chip) ---------- */
+  /* ---------- Dock collapse (default collapsed = 🧰 chip) ---------- */
   var DOCK_KEY = 'dse-writing-dock-open';
   var foldBtn = document.getElementById('dockFold');
   function setDockOpen(open) {
@@ -48,7 +48,7 @@
       foldBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       foldBtn.setAttribute('aria-label', open ? 'Collapse tools' : 'Expand tools');
       foldBtn.title = open ? 'Collapse tools' : 'Tools';
-      foldBtn.textContent = open ? '▾' : 'Tools';
+      foldBtn.textContent = open ? '▾' : '🧰';
     }
     try { localStorage.setItem(DOCK_KEY, open ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {

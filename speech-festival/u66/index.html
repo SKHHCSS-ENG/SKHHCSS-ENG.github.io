@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<link rel="stylesheet" href="../tools-dock.css?v=20261018g">
+<link rel="stylesheet" href="../tools-dock.css?v=20261018h">
 <title>U66 Solo Verse — Late Home V1.7 | Practice Guide</title>
 <style>
  :root {
@@ -376,7 +376,6 @@
 <div class="quick-toggles" id="poemToggles">
  <button type="button" class="chip-toggle on" id="togRunon" aria-pressed="true">↪ Cut-offs</button>
  <button type="button" class="chip-toggle on" id="togStress" aria-pressed="true">★ Stress</button>
- <button type="button" class="chip-toggle on" id="togZh" aria-pressed="true">譯 中文</button>
  <button type="button" class="chip-toggle on" id="togCues" aria-pressed="true">💡 Notes</button>
 </div>
 <p class="tap-hint" id="tapHint">Tap an exchange (or the title) to hear that part of the Model — audio plays from this page · 點一節即可聽該段示範（本頁音訊）. Use <strong>Show</strong> if you want to watch the YouTube video · 要看影片請按 Show.</p>
@@ -599,12 +598,12 @@
  </section>
 </main>
 
-<!-- Collapsible Tools dock: 中文 · Handwrite · Record (DSE pattern; no timer) -->
+<!-- Collapsible Tools dock: 譯 · Handwrite · Record (DSE pattern; no timer) -->
 <div class="bottom-dock" id="bottomDock" role="toolbar" aria-label="Tools">
- <button type="button" class="dock-fold" id="dockFold" aria-expanded="false" aria-controls="dockInner" aria-label="Expand tools" title="Tools">Tools</button>
+ <button type="button" class="dock-fold" id="dockFold" aria-expanded="false" aria-controls="dockInner" aria-label="Expand tools" title="Tools">🧰</button>
  <div class="dock-inner" id="dockInner">
  <div class="dock-chrome">
- <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false" aria-label="Chinese gloss" title="Chinese gloss">中文</button>
+ <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false" aria-label="Chinese gloss" title="Chinese gloss">譯</button>
  <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false" aria-label="Handwrite" title="Handwrite">✍️</button>
  <button type="button" class="dock-chip" id="togRecord" aria-pressed="false" aria-label="Record" title="Record or choose a voice memo">🎙</button>
  </div>
@@ -630,7 +629,6 @@
  <button type="button" class="btn-mini" id="btnChangeTake">🔄 New</button>
  </div>
  </div>
- <div class="audio-help" id="audioHelp">Your device may offer recording or file selection. This page plays the selected take locally; it does not save or upload it.</div>
  </div>
  </div>
 </div>
@@ -760,7 +758,7 @@ VOCAB_TRAPS.forEach(item => {
  grid.appendChild(btn);
 });
 
-// 4–7. Tools dock (中文 · Handwrite · Record) — see ../tools-dock.js
+// 4–7. Tools dock (譯 · Handwrite · Record) — see ../tools-dock.js
 // Timer removed per How Ch (2026-10-18).
 
 // --- V22: local HTML5 audio for stanza cues; YouTube optional (Show / Model tab) ---
@@ -1066,6 +1064,6 @@ syncYtLayout(document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem
 </script>
 
 <p class="school-brand"><a href="../../">SKH Holy Carpenter Secondary School · English</a></p>
-<script src="../tools-dock.js?v=20261018g"></script>
+<script src="../tools-dock.js?v=20261018h"></script>
 </body>
 </html>

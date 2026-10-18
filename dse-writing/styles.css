@@ -33,7 +33,7 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 body.tools-page {
-  /* Collapsed by default: room for Tools chip only */
+  /* Collapsed by default: room for 🧰 chip only */
   padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 body.tools-page.dock-open {
@@ -168,7 +168,7 @@ a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   color: var(--accent-ink);
 }
 
-/* Sticky Tools dock — collapsed Tools chip by default; expands to compact rows.
+/* Sticky Tools dock — collapsed 🧰 chip by default; expands to compact rows.
    Collapsed: hug the chip (not full-bleed) so we never need pointer-events:none
    on a parent — that pattern drops taps on iOS Safari. */
 .bottom-dock {

@@ -1,8 +1,8 @@
 /**
  * Speech Festival — sticky Tools dock (U47 / U66)
- * Chinese gloss + Handwrite (Colour · Pen · Highlighter · Eraser · Undo · Redo · Clear)
+ * 譯 (Chinese gloss) + Handwrite (Colour · Pen · Highlighter · Eraser · Undo · Redo · Clear)
  * + Record (device file / voice memo, local playback only)
- * Collapsible dock (Tools chip default). Canvas overlays stanzas — no blank spacer.
+ * Collapsible dock (🧰 chip default). Canvas overlays stanzas — no blank spacer.
  * Adapted from dse-writing/tools-dock.js; does not load on Solo Verse.
  */
 (function () {
@@ -27,7 +27,6 @@
 
   var glossRoot = document.getElementById('stanzaContainer');
   var zhBtn = document.getElementById('zhToggle');
-  var zhHeader = document.getElementById('togZh');
 
   function glossVisible() {
     if (!glossRoot) return true;
@@ -39,11 +38,7 @@
       zhBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
       zhBtn.setAttribute('aria-label', on ? 'Chinese gloss: ON' : 'Chinese gloss: OFF');
       zhBtn.classList.toggle('on', on);
-      zhBtn.textContent = '中文';
-    }
-    if (zhHeader) {
-      zhHeader.classList.toggle('on', on);
-      zhHeader.setAttribute('aria-pressed', String(on));
+      zhBtn.textContent = '譯';
     }
     try { localStorage.setItem(ZH_KEY, on ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
@@ -59,14 +54,8 @@
       applyZh(!glossVisible());
     });
   }
-  if (zhHeader) {
-    /* Replace page bindToggle for 中文 so dock + header stay in sync */
-    zhHeader.onclick = function () {
-      applyZh(!glossVisible());
-    };
-  }
 
-  /* ---------- Dock collapse (default collapsed = Tools chip) ---------- */
+  /* ---------- Dock collapse (default collapsed = 🧰 chip) ---------- */
   var foldBtn = document.getElementById('dockFold');
   function setDockOpen(open) {
     document.body.classList.toggle('dock-open', open);
@@ -75,7 +64,7 @@
       foldBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       foldBtn.setAttribute('aria-label', open ? 'Collapse tools' : 'Expand tools');
       foldBtn.title = open ? 'Collapse tools' : 'Tools';
-      foldBtn.textContent = open ? '▾' : 'Tools';
+      foldBtn.textContent = open ? '▾' : '🧰';
     }
     try { localStorage.setItem(DOCK_KEY, open ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
@@ -493,7 +482,7 @@
     }
 
     /* Resize when poem toggles change height */
-    ['togRunon', 'togStress', 'togZh', 'togCues'].forEach(function (id) {
+    ['togRunon', 'togStress', 'togCues'].forEach(function (id) {
       var b = document.getElementById(id);
       if (!b) return;
       b.addEventListener('click', function () {

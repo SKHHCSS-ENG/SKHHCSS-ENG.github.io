@@ -1,5 +1,5 @@
 /* Speech Festival — DSE-style sticky Tools dock (U47 / U66)
-   Compact: Tools chip collapsed by default; expand → 中文 · ✍️ · 🎙 + hw row.
+   Compact: 🧰 chip collapsed by default; expand → 譯 · ✍️ · 🎙 + hw row.
    Warm SF palette (--gold / --asphalt). Does not affect Solo Verse. */
 :root {
   --sf-dock-accent: #C45C26;
@@ -37,7 +37,7 @@ html.sf-tools.dock-open {
   scroll-padding-bottom: calc(220px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Sticky Tools dock — hug chip when collapsed (iOS-safe taps) */
+/* Sticky Tools dock — hug 🧰 chip when collapsed (iOS-safe taps) */
 .bottom-dock {
   position: fixed;
   bottom: 0;
@@ -330,14 +330,6 @@ body.rec-on .rec-bar:not([hidden]) {
   text-decoration: none;
   font-family: inherit;
 }
-.audio-help {
-  display: none;
-  font-size: .7rem;
-  color: var(--sf-dock-muted);
-  line-height: 1.25;
-}
-body.rec-on .audio-help { display: block; }
-
 /* Handwrite overlay — absolute over stanzas; never inserts spacer */
 .hw-wrap { position: relative; }
 .hw-canvas {
