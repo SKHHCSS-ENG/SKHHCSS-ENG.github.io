@@ -1,34 +1,27 @@
 /**
- * DSE Writing — U47-style Tools dock
- * 中文 gloss + Handwrite notes (localStorage). No timer/recording.
+ * DSE Writing — sticky Tools dock
+ * Chinese gloss + Handwrite (Pen / Eraser / Colour / Highlighter / Clear all / Undo / Redo)
+ * Canvas overlays cards — never inserts blank spacer under content.
  */
 (function () {
   var ZH_KEY = 'dse-writing-zh-on';
-  var DOCK_KEY = 'dse-writing-dock-open';
   var pageSlug = (function () {
     var parts = location.pathname.replace(/\/+$/, '').split('/');
     var last = parts[parts.length - 1] || '';
     if (last === 'index.html') last = parts[parts.length - 2] || 'page';
     return last || 'page';
   })();
-  var HW_KEY = 'dse-writing-hw-' + pageSlug;
+  var HW_KEY = 'dse-writing-hw-v2-' + pageSlug;
 
-  /* ---------- 中文 gloss ---------- */
+  /* ---------- Chinese gloss ---------- */
   var zhBtn = document.getElementById('zhToggle');
-  function shortLabel() {
-    return window.matchMedia('(max-width: 700px)').matches;
-  }
-  function zhLabel(on) {
-    if (shortLabel()) return on ? '中文 ON' : '中文';
-    return on ? '中文 ON' : '中文';
-  }
   function applyZh(on) {
     document.body.classList.toggle('zh-on', on);
     if (zhBtn) {
       zhBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
       zhBtn.setAttribute('aria-label', on ? 'Chinese gloss: ON' : 'Chinese gloss: OFF');
       zhBtn.classList.toggle('on', on);
-      zhBtn.textContent = zhLabel(on);
+      zhBtn.textContent = 'Chinese';
     }
     try { localStorage.setItem(ZH_KEY, on ? '1' : '0'); } catch (e) {}
     if (typeof window.hwResize === 'function') {
@@ -43,73 +36,57 @@
       applyZh(!document.body.classList.contains('zh-on'));
     });
   }
-  var mq = window.matchMedia('(max-width: 700px)');
-  function refreshZhLabel() {
-    applyZh(document.body.classList.contains('zh-on'));
-  }
-  if (mq.addEventListener) mq.addEventListener('change', refreshZhLabel);
-  else if (mq.addListener) mq.addListener(refreshZhLabel);
 
-  /* ---------- Collapsible dock ---------- */
-  var dockToggle = document.getElementById('dockToggle');
-  var dockOpen = false;
-  function loadDockOpen() {
-    try {
-      var v = localStorage.getItem(DOCK_KEY);
-      if (v === '1') return true;
-      if (v === '0') return false;
-    } catch (e) {}
-    return false;
-  }
-  function saveDockOpen(on) {
-    try { localStorage.setItem(DOCK_KEY, on ? '1' : '0'); } catch (e) {}
-  }
-  function setDockOpen(on, persist) {
-    dockOpen = !!on;
-    document.body.classList.toggle('dock-open', dockOpen);
-    if (dockToggle) dockToggle.setAttribute('aria-expanded', String(dockOpen));
-    if (persist !== false) saveDockOpen(dockOpen);
-  }
-  window.dseExpandDock = function () { setDockOpen(true, true); };
-  if (dockToggle) {
-    dockToggle.addEventListener('click', function () {
-      setDockOpen(!dockOpen, true);
-    });
-  }
-  setDockOpen(loadDockOpen(), false);
-
-  /* ---------- Handwrite (U47 pattern; Clear last = last drawn area) ---------- */
+  /* ---------- Handwrite ---------- */
   (function initHandwrite() {
     var COLOURS = [
-      { id: 'teal', hex: '#0e6b7a', emoji: '🟢' },
-      { id: 'navy', hex: '#123a4d', emoji: '⚫' },
-      { id: 'warn', hex: '#b45309', emoji: '🟠' },
-      { id: 'blue', hex: '#2563EB', emoji: '🔵' }
+      { id: 'teal', hex: '#0e6b7a', hi: 'rgba(14,107,122,0.35)' },
+      { id: 'navy', hex: '#123a4d', hi: 'rgba(18,58,77,0.35)' },
+      { id: 'amber', hex: '#b45309', hi: 'rgba(250,204,21,0.45)' },
+      { id: 'blue', hex: '#2563EB', hi: 'rgba(37,99,235,0.35)' },
+      { id: 'pink', hex: '#db2777', hi: 'rgba(244,114,182,0.45)' }
     ];
     var colourIdx = 0;
-    var tool = 'pen';
+    var tool = 'pen'; /* pen | erase | highlight */
     var enabled = false;
     var strokes = {};
+    var undoStack = [];
+    var redoStack = [];
     var drawing = false;
     var current = null;
     var activeCanvas = null;
     var lastHwId = null;
 
+    var PEN_BASE = 0.85;
+    var PEN_PRESS = 0.55;
+    var HI_BASE = 14;
+    var HI_PRESS = 6;
+    var ER_BASE = 14;
+    var ER_PRESS = 8;
+
     var tog = document.getElementById('togHandwrite');
+    var hwBar = document.getElementById('hwBar');
     var btnPen = document.getElementById('hwPen');
     var btnEraser = document.getElementById('hwEraser');
     var btnColour = document.getElementById('hwColour');
-    var btnClearLast = document.getElementById('hwClearLast');
+    var btnHighlight = document.getElementById('hwHighlight');
     var btnClearAll = document.getElementById('hwClearAll');
+    var btnUndo = document.getElementById('hwUndo');
+    var btnRedo = document.getElementById('hwRedo');
     var canvases = Array.from(document.querySelectorAll('.hw-canvas'));
     if (!tog || !canvases.length) return;
 
     function load() {
       try {
         var raw = localStorage.getItem(HW_KEY);
+        if (!raw) {
+          /* migrate v1 key if present */
+          var old = localStorage.getItem('dse-writing-hw-' + pageSlug);
+          if (old) raw = old;
+        }
         if (raw) {
           var data = JSON.parse(raw);
-          if (data && typeof data === 'object' && data.strokes) strokes = data.strokes;
+          if (data && data.strokes) strokes = data.strokes;
           else if (data && typeof data === 'object') strokes = data;
           if (data && data.lastHwId) lastHwId = data.lastHwId;
         }
@@ -117,33 +94,35 @@
     }
     function save() {
       try {
-        localStorage.setItem(HW_KEY, JSON.stringify({ v: 1, strokes: strokes, lastHwId: lastHwId }));
+        localStorage.setItem(HW_KEY, JSON.stringify({ v: 2, strokes: strokes, lastHwId: lastHwId }));
       } catch (e) {}
     }
-    function setToolsEnabled(on) {
-      [btnPen, btnEraser, btnColour, btnClearLast, btnClearAll].forEach(function (b) {
-        if (b) b.disabled = !on;
-      });
+    function updateUndoRedo() {
+      if (btnUndo) btnUndo.disabled = !enabled || undoStack.length === 0;
+      if (btnRedo) btnRedo.disabled = !enabled || redoStack.length === 0;
     }
     function setEnabled(on) {
       enabled = on;
       document.body.classList.toggle('hw-on', on);
       document.body.classList.toggle('hw-erase', on && tool === 'erase');
+      document.body.classList.toggle('hw-highlight', on && tool === 'highlight');
       tog.classList.toggle('on', on);
       tog.setAttribute('aria-pressed', String(on));
-      setToolsEnabled(on);
+      if (hwBar) {
+        if (on) hwBar.removeAttribute('hidden');
+        else hwBar.setAttribute('hidden', '');
+      }
       canvases.forEach(function (c) {
         c.style.display = on ? 'block' : 'none';
         c.style.pointerEvents = on ? 'auto' : 'none';
       });
-      if (on) {
-        if (typeof window.dseExpandDock === 'function') window.dseExpandDock();
-        resizeAll();
-      }
+      if (on) resizeAll();
+      updateUndoRedo();
     }
     function setTool(t) {
       tool = t;
       document.body.classList.toggle('hw-erase', enabled && tool === 'erase');
+      document.body.classList.toggle('hw-highlight', enabled && tool === 'highlight');
       if (btnPen) {
         btnPen.classList.toggle('tool-on', tool === 'pen');
         btnPen.setAttribute('aria-pressed', String(tool === 'pen'));
@@ -152,13 +131,21 @@
         btnEraser.classList.toggle('tool-on', tool === 'erase');
         btnEraser.setAttribute('aria-pressed', String(tool === 'erase'));
       }
+      if (btnHighlight) {
+        btnHighlight.classList.toggle('tool-on', tool === 'highlight');
+        btnHighlight.setAttribute('aria-pressed', String(tool === 'highlight'));
+      }
+    }
+    function syncColourBtn() {
+      if (!btnColour) return;
+      var c = COLOURS[colourIdx];
+      btnColour.textContent = 'Colour';
+      btnColour.title = 'Colour: ' + c.id;
+      btnColour.style.boxShadow = 'inset 0 -3px 0 ' + c.hex;
     }
     function cycleColour() {
       colourIdx = (colourIdx + 1) % COLOURS.length;
-      if (btnColour) {
-        btnColour.textContent = COLOURS[colourIdx].emoji;
-        btnColour.title = 'Ink: ' + COLOURS[colourIdx].id;
-      }
+      syncColourBtn();
     }
 
     function sizeCanvas(canvas) {
@@ -181,6 +168,14 @@
       redrawCanvas(canvas);
     }
 
+    function strokeStyleFor(stroke) {
+      if (stroke.erase) return null;
+      if (stroke.highlight) {
+        return stroke.hiColour || COLOURS[0].hi;
+      }
+      return stroke.colour || COLOURS[0].hex;
+    }
+
     function redrawCanvas(canvas) {
       var id = canvas.dataset.hw;
       var ctx = canvas.getContext('2d');
@@ -195,13 +190,20 @@
         if (stroke.erase) {
           ctx.globalCompositeOperation = 'destination-out';
           ctx.strokeStyle = 'rgba(0,0,0,1)';
+          ctx.fillStyle = 'rgba(0,0,0,1)';
+        } else if (stroke.highlight) {
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.strokeStyle = strokeStyleFor(stroke);
+          ctx.fillStyle = strokeStyleFor(stroke);
         } else {
           ctx.globalCompositeOperation = 'source-over';
-          ctx.strokeStyle = stroke.colour || COLOURS[0].hex;
+          ctx.strokeStyle = strokeStyleFor(stroke);
+          ctx.fillStyle = strokeStyleFor(stroke);
         }
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.lineWidth = stroke.width || 2.0;
+        var lw = stroke.width || (stroke.highlight ? HI_BASE : PEN_BASE);
+        ctx.lineWidth = lw;
         ctx.beginPath();
         for (var i = 0; i < stroke.points.length; i++) {
           var pt = stroke.points[i];
@@ -212,9 +214,8 @@
         }
         if (stroke.points.length === 1) {
           var p0 = stroke.points[0];
-          ctx.arc(p0.x * w, p0.y * h, (stroke.width || 2.0) / 2, 0, Math.PI * 2);
-          ctx.fillStyle = stroke.erase ? 'rgba(0,0,0,1)' : (stroke.colour || COLOURS[0].hex);
-          if (stroke.erase) ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.arc(p0.x * w, p0.y * h, lw / 2, 0, Math.PI * 2);
           ctx.fill();
         } else {
           ctx.stroke();
@@ -226,7 +227,6 @@
     function redrawAll() {
       canvases.forEach(redrawCanvas);
     }
-
     function resizeAll() {
       canvases.forEach(sizeCanvas);
     }
@@ -242,6 +242,12 @@
       };
     }
 
+    function penWidth(p) {
+      if (tool === 'erase') return ER_BASE + p * ER_PRESS;
+      if (tool === 'highlight') return HI_BASE + p * HI_PRESS;
+      return PEN_BASE + p * PEN_PRESS;
+    }
+
     function startDraw(canvas, e) {
       if (!enabled) return;
       e.preventDefault();
@@ -253,11 +259,13 @@
       var p = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
       var pt = posNorm(canvas, e.clientX, e.clientY);
       pt.p = p;
-      var width = tool === 'erase' ? 12 + p * 8 : 1.5 + p * 1.0;
+      var c = COLOURS[colourIdx];
       current = {
-        colour: COLOURS[colourIdx].hex,
-        width: width,
+        colour: c.hex,
+        hiColour: c.hi,
+        width: penWidth(p),
         erase: tool === 'erase',
+        highlight: tool === 'highlight',
         points: [pt]
       };
       strokes[id].push(current);
@@ -271,16 +279,66 @@
       var pt = posNorm(activeCanvas, e.clientX, e.clientY);
       pt.p = p;
       current.points.push(pt);
-      if (!current.erase) current.width = 1.5 + p * 1.0;
+      if (!current.erase) {
+        if (current.highlight) current.width = HI_BASE + p * HI_PRESS;
+        else current.width = PEN_BASE + p * PEN_PRESS;
+      }
       redrawCanvas(activeCanvas);
     }
 
     function endDraw() {
       if (!drawing) return;
       drawing = false;
+      if (current && activeCanvas) {
+        var id = activeCanvas.dataset.hw;
+        /* deep-ish copy for undo */
+        var snap = {
+          type: 'add',
+          id: id,
+          stroke: JSON.parse(JSON.stringify(current))
+        };
+        undoStack.push(snap);
+        redoStack = [];
+        save();
+        updateUndoRedo();
+      }
       current = null;
       activeCanvas = null;
+    }
+
+    function doUndo() {
+      if (!undoStack.length) return;
+      var act = undoStack.pop();
+      if (act.type === 'add') {
+        var list = strokes[act.id] || [];
+        if (list.length) {
+          var removed = list.pop();
+          redoStack.push({ type: 'add', id: act.id, stroke: removed });
+        }
+      } else if (act.type === 'clearAll') {
+        strokes = act.prev || {};
+        redoStack.push({ type: 'clearAll', prev: null, after: act.after });
+      }
       save();
+      redrawAll();
+      updateUndoRedo();
+    }
+
+    function doRedo() {
+      if (!redoStack.length) return;
+      var act = redoStack.pop();
+      if (act.type === 'add') {
+        if (!strokes[act.id]) strokes[act.id] = [];
+        strokes[act.id].push(act.stroke);
+        undoStack.push({ type: 'add', id: act.id, stroke: act.stroke });
+      } else if (act.type === 'clearAll') {
+        var prev = JSON.parse(JSON.stringify(strokes));
+        strokes = {};
+        undoStack.push({ type: 'clearAll', prev: prev, after: {} });
+      }
+      save();
+      redrawAll();
+      updateUndoRedo();
     }
 
     canvases.forEach(function (canvas) {
@@ -298,34 +356,10 @@
     tog.addEventListener('click', function () { setEnabled(!enabled); });
     if (btnPen) btnPen.addEventListener('click', function () { setTool('pen'); });
     if (btnEraser) btnEraser.addEventListener('click', function () { setTool('erase'); });
+    if (btnHighlight) btnHighlight.addEventListener('click', function () { setTool('highlight'); });
     if (btnColour) btnColour.addEventListener('click', cycleColour);
-
-    /* Clear last drawn section — no play-focus required */
-    if (btnClearLast) {
-      btnClearLast.addEventListener('click', function () {
-        var id = lastHwId;
-        var target = null;
-        if (id) {
-          target = document.querySelector('.hw-canvas[data-hw="' + id + '"]');
-        }
-        if (!target || !strokes[id] || !strokes[id].length) {
-          /* fallback: most recently non-empty canvas in DOM order (last with ink) */
-          for (var i = canvases.length - 1; i >= 0; i--) {
-            var cid = canvases[i].dataset.hw;
-            if (strokes[cid] && strokes[cid].length) {
-              id = cid;
-              target = canvases[i];
-              break;
-            }
-          }
-        }
-        if (!target || !id || !strokes[id] || !strokes[id].length) return;
-        if (!confirm('Clear handwriting on this section? / 清除這一區的手寫？')) return;
-        strokes[id] = [];
-        save();
-        redrawCanvas(target);
-      });
-    }
+    if (btnUndo) btnUndo.addEventListener('click', doUndo);
+    if (btnRedo) btnRedo.addEventListener('click', doRedo);
 
     if (btnClearAll) {
       btnClearAll.addEventListener('click', function () {
@@ -334,10 +368,14 @@
         });
         if (!any) return;
         if (!confirm('Clear ALL handwriting notes? / 清除全部手寫筆記？')) return;
+        var prev = JSON.parse(JSON.stringify(strokes));
+        undoStack.push({ type: 'clearAll', prev: prev, after: {} });
+        redoStack = [];
         strokes = {};
         lastHwId = null;
         save();
         redrawAll();
+        updateUndoRedo();
       });
     }
 
@@ -351,6 +389,7 @@
     });
 
     load();
+    syncColourBtn();
     setTool('pen');
     setEnabled(false);
     resizeAll();

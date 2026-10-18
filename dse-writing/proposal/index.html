@@ -132,27 +132,25 @@ I am happy to provide further details if needed.
     </footer>
   </div>
 
-  <div class="bottom-dock" id="bottomDock">
+  <div class="bottom-dock" id="bottomDock" role="toolbar" aria-label="Tools">
     <div class="dock-inner">
       <div class="dock-chrome">
-        <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="false" aria-controls="dockBody" title="Tools">
-          <span class="chev" aria-hidden="true">▴</span> 工具 · Tools
-        </button>
-        <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false">中文</button>
-        <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false">✏️ Handwrite</button>
+        <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false">Chinese</button>
+        <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false">Handwrite</button>
       </div>
-      <div class="dock-body" id="dockBody">
-        <div class="hw-bar" id="hwBar" aria-label="Handwrite tools">
-          <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" disabled>🖊️ Pen</button>
-          <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" disabled>🧹 Eraser</button>
-          <button type="button" class="hw-chip" id="hwColour" title="Ink colour" disabled>🟢</button>
-          <button type="button" class="hw-chip danger-chip" id="hwClearLast" disabled>Clear last</button>
-          <button type="button" class="hw-chip danger-chip" id="hwClearAll" disabled>Clear all</button>
-        </div>
-        <p class="dock-hint">中文 shows glosses. Handwrite: sketch on PAT / Structure / Phrases. Notes stay on this device only.</p>
+      <div class="hw-bar" id="hwBar" aria-label="Handwrite tools" hidden>
+        <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true">Pen</button>
+        <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false">Eraser</button>
+        <button type="button" class="hw-chip" id="hwColour" title="Ink colour">Colour</button>
+        <button type="button" class="hw-chip" id="hwHighlight" aria-pressed="false">Highlighter</button>
+        <button type="button" class="hw-chip danger-chip" id="hwClearAll">Clear all</button>
+        <button type="button" class="hw-chip" id="hwUndo" disabled>Undo</button>
+        <button type="button" class="hw-chip" id="hwRedo" disabled>Redo</button>
       </div>
     </div>
   </div>
   <script src="../tools-dock.js"></script>
+
+
 </body>
 </html>
