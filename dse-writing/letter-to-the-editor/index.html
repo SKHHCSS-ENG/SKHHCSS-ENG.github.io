@@ -7,7 +7,7 @@
 <meta name="description" content="Letter to the editor — DSE Writing Formats for SKH Holy Carpenter Secondary School English.">
 <link rel="stylesheet" href="../styles.css">
 </head>
-<body>
+<body class="tools-page">
   <div class="wrap">
     <a class="back" href="../">← DSE Writing Formats</a>
 
@@ -27,14 +27,9 @@
       </div>
     </header>
 
-    <div class="toolbar">
-      <button type="button" class="zh-toggle" id="zhToggle" aria-pressed="false">中文 gloss：OFF</button>
-      <p class="zh-hint">Tap to show Chinese glosses for harder words (marked in the text).</p>
-    </div>
-
     <p class="meta-line"><strong>P2 / P3B:</strong> Both. P2: invent suitable details. P3B: follow Data File + task (who, points, tone).</p>
 
-    <section class="block" aria-labelledby="pat-h">
+    <section class="block hw-wrap" aria-labelledby="pat-h">
       <h2 id="pat-h">PAT</h2>
       <table class="pat-table">
         <tbody>
@@ -43,9 +38,11 @@
       <tr><th scope="row">Tone</th><td>Formal, polite, clear. Strong views OK — no slang or insults.</td></tr>
         </tbody>
       </table>
+    
+      <canvas class="hw-canvas" data-hw="pat" aria-hidden="true"></canvas>
     </section>
 
-    <section class="block" aria-labelledby="ss-h">
+    <section class="block hw-wrap" aria-labelledby="ss-h">
       <h2 id="ss-h">Structure ‖ Skeleton</h2>
       <div class="split">
         <div class="split-col">
@@ -97,9 +94,11 @@ Yours faithfully,
       </div>
         </div>
       </div>
+    
+      <canvas class="hw-canvas" data-hw="structure" aria-hidden="true"></canvas>
     </section>
 
-    <section class="block" aria-labelledby="ph-h">
+    <section class="block hw-wrap" aria-labelledby="ph-h">
       <h2 id="ph-h">Useful phrases</h2>
       <ul class="phrases">
       <li>I am writing to express my <span class="gloss" data-zh="關注／憂慮">concern</span> about…</li>
@@ -112,6 +111,8 @@ Yours faithfully,
       <li>I hope the editor will publish this letter so that…</li>
       </ul>
 <p class="gloss-key"><strong>中文 gloss</strong>（harder words）：<strong>persuade</strong> — 說服 · <strong>thesis</strong> — 中心論點 · <strong>topic sentence</strong> — 主題句 · <strong>concern</strong> — 關注／憂慮 · <strong>authorities</strong> — 當局 · <strong>faithfully</strong> — 忠實地（信末） · <strong>sincerely</strong> — 誠摯地（信末） · <strong>request</strong> — 請求</p>
+    
+      <canvas class="hw-canvas" data-hw="phrases" aria-hidden="true"></canvas>
     </section>
 
     <footer>
@@ -119,6 +120,28 @@ Yours faithfully,
       DSE Writing Formats · Batch 1
     </footer>
   </div>
-  <script src="../zh-toggle.js"></script>
+
+  <div class="bottom-dock" id="bottomDock">
+    <div class="dock-inner">
+      <div class="dock-chrome">
+        <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="false" aria-controls="dockBody" title="Tools">
+          <span class="chev" aria-hidden="true">▴</span> 工具 · Tools
+        </button>
+        <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false">中文</button>
+        <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false">✏️ Handwrite</button>
+      </div>
+      <div class="dock-body" id="dockBody">
+        <div class="hw-bar" id="hwBar" aria-label="Handwrite tools">
+          <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" disabled>🖊️ Pen</button>
+          <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" disabled>🧹 Eraser</button>
+          <button type="button" class="hw-chip" id="hwColour" title="Ink colour" disabled>🟢</button>
+          <button type="button" class="hw-chip danger-chip" id="hwClearLast" disabled>Clear last</button>
+          <button type="button" class="hw-chip danger-chip" id="hwClearAll" disabled>Clear all</button>
+        </div>
+        <p class="dock-hint">中文 shows glosses. Handwrite: sketch on PAT / Structure / Phrases. Notes stay on this device only.</p>
+      </div>
+    </div>
+  </div>
+  <script src="../tools-dock.js"></script>
 </body>
 </html>

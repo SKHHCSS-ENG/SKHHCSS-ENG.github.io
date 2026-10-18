@@ -18,7 +18,7 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html {
   scroll-padding-top: calc(16px + env(safe-area-inset-top, 0px));
-  scroll-padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  scroll-padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }
 body {
   margin: 0;
@@ -28,6 +28,9 @@ body {
   background: var(--bg);
   line-height: 1.55;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+body.tools-page {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
 }
 .wrap {
   max-width: 820px;
@@ -148,24 +151,74 @@ a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   color: var(--accent-ink);
 }
 
-/* Type page toolbar — compact chip; non-sticky on phone; sticky+hint on wider screens */
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  margin: 0 0 8px;
-  padding: 0;
-  background: transparent;
-  border-bottom: none;
+/* U47-style bottom Tools dock (中文 + Handwrite) — replaces tall gloss chip */
+body.tools-page.dock-open {
+  padding-bottom: calc(168px + env(safe-area-inset-bottom, 0px));
 }
-.zh-toggle {
+.bottom-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 2px solid var(--accent);
+  padding: 4px 12px calc(6px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -4px 20px rgba(18, 58, 77, 0.12);
+}
+.dock-inner {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dock-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dock-chrome::-webkit-scrollbar { display: none; }
+.dock-toggle {
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--navy);
+  font-size: .78rem;
+  font-weight: 800;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.dock-toggle .chev {
+  display: inline-block;
+  transition: transform .15s ease;
+  font-size: .7rem;
+}
+body.dock-open .dock-toggle .chev { transform: rotate(180deg); }
+.dock-toggle:focus-visible,
+.dock-chip:focus-visible,
+.hw-chip:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 2px;
+}
+.dock-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   min-height: 44px;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   border: 1.5px solid var(--accent);
   background: var(--card);
@@ -173,65 +226,90 @@ a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   font-size: .78rem;
   font-weight: 800;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   line-height: 1.1;
-  box-sizing: border-box;
 }
-.zh-toggle[aria-pressed="true"] {
+.dock-chip.on,
+.dock-chip[aria-pressed="true"] {
   background: var(--accent-on);
   color: #fff;
   border-color: #0a5561;
 }
-.zh-toggle:focus-visible {
-  outline: 3px solid var(--navy);
-  outline-offset: 2px;
+.dock-body {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 2px;
 }
-.zh-hint {
-  font-size: .72rem;
-  line-height: 1.2;
-  margin: 0;
+body.dock-open .dock-body { display: flex; }
+.hw-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+}
+.hw-chip {
+  border: 1px solid var(--border);
+  background: var(--bg);
   color: var(--muted);
-  flex: 1;
-  min-width: 140px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
 }
-/* Phone / tablet portrait: no sticky overlay, hide hint, compact left-aligned chip */
-@media (max-width: 700px) {
-  .toolbar {
-    position: static;
-    z-index: auto;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: transparent;
-    padding: 0;
-    margin: 0 0 6px;
-    flex-wrap: nowrap;
-  }
-  .zh-hint {
-    display: none !important;
-  }
-  .zh-toggle {
-    width: auto;
-    max-width: 100%;
-    min-height: 44px;
-    padding: 4px 10px;
-    font-size: .75rem;
-  }
+.hw-chip:disabled {
+  opacity: .45;
+  cursor: default;
 }
-/* Wider screens: slim sticky bar OK; leave room so content never sits under it */
-@media (min-width: 701px) {
-  .toolbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: rgba(245, 250, 252, 0.96);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 2px 0;
-    margin: 0 0 8px;
-  }
-  html {
-    scroll-padding-top: calc(48px + env(safe-area-inset-top, 0px));
-  }
+.hw-chip.on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-ink);
 }
+.hw-chip.tool-on {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.hw-chip.danger-chip {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: var(--warn);
+}
+.dock-hint {
+  margin: 0;
+  font-size: .7rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+/* Handwrite overlay on each content block */
+.hw-wrap {
+  position: relative;
+}
+.hw-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+  touch-action: none;
+  display: none;
+  border-radius: 14px;
+}
+body.hw-on .hw-canvas {
+  display: block;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+body.hw-erase .hw-canvas { cursor: cell; }
 
 section.block {
   background: var(--card);
@@ -362,9 +440,9 @@ footer {
   }
 }
 @media print {
-  body { background: #fff; }
-  .toolbar { position: static; background: none; }
-  .zh-toggle { display: none; }
+  body { background: #fff; padding-bottom: 0; }
+  .bottom-dock { display: none !important; }
+  .hw-canvas { display: none !important; }
   section.block, a.card { box-shadow: none; break-inside: avoid; }
   body.zh-on .gloss::after { color: #000; }
 }
