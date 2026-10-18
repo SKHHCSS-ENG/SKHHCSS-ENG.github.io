@@ -45,7 +45,15 @@
  backdrop-filter: blur(12px);
  -webkit-backdrop-filter: blur(12px);
  border-bottom: 1px solid var(--border);
- padding: 10px 14px 8px;
+ padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 8px;
+ }
+ html {
+  scroll-padding-top: calc(120px + env(safe-area-inset-top, 0px));
+  scroll-padding-bottom: calc(200px + env(safe-area-inset-bottom, 0px));
+ }
+ .stanza.focused, .stanza.playing {
+  scroll-margin-top: calc(120px + env(safe-area-inset-top, 0px));
+  scroll-margin-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
  }
  .top-row {
  display: flex; justify-content: space-between; align-items: center; gap: 8px;
@@ -401,18 +409,18 @@
  }
 
  .yt-persist {
-  position: fixed; left: 10px; right: 10px; bottom: 78px; z-index: 45;
+  position: fixed; left: 10px; right: 10px; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); z-index: 45;
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
   box-shadow: 0 8px 24px rgba(44,41,38,.18); overflow: hidden;
   display: flex; flex-direction: column; max-width: 520px; margin: 0 auto;
  }
- body.dock-open .yt-persist { bottom: 248px; }
- body.dock-mini-timer-on:not(.dock-open) .yt-persist { bottom: 102px; }
+ body.dock-open .yt-persist { bottom: calc(220px + env(safe-area-inset-bottom, 0px)); }
+ body.dock-mini-timer-on:not(.dock-open) .yt-persist { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
  .yt-persist.compact .yt-frame-wrap {
   display: none !important; height: 0 !important; max-height: 0 !important;
   aspect-ratio: auto !important; opacity: 0; pointer-events: none; overflow: hidden;
  }
- .yt-persist.compact { flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; min-height: 44px; }
+ .yt-persist.compact { flex-direction: row; align-items: center; gap: 6px; padding: 4px 8px; min-height: 40px; }
  .yt-persist.expanded { bottom: auto; top: auto; position: relative; left: auto; right: auto;
   margin: 0 0 12px; max-width: none; box-shadow: none; }
  .yt-persist.expanded .yt-frame-wrap { height: auto; opacity: 1; pointer-events: auto; }
@@ -420,7 +428,7 @@
  .yt-frame-wrap iframe, .yt-frame-wrap > div { position: absolute; inset: 0; width: 100%; height: 100%; }
  .yt-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; flex: 1; min-width: 0; }
  .yt-persist.expanded .yt-bar { border-top: 1px solid var(--border); }
- .yt-status { font-size: .78rem; font-weight: 700; color: var(--asphalt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+ .yt-status { font-size: .72rem; font-weight: 700; color: var(--asphalt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
  .yt-status span { color: var(--gold); }
  .yt-ctrl { border: 1px solid var(--border); background: var(--card); border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: .75rem; cursor: pointer; color: var(--asphalt); }
  .yt-ctrl:disabled { opacity: .45; cursor: default; }
@@ -496,7 +504,7 @@
  <button type="button" class="chip-toggle on" id="togZh" aria-pressed="true">譯 中文</button>
  <button type="button" class="chip-toggle on" id="togCues" aria-pressed="true">💡 Notes</button>
 </div>
-<p class="tap-hint" id="tapHint">Tap an exchange (or the title) to hear that part of the Model — audio plays from this page · 點一節即可聽該段示範（本頁音訊）. Use <strong>Show</strong> if you want to watch the YouTube video · 要看影片請按 Show. From Downloads (file://), use the https Pages link for audio.</p>
+<p class="tap-hint" id="tapHint">Tap an exchange (or the title) to hear that part of the Model — audio plays from this page · 點一節即可聽該段示範（本頁音訊）. Use <strong>Show</strong> if you want to watch the YouTube video · 要看影片請按 Show.</p>
 
 <main>
  <!-- TAB 1: POEM & CUES -->
@@ -577,7 +585,7 @@
  <canvas class="hw-canvas" data-hw="2" aria-hidden="true"></canvas>
  </div>
  <div class="cues">
- Mum talks over him — a little faster each time. Mum talks over him — a little faster each time. Boy’s “But…” / “I was…” stay soft and unfinished.
+ Mum talks over him — a little faster each time. Boy’s “But…” / “I was…” stay soft and unfinished.
  <span class="eye-cue">👀 Mum barely looks at him; Boy leans in to be heard.</span>
  </div>
  </div>
@@ -634,7 +642,7 @@
  <div class="hw-wrap" data-hw="5">
  <div class="poem-lines">
  <span class="line"><span class="who who-boy">Boy</span> <span class="stress">Mrs Wilson!!!!!</span></span>
- <span class="line"><span class="who who-mum">Mum</span> Pardon<span class="zh-gloss">吓？</span>?</span>
+ <span class="line"><span class="who who-mum">Mum</span> Pardon<span class="zh-gloss">吓？</span></span>
  <span class="line"><span class="who who-boy">Boy</span> I’ve been trying to tell you!</span>
  <span class="line"><span class="who who-mum">Mum</span> What?</span>
  </div>
@@ -755,7 +763,7 @@
  <div class="dock-pane" id="paneAudio">
  <label class="dock-btn btn-native" id="lblNativeRec" role="button" tabindex="0">
  📲 Record or Choose a Voice Memo
- <input type="file" id="nativeAudioInput" accept="audio/*" capture style="display:none" aria-label="Choose an audio recording from your device" />
+ <input type="file" id="nativeAudioInput" accept="audio/*" style="display:none" aria-label="Choose an audio recording from your device" />
  </label>
  <div class="audio-bar" id="audioBar">
  <audio id="audioPlayer" controls playsinline></audio>
@@ -828,6 +836,7 @@ document.querySelectorAll(".stanza").forEach(st => {
  if (document.body.classList.contains("hw-on") && ev.target.closest(".hw-canvas")) return;
  document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
  st.classList.add("focused", "playing");
+ try { st.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {}
  const a = +st.dataset.ytStart, b = +st.dataset.ytEnd;
  if (!Number.isNaN(a) && !Number.isNaN(b)) playYtRange(a, b, st.querySelector(".st-tag")?.textContent || "Exchange");
  };
@@ -883,7 +892,7 @@ VOCAB_TRAPS.forEach(item => {
  `;
  pronBox.classList.add("has-content");
  if ("speechSynthesis" in window) {
- window.speechSynthesis.cancel();
+ try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {}
  const u = new SpeechSynthesisUtterance(item.word);
  u.lang = "en-GB";
  u.rate = 0.85;
@@ -1358,8 +1367,8 @@ function setYtStatus(label) {
 
 function idleYtTip() {
  return isFilePage
-  ? "Tap an exchange · opens YouTube window · 點對話（本機檔會開小窗）"
-  : "Tap an exchange to play · audio from this page · 點對話聽示範（本頁音訊）";
+  ? "Tap · YouTube window (file://)"
+  : "Tap an exchange to play";
 }
 
 function ytEmbedUrl(start, end, autoplay) {
