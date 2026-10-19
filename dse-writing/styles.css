@@ -793,6 +793,11 @@ body.vocab-hub footer {
   margin-top: 110px;
 }
 
+/* Stage 1 譯: Chinese after-text may wrap inside chips/cells at ~390px */
+body.vocab-hub.zh-on .gloss::after {
+  white-space: normal;
+}
+
 /* Sentence patterns — pattern cards */
 .pattern-card {
   margin: 0 0 14px;
