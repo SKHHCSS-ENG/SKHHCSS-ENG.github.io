@@ -48,6 +48,14 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    .desk-card .desk-action-btn {
+      /* Flat horizontal chips — short row, wide tap */
+      height: 32px;
+      min-height: 32px;
+      max-height: 32px;
+      border-radius: 999px;
+      line-height: 1;
+    }
     .desk-card {
       position: absolute;
       width: 148px;
@@ -866,7 +874,7 @@
       const STAGE_WIDTH = 1120;
       const STAGE_HEIGHT = 640;
       const DESK_W = 144;
-      const DESK_H = 158;
+      const DESK_H = 132;
       const GRID_SIZE = 20;
 
       // Team Color Palette Definitions
@@ -1805,7 +1813,7 @@
         const scoreBadge = deskEl.querySelector('.desk-score-value');
         if (scoreBadge) {
           scoreBadge.textContent = String(newScore);
-          scoreBadge.className = 'desk-score-value font-display font-extrabold text-lg leading-none px-2 py-1 rounded-lg ' +
+          scoreBadge.className = 'desk-score-value font-display font-extrabold text-lg leading-none px-2 py-0.5 rounded-md ' +
             (newScore > 0 ? 'bg-emerald-100 text-emerald-800' : (newScore < 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'));
         }
 
@@ -2098,28 +2106,28 @@
             'data-student-id="' + escapeHtml(st.id) + '" ' +
             'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
             '<!-- Top Color Accent Bar -->' +
-            '<div class="h-1.5 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
-            '<div class="p-2">' +
+            '<div class="h-1 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
+            '<div class="px-1.5 pt-1 pb-1.5">' +
               '<!-- Row 1: Class No + Score Badge -->' +
               '<div class="flex items-center justify-between gap-1 mb-0.5">' +
                 '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">#' + escapeHtml(st.classNo) + '</span>' +
-                '<span class="desk-score-value font-display font-extrabold text-lg leading-none px-2 py-1 rounded-lg ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
+                '<span class="desk-score-value font-display font-extrabold text-lg leading-none px-2 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
               '</div>' +
               '<!-- Row 2: Student Name -->' +
-              '<div class="font-display font-bold text-sm sm:text-base text-slate-900 leading-snug line-clamp-2 mb-1 min-h-[2.4em]" title="' + escapeHtml(st.name) + '">' +
+              '<div class="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight line-clamp-2 mb-0.5" title="' + escapeHtml(st.name) + '">' +
                 escapeHtml(st.name) +
               '</div>' +
               '<!-- Row 3: Team Badge -->' +
-              '<div class="flex items-center justify-between mb-1.5">' +
+              '<div class="flex items-center justify-between mb-1">' +
                 groupBadgeHtml +
                 (state.activityMode === 'group' && grp
                   ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
                   : '') +
               '</div>' +
-              '<!-- Row 4: Live -1 / +1 Buttons -->' +
+              '<!-- Row 4: Live -1 / +1 flat chips -->' +
               '<div class="grid grid-cols-2 gap-1">' +
-                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn min-h-[44px] py-1 rounded-lg bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold text-[11px] leading-none transition">−1</button>' +
-                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn min-h-[44px] py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-[11px] leading-none transition shadow-2xs">＋1</button>' +
+                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn h-8 min-h-[32px] max-h-8 px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold text-[11px] leading-none transition flex items-center justify-center">−1</button>' +
+                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn h-8 min-h-[32px] max-h-8 px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-[11px] leading-none transition shadow-2xs flex items-center justify-center">＋1</button>' +
               '</div>' +
             '</div>' +
           '</div>';
