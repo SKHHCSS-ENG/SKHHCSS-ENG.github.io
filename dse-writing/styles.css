@@ -826,6 +826,15 @@ body.vocab-hub.zh-on .gloss::after {
   white-space: normal;
 }
 
+/* Sentence patterns 譯: Chinese after-text may wrap at ~390px (mirror vocab-hub) */
+body.sentence-patterns.zh-on .gloss::after {
+  white-space: normal;
+}
+/* When glosses wrap, avoid format-section overflow:hidden clipping at card edge */
+body.sentence-patterns.zh-on details.format-section {
+  overflow: visible;
+}
+
 /* Sentence patterns — pattern cards */
 .pattern-card {
   margin: 0 0 14px;
