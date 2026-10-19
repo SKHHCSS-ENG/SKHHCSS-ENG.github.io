@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DSE Writing Formats · SKH Holy Carpenter Secondary School · English</title>
 <meta name="description" content="DSE Writing Formats — Letter to the editor, Article, Proposal, Report, Speech, Formal letter/email, Blog, Review.">
-<link rel="stylesheet" href="styles.css?v=20261019g">
+<link rel="stylesheet" href="styles.css?v=20261019c">
 </head>
 <body>
   <div class="wrap">
@@ -24,8 +24,11 @@
 
     <p class="note">In P3B, use the Data File — do not invent facts. On each format page, tap <strong>🛠</strong> (bottom-right) for <strong>譯</strong> (Chinese glosses) and <strong>✍️</strong> Handwrite notes.</p>
 
-    <section class="format-group" aria-labelledby="g-letters">
-      <h2 id="g-letters">Letters &amp; emails</h2>
+    <details class="format-group" data-group="letters" open>
+      <summary id="g-letters">
+        <span class="group-title">Letters &amp; emails</span>
+        <span class="group-chevron" aria-hidden="true"></span>
+      </summary>
       <div class="cards">
         <a class="card" href="letter-to-the-editor/">
           <span class="badge">Letter</span>
@@ -40,10 +43,13 @@
           <span class="card-arrow">Open →</span>
         </a>
       </div>
-    </section>
+    </details>
 
-    <section class="format-group" aria-labelledby="g-magazine">
-      <h2 id="g-magazine">Magazine &amp; web</h2>
+    <details class="format-group" data-group="magazine" open>
+      <summary id="g-magazine">
+        <span class="group-title">Magazine &amp; web</span>
+        <span class="group-chevron" aria-hidden="true"></span>
+      </summary>
       <div class="cards">
         <a class="card" href="article/">
           <span class="badge">Article</span>
@@ -64,10 +70,13 @@
           <span class="card-arrow">Open →</span>
         </a>
       </div>
-    </section>
+    </details>
 
-    <section class="format-group" aria-labelledby="g-school">
-      <h2 id="g-school">School writing</h2>
+    <details class="format-group" data-group="school" open>
+      <summary id="g-school">
+        <span class="group-title">School writing</span>
+        <span class="group-chevron" aria-hidden="true"></span>
+      </summary>
       <div class="cards">
         <a class="card" href="proposal/">
           <span class="badge">Proposal</span>
@@ -82,10 +91,13 @@
           <span class="card-arrow">Open →</span>
         </a>
       </div>
-    </section>
+    </details>
 
-    <section class="format-group" aria-labelledby="g-speech">
-      <h2 id="g-speech">Speech</h2>
+    <details class="format-group" data-group="speech" open>
+      <summary id="g-speech">
+        <span class="group-title">Speech</span>
+        <span class="group-chevron" aria-hidden="true"></span>
+      </summary>
       <div class="cards">
         <a class="card" href="speech/">
           <span class="badge">Speech</span>
@@ -94,12 +106,39 @@
           <span class="card-arrow">Open →</span>
         </a>
       </div>
-    </section>
+    </details>
 
     <footer>
       聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
       DSE Writing Formats · Batch 1 + Batch 2
     </footer>
   </div>
+  <script>
+  (function () {
+    var KEY = 'dse-writing-hub-groups-v1';
+    var groups = document.querySelectorAll('details.format-group[data-group]');
+    if (!groups.length) return;
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+    if (saved && typeof saved === 'object') {
+      groups.forEach(function (el) {
+        var id = el.getAttribute('data-group');
+        if (Object.prototype.hasOwnProperty.call(saved, id)) {
+          el.open = !!saved[id];
+        }
+      });
+    }
+    function persist() {
+      var state = {};
+      groups.forEach(function (el) {
+        state[el.getAttribute('data-group')] = el.open;
+      });
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }
+    groups.forEach(function (el) {
+      el.addEventListener('toggle', persist);
+    });
+  })();
+  </script>
 </body>
 </html>
