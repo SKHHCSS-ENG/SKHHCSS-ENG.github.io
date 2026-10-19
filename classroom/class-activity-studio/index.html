@@ -357,12 +357,18 @@
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
 
-        <!-- Whole Class +1 / -1 & Reset Scores -->
-        <button id="btnAllPlusOne" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
+        <!-- Whole Class +1 · Undo · Redo · Reset Scores -->
+        <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
-        <button id="btnOpenResetModal" type="button" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition" title="Reset current class scores">
-          Reset Scores
+        <button id="btnUndoLastScore" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo last score" aria-label="Undo last score">
+          ↩️
+        </button>
+        <button id="btnRedoScore" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
+          ↪️
+        </button>
+        <button id="btnOpenResetModal" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
+          🔄
         </button>
       </div>
     </div>
@@ -461,10 +467,6 @@
       <div class="bg-gradient-to-br from-[#123a4d] via-[#2a8fad] to-[#5bbad5] rounded-2xl p-4 text-white shadow-md">
         <div class="flex items-center justify-between mb-2">
           <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-200">Live Class Pulse</span>
-          <button id="btnUndoLastScore" type="button" class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Last Point Action">
-            <span>↩</span>
-            <span>Undo Last</span>
-          </button>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
@@ -1346,6 +1348,7 @@
         leaderboardTab: 'students', // 'students' | 'groups' | 'feed'
         lbSearch: '',
         historyStack: [], // For undo and live history feed
+        redoStack: [], // For redo (cleared on new score actions)
         // Timer state
         timerTotalSec: 180,
         timerRemainingSec: 180,
@@ -1464,6 +1467,7 @@
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         });
         if (state.historyStack.length > 40) state.historyStack.pop();
+        clearRedoStack();
 
         playSubtleSound(delta > 0 ? 'plus' : 'minus');
         saveState();
@@ -1501,6 +1505,7 @@
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         });
         if (state.historyStack.length > 40) state.historyStack.pop();
+        clearRedoStack();
 
         playSubtleSound(delta > 0 ? 'groupPlus' : 'minus');
         saveState();
@@ -1539,6 +1544,7 @@
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         });
         if (state.historyStack.length > 40) state.historyStack.pop();
+        clearRedoStack();
 
         playSubtleSound(delta > 0 ? 'groupPlus' : 'minus');
         saveState();
@@ -1550,13 +1556,35 @@
         showToast('Awarded ' + (delta > 0 ? '+1' : '-1') + ' to all ' + cls.students.length + ' students!', '🎉');
       }
 
+      function clearRedoStack() {
+        state.redoStack = [];
+        updateUndoRedoButtons();
+      }
+
+      function updateUndoRedoButtons() {
+        const cls = getCurrentClass();
+        const btnUndo = document.getElementById('btnUndoLastScore');
+        const btnRedo = document.getElementById('btnRedoScore');
+        if (!cls) {
+          if (btnUndo) btnUndo.disabled = true;
+          if (btnRedo) btnRedo.disabled = true;
+          return;
+        }
+        const hasUndo = state.historyStack.length > 0 && state.historyStack[0].classId === cls.id;
+        const hasRedo = state.redoStack.length > 0 && state.redoStack[0].classId === cls.id;
+        if (btnUndo) btnUndo.disabled = !hasUndo;
+        if (btnRedo) btnRedo.disabled = !hasRedo;
+      }
+
       function undoLastScoreAction() {
         const cls = getCurrentClass();
         if (!cls || state.historyStack.length === 0) return;
         const last = state.historyStack.shift();
         if (last.classId !== cls.id) {
+          // Put it back; undo only applies to current class tip
+          state.historyStack.unshift(last);
           showToast('Cannot undo action from another class.', 'ℹ️');
-          renderLeaderboardAndStats();
+          updateUndoRedoButtons();
           return;
         }
 
@@ -1587,9 +1615,60 @@
           });
         }
 
+        state.redoStack.unshift(last);
+        if (state.redoStack.length > 40) state.redoStack.pop();
+
         saveState();
         renderLeaderboardAndStats();
-        showToast('Undid: ' + last.label + ' (' + (last.delta > 0 ? '+' : '') + last.delta + ')', '↩');
+        updateUndoRedoButtons();
+        showToast('Undid: ' + last.label + ' (' + (last.delta > 0 ? '+' : '') + last.delta + ')', '↩️');
+      }
+
+      function redoLastScoreAction() {
+        const cls = getCurrentClass();
+        if (!cls || state.redoStack.length === 0) return;
+        const next = state.redoStack.shift();
+        if (next.classId !== cls.id) {
+          state.redoStack.unshift(next);
+          showToast('Cannot redo action from another class.', 'ℹ️');
+          updateUndoRedoButtons();
+          return;
+        }
+
+        if (next.type === 'student') {
+          const st = cls.students.find(function (s) { return s.id === next.studentId; });
+          if (st) {
+            st.score = (Number(st.score) || 0) + next.delta;
+            updateSingleDeskScoreDOM(st.id, st.score, next.delta);
+          }
+        } else if (next.type === 'group') {
+          const grp = getGroupById(cls, next.groupId);
+          if (grp) grp.score = (Number(grp.score) || 0) + next.delta;
+          (next.memberIds || []).forEach(function (mId) {
+            const st = cls.students.find(function (s) { return s.id === mId; });
+            if (st) {
+              st.score = (Number(st.score) || 0) + next.delta;
+              updateSingleDeskScoreDOM(st.id, st.score, next.delta, true);
+            }
+          });
+          renderGroupScoreDock();
+        } else if (next.type === 'all') {
+          (next.memberIds || []).forEach(function (mId) {
+            const st = cls.students.find(function (s) { return s.id === mId; });
+            if (st) {
+              st.score = (Number(st.score) || 0) + next.delta;
+              updateSingleDeskScoreDOM(st.id, st.score, next.delta, false);
+            }
+          });
+        }
+
+        state.historyStack.unshift(next);
+        if (state.historyStack.length > 40) state.historyStack.pop();
+
+        saveState();
+        renderLeaderboardAndStats();
+        updateUndoRedoButtons();
+        showToast('Redid: ' + next.label + ' (' + (next.delta > 0 ? '+' : '') + next.delta + ')', '↪️');
       }
 
       // Fast targeted DOM update + floating score animation for a student desk
@@ -1939,7 +2018,6 @@
         const elTotal = document.getElementById('statTotalPoints');
         const elTopSt = document.getElementById('statTopStudent');
         const elTopGrp = document.getElementById('statTopGroup');
-        const btnUndo = document.getElementById('btnUndoLastScore');
 
         if (elTotal) elTotal.textContent = (totalPts > 0 ? '+' : '') + totalPts;
         if (elTopSt) {
@@ -1950,10 +2028,7 @@
           const topG = sortedGroups[0];
           elTopGrp.textContent = (topG && topG.score > 0) ? (topG.icon + ' ' + topG.name + ' (' + topG.score + ')') : '—';
         }
-        if (btnUndo) {
-          const hasUndoForClass = state.historyStack.length > 0 && state.historyStack[0].classId === cls.id;
-          btnUndo.disabled = !hasUndoForClass;
-        }
+        updateUndoRedoButtons();
 
         // 2. Leaderboard Tab Buttons
         const tabSt = document.getElementById('tabLbStudents');
@@ -3049,11 +3124,12 @@
           showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
         });
 
-        // Whole Class +1 & Undo
+        // Whole Class +1 · Undo · Redo
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
         });
         document.getElementById('btnUndoLastScore').addEventListener('click', undoLastScoreAction);
+        document.getElementById('btnRedoScore').addEventListener('click', redoLastScoreAction);
 
         // Group Dock Event Delegation (+1 / -1 on group cards)
         document.getElementById('groupDockCards').addEventListener('click', function (e) {
@@ -3358,6 +3434,7 @@
           state.classes = createFactoryPresets();
           state.currentClassId = state.classes[0].id;
           state.historyStack = [];
+          state.redoStack = [];
           saveState();
           renderAll();
           renderClassModalContents();
@@ -3554,9 +3631,10 @@
             cls.students.forEach(function (s) { s.score = 0; });
             cls.groups.forEach(function (g) { g.score = 0; });
             state.historyStack = state.historyStack.filter(function (h) { return h.classId !== cls.id; });
+            state.redoStack = state.redoStack.filter(function (h) { return h.classId !== cls.id; });
             saveState();
             renderAll();
-            showToast('Reset all individual and group scores for ' + cls.name, '↺');
+            showToast('Reset all individual and group scores for ' + cls.name, '🔄');
           }
           document.getElementById('resetModal').classList.add('hidden');
         });
