@@ -720,6 +720,9 @@ body.zh-on .gloss-key { display: block; }
   border: 1px solid var(--border);
   border-radius: 999px;
   max-width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 .vocab-chips-pairs li {
   border-radius: 10px;
@@ -819,6 +822,14 @@ body.zh-on .gloss-key { display: block; }
 /* Useful vocabulary hub — keep footer clear of collapsed 🛠 chip */
 body.vocab-hub footer {
   margin-top: 110px;
+}
+
+/* Slight extra bottom pad so collapsed 🛠 clears last chips while scrolling */
+body.vocab-hub.tools-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.vocab-hub.tools-page.dock-open {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Stage 1 譯: Chinese after-text may wrap inside chips/cells at ~390px */
