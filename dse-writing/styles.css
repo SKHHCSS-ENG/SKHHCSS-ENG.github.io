@@ -127,6 +127,17 @@ h1 {
   color: var(--navy);
 }
 .tip { margin: 0; font-size: .9rem; color: var(--muted); }
+/* Soft pills in hero tip — keep accent ink (not muted from .tip) */
+.hero-body > .badge,
+.tip .badge {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+.tip .badge {
+  margin-bottom: 0;
+  margin-right: 6px;
+  vertical-align: middle;
+}
 .note {
   margin: 0 0 16px;
   color: var(--muted);
