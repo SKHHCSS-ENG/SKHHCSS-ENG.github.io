@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DSE Writing Formats · SKH Holy Carpenter Secondary School · English</title>
 <meta name="description" content="DSE Writing Formats — Letter to the editor, Article, Proposal, Report, Speech, Formal letter/email, Blog, Review.">
-<link rel="stylesheet" href="styles.css?v=20261019c">
+<link rel="stylesheet" href="styles.css?v=20261019a">
 </head>
 <body>
   <div class="wrap">
@@ -45,7 +45,7 @@
       </div>
     </details>
 
-    <details class="format-group" data-group="magazine" open>
+    <details class="format-group" data-group="magazine">
       <summary id="g-magazine">
         <span class="group-title">Magazine &amp; web</span>
         <span class="group-chevron" aria-hidden="true"></span>
@@ -72,7 +72,7 @@
       </div>
     </details>
 
-    <details class="format-group" data-group="school" open>
+    <details class="format-group" data-group="school">
       <summary id="g-school">
         <span class="group-title">School writing</span>
         <span class="group-chevron" aria-hidden="true"></span>
@@ -93,7 +93,7 @@
       </div>
     </details>
 
-    <details class="format-group" data-group="speech" open>
+    <details class="format-group" data-group="speech">
       <summary id="g-speech">
         <span class="group-title">Speech</span>
         <span class="group-chevron" aria-hidden="true"></span>
@@ -115,19 +115,35 @@
   </div>
   <script>
   (function () {
-    var KEY = 'dse-writing-hub-groups-v1';
-    var groups = document.querySelectorAll('details.format-group[data-group]');
+    /* v2: first-group default + accordion (one open; all-closed OK) */
+    var KEY = 'dse-writing-hub-groups-v2';
+    var groups = Array.prototype.slice.call(
+      document.querySelectorAll('details.format-group[data-group]')
+    );
     if (!groups.length) return;
+    var syncing = false;
+
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
     if (saved && typeof saved === 'object') {
-      groups.forEach(function (el) {
-        var id = el.getAttribute('data-group');
-        if (Object.prototype.hasOwnProperty.call(saved, id)) {
-          el.open = !!saved[id];
-        }
+      var anyKnown = groups.some(function (el) {
+        return Object.prototype.hasOwnProperty.call(saved, el.getAttribute('data-group'));
       });
+      if (anyKnown) {
+        groups.forEach(function (el) {
+          var id = el.getAttribute('data-group');
+          el.open = Object.prototype.hasOwnProperty.call(saved, id) ? !!saved[id] : false;
+        });
+        /* Accordion restore: keep at most one open (prefer first open in DOM order) */
+        var kept = false;
+        groups.forEach(function (el) {
+          if (!el.open) return;
+          if (kept) el.open = false;
+          else kept = true;
+        });
+      }
     }
+
     function persist() {
       var state = {};
       groups.forEach(function (el) {
@@ -135,8 +151,19 @@
       });
       try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
     }
+
     groups.forEach(function (el) {
-      el.addEventListener('toggle', persist);
+      el.addEventListener('toggle', function () {
+        if (syncing) return;
+        if (el.open) {
+          syncing = true;
+          groups.forEach(function (other) {
+            if (other !== el && other.open) other.open = false;
+          });
+          syncing = false;
+        }
+        persist();
+      });
     });
   })();
   </script>
