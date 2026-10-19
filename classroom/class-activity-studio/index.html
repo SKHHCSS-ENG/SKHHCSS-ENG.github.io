@@ -378,13 +378,13 @@
         <button id="btnOpenResetModal" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
           🔄
         </button>
-        <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo desk move" aria-label="Undo desk move">
+        <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo layout" aria-label="Undo layout">
           ↩️
         </button>
-        <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo desk move" aria-label="Redo desk move">
+        <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo layout" aria-label="Redo layout">
           ↪️
         </button>
-        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset layout to default grid" aria-label="Reset layout to default grid">
+        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset layout to class default seating" aria-label="Reset layout to class default seating">
           🔃
         </button>
       </div>
@@ -873,7 +873,7 @@
       const STORAGE_KEY = 'skhhcss_eng_classroom_v4';
       const STAGE_WIDTH = 1120;
       const STAGE_HEIGHT = 640;
-      const DESK_W = 144;
+      const DESK_W = 148;
       const DESK_H = 132;
       const GRID_SIZE = 20;
 
@@ -1084,8 +1084,8 @@
       function computeLayoutPositions(count, layoutType, frontAtTop, students, groups, customCols, customRows) {
         const positions = [];
         const topOffset = frontAtTop ? 80 : 28;
-        const stepX = 168; // 144px card width + 24px clear horizontal gap
-        const stepY = 140; // 114px card height + 26px clear vertical gap
+        const stepX = DESK_W + 24; // card width + clear horizontal gap
+        const stepY = DESK_H + 26; // card height + clear vertical gap
         const cols = Math.max(1, Math.min(12, customCols || (count > 30 ? 7 : 6)));
 
         if (layoutType === 'customGrid' || layoutType === 'rows') {
@@ -1184,12 +1184,12 @@
                 const col = posInTeam % 2;
                 const row = Math.floor(posInTeam / 2);
                 resultByStudentIdx[sIdx] = {
-                  x: baseX + col * 154,
-                  y: currentBandY + row * 128
+                  x: baseX + col * (DESK_W + 10),
+                  y: currentBandY + row * (DESK_H + 12)
                 };
               });
             });
-            currentBandY += maxRowsInBand * 128 + 44;
+            currentBandY += maxRowsInBand * (DESK_H + 12) + 44;
           }
 
           for (let i = 0; i < count; i++) {
@@ -1326,7 +1326,8 @@
             gridCols: 6,
             layoutStyle: 'pods4',
             groups: groups1A,
-            students: students1A
+            students: students1A,
+            defaultPositions: students1A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
           },
           {
             id: 'cls_3b',
@@ -1336,7 +1337,8 @@
             gridCols: 4,
             layoutStyle: 'pairs',
             groups: groups3B,
-            students: students3B
+            students: students3B,
+            defaultPositions: students3B.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
           },
           {
             id: 'cls_5a',
@@ -1346,7 +1348,8 @@
             gridCols: 6,
             layoutStyle: 'rows',
             groups: groups5A,
-            students: students5A
+            students: students5A,
+            defaultPositions: students5A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
           }
         ];
       }
@@ -1396,6 +1399,7 @@
               state.activityMode = parsed.activityMode || 'individual';
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+              state.classes.forEach(function (c) { ensureClassDefaultPositions(c); });
               return;
             }
           }
@@ -1612,6 +1616,88 @@
         });
       }
 
+      // Restore exact saved coords; only nudge desks NOT in the locked id set if they overlap locked ones
+      function ensureNoOverlapsProtecting(students, lockedIds) {
+        if (!students || students.length < 2) return;
+        const locked = lockedIds || {};
+        const minDx = DESK_W + 8;
+        const minDy = DESK_H + 8;
+        for (let pass = 0; pass < 4; pass++) {
+          let moved = false;
+          for (let i = 0; i < students.length; i++) {
+            for (let j = i + 1; j < students.length; j++) {
+              const a = students[i];
+              const b = students[j];
+              const dx = Math.abs(a.x - b.x);
+              const dy = Math.abs(a.y - b.y);
+              if (dx < minDx - 4 && dy < minDy - 4) {
+                const aLock = !!locked[a.id];
+                const bLock = !!locked[b.id];
+                if (aLock && bLock) continue; // both exact — leave as saved
+                var mover = (!aLock && bLock) ? a : ((!bLock && aLock) ? b : (b.y >= a.y ? b : a));
+                var anchor = (mover === a) ? b : a;
+                if (dy >= dx * 0.5) {
+                  mover.y = anchor.y + (mover.y >= anchor.y ? minDy : -minDy);
+                } else {
+                  mover.x = anchor.x + (mover.x >= anchor.x ? minDx : -minDx);
+                }
+                moved = true;
+              }
+            }
+          }
+          if (!moved) break;
+        }
+      }
+
+      function buildDefaultPositionsFromGrid(cls) {
+        const ordered = (cls.students || []).slice().sort(function (a, b) {
+          return String(a.classNo).localeCompare(String(b.classNo), undefined, { numeric: true });
+        });
+        const cols = cls.gridCols || 6;
+        const rows = cls.gridRows || Math.max(1, Math.ceil(ordered.length / cols));
+        const style = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
+        const coords = computeLayoutPositions(ordered.length, style, !!cls.frontAtTop, ordered, cls.groups, cols, rows);
+        return ordered.map(function (st, i) {
+          const c = coords[i] || { x: st.x, y: st.y };
+          return { id: st.id, x: c.x, y: c.y };
+        });
+      }
+
+      function ensureClassDefaultPositions(cls) {
+        if (!cls) return;
+        if (!cls.defaultPositions || !cls.defaultPositions.length) {
+          cls.defaultPositions = buildDefaultPositionsFromGrid(cls);
+        }
+        // Keep roster in sync: drop removed ids; add missing students at their current xy
+        const byId = {};
+        cls.defaultPositions.forEach(function (p) { byId[p.id] = p; });
+        const next = [];
+        (cls.students || []).forEach(function (st) {
+          if (byId[st.id]) {
+            next.push({ id: st.id, x: byId[st.id].x, y: byId[st.id].y });
+          } else {
+            next.push({ id: st.id, x: st.x, y: st.y });
+          }
+        });
+        cls.defaultPositions = next;
+      }
+
+      function rememberStudentDefaultPosition(cls, student) {
+        if (!cls || !student) return;
+        ensureClassDefaultPositions(cls);
+        var found = false;
+        cls.defaultPositions.forEach(function (p) {
+          if (p.id === student.id) {
+            p.x = student.x;
+            p.y = student.y;
+            found = true;
+          }
+        });
+        if (!found) {
+          cls.defaultPositions.push({ id: student.id, x: student.x, y: student.y });
+        }
+      }
+
       function layoutsEqual(a, b) {
         if (!a || !b || a.length !== b.length) return false;
         const map = {};
@@ -1649,7 +1735,10 @@
         if (idx < 0) return;
         const entry = state.layoutHistoryStack.splice(idx, 1)[0];
         applyLayoutPositions(cls, entry.before);
-        ensureNoOverlaps(cls.students);
+        // Exact restore — do not rewrite saved coords via ensureNoOverlaps
+        const locked = {};
+        (entry.before || []).forEach(function (p) { locked[p.id] = true; });
+        ensureNoOverlapsProtecting(cls.students, locked);
         state.layoutRedoStack.unshift(entry);
         if (state.layoutRedoStack.length > 40) state.layoutRedoStack.pop();
         saveState();
@@ -1668,7 +1757,10 @@
         if (idx < 0) return;
         const entry = state.layoutRedoStack.splice(idx, 1)[0];
         applyLayoutPositions(cls, entry.after);
-        ensureNoOverlaps(cls.students);
+        // Exact restore of redo target coords
+        const locked = {};
+        (entry.after || []).forEach(function (p) { locked[p.id] = true; });
+        ensureNoOverlapsProtecting(cls.students, locked);
         state.layoutHistoryStack.unshift(entry);
         if (state.layoutHistoryStack.length > 40) state.layoutHistoryStack.pop();
         saveState();
@@ -1680,26 +1772,19 @@
       function resetLayoutToDefaultGrid() {
         const cls = getCurrentClass();
         if (!cls || cls.students.length === 0) return;
+        ensureClassDefaultPositions(cls);
         const before = snapshotLayoutPositions(cls);
-        const grid = syncGridInputsToClass(cls);
-        const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
-        cls.layoutStyle = activeStyle;
-        const spatiallyOrdered = getSpatiallyOrderedStudents(cls.students);
-        const coords = computeLayoutPositions(spatiallyOrdered.length, activeStyle, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows);
-        spatiallyOrdered.forEach(function (st, idx) {
-          if (coords[idx]) {
-            st.x = coords[idx].x;
-            st.y = coords[idx].y;
-          }
-        });
-        ensureNoOverlaps(cls.students);
+        applyLayoutPositions(cls, cls.defaultPositions);
+        // Exact preset snap-back — scores/groups untouched; no spatial repack
+        const locked = {};
+        (cls.defaultPositions || []).forEach(function (p) { locked[p.id] = true; });
+        ensureNoOverlapsProtecting(cls.students, locked);
         const after = snapshotLayoutPositions(cls);
-        pushLayoutHistory(before, after, 'Reset to default grid');
+        pushLayoutHistory(before, after, 'Reset to class default seating');
         saveState();
         renderHeaderControls();
         renderClassroomCanvas(true);
-        const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
-        showToast('Layout reset to ' + actualRowsUsed + '×' + grid.cols + ' default grid (scores kept)', '🔃');
+        showToast('Layout snapped back to class default seating (scores kept)', '🔃');
       }
 
       function fitZoomToViewport() {
@@ -3269,6 +3354,7 @@
             y: (cls.frontAtTop ? 84 : 32) + Math.floor((nextNum - 1) / 6) * 138
           };
           cls.students.push(newSt);
+          rememberStudentDefaultPosition(cls, newSt);
           saveState();
           renderAll();
           showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
