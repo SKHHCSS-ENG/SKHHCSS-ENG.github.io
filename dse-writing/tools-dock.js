@@ -449,15 +449,16 @@
     });
   })();
 
-  /* ---------- Format page sections: accordion + localStorage ---------- */
+  /* ---------- Format page sections: multi-open + localStorage ---------- */
   (function () {
-    /* Defaults in HTML: Structure + Skeleton open. Accordion on interact; all-closed OK. */
-    var KEY = 'dse-writing-format-sections-v1-' + pageSlug;
+    /* Defaults in HTML: Structure + Skeleton open; PAT / phrases collapsed.
+       Sections open/close independently (no accordion) so Structure + Skeleton
+       can stay open together. */
+    var KEY = 'dse-writing-format-sections-v2-' + pageSlug;
     var sections = Array.prototype.slice.call(
       document.querySelectorAll('details.format-section[data-section]')
     );
     if (!sections.length) return;
-    var syncing = false;
 
     var saved = null;
     try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
@@ -469,13 +470,6 @@
         sections.forEach(function (el) {
           var id = el.getAttribute('data-section');
           el.open = Object.prototype.hasOwnProperty.call(saved, id) ? !!saved[id] : false;
-        });
-        /* Accordion restore: keep at most one open (prefer first open in DOM order) */
-        var kept = false;
-        sections.forEach(function (el) {
-          if (!el.open) return;
-          if (kept) el.open = false;
-          else kept = true;
         });
       }
     }
@@ -490,14 +484,6 @@
 
     sections.forEach(function (el) {
       el.addEventListener('toggle', function () {
-        if (syncing) return;
-        if (el.open) {
-          syncing = true;
-          sections.forEach(function (other) {
-            if (other !== el && other.open) other.open = false;
-          });
-          syncing = false;
-        }
         persist();
         if (typeof window.hwResize === 'function') {
           requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
