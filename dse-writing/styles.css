@@ -680,6 +680,151 @@ body.zh-on .gloss::after {
 body.zh-on .gloss-key { display: block; }
 .gloss-key strong { color: var(--warn); }
 
+/* Useful vocabulary hub — chips + tables */
+.section-lead {
+  margin: 0 0 14px;
+  font-size: .9rem;
+  color: var(--muted);
+}
+.vocab-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vocab-chips li {
+  margin: 0;
+  padding: 5px 10px;
+  font-size: .82rem;
+  line-height: 1.35;
+  background: var(--accent-soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  max-width: 100%;
+}
+.vocab-chips-pairs li {
+  border-radius: 10px;
+  background: #fff;
+}
+.chip-note {
+  color: var(--muted);
+  font-size: .78em;
+  font-weight: 600;
+}
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 0 4px;
+}
+.vocab-table {
+  width: 100%;
+  min-width: 0;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.vocab-table th,
+.vocab-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+}
+.vocab-table thead th {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+.vocab-table tbody th {
+  width: 9.5rem;
+  background: var(--bg);
+  color: var(--navy);
+  font-weight: 700;
+}
+.vocab-table-pairs td:first-child {
+  font-weight: 600;
+  color: var(--navy);
+}
+@media (max-width: 560px) {
+  .vocab-table, .vocab-table thead, .vocab-table tbody,
+  .vocab-table tr, .vocab-table th, .vocab-table td {
+    display: block;
+    width: 100%;
+  }
+  .vocab-table thead { display: none; }
+  .vocab-table tr {
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .vocab-table tbody th {
+    width: auto;
+    border: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .vocab-table td {
+    border: none;
+    padding-top: 8px;
+  }
+  .vocab-table-pairs td:first-child {
+    background: var(--accent-soft);
+    border-bottom: 1px solid var(--border);
+  }
+  .vocab-table-pairs td:last-child::before {
+    content: "Informal / blog · ";
+    display: block;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 4px;
+  }
+}
+
+/* Format page → shared vocab bank */
+.more-vocab {
+  margin: 4px 0 18px;
+  font-size: .92rem;
+}
+.more-vocab a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 2px;
+  font-weight: 800;
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+.more-vocab a:hover,
+.more-vocab a:focus-visible { text-decoration: underline; outline: none; }
+.more-vocab a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.more-vocab .more-vocab-hint {
+  display: block;
+  margin-top: -6px;
+  margin-bottom: 4px;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* Hub shared-bank card */
+.hub-extra {
+  margin: 4px 0 18px;
+}
+a.card.card-vocab {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, #fff 0%, var(--accent-soft) 100%);
+}
+
 footer {
   margin-top: 28px;
   padding-top: 14px;
