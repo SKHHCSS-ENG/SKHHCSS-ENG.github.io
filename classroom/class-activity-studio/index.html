@@ -1,0 +1,3587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Class Activity Studio · English · SKH Holy Carpenter Secondary School</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'Fredoka', 'Inter', sans-serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: #f0f4ff;
+      color: #1e293b;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    .font-display {
+      font-family: var(--font-display);
+    }
+    /* Classroom Floor Grid Pattern */
+    .classroom-floor {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(#cbd5e1 1.35px, transparent 1.35px),
+        radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      position: relative;
+      overflow: auto;
+    }
+    .classroom-floor.snap-active {
+      background-image: 
+        linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        radial-gradient(#94a3b8 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    /* Desk Card Styling */
+    .desk-card {
+      position: absolute;
+      width: 144px;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+      transition: transform 0.16s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.16s ease, border-color 0.2s ease;
+      touch-action: none;
+      z-index: 10;
+    }
+    .desk-card:hover {
+      box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.14), 0 4px 8px -2px rgba(15, 23, 42, 0.06);
+      z-index: 25;
+    }
+    .desk-card.dragging {
+      box-shadow: 0 20px 30px -6px rgba(79, 70, 229, 0.28), 0 8px 16px -4px rgba(15, 23, 42, 0.12);
+      transform: scale(1.05) rotate(1deg);
+      z-index: 50 !important;
+      transition: none !important;
+      cursor: grabbing !important;
+    }
+    .desk-card.smooth-move {
+      transition: left 0.42s cubic-bezier(0.22, 1, 0.36, 1), top 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .desk-card.spotlight-active {
+      box-shadow: 0 0 0 4px #f59e0b, 0 16px 32px -4px rgba(245, 158, 11, 0.45) !important;
+      transform: scale(1.08);
+      z-index: 45 !important;
+    }
+    .desk-card.pulse-plus {
+      animation: pulsePlus 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .desk-card.pulse-minus {
+      animation: pulseMinus 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes pulsePlus {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.09); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.35); }
+      100% { transform: scale(1); }
+    }
+    @keyframes pulseMinus {
+      0% { transform: scale(1); }
+      30% { transform: scale(0.95) translateX(-3px); box-shadow: 0 0 0 5px rgba(244, 63, 94, 0.3); }
+      60% { transform: scale(0.97) translateX(3px); }
+      100% { transform: scale(1); }
+    }
+    /* Floating score pop animation */
+    .score-float {
+      position: absolute;
+      pointer-events: none;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.15rem;
+      z-index: 80;
+      animation: floatUpFade 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      text-shadow: 0 2px 6px rgba(255,255,255,0.95);
+    }
+    @keyframes floatUpFade {
+      0% { opacity: 0; transform: translateY(6px) scale(0.75); }
+      20% { opacity: 1; transform: translateY(-6px) scale(1.12); }
+      80% { opacity: 1; transform: translateY(-24px) scale(1); }
+      100% { opacity: 0; transform: translateY(-34px) scale(0.9); }
+    }
+    /* Subtle Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    /* Brush Cursor when painting groups */
+    .brush-mode-active .desk-card {
+      cursor: pointer !important;
+    }
+    .brush-mode-active .desk-card:hover {
+      transform: translateY(-3px) scale(1.03);
+    }
+    /* Podium Bar Animation */
+    @keyframes growUp {
+      from { transform: scaleY(0.1); opacity: 0.3; }
+      to { transform: scaleY(1); opacity: 1; }
+    }
+    .podium-pillar {
+      transform-origin: bottom;
+      animation: growUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
+
+  <!-- TOP NAVIGATION & ACTIVITY BAR -->
+  <header class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      
+      <!-- Brand + School Badge -->
+      <div class="flex items-center gap-3">
+        <a href="../" class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 border border-white/25 text-xs font-bold text-white transition min-h-[36px]" title="Back to Classroom">← Classroom</a>
+        <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-inner shrink-0" title="SKHHCSS English Department">
+          <svg class="w-6 h-6 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            <path d="M12 7v10"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/90 text-slate-950 shadow-sm">SKHHCSS English</span>
+            <span class="hidden sm:inline-block text-xs text-sky-100 font-medium">Class Activity Studio</span>
+          </div>
+          <h1 class="font-display text-base sm:text-lg font-bold tracking-tight leading-tight text-white">Class Activity Studio</h1>
+        </div>
+      </div>
+
+      <!-- Center Controls: Class Preset Selector + Mode Switcher -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <!-- Preset Class Selector -->
+        <div class="flex items-center bg-white/15 backdrop-blur-sm rounded-xl p-1 border border-white/20">
+          <label for="classSelect" class="text-xs font-semibold px-2 text-sky-100 hidden md:inline">Class:</label>
+          <select id="classSelect" aria-label="Select Preset Class" class="bg-white text-slate-800 text-xs sm:text-sm font-bold rounded-lg px-2.5 py-1.5 pr-7 focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer shadow-sm">
+          </select>
+          <button id="btnOpenClassModal" type="button" class="ml-1.5 px-2.5 py-1.5 rounded-lg bg-[#0c5a70]/50 hover:bg-[#0c5a70]/80 text-xs font-semibold text-white flex items-center gap-1 transition" title="Customize Preset Classes & Student Roster">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Classes</span>
+          </button>
+        </div>
+
+        <!-- Mode Switcher: Individual vs Group Work -->
+        <div class="flex items-center bg-slate-900/30 p-1 rounded-xl border border-white/15" role="group" aria-label="Activity Mode">
+          <button id="btnModeIndividual" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all bg-white text-[#0c5a70] shadow-sm">
+            <span>👤</span>
+            <span>Individual Work</span>
+          </button>
+          <button id="btnModeGroup" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all text-white/90 hover:text-white">
+            <span>🛡️</span>
+            <span>Group Work</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Utilities: Timer, Random Picker, Podium, Sound, Export -->
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <!-- Live Countdown Timer Button -->
+        <div class="relative">
+          <button id="btnToggleTimerPanel" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Classroom Countdown Timer">
+            <span>⏱️</span>
+            <span id="headerTimerDisplay" class="font-mono tracking-wider text-amber-200">03:00</span>
+          </button>
+
+          <!-- Floating Timer Popover Panel (Fixed & Viewport-Clamped so it never clips off-screen) -->
+          <div id="timerPopover" class="hidden fixed top-16 right-4 w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-80px)] overflow-y-auto bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
+            <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏱️</span>
+                <h3 class="font-display font-bold text-slate-800 text-base">Activity Timer</h3>
+              </div>
+              <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">✕</button>
+            </div>
+
+            <!-- Big Timer Readout -->
+            <div id="timerCardBox" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl p-4 text-center mb-3 relative overflow-hidden">
+              <div id="timerProgressBar" class="absolute bottom-0 left-0 h-1.5 bg-emerald-400 transition-all duration-300" style="width: 100%;"></div>
+              <div id="timerBigDisplay" class="font-mono text-4xl font-extrabold tracking-widest text-amber-300">03:00</div>
+              <div id="timerStatusText" class="text-[11px] uppercase tracking-wider text-indigo-200 mt-1">Ready to start</div>
+            </div>
+
+            <!-- Play / Pause / Reset / +30s -->
+            <div class="grid grid-cols-3 gap-2 mb-3">
+              <button id="btnTimerStartPause" type="button" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-1.5">
+                <span id="timerStartPauseIcon">▶</span>
+                <span id="timerStartPauseLabel">Start</span>
+              </button>
+              <button id="btnTimerReset" type="button" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
+                Reset
+              </button>
+            </div>
+
+            <!-- Quick Preset Pills -->
+            <div class="mb-3">
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Presets</div>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-timer-sec="60" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">1m</button>
+                <button type="button" data-timer-sec="120" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">2m</button>
+                <button type="button" data-timer-sec="180" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">3m</button>
+                <button type="button" data-timer-sec="300" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">5m</button>
+                <button type="button" data-timer-sec="600" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">10m</button>
+                <button type="button" data-timer-sec="900" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">15m</button>
+                <button id="btnTimerAdd30" type="button" class="col-span-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs transition">+30 Sec</button>
+              </div>
+            </div>
+
+            <!-- Custom Minutes/Seconds -->
+            <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100">
+              <input id="customTimerMin" type="number" min="0" max="99" value="3" aria-label="Custom Minutes" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Min" />
+              <span class="font-bold text-slate-400">:</span>
+              <input id="customTimerSec" type="number" min="0" max="59" value="0" aria-label="Custom Seconds" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Sec" />
+              <button id="btnSetCustomTimer" type="button" class="flex-1 py-1.5 px-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">Set Time</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Random Picker Button -->
+        <button id="btnOpenPickerModal" type="button" class="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Pick a Random Student or Group">
+          <span>🎲</span>
+          <span>Random Picker</span>
+        </button>
+
+        <!-- Podium Celebration Button -->
+        <button id="btnOpenPodiumModal" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Show Live Podium Celebration">
+          <span>🏆</span>
+          <span class="hidden sm:inline">Podium</span>
+        </button>
+
+        <!-- Subtle Sound Toggle -->
+        <button id="btnToggleSound" type="button" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-semibold flex items-center gap-1 transition" title="Toggle Subtle Sound Effects">
+          <span id="soundIcon">🔊</span>
+          <span id="soundLabel" class="hidden lg:inline text-xs">Subtle SFX</span>
+        </button>
+
+        <!-- Export CSV Button -->
+        <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Export Class & Group Scores to CSV">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="hidden sm:inline">Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Teacher tip: best on tablet / projector -->
+  <div class="bg-[#e8f7fb] border-b border-[#d3e8ef] px-3 sm:px-5 py-1.5 text-[11px] sm:text-xs text-[#0c5a70] font-medium text-center">
+    Teacher tool · Best on tablet or projector · Scores stay on this device (localStorage)
+  </div>
+
+
+  <!-- SECONDARY CLASSROOM LAYOUT & GROUPING TOOLBAR -->
+  <section class="bg-white border-b border-slate-200 shadow-sm z-30">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-2">
+      
+      <!-- Left: Freeform Layout Templates & Canvas Controls -->
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          Quick Layout:
+        </span>
+        <!-- Custom Rows x Columns Grid Quick Setup -->
+        <div class="inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 py-0.5 shadow-2xs" title="Custom Rows × Columns Quick Grid Setup">
+          <span class="text-[11px] font-bold text-indigo-800">Grid:</span>
+          <label for="quickRowsInput" class="text-[10px] font-bold text-slate-500 uppercase">Rows</label>
+          <input id="quickRowsInput" type="number" min="1" max="15" value="4" aria-label="Number of Rows" class="w-11 px-1 py-0.5 text-xs font-bold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <span class="text-xs font-bold text-slate-400">×</span>
+          <label for="quickColsInput" class="text-[10px] font-bold text-slate-500 uppercase">Cols</label>
+          <input id="quickColsInput" type="number" min="1" max="12" value="6" aria-label="Number of Columns" class="w-11 px-1 py-0.5 text-xs font-bold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button id="btnApplyCustomGrid" type="button" class="ml-0.5 px-2.5 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-2xs">
+            Apply Grid
+          </button>
+        </div>
+
+        <button type="button" data-layout="rows" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
+        <button type="button" data-layout="pairs" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns (2 desks together) within your Rows × Cols grid">Paired Desks</button>
+        <button type="button" data-layout="pods4" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block of desks into 4-desk pods within your Rows × Cols grid">4-Desk Pods</button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather desks belonging to the same manual group into pods">
+          <span>🧲</span>
+          <span>Cluster by Group</span>
+        </button>
+
+        <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
+
+        <!-- Lock / Unlock Freeform Dragging -->
+        <button id="btnToggleLockLayout" type="button" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold flex items-center gap-1 transition" title="Unlock to drag desks anywhere on the canvas, or lock during rapid scoring">
+          <span id="lockLayoutIcon">🔓</span>
+          <span id="lockLayoutText">Freeform Drag: ON</span>
+        </button>
+
+        <!-- Snap to Grid Toggle -->
+        <button id="btnToggleSnapGrid" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Snap desks to a clean grid when dragging">
+          <span>📏</span>
+          <span id="snapGridText">Snap: ON</span>
+        </button>
+
+        <!-- Flip Room View (Front at Top vs Bottom) -->
+        <button id="btnFlipRoom" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Flip Classroom Orientation (Teacher's Desk at Top vs Bottom)">
+          <span>🔄</span>
+          <span id="flipRoomText">Front: Bottom</span>
+        </button>
+      </div>
+
+      <!-- Right: Manual Grouping Controls & Bulk Scoring Actions -->
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <!-- Manual Group Paint Brush Toggle -->
+        <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Click a team color and tap desks on the floor plan to assign groups manually">
+          <span>🎨</span>
+          <span id="groupBrushBtnLabel">Assign Groups (Paint)</span>
+        </button>
+
+        <!-- Manual Grouping Modal Button -->
+        <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition" title="Open Manual Team & Group Manager">
+          <span>🛡️</span>
+          <span>Manage Teams</span>
+        </button>
+
+        <!-- Quick Add Student Button -->
+        <button id="btnQuickAddStudent" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition" title="Add a student desk to this class">
+          <span>＋ Desk</span>
+        </button>
+
+        <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
+
+        <!-- Whole Class +1 / -1 & Reset Scores -->
+        <button id="btnAllPlusOne" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
+          All +1
+        </button>
+        <button id="btnOpenResetModal" type="button" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition" title="Reset current class scores">
+          Reset Scores
+        </button>
+      </div>
+    </div>
+
+    <!-- MANUAL GROUP PAINT BRUSH BAR (Visible when Paint Mode is active or in Group Mode) -->
+    <div id="groupBrushBar" class="hidden bg-gradient-to-r from-fuchsia-50 via-indigo-50 to-sky-50 border-t border-indigo-100 px-3 sm:px-5 py-2">
+      <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-xs font-extrabold text-fuchsia-800 flex items-center gap-1 mr-1">
+            <span>🖌️ Manual Group Brush:</span>
+            <span class="font-normal text-slate-600 hidden sm:inline">Select a team below, then click any student desk to assign them!</span>
+          </span>
+          <div id="groupBrushChips" class="flex flex-wrap items-center gap-1.5"></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnClusterAfterBrush" type="button" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-sm">
+            🧲 Gather Desks by Team
+          </button>
+          <button id="btnCloseBrushBar" type="button" class="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition">
+            Done Assigning
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN WORKSPACE: LEFT/CENTER CLASSROOM CANVAS + RIGHT LIVE LEADERBOARD -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-5 py-3 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    
+    <!-- LEFT / CENTER COLUMN: GROUP SCOREBOARD DOCK (IN GROUP MODE) + FREEFORM CLASSROOM FLOOR PLAN -->
+    <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-3">
+      
+      <!-- GROUP WORK LIVE SCORE DOCK (Shown in Group Work mode, or toggleable) -->
+      <section id="groupScoreDock" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3.5 transition-all">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold uppercase tracking-wider">Group Work Active</span>
+            <h2 class="font-display font-bold text-slate-800 text-sm sm:text-base">Live Team Scoreboard</h2>
+            <span class="text-xs text-slate-500 hidden md:inline">• Giving <strong class="text-emerald-600">+1</strong> or <strong class="text-rose-600">-1</strong> to a group automatically updates every group member's individual score!</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnQuickAssignFromDock" type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline">
+              Assign / Edit Groups
+            </button>
+          </div>
+        </div>
+        <!-- Group Cards Grid -->
+        <div id="groupDockCards" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5"></div>
+      </section>
+
+      <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
+      <section class="bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col">
+        <!-- Floor Plan Subheader -->
+        <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <span id="currentClassBadge" class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-display font-bold text-xs">1A English</span>
+            <span id="studentCountBadge" class="text-xs font-semibold text-slate-600">24 Students</span>
+            <span class="text-slate-300">|</span>
+            <span id="modeStatusHint" class="text-xs font-medium text-slate-500">Drag desks freely to customize layout • Tap +1 / -1 to score</span>
+          </div>
+          <!-- Zoom & View Controls -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-[11px] font-semibold text-slate-400">Zoom:</span>
+            <button id="btnZoomOut" type="button" class="w-6 h-6 rounded bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold flex items-center justify-center" title="Zoom Out">−</button>
+            <span id="zoomReadout" class="text-xs font-bold text-slate-700 w-10 text-center">100%</span>
+            <button id="btnZoomIn" type="button" class="w-6 h-6 rounded bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold flex items-center justify-center" title="Zoom In">＋</button>
+            <button id="btnZoomReset" type="button" class="px-2 py-0.5 rounded bg-white border border-slate-200 hover:bg-slate-100 text-[11px] font-semibold text-slate-600">Reset</button>
+          </div>
+        </div>
+
+        <!-- Scrollable Freeform Viewport -->
+        <div id="classroomViewport" class="classroom-floor snap-active w-full h-[600px] sm:h-[650px] relative select-none">
+          <!-- Scaled Inner Stage -->
+          <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
+            
+            <!-- Teacher Smartboard / Podium Indicator (Top or Bottom depending on flip) -->
+            <div id="teacherBoardBar" class="absolute left-1/2 -translate-x-1/2 bottom-3 w-[460px] h-11 rounded-2xl bg-gradient-to-r from-slate-800 via-indigo-950 to-slate-800 text-white shadow-md border-2 border-indigo-400/40 flex items-center justify-between px-5 z-20 pointer-events-none">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-bold tracking-wider uppercase text-indigo-200">Interactive Smartboard &amp; Teacher's Desk</span>
+              </div>
+              <span class="text-[11px] font-semibold text-amber-300">FRONT OF ROOM</span>
+            </div>
+
+            <!-- Desks Layer -->
+            <div id="desksContainer" class="absolute inset-0"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN: LIVE LEADERBOARD & SESSION FEED -->
+    <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3">
+      
+      <!-- Live Summary Metrics Card -->
+      <div class="bg-gradient-to-br from-[#123a4d] via-[#2a8fad] to-[#5bbad5] rounded-2xl p-4 text-white shadow-md">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-200">Live Class Pulse</span>
+          <button id="btnUndoLastScore" type="button" class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Last Point Action">
+            <span>↩</span>
+            <span>Undo Last</span>
+          </button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
+            <div class="text-[11px] text-indigo-100">Total Points</div>
+            <div id="statTotalPoints" class="font-display text-xl font-bold text-amber-300">0</div>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
+            <div class="text-[11px] text-indigo-100">Top Student</div>
+            <div id="statTopStudent" class="font-display text-xs font-bold text-white truncate mt-1">—</div>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
+            <div class="text-[11px] text-indigo-100">Leading Team</div>
+            <div id="statTopGroup" class="font-display text-xs font-bold text-emerald-300 truncate mt-1">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Leaderboard Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col overflow-hidden">
+        <!-- Leaderboard Header & Tabs -->
+        <div class="p-3 border-b border-slate-100 bg-slate-50/70">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <span class="text-base">🏆</span>
+              <h2 class="font-display font-bold text-slate-800 text-base">Live Leaderboard</h2>
+            </div>
+            <span id="leaderboardSortHint" class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Real-Time Rank</span>
+          </div>
+
+          <!-- Segmented Tabs: Students | Groups | Feed -->
+          <div class="grid grid-cols-3 gap-1 bg-slate-200/75 p-1 rounded-xl">
+            <button id="tabLbStudents" type="button" class=" py-1.5 rounded-lg text-xs font-bold transition bg-white text-indigo-700 shadow-sm">
+              👤 Students
+            </button>
+            <button id="tabLbGroups" type="button" class="py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">
+              🛡️ Groups
+            </button>
+            <button id="tabLbFeed" type="button" class="py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">
+              ⚡ History
+            </button>
+          </div>
+        </div>
+
+        <!-- Search filter inside Student Leaderboard -->
+        <div id="lbSearchWrapper" class="px-3 pt-2.5 pb-1">
+          <input id="lbSearchInput" type="text" placeholder="Filter students or groups..." aria-label="Filter Leaderboard" class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+        </div>
+
+        <!-- Leaderboard List Body -->
+        <div id="leaderboardBody" class="p-3 space-y-2 max-h-[500px] overflow-y-auto"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: MANAGE PRESET CLASSES & STUDENT ROSTER                       -->
+  <!-- ===================================================================== -->
+  <div id="classModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-lg sm:text-xl font-bold">Manage Preset Classes &amp; Student Roster</h2>
+          <p class="text-xs text-indigo-100">Save multiple custom classes in your browser and edit student seats anytime</p>
+        </div>
+        <button id="btnCloseClassModal" type="button" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-5 flex-1">
+        
+        <!-- Left Col (5): Saved Preset Classes -->
+        <div class="md:col-span-5 flex flex-col gap-4 border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-5">
+          <div>
+            <h3 class="font-display font-bold text-sm text-slate-800 uppercase tracking-wider mb-2">1. Saved Preset Classes</h3>
+            <div id="presetClassList" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+          </div>
+
+          <!-- Create New Class Form -->
+          <div class="bg-indigo-50/70 rounded-2xl p-3.5 border border-indigo-100">
+            <h4 class="font-display font-bold text-xs uppercase tracking-wider text-indigo-900 mb-2">＋ Create New Preset Class</h4>
+            <div class="space-y-2.5">
+              <div>
+                <label for="newClassNameInput" class="block text-xs font-semibold text-slate-700 mb-1">Class Name (e.g. 2A English, 5B DSE)</label>
+                <input id="newClassNameInput" type="text" placeholder="e.g., 3A English" class="w-full px-3 py-1.5 text-xs sm:text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div>
+                <label for="newClassCountInput" class="block text-xs font-semibold text-slate-700 mb-1">Initial Number of Desks (1–45)</label>
+                <input id="newClassCountInput" type="number" min="1" max="45" value="24" class="w-full px-3 py-1.5 text-xs sm:text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <button id="btnCreateNewClass" type="button" class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-sm transition">
+                Create &amp; Switch to Class
+              </button>
+            </div>
+          </div>
+
+          <!-- Backup / Restore All Presets JSON -->
+          <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+            <h4 class="font-bold text-xs text-slate-700 mb-1">Backup / Transfer Setup (JSON)</h4>
+            <p class="text-[11px] text-slate-500 mb-2.5">Save your custom classes &amp; seating plans to a file to load on any classroom computer.</p>
+            <div class="flex items-center gap-2">
+              <button id="btnBackupJson" type="button" class="flex-1 py-1.5 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition">
+                ⬇ Backup File
+              </button>
+              <label for="importJsonInput" class="flex-1 py-1.5 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition text-center cursor-pointer">
+                ⬆ Load File
+              </label>
+              <input id="importJsonInput" type="file" accept=".json" class="hidden" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Col (7): Customize Students in Active Class -->
+        <div class="md:col-span-7 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="font-display font-bold text-sm text-slate-800 uppercase tracking-wider">2. Students in <span id="rosterModalClassTitle" class="text-indigo-600">Current Class</span></h3>
+              <p class="text-xs text-slate-500">Edit names, add individual students, or bulk paste a class list</p>
+            </div>
+            <!-- Rename Active Class -->
+            <div class="flex items-center gap-1.5">
+              <input id="renameClassInput" type="text" aria-label="Rename Current Class" class="px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg w-36" />
+              <button id="btnSaveClassName" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold">Rename</button>
+            </div>
+          </div>
+
+          <!-- Add Single Student Bar -->
+          <div class="flex flex-wrap items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <input id="addStudentNoInput" type="text" placeholder="No. (e.g. 25)" aria-label="New Student Class Number" class="w-24 px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg" />
+            <input id="addStudentNameInput" type="text" placeholder="Student Name (e.g. Wong Siu Ming)" aria-label="New Student Name" class="flex-1 min-w-[140px] px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg" />
+            <button id="btnAddSingleStudent" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">
+              ＋ Add Student
+            </button>
+          </div>
+
+          <!-- Student Roster Editable List -->
+          <div id="rosterStudentList" class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-60 overflow-y-auto bg-white"></div>
+
+          <!-- Bulk Paste Names Collapsible / Box -->
+          <div class="bg-amber-50/70 rounded-2xl p-3.5 border border-amber-200/80">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="bulkPasteTextarea" class="font-bold text-xs text-amber-950">📋 Bulk Paste Student Roster (One student per line)</label>
+              <span class="text-[11px] text-amber-800">Format: <code class="bg-white px-1 rounded">Name</code> or <code class="bg-white px-1 rounded">01, Name</code></span>
+            </div>
+            <textarea id="bulkPasteTextarea" rows="3" placeholder="01, Chan Tai Man&#10;02, Cheung Siu Yuk&#10;03, Lam Ka Ho" class="w-full p-2.5 text-xs bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 mb-2"></textarea>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="btnBulkReplaceRoster" type="button" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition">
+                Replace Current Class List
+              </button>
+              <button id="btnBulkAppendRoster" type="button" class="px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition">
+                Append to Current List
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button id="btnResetFactoryPresets" type="button" class="text-xs font-semibold text-slate-500 hover:text-rose-600 transition">
+          Restore Default Sample Classes
+        </button>
+        <button id="btnDoneClassModal" type="button" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-sm transition">
+          Done &amp; Return to Classroom
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: MANUAL GROUPING & TEAM MANAGER                               -->
+  <!-- ===================================================================== -->
+  <div id="groupModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="px-6 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white flex items-center justify-between">
+        <div>
+          <h2 class="font-display text-lg sm:text-xl font-bold">🛡️ Manual Grouping &amp; Team Manager</h2>
+          <p class="text-xs text-fuchsia-100">Customize teams and manually assign each student to a group. Group points (+1 / -1) automatically add to every member's individual score!</p>
+        </div>
+        <button id="btnCloseGroupModal" type="button" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-5 flex-1">
+        <!-- Left Col (5): Customize Groups/Teams -->
+        <div class="md:col-span-5 flex flex-col gap-3 border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-sm text-slate-800 uppercase tracking-wider">1. Teams in This Class</h3>
+            <button id="btnAddNewGroup" type="button" class="px-2.5 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition">
+              ＋ Add Team
+            </button>
+          </div>
+          <div id="groupManagerList" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+
+          <div class="bg-violet-50 rounded-2xl p-3.5 border border-violet-100 mt-auto">
+            <div class="text-xs font-bold text-violet-950 mb-1">💡 Fast Canvas Grouping Tip</div>
+            <p class="text-[11px] text-violet-800 mb-2">You can also click <strong>"Assign Groups (Paint)"</strong> on the main toolbar, pick a team color, and tap desks directly on the classroom map!</p>
+            <button id="btnSwitchToBrushFromModal" type="button" class="w-full py-1.5 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs transition">
+              🎨 Switch to Canvas Group Brush
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Col (7): Assign Students to Groups -->
+        <div class="md:col-span-7 flex flex-col gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="font-display font-bold text-sm text-slate-800 uppercase tracking-wider">2. Assign Students to Teams</h3>
+              <p class="text-xs text-slate-500">Select a team for each student below, or use quick actions</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button id="btnEvenDistributeGroups" type="button" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition" title="Distribute students evenly in order across active teams (you can still adjust manually)">
+                Auto-Fill Evenly
+              </button>
+              <button id="btnClearAllGroupAssignments" type="button" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition">
+                Clear Assignments
+              </button>
+            </div>
+          </div>
+
+          <div id="studentGroupAssignList" class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-96 overflow-y-auto bg-white"></div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <button id="btnModalClusterByGroup" type="button" class="px-3.5 py-2 rounded-xl bg-violet-100 hover:bg-violet-200 text-violet-900 font-bold text-xs transition">
+          🧲 Also Cluster Desks by Group on Floor Plan
+        </button>
+        <button id="btnDoneGroupModal" type="button" class="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs sm:text-sm shadow-sm transition">
+          Done &amp; Return to Classroom
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: RANDOM STUDENT / GROUP SPOTLIGHT PICKER                      -->
+  <!-- ===================================================================== -->
+  <div id="pickerModal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden">
+      <!-- Header -->
+      <div class="px-6 py-4 bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 text-slate-950 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🎲</span>
+          <div>
+            <h2 class="font-display text-lg font-bold leading-tight">Random Spotlight Picker</h2>
+            <p class="text-xs font-medium text-slate-800">Pick a random student or team and score them live</p>
+          </div>
+        </div>
+        <button id="btnClosePickerModal" type="button" class="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5">
+        <!-- Mode Toggle: Pick Student vs Pick Group -->
+        <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl mb-4">
+          <button id="btnPickerTypeStudent" type="button" class="py-2 rounded-lg text-xs sm:text-sm font-bold transition bg-white text-indigo-700 shadow-sm">
+            👤 Pick Random Student
+          </button>
+          <button id="btnPickerTypeGroup" type="button" class="py-2 rounded-lg text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900">
+            🛡️ Pick Random Group
+          </button>
+        </div>
+
+        <!-- Optional Group Filter (when picking student) + No Repeat Checkbox -->
+        <div id="pickerStudentOptions" class="flex flex-wrap items-center justify-between gap-2 mb-4 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/80 text-xs">
+          <div class="flex items-center gap-1.5">
+            <label for="pickerGroupFilter" class="font-semibold text-slate-600">Pool:</label>
+            <select id="pickerGroupFilter" class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-bold text-slate-800">
+              <option value="ALL">All Students</option>
+            </select>
+          </div>
+          <label class="flex items-center gap-1.5 cursor-pointer font-semibold text-slate-700">
+            <input id="pickerNoRepeatCheckbox" type="checkbox" checked class="rounded text-indigo-600 focus:ring-indigo-500" />
+            <span>Avoid repeats (<span id="pickerRemainingCount">24</span> left)</span>
+          </label>
+          <button id="btnResetPickerPool" type="button" class="text-indigo-600 hover:underline font-bold">Reset Pool</button>
+        </div>
+
+        <!-- Roulette Display Box -->
+        <div id="pickerStageBox" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 text-white rounded-2xl p-6 text-center shadow-inner mb-4 min-h-[170px] flex flex-col items-center justify-center relative overflow-hidden">
+          <div id="pickerBadge" class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full bg-white/15 text-amber-300 mb-2">Ready to Spin</div>
+          <div id="pickerResultTitle" class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Tap "Draw Now"</div>
+          <div id="pickerResultSub" class="text-xs sm:text-sm text-indigo-200 mt-1">Spotlight will highlight on the classroom map</div>
+
+          <!-- Instant Score Controls (Enabled once a student/group is picked) -->
+          <div id="pickerQuickScoreBar" class="hidden mt-4 pt-3 border-t border-white/15 flex items-center justify-center gap-3 w-full">
+            <button id="btnPickerMinusOne" type="button" class="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-display font-bold text-sm shadow transition">
+              −1 Point
+            </button>
+            <span id="pickerCurrentScorePill" class="px-3 py-1 rounded-lg bg-white/10 font-mono text-xs font-bold text-amber-200">Score: 0</span>
+            <button id="btnPickerPlusOne" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-sm shadow transition">
+              ＋1 Point ★
+            </button>
+          </div>
+        </div>
+
+        <!-- Spin Action Button -->
+        <button id="btnTriggerRandomPick" type="button" class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-950 font-display font-bold text-base shadow-md transition flex items-center justify-center gap-2">
+          <span>🎰</span>
+          <span id="btnTriggerPickText">Draw Random Student</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: LIVE PODIUM CELEBRATION                                      -->
+  <!-- ===================================================================== -->
+  <div id="podiumModal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white rounded-3xl shadow-2xl border border-indigo-500/30 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏆</span>
+          <div>
+            <h2 class="font-display text-xl font-bold text-amber-300">SKHHCSS Classroom Champions Podium</h2>
+            <p id="podiumSubTitle" class="text-xs text-indigo-200">Live Standings — Individual &amp; Team Leaders</p>
+          </div>
+        </div>
+        <button id="btnClosePodiumModal" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Top 3 Students Podium -->
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
+          <h3 class="font-display text-center text-base font-bold text-amber-300 mb-4">🌟 Top Individual Students</h3>
+          <div id="podiumStudentsContainer" class="flex-1 flex items-end justify-center gap-3 min-h-[220px] pt-6"></div>
+        </div>
+
+        <!-- Top 3 Teams Podium -->
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
+          <h3 class="font-display text-center text-base font-bold text-emerald-300 mb-4">🛡️ Top Classroom Teams</h3>
+          <div id="podiumGroupsContainer" class="flex-1 flex items-end justify-center gap-3 min-h-[220px] pt-6"></div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-3 bg-black/30 border-t border-white/10 flex items-center justify-between">
+        <span class="text-xs text-indigo-200">Tip: Export CSV anytime from the top bar to save a permanent record!</span>
+        <button id="btnDonePodiumModal" type="button" class="px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm transition">
+          Back to Activity
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 5: RESET SCORES CONFIRMATION                                    -->
+  <!-- ===================================================================== -->
+  <div id="resetModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl font-bold">↺</div>
+        <div>
+          <h3 class="font-display text-lg font-bold text-slate-800">Reset Class Scores?</h3>
+          <p class="text-xs text-slate-500">Your seating layout and group assignments will be kept intact.</p>
+        </div>
+      </div>
+      <div class="space-y-2.5 my-4">
+        <button id="btnConfirmResetAllScores" type="button" class="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm transition">
+          Reset Both Individual &amp; Group Scores to 0
+        </button>
+        <button id="btnConfirmResetGroupScoresOnly" type="button" class="w-full py-2.5 px-4 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs sm:text-sm transition">
+          Reset Group Scores Only (Keep Individual Scores)
+        </button>
+        <button id="btnCancelResetModal" type="button" class="w-full py-2 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION LOGIC                                                     -->
+  <!-- ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'skhhcss_eng_classroom_v4';
+      const STAGE_WIDTH = 1120;
+      const STAGE_HEIGHT = 640;
+      const DESK_W = 144;
+      const DESK_H = 114;
+      const GRID_SIZE = 20;
+
+      // Team Color Palette Definitions
+      const TEAM_PALETTES = {
+        red: {
+          name: 'Coral Red',
+          bg: 'bg-rose-50',
+          border: 'border-rose-400',
+          headerBg: 'bg-rose-500',
+          text: 'text-rose-700',
+          badgeBg: 'bg-rose-100',
+          hex: '#f43f5e'
+        },
+        blue: {
+          name: 'Ocean Blue',
+          bg: 'bg-sky-50',
+          border: 'border-sky-400',
+          headerBg: 'bg-sky-500',
+          text: 'text-sky-700',
+          badgeBg: 'bg-sky-100',
+          hex: '#0ea5e9'
+        },
+        green: {
+          name: 'Emerald Green',
+          bg: 'bg-emerald-50',
+          border: 'border-emerald-400',
+          headerBg: 'bg-emerald-500',
+          text: 'text-emerald-700',
+          badgeBg: 'bg-emerald-100',
+          hex: '#10b981'
+        },
+        amber: {
+          name: 'Amber Gold',
+          bg: 'bg-amber-50',
+          border: 'border-amber-400',
+          headerBg: 'bg-amber-500',
+          text: 'text-amber-800',
+          badgeBg: 'bg-amber-100',
+          hex: '#f59e0b'
+        },
+        purple: {
+          name: 'Royal Purple',
+          bg: 'bg-violet-50',
+          border: 'border-violet-400',
+          headerBg: 'bg-violet-500',
+          text: 'text-violet-700',
+          badgeBg: 'bg-violet-100',
+          hex: '#8b5cf6'
+        },
+        teal: {
+          name: 'Lagoon Teal',
+          bg: 'bg-teal-50',
+          border: 'border-teal-400',
+          headerBg: 'bg-teal-500',
+          text: 'text-teal-700',
+          badgeBg: 'bg-teal-100',
+          hex: '#14b8a6'
+        }
+      };
+
+      const PALETTE_KEYS = Object.keys(TEAM_PALETTES);
+
+      // Subtle Web Audio API Synthesizer
+      let audioCtx = null;
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(function () {});
+        }
+        return audioCtx;
+      }
+
+      function playSubtleSound(type) {
+        if (!state.soundEnabled) return;
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        try {
+          if (type === 'plus') {
+            // Soft harmonic marimba fifth (C5 -> G5)
+            const notes = [523.25, 783.99];
+            notes.forEach(function (freq, idx) {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, now + idx * 0.065);
+              gain.gain.setValueAtTime(0.001, now + idx * 0.065);
+              gain.gain.linearRampToValueAtTime(0.085, now + idx * 0.065 + 0.015);
+              gain.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.065 + 0.26);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(now + idx * 0.065);
+              osc.stop(now + idx * 0.065 + 0.28);
+            });
+          } else if (type === 'groupPlus') {
+            // Warm gentle triad arpeggio (C5 - E5 - G5)
+            const notes = [523.25, 659.25, 783.99];
+            notes.forEach(function (freq, idx) {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, now + idx * 0.055);
+              gain.gain.setValueAtTime(0.001, now + idx * 0.055);
+              gain.gain.linearRampToValueAtTime(0.075, now + idx * 0.055 + 0.015);
+              gain.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.055 + 0.32);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(now + idx * 0.055);
+              osc.stop(now + idx * 0.055 + 0.34);
+            });
+          } else if (type === 'minus') {
+            // Soft muted woodblock tap (E4 -> C4)
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(329.63, now);
+            osc.frequency.exponentialRampToValueAtTime(220.0, now + 0.16);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.07, now + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + 0.18);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.2);
+          } else if (type === 'tick') {
+            // Subtle wooden roulette click
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(680, now);
+            gain.gain.setValueAtTime(0.035, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.04);
+          } else if (type === 'fanfare') {
+            // Gentle celebration chord (C5 - E5 - G5 - C6)
+            const notes = [523.25, 659.25, 783.99, 1046.5];
+            notes.forEach(function (freq, idx) {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+              gain.gain.setValueAtTime(0.001, now + idx * 0.07);
+              gain.gain.linearRampToValueAtTime(0.08, now + idx * 0.07 + 0.02);
+              gain.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.07 + 0.45);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(now + idx * 0.07);
+              osc.stop(now + idx * 0.07 + 0.48);
+            });
+          }
+        } catch (err) {
+          // Ignore audio errors if blocked
+        }
+      }
+
+      // Helper to generate default teams for a class
+      function createDefaultGroups() {
+        return [
+          { id: 'grp_1', name: 'Red Falcons', icon: '🦅', color: 'red', score: 0 },
+          { id: 'grp_2', name: 'Blue Dolphins', icon: '🐬', color: 'blue', score: 0 },
+          { id: 'grp_3', name: 'Green Dragons', icon: '🐉', color: 'green', score: 0 },
+          { id: 'grp_4', name: 'Gold Phoenixes', icon: '🔥', color: 'amber', score: 0 },
+          { id: 'grp_5', name: 'Purple Unicorns', icon: '🦄', color: 'purple', score: 0 },
+          { id: 'grp_6', name: 'Teal Tigers', icon: '🐯', color: 'teal', score: 0 }
+        ];
+      }
+
+      // Sort students by their current visual row & column on the canvas so custom seat swaps are preserved
+      function getSpatiallyOrderedStudents(students) {
+        if (!students || students.length === 0) return [];
+        const copy = students.slice();
+        const hasCoords = copy.every(function (s) {
+          return typeof s.x === 'number' && typeof s.y === 'number';
+        });
+        if (!hasCoords) return copy;
+
+        // Sort primarily by Y, then bucket into horizontal row bands (within 65px) and sort each row band by X
+        copy.sort(function (a, b) { return a.y - b.y; });
+        const rowBands = [];
+        copy.forEach(function (st) {
+          const lastBand = rowBands[rowBands.length - 1];
+          if (!lastBand || Math.abs(st.y - lastBand.avgY) > 65) {
+            rowBands.push({ avgY: st.y, items: [st] });
+          } else {
+            lastBand.items.push(st);
+            lastBand.avgY = lastBand.items.reduce(function (sum, item) { return sum + item.y; }, 0) / lastBand.items.length;
+          }
+        });
+        const ordered = [];
+        rowBands.forEach(function (band) {
+          band.items.sort(function (a, b) { return a.x - b.x; });
+          band.items.forEach(function (item) { ordered.push(item); });
+        });
+        return ordered;
+      }
+
+      // Coordinate calculator for preset and custom grid layouts (adapts Exam Rows, Paired Desks, and 4-Desk Pods to custom Rows x Cols)
+      function computeLayoutPositions(count, layoutType, frontAtTop, students, groups, customCols, customRows) {
+        const positions = [];
+        const topOffset = frontAtTop ? 80 : 28;
+        const stepX = 168; // 144px card width + 24px clear horizontal gap
+        const stepY = 140; // 114px card height + 26px clear vertical gap
+        const cols = Math.max(1, Math.min(12, customCols || (count > 30 ? 7 : 6)));
+
+        if (layoutType === 'customGrid' || layoutType === 'rows') {
+          // Exam Rows applied to (customRows x cols) grid: even spacing between every column and row
+          const totalGridW = (cols - 1) * stepX + DESK_W;
+          const effStageW = Math.max(STAGE_WIDTH, totalGridW + 64);
+          const startX = Math.max(28, Math.round((effStageW - totalGridW) / 2));
+          for (let i = 0; i < count; i++) {
+            const r = Math.floor(i / cols);
+            const c = i % cols;
+            positions.push({
+              x: startX + c * stepX,
+              y: topOffset + r * stepY
+            });
+          }
+        } else if (layoutType === 'pairs') {
+          // Paired Desks applied to (customRows x cols) grid:
+          // Adjacent column pairs (0&1, 2&3, 4&5...) sit snug together (10px gap), with a wide 54px aisle between pairs
+          const pairInnerGap = 10;
+          const pairAisleGap = 54;
+          function getPairColOffset(c) {
+            const pairIdx = Math.floor(c / 2);
+            const inPair = c % 2;
+            return pairIdx * (2 * DESK_W + pairInnerGap + pairAisleGap) + inPair * (DESK_W + pairInnerGap);
+          }
+          const totalGridW = cols > 0 ? (getPairColOffset(cols - 1) + DESK_W) : DESK_W;
+          const effStageW = Math.max(STAGE_WIDTH, totalGridW + 64);
+          const startX = Math.max(28, Math.round((effStageW - totalGridW) / 2));
+
+          for (let i = 0; i < count; i++) {
+            const r = Math.floor(i / cols);
+            const c = i % cols;
+            positions.push({
+              x: startX + getPairColOffset(c),
+              y: topOffset + r * stepY
+            });
+          }
+        } else if (layoutType === 'pods4') {
+          // 4-Desk Pods applied to (customRows x cols) grid:
+          // Every 2x2 block in the (Rows x Cols) grid (cols 0&1 with rows 0&1, cols 2&3 with rows 0&1, etc.) clusters into a 4-desk pod!
+          const podInnerGapX = 10;
+          const podAisleGapX = 56;
+          const podInnerGapY = 14;
+          const podAisleGapY = 54;
+
+          function getPodColOffset(c) {
+            const podCol = Math.floor(c / 2);
+            const inPodCol = c % 2;
+            return podCol * (2 * DESK_W + podInnerGapX + podAisleGapX) + inPodCol * (DESK_W + podInnerGapX);
+          }
+          function getPodRowOffset(r) {
+            const podRow = Math.floor(r / 2);
+            const inPodRow = r % 2;
+            return podRow * (2 * DESK_H + podInnerGapY + podAisleGapY) + inPodRow * (DESK_H + podInnerGapY);
+          }
+
+          const totalGridW = cols > 0 ? (getPodColOffset(cols - 1) + DESK_W) : DESK_W;
+          const effStageW = Math.max(STAGE_WIDTH, totalGridW + 64);
+          const startX = Math.max(28, Math.round((effStageW - totalGridW) / 2));
+
+          for (let i = 0; i < count; i++) {
+            const r = Math.floor(i / cols);
+            const c = i % cols;
+            positions.push({
+              x: startX + getPodColOffset(c),
+              y: topOffset + getPodRowOffset(r)
+            });
+          }
+        } else if (layoutType === 'groupClusters' && students && groups) {
+          // Cluster students by their assigned groupId with dynamic row heights so large teams never overlap
+          const groupOrder = groups.map(function (g) { return g.id; }).concat(['']);
+          const buckets = {};
+          groupOrder.forEach(function (gid) { buckets[gid] = []; });
+          students.forEach(function (st, idx) {
+            const key = st.groupId && buckets[st.groupId] ? st.groupId : '';
+            buckets[key].push(idx);
+          });
+
+          const activeGids = groupOrder.filter(function (gid) {
+            return buckets[gid] && buckets[gid].length > 0;
+          });
+
+          const podOriginX = [28, 392, 756];
+          const resultByStudentIdx = {};
+          let currentBandY = topOffset;
+
+          for (let b = 0; b < activeGids.length; b += 3) {
+            const bandGids = activeGids.slice(b, b + 3);
+            let maxRowsInBand = 1;
+            bandGids.forEach(function (gid, colInBand) {
+              const indices = buckets[gid];
+              const rowsNeeded = Math.ceil(indices.length / 2);
+              if (rowsNeeded > maxRowsInBand) maxRowsInBand = rowsNeeded;
+              const baseX = podOriginX[colInBand];
+              indices.forEach(function (sIdx, posInTeam) {
+                const col = posInTeam % 2;
+                const row = Math.floor(posInTeam / 2);
+                resultByStudentIdx[sIdx] = {
+                  x: baseX + col * 154,
+                  y: currentBandY + row * 128
+                };
+              });
+            });
+            currentBandY += maxRowsInBand * 128 + 44;
+          }
+
+          for (let i = 0; i < count; i++) {
+            positions.push(resultByStudentIdx[i] || {
+              x: 32 + (i % 6) * stepX,
+              y: topOffset + Math.floor(i / 6) * stepY
+            });
+          }
+        } else {
+          // Fallback non-overlapping rows
+          for (let i = 0; i < count; i++) {
+            positions.push({
+              x: 32 + (i % 6) * stepX,
+              y: topOffset + Math.floor(i / 6) * stepY
+            });
+          }
+        }
+        return positions;
+      }
+
+      // Guarantee zero unintended box overlaps when loading or adding students
+      function ensureNoOverlaps(students) {
+        if (!students || students.length < 2) return;
+        const minDx = DESK_W + 8;
+        const minDy = DESK_H + 8;
+        for (let pass = 0; pass < 4; pass++) {
+          let moved = false;
+          for (let i = 0; i < students.length; i++) {
+            for (let j = i + 1; j < students.length; j++) {
+              const a = students[i];
+              const b = students[j];
+              const dx = Math.abs(a.x - b.x);
+              const dy = Math.abs(a.y - b.y);
+              if (dx < minDx - 4 && dy < minDy - 4) {
+                // Push lower/later desk down or right so they don't overlap
+                if (dy >= dx * 0.5) {
+                  if (b.y >= a.y) {
+                    b.y = a.y + minDy;
+                  } else {
+                    a.y = b.y + minDy;
+                  }
+                } else {
+                  if (b.x >= a.x) {
+                    b.x = a.x + minDx;
+                  } else {
+                    a.x = b.x + minDx;
+                  }
+                }
+                moved = true;
+              }
+            }
+          }
+          if (!moved) break;
+        }
+      }
+
+      // Build initial sample preset classes
+      function createFactoryPresets() {
+        const names1A = [
+          'Chan Cheuk Him', 'Chan Hoi Lam', 'Cheung Tsz Yin', 'Chow Wing Yan',
+          'Fung Ka Yi', 'Ho Cheuk Nam', 'Ip Tsz Ching', 'Kwok Hoi Ting',
+          'Lam Pak Hei', 'Lau Siu Ming', 'Lee Cheuk Ying', 'Leung Ka Ho',
+          'Li Wing Tung', 'Lo Tsz Hin', 'Mak Hiu Lam', 'Ng Cheuk Fung',
+          'Poon Wing Sze', 'Siu KaChun', 'Tam Hoi Ki', 'Tang Tsz Lok',
+          'Tsang Wing Kiu', 'Wong Cheuk Yiu', 'Wu Hiu Tung', 'Yip Ka Yan'
+        ];
+        const groups1A = createDefaultGroups();
+        const pos1A = computeLayoutPositions(names1A.length, 'pods4', false, null, null, 6, 4);
+        const students1A = names1A.map(function (name, i) {
+          const grpIdx = Math.floor(i / 4) % groups1A.length;
+          return {
+            id: 's_1a_' + (i + 1),
+            classNo: String(i + 1).padStart(2, '0'),
+            name: name,
+            groupId: groups1A[grpIdx].id,
+            score: 0,
+            x: pos1A[i].x,
+            y: pos1A[i].y
+          };
+        });
+
+        const names3B = [
+          'Au Yeung Tsz轩', 'Chan Hiu Ching', 'Cheng Pak Yin', 'Chu Wing Lam',
+          'Fong Ka Hei', 'Ho Sum Yi', 'Kwan Tsz Lok', 'Lai Wing Yan',
+          'Lam Cheuk Kwan', 'Law Hiu Tung', 'Lee Tsz Ho', 'Leung Lok Yi',
+          'Luk Ka Ming', 'Ma Wing Sze', 'Ng Tsz Ching', 'Or Cheuk Him',
+          'So Hiu Lam', 'Tse Pak Ho', 'Wong Wing Kiu', 'Yuen Ka Yi'
+        ];
+        const groups3B = createDefaultGroups();
+        const pos3B = computeLayoutPositions(names3B.length, 'pairs', false, null, null, 4, 5);
+        const students3B = names3B.map(function (name, i) {
+          const grpIdx = i % 4;
+          return {
+            id: 's_3b_' + (i + 1),
+            classNo: String(i + 1).padStart(2, '0'),
+            name: name.replace('轩', ' Hin'),
+            groupId: groups3B[grpIdx].id,
+            score: 0,
+            x: pos3B[i].x,
+            y: pos3B[i].y
+          };
+        });
+
+        const names5A = [
+          'Chan Ka朗', 'Chan Lok Yiu', 'Cheung Hiu風', 'Cheung Wing Sum',
+          'Chiu Tsz Hin', 'Choy Hoi Lam', 'Fan Ka Yi', 'Fung Pak Hei',
+          'Ho Tsz Ching', 'Hung Wing Tung', 'Ip Cheuk Nam', 'Ko Hiu Lam',
+          'Kwong Ka Ho', 'Lai Tsz Yin', 'Lam Wing Yan', 'Lau Cheuk Fung',
+          'Lee Hoi Ting', 'Leung Pak Yin', 'Li Tsz Lok', 'Lo Wing Sze',
+          'Mok Ka Chun', 'Ng Hiu Tung', 'Poon Cheuk Yiu', 'Sin Wing Kiu',
+          'Tang Hoi Ki', 'Tsui Ka Yan', 'Wong Tsz Hin', 'Yim Lok Yi'
+        ];
+        const groups5A = createDefaultGroups();
+        const pos5A = computeLayoutPositions(names5A.length, 'rows', false, null, null, 6, 5);
+        const students5A = names5A.map(function (name, i) {
+          const grpIdx = Math.floor(i / 5) % groups5A.length;
+          return {
+            id: 's_5a_' + (i + 1),
+            classNo: String(i + 1).padStart(2, '0'),
+            name: name.replace('朗', ' Long').replace('風', ' Fung'),
+            groupId: groups5A[grpIdx].id,
+            score: 0,
+            x: pos5A[i].x,
+            y: pos5A[i].y
+          };
+        });
+
+        return [
+          {
+            id: 'cls_1a',
+            name: '1A • Junior English',
+            frontAtTop: false,
+            gridRows: 4,
+            gridCols: 6,
+            layoutStyle: 'pods4',
+            groups: groups1A,
+            students: students1A
+          },
+          {
+            id: 'cls_3b',
+            name: '3B • Speech & Drama',
+            frontAtTop: false,
+            gridRows: 5,
+            gridCols: 4,
+            layoutStyle: 'pairs',
+            groups: groups3B,
+            students: students3B
+          },
+          {
+            id: 'cls_5a',
+            name: '5A • DSE Writing',
+            frontAtTop: false,
+            gridRows: 5,
+            gridCols: 6,
+            layoutStyle: 'rows',
+            groups: groups5A,
+            students: students5A
+          }
+        ];
+      }
+
+      // Application State
+      let state = {
+        classes: [],
+        currentClassId: '',
+        activityMode: 'individual', // 'individual' | 'group'
+        layoutLocked: false,
+        snapToGrid: true,
+        zoom: 1,
+        soundEnabled: true,
+        brushMode: false,
+        activeBrushGroupId: 'grp_1',
+        leaderboardTab: 'students', // 'students' | 'groups' | 'feed'
+        lbSearch: '',
+        historyStack: [], // For undo and live history feed
+        // Timer state
+        timerTotalSec: 180,
+        timerRemainingSec: 180,
+        timerRunning: false,
+        // Picker state
+        pickerMode: 'student', // 'student' | 'group'
+        pickerGroupFilter: 'ALL',
+        pickerNoRepeat: true,
+        pickedStudentIds: [],
+        pickedGroupIds: [],
+        lastPickedTarget: null // { type: 'student'|'group', id: string }
+      };
+
+      let timerIntervalId = null;
+      let pickerSpinIntervalId = null;
+
+      // Load or Initialize State
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.classes) && parsed.classes.length > 0) {
+              state.classes = parsed.classes;
+              state.currentClassId = parsed.currentClassId || parsed.classes[0].id;
+              state.activityMode = parsed.activityMode || 'individual';
+              state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
+              state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+              return;
+            }
+          }
+        } catch (e) {
+          // Ignore storage errors in sandboxed iframes
+        }
+        state.classes = createFactoryPresets();
+        state.currentClassId = state.classes[0].id;
+      }
+
+      function saveState() {
+        try {
+          const payload = {
+            classes: state.classes,
+            currentClassId: state.currentClassId,
+            activityMode: state.activityMode,
+            snapToGrid: state.snapToGrid,
+            soundEnabled: state.soundEnabled
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (e) {
+          // Ignore storage quota / sandbox restrictions
+        }
+      }
+
+      function getCurrentClass() {
+        let cls = state.classes.find(function (c) { return c.id === state.currentClassId; });
+        if (!cls && state.classes.length > 0) {
+          cls = state.classes[0];
+          state.currentClassId = cls.id;
+        }
+        return cls;
+      }
+
+      function getGroupById(cls, groupId) {
+        if (!cls || !groupId) return null;
+        return cls.groups.find(function (g) { return g.id === groupId; }) || null;
+      }
+
+      // Toast Notification Helper
+      function showToast(message, icon) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'px-4 py-2.5 rounded-2xl bg-slate-900/95 text-white text-xs sm:text-sm font-semibold shadow-xl border border-white/15 flex items-center gap-2 transition-all duration-300 transform translate-y-2 opacity-0';
+        toast.innerHTML = '<span>' + (icon || '✨') + '</span><span>' + escapeHtml(message) + '</span>';
+        container.appendChild(toast);
+        requestAnimationFrame(function () {
+          toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+        setTimeout(function () {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(function () {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 300);
+        }, 2600);
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // ===================================================================
+      // SCORING ENGINE (INDIVIDUAL & GROUP-TO-MEMBER SYNC)
+      // ===================================================================
+
+      function adjustStudentScore(studentId, delta, sourceLabel) {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        const st = cls.students.find(function (s) { return s.id === studentId; });
+        if (!st) return;
+
+        st.score = (Number(st.score) || 0) + delta;
+
+        // Record history for Undo & Activity Feed
+        state.historyStack.unshift({
+          id: 'h_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          type: 'student',
+          classId: cls.id,
+          studentId: st.id,
+          label: st.classNo + ' ' + st.name,
+          delta: delta,
+          note: sourceLabel || 'Individual score',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        });
+        if (state.historyStack.length > 40) state.historyStack.pop();
+
+        playSubtleSound(delta > 0 ? 'plus' : 'minus');
+        saveState();
+        updateSingleDeskScoreDOM(st.id, st.score, delta);
+        renderLeaderboardAndStats();
+        updatePickerScoreReadout();
+      }
+
+      function adjustGroupScore(groupId, delta) {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        const grp = getGroupById(cls, groupId);
+        if (!grp) return;
+
+        grp.score = (Number(grp.score) || 0) + delta;
+
+        // Crucial requirement: Group points ALSO add to each member's individual score!
+        const memberIds = [];
+        cls.students.forEach(function (st) {
+          if (st.groupId === grp.id) {
+            st.score = (Number(st.score) || 0) + delta;
+            memberIds.push(st.id);
+          }
+        });
+
+        state.historyStack.unshift({
+          id: 'h_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          type: 'group',
+          classId: cls.id,
+          groupId: grp.id,
+          memberIds: memberIds,
+          label: grp.icon + ' ' + grp.name,
+          delta: delta,
+          note: 'Group point (also ' + (delta > 0 ? '+' : '') + delta + ' to ' + memberIds.length + ' members)',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        });
+        if (state.historyStack.length > 40) state.historyStack.pop();
+
+        playSubtleSound(delta > 0 ? 'groupPlus' : 'minus');
+        saveState();
+
+        // Animate every member's desk on the classroom canvas!
+        memberIds.forEach(function (mId) {
+          const st = cls.students.find(function (s) { return s.id === mId; });
+          if (st) {
+            updateSingleDeskScoreDOM(st.id, st.score, delta, true);
+          }
+        });
+
+        renderGroupScoreDock();
+        renderLeaderboardAndStats();
+        updatePickerScoreReadout();
+      }
+
+      function adjustWholeClassScore(delta) {
+        const cls = getCurrentClass();
+        if (!cls || cls.students.length === 0) return;
+
+        const memberIds = [];
+        cls.students.forEach(function (st) {
+          st.score = (Number(st.score) || 0) + delta;
+          memberIds.push(st.id);
+        });
+
+        state.historyStack.unshift({
+          id: 'h_' + Date.now(),
+          type: 'all',
+          classId: cls.id,
+          memberIds: memberIds,
+          label: 'Whole Class (' + cls.name + ')',
+          delta: delta,
+          note: 'Class-wide bonus',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        });
+        if (state.historyStack.length > 40) state.historyStack.pop();
+
+        playSubtleSound(delta > 0 ? 'groupPlus' : 'minus');
+        saveState();
+
+        cls.students.forEach(function (st) {
+          updateSingleDeskScoreDOM(st.id, st.score, delta, false);
+        });
+        renderLeaderboardAndStats();
+        showToast('Awarded ' + (delta > 0 ? '+1' : '-1') + ' to all ' + cls.students.length + ' students!', '🎉');
+      }
+
+      function undoLastScoreAction() {
+        const cls = getCurrentClass();
+        if (!cls || state.historyStack.length === 0) return;
+        const last = state.historyStack.shift();
+        if (last.classId !== cls.id) {
+          showToast('Cannot undo action from another class.', 'ℹ️');
+          renderLeaderboardAndStats();
+          return;
+        }
+
+        if (last.type === 'student') {
+          const st = cls.students.find(function (s) { return s.id === last.studentId; });
+          if (st) {
+            st.score -= last.delta;
+            updateSingleDeskScoreDOM(st.id, st.score, 0);
+          }
+        } else if (last.type === 'group') {
+          const grp = getGroupById(cls, last.groupId);
+          if (grp) grp.score -= last.delta;
+          (last.memberIds || []).forEach(function (mId) {
+            const st = cls.students.find(function (s) { return s.id === mId; });
+            if (st) {
+              st.score -= last.delta;
+              updateSingleDeskScoreDOM(st.id, st.score, 0);
+            }
+          });
+          renderGroupScoreDock();
+        } else if (last.type === 'all') {
+          (last.memberIds || []).forEach(function (mId) {
+            const st = cls.students.find(function (s) { return s.id === mId; });
+            if (st) {
+              st.score -= last.delta;
+              updateSingleDeskScoreDOM(st.id, st.score, 0);
+            }
+          });
+        }
+
+        saveState();
+        renderLeaderboardAndStats();
+        showToast('Undid: ' + last.label + ' (' + (last.delta > 0 ? '+' : '') + last.delta + ')', '↩');
+      }
+
+      // Fast targeted DOM update + floating score animation for a student desk
+      function updateSingleDeskScoreDOM(studentId, newScore, delta, isTeamSync) {
+        const deskEl = document.querySelector('.desk-card[data-student-id="' + studentId + '"]');
+        if (!deskEl) return;
+
+        const scoreBadge = deskEl.querySelector('.desk-score-value');
+        if (scoreBadge) {
+          scoreBadge.textContent = String(newScore);
+          scoreBadge.className = 'desk-score-value font-display font-bold text-sm px-2 py-0.5 rounded-lg ' +
+            (newScore > 0 ? 'bg-emerald-100 text-emerald-800' : (newScore < 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'));
+        }
+
+        if (delta !== 0) {
+          deskEl.classList.remove('pulse-plus', 'pulse-minus');
+          void deskEl.offsetWidth; // Force reflow
+          deskEl.classList.add(delta > 0 ? 'pulse-plus' : 'pulse-minus');
+
+          // Spawn floating score badge
+          const floatEl = document.createElement('div');
+          floatEl.className = 'score-float ' + (delta > 0 ? 'text-emerald-600' : 'text-rose-600');
+          floatEl.style.left = isTeamSync ? '32px' : '54px';
+          floatEl.style.top = '-8px';
+          floatEl.textContent = (delta > 0 ? '+' + delta : String(delta)) + (isTeamSync ? ' 🛡️' : ' ★');
+          deskEl.appendChild(floatEl);
+          setTimeout(function () {
+            if (floatEl.parentNode) floatEl.parentNode.removeChild(floatEl);
+          }, 950);
+        }
+      }
+
+      // ===================================================================
+      // RENDER FUNCTIONS: HEADER, GROUP DOCK, DESKS CANVAS, LEADERBOARD
+      // ===================================================================
+
+      function renderAll() {
+        renderHeaderControls();
+        renderGroupBrushBar();
+        renderGroupScoreDock();
+        renderClassroomCanvas();
+        renderLeaderboardAndStats();
+      }
+
+      function renderHeaderControls() {
+        const cls = getCurrentClass();
+        const selectEl = document.getElementById('classSelect');
+        if (selectEl) {
+          selectEl.innerHTML = state.classes.map(function (c) {
+            const selected = c.id === state.currentClassId ? 'selected' : '';
+            return '<option value="' + escapeHtml(c.id) + '" ' + selected + '>' + escapeHtml(c.name) + ' (' + c.students.length + ')</option>';
+          }).join('');
+        }
+
+        // Mode switcher active state
+        const btnInd = document.getElementById('btnModeIndividual');
+        const btnGrp = document.getElementById('btnModeGroup');
+        if (btnInd && btnGrp) {
+          if (state.activityMode === 'individual') {
+            btnInd.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all bg-white text-indigo-700 shadow-sm';
+            btnGrp.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all text-white/90 hover:text-white';
+          } else {
+            btnGrp.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all bg-amber-300 text-slate-950 shadow-sm';
+            btnInd.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all text-white/90 hover:text-white';
+          }
+        }
+
+        // Lock / Snap / Flip buttons
+        const lockIcon = document.getElementById('lockLayoutIcon');
+        const lockText = document.getElementById('lockLayoutText');
+        const btnLock = document.getElementById('btnToggleLockLayout');
+        if (lockIcon && lockText && btnLock) {
+          if (state.layoutLocked) {
+            lockIcon.textContent = '🔒';
+            lockText.textContent = 'Desks Locked';
+            btnLock.className = 'px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 hover:bg-amber-200 text-xs font-bold flex items-center gap-1 transition';
+          } else {
+            lockIcon.textContent = '🔓';
+            lockText.textContent = 'Freeform Drag: ON';
+            btnLock.className = 'px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold flex items-center gap-1 transition';
+          }
+        }
+
+        const snapText = document.getElementById('snapGridText');
+        const viewport = document.getElementById('classroomViewport');
+        if (snapText) snapText.textContent = state.snapToGrid ? 'Snap: ON' : 'Snap: OFF';
+        if (viewport) {
+          viewport.classList.toggle('snap-active', state.snapToGrid);
+        }
+
+        const flipText = document.getElementById('flipRoomText');
+        if (flipText && cls) {
+          flipText.textContent = cls.frontAtTop ? 'Front: Top' : 'Front: Bottom';
+        }
+
+        const rInput = document.getElementById('quickRowsInput');
+        const cInput = document.getElementById('quickColsInput');
+        if (rInput && cInput && cls) {
+          const defaultCols = cls.gridCols || (cls.students.length > 30 ? 7 : 6);
+          const defaultRows = cls.gridRows || Math.max(1, Math.ceil(cls.students.length / defaultCols));
+          if (document.activeElement !== rInput) rInput.value = String(defaultRows);
+          if (document.activeElement !== cInput) cInput.value = String(defaultCols);
+        }
+
+        // Highlight currently active layout style button
+        const activeStyle = (cls && cls.layoutStyle) ? cls.layoutStyle : 'rows';
+        document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
+          const lt = btn.getAttribute('data-layout');
+          if (lt === 'groupClusters') {
+            btn.className = 'layout-preset-btn px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ' +
+              (activeStyle === 'groupClusters'
+                ? 'bg-violet-600 text-white shadow-xs ring-2 ring-violet-300'
+                : 'bg-violet-100 hover:bg-violet-200 text-violet-800');
+          } else {
+            btn.className = 'layout-preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition ' +
+              (activeStyle === lt
+                ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                : 'bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700');
+          }
+        });
+
+        // Sound button
+        const soundIcon = document.getElementById('soundIcon');
+        const soundLabel = document.getElementById('soundLabel');
+        if (soundIcon) soundIcon.textContent = state.soundEnabled ? '🔊' : '🔇';
+        if (soundLabel) soundLabel.textContent = state.soundEnabled ? 'Subtle SFX' : 'Muted';
+
+        // Subheader badges
+        const clsBadge = document.getElementById('currentClassBadge');
+        const countBadge = document.getElementById('studentCountBadge');
+        const modeHint = document.getElementById('modeStatusHint');
+        if (cls && clsBadge && countBadge && modeHint) {
+          clsBadge.textContent = cls.name;
+          countBadge.textContent = cls.students.length + ' Students';
+          if (state.brushMode) {
+            modeHint.innerHTML = '<strong class="text-fuchsia-600">🖌️ Group Paint Mode Active:</strong> Click any student desk to assign them to the selected team!';
+          } else if (state.activityMode === 'group') {
+            modeHint.textContent = 'Group Work Mode • Score teams above (+1/-1 adds to all members) or score individual desks below';
+          } else {
+            modeHint.textContent = state.layoutLocked ? 'Layout locked for rapid scoring • Tap +1 or -1 on any desk' : 'Drag any desk freely to customize layout • Tap +1 or -1 to score';
+          }
+        }
+      }
+
+      // Render Manual Group Paint Brush Bar
+      function renderGroupBrushBar() {
+        const bar = document.getElementById('groupBrushBar');
+        const chipsContainer = document.getElementById('groupBrushChips');
+        const btnBrush = document.getElementById('btnToggleGroupBrush');
+        const stage = document.getElementById('classroomStage');
+        const cls = getCurrentClass();
+        if (!bar || !chipsContainer || !cls) return;
+
+        if (state.brushMode) {
+          bar.classList.remove('hidden');
+          stage.classList.add('brush-mode-active');
+          if (btnBrush) {
+            btnBrush.className = 'px-3 py-1 rounded-lg bg-fuchsia-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition';
+          }
+        } else {
+          bar.classList.add('hidden');
+          stage.classList.remove('brush-mode-active');
+          if (btnBrush) {
+            btnBrush.className = 'px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition';
+          }
+          return;
+        }
+
+        // Ensure activeBrushGroupId is valid
+        if (state.activeBrushGroupId !== 'NONE' && !getGroupById(cls, state.activeBrushGroupId)) {
+          state.activeBrushGroupId = cls.groups[0] ? cls.groups[0].id : 'NONE';
+        }
+
+        let html = '';
+        cls.groups.forEach(function (grp) {
+          const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
+          const isSelected = state.activeBrushGroupId === grp.id;
+          const count = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
+          html += '<button type="button" data-brush-group="' + escapeHtml(grp.id) + '" class="brush-chip-btn px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ' +
+            (isSelected ? (pal.headerBg + ' text-white ring-2 ring-offset-1 ring-slate-900 shadow-sm scale-105') : ('bg-white ' + pal.text + ' border ' + pal.border + ' hover:scale-102')) + '">' +
+            '<span>' + escapeHtml(grp.icon) + '</span>' +
+            '<span>' + escapeHtml(grp.name) + '</span>' +
+            '<span class="px-1.5 py-0.2 rounded-full text-[10px] ' + (isSelected ? 'bg-black/20 text-white' : 'bg-slate-100 text-slate-600') + '">' + count + '</span>' +
+            '</button>';
+        });
+
+        // Unassigned eraser chip
+        const isNone = state.activeBrushGroupId === 'NONE';
+        html += '<button type="button" data-brush-group="NONE" class="brush-chip-btn px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1 transition ' +
+          (isNone ? 'bg-slate-800 text-white ring-2 ring-offset-1 ring-slate-900 shadow-sm' : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-100') + '">' +
+          '<span>🧹</span><span>Unassigned</span></button>';
+
+        chipsContainer.innerHTML = html;
+      }
+
+      // Render Group Work Score Dock
+      function renderGroupScoreDock() {
+        const dock = document.getElementById('groupScoreDock');
+        const container = document.getElementById('groupDockCards');
+        const cls = getCurrentClass();
+        if (!dock || !container || !cls) return;
+
+        if (state.activityMode !== 'group') {
+          dock.classList.add('hidden');
+          return;
+        }
+        dock.classList.remove('hidden');
+
+        if (cls.groups.length === 0) {
+          container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-500">No teams configured yet. Click "Manage Teams" to add groups!</div>';
+          return;
+        }
+
+        container.innerHTML = cls.groups.map(function (grp) {
+          const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
+          const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
+          return '<div class="rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md">' +
+            '<div class="flex items-start justify-between gap-1 mb-1.5">' +
+              '<div class="min-w-0">' +
+                '<div class="flex items-center gap-1">' +
+                  '<span class="text-base leading-none">' + escapeHtml(grp.icon) + '</span>' +
+                  '<span class="font-display font-bold text-xs sm:text-sm text-slate-900 truncate">' + escapeHtml(grp.name) + '</span>' +
+                '</div>' +
+                '<div class="text-[11px] font-medium text-slate-500 mt-0.5">' + memberCount + ' member' + (memberCount === 1 ? '' : 's') + '</div>' +
+              '</div>' +
+              '<span class="font-display font-extrabold text-base sm:text-lg px-2 py-0.5 rounded-xl bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
+                (grp.score > 0 ? '+' + grp.score : grp.score) +
+              '</span>' +
+            '</div>' +
+            '<div class="grid grid-cols-2 gap-1.5 mt-1">' +
+              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="py-1.5 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-xs transition shadow-2xs" title="Subtract 1 from group and each member">−1</button>' +
+              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="py-1.5 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-xs transition shadow-xs" title="Add +1 to group and each member">＋1 ★</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      // Compute dynamic stage bounds so large grids or tall layouts never clip
+      function getDynamicStageBounds(cls) {
+        let maxX = STAGE_WIDTH;
+        let maxY = STAGE_HEIGHT;
+        if (cls && cls.students) {
+          cls.students.forEach(function (st) {
+            if (st.x + DESK_W + 36 > maxX) maxX = st.x + DESK_W + 36;
+            if (st.y + DESK_H + (cls.frontAtTop ? 36 : 76) > maxY) maxY = st.y + DESK_H + (cls.frontAtTop ? 36 : 76);
+          });
+        }
+        return { width: Math.ceil(maxX), height: Math.ceil(maxY) };
+      }
+
+      // Render Freeform Classroom Floor Plan & Desks
+      function renderClassroomCanvas(smoothTransition) {
+        const cls = getCurrentClass();
+        const container = document.getElementById('desksContainer');
+        const boardBar = document.getElementById('teacherBoardBar');
+        const stage = document.getElementById('classroomStage');
+        const zoomReadout = document.getElementById('zoomReadout');
+        if (!cls || !container || !boardBar || !stage) return;
+
+        // Dynamically size stage so all desks fit with breathing room
+        const bounds = getDynamicStageBounds(cls);
+        stage.style.width = bounds.width + 'px';
+        stage.style.height = bounds.height + 'px';
+
+        // Apply Zoom
+        stage.style.transform = 'scale(' + state.zoom + ')';
+        if (zoomReadout) zoomReadout.textContent = Math.round(state.zoom * 100) + '%';
+
+        // Position Teacher Smartboard at Top or Bottom
+        if (cls.frontAtTop) {
+          boardBar.style.top = '12px';
+          boardBar.style.bottom = 'auto';
+        } else {
+          boardBar.style.bottom = '12px';
+          boardBar.style.top = 'auto';
+        }
+
+        container.innerHTML = cls.students.map(function (st) {
+          const grp = getGroupById(cls, st.groupId);
+          const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
+          const borderClass = pal ? ('border-2 ' + pal.border) : 'border-2 border-slate-200';
+          const topStripClass = pal ? pal.headerBg : 'bg-slate-700';
+          const groupBadgeHtml = grp
+            ? '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold ' + pal.badgeBg + ' ' + pal.text + ' max-w-[88px] truncate" title="' + escapeHtml(grp.name) + '">' +
+                escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
+              '</span>'
+            : '<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-400">No Team</span>';
+
+          const scoreVal = Number(st.score) || 0;
+          const scoreBadgeClass = scoreVal > 0
+            ? 'bg-emerald-100 text-emerald-800'
+            : (scoreVal < 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700');
+
+          const cursorClass = state.brushMode
+            ? 'cursor-pointer'
+            : (state.layoutLocked ? 'cursor-default' : 'cursor-grab');
+
+          const isSpotlight = state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === st.id;
+
+          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + '" ' +
+            'data-student-id="' + escapeHtml(st.id) + '" ' +
+            'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
+            '<!-- Top Color Accent Bar -->' +
+            '<div class="h-1.5 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
+            '<div class="p-2">' +
+              '<!-- Row 1: Class No + Score Badge -->' +
+              '<div class="flex items-center justify-between gap-1 mb-0.5">' +
+                '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">#' + escapeHtml(st.classNo) + '</span>' +
+                '<span class="desk-score-value font-display font-bold text-xs px-2 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
+              '</div>' +
+              '<!-- Row 2: Student Name -->' +
+              '<div class="font-display font-bold text-xs text-slate-800 truncate mb-1" title="' + escapeHtml(st.name) + '">' +
+                escapeHtml(st.name) +
+              '</div>' +
+              '<!-- Row 3: Team Badge -->' +
+              '<div class="flex items-center justify-between mb-1.5">' +
+                groupBadgeHtml +
+                (state.activityMode === 'group' && grp
+                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
+                  : '') +
+              '</div>' +
+              '<!-- Row 4: Live -1 / +1 Buttons -->' +
+              '<div class="grid grid-cols-2 gap-1">' +
+                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn py-0.5 rounded-lg bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold text-xs transition">−1</button>' +
+                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn py-0.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-xs transition shadow-2xs">＋1</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      // Render Right Sidebar: Live Leaderboard, Pulse Stats, & History Feed
+      function renderLeaderboardAndStats() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+
+        // 1. Update Top Summary Pulse Stats
+        const totalPts = cls.students.reduce(function (acc, s) { return acc + (Number(s.score) || 0); }, 0);
+        const sortedStudents = cls.students.slice().sort(function (a, b) {
+          if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
+          return String(a.classNo).localeCompare(String(b.classNo));
+        });
+        const sortedGroups = cls.groups.slice().sort(function (a, b) {
+          return (b.score || 0) - (a.score || 0);
+        });
+
+        const elTotal = document.getElementById('statTotalPoints');
+        const elTopSt = document.getElementById('statTopStudent');
+        const elTopGrp = document.getElementById('statTopGroup');
+        const btnUndo = document.getElementById('btnUndoLastScore');
+
+        if (elTotal) elTotal.textContent = (totalPts > 0 ? '+' : '') + totalPts;
+        if (elTopSt) {
+          const topS = sortedStudents[0];
+          elTopSt.textContent = (topS && topS.score > 0) ? (topS.name + ' (' + topS.score + ')') : '—';
+        }
+        if (elTopGrp) {
+          const topG = sortedGroups[0];
+          elTopGrp.textContent = (topG && topG.score > 0) ? (topG.icon + ' ' + topG.name + ' (' + topG.score + ')') : '—';
+        }
+        if (btnUndo) {
+          const hasUndoForClass = state.historyStack.length > 0 && state.historyStack[0].classId === cls.id;
+          btnUndo.disabled = !hasUndoForClass;
+        }
+
+        // 2. Leaderboard Tab Buttons
+        const tabSt = document.getElementById('tabLbStudents');
+        const tabGr = document.getElementById('tabLbGroups');
+        const tabFd = document.getElementById('tabLbFeed');
+        const searchWrap = document.getElementById('lbSearchWrapper');
+        if (tabSt && tabGr && tabFd) {
+          tabSt.className = 'py-1.5 rounded-lg text-xs font-bold transition ' + (state.leaderboardTab === 'students' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900');
+          tabGr.className = 'py-1.5 rounded-lg text-xs font-bold transition ' + (state.leaderboardTab === 'groups' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900');
+          tabFd.className = 'py-1.5 rounded-lg text-xs font-bold transition ' + (state.leaderboardTab === 'feed' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900');
+        }
+        if (searchWrap) {
+          searchWrap.classList.toggle('hidden', state.leaderboardTab === 'feed');
+        }
+
+        const body = document.getElementById('leaderboardBody');
+        if (!body) return;
+        const query = (state.lbSearch || '').trim().toLowerCase();
+
+        if (state.leaderboardTab === 'students') {
+          const filtered = sortedStudents.filter(function (st) {
+            if (!query) return true;
+            const grp = getGroupById(cls, st.groupId);
+            const grpName = grp ? grp.name.toLowerCase() : '';
+            return st.name.toLowerCase().includes(query) || String(st.classNo).toLowerCase().includes(query) || grpName.includes(query);
+          });
+
+          if (filtered.length === 0) {
+            body.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">No matching students found.</div>';
+            return;
+          }
+
+          const maxScore = Math.max(1, sortedStudents[0] ? sortedStudents[0].score : 1);
+
+          body.innerHTML = filtered.map(function (st) {
+            const rank = sortedStudents.findIndex(function (s) { return s.id === st.id; }) + 1;
+            const medal = rank === 1 && st.score > 0 ? '🥇' : (rank === 2 && st.score > 0 ? '🥈' : (rank === 3 && st.score > 0 ? '🥉' : '#' + rank));
+            const grp = getGroupById(cls, st.groupId);
+            const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
+            const pct = st.score > 0 ? Math.min(100, Math.round((st.score / maxScore) * 100)) : 0;
+
+            return '<div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-indigo-200 transition flex items-center justify-between gap-2">' +
+              '<div class="flex items-center gap-2.5 min-w-0 flex-1">' +
+                '<span class="w-7 text-center font-display font-bold text-xs ' + (rank <= 3 && st.score > 0 ? 'text-base' : 'text-slate-400') + '">' + medal + '</span>' +
+                '<div class="min-w-0 flex-1">' +
+                  '<div class="flex items-center gap-1.5">' +
+                    '<span class="text-[11px] font-mono font-bold text-slate-400">#' + escapeHtml(st.classNo) + '</span>' +
+                    '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
+                  '</div>' +
+                  '<div class="flex items-center gap-2 mt-1">' +
+                    (grp ? '<span class="text-[10px] font-bold px-1.5 py-0.2 rounded ' + pal.badgeBg + ' ' + pal.text + '">' + escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) + '</span>' : '<span class="text-[10px] text-slate-400">Unassigned</span>') +
+                    '<div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden max-w-[70px]">' +
+                      '<div class="h-full bg-indigo-500 rounded-full" style="width:' + pct + '%"></div>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-1">' +
+                '<button type="button" data-lb-st-minus="' + escapeHtml(st.id) + '" class="w-6 h-6 rounded-lg bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-slate-200 font-bold text-xs flex items-center justify-center transition">−</button>' +
+                '<span class="w-8 text-center font-display font-bold text-sm ' + (st.score > 0 ? 'text-emerald-700' : (st.score < 0 ? 'text-rose-600' : 'text-slate-600')) + '">' + st.score + '</span>' +
+                '<button type="button" data-lb-st-plus="' + escapeHtml(st.id) + '" class="w-6 h-6 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center transition">＋</button>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+
+        } else if (state.leaderboardTab === 'groups') {
+          const filteredGroups = sortedGroups.filter(function (g) {
+            if (!query) return true;
+            return g.name.toLowerCase().includes(query);
+          });
+
+          if (filteredGroups.length === 0) {
+            body.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">No teams found.</div>';
+            return;
+          }
+
+          body.innerHTML = filteredGroups.map(function (grp, idx) {
+            const rank = idx + 1;
+            const medal = rank === 1 && grp.score > 0 ? '🥇' : (rank === 2 && grp.score > 0 ? '🥈' : (rank === 3 && grp.score > 0 ? '🥉' : '#' + rank));
+            const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
+            const members = cls.students.filter(function (s) { return s.groupId === grp.id; });
+            const combinedMemberScore = members.reduce(function (sum, m) { return sum + (Number(m.score) || 0); }, 0);
+
+            return '<div class="p-3 rounded-xl border-2 ' + pal.border + ' ' + pal.bg + ' flex items-center justify-between gap-2">' +
+              '<div class="flex items-center gap-2.5 min-w-0">' +
+                '<span class="font-display font-bold text-sm w-6 text-center">' + medal + '</span>' +
+                '<div class="min-w-0">' +
+                  '<div class="font-display font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1">' +
+                    '<span>' + escapeHtml(grp.icon) + '</span>' +
+                    '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
+                  '</div>' +
+                  '<div class="text-[11px] text-slate-600">' +
+                    members.length + ' members • Combined indiv pts: <strong>' + combinedMemberScore + '</strong>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="flex items-center gap-1.5 shrink-0">' +
+                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="w-7 h-7 rounded-lg bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold text-xs flex items-center justify-center transition">−1</button>' +
+                '<span class="px-2.5 py-1 rounded-lg bg-white font-display font-extrabold text-sm ' + pal.text + ' border ' + pal.border + '">' + grp.score + '</span>' +
+                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="w-7 h-7 rounded-lg ' + pal.headerBg + ' hover:opacity-90 text-white font-bold text-xs flex items-center justify-center transition">＋1</button>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+
+        } else {
+          // Activity History Feed
+          const classHistory = state.historyStack.filter(function (h) { return h.classId === cls.id; });
+          if (classHistory.length === 0) {
+            body.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">No scoring actions recorded yet in this session. Tap +1 or -1 to start!</div>';
+            return;
+          }
+          body.innerHTML = classHistory.map(function (item) {
+            const isPos = item.delta > 0;
+            return '<div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-2 text-xs">' +
+              '<div class="min-w-0">' +
+                '<div class="font-bold text-slate-800 truncate">' + escapeHtml(item.label) + '</div>' +
+                '<div class="text-[11px] text-slate-500">' + escapeHtml(item.note) + ' • ' + escapeHtml(item.timestamp) + '</div>' +
+              '</div>' +
+              '<span class="px-2 py-0.5 rounded-lg font-display font-bold ' + (isPos ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700') + '">' +
+                (isPos ? '+' + item.delta : item.delta) +
+              '</span>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
+      // ===================================================================
+      // FREEFORM DRAG-AND-DROP ENGINE (MOUSE & TOUCH POINTER EVENTS)
+      // ===================================================================
+
+      let dragContext = null;
+
+      function initCanvasDragAndClickEvents() {
+        const container = document.getElementById('desksContainer');
+        if (!container) return;
+
+        container.addEventListener('pointerdown', function (e) {
+          const plusBtn = e.target.closest('[data-desk-plus]');
+          if (plusBtn) {
+            e.stopPropagation();
+            adjustStudentScore(plusBtn.getAttribute('data-desk-plus'), 1, 'Individual +1');
+            return;
+          }
+          const minusBtn = e.target.closest('[data-desk-minus]');
+          if (minusBtn) {
+            e.stopPropagation();
+            adjustStudentScore(minusBtn.getAttribute('data-desk-minus'), -1, 'Individual -1');
+            return;
+          }
+          const teamPlusBtn = e.target.closest('[data-desk-team-plus]');
+          if (teamPlusBtn) {
+            e.stopPropagation();
+            adjustGroupScore(teamPlusBtn.getAttribute('data-desk-team-plus'), 1);
+            return;
+          }
+
+          const deskEl = e.target.closest('.desk-card');
+          if (!deskEl) return;
+          const studentId = deskEl.getAttribute('data-student-id');
+          const cls = getCurrentClass();
+          if (!cls || !studentId) return;
+          const student = cls.students.find(function (s) { return s.id === studentId; });
+          if (!student) return;
+
+          // If Manual Group Paint Brush Mode is active, clicking assigns the student to activeBrushGroupId!
+          if (state.brushMode) {
+            e.preventDefault();
+            student.groupId = state.activeBrushGroupId === 'NONE' ? '' : state.activeBrushGroupId;
+            playSubtleSound('tick');
+            saveState();
+            renderGroupBrushBar();
+            renderGroupScoreDock();
+            renderClassroomCanvas(false);
+            renderLeaderboardAndStats();
+            return;
+          }
+
+          // Otherwise, if layout is unlocked, start freeform drag!
+          if (state.layoutLocked) return;
+
+          e.preventDefault();
+          deskEl.setPointerCapture(e.pointerId);
+          deskEl.classList.remove('smooth-move');
+          deskEl.classList.add('dragging');
+
+          dragContext = {
+            pointerId: e.pointerId,
+            deskEl: deskEl,
+            student: student,
+            startClientX: e.clientX,
+            startClientY: e.clientY,
+            origX: student.x,
+            origY: student.y,
+            hasMoved: false
+          };
+        });
+
+        container.addEventListener('pointermove', function (e) {
+          if (!dragContext || e.pointerId !== dragContext.pointerId) return;
+          const dx = (e.clientX - dragContext.startClientX) / state.zoom;
+          const dy = (e.clientY - dragContext.startClientY) / state.zoom;
+
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+            dragContext.hasMoved = true;
+          }
+
+          let nextX = dragContext.origX + dx;
+          let nextY = dragContext.origY + dy;
+
+          if (state.snapToGrid) {
+            nextX = Math.round(nextX / GRID_SIZE) * GRID_SIZE;
+            nextY = Math.round(nextY / GRID_SIZE) * GRID_SIZE;
+          }
+
+          const stageEl = document.getElementById('classroomStage');
+          const curStageW = stageEl ? stageEl.offsetWidth : STAGE_WIDTH;
+          const curStageH = stageEl ? stageEl.offsetHeight : STAGE_HEIGHT;
+          nextX = Math.max(8, Math.min(Math.max(STAGE_WIDTH, curStageW) - DESK_W - 8, nextX));
+          nextY = Math.max(8, Math.min(Math.max(STAGE_HEIGHT, curStageH) - DESK_H - 8, nextY));
+
+          dragContext.student.x = nextX;
+          dragContext.student.y = nextY;
+          dragContext.deskEl.style.left = Math.round(nextX) + 'px';
+          dragContext.deskEl.style.top = Math.round(nextY) + 'px';
+        });
+
+        function finishDrag(e) {
+          if (!dragContext || e.pointerId !== dragContext.pointerId) return;
+          dragContext.deskEl.classList.remove('dragging');
+          try {
+            dragContext.deskEl.releasePointerCapture(e.pointerId);
+          } catch (err) {}
+          if (dragContext.hasMoved) {
+            saveState();
+          }
+          dragContext = null;
+        }
+
+        container.addEventListener('pointerup', finishDrag);
+        container.addEventListener('pointercancel', finishDrag);
+      }
+
+      // Read and store the current Rows x Columns inputs on the active class
+      function syncGridInputsToClass(cls) {
+        const rInput = document.getElementById('quickRowsInput');
+        const cInput = document.getElementById('quickColsInput');
+        const reqRows = Math.max(1, Math.min(15, parseInt(rInput ? rInput.value : String(cls.gridRows || 4), 10) || (cls.gridRows || 4)));
+        const reqCols = Math.max(1, Math.min(12, parseInt(cInput ? cInput.value : String(cls.gridCols || 6), 10) || (cls.gridCols || 6)));
+        cls.gridRows = reqRows;
+        cls.gridCols = reqCols;
+        if (rInput) rInput.value = String(reqRows);
+        if (cInput) cInput.value = String(reqCols);
+        return { rows: reqRows, cols: reqCols };
+      }
+
+      // Apply a quick layout template ('rows', 'pairs', 'pods4', 'groupClusters') onto the user's customized Rows x Cols grid
+      function applyQuickLayout(layoutType) {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        const grid = syncGridInputsToClass(cls);
+        cls.layoutStyle = layoutType;
+
+        if (layoutType === 'groupClusters') {
+          const coords = computeLayoutPositions(cls.students.length, 'groupClusters', cls.frontAtTop, cls.students, cls.groups, grid.cols, grid.rows);
+          cls.students.forEach(function (st, idx) {
+            if (coords[idx]) {
+              st.x = coords[idx].x;
+              st.y = coords[idx].y;
+            }
+          });
+        } else {
+          // Preserve the current spatial order of desks on the floor plan while transforming into Exam Rows, Paired Desks, or 4-Desk Pods
+          const spatiallyOrdered = getSpatiallyOrderedStudents(cls.students);
+          const coords = computeLayoutPositions(spatiallyOrdered.length, layoutType, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows);
+          spatiallyOrdered.forEach(function (st, idx) {
+            if (coords[idx]) {
+              st.x = coords[idx].x;
+              st.y = coords[idx].y;
+            }
+          });
+        }
+
+        ensureNoOverlaps(cls.students);
+        saveState();
+        renderHeaderControls();
+        renderClassroomCanvas(true);
+
+        const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
+        const gridDesc = actualRowsUsed + '×' + grid.cols + ' grid';
+        const labelMap = {
+          rows: 'Exam Rows (' + gridDesc + ')',
+          pairs: 'Paired Desks (' + gridDesc + ')',
+          pods4: '4-Desk Pods (' + gridDesc + ')',
+          groupClusters: 'Team Clusters'
+        };
+        showToast('Applied ' + (labelMap[layoutType] || 'layout') + ' to your customised seating!', '📐');
+      }
+
+      // Apply user-specified custom Rows x Columns grid using the active layout style (Exam Rows, Paired Desks, or 4-Desk Pods)
+      function applyCustomRowsColsGrid() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        const grid = syncGridInputsToClass(cls);
+        const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
+        cls.layoutStyle = activeStyle;
+
+        const spatiallyOrdered = getSpatiallyOrderedStudents(cls.students);
+        const coords = computeLayoutPositions(spatiallyOrdered.length, activeStyle, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows);
+        spatiallyOrdered.forEach(function (st, idx) {
+          if (coords[idx]) {
+            st.x = coords[idx].x;
+            st.y = coords[idx].y;
+          }
+        });
+        ensureNoOverlaps(cls.students);
+        saveState();
+        renderHeaderControls();
+        renderClassroomCanvas(true);
+
+        const styleNames = { rows: 'Exam Rows', pairs: 'Paired Desks', pods4: '4-Desk Pods' };
+        const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
+        if (cls.students.length > grid.rows * grid.cols) {
+          showToast('Set ' + grid.cols + ' columns (' + actualRowsUsed + ' rows needed for ' + cls.students.length + ' students) in ' + (styleNames[activeStyle] || 'Grid') + ' mode!', '📐');
+        } else {
+          showToast('Applied ' + grid.rows + ' Rows × ' + grid.cols + ' Cols (' + (styleNames[activeStyle] || 'Grid') + ')!', '📐');
+        }
+      }
+
+      // Flip Classroom View Vertically (Front at Top vs Front at Bottom)
+      function flipClassroomOrientation() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        const bounds = getDynamicStageBounds(cls);
+        cls.frontAtTop = !cls.frontAtTop;
+        cls.students.forEach(function (st) {
+          st.y = Math.max(16, Math.min(bounds.height - DESK_H - 16, bounds.height - st.y - DESK_H));
+        });
+        ensureNoOverlaps(cls.students);
+        saveState();
+        renderHeaderControls();
+        renderClassroomCanvas(true);
+        showToast('Flipped room view: Teacher Smartboard at ' + (cls.frontAtTop ? 'Top' : 'Bottom'), '🔄');
+      }
+
+      // ===================================================================
+      // MODAL 1: CLASS PRESETS & ROSTER MANAGEMENT
+      // ===================================================================
+
+      function openClassModal() {
+        renderClassModalContents();
+        document.getElementById('classModal').classList.remove('hidden');
+      }
+
+      function closeClassModal() {
+        document.getElementById('classModal').classList.add('hidden');
+      }
+
+      function renderClassModalContents() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+
+        // Render preset classes list
+        const listEl = document.getElementById('presetClassList');
+        if (listEl) {
+          listEl.innerHTML = state.classes.map(function (c) {
+            const isActive = c.id === state.currentClassId;
+            return '<div class="p-2.5 rounded-xl border ' + (isActive ? 'border-indigo-500 bg-indigo-50/80' : 'border-slate-200 bg-white') + ' flex items-center justify-between gap-2">' +
+              '<button type="button" data-switch-class="' + escapeHtml(c.id) + '" class="flex-1 text-left min-w-0">' +
+                '<div class="font-display font-bold text-xs sm:text-sm text-slate-900 truncate">' + escapeHtml(c.name) + '</div>' +
+                '<div class="text-[11px] text-slate-500">' + c.students.length + ' students • ' + c.groups.length + ' teams</div>' +
+              '</button>' +
+              '<div class="flex items-center gap-1">' +
+                (isActive ? '<span class="px-2 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-bold">Active</span>' : '<button type="button" data-switch-class="' + escapeHtml(c.id) + '" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold">Load</button>') +
+                (state.classes.length > 1
+                  ? '<button type="button" data-delete-class="' + escapeHtml(c.id) + '" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Delete Class Preset">🗑️</button>'
+                  : '') +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+
+        const titleEl = document.getElementById('rosterModalClassTitle');
+        const renameInput = document.getElementById('renameClassInput');
+        if (titleEl) titleEl.textContent = cls.name;
+        if (renameInput) renameInput.value = cls.name;
+
+        // Render editable student roster
+        const rosterEl = document.getElementById('rosterStudentList');
+        if (rosterEl) {
+          if (cls.students.length === 0) {
+            rosterEl.innerHTML = '<div class="p-6 text-center text-xs text-slate-400">No students in this class yet. Add one above or bulk paste below!</div>';
+          } else {
+            rosterEl.innerHTML = cls.students.map(function (st) {
+              return '<div class="px-3 py-2 flex items-center justify-between gap-2 hover:bg-slate-50">' +
+                '<div class="flex items-center gap-2 flex-1 min-w-0">' +
+                  '<input type="text" data-edit-st-no="' + escapeHtml(st.id) + '" value="' + escapeHtml(st.classNo) + '" aria-label="Class Number" class="w-14 px-2 py-1 text-xs font-mono font-bold border border-slate-200 rounded-lg text-center" />' +
+                  '<input type="text" data-edit-st-name="' + escapeHtml(st.id) + '" value="' + escapeHtml(st.name) + '" aria-label="Student Name" class="flex-1 min-w-0 px-2.5 py-1 text-xs font-semibold border border-slate-200 rounded-lg" />' +
+                '</div>' +
+                '<div class="flex items-center gap-2">' +
+                  '<span class="text-[11px] font-mono text-slate-400">Pts: ' + st.score + '</span>' +
+                  '<button type="button" data-remove-student="' + escapeHtml(st.id) + '" class="text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded-lg text-xs font-bold" title="Remove Student">✕</button>' +
+                '</div>' +
+              '</div>';
+            }).join('');
+          }
+        }
+      }
+
+      function createNewPresetClass() {
+        const nameInput = document.getElementById('newClassNameInput');
+        const countInput = document.getElementById('newClassCountInput');
+        const rawName = (nameInput ? nameInput.value : '').trim() || ('New Class ' + (state.classes.length + 1));
+        const count = Math.max(1, Math.min(45, parseInt(countInput ? countInput.value : '24', 10) || 24));
+
+        const groups = createDefaultGroups();
+        const defaultCols = count > 30 ? 7 : 6;
+        const defaultRows = Math.max(1, Math.ceil(count / defaultCols));
+        const coords = computeLayoutPositions(count, 'rows', false, null, null, defaultCols, defaultRows);
+        const students = [];
+        for (let i = 0; i < count; i++) {
+          students.push({
+            id: 'st_' + Date.now() + '_' + i,
+            classNo: String(i + 1).padStart(2, '0'),
+            name: 'Student ' + String(i + 1).padStart(2, '0'),
+            groupId: groups[i % 4].id,
+            score: 0,
+            x: coords[i].x,
+            y: coords[i].y
+          });
+        }
+
+        const newCls = {
+          id: 'cls_' + Date.now(),
+          name: rawName,
+          frontAtTop: false,
+          gridRows: defaultRows,
+          gridCols: defaultCols,
+          layoutStyle: 'rows',
+          groups: groups,
+          students: students
+        };
+
+        state.classes.push(newCls);
+        state.currentClassId = newCls.id;
+        if (nameInput) nameInput.value = '';
+        saveState();
+        renderAll();
+        renderClassModalContents();
+        showToast('Created preset class "' + rawName + '" with ' + count + ' desks!', '🎉');
+      }
+
+      function parseBulkRosterLines(rawText, startIdx) {
+        const lines = String(rawText || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+        return lines.map(function (line, idx) {
+          // Match optional leading number e.g. "01, Chan Tai Man" or "1. Chan Tai Man"
+          const match = line.match(/^(\d{1,3})\s*[,.\-\t:]\s*(.+)$/);
+          if (match) {
+            return {
+              classNo: match[1].padStart(2, '0'),
+              name: match[2].trim()
+            };
+          }
+          return {
+            classNo: String(startIdx + idx + 1).padStart(2, '0'),
+            name: line
+          };
+        });
+      }
+
+      // ===================================================================
+      // MODAL 2: MANUAL GROUPING & TEAM MANAGER
+      // ===================================================================
+
+      function openGroupModal() {
+        renderGroupModalContents();
+        document.getElementById('groupModal').classList.remove('hidden');
+      }
+
+      function closeGroupModal() {
+        document.getElementById('groupModal').classList.add('hidden');
+      }
+
+      function renderGroupModalContents() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+
+        // 1. Render Team List
+        const grpListEl = document.getElementById('groupManagerList');
+        if (grpListEl) {
+          grpListEl.innerHTML = cls.groups.map(function (grp) {
+            const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
+            const count = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
+            const colorOptions = PALETTE_KEYS.map(function (k) {
+              return '<option value="' + k + '" ' + (grp.color === k ? 'selected' : '') + '>' + TEAM_PALETTES[k].name + '</option>';
+            }).join('');
+
+            return '<div class="p-2.5 rounded-xl border-2 ' + pal.border + ' ' + pal.bg + ' flex flex-col gap-2">' +
+              '<div class="flex items-center gap-1.5">' +
+                '<input type="text" data-edit-grp-icon="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.icon) + '" aria-label="Team Emoji" class="w-10 px-1.5 py-1 text-center text-sm bg-white border border-slate-200 rounded-lg" />' +
+                '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Team Name" class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold bg-white border border-slate-200 rounded-lg" />' +
+                '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" title="Delete Team">✕</button>' +
+              '</div>' +
+              '<div class="flex items-center justify-between text-[11px]">' +
+                '<select data-edit-grp-color="' + escapeHtml(grp.id) + '" aria-label="Team Color" class="bg-white border border-slate-200 rounded-lg px-2 py-0.5 font-semibold text-slate-700">' +
+                  colorOptions +
+                '</select>' +
+                '<span class="font-bold ' + pal.text + '">' + count + ' students • Score: ' + grp.score + '</span>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+
+        // 2. Render Student Manual Assignment List
+        const assignEl = document.getElementById('studentGroupAssignList');
+        if (assignEl) {
+          assignEl.innerHTML = cls.students.map(function (st) {
+            const groupOptions = '<option value="">— Unassigned —</option>' + cls.groups.map(function (g) {
+              return '<option value="' + escapeHtml(g.id) + '" ' + (st.groupId === g.id ? 'selected' : '') + '>' + escapeHtml(g.icon + ' ' + g.name) + '</option>';
+            }).join('');
+
+            return '<div class="px-3 py-2 flex items-center justify-between gap-2 hover:bg-slate-50">' +
+              '<div class="flex items-center gap-2 min-w-0">' +
+                '<span class="text-xs font-mono font-bold text-slate-400 w-8">#' + escapeHtml(st.classNo) + '</span>' +
+                '<span class="text-xs font-bold text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
+              '</div>' +
+              '<select data-assign-student-grp="' + escapeHtml(st.id) + '" aria-label="Assign Team for ' + escapeHtml(st.name) + '" class="px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:ring-2 focus:ring-violet-400">' +
+                groupOptions +
+              '</select>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
+      // ===================================================================
+      // MODAL 3: RANDOM STUDENT / GROUP SPOTLIGHT PICKER
+      // ===================================================================
+
+      function openPickerModal() {
+        populatePickerGroupFilter();
+        updatePickerModalUI();
+        document.getElementById('pickerModal').classList.remove('hidden');
+      }
+
+      function closePickerModal() {
+        if (pickerSpinIntervalId) {
+          clearInterval(pickerSpinIntervalId);
+          pickerSpinIntervalId = null;
+        }
+        document.getElementById('pickerModal').classList.add('hidden');
+      }
+
+      function populatePickerGroupFilter() {
+        const cls = getCurrentClass();
+        const sel = document.getElementById('pickerGroupFilter');
+        if (!cls || !sel) return;
+        const currentVal = state.pickerGroupFilter;
+        let html = '<option value="ALL">All Students (' + cls.students.length + ')</option>';
+        cls.groups.forEach(function (g) {
+          const count = cls.students.filter(function (s) { return s.groupId === g.id; }).length;
+          html += '<option value="' + escapeHtml(g.id) + '">' + escapeHtml(g.icon + ' ' + g.name) + ' (' + count + ')</option>';
+        });
+        sel.innerHTML = html;
+        if (cls.groups.some(function (g) { return g.id === currentVal; })) {
+          sel.value = currentVal;
+        } else {
+          state.pickerGroupFilter = 'ALL';
+          sel.value = 'ALL';
+        }
+      }
+
+      function getEligibleStudentPool() {
+        const cls = getCurrentClass();
+        if (!cls) return [];
+        let pool = cls.students.filter(function (s) {
+          if (state.pickerGroupFilter === 'ALL') return true;
+          return s.groupId === state.pickerGroupFilter;
+        });
+        if (state.pickerNoRepeat) {
+          const unpicked = pool.filter(function (s) { return !state.pickedStudentIds.includes(s.id); });
+          return unpicked;
+        }
+        return pool;
+      }
+
+      function updatePickerModalUI() {
+        const btnSt = document.getElementById('btnPickerTypeStudent');
+        const btnGr = document.getElementById('btnPickerTypeGroup');
+        const stOpts = document.getElementById('pickerStudentOptions');
+        const btnText = document.getElementById('btnTriggerPickText');
+        const remCount = document.getElementById('pickerRemainingCount');
+
+        if (state.pickerMode === 'student') {
+          btnSt.className = 'py-2 rounded-lg text-xs sm:text-sm font-bold transition bg-white text-indigo-700 shadow-sm';
+          btnGr.className = 'py-2 rounded-lg text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900';
+          stOpts.classList.remove('hidden');
+          btnText.textContent = 'Draw Random Student';
+          if (remCount) remCount.textContent = String(getEligibleStudentPool().length);
+        } else {
+          btnGr.className = 'py-2 rounded-lg text-xs sm:text-sm font-bold transition bg-white text-indigo-700 shadow-sm';
+          btnSt.className = 'py-2 rounded-lg text-xs sm:text-sm font-bold transition text-slate-600 hover:text-slate-900';
+          stOpts.classList.add('hidden');
+          btnText.textContent = 'Draw Random Group';
+        }
+        updatePickerScoreReadout();
+      }
+
+      function updatePickerScoreReadout() {
+        const bar = document.getElementById('pickerQuickScoreBar');
+        const pill = document.getElementById('pickerCurrentScorePill');
+        const cls = getCurrentClass();
+        if (!bar || !pill || !cls || !state.lastPickedTarget) {
+          if (bar) bar.classList.add('hidden');
+          return;
+        }
+        if (state.lastPickedTarget.type === 'student') {
+          const st = cls.students.find(function (s) { return s.id === state.lastPickedTarget.id; });
+          if (!st) {
+            bar.classList.add('hidden');
+            return;
+          }
+          bar.classList.remove('hidden');
+          pill.textContent = 'Current Score: ' + st.score;
+        } else if (state.lastPickedTarget.type === 'group') {
+          const grp = getGroupById(cls, state.lastPickedTarget.id);
+          if (!grp) {
+            bar.classList.add('hidden');
+            return;
+          }
+          bar.classList.remove('hidden');
+          pill.textContent = 'Team Score: ' + grp.score;
+        }
+      }
+
+      function triggerRandomPick() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        if (pickerSpinIntervalId) {
+          clearInterval(pickerSpinIntervalId);
+          pickerSpinIntervalId = null;
+        }
+
+        const badgeEl = document.getElementById('pickerBadge');
+        const titleEl = document.getElementById('pickerResultTitle');
+        const subEl = document.getElementById('pickerResultSub');
+        const scoreBar = document.getElementById('pickerQuickScoreBar');
+        if (scoreBar) scoreBar.classList.add('hidden');
+
+        if (state.pickerMode === 'student') {
+          let pool = getEligibleStudentPool();
+          if (pool.length === 0) {
+            // Auto-reset pool if everyone was picked
+            state.pickedStudentIds = [];
+            pool = getEligibleStudentPool();
+            if (pool.length === 0) {
+              showToast('No students in this pool!', '⚠️');
+              return;
+            }
+            showToast('All students were picked once — pool reshuffled!', '🔄');
+          }
+
+          let ticks = 0;
+          const totalTicks = 14;
+          badgeEl.textContent = 'Selecting Student...';
+
+          pickerSpinIntervalId = setInterval(function () {
+            const candidate = pool[Math.floor(Math.random() * pool.length)];
+            titleEl.textContent = '#' + candidate.classNo + ' ' + candidate.name;
+            const g = getGroupById(cls, candidate.groupId);
+            subEl.textContent = g ? (g.icon + ' ' + g.name) : 'Individual Student';
+            playSubtleSound('tick');
+            ticks++;
+
+            if (ticks >= totalTicks) {
+              clearInterval(pickerSpinIntervalId);
+              pickerSpinIntervalId = null;
+              const winner = pool[Math.floor(Math.random() * pool.length)];
+              if (state.pickerNoRepeat && !state.pickedStudentIds.includes(winner.id)) {
+                state.pickedStudentIds.push(winner.id);
+              }
+              state.lastPickedTarget = { type: 'student', id: winner.id };
+              const winGrp = getGroupById(cls, winner.groupId);
+              badgeEl.textContent = '🎉 Selected Student!';
+              titleEl.textContent = '#' + winner.classNo + ' ' + winner.name;
+              subEl.textContent = winGrp ? (winGrp.icon + ' ' + winGrp.name + ' • Highlighted on classroom map') : 'Highlighted on classroom map';
+              playSubtleSound('fanfare');
+              updatePickerModalUI();
+              renderClassroomCanvas(false);
+            }
+          }, 65);
+
+        } else {
+          // Pick Random Group
+          if (cls.groups.length === 0) {
+            showToast('No teams available to pick!', '⚠️');
+            return;
+          }
+          let ticks = 0;
+          const totalTicks = 12;
+          badgeEl.textContent = 'Selecting Team...';
+
+          pickerSpinIntervalId = setInterval(function () {
+            const candidate = cls.groups[Math.floor(Math.random() * cls.groups.length)];
+            titleEl.textContent = candidate.icon + ' ' + candidate.name;
+            subEl.textContent = 'Team Score: ' + candidate.score;
+            playSubtleSound('tick');
+            ticks++;
+
+            if (ticks >= totalTicks) {
+              clearInterval(pickerSpinIntervalId);
+              pickerSpinIntervalId = null;
+              const winner = cls.groups[Math.floor(Math.random() * cls.groups.length)];
+              state.lastPickedTarget = { type: 'group', id: winner.id };
+              const memberCount = cls.students.filter(function (s) { return s.groupId === winner.id; }).length;
+              badgeEl.textContent = '🛡️ Selected Team!';
+              titleEl.textContent = winner.icon + ' ' + winner.name;
+              subEl.textContent = memberCount + ' team members • Awarding +1/-1 updates all members!';
+              playSubtleSound('fanfare');
+              updatePickerModalUI();
+            }
+          }, 70);
+        }
+      }
+
+      // ===================================================================
+      // MODAL 4: LIVE PODIUM CELEBRATION
+      // ===================================================================
+
+      function openPodiumModal() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        playSubtleSound('fanfare');
+
+        const subTitle = document.getElementById('podiumSubTitle');
+        if (subTitle) subTitle.textContent = cls.name + ' — Live Champions Standings';
+
+        // Top 3 Students
+        const sortedSt = cls.students.slice().sort(function (a, b) {
+          return (b.score || 0) - (a.score || 0);
+        });
+        const top3St = [sortedSt[1], sortedSt[0], sortedSt[2]]; // 2nd, 1st, 3rd visual layout
+        const stHeights = ['h-28', 'h-36', 'h-24'];
+        const stMedals = ['🥈 2nd', '🥇 1st', '🥉 3rd'];
+        const stGradients = [
+          'from-slate-400 to-slate-600',
+          'from-amber-300 via-amber-400 to-orange-500 text-slate-950',
+          'from-amber-600 to-amber-800'
+        ];
+
+        const stContainer = document.getElementById('podiumStudentsContainer');
+        if (stContainer) {
+          stContainer.innerHTML = top3St.map(function (st, idx) {
+            if (!st) return '<div class="flex-1"></div>';
+            return '<div class="flex-1 flex flex-col items-center text-center">' +
+              '<div class="text-xs font-bold text-white truncate max-w-[115px] mb-0.5">' + escapeHtml(st.name) + '</div>' +
+              '<div class="text-[11px] font-mono text-amber-300 mb-2">' + st.score + ' pts</div>' +
+              '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-between p-2.5 shadow-lg">' +
+                '<span class="font-display font-extrabold text-xs sm:text-sm">' + stMedals[idx] + '</span>' +
+                '<span class="text-[10px] opacity-80 font-mono">#' + escapeHtml(st.classNo) + '</span>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+
+        // Top 3 Groups
+        const sortedGrp = cls.groups.slice().sort(function (a, b) {
+          return (b.score || 0) - (a.score || 0);
+        });
+        const top3Grp = [sortedGrp[1], sortedGrp[0], sortedGrp[2]];
+        const grpContainer = document.getElementById('podiumGroupsContainer');
+        if (grpContainer) {
+          grpContainer.innerHTML = top3Grp.map(function (grp, idx) {
+            if (!grp) return '<div class="flex-1"></div>';
+            return '<div class="flex-1 flex flex-col items-center text-center">' +
+              '<div class="text-lg mb-0.5">' + escapeHtml(grp.icon) + '</div>' +
+              '<div class="text-xs font-bold text-white truncate max-w-[115px] mb-0.5">' + escapeHtml(grp.name) + '</div>' +
+              '<div class="text-[11px] font-mono text-emerald-300 mb-2">' + grp.score + ' team pts</div>' +
+              '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-center p-2.5 shadow-lg">' +
+                '<span class="font-display font-extrabold text-xs sm:text-sm">' + stMedals[idx] + '</span>' +
+              '</div>' +
+            '</div>';
+          }).join('');
+        }
+
+        document.getElementById('podiumModal').classList.remove('hidden');
+      }
+
+      // ===================================================================
+      // CLASSROOM COUNTDOWN TIMER ENGINE
+      // ===================================================================
+
+      function formatMMSS(totalSeconds) {
+        const s = Math.max(0, Math.floor(totalSeconds));
+        const mins = Math.floor(s / 60);
+        const secs = s % 60;
+        return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+      }
+
+      function renderTimerUI() {
+        const formatted = formatMMSS(state.timerRemainingSec);
+        const headerDisp = document.getElementById('headerTimerDisplay');
+        const bigDisp = document.getElementById('timerBigDisplay');
+        const statusText = document.getElementById('timerStatusText');
+        const progBar = document.getElementById('timerProgressBar');
+        const startIcon = document.getElementById('timerStartPauseIcon');
+        const startLabel = document.getElementById('timerStartPauseLabel');
+
+        if (headerDisp) {
+          headerDisp.textContent = formatted;
+          headerDisp.className = 'font-mono tracking-wider ' + (state.timerRunning && state.timerRemainingSec <= 15 ? 'text-rose-300 animate-pulse' : 'text-amber-200');
+        }
+        if (bigDisp) {
+          bigDisp.textContent = formatted;
+          bigDisp.className = 'font-mono text-4xl font-extrabold tracking-widest ' + (state.timerRemainingSec <= 15 && state.timerRemainingSec > 0 ? 'text-rose-400 animate-pulse' : 'text-amber-300');
+        }
+        if (statusText) {
+          statusText.textContent = state.timerRunning ? 'Timer Running...' : (state.timerRemainingSec === 0 ? 'Time is up!' : 'Paused / Ready');
+        }
+        if (progBar) {
+          const pct = state.timerTotalSec > 0 ? Math.max(0, Math.min(100, (state.timerRemainingSec / state.timerTotalSec) * 100)) : 0;
+          progBar.style.width = pct + '%';
+          progBar.className = 'absolute bottom-0 left-0 h-1.5 transition-all duration-300 ' + (state.timerRemainingSec <= 15 ? 'bg-rose-500' : 'bg-emerald-400');
+        }
+        if (startIcon && startLabel) {
+          startIcon.textContent = state.timerRunning ? '⏸' : '▶';
+          startLabel.textContent = state.timerRunning ? 'Pause' : 'Start';
+        }
+      }
+
+      function toggleTimerStartPause() {
+        if (state.timerRunning) {
+          clearInterval(timerIntervalId);
+          timerIntervalId = null;
+          state.timerRunning = false;
+          renderTimerUI();
+        } else {
+          if (state.timerRemainingSec <= 0) {
+            state.timerRemainingSec = state.timerTotalSec || 180;
+          }
+          state.timerRunning = true;
+          playSubtleSound('tick');
+          renderTimerUI();
+          if (timerIntervalId) clearInterval(timerIntervalId);
+          timerIntervalId = setInterval(function () {
+            if (state.timerRemainingSec > 0) {
+              state.timerRemainingSec--;
+              if (state.timerRemainingSec <= 5 && state.timerRemainingSec > 0) {
+                playSubtleSound('tick');
+              }
+              renderTimerUI();
+            }
+            if (state.timerRemainingSec <= 0) {
+              clearInterval(timerIntervalId);
+              timerIntervalId = null;
+              state.timerRunning = false;
+              playSubtleSound('fanfare');
+              renderTimerUI();
+              showToast('⏰ Classroom Timer Finished!', '🔔');
+            }
+          }, 1000);
+        }
+      }
+
+      function setTimerSeconds(seconds) {
+        if (timerIntervalId) {
+          clearInterval(timerIntervalId);
+          timerIntervalId = null;
+        }
+        state.timerRunning = false;
+        state.timerTotalSec = Math.max(5, seconds);
+        state.timerRemainingSec = state.timerTotalSec;
+        renderTimerUI();
+      }
+
+      // ===================================================================
+      // CSV SCORE EXPORT & JSON BACKUP
+      // ===================================================================
+
+      function exportClassScoresToCsv() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+
+        const nowStr = new Date().toLocaleString();
+        const sortedStudents = cls.students.slice().sort(function (a, b) {
+          if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
+          return String(a.classNo).localeCompare(String(b.classNo));
+        });
+
+        const rows = [
+          ['SKHHCSS English Department - Classroom Activity Score Report'],
+          ['Class Name', cls.name, 'Activity Mode', state.activityMode === 'group' ? 'Group Work' : 'Individual Work', 'Exported At', nowStr],
+          [],
+          ['Rank', 'Class No.', 'Student Name', 'Assigned Team', 'Individual Score', 'Team Score']
+        ];
+
+        sortedStudents.forEach(function (st, idx) {
+          const grp = getGroupById(cls, st.groupId);
+          rows.push([
+            String(idx + 1),
+            st.classNo,
+            st.name,
+            grp ? grp.name : 'Unassigned',
+            String(st.score || 0),
+            grp ? String(grp.score || 0) : '0'
+          ]);
+        });
+
+        rows.push([]);
+        rows.push(['TEAM STANDINGS SUMMARY']);
+        rows.push(['Team Name', 'Member Count', 'Team Score', 'Combined Member Individual Scores']);
+
+        cls.groups.forEach(function (grp) {
+          const members = cls.students.filter(function (s) { return s.groupId === grp.id; });
+          const sumIndiv = members.reduce(function (acc, m) { return acc + (Number(m.score) || 0); }, 0);
+          rows.push([
+            grp.name,
+            String(members.length),
+            String(grp.score || 0),
+            String(sumIndiv)
+          ]);
+        });
+
+        const csvString = '\uFEFF' + rows.map(function (r) {
+          return r.map(function (cell) {
+            const val = String(cell === undefined || cell === null ? '' : cell);
+            return '"' + val.replace(/"/g, '""') + '"';
+          }).join(',');
+        }).join('\r\n');
+
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const safeClass = cls.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+        link.href = url;
+        link.download = 'SKHHCSS_Scores_' + safeClass + '.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('Exported CSV score sheet for ' + cls.name + '!', '📥');
+      }
+
+      function exportBackupJson() {
+        const dataStr = JSON.stringify({
+          exportedAt: new Date().toISOString(),
+          classes: state.classes,
+          currentClassId: state.currentClassId
+        }, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'SKHHCSS_Classroom_Presets_Backup.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Downloaded JSON backup of all preset classes & layouts!', '💾');
+      }
+
+      // ===================================================================
+      // EVENT LISTENERS WIRING
+      // ===================================================================
+
+      function bindAllEvents() {
+        // Class Preset Selector
+        document.getElementById('classSelect').addEventListener('change', function (e) {
+          state.currentClassId = e.target.value;
+          state.pickedStudentIds = [];
+          state.lastPickedTarget = null;
+          saveState();
+          renderAll();
+          showToast('Switched to ' + getCurrentClass().name, '🏫');
+        });
+
+        // Mode Switcher: Individual vs Group Work
+        document.getElementById('btnModeIndividual').addEventListener('click', function () {
+          state.activityMode = 'individual';
+          saveState();
+          renderAll();
+          showToast('Switched to Individual Work Mode', '👤');
+        });
+        document.getElementById('btnModeGroup').addEventListener('click', function () {
+          state.activityMode = 'group';
+          saveState();
+          renderAll();
+          showToast('Switched to Group Work Mode (Team points also add to each member!)', '🛡️');
+        });
+
+        // Sound Toggle
+        document.getElementById('btnToggleSound').addEventListener('click', function () {
+          state.soundEnabled = !state.soundEnabled;
+          if (state.soundEnabled) playSubtleSound('plus');
+          saveState();
+          renderHeaderControls();
+          showToast(state.soundEnabled ? 'Subtle sound effects enabled' : 'Sound effects muted', state.soundEnabled ? '🔊' : '🔇');
+        });
+
+        // Export CSV
+        document.getElementById('btnExportCsv').addEventListener('click', exportClassScoresToCsv);
+
+        // Custom Rows x Columns Quick Setup Binding
+        document.getElementById('btnApplyCustomGrid').addEventListener('click', applyCustomRowsColsGrid);
+        ['quickRowsInput', 'quickColsInput'].forEach(function (inputId) {
+          const el = document.getElementById(inputId);
+          if (el) {
+            el.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                applyCustomRowsColsGrid();
+              }
+            });
+          }
+        });
+
+        // Layout Preset Buttons
+        document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const layoutType = btn.getAttribute('data-layout');
+            applyQuickLayout(layoutType);
+          });
+        });
+
+        // Lock / Snap / Flip Room
+        document.getElementById('btnToggleLockLayout').addEventListener('click', function () {
+          state.layoutLocked = !state.layoutLocked;
+          renderHeaderControls();
+          renderClassroomCanvas(false);
+          showToast(state.layoutLocked ? 'Desk positions locked for fast scoring' : 'Freeform desk dragging enabled', state.layoutLocked ? '🔒' : '🔓');
+        });
+
+        document.getElementById('btnToggleSnapGrid').addEventListener('click', function () {
+          state.snapToGrid = !state.snapToGrid;
+          saveState();
+          renderHeaderControls();
+        });
+
+        document.getElementById('btnFlipRoom').addEventListener('click', flipClassroomOrientation);
+
+        // Zoom Controls
+        document.getElementById('btnZoomIn').addEventListener('click', function () {
+          state.zoom = Math.min(1.25, Math.round((state.zoom + 0.1) * 100) / 100);
+          renderClassroomCanvas(false);
+        });
+        document.getElementById('btnZoomOut').addEventListener('click', function () {
+          state.zoom = Math.max(0.65, Math.round((state.zoom - 0.1) * 100) / 100);
+          renderClassroomCanvas(false);
+        });
+        document.getElementById('btnZoomReset').addEventListener('click', function () {
+          state.zoom = 1;
+          renderClassroomCanvas(false);
+        });
+
+        // Manual Group Brush Bar
+        document.getElementById('btnToggleGroupBrush').addEventListener('click', function () {
+          state.brushMode = !state.brushMode;
+          renderHeaderControls();
+          renderGroupBrushBar();
+          renderClassroomCanvas(false);
+        });
+        document.getElementById('btnCloseBrushBar').addEventListener('click', function () {
+          state.brushMode = false;
+          renderHeaderControls();
+          renderGroupBrushBar();
+          renderClassroomCanvas(false);
+        });
+        document.getElementById('btnClusterAfterBrush').addEventListener('click', function () {
+          applyQuickLayout('groupClusters');
+        });
+        document.getElementById('groupBrushChips').addEventListener('click', function (e) {
+          const chip = e.target.closest('[data-brush-group]');
+          if (!chip) return;
+          state.activeBrushGroupId = chip.getAttribute('data-brush-group');
+          renderGroupBrushBar();
+        });
+
+        // Quick Add Student Desk on Canvas
+        document.getElementById('btnQuickAddStudent').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const nextNum = cls.students.length + 1;
+          const newSt = {
+            id: 'st_' + Date.now(),
+            classNo: String(nextNum).padStart(2, '0'),
+            name: 'Student ' + String(nextNum).padStart(2, '0'),
+            groupId: cls.groups[0] ? cls.groups[0].id : '',
+            score: 0,
+            x: 60 + ((nextNum - 1) % 6) * 164,
+            y: (cls.frontAtTop ? 84 : 32) + Math.floor((nextNum - 1) / 6) * 138
+          };
+          cls.students.push(newSt);
+          saveState();
+          renderAll();
+          showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
+        });
+
+        // Whole Class +1 & Undo
+        document.getElementById('btnAllPlusOne').addEventListener('click', function () {
+          adjustWholeClassScore(1);
+        });
+        document.getElementById('btnUndoLastScore').addEventListener('click', undoLastScoreAction);
+
+        // Group Dock Event Delegation (+1 / -1 on group cards)
+        document.getElementById('groupDockCards').addEventListener('click', function (e) {
+          const plusBtn = e.target.closest('[data-grp-plus]');
+          if (plusBtn) {
+            adjustGroupScore(plusBtn.getAttribute('data-grp-plus'), 1);
+            return;
+          }
+          const minusBtn = e.target.closest('[data-grp-minus]');
+          if (minusBtn) {
+            adjustGroupScore(minusBtn.getAttribute('data-grp-minus'), -1);
+          }
+        });
+        document.getElementById('btnQuickAssignFromDock').addEventListener('click', openGroupModal);
+
+        // Leaderboard Tabs, Filter & Score Buttons
+        document.getElementById('tabLbStudents').addEventListener('click', function () {
+          state.leaderboardTab = 'students';
+          renderLeaderboardAndStats();
+        });
+        document.getElementById('tabLbGroups').addEventListener('click', function () {
+          state.leaderboardTab = 'groups';
+          renderLeaderboardAndStats();
+        });
+        document.getElementById('tabLbFeed').addEventListener('click', function () {
+          state.leaderboardTab = 'feed';
+          renderLeaderboardAndStats();
+        });
+        document.getElementById('lbSearchInput').addEventListener('input', function (e) {
+          state.lbSearch = e.target.value;
+          renderLeaderboardAndStats();
+        });
+        document.getElementById('leaderboardBody').addEventListener('click', function (e) {
+          const stPlus = e.target.closest('[data-lb-st-plus]');
+          if (stPlus) {
+            adjustStudentScore(stPlus.getAttribute('data-lb-st-plus'), 1, 'Leaderboard +1');
+            return;
+          }
+          const stMinus = e.target.closest('[data-lb-st-minus]');
+          if (stMinus) {
+            adjustStudentScore(stMinus.getAttribute('data-lb-st-minus'), -1, 'Leaderboard -1');
+            return;
+          }
+          const grpPlus = e.target.closest('[data-grp-plus]');
+          if (grpPlus) {
+            adjustGroupScore(grpPlus.getAttribute('data-grp-plus'), 1);
+            return;
+          }
+          const grpMinus = e.target.closest('[data-grp-minus]');
+          if (grpMinus) {
+            adjustGroupScore(grpMinus.getAttribute('data-grp-minus'), -1);
+          }
+        });
+
+        // Viewport-aware positioning for Timer Popover so it never overflows off-screen
+        function positionTimerPopover() {
+          const btn = document.getElementById('btnToggleTimerPanel');
+          const pop = document.getElementById('timerPopover');
+          if (!btn || !pop || pop.classList.contains('hidden')) return;
+          const rect = btn.getBoundingClientRect();
+          const popW = Math.min(320, window.innerWidth - 24);
+          const popH = pop.offsetHeight || 340;
+          let left = rect.right - popW;
+          if (left < 12) left = 12;
+          if (left + popW > window.innerWidth - 12) left = window.innerWidth - popW - 12;
+          let top = rect.bottom + 8;
+          if (top + popH > window.innerHeight - 12) {
+            top = Math.max(12, window.innerHeight - popH - 12);
+          }
+          pop.style.left = Math.round(left) + 'px';
+          pop.style.top = Math.round(top) + 'px';
+          pop.style.right = 'auto';
+        }
+
+        // Timer Popover Controls
+        document.getElementById('btnToggleTimerPanel').addEventListener('click', function (e) {
+          e.stopPropagation();
+          const pop = document.getElementById('timerPopover');
+          pop.classList.toggle('hidden');
+          if (!pop.classList.contains('hidden')) {
+            positionTimerPopover();
+          }
+        });
+        document.getElementById('btnCloseTimerPopover').addEventListener('click', function () {
+          document.getElementById('timerPopover').classList.add('hidden');
+        });
+        window.addEventListener('resize', positionTimerPopover);
+        document.addEventListener('click', function (e) {
+          const pop = document.getElementById('timerPopover');
+          const btn = document.getElementById('btnToggleTimerPanel');
+          if (!pop || pop.classList.contains('hidden')) return;
+          if (!pop.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            pop.classList.add('hidden');
+          }
+        });
+        document.getElementById('btnTimerStartPause').addEventListener('click', toggleTimerStartPause);
+        document.getElementById('btnTimerReset').addEventListener('click', function () {
+          setTimerSeconds(state.timerTotalSec);
+        });
+        document.querySelectorAll('.timer-preset-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const sec = parseInt(btn.getAttribute('data-timer-sec'), 10);
+            setTimerSeconds(sec);
+          });
+        });
+        document.getElementById('btnTimerAdd30').addEventListener('click', function () {
+          state.timerTotalSec += 30;
+          state.timerRemainingSec += 30;
+          renderTimerUI();
+        });
+        document.getElementById('btnSetCustomTimer').addEventListener('click', function () {
+          const m = parseInt(document.getElementById('customTimerMin').value, 10) || 0;
+          const s = parseInt(document.getElementById('customTimerSec').value, 10) || 0;
+          setTimerSeconds(Math.max(5, m * 60 + s));
+        });
+
+        // Modal 1: Classes & Roster
+        document.getElementById('btnOpenClassModal').addEventListener('click', openClassModal);
+        document.getElementById('btnCloseClassModal').addEventListener('click', closeClassModal);
+        document.getElementById('btnDoneClassModal').addEventListener('click', closeClassModal);
+        document.getElementById('btnCreateNewClass').addEventListener('click', createNewPresetClass);
+
+        document.getElementById('presetClassList').addEventListener('click', function (e) {
+          const switchBtn = e.target.closest('[data-switch-class]');
+          if (switchBtn) {
+            state.currentClassId = switchBtn.getAttribute('data-switch-class');
+            saveState();
+            renderAll();
+            renderClassModalContents();
+            return;
+          }
+          const delBtn = e.target.closest('[data-delete-class]');
+          if (delBtn && state.classes.length > 1) {
+            const delId = delBtn.getAttribute('data-delete-class');
+            state.classes = state.classes.filter(function (c) { return c.id !== delId; });
+            if (state.currentClassId === delId) {
+              state.currentClassId = state.classes[0].id;
+            }
+            saveState();
+            renderAll();
+            renderClassModalContents();
+            showToast('Deleted class preset', '🗑️');
+          }
+        });
+
+        document.getElementById('btnSaveClassName').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          const val = (document.getElementById('renameClassInput').value || '').trim();
+          if (cls && val) {
+            cls.name = val;
+            saveState();
+            renderAll();
+            renderClassModalContents();
+            showToast('Renamed class to ' + val, '✏️');
+          }
+        });
+
+        document.getElementById('btnAddSingleStudent').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const noInput = document.getElementById('addStudentNoInput');
+          const nameInput = document.getElementById('addStudentNameInput');
+          const classNo = (noInput.value || '').trim() || String(cls.students.length + 1).padStart(2, '0');
+          const name = (nameInput.value || '').trim() || ('Student ' + classNo);
+          const idx = cls.students.length;
+          cls.students.push({
+            id: 'st_' + Date.now(),
+            classNo: classNo,
+            name: name,
+            groupId: cls.groups[0] ? cls.groups[0].id : '',
+            score: 0,
+            x: 48 + (idx % 6) * 165,
+            y: 84 + Math.floor(idx / 6) * 138
+          });
+          noInput.value = '';
+          nameInput.value = '';
+          saveState();
+          renderAll();
+          renderClassModalContents();
+          showToast('Added ' + name + ' to ' + cls.name, '👤');
+        });
+
+        document.getElementById('rosterStudentList').addEventListener('input', function (e) {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const noId = e.target.getAttribute('data-edit-st-no');
+          if (noId) {
+            const st = cls.students.find(function (s) { return s.id === noId; });
+            if (st) {
+              st.classNo = e.target.value;
+              saveState();
+              renderClassroomCanvas(false);
+              renderLeaderboardAndStats();
+            }
+            return;
+          }
+          const nameId = e.target.getAttribute('data-edit-st-name');
+          if (nameId) {
+            const st = cls.students.find(function (s) { return s.id === nameId; });
+            if (st) {
+              st.name = e.target.value;
+              saveState();
+              renderClassroomCanvas(false);
+              renderLeaderboardAndStats();
+            }
+          }
+        });
+
+        document.getElementById('rosterStudentList').addEventListener('click', function (e) {
+          const rmBtn = e.target.closest('[data-remove-student]');
+          if (!rmBtn) return;
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const stId = rmBtn.getAttribute('data-remove-student');
+          cls.students = cls.students.filter(function (s) { return s.id !== stId; });
+          saveState();
+          renderAll();
+          renderClassModalContents();
+        });
+
+        document.getElementById('btnBulkReplaceRoster').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          const raw = document.getElementById('bulkPasteTextarea').value;
+          const entries = parseBulkRosterLines(raw, 0);
+          if (!cls || entries.length === 0) {
+            showToast('Please paste at least one student name first.', '⚠️');
+            return;
+          }
+          const coords = computeLayoutPositions(entries.length, 'rows', cls.frontAtTop);
+          cls.students = entries.map(function (item, idx) {
+            return {
+              id: 'st_' + Date.now() + '_' + idx,
+              classNo: item.classNo,
+              name: item.name,
+              groupId: cls.groups[idx % Math.max(1, cls.groups.length)] ? cls.groups[idx % cls.groups.length].id : '',
+              score: 0,
+              x: coords[idx].x,
+              y: coords[idx].y
+            };
+          });
+          document.getElementById('bulkPasteTextarea').value = '';
+          saveState();
+          renderAll();
+          renderClassModalContents();
+          showToast('Replaced roster with ' + entries.length + ' students!', '📋');
+        });
+
+        document.getElementById('btnBulkAppendRoster').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          const raw = document.getElementById('bulkPasteTextarea').value;
+          const entries = parseBulkRosterLines(raw, cls ? cls.students.length : 0);
+          if (!cls || entries.length === 0) {
+            showToast('Please paste at least one student name first.', '⚠️');
+            return;
+          }
+          entries.forEach(function (item, i) {
+            const idx = cls.students.length;
+            cls.students.push({
+              id: 'st_' + Date.now() + '_' + i,
+              classNo: item.classNo,
+              name: item.name,
+              groupId: '',
+              score: 0,
+              x: 48 + (idx % 6) * 165,
+              y: 84 + Math.floor(idx / 6) * 138
+            });
+          });
+          document.getElementById('bulkPasteTextarea').value = '';
+          saveState();
+          renderAll();
+          renderClassModalContents();
+          showToast('Appended ' + entries.length + ' students to roster!', '📋');
+        });
+
+        document.getElementById('btnBackupJson').addEventListener('click', exportBackupJson);
+        document.getElementById('importJsonInput').addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            try {
+              const parsed = JSON.parse(ev.target.result);
+              if (parsed && Array.isArray(parsed.classes) && parsed.classes.length > 0) {
+                state.classes = parsed.classes;
+                state.currentClassId = parsed.currentClassId || parsed.classes[0].id;
+                saveState();
+                renderAll();
+                renderClassModalContents();
+                showToast('Loaded preset classes and layouts from backup!', '✅');
+              } else {
+                showToast('Invalid backup JSON file format.', '⚠️');
+              }
+            } catch (err) {
+              showToast('Could not parse JSON file.', '⚠️');
+            }
+          };
+          reader.readAsText(file);
+          e.target.value = '';
+        });
+
+        document.getElementById('btnResetFactoryPresets').addEventListener('click', function () {
+          state.classes = createFactoryPresets();
+          state.currentClassId = state.classes[0].id;
+          state.historyStack = [];
+          saveState();
+          renderAll();
+          renderClassModalContents();
+          showToast('Restored default SKHHCSS sample classes!', '✨');
+        });
+
+        // Modal 2: Manual Grouping & Team Manager
+        document.getElementById('btnOpenGroupModal').addEventListener('click', openGroupModal);
+        document.getElementById('btnCloseGroupModal').addEventListener('click', closeGroupModal);
+        document.getElementById('btnDoneGroupModal').addEventListener('click', closeGroupModal);
+
+        document.getElementById('btnAddNewGroup').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const nextNum = cls.groups.length + 1;
+          const colorKey = PALETTE_KEYS[(nextNum - 1) % PALETTE_KEYS.length];
+          const icons = ['🦅', '🐬', '🐉', '🔥', '🦄', '🐯', '🦁', '⚡'];
+          cls.groups.push({
+            id: 'grp_' + Date.now(),
+            name: 'Team ' + nextNum,
+            icon: icons[(nextNum - 1) % icons.length],
+            color: colorKey,
+            score: 0
+          });
+          saveState();
+          renderAll();
+          renderGroupModalContents();
+        });
+
+        document.getElementById('groupManagerList').addEventListener('input', function (e) {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const iconGrpId = e.target.getAttribute('data-edit-grp-icon');
+          if (iconGrpId) {
+            const g = getGroupById(cls, iconGrpId);
+            if (g) {
+              g.icon = e.target.value || '🛡️';
+              saveState();
+              renderAll();
+            }
+            return;
+          }
+          const nameGrpId = e.target.getAttribute('data-edit-grp-name');
+          if (nameGrpId) {
+            const g = getGroupById(cls, nameGrpId);
+            if (g) {
+              g.name = e.target.value;
+              saveState();
+              renderAll();
+            }
+          }
+        });
+
+        document.getElementById('groupManagerList').addEventListener('change', function (e) {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const colorGrpId = e.target.getAttribute('data-edit-grp-color');
+          if (colorGrpId) {
+            const g = getGroupById(cls, colorGrpId);
+            if (g) {
+              g.color = e.target.value;
+              saveState();
+              renderAll();
+              renderGroupModalContents();
+            }
+          }
+        });
+
+        document.getElementById('groupManagerList').addEventListener('click', function (e) {
+          const delBtn = e.target.closest('[data-delete-grp]');
+          if (!delBtn) return;
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const gId = delBtn.getAttribute('data-delete-grp');
+          cls.groups = cls.groups.filter(function (g) { return g.id !== gId; });
+          cls.students.forEach(function (s) {
+            if (s.groupId === gId) s.groupId = '';
+          });
+          saveState();
+          renderAll();
+          renderGroupModalContents();
+        });
+
+        document.getElementById('studentGroupAssignList').addEventListener('change', function (e) {
+          const stId = e.target.getAttribute('data-assign-student-grp');
+          if (!stId) return;
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const st = cls.students.find(function (s) { return s.id === stId; });
+          if (st) {
+            st.groupId = e.target.value;
+            saveState();
+            renderAll();
+            renderGroupModalContents();
+          }
+        });
+
+        document.getElementById('btnEvenDistributeGroups').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (!cls || cls.groups.length === 0) return;
+          cls.students.forEach(function (st, idx) {
+            st.groupId = cls.groups[idx % cls.groups.length].id;
+          });
+          saveState();
+          renderAll();
+          renderGroupModalContents();
+          showToast('Distributed students across ' + cls.groups.length + ' teams!', '🛡️');
+        });
+
+        document.getElementById('btnClearAllGroupAssignments').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          cls.students.forEach(function (st) { st.groupId = ''; });
+          saveState();
+          renderAll();
+          renderGroupModalContents();
+          showToast('Cleared group assignments for all students', '🧹');
+        });
+
+        document.getElementById('btnSwitchToBrushFromModal').addEventListener('click', function () {
+          closeGroupModal();
+          state.brushMode = true;
+          renderHeaderControls();
+          renderGroupBrushBar();
+          renderClassroomCanvas(false);
+        });
+
+        document.getElementById('btnModalClusterByGroup').addEventListener('click', function () {
+          applyQuickLayout('groupClusters');
+        });
+
+        // Modal 3: Random Picker
+        document.getElementById('btnOpenPickerModal').addEventListener('click', openPickerModal);
+        document.getElementById('btnClosePickerModal').addEventListener('click', closePickerModal);
+        document.getElementById('btnPickerTypeStudent').addEventListener('click', function () {
+          state.pickerMode = 'student';
+          updatePickerModalUI();
+        });
+        document.getElementById('btnPickerTypeGroup').addEventListener('click', function () {
+          state.pickerMode = 'group';
+          updatePickerModalUI();
+        });
+        document.getElementById('pickerGroupFilter').addEventListener('change', function (e) {
+          state.pickerGroupFilter = e.target.value;
+          updatePickerModalUI();
+        });
+        document.getElementById('pickerNoRepeatCheckbox').addEventListener('change', function (e) {
+          state.pickerNoRepeat = e.target.checked;
+          updatePickerModalUI();
+        });
+        document.getElementById('btnResetPickerPool').addEventListener('click', function () {
+          state.pickedStudentIds = [];
+          updatePickerModalUI();
+          showToast('Reset random picker student pool!', '🔄');
+        });
+        document.getElementById('btnTriggerRandomPick').addEventListener('click', triggerRandomPick);
+
+        document.getElementById('btnPickerPlusOne').addEventListener('click', function () {
+          if (!state.lastPickedTarget) return;
+          if (state.lastPickedTarget.type === 'student') {
+            adjustStudentScore(state.lastPickedTarget.id, 1, 'Random Picker +1');
+          } else {
+            adjustGroupScore(state.lastPickedTarget.id, 1);
+          }
+        });
+        document.getElementById('btnPickerMinusOne').addEventListener('click', function () {
+          if (!state.lastPickedTarget) return;
+          if (state.lastPickedTarget.type === 'student') {
+            adjustStudentScore(state.lastPickedTarget.id, -1, 'Random Picker -1');
+          } else {
+            adjustGroupScore(state.lastPickedTarget.id, -1);
+          }
+        });
+
+        // Modal 4: Podium Celebration
+        document.getElementById('btnOpenPodiumModal').addEventListener('click', openPodiumModal);
+        document.getElementById('btnClosePodiumModal').addEventListener('click', function () {
+          document.getElementById('podiumModal').classList.add('hidden');
+        });
+        document.getElementById('btnDonePodiumModal').addEventListener('click', function () {
+          document.getElementById('podiumModal').classList.add('hidden');
+        });
+
+        // Modal 5: Reset Scores Confirmation
+        document.getElementById('btnOpenResetModal').addEventListener('click', function () {
+          document.getElementById('resetModal').classList.remove('hidden');
+        });
+        document.getElementById('btnCancelResetModal').addEventListener('click', function () {
+          document.getElementById('resetModal').classList.add('hidden');
+        });
+        document.getElementById('btnConfirmResetAllScores').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (cls) {
+            cls.students.forEach(function (s) { s.score = 0; });
+            cls.groups.forEach(function (g) { g.score = 0; });
+            state.historyStack = state.historyStack.filter(function (h) { return h.classId !== cls.id; });
+            saveState();
+            renderAll();
+            showToast('Reset all individual and group scores for ' + cls.name, '↺');
+          }
+          document.getElementById('resetModal').classList.add('hidden');
+        });
+        document.getElementById('btnConfirmResetGroupScoresOnly').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (cls) {
+            cls.groups.forEach(function (g) { g.score = 0; });
+            saveState();
+            renderAll();
+            showToast('Reset group scores to 0 (individual scores kept)', '↺');
+          }
+          document.getElementById('resetModal').classList.add('hidden');
+        });
+      }
+
+      // Initialize App on Load
+      window.addEventListener('DOMContentLoaded', function () {
+        loadState();
+        state.classes.forEach(function (c) { ensureNoOverlaps(c.students); });
+        initCanvasDragAndClickEvents();
+        bindAllEvents();
+        renderTimerUI();
+        renderAll();
+      });
+    })();
+  </script>
+</body>
+</html>

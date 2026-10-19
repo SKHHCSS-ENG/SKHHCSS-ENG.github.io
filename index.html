@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>English Learning Materials · SKH Holy Carpenter Secondary School</title>
-<meta name="description" content="English Language learning materials for SKH Holy Carpenter Secondary School.">
+<title>English · SKH Holy Carpenter Secondary School</title>
+<meta name="description" content="English Department subject site for SKH Holy Carpenter Secondary School — learning materials and classroom tools.">
 <style>
   :root {
     --accent: #5bbad5;
@@ -18,6 +18,8 @@
     --bg: #f5fafc;
     --border: #d3e8ef;
     --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
+    --teacher: #0c5a70;
+    --teacher-soft: #e6f4f8;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -86,7 +88,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 18px 18px 16px;
+    padding: 20px 18px 18px;
     box-shadow: var(--shadow);
     min-height: 44px;
     transition: border-color .15s ease, box-shadow .15s ease;
@@ -97,6 +99,10 @@
     box-shadow: 0 6px 20px rgba(91, 186, 213, 0.22);
   }
   a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  a.card.card-teacher:hover, a.card.card-teacher:focus-visible {
+    border-color: var(--teacher);
+    box-shadow: 0 6px 20px rgba(12, 90, 112, 0.18);
+  }
   .card-kicker {
     font-size: .72rem;
     font-weight: 800;
@@ -105,9 +111,10 @@
     color: var(--accent-ink);
     margin: 0 0 6px;
   }
+  .card-teacher .card-kicker { color: var(--teacher); }
   .card h2 {
     margin: 0 0 6px;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     color: var(--navy);
   }
   .card p {
@@ -117,10 +124,30 @@
   }
   .card-arrow {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: .85rem;
     font-weight: 700;
     color: var(--accent-ink);
+  }
+  .card-teacher .card-arrow { color: var(--teacher); }
+  .badge {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    vertical-align: middle;
+  }
+  .badge-student {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .badge-teacher {
+    background: var(--teacher-soft);
+    color: var(--teacher);
   }
   footer {
     margin-top: 36px;
@@ -144,25 +171,25 @@
         <img src="https://www.hcs.edu.hk/template/app/img/logo.png" width="276" height="58" alt="SKH Holy Carpenter Secondary School logo">
       </div>
       <div class="hero-body">
-        <h1>English Learning Materials</h1>
-        <p class="subject">English Language · 英國語文</p>
+        <h1>English Department</h1>
+        <p class="subject">English Language · 英國語文 · SKH Holy Carpenter Secondary School</p>
       </div>
     </header>
 
-    <p class="note">Practice pages and teaching materials for the English panel. More subject materials will be added here over time.</p>
+    <p class="note">Choose a section below. Learning materials are for student practice; Classroom is for teacher tools in live lessons.</p>
 
     <div class="cards">
-      <a class="card" href="speech-festival/">
-        <p class="card-kicker">Competition practice</p>
-        <h2>Speech Festival</h2>
-        <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
-        <span class="card-arrow">Open →</span>
+      <a class="card" href="learning-materials/">
+        <p class="card-kicker">Students · practice <span class="badge badge-student">Student</span></p>
+        <h2>Learning materials</h2>
+        <p>Speech Festival practice pages and DSE Writing Formats — self-learn and classroom practice.</p>
+        <span class="card-arrow">Open materials →</span>
       </a>
-      <a class="card" href="dse-writing/">
-        <p class="card-kicker">Senior / DSE</p>
-        <h2>DSE Writing Formats</h2>
-        <p>Letter to the editor, Article, Proposal, Report, Speech — PAT, structure, skeleton &amp; useful phrases.</p>
-        <span class="card-arrow">Open →</span>
+      <a class="card card-teacher" href="classroom/">
+        <p class="card-kicker">Teachers · live lesson <span class="badge badge-teacher">Teacher</span></p>
+        <h2>Classroom</h2>
+        <p>Teacher tools for live lessons — Class Activity Studio (desks, roster, live points).</p>
+        <span class="card-arrow">Open Classroom →</span>
       </a>
     </div>
 
