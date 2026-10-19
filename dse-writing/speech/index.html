@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Speech · DSE Writing Formats · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="Speech — DSE Writing Formats for SKH Holy Carpenter Secondary School English.">
-<link rel="stylesheet" href="../styles.css?v=20261018n">
+<link rel="stylesheet" href="../styles.css?v=20261019b">
 </head>
 <body class="tools-page">
   <div class="wrap">
@@ -25,8 +25,12 @@
 
     <p class="meta-line"><strong>P2 / P3B:</strong> Both. P2: school / community speech. P3B: use audience, occasion, and key points from the Data File.</p>
 
-    <section class="block hw-wrap" aria-labelledby="pat-h">
-      <h2 id="pat-h">PAT</h2>
+    <details class="format-section hw-wrap" data-section="pat" aria-labelledby="pat-h">
+      <summary id="pat-h">
+        <span class="section-title">PAT</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
       <table class="pat-table">
         <tbody>
       <tr><th scope="row">Purpose</th><td>Inform, persuade, <span class="gloss" data-zh="激勵">motivate</span>, or thank — as the occasion requires.</td></tr>
@@ -34,15 +38,16 @@
       <tr><th scope="row">Tone</th><td>Formal enough for the occasion, but warmer and more direct than a report.</td></tr>
         </tbody>
       </table>
-    
+      </div>
       <canvas class="hw-canvas" data-hw="pat" aria-hidden="true"></canvas>
-    </section>
+    </details>
 
-    <section class="block hw-wrap" aria-labelledby="ss-h">
-      <h2 id="ss-h">Structure ‖ Skeleton</h2>
-      <div class="split">
-        <div class="split-col">
-          <h3>Structure</h3>
+    <details class="format-section hw-wrap" data-section="structure" open aria-labelledby="ss-h">
+      <summary id="ss-h">
+        <span class="section-title">Structure</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
       <div class="part">
         <p class="part-label">Opening</p>
         <ul>
@@ -67,34 +72,44 @@
           <li>Thank the audience</li>
         </ul>
       </div>
-        </div>
-        <div class="split-col">
-          <h3>Skeleton</h3>
-      <div class="part">
+      </div>
+      <canvas class="hw-canvas" data-hw="structure" aria-hidden="true"></canvas>
+    </details>
+
+    <details class="format-section hw-wrap" data-section="skeleton" open aria-labelledby="skel-h">
+      <summary id="skel-h">
+        <span class="section-title">Skeleton</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
+            <p class="skel-legend" aria-label="Placeholder colour key">Slots: <span class="skel-slot slot-thesis">[thesis / angle]</span> · <span class="skel-slot slot-topic">[topic / point]</span> · <span class="skel-slot slot-detail">[detail / example]</span> · <span class="skel-slot slot-other">[other]</span></p>
+<div class="part">
         <p class="part-label">Opening</p>
-        <pre class="skeleton">Good [morning / afternoon], [audience].
-My name is [Name], and today I would like to talk about [topic].
-My main message is that [thesis].</pre>
+        <pre class="skeleton">Good <span class="skel-slot slot-other">[morning / afternoon]</span>, <span class="skel-slot slot-other">[audience]</span>.
+My name is <span class="skel-slot slot-other">[Name]</span>, and today I would like to talk about <span class="skel-slot slot-other">[topic]</span>.
+My main message is that <span class="skel-slot slot-thesis">[thesis]</span>.</pre>
       </div>
       <div class="part">
         <p class="part-label">Body</p>
-        <pre class="skeleton">First, [main idea 1]. This matters because [reason]. For example, [example].
-Second, [main idea 2]. If we [action], we can [result].
-Finally, [main idea 3 / call to action]. Together, we can [hope / goal].</pre>
+        <pre class="skeleton">First, <span class="skel-slot slot-topic">[main idea 1]</span>. This matters because <span class="skel-slot slot-detail">[reason]</span>. For example, <span class="skel-slot slot-detail">[example]</span>.
+Second, <span class="skel-slot slot-topic">[main idea 2]</span>. If we <span class="skel-slot slot-detail">[action]</span>, we can <span class="skel-slot slot-detail">[result]</span>.
+Finally, <span class="skel-slot slot-topic">[main idea 3 / call to action]</span>. Together, we can <span class="skel-slot slot-detail">[hope / goal]</span>.</pre>
       </div>
       <div class="part">
         <p class="part-label">Closing</p>
-        <pre class="skeleton">To sum up, [restate central idea].
+        <pre class="skeleton">To sum up, <span class="skel-slot slot-thesis">[restate central idea]</span>.
 Thank you for your kind attention.</pre>
       </div>
-        </div>
       </div>
-    
-      <canvas class="hw-canvas" data-hw="structure" aria-hidden="true"></canvas>
-    </section>
+      <canvas class="hw-canvas" data-hw="skeleton" aria-hidden="true"></canvas>
+    </details>
 
-    <section class="block hw-wrap" aria-labelledby="ph-h">
-      <h2 id="ph-h">Useful phrases</h2>
+    <details class="format-section hw-wrap" data-section="phrases" aria-labelledby="ph-h">
+      <summary id="ph-h">
+        <span class="section-title">Useful phrases</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
       <ul class="phrases">
       <li>Good morning / afternoon, [audience].</li>
       <li>It is my <span class="gloss" data-zh="榮幸">honour</span> to speak to you today about…</li>
@@ -107,9 +122,9 @@ Thank you for your kind attention.</pre>
       <li>Thank you for your kind <span class="gloss" data-zh="注意">attention</span>.</li>
       </ul>
 <p class="gloss-key"><strong>中文 gloss</strong>（harder words）：<strong>motivate</strong> — 激勵 · <strong>thesis</strong> — 中心論點 · <strong>topic sentence</strong> — 主題句 · <strong>honour</strong> — 榮幸 · <strong>signpost</strong> — 結構提示語 · <strong>occasion</strong> — 場合 · <strong>central message</strong> — 中心信息 · <strong>attention</strong> — 注意</p>
-    
+      </div>
       <canvas class="hw-canvas" data-hw="phrases" aria-hidden="true"></canvas>
-    </section>
+    </details>
 
     <footer>
       聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
@@ -137,7 +152,7 @@ Thank you for your kind attention.</pre>
       </div>
     </div>
   </div>
-  <script src="../tools-dock.js?v=20261018k"></script>
+  <script src="../tools-dock.js?v=20261019b"></script>
 
 
 </body>

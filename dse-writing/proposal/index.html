@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Proposal · DSE Writing Formats · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="Proposal — DSE Writing Formats for SKH Holy Carpenter Secondary School English.">
-<link rel="stylesheet" href="../styles.css?v=20261018n">
+<link rel="stylesheet" href="../styles.css?v=20261019b">
 </head>
 <body class="tools-page">
   <div class="wrap">
@@ -25,8 +25,12 @@
 
     <p class="meta-line"><strong>P2 / P3B:</strong> Both (common in P3B). Check Data File for purpose, budget, dates, and who decides.</p>
 
-    <section class="block hw-wrap" aria-labelledby="pat-h">
-      <h2 id="pat-h">PAT</h2>
+    <details class="format-section hw-wrap" data-section="pat" aria-labelledby="pat-h">
+      <summary id="pat-h">
+        <span class="section-title">PAT</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
       <table class="pat-table">
         <tbody>
       <tr><th scope="row">Purpose</th><td>Suggest a plan and <span class="gloss" data-zh="說服">persuade</span> the reader to approve it.</td></tr>
@@ -34,15 +38,16 @@
       <tr><th scope="row">Tone</th><td>Formal, practical, polite, confident — what / why / how / benefits.</td></tr>
         </tbody>
       </table>
-    
+      </div>
       <canvas class="hw-canvas" data-hw="pat" aria-hidden="true"></canvas>
-    </section>
+    </details>
 
-    <section class="block hw-wrap" aria-labelledby="ss-h">
-      <h2 id="ss-h">Structure ‖ Skeleton</h2>
-      <div class="split">
-        <div class="split-col">
-          <h3>Structure</h3>
+    <details class="format-section hw-wrap" data-section="structure" open aria-labelledby="ss-h">
+      <summary id="ss-h">
+        <span class="section-title">Structure</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
       <div class="part">
         <p class="part-label">Opening</p>
         <ul>
@@ -69,44 +74,54 @@
           <li>Name / role if required</li>
         </ul>
       </div>
-        </div>
-        <div class="split-col">
-          <h3>Skeleton</h3>
-      <div class="part">
+      </div>
+      <canvas class="hw-canvas" data-hw="structure" aria-hidden="true"></canvas>
+    </details>
+
+    <details class="format-section hw-wrap" data-section="skeleton" open aria-labelledby="skel-h">
+      <summary id="skel-h">
+        <span class="section-title">Skeleton</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
+            <p class="skel-legend" aria-label="Placeholder colour key">Slots: <span class="skel-slot slot-thesis">[thesis / angle]</span> · <span class="skel-slot slot-topic">[topic / point]</span> · <span class="skel-slot slot-detail">[detail / example]</span> · <span class="skel-slot slot-other">[other]</span></p>
+<div class="part">
         <p class="part-label">Opening</p>
-        <pre class="skeleton">Proposal for [name of plan]
-[Why now — brief context].
-I propose that [plan] be held [when / where] in order to [main aim].</pre>
+        <pre class="skeleton">Proposal for <span class="skel-slot slot-other">[name of plan]</span>
+<span class="skel-slot slot-detail">[Why now — brief context]</span>.
+I propose that <span class="skel-slot slot-other">[plan]</span> be held <span class="skel-slot slot-other">[when / where]</span> in order to <span class="skel-slot slot-thesis">[main aim]</span>.</pre>
       </div>
       <div class="part">
         <p class="part-label">Body</p>
         <pre class="skeleton">Aims
-1. [aim 1]
-2. [aim 2]
+1. <span class="skel-slot slot-topic">[aim 1]</span>
+2. <span class="skel-slot slot-topic">[aim 2]</span>
 
 Details of the plan
-- Target group: [who]
-- Activities: [what]
-- Date / time / venue: [details]
-- Resources: [people / materials / budget]
+- Target group: <span class="skel-slot slot-other">[who]</span>
+- Activities: <span class="skel-slot slot-other">[what]</span>
+- Date / time / venue: <span class="skel-slot slot-detail">[details]</span>
+- Resources: <span class="skel-slot slot-other">[people / materials / budget]</span>
 
 Expected benefits
-[Benefit 1]. [Benefit 2].</pre>
+<span class="skel-slot slot-detail">[Benefit 1]</span>. <span class="skel-slot slot-detail">[Benefit 2]</span>.</pre>
       </div>
       <div class="part">
         <p class="part-label">Closing</p>
         <pre class="skeleton">I hope this proposal will be approved.
 I am happy to provide further details if needed.
-[Name / role]</pre>
+<span class="skel-slot slot-other">[Name / role]</span></pre>
       </div>
-        </div>
       </div>
-    
-      <canvas class="hw-canvas" data-hw="structure" aria-hidden="true"></canvas>
-    </section>
+      <canvas class="hw-canvas" data-hw="skeleton" aria-hidden="true"></canvas>
+    </details>
 
-    <section class="block hw-wrap" aria-labelledby="ph-h">
-      <h2 id="ph-h">Useful phrases</h2>
+    <details class="format-section hw-wrap" data-section="phrases" aria-labelledby="ph-h">
+      <summary id="ph-h">
+        <span class="section-title">Useful phrases</span>
+        <span class="section-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="section-body">
       <ul class="phrases">
       <li>I am writing to <span class="gloss" data-zh="建議">propose</span> that…</li>
       <li>The aim of this proposal is to…</li>
@@ -118,9 +133,9 @@ I am happy to provide further details if needed.
       <li>I should be grateful if you would consider this proposal.</li>
       </ul>
 <p class="gloss-key"><strong>中文 gloss</strong>（harder words）：<strong>persuade</strong> — 說服 · <strong>thesis</strong> — 中心論點 · <strong>topic sentence</strong> — 主題句 · <strong>approval</strong> — 批准 · <strong>estimated</strong> — 估計的 · <strong>participants</strong> — 參加者 · <strong>resources</strong> — 資源 · <strong>benefits</strong> — 益處 · <strong>propose</strong> — 建議</p>
-    
+      </div>
       <canvas class="hw-canvas" data-hw="phrases" aria-hidden="true"></canvas>
-    </section>
+    </details>
 
     <footer>
       聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
@@ -148,7 +163,7 @@ I am happy to provide further details if needed.
       </div>
     </div>
   </div>
-  <script src="../tools-dock.js?v=20261018k"></script>
+  <script src="../tools-dock.js?v=20261019b"></script>
 
 
 </body>

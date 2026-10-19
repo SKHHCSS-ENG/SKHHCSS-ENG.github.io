@@ -448,4 +448,61 @@
       c.style.pointerEvents = 'none';
     });
   })();
+
+  /* ---------- Format page sections: accordion + localStorage ---------- */
+  (function () {
+    /* Defaults in HTML: Structure + Skeleton open. Accordion on interact; all-closed OK. */
+    var KEY = 'dse-writing-format-sections-v1-' + pageSlug;
+    var sections = Array.prototype.slice.call(
+      document.querySelectorAll('details.format-section[data-section]')
+    );
+    if (!sections.length) return;
+    var syncing = false;
+
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+    if (saved && typeof saved === 'object') {
+      var anyKnown = sections.some(function (el) {
+        return Object.prototype.hasOwnProperty.call(saved, el.getAttribute('data-section'));
+      });
+      if (anyKnown) {
+        sections.forEach(function (el) {
+          var id = el.getAttribute('data-section');
+          el.open = Object.prototype.hasOwnProperty.call(saved, id) ? !!saved[id] : false;
+        });
+        /* Accordion restore: keep at most one open (prefer first open in DOM order) */
+        var kept = false;
+        sections.forEach(function (el) {
+          if (!el.open) return;
+          if (kept) el.open = false;
+          else kept = true;
+        });
+      }
+    }
+
+    function persist() {
+      var state = {};
+      sections.forEach(function (el) {
+        state[el.getAttribute('data-section')] = el.open;
+      });
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    sections.forEach(function (el) {
+      el.addEventListener('toggle', function () {
+        if (syncing) return;
+        if (el.open) {
+          syncing = true;
+          sections.forEach(function (other) {
+            if (other !== el && other.open) other.open = false;
+          });
+          syncing = false;
+        }
+        persist();
+        if (typeof window.hwResize === 'function') {
+          requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
+        }
+      });
+    });
+  })();
 })();

@@ -14,6 +14,15 @@
   --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
   --warn: #b45309;
   --warn-bg: #fff7ed;
+  /* Skeleton slot accents (shared by job across formats) */
+  --slot-thesis: #0c5a70;
+  --slot-thesis-bg: #d8f0f6;
+  --slot-topic: #5b21b6;
+  --slot-topic-bg: #ede9fe;
+  --slot-detail: #9a3412;
+  --slot-detail-bg: #ffedd5;
+  --slot-other: #0369a1;
+  --slot-other-bg: #e0f2fe;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html {
@@ -208,6 +217,95 @@ details.format-group > .cards {
   padding-top: 12px;
 }
 .card h3 { margin: 0 0 4px; font-size: 1.1rem; color: var(--navy); font-weight: 800; }
+
+/* Format page section cards — collapsible (PAT / Structure / Skeleton / Phrases) */
+details.format-section {
+  margin: 0 0 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+details.format-section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 12px 14px;
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  border-left: 4px solid var(--accent-deep);
+  color: var(--navy);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+details.format-section > summary::-webkit-details-marker { display: none; }
+details.format-section > summary::marker { content: ""; }
+details.format-section > summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+details.format-section .section-title { flex: 1; text-align: left; }
+details.format-section .section-chevron {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-right: 2.5px solid var(--accent-ink);
+  border-bottom: 2.5px solid var(--accent-ink);
+  transform: rotate(45deg);
+  margin-top: -4px;
+  transition: transform .15s ease;
+}
+details.format-section[open] > summary .section-chevron {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+}
+details.format-section > .section-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+details.format-section[data-section="structure"] > summary,
+details.format-section[data-section="skeleton"] > summary {
+  border-left-color: var(--accent);
+}
+
+/* Coloured [placeholders] in Skeleton only */
+.skel-slot {
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0 .15em;
+  white-space: pre-wrap;
+}
+.skel-slot.slot-thesis {
+  color: var(--slot-thesis);
+  background: var(--slot-thesis-bg);
+}
+.skel-slot.slot-topic {
+  color: var(--slot-topic);
+  background: var(--slot-topic-bg);
+}
+.skel-slot.slot-detail {
+  color: var(--slot-detail);
+  background: var(--slot-detail-bg);
+}
+.skel-slot.slot-other {
+  color: var(--slot-other);
+  background: var(--slot-other-bg);
+}
+.skel-legend {
+  margin: 0 0 12px;
+  font-size: .78rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.skel-legend .skel-slot { font-size: .78rem; }
+
 
 /* Sticky Tools dock — 🛠 always bottom-right; toggles expand/collapse.
    Collapsed: hug the chip. Expanded: dense chrome row, 🛠 at far right (no ▾ strip). */
@@ -601,6 +699,9 @@ footer {
   body { background: #fff; padding-bottom: 0; }
   .bottom-dock { display: none !important; }
   .hw-canvas { display: none !important; }
-  section.block, a.card { box-shadow: none; break-inside: avoid; }
+  section.block, details.format-section, a.card { box-shadow: none; break-inside: avoid; }
+  details.format-section > summary { border-left-color: #000; }
+  details.format-section { border-color: #ccc; }
+  .skel-slot { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   body.zh-on .gloss::after { color: #000; }
 }
