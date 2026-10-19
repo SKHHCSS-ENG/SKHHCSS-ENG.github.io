@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261019t -->
+<!-- cache 20261019u -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -121,13 +121,21 @@
   }
   a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   .card-kicker {
-    font-size: .72rem;
-    font-weight: 800;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    color: var(--kicker);
     margin: 0 0 6px;
   }
+  .badge {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .card .badge { color: var(--accent-ink); background: var(--accent-soft); }
+  .card-kicker .badge + .badge { margin-left: 6px; }
   .card h2 {
     margin: 0 0 6px;
     font-size: 1.15rem;
@@ -177,25 +185,25 @@
 
     <div class="cards">
       <a class="card" href="../speech-festival/">
-        <p class="card-kicker">Competition practice</p>
+        <p class="card-kicker"><span class="badge">Competition</span></p>
         <h2>Speech Festival</h2>
         <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
         <span class="card-arrow">Open →</span>
       </a>
       <a class="card" href="../dse-writing/">
-        <p class="card-kicker">Senior / DSE</p>
+        <p class="card-kicker"><span class="badge">DSE</span></p>
         <h2>DSE Writing Formats</h2>
         <p>Letter to the editor, Article, Proposal, Report, Speech — PAT, structure, skeleton &amp; useful phrases.</p>
         <span class="card-arrow">Open →</span>
       </a>
       <a class="card" href="useful-vocabulary/">
-        <p class="card-kicker">Junior · Senior / DSE</p>
+        <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
         <h2>Useful vocabulary</h2>
         <p>Shared vocab banks for DSE writing — cohesion, tone &amp; attitude, spelling, jobs / HK places, formality pairs.</p>
         <span class="card-arrow">Open →</span>
       </a>
       <a class="card" href="sentence-patterns/">
-        <p class="card-kicker">Junior · Senior / DSE</p>
+        <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
         <h2>Sentence patterns</h2>
         <p>Basic · Building · Exam-ready frames with Hong Kong examples — pick 2–3 per writing task.</p>
         <span class="card-arrow">Open →</span>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261019t -->
+<!-- cache 20261019u -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -106,14 +106,8 @@
     box-shadow: 0 6px 20px rgba(12, 90, 112, 0.18);
   }
   .card-kicker {
-    font-size: .72rem;
-    font-weight: 800;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-    color: var(--kicker);
     margin: 0 0 6px;
   }
-  .card-teacher .card-kicker { color: var(--kicker); }
   .card h2 {
     margin: 0 0 6px;
     font-size: 1.2rem;
@@ -134,14 +128,14 @@
   .card-teacher .card-arrow { color: var(--teacher); }
   .badge {
     display: inline-block;
-    margin-left: 6px;
     font-size: .65rem;
     font-weight: 800;
     letter-spacing: .04em;
     text-transform: uppercase;
     padding: 2px 7px;
     border-radius: 999px;
-    vertical-align: middle;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
   }
   .badge-student {
     background: var(--accent-soft);
@@ -151,6 +145,10 @@
     background: var(--teacher-soft);
     color: var(--teacher);
   }
+  .card .badge { color: var(--accent-ink); }
+  .card .badge-student { color: var(--accent-ink); background: var(--accent-soft); }
+  .card .badge-teacher { color: var(--teacher); background: var(--teacher-soft); }
+  .card-kicker .badge + .badge { margin-left: 6px; }
   footer {
     margin-top: 36px;
     padding-top: 16px;
@@ -180,13 +178,13 @@
 
     <div class="cards">
       <a class="card" href="learning-materials/">
-        <p class="card-kicker">Students · practice <span class="badge badge-student">Student</span></p>
+        <p class="card-kicker"><span class="badge badge-student">Student</span></p>
         <h2>Learning materials</h2>
         <p>Speech Festival, DSE Writing Formats, and Useful vocabulary — self-learn and classroom practice.</p>
         <span class="card-arrow">Open materials →</span>
       </a>
       <a class="card card-teacher" href="classroom/">
-        <p class="card-kicker">Teachers · live lesson <span class="badge badge-teacher">Teacher</span></p>
+        <p class="card-kicker"><span class="badge badge-teacher">Teacher</span></p>
         <h2>Classroom</h2>
         <p>Teacher tools for live lessons — Class Activity Studio (desks, roster, live points).</p>
         <span class="card-arrow">Open Classroom →</span>
