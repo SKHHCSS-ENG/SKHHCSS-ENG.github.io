@@ -875,6 +875,8 @@
       const STAGE_HEIGHT = 640;
       const DESK_W = 148;
       const DESK_H = 123;
+      // Bump when desk size or step formula changes — reseeds defaultPositions only (not live seats)
+      const LAYOUT_PITCH_VERSION = 'desk-148x123-stepY+26';
       const GRID_SIZE = 20;
 
       // Team Color Palette Definitions
@@ -1327,6 +1329,7 @@
             layoutStyle: 'pods4',
             groups: groups1A,
             students: students1A,
+            layoutPitchVersion: LAYOUT_PITCH_VERSION,
             defaultPositions: students1A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
           },
           {
@@ -1338,6 +1341,7 @@
             layoutStyle: 'pairs',
             groups: groups3B,
             students: students3B,
+            layoutPitchVersion: LAYOUT_PITCH_VERSION,
             defaultPositions: students3B.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
           },
           {
@@ -1349,6 +1353,7 @@
             layoutStyle: 'rows',
             groups: groups5A,
             students: students5A,
+            layoutPitchVersion: LAYOUT_PITCH_VERSION,
             defaultPositions: students5A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
           }
         ];
@@ -1399,7 +1404,13 @@
               state.activityMode = parsed.activityMode || 'individual';
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
-              state.classes.forEach(function (c) { ensureClassDefaultPositions(c); });
+              var pitchMigrated = false;
+              state.classes.forEach(function (c) {
+                if (ensureClassDefaultPositions(c)) pitchMigrated = true;
+              });
+              if (pitchMigrated) {
+                try { saveState(); } catch (err) {}
+              }
               return;
             }
           }
@@ -1417,7 +1428,8 @@
             currentClassId: state.currentClassId,
             activityMode: state.activityMode,
             snapToGrid: state.snapToGrid,
-            soundEnabled: state.soundEnabled
+            soundEnabled: state.soundEnabled,
+            layoutPitchVersion: LAYOUT_PITCH_VERSION
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         } catch (e) {
@@ -1664,9 +1676,13 @@
       }
 
       function ensureClassDefaultPositions(cls) {
-        if (!cls) return;
-        if (!cls.defaultPositions || !cls.defaultPositions.length) {
+        if (!cls) return false;
+        var reseeds = false;
+        // Recompute factory/default seating when desk pitch changed (does NOT move live student seats)
+        if (!cls.defaultPositions || !cls.defaultPositions.length || cls.layoutPitchVersion !== LAYOUT_PITCH_VERSION) {
           cls.defaultPositions = buildDefaultPositionsFromGrid(cls);
+          cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
+          reseeds = true;
         }
         // Keep roster in sync: drop removed ids; add missing students at their current xy
         const byId = {};
@@ -1680,6 +1696,7 @@
           }
         });
         cls.defaultPositions = next;
+        return reseeds;
       }
 
       function rememberStudentDefaultPosition(cls, student) {
@@ -1696,6 +1713,7 @@
         if (!found) {
           cls.defaultPositions.push({ id: student.id, x: student.x, y: student.y });
         }
+        cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
       }
 
       function layoutsEqual(a, b) {
