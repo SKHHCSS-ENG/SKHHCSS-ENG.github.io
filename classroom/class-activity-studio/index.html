@@ -307,10 +307,10 @@
           </button>
         </div>
 
-        <button type="button" data-layout="rows" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
-        <button type="button" data-layout="pairs" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns (2 desks together) within your Rows × Cols grid">Paired Desks</button>
-        <button type="button" data-layout="pods4" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block of desks into 4-desk pods within your Rows × Cols grid">4-Desk Pods</button>
-        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-2.5 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather desks belonging to the same manual group into pods">
+        <button type="button" data-layout="rows" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
+        <button type="button" data-layout="pairs" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns (2 desks together) within your Rows × Cols grid">Paired Desks</button>
+        <button type="button" data-layout="pods4" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block of desks into 4-desk pods within your Rows × Cols grid">4-Desk Pods</button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather desks belonging to the same manual group into pods">
           <span>🧲</span>
           <span>Cluster by Group</span>
         </button>
@@ -357,15 +357,18 @@
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
 
-        <!-- Whole Class +1 · Undo · Redo · Reset Scores -->
+        <!-- All +1 · Undo layout · Redo layout · Reset layout · Reset Scores -->
         <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
-        <button id="btnUndoLastScore" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo last score" aria-label="Undo last score">
+        <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo desk move" aria-label="Undo desk move">
           ↩️
         </button>
-        <button id="btnRedoScore" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
+        <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo desk move" aria-label="Redo desk move">
           ↪️
+        </button>
+        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset layout to default grid" aria-label="Reset layout to default grid">
+          🔃
         </button>
         <button id="btnOpenResetModal" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
           🔄
@@ -432,10 +435,10 @@
           <!-- Zoom & View Controls -->
           <div class="flex items-center gap-1.5">
             <span class="text-[11px] font-semibold text-slate-400">Zoom:</span>
-            <button id="btnZoomOut" type="button" class="w-6 h-6 rounded bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold flex items-center justify-center" title="Zoom Out">−</button>
+            <button id="btnZoomOut" type="button" class="min-h-[44px] min-w-[44px] rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-sm font-bold flex items-center justify-center" title="Zoom Out">−</button>
             <span id="zoomReadout" class="text-xs font-bold text-slate-700 w-10 text-center">100%</span>
-            <button id="btnZoomIn" type="button" class="w-6 h-6 rounded bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold flex items-center justify-center" title="Zoom In">＋</button>
-            <button id="btnZoomReset" type="button" class="px-2 py-0.5 rounded bg-white border border-slate-200 hover:bg-slate-100 text-[11px] font-semibold text-slate-600">Reset</button>
+            <button id="btnZoomIn" type="button" class="min-h-[44px] min-w-[44px] rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-sm font-bold flex items-center justify-center" title="Zoom In">＋</button>
+            <button id="btnZoomReset" type="button" class="min-h-[44px] px-3 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-600" title="Fit floor plan to viewport">Fit</button>
           </div>
         </div>
 
@@ -857,7 +860,7 @@
       const STAGE_WIDTH = 1120;
       const STAGE_HEIGHT = 640;
       const DESK_W = 144;
-      const DESK_H = 114;
+      const DESK_H = 148;
       const GRID_SIZE = 20;
 
       // Team Color Palette Definitions
@@ -1347,8 +1350,10 @@
         activeBrushGroupId: 'grp_1',
         leaderboardTab: 'students', // 'students' | 'groups' | 'feed'
         lbSearch: '',
-        historyStack: [], // For undo and live history feed
-        redoStack: [], // For redo (cleared on new score actions)
+        historyStack: [], // For score undo and live history feed
+        redoStack: [], // Score redo (cleared on new score actions)
+        layoutHistoryStack: [], // Desk layout undo (session only)
+        layoutRedoStack: [], // Desk layout redo
         // Timer state
         timerTotalSec: 180,
         timerRemainingSec: 180,
@@ -1558,22 +1563,141 @@
 
       function clearRedoStack() {
         state.redoStack = [];
-        updateUndoRedoButtons();
       }
 
-      function updateUndoRedoButtons() {
+      function updateLayoutUndoRedoButtons() {
         const cls = getCurrentClass();
-        const btnUndo = document.getElementById('btnUndoLastScore');
-        const btnRedo = document.getElementById('btnRedoScore');
+        const btnUndo = document.getElementById('btnUndoLayout');
+        const btnRedo = document.getElementById('btnRedoLayout');
         if (!cls) {
           if (btnUndo) btnUndo.disabled = true;
           if (btnRedo) btnRedo.disabled = true;
           return;
         }
-        const hasUndo = state.historyStack.length > 0 && state.historyStack[0].classId === cls.id;
-        const hasRedo = state.redoStack.length > 0 && state.redoStack[0].classId === cls.id;
+        const hasUndo = state.layoutHistoryStack.some(function (h) { return h.classId === cls.id; });
+        const hasRedo = state.layoutRedoStack.some(function (h) { return h.classId === cls.id; });
         if (btnUndo) btnUndo.disabled = !hasUndo;
         if (btnRedo) btnRedo.disabled = !hasRedo;
+      }
+
+      function snapshotLayoutPositions(cls) {
+        return (cls.students || []).map(function (st) {
+          return { id: st.id, x: st.x, y: st.y };
+        });
+      }
+
+      function applyLayoutPositions(cls, positions) {
+        if (!cls || !positions) return;
+        const map = {};
+        positions.forEach(function (p) { map[p.id] = p; });
+        cls.students.forEach(function (st) {
+          if (map[st.id]) {
+            st.x = map[st.id].x;
+            st.y = map[st.id].y;
+          }
+        });
+      }
+
+      function layoutsEqual(a, b) {
+        if (!a || !b || a.length !== b.length) return false;
+        const map = {};
+        b.forEach(function (p) { map[p.id] = p; });
+        for (var i = 0; i < a.length; i++) {
+          const p = map[a[i].id];
+          if (!p || p.x !== a[i].x || p.y !== a[i].y) return false;
+        }
+        return true;
+      }
+
+      function pushLayoutHistory(before, after, label) {
+        const cls = getCurrentClass();
+        if (!cls || !before || !after) return;
+        if (layoutsEqual(before, after)) return;
+        state.layoutHistoryStack.unshift({
+          id: 'lay_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          classId: cls.id,
+          label: label || 'Layout change',
+          before: before,
+          after: after
+        });
+        if (state.layoutHistoryStack.length > 40) state.layoutHistoryStack.pop();
+        state.layoutRedoStack = [];
+        updateLayoutUndoRedoButtons();
+      }
+
+      function undoLayoutAction() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        var idx = -1;
+        for (var i = 0; i < state.layoutHistoryStack.length; i++) {
+          if (state.layoutHistoryStack[i].classId === cls.id) { idx = i; break; }
+        }
+        if (idx < 0) return;
+        const entry = state.layoutHistoryStack.splice(idx, 1)[0];
+        applyLayoutPositions(cls, entry.before);
+        ensureNoOverlaps(cls.students);
+        state.layoutRedoStack.unshift(entry);
+        if (state.layoutRedoStack.length > 40) state.layoutRedoStack.pop();
+        saveState();
+        renderClassroomCanvas(true);
+        updateLayoutUndoRedoButtons();
+        showToast('Undid layout: ' + entry.label, '↩️');
+      }
+
+      function redoLayoutAction() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        var idx = -1;
+        for (var i = 0; i < state.layoutRedoStack.length; i++) {
+          if (state.layoutRedoStack[i].classId === cls.id) { idx = i; break; }
+        }
+        if (idx < 0) return;
+        const entry = state.layoutRedoStack.splice(idx, 1)[0];
+        applyLayoutPositions(cls, entry.after);
+        ensureNoOverlaps(cls.students);
+        state.layoutHistoryStack.unshift(entry);
+        if (state.layoutHistoryStack.length > 40) state.layoutHistoryStack.pop();
+        saveState();
+        renderClassroomCanvas(true);
+        updateLayoutUndoRedoButtons();
+        showToast('Redid layout: ' + entry.label, '↪️');
+      }
+
+      function resetLayoutToDefaultGrid() {
+        const cls = getCurrentClass();
+        if (!cls || cls.students.length === 0) return;
+        const before = snapshotLayoutPositions(cls);
+        const grid = syncGridInputsToClass(cls);
+        const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
+        cls.layoutStyle = activeStyle;
+        const spatiallyOrdered = getSpatiallyOrderedStudents(cls.students);
+        const coords = computeLayoutPositions(spatiallyOrdered.length, activeStyle, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows);
+        spatiallyOrdered.forEach(function (st, idx) {
+          if (coords[idx]) {
+            st.x = coords[idx].x;
+            st.y = coords[idx].y;
+          }
+        });
+        ensureNoOverlaps(cls.students);
+        const after = snapshotLayoutPositions(cls);
+        pushLayoutHistory(before, after, 'Reset to default grid');
+        saveState();
+        renderHeaderControls();
+        renderClassroomCanvas(true);
+        const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
+        showToast('Layout reset to ' + actualRowsUsed + '×' + grid.cols + ' default grid (scores kept)', '🔃');
+      }
+
+      function fitZoomToViewport() {
+        const floor = document.getElementById('classroomViewport');
+        const stage = document.getElementById('classroomStage');
+        if (!floor || !stage) {
+          state.zoom = 1;
+          return;
+        }
+        const stageW = stage.offsetWidth || STAGE_WIDTH;
+        const fit = Math.min(1, floor.clientWidth / Math.max(1, stageW));
+        state.zoom = Math.max(0.35, Math.min(1.25, Math.round(fit * 100) / 100));
       }
 
       function undoLastScoreAction() {
@@ -1584,7 +1708,6 @@
           // Put it back; undo only applies to current class tip
           state.historyStack.unshift(last);
           showToast('Cannot undo action from another class.', 'ℹ️');
-          updateUndoRedoButtons();
           return;
         }
 
@@ -1620,7 +1743,6 @@
 
         saveState();
         renderLeaderboardAndStats();
-        updateUndoRedoButtons();
         showToast('Undid: ' + last.label + ' (' + (last.delta > 0 ? '+' : '') + last.delta + ')', '↩️');
       }
 
@@ -1631,7 +1753,6 @@
         if (next.classId !== cls.id) {
           state.redoStack.unshift(next);
           showToast('Cannot redo action from another class.', 'ℹ️');
-          updateUndoRedoButtons();
           return;
         }
 
@@ -1667,7 +1788,6 @@
 
         saveState();
         renderLeaderboardAndStats();
-        updateUndoRedoButtons();
         showToast('Redid: ' + next.label + ' (' + (next.delta > 0 ? '+' : '') + next.delta + ')', '↪️');
       }
 
@@ -1778,12 +1898,12 @@
         document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
           const lt = btn.getAttribute('data-layout');
           if (lt === 'groupClusters') {
-            btn.className = 'layout-preset-btn px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ' +
+            btn.className = 'layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1 ' +
               (activeStyle === 'groupClusters'
                 ? 'bg-violet-600 text-white shadow-xs ring-2 ring-violet-300'
                 : 'bg-violet-100 hover:bg-violet-200 text-violet-800');
           } else {
-            btn.className = 'layout-preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition ' +
+            btn.className = 'layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg text-xs font-semibold transition ' +
               (activeStyle === lt
                 ? 'bg-indigo-600 text-white shadow-xs font-bold'
                 : 'bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700');
@@ -1992,8 +2112,8 @@
               '</div>' +
               '<!-- Row 4: Live -1 / +1 Buttons -->' +
               '<div class="grid grid-cols-2 gap-1">' +
-                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn py-0.5 rounded-lg bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold text-xs transition">−1</button>' +
-                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn py-0.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-xs transition shadow-2xs">＋1</button>' +
+                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn min-h-[44px] py-2 rounded-lg bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold text-xs transition">−1</button>' +
+                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn min-h-[44px] py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-xs transition shadow-2xs">＋1</button>' +
               '</div>' +
             '</div>' +
           '</div>';
@@ -2028,7 +2148,7 @@
           const topG = sortedGroups[0];
           elTopGrp.textContent = (topG && topG.score > 0) ? (topG.icon + ' ' + topG.name + ' (' + topG.score + ')') : '—';
         }
-        updateUndoRedoButtons();
+        updateLayoutUndoRedoButtons();
 
         // 2. Leaderboard Tab Buttons
         const tabSt = document.getElementById('tabLbStudents');
@@ -2262,6 +2382,17 @@
             dragContext.deskEl.releasePointerCapture(e.pointerId);
           } catch (err) {}
           if (dragContext.hasMoved) {
+            const cls = getCurrentClass();
+            if (cls && dragContext.student) {
+              const after = snapshotLayoutPositions(cls);
+              const beforeDrag = after.map(function (p) {
+                if (p.id === dragContext.student.id) {
+                  return { id: p.id, x: dragContext.origX, y: dragContext.origY };
+                }
+                return { id: p.id, x: p.x, y: p.y };
+              });
+              pushLayoutHistory(beforeDrag, after, 'Move ' + (dragContext.student.classNo || '') + ' ' + (dragContext.student.name || 'desk'));
+            }
             saveState();
           }
           dragContext = null;
@@ -2288,6 +2419,7 @@
       function applyQuickLayout(layoutType) {
         const cls = getCurrentClass();
         if (!cls) return;
+        const before = snapshotLayoutPositions(cls);
         const grid = syncGridInputsToClass(cls);
         cls.layoutStyle = layoutType;
 
@@ -2312,10 +2444,7 @@
         }
 
         ensureNoOverlaps(cls.students);
-        saveState();
-        renderHeaderControls();
-        renderClassroomCanvas(true);
-
+        const after = snapshotLayoutPositions(cls);
         const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
         const gridDesc = actualRowsUsed + '×' + grid.cols + ' grid';
         const labelMap = {
@@ -2324,6 +2453,10 @@
           pods4: '4-Desk Pods (' + gridDesc + ')',
           groupClusters: 'Team Clusters'
         };
+        pushLayoutHistory(before, after, labelMap[layoutType] || 'Layout');
+        saveState();
+        renderHeaderControls();
+        renderClassroomCanvas(true);
         showToast('Applied ' + (labelMap[layoutType] || 'layout') + ' to your customised seating!', '📐');
       }
 
@@ -2331,6 +2464,7 @@
       function applyCustomRowsColsGrid() {
         const cls = getCurrentClass();
         if (!cls) return;
+        const before = snapshotLayoutPositions(cls);
         const grid = syncGridInputsToClass(cls);
         const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
         cls.layoutStyle = activeStyle;
@@ -2344,12 +2478,13 @@
           }
         });
         ensureNoOverlaps(cls.students);
+        const after = snapshotLayoutPositions(cls);
+        const styleNames = { rows: 'Exam Rows', pairs: 'Paired Desks', pods4: '4-Desk Pods' };
+        const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
+        pushLayoutHistory(before, after, (styleNames[activeStyle] || 'Grid') + ' ' + grid.rows + '×' + grid.cols);
         saveState();
         renderHeaderControls();
         renderClassroomCanvas(true);
-
-        const styleNames = { rows: 'Exam Rows', pairs: 'Paired Desks', pods4: '4-Desk Pods' };
-        const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
         if (cls.students.length > grid.rows * grid.cols) {
           showToast('Set ' + grid.cols + ' columns (' + actualRowsUsed + ' rows needed for ' + cls.students.length + ' students) in ' + (styleNames[activeStyle] || 'Grid') + ' mode!', '📐');
         } else {
@@ -3073,12 +3208,13 @@
           renderClassroomCanvas(false);
         });
         document.getElementById('btnZoomOut').addEventListener('click', function () {
-          state.zoom = Math.max(0.65, Math.round((state.zoom - 0.1) * 100) / 100);
+          state.zoom = Math.max(0.35, Math.round((state.zoom - 0.1) * 100) / 100);
           renderClassroomCanvas(false);
         });
         document.getElementById('btnZoomReset').addEventListener('click', function () {
-          state.zoom = 1;
+          fitZoomToViewport();
           renderClassroomCanvas(false);
+          showToast('Fit zoom ' + Math.round(state.zoom * 100) + '%', '🔍');
         });
 
         // Manual Group Brush Bar
@@ -3124,12 +3260,13 @@
           showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
         });
 
-        // Whole Class +1 · Undo · Redo
+        // Whole Class +1 · Layout Undo / Redo / Reset · (Reset Scores stays on modal btn)
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
         });
-        document.getElementById('btnUndoLastScore').addEventListener('click', undoLastScoreAction);
-        document.getElementById('btnRedoScore').addEventListener('click', redoLastScoreAction);
+        document.getElementById('btnUndoLayout').addEventListener('click', undoLayoutAction);
+        document.getElementById('btnRedoLayout').addEventListener('click', redoLayoutAction);
+        document.getElementById('btnResetLayout').addEventListener('click', resetLayoutToDefaultGrid);
 
         // Group Dock Event Delegation (+1 / -1 on group cards)
         document.getElementById('groupDockCards').addEventListener('click', function (e) {
