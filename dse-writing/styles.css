@@ -43,7 +43,7 @@ body {
 }
 body.tools-page {
   /* Collapsed by default: room for 🛠 chip + footer clearance */
-  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }
 body.tools-page.dock-open {
   /* chrome row with tools + 🛠 (no separate fold strip) */
@@ -786,6 +786,12 @@ body.zh-on .gloss-key { display: block; }
   }
 }
 
+
+
+/* Useful vocabulary hub — keep footer clear of collapsed 🛠 chip */
+body.vocab-hub footer {
+  margin-top: 110px;
+}
 
 /* Sentence patterns — pattern cards */
 .pattern-card {
