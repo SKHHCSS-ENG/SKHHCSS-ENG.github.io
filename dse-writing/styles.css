@@ -774,8 +774,8 @@ body.zh-on .gloss-key { display: block; }
     background: var(--accent-soft);
     border-bottom: 1px solid var(--border);
   }
+  .vocab-table-pairs td:first-child::before,
   .vocab-table-pairs td:last-child::before {
-    content: "Informal / blog · ";
     display: block;
     font-size: .72rem;
     font-weight: 800;
@@ -783,6 +783,18 @@ body.zh-on .gloss-key { display: block; }
     text-transform: uppercase;
     color: var(--accent-ink);
     margin-bottom: 4px;
+  }
+  .vocab-table-pairs td:first-child::before {
+    content: "More formal · ";
+  }
+  .vocab-table-pairs td:last-child::before {
+    content: "More informal / blog · ";
+  }
+  body.zh-on .vocab-table-pairs td:first-child::before {
+    content: "較正式 · ";
+  }
+  body.zh-on .vocab-table-pairs td:last-child::before {
+    content: "較非正式／網誌 · ";
   }
 }
 
