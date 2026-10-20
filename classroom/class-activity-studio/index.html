@@ -689,9 +689,9 @@
         </div>
 
         <button type="button" data-layout="rows" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
-        <button type="button" data-layout="pairs" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns (2 desks together) within your Rows × Cols grid">Paired Desks</button>
-        <button type="button" data-layout="pods4" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block of desks into 4-desk pods within your Rows × Cols grid">4-Desk Pods</button>
-        <button type="button" data-layout="groupClusters" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather desks belonging to the same manual group into pods">
+        <button type="button" data-layout="pairs" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns: tight gap inside each pair, wider left–right aisle between pairs">Paired Desks</button>
+        <button type="button" data-layout="pods4" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block: tight inside each pod, wider left–right aisle between pods">4-Desk Pods</button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather each team into a tight cluster, with a wider left–right aisle between clusters">
           <span>🧲</span>
           <span>Cluster by Group</span>
         </button>
@@ -753,7 +753,7 @@
         <button id="btnSetDefaultLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
           Set as Default
         </button>
-        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset Layout — restore this class’s saved default seating and grouping (scores kept)" aria-label="Reset Layout">
+        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset Layout — restore this class’s saved default seating and grouping (scores kept). A saved or dragged board keeps its old positions until you reseed with a Quick Layout button." aria-label="Reset Layout">
           🔃
         </button>
         <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
@@ -1239,25 +1239,29 @@
       // Desktop paints about 105px, so a row gap of 10px reads as about 20px of white there.
       const DESK_H = 115;
       const ROW_GAP_Y = 10;
-      // Within-pod / within-pair pack stays at 10px. Between-pod, between-pair,
-      // and between-cluster aisles use that same 10px so those layouts read as
-      // one even grid (was 16px horizontal / 12px vertical, which still looked
-      // like blocks). Exam columns stay on their own even 16px gap.
-      const POD_INNER_GAP_X = 10;
-      const POD_AISLE_GAP_X = 10;
-      const POD_ROW_AISLE_Y = 10;
+      // Paired Desks, 4-Desk Pods, and Cluster by Group: tight left–right pack
+      // inside the group, and a clearly wider left–right aisle between groups.
+      // 8px within vs 36px between is enough to read as pairs / pods / clusters
+      // rather than Exam Rows' even 16px grid. Vertical gutters stay compact:
+      // 10px inside a group and between ordinary rows; 24px only between stacked
+      // 4-desk pods and between cluster bands (one aisle, not a second moat).
+      // Exam Rows do not use these gaps.
+      const POD_INNER_GAP_X = 8;
+      const POD_AISLE_GAP_X = 36;
+      const POD_ROW_AISLE_Y = 24;
       const EXAM_COL_GAP_X = 16;
       // Framed FRONT OF ROOM pill is 32px tall and stays 10px from the facing desk row.
       // A fresh front-at-top layout also leaves 8px above the strip.
       const FRONT_LABEL_H = 32;
       const FRONT_EDGE = 8;
       const FRONT_ROW_GAP = 10;
-      // Bump when desk size or step formula changes. Factory defaults reseed.
-      // Untouched factory seats move with the new pitch. A saved custom default
-      // (Set as Default) and any dragged seats keep their old positions until
-      // the teacher presses a Quick Layout button (or Reset Layout on a class
-      // that was still on the factory grid).
-      const LAYOUT_PITCH_VERSION = 'desk-148x115-evenAisle10-frontframe';
+      // Bump when desk size or step formula changes. Factory Quick Layout
+      // buttons (Exam Rows, Paired Desks, 4-Desk Pods, Cluster by Group, Apply
+      // Grid) always emit this pitch. Untouched factory seats reseed with it.
+      // Saved boards (Set as Default), dragged seats, and Reset Layout on a
+      // class whose saved default was captured before this pitch keep the old
+      // positions until the teacher reseeds with a Quick Layout button.
+      const LAYOUT_PITCH_VERSION = 'desk-148x115-groupLr-8within-36aisle';
       const GRID_SIZE = 20;
       const ZOOM_MIN = 0.35;
       const ZOOM_MAX = 1.25;
@@ -1494,8 +1498,8 @@
           }
         } else if (layoutType === 'pairs') {
           // Paired Desks applied to (customRows x cols) grid.
-          // Within-pair and between-pair gaps are the same even 10px, so the
-          // row does not open a wider aisle than Exam Rows' even grid.
+          // Tight gap inside each pair; a wider left–right aisle between pairs.
+          // Rows stay on the compact ROW_GAP_Y gutter (pairs are not stacked pods).
           const pairInnerGap = POD_INNER_GAP_X;
           const pairAisleGap = POD_AISLE_GAP_X;
           function getPairColOffset(c) {
@@ -1517,8 +1521,9 @@
           }
         } else if (layoutType === 'pods4') {
           // 4-Desk Pods applied to (customRows x cols) grid:
-          // Every 2x2 block keeps its seats together, but the gap inside a pod
-          // and the gap between pods are the same even 10px (horizontal and vertical).
+          // Every 2×2 block sits tight inside the pod. The left–right aisle
+          // between pods is wider; the vertical break between pod rows is a
+          // compact aisle so the block reads as four desks, not an even grid.
           const podInnerGapX = POD_INNER_GAP_X;
           const podAisleGapX = POD_AISLE_GAP_X;
           const podInnerGapY = ROW_GAP_Y;
@@ -1583,9 +1588,9 @@
                 };
               });
             });
-            // Between-band gutter is the same 10px already included in each row
-            // step. Do not add a second aisle (that used to make a 22px moat).
-            currentBandY += maxRowsInBand * (DESK_H + ROW_GAP_Y);
+            // One compact aisle under the band. Do not add it on top of the
+            // within-cluster row gutter (that double count was the old moat).
+            currentBandY += (maxRowsInBand - 1) * (DESK_H + ROW_GAP_Y) + DESK_H + POD_ROW_AISLE_Y;
           }
 
           for (let i = 0; i < count; i++) {
