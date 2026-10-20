@@ -1090,3 +1090,21 @@ body.grammar-junior.tools-page.dock-open {
 body.grammar-junior.tools-page.dock-open.hw-on {
   padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
 }
+
+/* Grammar (Junior) Core 譯: Chinese after-text may wrap at ~390px (mirror vocab / sentence patterns) */
+body.grammar-junior.zh-on .gloss::after {
+  white-space: normal;
+}
+/* When glosses wrap, avoid format-section / format-group overflow:hidden clipping at the card edge */
+body.grammar-junior.zh-on details.format-section,
+body.grammar-junior.zh-on details.format-group {
+  overflow: visible;
+}
+@media (max-width: 560px) {
+  body.grammar-junior.zh-on #core .grammar-table td[data-label="Positive"]::before { content: "肯定句"; }
+  body.grammar-junior.zh-on #core .grammar-table td[data-label="Negative"]::before { content: "否定句"; }
+  body.grammar-junior.zh-on #core .grammar-table td[data-label="Questions"]::before { content: "疑問句"; }
+  body.grammar-junior.zh-on #core .grammar-table td[data-label="Short answers"]::before { content: "簡短回答"; }
+  body.grammar-junior.zh-on #core .grammar-table td[data-label="Direct"]::before { content: "直接引語"; }
+  body.grammar-junior.zh-on #core .grammar-table td[data-label="Reported"]::before { content: "間接引語"; }
+}
