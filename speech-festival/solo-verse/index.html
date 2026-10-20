@@ -369,7 +369,7 @@ function prepareYtIframe() {
   if (!iframe) return;
   iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
   iframe.setAttribute('playsinline', '1');
-  iframe.setAttribute('aria-hidden', 'true');
+  iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
   iframe.tabIndex = -1;
   iframe.style.pointerEvents = 'none';
 }
@@ -491,6 +491,7 @@ function beginPlayback(meta) {
     ytPlayer.setVolume(100);
     loadedVideoId = meta.videoId;
     ytPlayer.loadVideoById({ videoId: meta.videoId, startSeconds: start, endSeconds: end });
+    ytPlayer.playVideo();
   } catch (e) {
     showToast('Could not play this recording — tap again');
     stopAudio(false);
