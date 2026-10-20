@@ -267,6 +267,26 @@
     .desk-name-btn.desk-name-empty:focus-visible {
       color: #0f172a;
     }
+    /* Frozen name/number keep the button box. Only the cursor and hover change. */
+    .desk-name-btn.is-frozen,
+    .desk-classno-btn.is-frozen {
+      cursor: default;
+    }
+    .desk-name-btn.is-frozen:hover,
+    .desk-name-btn.is-frozen:focus-visible {
+      background: transparent;
+      border-color: transparent;
+      outline: none;
+    }
+    .desk-name-btn.is-frozen.desk-name-empty:hover,
+    .desk-name-btn.is-frozen.desk-name-empty:focus-visible {
+      color: #64748b;
+    }
+    .desk-classno-btn.is-frozen:hover,
+    .desk-classno-btn.is-frozen:focus-visible {
+      background: #f1f5f9;
+      outline: none;
+    }
     .desk-name-static {
       cursor: default;
       min-height: 26px;
@@ -850,9 +870,9 @@
           <span>＋ Desk</span>
         </button>
 
-        <!-- Edit Name: bulk rename and fill Empty seats from the board -->
-        <button id="btnToggleEditName" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Rename students on the seating board, including empty seats" aria-pressed="false">
-          Edit Name
+        <!-- Edit: gate for name, seat number, and team rename. On by default. -->
+        <button id="btnToggleEditName" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm" title="Stop Editing" aria-label="Edit" aria-pressed="true">
+          Edit
         </button>
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
@@ -870,7 +890,7 @@
         <button id="btnResetLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
           🔄 Layout
         </button>
-        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout" aria-label="Lock Layout" aria-pressed="false">
+        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Edit &amp; Drag — freeze layout and names" aria-label="Lock Edit &amp; Drag" aria-pressed="false">
           <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
         </button>
       </div>
@@ -1899,14 +1919,14 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
-        layoutLocked: false, // persisted with the studio payload; default unlocked
+        layoutLocked: false, // persisted; default unlocked. Lock wins over Edit.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
         zoomChipLeft: null,
         zoomChipTop: null,
         brushMode: false,
-        editNameMode: false,
+        editMode: true, // persisted; default on so taps can rename. Lock still freezes edits.
         editingStudentId: '',
         editingClassNoId: '',
         editingGroupId: '',
@@ -1966,6 +1986,8 @@
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
               // Absent or false keeps names, seat numbers, group names, and desk drag editable.
               state.layoutLocked = parsed.layoutLocked === true;
+              // Missing flag stays on: taps already rename today. Explicit false turns Edit off.
+              state.editMode = parsed.editMode !== false;
               readZoomChipPref(parsed);
               var pitchMigrated = false;
               state.classes.forEach(function (c) {
@@ -1993,6 +2015,7 @@
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
             layoutLocked: state.layoutLocked === true,
+            editMode: state.editMode !== false,
             layoutPitchVersion: LAYOUT_PITCH_VERSION
           };
           if (hasSavedZoomChip()) {
@@ -2003,6 +2026,11 @@
         } catch (e) {
           // Ignore storage quota / sandbox restrictions
         }
+      }
+
+      // Lock wins over Edit. editMode only opens name, seat #, and team rename while unlocked.
+      function boardEditsAllowed() {
+        return state.editMode !== false && state.layoutLocked !== true;
       }
 
       function getCurrentClass() {
@@ -2173,7 +2201,7 @@
       }
 
       function beginGroupNameEdit(groupId) {
-        if (!groupId || state.layoutLocked) return;
+        if (!groupId || !boardEditsAllowed()) return;
         groupEditToken += 1;
         state.editingClassNoId = '';
         state.editingStudentId = '';
@@ -2235,11 +2263,11 @@
       }
 
       function renderDockGroupNameControl(grp) {
-        if (state.layoutLocked) {
-          return '<span class="dock-group-btn dock-group-static" title="' + escapeHtml(grp.name) + '" aria-label="' + escapeHtml(grp.name) + '">' +
+        if (!boardEditsAllowed()) {
+          return '<button type="button" class="dock-group-btn dock-group-static" title="' + escapeHtml(grp.name) + '" aria-label="' + escapeHtml(grp.name) + '">' +
             '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
             '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
-            '</span>';
+            '</button>';
         }
         const editingHere = state.editingGroupId === grp.id && state.editingGroupAnchor === 'dock';
         if (editingHere) {
@@ -2260,37 +2288,25 @@
 
       function renderDeskClassNoControl(st) {
         const no = String(st.classNo == null ? '' : st.classNo);
-        if (state.layoutLocked) {
-          return '<span class="desk-classno-static" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</span>';
-        }
-        if (state.editingClassNoId === st.id) {
+        if (state.editingClassNoId === st.id && boardEditsAllowed()) {
           return '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12" ' +
             'class="desk-classno-input" data-desk-classno-input="' + escapeHtml(st.id) + '" ' +
             'data-original-classno="' + escapeHtml(no) + '" ' +
             'value="' + escapeHtml(no) + '" aria-label="Class number" />';
         }
-        // Empty seats keep a tappable #. Clearing a name must not freeze the number.
-        return '<button type="button" class="desk-classno-btn" data-desk-classno="' + escapeHtml(st.id) + '" ' +
-          'title="Edit class number" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
+        // Same button box when edits are frozen, so locking does not move the name row.
+        const frozen = !boardEditsAllowed();
+        return '<button type="button" class="desk-classno-btn' + (frozen ? ' is-frozen' : '') + '" data-desk-classno="' + escapeHtml(st.id) + '" ' +
+          'title="' + (frozen ? ('Class number ' + escapeHtml(no)) : 'Edit class number') + '" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
       }
 
       function deskNameIsEditable(st) {
-        if (state.layoutLocked) return false;
-        if (state.editingStudentId && state.editingStudentId === st.id) return true;
-        // Edit Name opens named seats for bulk rename. Empty stays a button
-        // until tapped, so a cleared name is never plain locked text.
-        if (state.editNameMode && !isEmptySeatName(st.name)) return true;
-        return false;
+        if (!boardEditsAllowed()) return false;
+        return !!(state.editingStudentId && state.editingStudentId === st.id);
       }
 
       function renderDeskNameControl(st) {
         const empty = isEmptySeatName(st.name);
-        if (state.layoutLocked) {
-          if (empty) {
-            return '<span class="desk-name-static desk-name-empty line-clamp-2">Empty</span>';
-          }
-          return '<span class="desk-name-static line-clamp-2">' + escapeHtml(st.name) + '</span>';
-        }
         if (deskNameIsEditable(st)) {
           const shown = empty ? '' : st.name;
           const label = empty ? 'Empty seat name' : ('Student name, ' + st.name);
@@ -2299,12 +2315,13 @@
             'data-original-name="' + escapeHtml(shown) + '" ' +
             'value="' + escapeHtml(shown) + '" placeholder="Empty" aria-label="' + escapeHtml(label) + '" />';
         }
+        const frozen = !boardEditsAllowed();
         if (empty) {
-          return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2" data-desk-rename="' + escapeHtml(st.id) + '" ' +
-            'title="Type a name" aria-label="Empty seat, type a name">Empty</button>';
+          return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2' + (frozen ? ' is-frozen' : '') + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+            'title="' + (frozen ? 'Empty' : 'Type a name') + '" aria-label="' + (frozen ? 'Empty' : 'Empty seat, type a name') + '">Empty</button>';
         }
-        return '<button type="button" class="desk-name-btn line-clamp-2" data-desk-rename="' + escapeHtml(st.id) + '" ' +
-          'title="Rename ' + escapeHtml(st.name) + '" aria-label="Rename ' + escapeHtml(st.name) + '">' +
+        return '<button type="button" class="desk-name-btn line-clamp-2' + (frozen ? ' is-frozen' : '') + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+          'title="' + (frozen ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '" aria-label="' + (frozen ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '">' +
           escapeHtml(st.name) + '</button>';
       }
 
@@ -2954,15 +2971,16 @@
           }
         }
 
-        // Lock sits beside Reset Layout. Label is the action; pressed means the board is locked.
+        // Lock sits beside Reset Layout. Aria is the action; the title is one line.
         const lockIcon = document.getElementById('lockLayoutIcon');
         const btnLock = document.getElementById('btnToggleLockLayout');
         if (lockIcon && btnLock) {
           const locked = state.layoutLocked === true;
-          const actionLabel = locked ? 'Unlock Layout' : 'Lock Layout';
           lockIcon.textContent = locked ? '🔒' : '🔓';
-          btnLock.title = actionLabel;
-          btnLock.setAttribute('aria-label', actionLabel);
+          btnLock.title = locked
+            ? 'Unlock Edit & Drag — allow desk drag and name / # / team edits'
+            : 'Lock Edit & Drag — freeze layout and names';
+          btnLock.setAttribute('aria-label', locked ? 'Unlock Edit & Drag' : 'Lock Edit & Drag');
           btnLock.setAttribute('aria-pressed', locked ? 'true' : 'false');
           btnLock.className = locked
             ? 'min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-950 text-base font-bold transition'
@@ -3015,17 +3033,16 @@
 
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
-          const editsLocked = state.layoutLocked === true;
-          btnEditName.disabled = editsLocked;
-          btnEditName.setAttribute('aria-disabled', editsLocked ? 'true' : 'false');
-          btnEditName.setAttribute('aria-pressed', !editsLocked && state.editNameMode ? 'true' : 'false');
-          if (editsLocked) {
-            btnEditName.className = 'min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 text-slate-400 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition opacity-60 cursor-default';
-          } else {
-            btnEditName.className = state.editNameMode
-              ? 'min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm'
-              : 'min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition';
-          }
+          const editing = state.editMode !== false;
+          btnEditName.disabled = false;
+          btnEditName.removeAttribute('aria-disabled');
+          btnEditName.textContent = 'Edit';
+          btnEditName.setAttribute('aria-label', 'Edit');
+          btnEditName.title = editing ? 'Stop Editing' : 'Edit';
+          btnEditName.setAttribute('aria-pressed', editing ? 'true' : 'false');
+          btnEditName.className = editing
+            ? 'min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm'
+            : 'min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition';
         }
       }
 
@@ -3422,7 +3439,7 @@
           if (noBtn) {
             e.preventDefault();
             e.stopPropagation();
-            if (state.layoutLocked) return;
+            if (!boardEditsAllowed()) return;
             const id = noBtn.getAttribute('data-desk-classno');
             if (!id) return;
             state.editingClassNoId = id;
@@ -3444,7 +3461,7 @@
           if (!nameBtn) return;
           e.preventDefault();
           e.stopPropagation();
-          if (state.layoutLocked) return;
+          if (!boardEditsAllowed()) return;
           const id = nameBtn.getAttribute('data-desk-rename');
           if (!id) return;
           state.editingClassNoId = '';
@@ -3528,10 +3545,6 @@
             const clsNow = getCurrentClass();
             const stNow = clsNow && clsNow.students.find(function (s) { return s.id === id; });
             becameEmpty = !!(stNow && isEmptySeatName(stNow.name));
-            if (state.editNameMode && !becameEmpty && input.isConnected && stNow) {
-              input.value = stNow.name;
-              input.setAttribute('data-original-name', stNow.name);
-            }
           } else {
             const clsNow = getCurrentClass();
             const stNow = clsNow && clsNow.students.find(function (s) { return s.id === id; });
@@ -3541,7 +3554,7 @@
           renderLeaderboardAndStats();
           // Close a one-off edit, and turn a cleared name back into a tappable Empty.
           // Skip if the teacher already moved to another name or class number.
-          if (becameEmpty || (!state.editNameMode && state.editingStudentId === id)) {
+          if (becameEmpty || state.editingStudentId === id) {
             const closingId = id;
             setTimeout(function () {
               const activeNow = document.activeElement;
@@ -3959,9 +3972,9 @@
               '<div class="flex items-center gap-1.5">' +
                 '<input type="text" data-edit-grp-icon="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.icon) + '" aria-label="Team Emoji" class="w-10 px-1.5 py-1 text-center text-sm bg-white border border-slate-200 rounded-lg" />' +
                 '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Team Name"' +
-                  (state.layoutLocked ? ' readonly aria-readonly="true"' : '') +
+                  (boardEditsAllowed() ? '' : ' readonly aria-readonly="true"') +
                   ' class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg ' +
-                  (state.layoutLocked ? 'bg-slate-100 text-slate-500 cursor-default' : 'bg-white') + '" />' +
+                  (boardEditsAllowed() ? 'bg-white' : 'bg-slate-100 text-slate-500 cursor-default') + '" />' +
                 '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" title="Delete Team">✕</button>' +
               '</div>' +
               '<div class="flex items-center justify-between text-[11px]">' +
@@ -4603,22 +4616,26 @@
         });
 
         document.getElementById('btnToggleEditName').addEventListener('click', function () {
-          if (state.layoutLocked) return;
           const active = document.activeElement;
-          if (active && active.getAttribute && (active.getAttribute('data-desk-name-input') || active.getAttribute('data-desk-classno-input') || active.getAttribute('data-dock-group-input'))) {
+          if (active && active.blur && active.getAttribute && (active.getAttribute('data-desk-name-input') || active.getAttribute('data-desk-classno-input') || active.getAttribute('data-dock-group-input') || active.getAttribute('data-edit-grp-name'))) {
             active.blur();
           }
-          state.editNameMode = !state.editNameMode;
+          state.editMode = state.editMode === false;
           state.editingStudentId = '';
           state.editingClassNoId = '';
           groupEditToken += 1;
           state.editingGroupId = '';
           state.editingGroupAnchor = '';
           state.editingGroupDeskId = '';
+          saveState();
           renderHeaderControls();
           renderGroupScoreDock();
           renderClassroomCanvas(false);
-          showToast(state.editNameMode ? 'Edit Name is on — tap a name to rename. Empty seats are open too.' : 'Edit Name is off', '✏️');
+          const groupModal = document.getElementById('groupModal');
+          if (groupModal && !groupModal.classList.contains('hidden')) {
+            renderGroupModalContents();
+          }
+          showToast(state.editMode !== false ? 'Editing on' : 'Editing off', '✏️');
         });
 
         // Sound Toggle
@@ -4667,7 +4684,6 @@
             )) {
               active.blur();
             }
-            state.editNameMode = false;
             state.editingStudentId = '';
             state.editingClassNoId = '';
             groupEditToken += 1;
@@ -4684,7 +4700,7 @@
           if (groupModal && !groupModal.classList.contains('hidden')) {
             renderGroupModalContents();
           }
-          showToast(state.layoutLocked ? 'Layout locked' : 'Layout unlocked', state.layoutLocked ? '🔒' : '🔓');
+          showToast(state.layoutLocked ? 'Locked' : 'Unlocked', state.layoutLocked ? '🔒' : '🔓');
         });
 
         document.getElementById('btnToggleSnapGrid').addEventListener('click', function () {
@@ -5144,7 +5160,7 @@
           }
           const nameGrpId = e.target.getAttribute('data-edit-grp-name');
           if (nameGrpId) {
-            if (state.layoutLocked) return;
+            if (!boardEditsAllowed()) return;
             const g = getGroupById(cls, nameGrpId);
             if (g) {
               g.name = e.target.value;
