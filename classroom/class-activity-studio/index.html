@@ -27,6 +27,94 @@
     #zoomReadout {
       user-select: text;
       -webkit-user-select: text;
+      width: 3.25rem;
+      min-height: 44px;
+      padding: 0 2px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #334155;
+    }
+    #zoomReadout:focus {
+      outline: none;
+      border-color: #818cf8;
+      box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.45);
+    }
+    /* Floating Zoom on the seating canvas. Bottom-left stays clear of the
+       site Tools dock, which is fixed to the window's bottom-right. */
+    .zoom-chip {
+      position: absolute;
+      z-index: 40;
+      left: 8px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      max-width: calc(100% - 72px);
+      padding: 4px 6px 4px 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(203, 213, 225, 0.95);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
+    }
+    .zoom-chip-label {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      user-select: none;
+    }
+    .zoom-chip-btn,
+    .zoom-chip-fit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-weight: 700;
+      touch-action: manipulation;
+    }
+    .zoom-chip-btn {
+      min-width: 44px;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .zoom-chip-fit {
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .zoom-chip-btn:hover,
+    .zoom-chip-fit:hover {
+      background: #f1f5f9;
+    }
+    .zoom-chip-pct {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      min-height: 44px;
+    }
+    .zoom-chip-pct span {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      user-select: none;
+    }
+    @media (min-width: 640px) {
+      .zoom-chip {
+        left: 10px;
+        bottom: 10px;
+      }
+    }
+    /* Extra scroll room so the last row can move clear of the floating Zoom chip. */
+    #classroomStage {
+      margin-bottom: 72px;
     }
     /* Classroom Floor Grid Pattern */
     .classroom-floor {
@@ -102,6 +190,14 @@
       background: #fffbeb;
       border-color: #fcd34d;
       outline: none;
+    }
+    .desk-name-btn.desk-name-empty {
+      color: #64748b;
+      font-weight: 600;
+    }
+    .desk-name-btn.desk-name-empty:hover,
+    .desk-name-btn.desk-name-empty:focus-visible {
+      color: #0f172a;
     }
     .desk-name-static {
       cursor: default;
@@ -611,22 +707,8 @@
       </section>
 
       <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
-      <section class="bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col">
-        <!-- Floor plan bar: Zoom only. Class name, headcount, and mode hints live elsewhere. -->
-        <div class="px-3 sm:px-4 py-1 bg-slate-50 border-b border-slate-200/80 flex items-center justify-end">
-          <div class="flex items-center gap-1.5">
-            <span class="text-[11px] font-semibold text-slate-500">Zoom:</span>
-            <button id="btnZoomOut" type="button" class="min-h-[44px] min-w-[44px] rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-sm font-bold flex items-center justify-center" title="Zoom Out">−</button>
-            <label class="inline-flex items-center gap-0.5 min-h-[44px]">
-              <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" class="min-h-[44px] w-16 px-1 rounded-lg bg-white border border-slate-200 text-base font-bold text-slate-700 text-center focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-              <span class="text-xs font-bold text-slate-700 select-none" aria-hidden="true">%</span>
-            </label>
-            <button id="btnZoomIn" type="button" class="min-h-[44px] min-w-[44px] rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-sm font-bold flex items-center justify-center" title="Zoom In">＋</button>
-            <button id="btnZoomReset" type="button" class="min-h-[44px] px-3 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-600" title="Fit floor plan to viewport">Fit</button>
-          </div>
-        </div>
-
-        <!-- Scrollable Freeform Viewport -->
+      <section class="relative bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col">
+        <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full h-[600px] sm:h-[650px] relative select-none">
           <!-- Scaled Inner Stage -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
@@ -643,6 +725,17 @@
             <!-- Desks Layer -->
             <div id="desksContainer" class="absolute inset-0"></div>
           </div>
+        </div>
+        <!-- Bottom-left of the board viewport. The site Tools dock owns bottom-right. -->
+        <div id="zoomChip" class="zoom-chip" role="group" aria-label="Zoom">
+          <span class="zoom-chip-label">Zoom</span>
+          <button id="btnZoomOut" type="button" class="zoom-chip-btn" title="Zoom Out" aria-label="Zoom Out">−</button>
+          <label class="zoom-chip-pct">
+            <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" />
+            <span aria-hidden="true">%</span>
+          </label>
+          <button id="btnZoomIn" type="button" class="zoom-chip-btn" title="Zoom In" aria-label="Zoom In">＋</button>
+          <button id="btnZoomReset" type="button" class="zoom-chip-fit" title="Fit floor plan to viewport">Fit</button>
         </div>
       </section>
     </div>
@@ -1742,11 +1835,6 @@
         return true;
       }
 
-      function classNoIsInteractive(st) {
-        if (state.editNameMode) return true;
-        return !isEmptySeatName(st.name);
-      }
-
       function renderDeskClassNoControl(st) {
         const no = String(st.classNo == null ? '' : st.classNo);
         if (state.editingClassNoId === st.id) {
@@ -1755,16 +1843,16 @@
             'data-original-classno="' + escapeHtml(no) + '" ' +
             'value="' + escapeHtml(no) + '" aria-label="Class number" />';
         }
-        if (!classNoIsInteractive(st)) {
-          return '<span class="desk-classno-static" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</span>';
-        }
+        // Empty seats keep a tappable #. Clearing a name must not freeze the number.
         return '<button type="button" class="desk-classno-btn" data-desk-classno="' + escapeHtml(st.id) + '" ' +
           'title="Edit class number" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
       }
 
       function deskNameIsEditable(st) {
-        if (state.editNameMode) return true;
         if (state.editingStudentId && state.editingStudentId === st.id) return true;
+        // Edit Name opens named seats for bulk rename. Empty stays a button
+        // until tapped, so a cleared name is never plain locked text.
+        if (state.editNameMode && !isEmptySeatName(st.name)) return true;
         return false;
       }
 
@@ -1778,12 +1866,13 @@
             'data-original-name="' + escapeHtml(shown) + '" ' +
             'value="' + escapeHtml(shown) + '" placeholder="Empty" aria-label="' + escapeHtml(label) + '" />';
         }
-        if (!empty) {
-          return '<button type="button" class="desk-name-btn line-clamp-2" data-desk-rename="' + escapeHtml(st.id) + '" ' +
-            'title="Rename ' + escapeHtml(st.name) + '" aria-label="Rename ' + escapeHtml(st.name) + '">' +
-            escapeHtml(st.name) + '</button>';
+        if (empty) {
+          return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+            'title="Type a name" aria-label="Empty seat, type a name">Empty</button>';
         }
-        return '<div class="desk-name-static line-clamp-2" title="Empty">Empty</div>';
+        return '<button type="button" class="desk-name-btn line-clamp-2" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+          'title="Rename ' + escapeHtml(st.name) + '" aria-label="Rename ' + escapeHtml(st.name) + '">' +
+          escapeHtml(st.name) + '</button>';
       }
 
       // ===================================================================
@@ -2677,7 +2766,7 @@
                 renderDeskClassNoControl(st) +
                 '<span class="desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
               '</div>' +
-              '<!-- Row 2: Student Name (tap to rename; Empty stays plain until Edit Name) -->' +
+              '<!-- Row 2: Student Name (tap to rename, including Empty) -->' +
               renderDeskNameControl(st) +
               '<!-- Row 3: Team Badge -->' +
               '<div class="flex items-center justify-between mb-0.5">' +
@@ -2880,7 +2969,7 @@
             return;
           }
           const nameBtn = e.target.closest('[data-desk-rename]');
-          if (!nameBtn || state.editNameMode) return;
+          if (!nameBtn) return;
           e.preventDefault();
           e.stopPropagation();
           const id = nameBtn.getAttribute('data-desk-rename');
@@ -2953,26 +3042,45 @@
           if (!nameId) return;
           const id = nameId;
           const cancel = input.dataset.cancelName === '1';
+          let becameEmpty = false;
           if (!cancel) {
             commitStudentName(id, input.value);
-            if (state.editNameMode && input.isConnected) {
-              const clsNow = getCurrentClass();
-              const stNow = clsNow && clsNow.students.find(function (s) { return s.id === id; });
-              if (stNow) {
-                const shown = isEmptySeatName(stNow.name) ? '' : stNow.name;
-                input.value = shown;
-                input.setAttribute('data-original-name', shown);
-              }
+            const clsNow = getCurrentClass();
+            const stNow = clsNow && clsNow.students.find(function (s) { return s.id === id; });
+            becameEmpty = !!(stNow && isEmptySeatName(stNow.name));
+            if (state.editNameMode && !becameEmpty && input.isConnected && stNow) {
+              input.value = stNow.name;
+              input.setAttribute('data-original-name', stNow.name);
             }
+          } else {
+            const clsNow = getCurrentClass();
+            const stNow = clsNow && clsNow.students.find(function (s) { return s.id === id; });
+            becameEmpty = !!(stNow && isEmptySeatName(stNow.name));
           }
           syncOpenRosterName(id);
           renderLeaderboardAndStats();
-          // Defer closing a one-off edit so a tap on another name still lands.
-          if (!state.editNameMode && state.editingStudentId === id) {
+          // Close a one-off edit, and turn a cleared name back into a tappable Empty.
+          // Skip if the teacher already moved to another name or class number.
+          if (becameEmpty || (!state.editNameMode && state.editingStudentId === id)) {
             const closingId = id;
             setTimeout(function () {
-              if (state.editNameMode) return;
-              if (state.editingStudentId !== closingId) return;
+              const activeNow = document.activeElement;
+              if (activeNow && activeNow.getAttribute) {
+                const activeName = activeNow.getAttribute('data-desk-name-input');
+                const activeNo = activeNow.getAttribute('data-desk-classno-input');
+                if (activeNo) return;
+                if (activeName && activeName !== closingId) return;
+              }
+              if (state.editingStudentId && state.editingStudentId !== closingId) return;
+              if (state.editingClassNoId) return;
+              const containerNow = document.getElementById('desksContainer');
+              if (containerNow) {
+                containerNow.querySelectorAll('[data-desk-name-input]').forEach(function (el) {
+                  const otherId = el.getAttribute('data-desk-name-input');
+                  if (!otherId || otherId === closingId || el.dataset.cancelName === '1') return;
+                  commitStudentName(otherId, el.value);
+                });
+              }
               state.editingStudentId = '';
               renderClassroomCanvas(false);
             }, 0);
@@ -3943,6 +4051,16 @@
           zoomReadoutInput.addEventListener('focus', function () {
             setTimeout(function () { zoomReadoutInput.select(); }, 0);
           });
+        }
+        // The chip sits over the board corner. Wheel there still scrolls the floor.
+        const zoomChip = document.getElementById('zoomChip');
+        if (zoomChip) {
+          zoomChip.addEventListener('wheel', function (e) {
+            const floor = document.getElementById('classroomViewport');
+            if (!floor) return;
+            floor.scrollBy({ left: e.deltaX, top: e.deltaY });
+            e.preventDefault();
+          }, { passive: false });
         }
 
         // Manual Group Brush Bar
