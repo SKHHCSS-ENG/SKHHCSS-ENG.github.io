@@ -438,6 +438,10 @@
       .studio-mast { padding: 0.55rem 1.25rem 0.1rem; }
     }
     .studio-back {
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
+      min-height: 44px;
       grid-column: 1;
       justify-self: start;
       align-self: center;
@@ -485,7 +489,18 @@
         align-items: stretch;
         row-gap: 0.15rem;
       }
-      .studio-back { align-self: flex-start; }
+      .studio-back {
+        align-self: flex-start;
+        position: relative;
+        z-index: 1;
+        /* text-xs line is 16px. The rest of the 44px target hangs into
+           the mast padding and the row beneath, then negative margins
+           cancel that so the centred brand does not move. */
+        padding-top: 8px;
+        padding-bottom: 20px;
+        margin-top: -8px;
+        margin-bottom: -20px;
+      }
       .studio-brand { align-self: center; width: 100%; }
     }
   </style>
