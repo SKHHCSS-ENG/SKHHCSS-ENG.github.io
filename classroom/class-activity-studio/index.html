@@ -475,22 +475,21 @@
       outline: none;
       border-color: #d97706;
     }
-    /* Edit-only delete. Glyph in the corner; the button itself is the 44px target
-       and stays inside the card so paired desks (8px gap) do not cover it. */
+    /* Edit-only delete. The hit target is the glyph itself, sitting in the
+       header row beside the score so it cannot cover the number or the name. */
     .board-delete-btn {
-      position: absolute;
-      z-index: 7;
-      top: 0;
-      right: 0;
-      width: 44px;
-      height: 44px;
+      position: relative;
+      z-index: 1;
+      flex: none;
+      width: 28px;
+      height: 28px;
       margin: 0;
       padding: 0;
       border: 0;
       background: transparent;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-end;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
@@ -498,8 +497,7 @@
     .board-delete-btn span {
       width: 22px;
       height: 22px;
-      margin-top: 3px;
-      margin-right: 3px;
+      margin: 0;
       border-radius: 999px;
       background: #fff;
       border: 1px solid #fecdd3;
@@ -512,6 +510,7 @@
       font-size: 13px;
       line-height: 1;
       color: #e11d48;
+      pointer-events: none;
     }
     .board-delete-btn:hover span,
     .board-delete-btn:focus-visible span {
@@ -524,15 +523,64 @@
     .board-delete-btn:focus-visible span {
       box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.35);
     }
-    .desk-card.has-edit-x .desk-top-row {
-      padding-right: 22px;
+    .desk-score-row,
+    .group-score-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      flex: none;
+      min-width: 0;
     }
-    .desk-card.has-edit-x .desk-name-btn,
-    .desk-card.has-edit-x .desk-name-input {
-      padding-right: 18px;
+    /* Edit + ON/OFF. Compact chip on the Register band. */
+    .studio-band #btnToggleEditName.edit-switch {
+      gap: 5px;
+      padding-left: 8px;
+      padding-right: 3px;
+      border-radius: 999px;
+      font-weight: 700;
     }
-    .group-dock-card.has-edit-x .group-dock-head {
-      padding-right: 22px;
+    .edit-switch-name {
+      line-height: 1;
+    }
+    .edit-switch-value {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-width: 30px;
+      height: 16px;
+      padding: 0 5px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    #btnToggleEditName.edit-switch.is-on {
+      background: #fcd34d;
+      color: #0f172a;
+      border: 1px solid #f59e0b;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+    #btnToggleEditName.edit-switch.is-on:hover {
+      background: #fde68a;
+    }
+    #btnToggleEditName.edit-switch.is-on .edit-switch-value {
+      background: #fff;
+      color: #92400e;
+    }
+    #btnToggleEditName.edit-switch.is-off {
+      background: #fff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      box-shadow: none;
+    }
+    #btnToggleEditName.edit-switch.is-off:hover {
+      background: #fffbeb;
+    }
+    #btnToggleEditName.edit-switch.is-off .edit-switch-value {
+      background: #e2e8f0;
+      color: #475569;
     }
     @media (min-width: 640px) {
       .dock-group-btn {
@@ -992,9 +1040,10 @@
           <span>＋ Desk</span>
         </button>
 
-        <!-- Edit: gate for name, seat number, and team rename. On by default. -->
-        <button id="btnToggleEditName" type="button" class="px-3 py-1 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs font-bold whitespace-nowrap transition shadow-sm" title="Stop Editing" aria-label="Edit" aria-pressed="true">
-          Edit
+        <!-- Edit: gate for name, seat number, team rename, and delete. On by default. -->
+        <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit on" aria-pressed="true">
+          <span class="edit-switch-name">Edit</span>
+          <span class="edit-switch-value" aria-hidden="true">ON</span>
         </button>
       </div>
 
@@ -2738,7 +2787,10 @@
               color: g.color,
               score: Number(g.score) || 0
             };
-          })
+          }),
+          layoutStyle: cls.layoutStyle || '',
+          gridRows: cls.gridRows,
+          gridCols: cls.gridCols
         };
       }
 
@@ -2802,6 +2854,14 @@
           });
         });
         cls.groups = nextGroups;
+
+        if (Object.prototype.hasOwnProperty.call(fromSnap, 'layoutStyle') || Object.prototype.hasOwnProperty.call(toSnap, 'layoutStyle')) {
+          if ((fromSnap.layoutStyle || '') !== (toSnap.layoutStyle || '')) {
+            cls.layoutStyle = toSnap.layoutStyle || '';
+          }
+        }
+        if (fromSnap.gridRows !== toSnap.gridRows && toSnap.gridRows != null) cls.gridRows = toSnap.gridRows;
+        if (fromSnap.gridCols !== toSnap.gridCols && toSnap.gridCols != null) cls.gridCols = toSnap.gridCols;
 
         var fromStudents = indexById(fromSnap.students);
         var toStudents = indexById(toSnap.students);
@@ -3010,6 +3070,8 @@
           if ((sa.groupId || '') !== (sb.groupId || '')) return false;
           if (sa.x !== sb.x || sa.y !== sb.y) return false;
         }
+        if ((a.layoutStyle || '') !== (b.layoutStyle || '')) return false;
+        if (a.gridRows !== b.gridRows || a.gridCols !== b.gridCols) return false;
         return true;
       }
 
@@ -3395,6 +3457,48 @@
         renderLeaderboardAndStats();
       }
 
+      // True when the live desks are still the arrangement that preset would draw.
+      function layoutMatchesStyle(cls, style) {
+        if (!cls || !style || !cls.students || !cls.students.length) return false;
+        const students = cls.students.map(function (st) {
+          return {
+            id: st.id,
+            x: st.x,
+            y: st.y,
+            groupId: st.groupId || '',
+            classNo: st.classNo
+          };
+        });
+        const cols = cls.gridCols || (students.length > 30 ? 7 : 6);
+        const rows = cls.gridRows || Math.max(1, Math.ceil(students.length / cols));
+        if (style === 'groupClusters') {
+          const coords = computeLayoutPositions(students.length, 'groupClusters', cls.frontAtTop, students, cls.groups, cols, rows);
+          students.forEach(function (st, idx) {
+            if (coords[idx]) {
+              st.x = coords[idx].x;
+              st.y = coords[idx].y;
+            }
+          });
+        } else {
+          const spatiallyOrdered = getSpatiallyOrderedStudents(students);
+          const coords = computeLayoutPositions(spatiallyOrdered.length, style, cls.frontAtTop, spatiallyOrdered, cls.groups, cols, rows);
+          spatiallyOrdered.forEach(function (st, idx) {
+            if (coords[idx]) {
+              st.x = coords[idx].x;
+              st.y = coords[idx].y;
+            }
+          });
+        }
+        ensureNoOverlaps(students);
+        const live = {};
+        cls.students.forEach(function (st) { live[st.id] = st; });
+        for (var i = 0; i < students.length; i++) {
+          const st = live[students[i].id];
+          if (!st || st.x !== students[i].x || st.y !== students[i].y) return false;
+        }
+        return true;
+      }
+
       function renderHeaderControls() {
         const cls = getCurrentClass();
         const selectEl = document.getElementById('classSelect');
@@ -3455,8 +3559,9 @@
           if (document.activeElement !== cInput) cInput.value = String(defaultCols);
         }
 
-        // Highlight currently active layout style button
-        const activeStyle = (cls && cls.layoutStyle) ? cls.layoutStyle : 'rows';
+        // Highlight the preset only when the desks still sit on that preset.
+        // Undo can restore an older arrangement; the chip must follow it.
+        const activeStyle = (cls && cls.layoutStyle && layoutMatchesStyle(cls, cls.layoutStyle)) ? cls.layoutStyle : '';
         document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
           const lt = btn.getAttribute('data-layout');
           if (lt === 'groupClusters') {
@@ -3481,15 +3586,14 @@
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
           const editing = state.editMode !== false;
+          const valueEl = btnEditName.querySelector('.edit-switch-value');
           btnEditName.disabled = false;
           btnEditName.removeAttribute('aria-disabled');
-          btnEditName.textContent = 'Edit';
-          btnEditName.setAttribute('aria-label', 'Edit');
-          btnEditName.title = editing ? 'Stop Editing' : 'Edit';
+          btnEditName.className = 'edit-switch ' + (editing ? 'is-on' : 'is-off');
+          btnEditName.setAttribute('aria-label', editing ? 'Edit on' : 'Edit off');
           btnEditName.setAttribute('aria-pressed', editing ? 'true' : 'false');
-          btnEditName.className = editing
-            ? 'px-3 py-1 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs font-bold whitespace-nowrap transition shadow-sm'
-            : 'px-3 py-1 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs font-bold whitespace-nowrap transition';
+          btnEditName.removeAttribute('title');
+          if (valueEl) valueEl.textContent = editing ? 'ON' : 'OFF';
         }
       }
 
@@ -3580,8 +3684,7 @@
           const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
           const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
           const editing = boardEditsAllowed();
-          return '<div class="group-dock-card relative rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md' + (editing ? ' has-edit-x' : '') + '">' +
-            renderEditDeleteButton('data-dock-delete-group', grp.id, 'Delete Team') +
+          return '<div class="group-dock-card relative rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md">' +
             '<div class="group-dock-head flex items-start justify-between gap-1 mb-1.5">' +
               '<div class="min-w-0 flex-1">' +
                 '<div class="flex items-center gap-1 min-w-0">' +
@@ -3589,8 +3692,11 @@
                 '</div>' +
                 '<div class="text-[11px] font-medium text-slate-500 mt-0.5">' + memberCount + ' member' + (memberCount === 1 ? '' : 's') + '</div>' +
               '</div>' +
-              '<span class="shrink-0 font-display font-extrabold text-base sm:text-lg px-2 py-0.5 rounded-xl bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
-                (grp.score > 0 ? '+' + grp.score : grp.score) +
+              '<span class="group-score-row">' +
+                '<span class="shrink-0 font-display font-extrabold text-base sm:text-lg px-2 py-0.5 rounded-xl bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
+                  (grp.score > 0 ? '+' + grp.score : grp.score) +
+                '</span>' +
+                (editing ? renderEditDeleteButton('data-dock-delete-group', grp.id, 'Delete Team') : '') +
               '</span>' +
             '</div>' +
             '<div class="grid grid-cols-2 gap-1.5 mt-1">' +
@@ -3688,17 +3794,19 @@
           const isSpotlight = state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === st.id;
           const editing = boardEditsAllowed();
 
-          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + (editing ? ' has-edit-x' : '') + '" ' +
+          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + '" ' +
             'data-student-id="' + escapeHtml(st.id) + '" ' +
             'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
-            renderEditDeleteButton('data-desk-delete', st.id, 'Delete Student') +
             '<!-- Top Color Accent Bar -->' +
             '<div class="h-1 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
             '<div class="px-1.5 pt-0.5 pb-1">' +
-              '<!-- Row 1: Class No (tap to edit) + Score Badge -->' +
+              '<!-- Row 1: Class No (tap to edit) + Score Badge + delete glyph -->' +
               '<div class="desk-top-row flex items-center justify-between gap-1">' +
                 renderDeskClassNoControl(st) +
-                '<span class="desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
+                '<span class="desk-score-row">' +
+                  '<span class="desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
+                  (editing ? renderEditDeleteButton('data-desk-delete', st.id, 'Delete Student') : '') +
+                '</span>' +
               '</div>' +
               '<!-- Row 2: Student Name (tap to rename, including Empty) -->' +
               renderDeskNameControl(st) +
@@ -4158,6 +4266,7 @@
               pushLayoutHistory(dragContext.beforeBoard, snapshotBoardEdit(cls), 'Move ' + (dragContext.student.classNo || '') + ' ' + (dragContext.student.name || 'desk'));
             }
             saveState();
+            renderHeaderControls();
           }
           dragContext = null;
         }
@@ -4326,7 +4435,7 @@
                 '</div>' +
                 '<div class="flex items-center gap-2">' +
                   '<span class="text-[11px] font-mono text-slate-400">Pts: ' + st.score + '</span>' +
-                  '<button type="button" data-remove-student="' + escapeHtml(st.id) + '" class="text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded-lg text-xs font-bold" title="Remove Student">✕</button>' +
+                  '<button type="button" data-remove-student="' + escapeHtml(st.id) + '" class="text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded-lg text-xs font-bold" title="Delete Student" aria-label="Delete Student">✕</button>' +
                 '</div>' +
               '</div>';
             }).join('');
