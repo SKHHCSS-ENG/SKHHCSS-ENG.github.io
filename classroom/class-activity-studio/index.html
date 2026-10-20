@@ -475,6 +475,65 @@
       outline: none;
       border-color: #d97706;
     }
+    /* Edit-only delete. Glyph in the corner; the button itself is the 44px target
+       and stays inside the card so paired desks (8px gap) do not cover it. */
+    .board-delete-btn {
+      position: absolute;
+      z-index: 7;
+      top: 0;
+      right: 0;
+      width: 44px;
+      height: 44px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .board-delete-btn span {
+      width: 22px;
+      height: 22px;
+      margin-top: 3px;
+      margin-right: 3px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #fecdd3;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1;
+      color: #e11d48;
+    }
+    .board-delete-btn:hover span,
+    .board-delete-btn:focus-visible span {
+      background: #ffe4e6;
+      border-color: #fb7185;
+    }
+    .board-delete-btn:focus-visible {
+      outline: none;
+    }
+    .board-delete-btn:focus-visible span {
+      box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.35);
+    }
+    .desk-card.has-edit-x .desk-top-row {
+      padding-right: 22px;
+    }
+    .desk-card.has-edit-x .desk-name-btn,
+    .desk-card.has-edit-x .desk-name-input {
+      padding-right: 18px;
+    }
+    .group-dock-card.has-edit-x .group-dock-head {
+      padding-right: 22px;
+    }
     @media (min-width: 640px) {
       .dock-group-btn {
         font-size: 0.875rem;
@@ -980,10 +1039,10 @@
 
         <div class="studio-band studio-history-gap flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
           <span class="studio-band-label">History</span>
-          <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
+          <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo" aria-label="Undo">
             <span aria-hidden="true">↩️</span>
           </button>
-          <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo Layout" aria-label="Redo Layout">
+          <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
             <span aria-hidden="true">↪️</span>
           </button>
           <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
@@ -2038,8 +2097,10 @@
         lbSearch: '',
         historyStack: [], // For score undo and live history feed
         redoStack: [], // Score redo (cleared on new score actions)
-        layoutHistoryStack: [], // Desk layout undo (session only)
-        layoutRedoStack: [], // Desk layout redo
+        // One session stack for desk moves AND board edits (name, seat #, team
+        // name, student/team delete). Score +1/−1 stay on historyStack.
+        layoutHistoryStack: [],
+        layoutRedoStack: [],
         // Timer state
         timerTotalSec: 180,
         timerRemainingSec: 180,
@@ -2058,6 +2119,10 @@
       let nameEditLock = false;
       let groupEditToken = 0;
       let keepGroupEditOpen = false;
+      // Roster / Manage Teams fields commit one history step on blur, not per key.
+      let fieldEditBefore = null;
+      let fieldEditLabel = '';
+      let skipEditCommit = false;
 
       function hasSavedZoomChip() {
         return typeof state.zoomChipLeft === 'number' && typeof state.zoomChipTop === 'number' &&
@@ -2206,7 +2271,9 @@
         if (!st) return false;
         const next = normaliseStudentName(rawText);
         if (st.name === next) return false;
+        const before = snapshotBoardEdit(cls);
         st.name = next;
+        pushLayoutHistory(before, snapshotBoardEdit(cls), next === 'Empty' ? 'Clear student name' : 'Rename student');
         saveState();
         showToast(next === 'Empty' ? 'Seat left empty' : ('Renamed to ' + next), '✏️');
         return true;
@@ -2247,7 +2314,9 @@
         if (!st) return false;
         const next = normaliseClassNo(rawText, st.classNo);
         if (String(st.classNo) === next) return false;
+        const before = snapshotBoardEdit(cls);
         st.classNo = next;
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Edit seat number');
         saveState();
         showToast('Class number set to #' + next, '✏️');
         return true;
@@ -2278,7 +2347,9 @@
         if (!grp) return false;
         const next = normaliseGroupName(rawText, grp.name);
         if (grp.name === next) return false;
+        const before = snapshotBoardEdit(cls);
         grp.name = next;
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Rename team');
         saveState();
         const titleEl = document.getElementById('pickerResultTitle');
         if (titleEl && state.lastPickedTarget && state.lastPickedTarget.type === 'group' && state.lastPickedTarget.id === groupId) {
@@ -2287,6 +2358,75 @@
         const field = elementByAttr('#groupManagerList [data-edit-grp-name]', 'data-edit-grp-name', groupId);
         if (field && document.activeElement !== field) field.value = grp.name;
         showToast('Team renamed to ' + next, '✏️');
+        return true;
+      }
+
+      function renderEditDeleteButton(dataAttr, id, ariaLabel) {
+        if (!boardEditsAllowed()) return '';
+        return '<button type="button" class="board-delete-btn" ' + dataAttr + '="' + escapeHtml(id) + '" aria-label="' + ariaLabel + '" title="' + ariaLabel + '"><span aria-hidden="true">✕</span></button>';
+      }
+
+      function studentHistoryLabel(st) {
+        if (!st) return 'student';
+        var no = st.classNo ? ('#' + st.classNo + ' ') : '';
+        var name = isEmptySeatName(st.name) ? 'Empty' : st.name;
+        return no + name;
+      }
+
+      // Same removal as the roster ✕: the desk leaves the class. Scores on everyone else stay.
+      function deleteStudentRecord(studentId) {
+        const cls = getCurrentClass();
+        if (!cls || !studentId) return false;
+        const idx = cls.students.findIndex(function (s) { return s.id === studentId; });
+        if (idx < 0) return false;
+        const st = cls.students[idx];
+        const before = snapshotBoardEdit(cls);
+        cls.students.splice(idx, 1);
+        if (state.editingStudentId === studentId) state.editingStudentId = '';
+        if (state.editingClassNoId === studentId) state.editingClassNoId = '';
+        if (state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === studentId) {
+          state.lastPickedTarget = null;
+        }
+        state.pickedStudentIds = (state.pickedStudentIds || []).filter(function (id) { return id !== studentId; });
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Delete student ' + studentHistoryLabel(st));
+        saveState();
+        return true;
+      }
+
+      // Dissolve the team and unassign members. Member scores and other team scores stay.
+      // The removed team's own score is kept on the history snapshot so Undo can restore it.
+      function deleteTeamRecord(groupId) {
+        const cls = getCurrentClass();
+        if (!cls || !groupId) return false;
+        const grp = getGroupById(cls, groupId);
+        if (!grp) return false;
+        const before = snapshotBoardEdit(cls);
+        const label = 'Delete team ' + (grp.name || 'team');
+        cls.groups = cls.groups.filter(function (g) { return g.id !== groupId; });
+        cls.students.forEach(function (s) {
+          if (s.groupId === groupId) s.groupId = '';
+        });
+        if (state.editingGroupId === groupId) {
+          groupEditToken += 1;
+          state.editingGroupId = '';
+          state.editingGroupAnchor = '';
+          state.editingGroupDeskId = '';
+        }
+        if (state.activeBrushGroupId === groupId) {
+          state.activeBrushGroupId = cls.groups[0] ? cls.groups[0].id : 'NONE';
+        }
+        if (state.pickerGroupFilter === groupId) state.pickerGroupFilter = 'ALL';
+        if (state.lastPickedTarget && state.lastPickedTarget.type === 'group' && state.lastPickedTarget.id === groupId) {
+          state.lastPickedTarget = null;
+        }
+        state.pickedGroupIds = (state.pickedGroupIds || []).filter(function (id) { return id !== groupId; });
+        pushLayoutHistory(before, snapshotBoardEdit(cls), label);
+        saveState();
+        var pickerModal = document.getElementById('pickerModal');
+        if (pickerModal && !pickerModal.classList.contains('hidden')) {
+          populatePickerGroupFilter();
+          updatePickerModalUI();
+        }
         return true;
       }
 
@@ -2573,6 +2713,43 @@
         });
       }
 
+      // Names, seat numbers, team identity, membership, and desk positions.
+      // Scores are stored so a deleted student or team can come back with the
+      // points they had; live scores are not rewritten for people who stayed.
+      function snapshotBoardEdit(cls) {
+        return {
+          kind: 'board',
+          students: (cls.students || []).map(function (st) {
+            return {
+              id: st.id,
+              classNo: String(st.classNo == null ? '' : st.classNo),
+              name: String(st.name == null ? '' : st.name),
+              groupId: st.groupId || '',
+              score: Number(st.score) || 0,
+              x: st.x,
+              y: st.y
+            };
+          }),
+          groups: (cls.groups || []).map(function (g) {
+            return {
+              id: g.id,
+              name: g.name,
+              icon: g.icon,
+              color: g.color,
+              score: Number(g.score) || 0
+            };
+          })
+        };
+      }
+
+      function indexById(list) {
+        var map = {};
+        (list || []).forEach(function (item) {
+          if (item && item.id) map[item.id] = item;
+        });
+        return map;
+      }
+
       function applyLayoutPositions(cls, positions) {
         if (!cls || !positions) return;
         const map = {};
@@ -2583,6 +2760,90 @@
             st.y = map[st.id].y;
           }
         });
+      }
+
+      // Apply only the fields that differ between two snapshots, onto the live
+      // class. Later score taps stay put. A student or team who only exists on
+      // one side is removed or put back (with the score from that snapshot).
+      function applyBoardDelta(cls, fromSnap, toSnap) {
+        if (!cls || !fromSnap || !toSnap || Array.isArray(fromSnap) || Array.isArray(toSnap)) return;
+        var fromGroups = indexById(fromSnap.groups);
+        var toGroups = indexById(toSnap.groups);
+        var liveGroups = indexById(cls.groups);
+        var nextGroups = (cls.groups || []).filter(function (g) {
+          return !(fromGroups[g.id] && !toGroups[g.id]);
+        }).map(function (g) {
+          return {
+            id: g.id,
+            name: g.name,
+            icon: g.icon,
+            color: g.color,
+            score: Number(g.score) || 0
+          };
+        });
+        nextGroups.forEach(function (g) {
+          var a = fromGroups[g.id];
+          var b = toGroups[g.id];
+          if (!a || !b) return;
+          if (a.name !== b.name) g.name = b.name;
+          if ((a.icon || '') !== (b.icon || '')) g.icon = b.icon;
+          if ((a.color || '') !== (b.color || '')) g.color = b.color;
+        });
+        (toSnap.groups || []).forEach(function (b, idx) {
+          if (fromGroups[b.id]) return;
+          if (nextGroups.some(function (g) { return g.id === b.id; })) return;
+          var live = liveGroups[b.id];
+          nextGroups.splice(Math.min(idx, nextGroups.length), 0, {
+            id: b.id,
+            name: b.name,
+            icon: b.icon,
+            color: b.color,
+            score: live ? (Number(live.score) || 0) : (Number(b.score) || 0)
+          });
+        });
+        cls.groups = nextGroups;
+
+        var fromStudents = indexById(fromSnap.students);
+        var toStudents = indexById(toSnap.students);
+        var liveStudents = indexById(cls.students);
+        var nextStudents = (cls.students || []).filter(function (st) {
+          return !(fromStudents[st.id] && !toStudents[st.id]);
+        }).map(function (st) {
+          return {
+            id: st.id,
+            classNo: st.classNo,
+            name: st.name,
+            groupId: st.groupId || '',
+            score: Number(st.score) || 0,
+            x: st.x,
+            y: st.y
+          };
+        });
+        nextStudents.forEach(function (st) {
+          var a = fromStudents[st.id];
+          var b = toStudents[st.id];
+          if (!a || !b) return;
+          if (String(a.classNo) !== String(b.classNo)) st.classNo = b.classNo;
+          if (a.name !== b.name) st.name = b.name;
+          if ((a.groupId || '') !== (b.groupId || '')) st.groupId = b.groupId || '';
+          if (a.x !== b.x) st.x = b.x;
+          if (a.y !== b.y) st.y = b.y;
+        });
+        (toSnap.students || []).forEach(function (b, idx) {
+          if (fromStudents[b.id]) return;
+          if (nextStudents.some(function (st) { return st.id === b.id; })) return;
+          var live = liveStudents[b.id];
+          nextStudents.splice(Math.min(idx, nextStudents.length), 0, {
+            id: b.id,
+            classNo: b.classNo,
+            name: b.name,
+            groupId: b.groupId || '',
+            score: live ? (Number(live.score) || 0) : (Number(b.score) || 0),
+            x: b.x,
+            y: b.y
+          });
+        });
+        cls.students = nextStudents;
       }
 
       // Restore exact saved coords; only nudge desks NOT in the locked id set if they overlap locked ones
@@ -2727,20 +2988,109 @@
         return true;
       }
 
+      function boardHistoryEqual(a, b) {
+        if (!a || !b) return false;
+        if (Array.isArray(a) || Array.isArray(b)) {
+          if (!Array.isArray(a) || !Array.isArray(b)) return false;
+          return layoutsEqual(a, b);
+        }
+        if (!a.students || !b.students || a.students.length !== b.students.length) return false;
+        if (!a.groups || !b.groups || a.groups.length !== b.groups.length) return false;
+        for (var gi = 0; gi < a.groups.length; gi++) {
+          var ga = a.groups[gi];
+          var gb = b.groups[gi];
+          if (!gb || ga.id !== gb.id || ga.name !== gb.name) return false;
+          if ((ga.icon || '') !== (gb.icon || '') || (ga.color || '') !== (gb.color || '')) return false;
+        }
+        for (var si = 0; si < a.students.length; si++) {
+          var sa = a.students[si];
+          var sb = b.students[si];
+          if (!sb || sa.id !== sb.id || sa.name !== sb.name) return false;
+          if (String(sa.classNo) !== String(sb.classNo)) return false;
+          if ((sa.groupId || '') !== (sb.groupId || '')) return false;
+          if (sa.x !== sb.x || sa.y !== sb.y) return false;
+        }
+        return true;
+      }
+
+      // Shared History stack. Position-only entries (older layout moves) still restore.
+      // Board entries undo just the fields that changed, so a later +1 is left alone.
       function pushLayoutHistory(before, after, label) {
         const cls = getCurrentClass();
         if (!cls || !before || !after) return;
-        if (layoutsEqual(before, after)) return;
+        if (boardHistoryEqual(before, after)) return;
         state.layoutHistoryStack.unshift({
           id: 'lay_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
           classId: cls.id,
-          label: label || 'Layout change',
+          label: label || 'Edit',
           before: before,
           after: after
         });
         if (state.layoutHistoryStack.length > 40) state.layoutHistoryStack.pop();
         state.layoutRedoStack = [];
         updateLayoutUndoRedoButtons();
+      }
+
+      function closeBoardEditors() {
+        state.editingStudentId = '';
+        state.editingClassNoId = '';
+        groupEditToken += 1;
+        state.editingGroupId = '';
+        state.editingGroupAnchor = '';
+        state.editingGroupDeskId = '';
+      }
+
+      function renderIfModalOpen() {
+        var groupModal = document.getElementById('groupModal');
+        if (groupModal && !groupModal.classList.contains('hidden')) renderGroupModalContents();
+        var classModal = document.getElementById('classModal');
+        if (classModal && !classModal.classList.contains('hidden')) renderClassModalContents();
+      }
+
+      function restoreHistorySnap(cls, fromSnap, toSnap) {
+        if (Array.isArray(toSnap)) {
+          applyLayoutPositions(cls, toSnap);
+          var locked = {};
+          toSnap.forEach(function (p) { if (p && p.id) locked[p.id] = true; });
+          ensureNoOverlapsProtecting(cls.students, locked);
+          return;
+        }
+        applyBoardDelta(cls, fromSnap, toSnap);
+      }
+
+      function finishHistoryRestore(cls) {
+        if (state.lastPickedTarget && state.lastPickedTarget.type === 'student') {
+          var stillStudent = cls.students.some(function (s) { return s.id === state.lastPickedTarget.id; });
+          if (!stillStudent) state.lastPickedTarget = null;
+        }
+        if (state.lastPickedTarget && state.lastPickedTarget.type === 'group' && !getGroupById(cls, state.lastPickedTarget.id)) {
+          state.lastPickedTarget = null;
+        }
+        closeBoardEditors();
+        skipEditCommit = true;
+        saveState();
+        renderAll();
+        renderIfModalOpen();
+        skipEditCommit = false;
+        updatePickerScoreReadout();
+      }
+
+      function beginFieldHistory(label) {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        fieldEditBefore = snapshotBoardEdit(cls);
+        fieldEditLabel = label || 'Edit';
+      }
+
+      function finishFieldHistory() {
+        if (!fieldEditBefore) return;
+        const before = fieldEditBefore;
+        const label = fieldEditLabel || 'Edit';
+        fieldEditBefore = null;
+        fieldEditLabel = '';
+        const cls = getCurrentClass();
+        if (!cls) return;
+        pushLayoutHistory(before, snapshotBoardEdit(cls), label);
       }
 
       function undoLayoutAction() {
@@ -2752,17 +3102,11 @@
         }
         if (idx < 0) return;
         const entry = state.layoutHistoryStack.splice(idx, 1)[0];
-        applyLayoutPositions(cls, entry.before);
-        // Exact restore — do not rewrite saved coords via ensureNoOverlaps
-        const locked = {};
-        (entry.before || []).forEach(function (p) { locked[p.id] = true; });
-        ensureNoOverlapsProtecting(cls.students, locked);
+        restoreHistorySnap(cls, entry.after, entry.before);
         state.layoutRedoStack.unshift(entry);
         if (state.layoutRedoStack.length > 40) state.layoutRedoStack.pop();
-        saveState();
-        renderClassroomCanvas(true);
-        updateLayoutUndoRedoButtons();
-        showToast('Undid layout: ' + entry.label, '↩️');
+        finishHistoryRestore(cls);
+        showToast('Undid: ' + entry.label, '↩️');
       }
 
       function redoLayoutAction() {
@@ -2774,17 +3118,11 @@
         }
         if (idx < 0) return;
         const entry = state.layoutRedoStack.splice(idx, 1)[0];
-        applyLayoutPositions(cls, entry.after);
-        // Exact restore of redo target coords
-        const locked = {};
-        (entry.after || []).forEach(function (p) { locked[p.id] = true; });
-        ensureNoOverlapsProtecting(cls.students, locked);
+        restoreHistorySnap(cls, entry.before, entry.after);
         state.layoutHistoryStack.unshift(entry);
         if (state.layoutHistoryStack.length > 40) state.layoutHistoryStack.pop();
-        saveState();
-        renderClassroomCanvas(true);
-        updateLayoutUndoRedoButtons();
-        showToast('Redid layout: ' + entry.label, '↪️');
+        finishHistoryRestore(cls);
+        showToast('Redid: ' + entry.label, '↪️');
       }
 
       // Save the current class’s desks and teams as its default. Does not touch scores or layout undo history.
@@ -2837,15 +3175,14 @@
         const cls = getCurrentClass();
         if (!cls || cls.students.length === 0) return;
         ensureClassDefaultPositions(cls);
-        const before = snapshotLayoutPositions(cls);
+        const before = snapshotBoardEdit(cls);
         applyLayoutPositions(cls, cls.defaultPositions);
         // Exact preset snap-back — scores untouched; no spatial repack
         const locked = {};
         (cls.defaultPositions || []).forEach(function (p) { locked[p.id] = true; });
         ensureNoOverlapsProtecting(cls.students, locked);
-        const after = snapshotLayoutPositions(cls);
-        pushLayoutHistory(before, after, 'Reset to saved default seating');
         const groupingRestored = applyDefaultGrouping(cls);
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Reset to saved default seating');
         saveState();
         renderHeaderControls();
         renderGroupBrushBar();
@@ -3215,7 +3552,7 @@
         if (!dock || !container || !cls) return;
 
         const activeDock = document.activeElement;
-        if (!nameEditLock && activeDock && activeDock.getAttribute && container.contains(activeDock)) {
+        if (!skipEditCommit && !nameEditLock && activeDock && activeDock.getAttribute && container.contains(activeDock)) {
           const gid = activeDock.getAttribute('data-dock-group-input');
           if (gid && activeDock.dataset.cancelGroupName !== '1') {
             commitGroupName(gid, activeDock.value);
@@ -3242,15 +3579,17 @@
         container.innerHTML = cls.groups.map(function (grp) {
           const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
           const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
-          return '<div class="rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md">' +
-            '<div class="flex items-start justify-between gap-1 mb-1.5">' +
+          const editing = boardEditsAllowed();
+          return '<div class="group-dock-card relative rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md' + (editing ? ' has-edit-x' : '') + '">' +
+            renderEditDeleteButton('data-dock-delete-group', grp.id, 'Delete Team') +
+            '<div class="group-dock-head flex items-start justify-between gap-1 mb-1.5">' +
               '<div class="min-w-0 flex-1">' +
                 '<div class="flex items-center gap-1 min-w-0">' +
                   renderDockGroupNameControl(grp) +
                 '</div>' +
                 '<div class="text-[11px] font-medium text-slate-500 mt-0.5">' + memberCount + ' member' + (memberCount === 1 ? '' : 's') + '</div>' +
               '</div>' +
-              '<span class="font-display font-extrabold text-base sm:text-lg px-2 py-0.5 rounded-xl bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
+              '<span class="shrink-0 font-display font-extrabold text-base sm:text-lg px-2 py-0.5 rounded-xl bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
                 (grp.score > 0 ? '+' + grp.score : grp.score) +
               '</span>' +
             '</div>' +
@@ -3288,7 +3627,7 @@
         if (!cls || !container || !frontLabel || !stage) return;
 
         const active = document.activeElement;
-        if (!nameEditLock && active && active.getAttribute && container.contains(active)) {
+        if (!skipEditCommit && !nameEditLock && active && active.getAttribute && container.contains(active)) {
           if (active.getAttribute('data-desk-name-input') && active.dataset.cancelName !== '1') {
             commitStudentName(active.getAttribute('data-desk-name-input'), active.value);
           }
@@ -3347,15 +3686,17 @@
             : (state.layoutLocked ? 'cursor-default' : 'cursor-grab');
 
           const isSpotlight = state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === st.id;
+          const editing = boardEditsAllowed();
 
-          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + '" ' +
+          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + (editing ? ' has-edit-x' : '') + '" ' +
             'data-student-id="' + escapeHtml(st.id) + '" ' +
             'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
+            renderEditDeleteButton('data-desk-delete', st.id, 'Delete Student') +
             '<!-- Top Color Accent Bar -->' +
             '<div class="h-1 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
             '<div class="px-1.5 pt-0.5 pb-1">' +
               '<!-- Row 1: Class No (tap to edit) + Score Badge -->' +
-              '<div class="flex items-center justify-between gap-1">' +
+              '<div class="desk-top-row flex items-center justify-between gap-1">' +
                 renderDeskClassNoControl(st) +
                 '<span class="desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
               '</div>' +
@@ -3545,6 +3886,19 @@
         if (!container) return;
 
         container.addEventListener('click', function (e) {
+          const delBtn = e.target.closest('[data-desk-delete]');
+          if (delBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!boardEditsAllowed()) return;
+            const id = delBtn.getAttribute('data-desk-delete');
+            if (deleteStudentRecord(id)) {
+              showToast('Removed student', '✕');
+              renderAll();
+              renderIfModalOpen();
+            }
+            return;
+          }
           const noBtn = e.target.closest('[data-desk-classno]');
           if (noBtn) {
             e.preventDefault();
@@ -3691,6 +4045,7 @@
         });
 
         container.addEventListener('pointerdown', function (e) {
+          if (e.target.closest('[data-desk-delete]')) return;
           const plusBtn = e.target.closest('[data-desk-plus]');
           if (plusBtn) {
             e.stopPropagation();
@@ -3757,6 +4112,7 @@
             startClientY: e.clientY,
             origX: student.x,
             origY: student.y,
+            beforeBoard: snapshotBoardEdit(cls),
             hasMoved: false
           };
         });
@@ -3798,15 +4154,8 @@
           } catch (err) {}
           if (dragContext.hasMoved) {
             const cls = getCurrentClass();
-            if (cls && dragContext.student) {
-              const after = snapshotLayoutPositions(cls);
-              const beforeDrag = after.map(function (p) {
-                if (p.id === dragContext.student.id) {
-                  return { id: p.id, x: dragContext.origX, y: dragContext.origY };
-                }
-                return { id: p.id, x: p.x, y: p.y };
-              });
-              pushLayoutHistory(beforeDrag, after, 'Move ' + (dragContext.student.classNo || '') + ' ' + (dragContext.student.name || 'desk'));
+            if (cls && dragContext.student && dragContext.beforeBoard) {
+              pushLayoutHistory(dragContext.beforeBoard, snapshotBoardEdit(cls), 'Move ' + (dragContext.student.classNo || '') + ' ' + (dragContext.student.name || 'desk'));
             }
             saveState();
           }
@@ -3834,7 +4183,7 @@
       function applyQuickLayout(layoutType) {
         const cls = getCurrentClass();
         if (!cls) return;
-        const before = snapshotLayoutPositions(cls);
+        const before = snapshotBoardEdit(cls);
         const grid = syncGridInputsToClass(cls);
         cls.layoutStyle = layoutType;
 
@@ -3859,7 +4208,6 @@
         }
 
         ensureNoOverlaps(cls.students);
-        const after = snapshotLayoutPositions(cls);
         const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
         const gridDesc = actualRowsUsed + '×' + grid.cols + ' grid';
         const labelMap = {
@@ -3868,7 +4216,7 @@
           pods4: '4-Desk Pods (' + gridDesc + ')',
           groupClusters: 'Team Clusters'
         };
-        pushLayoutHistory(before, after, labelMap[layoutType] || 'Layout');
+        pushLayoutHistory(before, snapshotBoardEdit(cls), labelMap[layoutType] || 'Layout');
         saveState();
         renderHeaderControls();
         renderClassroomCanvas(true);
@@ -3879,7 +4227,7 @@
       function applyCustomRowsColsGrid() {
         const cls = getCurrentClass();
         if (!cls) return;
-        const before = snapshotLayoutPositions(cls);
+        const before = snapshotBoardEdit(cls);
         const grid = syncGridInputsToClass(cls);
         const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
         cls.layoutStyle = activeStyle;
@@ -3893,10 +4241,9 @@
           }
         });
         ensureNoOverlaps(cls.students);
-        const after = snapshotLayoutPositions(cls);
         const styleNames = { rows: 'Exam Rows', pairs: 'Paired Desks', pods4: '4-Desk Pods' };
         const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
-        pushLayoutHistory(before, after, (styleNames[activeStyle] || 'Grid') + ' ' + grid.rows + '×' + grid.cols);
+        pushLayoutHistory(before, snapshotBoardEdit(cls), (styleNames[activeStyle] || 'Grid') + ' ' + grid.rows + '×' + grid.cols);
         saveState();
         renderHeaderControls();
         renderClassroomCanvas(true);
@@ -4879,7 +5226,7 @@
           showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
         });
 
-        // Layout Undo / Redo / Set as Default / Reset Layout, then All +1 · Reset Scores
+        // History Undo / Redo (layout and edits) / Set as Default / Reset Layout, then All +1 · Reset Scores
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
         });
@@ -4891,6 +5238,18 @@
         // Group Dock Event Delegation (rename, then +1 / -1 on group cards)
         const groupDockCards = document.getElementById('groupDockCards');
         groupDockCards.addEventListener('click', function (e) {
+          const delBtn = e.target.closest('[data-dock-delete-group]');
+          if (delBtn) {
+            e.preventDefault();
+            if (!boardEditsAllowed()) return;
+            const id = delBtn.getAttribute('data-dock-delete-group');
+            if (deleteTeamRecord(id)) {
+              showToast('Removed team', '✕');
+              renderAll();
+              renderIfModalOpen();
+            }
+            return;
+          }
           const renameBtn = e.target.closest('[data-dock-group-rename]');
           if (renameBtn) {
             e.preventDefault();
@@ -5104,14 +5463,24 @@
           }
         });
 
+        document.getElementById('rosterStudentList').addEventListener('focusin', function (e) {
+          const el = e.target;
+          if (!el || !el.getAttribute) return;
+          if (el.getAttribute('data-edit-st-name')) beginFieldHistory('Rename student');
+          else if (el.getAttribute('data-edit-st-no')) beginFieldHistory('Edit seat number');
+        });
+        document.getElementById('rosterStudentList').addEventListener('focusout', function (e) {
+          const el = e.target;
+          if (!el || !el.getAttribute) return;
+          if (!el.getAttribute('data-edit-st-name') && !el.getAttribute('data-edit-st-no')) return;
+          finishFieldHistory();
+        });
+
         document.getElementById('rosterStudentList').addEventListener('click', function (e) {
           const rmBtn = e.target.closest('[data-remove-student]');
           if (!rmBtn) return;
-          const cls = getCurrentClass();
-          if (!cls) return;
           const stId = rmBtn.getAttribute('data-remove-student');
-          cls.students = cls.students.filter(function (s) { return s.id !== stId; });
-          saveState();
+          if (!deleteStudentRecord(stId)) return;
           renderAll();
           renderClassModalContents();
         });
@@ -5270,17 +5639,23 @@
           }
         });
 
+        document.getElementById('groupManagerList').addEventListener('focusin', function (e) {
+          const el = e.target;
+          if (!el || !el.getAttribute) return;
+          if (el.getAttribute('data-edit-grp-name')) beginFieldHistory('Rename team');
+        });
+        document.getElementById('groupManagerList').addEventListener('focusout', function (e) {
+          const el = e.target;
+          if (!el || !el.getAttribute) return;
+          if (!el.getAttribute('data-edit-grp-name')) return;
+          finishFieldHistory();
+        });
+
         document.getElementById('groupManagerList').addEventListener('click', function (e) {
           const delBtn = e.target.closest('[data-delete-grp]');
           if (!delBtn) return;
-          const cls = getCurrentClass();
-          if (!cls) return;
           const gId = delBtn.getAttribute('data-delete-grp');
-          cls.groups = cls.groups.filter(function (g) { return g.id !== gId; });
-          cls.students.forEach(function (s) {
-            if (s.groupId === gId) s.groupId = '';
-          });
-          saveState();
+          if (!deleteTeamRecord(gId)) return;
           renderAll();
           renderGroupModalContents();
         });
