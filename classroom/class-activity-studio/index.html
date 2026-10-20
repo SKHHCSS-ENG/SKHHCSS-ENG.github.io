@@ -124,17 +124,8 @@
     }
     @media (max-width: 480px) {
       .desk-name-btn {
-        position: relative;
-        min-height: 32px;
-      }
-      /* Grow the name tap upward into the class-number row, away from − / +. */
-      .desk-name-btn::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: -12px;
-        bottom: 0;
+        /* Full card width; keep the face clear of the score chips below. */
+        min-height: 36px;
       }
       .desk-name-input {
         min-height: 40px;
@@ -383,12 +374,6 @@
           <span class="hidden sm:inline">Podium</span>
         </button>
 
-        <!-- Edit Name: bulk rename and fill Empty seats from the board -->
-        <button id="btnToggleEditName" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Edit names on the seating board, including empty seats" aria-pressed="false" aria-label="Edit Name">
-          <span aria-hidden="true">✏️</span>
-          <span>Edit Name</span>
-        </button>
-
         <!-- Sound Toggle -->
         <button id="btnToggleSound" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Toggle sound" aria-label="Toggle sound">
           <span id="soundIcon">🔊</span>
@@ -479,6 +464,11 @@
         <!-- Quick Add Student Button -->
         <button id="btnQuickAddStudent" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition" title="Add a student desk to this class">
           <span>＋ Desk</span>
+        </button>
+
+        <!-- Edit Name: bulk rename and fill Empty seats from the board -->
+        <button id="btnToggleEditName" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Rename students on the seating board, including empty seats" aria-pressed="false">
+          Edit Name
         </button>
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
@@ -2388,8 +2378,8 @@
         if (btnEditName) {
           btnEditName.setAttribute('aria-pressed', state.editNameMode ? 'true' : 'false');
           btnEditName.className = state.editNameMode
-            ? 'px-3 py-1.5 rounded-xl bg-amber-300 hover:bg-amber-200 border border-amber-200 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm'
-            : 'px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition';
+            ? 'min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm'
+            : 'min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition';
         }
 
         // Subheader badges
