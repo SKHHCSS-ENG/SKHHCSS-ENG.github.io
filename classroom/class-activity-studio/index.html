@@ -116,6 +116,38 @@
     #classroomStage {
       margin-bottom: 72px;
     }
+    /* Front-of-room strip only. No smartboard graphic and no teacher's desk. */
+    .front-of-room {
+      position: absolute;
+      left: 50%;
+      z-index: 4;
+      pointer-events: none;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 360px;
+      max-width: calc(100% - 32px);
+      height: 22px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .front-of-room::before,
+    .front-of-room::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #94a3b8;
+    }
     /* Classroom Floor Grid Pattern */
     .classroom-floor {
       background-color: #f8fafc;
@@ -678,7 +710,7 @@
         </button>
 
         <!-- Flip Room View (Front at Top vs Bottom) -->
-        <button id="btnFlipRoom" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Flip Classroom Orientation (Teacher's Desk at Top vs Bottom)">
+        <button id="btnFlipRoom" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Flip Classroom Orientation (FRONT OF ROOM at Top vs Bottom)">
           <span>🔄</span>
           <span id="flipRoomText">Front: Bottom</span>
         </button>
@@ -785,14 +817,8 @@
           <!-- Scaled Inner Stage -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
             
-            <!-- Teacher Smartboard / Podium Indicator (Top or Bottom depending on flip) -->
-            <div id="teacherBoardBar" class="absolute left-1/2 -translate-x-1/2 bottom-3 w-[460px] h-11 rounded-2xl bg-gradient-to-r from-slate-800 via-indigo-950 to-slate-800 text-white shadow-md border-2 border-indigo-400/40 flex items-center justify-between px-5 z-20 pointer-events-none">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-xs font-bold tracking-wider uppercase text-indigo-200">Interactive Smartboard &amp; Teacher's Desk</span>
-              </div>
-              <span class="text-[11px] font-semibold text-amber-300">FRONT OF ROOM</span>
-            </div>
+            <!-- Front-of-room strip. Sits just beyond the desk row that faces the front. -->
+            <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
 
             <!-- Desks Layer -->
             <div id="desksContainer" class="absolute inset-0"></div>
@@ -1214,9 +1240,20 @@
       const DESK_H = 115;
       const ROW_GAP_Y = 10;
       const POD_ROW_AISLE_Y = 12;
+      // Within-pod / within-pair pack stays at 10px. Horizontal aisles between
+      // pods and pairs move toward that density (was 56 / 54). Exam columns
+      // use one even gap, tightened from 24 so a full row is not looser than the aisles.
+      const POD_INNER_GAP_X = 10;
+      const POD_AISLE_GAP_X = 16;
+      const EXAM_COL_GAP_X = 16;
+      // FRONT OF ROOM strip is 22px tall and stays 10px from the facing desk row.
+      // A fresh front-at-top layout also leaves 8px above the strip.
+      const FRONT_LABEL_H = 22;
+      const FRONT_EDGE = 8;
+      const FRONT_ROW_GAP = 10;
       // Bump when desk size or step formula changes. Factory defaults reseed.
       // Untouched factory seats move with the new pitch; a saved custom default and dragged seats stay put.
-      const LAYOUT_PITCH_VERSION = 'desk-148x115-rowY10-aisle12';
+      const LAYOUT_PITCH_VERSION = 'desk-148x115-aisleX16-front10';
       const GRID_SIZE = 20;
       const ZOOM_MIN = 0.35;
       const ZOOM_MAX = 1.25;
@@ -1425,10 +1462,16 @@
       }
 
       // Coordinate calculator for preset and custom grid layouts (adapts Exam Rows, Paired Desks, and 4-Desk Pods to custom Rows x Cols)
+      function frontRowTopOffset(frontAtTop) {
+        // Front at the top: leave a compact strip for FRONT OF ROOM, then the first desk row.
+        // Front at the bottom: a small back-of-room margin. The strip sits just past the front row.
+        return frontAtTop ? (FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP) : 28;
+      }
+
       function computeLayoutPositions(count, layoutType, frontAtTop, students, groups, customCols, customRows) {
         const positions = [];
-        const topOffset = frontAtTop ? 80 : 28;
-        const stepX = DESK_W + 24; // card width + clear horizontal gap (unchanged)
+        const topOffset = frontRowTopOffset(frontAtTop);
+        const stepX = DESK_W + EXAM_COL_GAP_X;
         const stepY = DESK_H + ROW_GAP_Y; // card slot + tight vertical gutter
         const cols = Math.max(1, Math.min(12, customCols || (count > 30 ? 7 : 6)));
 
@@ -1447,9 +1490,10 @@
           }
         } else if (layoutType === 'pairs') {
           // Paired Desks applied to (customRows x cols) grid:
-          // Adjacent column pairs (0&1, 2&3, 4&5...) sit snug together (10px gap), with a wide 54px aisle between pairs
-          const pairInnerGap = 10;
-          const pairAisleGap = 54;
+          // Adjacent column pairs sit at the within-pair gap. The aisle between pairs
+          // is only slightly wider, so the row matches that density.
+          const pairInnerGap = POD_INNER_GAP_X;
+          const pairAisleGap = POD_AISLE_GAP_X;
           function getPairColOffset(c) {
             const pairIdx = Math.floor(c / 2);
             const inPair = c % 2;
@@ -1470,8 +1514,8 @@
         } else if (layoutType === 'pods4') {
           // 4-Desk Pods applied to (customRows x cols) grid:
           // Every 2x2 block in the (Rows x Cols) grid (cols 0&1 with rows 0&1, cols 2&3 with rows 0&1, etc.) clusters into a 4-desk pod!
-          const podInnerGapX = 10;
-          const podAisleGapX = 56;
+          const podInnerGapX = POD_INNER_GAP_X;
+          const podAisleGapX = POD_AISLE_GAP_X;
           const podInnerGapY = ROW_GAP_Y;
           const podAisleGapY = POD_ROW_AISLE_Y;
 
@@ -1512,7 +1556,8 @@
             return buckets[gid] && buckets[gid].length > 0;
           });
 
-          const podOriginX = [28, 392, 756];
+          const clusterStride = 2 * DESK_W + POD_INNER_GAP_X + POD_AISLE_GAP_X;
+          const podOriginX = [28, 28 + clusterStride, 28 + 2 * clusterStride];
           const resultByStudentIdx = {};
           let currentBandY = topOffset;
 
@@ -1528,7 +1573,7 @@
                 const col = posInTeam % 2;
                 const row = Math.floor(posInTeam / 2);
                 resultByStudentIdx[sIdx] = {
-                  x: baseX + col * (DESK_W + 10),
+                  x: baseX + col * (DESK_W + POD_INNER_GAP_X),
                   y: currentBandY + row * (DESK_H + ROW_GAP_Y)
                 };
               });
@@ -2762,7 +2807,10 @@
         if (cls && cls.students) {
           cls.students.forEach(function (st) {
             if (st.x + DESK_W + 36 > maxX) maxX = st.x + DESK_W + 36;
-            if (st.y + DESK_H + (cls.frontAtTop ? 36 : 76) > maxY) maxY = st.y + DESK_H + (cls.frontAtTop ? 36 : 76);
+            // Front at the bottom needs room for the FRONT OF ROOM strip just past the front row.
+            // Front at the top only needs a small back-of-room margin under the last row.
+            const endPad = cls.frontAtTop ? 28 : (FRONT_ROW_GAP + FRONT_LABEL_H + FRONT_EDGE);
+            if (st.y + DESK_H + endPad > maxY) maxY = st.y + DESK_H + endPad;
           });
         }
         return { width: Math.ceil(maxX), height: Math.ceil(maxY) };
@@ -2772,9 +2820,9 @@
       function renderClassroomCanvas(smoothTransition) {
         const cls = getCurrentClass();
         const container = document.getElementById('desksContainer');
-        const boardBar = document.getElementById('teacherBoardBar');
+        const frontLabel = document.getElementById('frontOfRoom');
         const stage = document.getElementById('classroomStage');
-        if (!cls || !container || !boardBar || !stage) return;
+        if (!cls || !container || !frontLabel || !stage) return;
 
         const active = document.activeElement;
         if (!nameEditLock && active && active.getAttribute && container.contains(active)) {
@@ -2795,13 +2843,27 @@
         stage.style.transform = 'scale(' + state.zoom + ')';
         syncZoomReadout();
 
-        // Position Teacher Smartboard at Top or Bottom
+        // FRONT OF ROOM sits a compact gap beyond the desk row that faces the front.
+        // Anchored to that row (not the far canvas edge) so a flip does not leave
+        // the old smartboard aisle between the strip and the first desks.
         if (cls.frontAtTop) {
-          boardBar.style.top = '12px';
-          boardBar.style.bottom = 'auto';
+          let minTop = Infinity;
+          (cls.students || []).forEach(function (st) {
+            const y = Number(st.y);
+            if (isFinite(y) && y < minTop) minTop = y;
+          });
+          if (!isFinite(minTop)) minTop = FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP;
+          const labelTop = Math.max(0, minTop - FRONT_ROW_GAP - FRONT_LABEL_H);
+          frontLabel.style.top = labelTop + 'px';
+          frontLabel.style.bottom = 'auto';
         } else {
-          boardBar.style.bottom = '12px';
-          boardBar.style.top = 'auto';
+          let maxBottom = 0;
+          (cls.students || []).forEach(function (st) {
+            const bottom = (Number(st.y) || 0) + DESK_H;
+            if (bottom > maxBottom) maxBottom = bottom;
+          });
+          frontLabel.style.top = (maxBottom + FRONT_ROW_GAP) + 'px';
+          frontLabel.style.bottom = 'auto';
         }
 
         nameEditLock = true;
@@ -3384,7 +3446,7 @@
         saveState();
         renderHeaderControls();
         renderClassroomCanvas(true);
-        showToast('Flipped room view: Teacher Smartboard at ' + (cls.frontAtTop ? 'Top' : 'Bottom'), '🔄');
+        showToast('Flipped room view: FRONT OF ROOM at ' + (cls.frontAtTop ? 'Top' : 'Bottom'), '🔄');
       }
 
       // ===================================================================
@@ -4169,8 +4231,8 @@
             name: 'Student ' + String(nextNum).padStart(2, '0'),
             groupId: cls.groups[0] ? cls.groups[0].id : '',
             score: 0,
-            x: 60 + ((nextNum - 1) % 6) * 164,
-            y: (cls.frontAtTop ? 84 : 32) + Math.floor((nextNum - 1) / 6) * 138
+            x: 28 + ((nextNum - 1) % 6) * (DESK_W + EXAM_COL_GAP_X),
+            y: frontRowTopOffset(cls.frontAtTop) + Math.floor((nextNum - 1) / 6) * (DESK_H + ROW_GAP_Y)
           };
           cls.students.push(newSt);
           rememberStudentDefaultPosition(cls, newSt);
