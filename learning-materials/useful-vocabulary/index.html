@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261020b -->
+<!-- cache 20261020h -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -246,5 +246,24 @@
     </div>
   </div>
   <script src="../../dse-writing/tools-dock.js?v=20261020e"></script>
+  <script>
+  (function () {
+    function openHash() {
+      var raw = location.hash;
+      if (!raw || raw.length < 2) return;
+      var el;
+      try { el = document.getElementById(decodeURIComponent(raw.slice(1))); }
+      catch (e) { return; }
+      if (!el) return;
+      var node = el;
+      while (node && node !== document.body) {
+        if (node.tagName === 'DETAILS') node.open = true;
+        node = node.parentElement;
+      }
+    }
+    openHash();
+    window.addEventListener('hashchange', openHash);
+  })();
+  </script>
 </body>
 </html>

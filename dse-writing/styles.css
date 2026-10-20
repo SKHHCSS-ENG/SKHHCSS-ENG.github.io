@@ -955,3 +955,132 @@ footer {
   .skel-slot { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   body.zh-on .gloss::after { color: #000; }
 }
+
+/* Grammar (Junior) — Core / Stretch groups, form tables, dock clearance */
+body.grammar-junior details.format-group > .group-body {
+  padding: 12px 12px 2px;
+  border-top: 1px solid var(--border);
+}
+body.grammar-junior details.format-group .format-section:last-child {
+  margin-bottom: 12px;
+}
+body.grammar-junior .grammar-meta {
+  margin: 0 0 6px;
+  font-size: .92rem;
+  color: var(--ink);
+}
+body.grammar-junior .grammar-meta strong { color: var(--navy); }
+body.grammar-junior .grammar-examples {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+body.grammar-junior .grammar-examples li { margin: 0 0 4px; }
+body.grammar-junior .pattern-card .table-scroll { margin: 8px 0 0; }
+body.grammar-junior .pattern-card .pattern-tip { margin-top: 10px; }
+body.grammar-junior .pattern-card .grammar-note {
+  margin: 10px 0 0;
+  font-size: .9rem;
+  color: var(--ink);
+}
+body.grammar-junior .see-also {
+  margin: 12px 0 0;
+  font-size: .9rem;
+}
+body.grammar-junior .see-also a,
+body.grammar-junior .pattern-tip a {
+  color: var(--accent-ink);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+body.grammar-junior .see-also a:focus-visible,
+body.grammar-junior .pattern-tip a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+body.grammar-junior .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+body.grammar-junior .grammar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .86rem;
+}
+body.grammar-junior .grammar-table th,
+body.grammar-junior .grammar-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  overflow-wrap: break-word;
+}
+body.grammar-junior .grammar-table thead th {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+body.grammar-junior .grammar-table tbody th {
+  background: var(--bg);
+  color: var(--navy);
+  font-weight: 700;
+}
+body.grammar-junior .grammar-corner { width: 1%; }
+@media (max-width: 560px) {
+  body.grammar-junior .grammar-table,
+  body.grammar-junior .grammar-table thead,
+  body.grammar-junior .grammar-table tbody,
+  body.grammar-junior .grammar-table tr,
+  body.grammar-junior .grammar-table th,
+  body.grammar-junior .grammar-table td {
+    display: block;
+    width: 100%;
+  }
+  body.grammar-junior .grammar-table thead { display: none; }
+  body.grammar-junior .grammar-table tr {
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  body.grammar-junior .grammar-table tbody th {
+    width: auto;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border: none;
+    border-bottom: 1px solid var(--border);
+  }
+  body.grammar-junior .grammar-table td {
+    border: none;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+  body.grammar-junior .grammar-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-bottom: 4px;
+  }
+}
+body.grammar-junior footer { margin-top: 110px; }
+body.grammar-junior.tools-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.grammar-junior.tools-page.dock-open {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.grammar-junior.tools-page.dock-open.hw-on {
+  padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
+}
