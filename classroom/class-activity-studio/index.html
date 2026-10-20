@@ -330,6 +330,167 @@
         width: 3.5rem;
       }
     }
+    /* Team name on a desk. Resting size matches the old badge so the card stays short. */
+    .desk-group-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      max-width: 88px;
+      min-width: 0;
+      margin: 0;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.2;
+      cursor: text;
+      touch-action: manipulation;
+      text-align: left;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .desk-group-btn span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    .desk-group-btn::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      right: -4px;
+      top: -4px;
+      bottom: -1px;
+    }
+    .desk-group-btn:hover,
+    .desk-group-btn:focus-visible {
+      background: #fffbeb;
+      outline: 1px solid #fcd34d;
+      outline-offset: 0;
+    }
+    .desk-group-edit {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 18px;
+    }
+    .desk-group-edit-icon {
+      font-size: 10px;
+      line-height: 1;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 6;
+      pointer-events: none;
+    }
+    .desk-group-input {
+      position: absolute;
+      left: 14px;
+      right: 0;
+      top: -6px;
+      height: 28px;
+      z-index: 5;
+      margin: 0;
+      padding: 0 6px;
+      border-radius: 6px;
+      border: 1px solid #f59e0b;
+      background: #fffbeb;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.2;
+      color: #0f172a;
+      user-select: text;
+      -webkit-user-select: text;
+      touch-action: manipulation;
+    }
+    .desk-group-input:focus {
+      outline: none;
+      border-color: #d97706;
+    }
+    .desk-card.is-editing-group {
+      z-index: 40;
+    }
+    /* Live Team Scoreboard name. Tap opens the same inline field. */
+    .dock-group-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      max-width: 100%;
+      min-width: 0;
+      margin: 0;
+      padding: 2px 4px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #0f172a;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.75rem;
+      line-height: 1.2;
+      text-align: left;
+      cursor: text;
+      touch-action: manipulation;
+      appearance: none;
+      -webkit-appearance: none;
+      overflow: hidden;
+    }
+    .dock-group-btn:hover,
+    .dock-group-btn:focus-visible {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      outline: none;
+    }
+    .dock-group-edit {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      min-width: 0;
+      flex: 1 1 auto;
+      width: 100%;
+    }
+    .dock-group-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: 100%;
+      margin: 0;
+      padding: 4px 6px;
+      border-radius: 8px;
+      border: 1px solid #f59e0b;
+      background: #fffbeb;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.2;
+      color: #0f172a;
+      min-height: 36px;
+      user-select: text;
+      -webkit-user-select: text;
+      touch-action: manipulation;
+    }
+    .dock-group-input:focus {
+      outline: none;
+      border-color: #d97706;
+    }
+    @media (min-width: 640px) {
+      .dock-group-btn {
+        font-size: 0.875rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .dock-group-btn {
+        min-height: 44px;
+      }
+      .dock-group-input {
+        min-height: 44px;
+      }
+    }
     .score-step {
       position: relative;
       width: 22px;
@@ -1783,6 +1944,9 @@
         editNameMode: false,
         editingStudentId: '',
         editingClassNoId: '',
+        editingGroupId: '',
+        editingGroupAnchor: '', // 'desk' | 'dock'
+        editingGroupDeskId: '',
         activeBrushGroupId: 'grp_1',
         leaderboardTab: 'students', // 'students' | 'groups' | 'feed'
         lbSearch: '',
@@ -1806,6 +1970,8 @@
       let timerIntervalId = null;
       let pickerSpinIntervalId = null;
       let nameEditLock = false;
+      let groupEditToken = 0;
+      let keepGroupEditOpen = false;
 
       // Load or Initialize State
       function loadState() {
@@ -1959,6 +2125,161 @@
         saveState();
         showToast('Class number set to #' + next, '✏️');
         return true;
+      }
+
+      // Blank or oversized team names fall back to the previous name. The live
+      // group record is what localStorage, Set as Default, and Reset already use.
+      function normaliseGroupName(rawText, previous) {
+        var prev = String(previous == null ? '' : previous);
+        var next = String(rawText == null ? '' : rawText).replace(/\s+/g, ' ').trim();
+        if (!next) return prev;
+        if (next.length > 48) next = next.slice(0, 48).trim();
+        return next || prev;
+      }
+
+      function elementByAttr(selector, attr, value) {
+        const nodes = document.querySelectorAll(selector);
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i].getAttribute(attr) === value) return nodes[i];
+        }
+        return null;
+      }
+
+      function commitGroupName(groupId, rawText) {
+        const cls = getCurrentClass();
+        if (!cls || !groupId) return false;
+        const grp = getGroupById(cls, groupId);
+        if (!grp) return false;
+        const next = normaliseGroupName(rawText, grp.name);
+        if (grp.name === next) return false;
+        grp.name = next;
+        saveState();
+        const titleEl = document.getElementById('pickerResultTitle');
+        if (titleEl && state.lastPickedTarget && state.lastPickedTarget.type === 'group' && state.lastPickedTarget.id === groupId) {
+          titleEl.textContent = grp.icon + ' ' + grp.name;
+        }
+        const field = elementByAttr('#groupManagerList [data-edit-grp-name]', 'data-edit-grp-name', groupId);
+        if (field && document.activeElement !== field) field.value = grp.name;
+        showToast('Team renamed to ' + next, '✏️');
+        return true;
+      }
+
+      function focusGroupInput(input) {
+        if (!input) return;
+        input.focus();
+        try { input.select(); } catch (err) {}
+      }
+
+      function refreshAfterGroupRename() {
+        renderGroupBrushBar();
+        renderGroupScoreDock();
+        renderClassroomCanvas(false);
+        renderLeaderboardAndStats();
+      }
+
+      function closeGroupNameEditor() {
+        if (!state.editingGroupId) return;
+        state.editingGroupId = '';
+        state.editingGroupAnchor = '';
+        state.editingGroupDeskId = '';
+        refreshAfterGroupRename();
+      }
+
+      function beginGroupNameEdit(groupId, anchor, deskId) {
+        if (!groupId) return;
+        groupEditToken += 1;
+        state.editingClassNoId = '';
+        state.editingStudentId = '';
+        state.editingGroupId = groupId;
+        state.editingGroupAnchor = anchor;
+        state.editingGroupDeskId = anchor === 'desk' ? (deskId || '') : '';
+        keepGroupEditOpen = true;
+        renderGroupScoreDock();
+        renderClassroomCanvas(false);
+        keepGroupEditOpen = false;
+        if (anchor === 'dock') {
+          focusGroupInput(elementByAttr('#groupDockCards [data-dock-group-input]', 'data-dock-group-input', groupId));
+        } else {
+          focusGroupInput(elementByAttr('#desksContainer [data-desk-group-input]', 'data-desk-group-input', groupId));
+        }
+      }
+
+      function onGroupNameKeydown(e) {
+        const input = e.target;
+        if (!input || !input.getAttribute) return false;
+        const id = input.getAttribute('data-desk-group-input') || input.getAttribute('data-dock-group-input');
+        if (!id) return false;
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          input.dataset.cancelGroupName = '1';
+          input.value = input.getAttribute('data-original-group-name') || '';
+          input.blur();
+        }
+        return true;
+      }
+
+      function onGroupNameFocusOut(e) {
+        const input = e.target;
+        if (!input || !input.getAttribute) return false;
+        if (nameEditLock) return false;
+        const deskId = input.getAttribute('data-desk-group-input');
+        const dockId = input.getAttribute('data-dock-group-input');
+        const id = deskId || dockId;
+        if (!id) return false;
+        const cancel = input.dataset.cancelGroupName === '1';
+        if (!cancel) commitGroupName(id, input.value);
+        const token = groupEditToken;
+        setTimeout(function () {
+          if (groupEditToken !== token) return;
+          const activeNow = document.activeElement;
+          if (activeNow && activeNow.getAttribute && (activeNow.getAttribute('data-desk-group-input') || activeNow.getAttribute('data-dock-group-input'))) {
+            return;
+          }
+          closeGroupNameEditor();
+        }, 0);
+        return true;
+      }
+
+      function renderDeskGroupControl(st, grp, pal) {
+        if (!grp || !pal) {
+          return '<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-400">No Team</span>';
+        }
+        const editingHere = state.editingGroupId === grp.id && state.editingGroupAnchor === 'desk' && state.editingGroupDeskId === st.id;
+        if (editingHere) {
+          return '<span class="desk-group-edit">' +
+            '<span class="desk-group-edit-icon" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
+            '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="48" ' +
+            'class="desk-group-input" data-desk-group-input="' + escapeHtml(grp.id) + '" ' +
+            'data-original-group-name="' + escapeHtml(grp.name) + '" ' +
+            'value="' + escapeHtml(grp.name) + '" aria-label="Team name, ' + escapeHtml(grp.name) + '" />' +
+            '</span>';
+        }
+        return '<button type="button" class="desk-group-btn ' + pal.badgeBg + ' ' + pal.text + '" ' +
+          'data-desk-group-rename="' + escapeHtml(grp.id) + '" data-desk-group-student="' + escapeHtml(st.id) + '" ' +
+          'title="Rename ' + escapeHtml(grp.name) + '" aria-label="Rename team ' + escapeHtml(grp.name) + '">' +
+          '<span>' + escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) + '</span>' +
+          '</button>';
+      }
+
+      function renderDockGroupNameControl(grp) {
+        const editingHere = state.editingGroupId === grp.id && state.editingGroupAnchor === 'dock';
+        if (editingHere) {
+          return '<span class="dock-group-edit">' +
+            '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
+            '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="48" ' +
+            'class="dock-group-input" data-dock-group-input="' + escapeHtml(grp.id) + '" ' +
+            'data-original-group-name="' + escapeHtml(grp.name) + '" ' +
+            'value="' + escapeHtml(grp.name) + '" aria-label="Team name" />' +
+            '</span>';
+        }
+        return '<button type="button" class="dock-group-btn" data-dock-group-rename="' + escapeHtml(grp.id) + '" ' +
+          'title="Rename ' + escapeHtml(grp.name) + '" aria-label="Rename team ' + escapeHtml(grp.name) + '">' +
+          '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
+          '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
+          '</button>';
       }
 
       function renderDeskClassNoControl(st) {
@@ -2774,6 +3095,19 @@
         const cls = getCurrentClass();
         if (!dock || !container || !cls) return;
 
+        const activeDock = document.activeElement;
+        if (!nameEditLock && activeDock && activeDock.getAttribute && container.contains(activeDock)) {
+          const gid = activeDock.getAttribute('data-dock-group-input');
+          if (gid && activeDock.dataset.cancelGroupName !== '1') {
+            commitGroupName(gid, activeDock.value);
+          }
+        }
+        if (!keepGroupEditOpen && state.editingGroupAnchor === 'dock') {
+          state.editingGroupId = '';
+          state.editingGroupAnchor = '';
+          state.editingGroupDeskId = '';
+        }
+
         if (state.activityMode !== 'group') {
           dock.classList.add('hidden');
           return;
@@ -2785,15 +3119,15 @@
           return;
         }
 
+        nameEditLock = true;
         container.innerHTML = cls.groups.map(function (grp) {
           const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
           const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
           return '<div class="rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md">' +
             '<div class="flex items-start justify-between gap-1 mb-1.5">' +
-              '<div class="min-w-0">' +
-                '<div class="flex items-center gap-1">' +
-                  '<span class="text-base leading-none">' + escapeHtml(grp.icon) + '</span>' +
-                  '<span class="font-display font-bold text-xs sm:text-sm text-slate-900 truncate">' + escapeHtml(grp.name) + '</span>' +
+              '<div class="min-w-0 flex-1">' +
+                '<div class="flex items-center gap-1 min-w-0">' +
+                  renderDockGroupNameControl(grp) +
                 '</div>' +
                 '<div class="text-[11px] font-medium text-slate-500 mt-0.5">' + memberCount + ' member' + (memberCount === 1 ? '' : 's') + '</div>' +
               '</div>' +
@@ -2807,6 +3141,7 @@
             '</div>' +
           '</div>';
         }).join('');
+        nameEditLock = false;
       }
 
       // Compute dynamic stage bounds so large grids or tall layouts never clip
@@ -2841,6 +3176,14 @@
           if (active.getAttribute('data-desk-classno-input') && active.dataset.cancelClassNo !== '1') {
             commitStudentClassNo(active.getAttribute('data-desk-classno-input'), active.value);
           }
+          if (active.getAttribute('data-desk-group-input') && active.dataset.cancelGroupName !== '1') {
+            commitGroupName(active.getAttribute('data-desk-group-input'), active.value);
+          }
+        }
+        if (!keepGroupEditOpen && state.editingGroupAnchor === 'desk') {
+          state.editingGroupId = '';
+          state.editingGroupAnchor = '';
+          state.editingGroupDeskId = '';
         }
 
         // Dynamically size stage so all desks fit with breathing room
@@ -2881,11 +3224,8 @@
           const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
           const borderClass = pal ? ('border-2 ' + pal.border) : 'border-2 border-slate-200';
           const topStripClass = pal ? pal.headerBg : 'bg-slate-700';
-          const groupBadgeHtml = grp
-            ? '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold ' + pal.badgeBg + ' ' + pal.text + ' max-w-[88px] truncate" title="' + escapeHtml(grp.name) + '">' +
-                escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
-              '</span>'
-            : '<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-400">No Team</span>';
+          const editingThisDeskGroup = !!(grp && state.editingGroupId === grp.id && state.editingGroupAnchor === 'desk' && state.editingGroupDeskId === st.id);
+          const groupBadgeHtml = renderDeskGroupControl(st, grp, pal);
 
           const scoreVal = Number(st.score) || 0;
           const scoreBadgeClass = scoreVal > 0
@@ -2898,7 +3238,7 @@
 
           const isSpotlight = state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === st.id;
 
-          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + '" ' +
+          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + (editingThisDeskGroup ? ' is-editing-group' : '') + '" ' +
             'data-student-id="' + escapeHtml(st.id) + '" ' +
             'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
             '<!-- Top Color Accent Bar -->' +
@@ -2911,10 +3251,10 @@
               '</div>' +
               '<!-- Row 2: Student Name (tap to rename, including Empty) -->' +
               renderDeskNameControl(st) +
-              '<!-- Row 3: Team Badge -->' +
-              '<div class="flex items-center justify-between mb-0.5">' +
+              '<!-- Row 3: Team name (tap to rename) -->' +
+              '<div class="flex items-center justify-between mb-0.5 gap-1">' +
                 groupBadgeHtml +
-                (state.activityMode === 'group' && grp
+                (state.activityMode === 'group' && grp && !editingThisDeskGroup
                   ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
                   : '') +
               '</div>' +
@@ -3103,12 +3443,24 @@
             if (!id) return;
             state.editingClassNoId = id;
             state.editingStudentId = '';
+            groupEditToken += 1;
+            state.editingGroupId = '';
+            state.editingGroupAnchor = '';
+            state.editingGroupDeskId = '';
+            renderGroupScoreDock();
             renderClassroomCanvas(false);
             const input = container.querySelector('[data-desk-classno-input="' + id + '"]');
             if (input) {
               input.focus();
               try { input.select(); } catch (err) {}
             }
+            return;
+          }
+          const groupBtn = e.target.closest('[data-desk-group-rename]');
+          if (groupBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            beginGroupNameEdit(groupBtn.getAttribute('data-desk-group-rename'), 'desk', groupBtn.getAttribute('data-desk-group-student'));
             return;
           }
           const nameBtn = e.target.closest('[data-desk-rename]');
@@ -3119,6 +3471,11 @@
           if (!id) return;
           state.editingClassNoId = '';
           state.editingStudentId = id;
+          groupEditToken += 1;
+          state.editingGroupId = '';
+          state.editingGroupAnchor = '';
+          state.editingGroupDeskId = '';
+          renderGroupScoreDock();
           renderClassroomCanvas(false);
           const input = container.querySelector('[data-desk-name-input="' + id + '"]');
           if (input) {
@@ -3130,6 +3487,7 @@
         container.addEventListener('keydown', function (e) {
           const input = e.target;
           if (!input || !input.getAttribute) return;
+          if (onGroupNameKeydown(e)) return;
           const nameId = input.getAttribute('data-desk-name-input');
           const noId = input.getAttribute('data-desk-classno-input');
           if (!nameId && !noId) return;
@@ -3153,6 +3511,7 @@
           const input = e.target;
           if (!input || !input.getAttribute) return;
           if (nameEditLock) return;
+          if (onGroupNameFocusOut(e)) return;
           const nameId = input.getAttribute('data-desk-name-input');
           const noId = input.getAttribute('data-desk-classno-input');
           if (noId) {
@@ -3251,7 +3610,7 @@
           }
 
           // Name and class-number editing must not start a drag, paint a team, or score.
-          if (e.target.closest('[data-desk-rename], [data-desk-name-input], [data-desk-classno], [data-desk-classno-input]')) {
+          if (e.target.closest('[data-desk-rename], [data-desk-name-input], [data-desk-classno], [data-desk-classno-input], [data-desk-group-rename], [data-desk-group-input]')) {
             return;
           }
 
@@ -4107,13 +4466,18 @@
 
         document.getElementById('btnToggleEditName').addEventListener('click', function () {
           const active = document.activeElement;
-          if (active && active.getAttribute && (active.getAttribute('data-desk-name-input') || active.getAttribute('data-desk-classno-input'))) {
+          if (active && active.getAttribute && (active.getAttribute('data-desk-name-input') || active.getAttribute('data-desk-classno-input') || active.getAttribute('data-desk-group-input') || active.getAttribute('data-dock-group-input'))) {
             active.blur();
           }
           state.editNameMode = !state.editNameMode;
           state.editingStudentId = '';
           state.editingClassNoId = '';
+          groupEditToken += 1;
+          state.editingGroupId = '';
+          state.editingGroupAnchor = '';
+          state.editingGroupDeskId = '';
           renderHeaderControls();
+          renderGroupScoreDock();
           renderClassroomCanvas(false);
           showToast(state.editNameMode ? 'Edit Name is on — tap a name to rename. Empty seats are open too.' : 'Edit Name is off', '✏️');
         });
@@ -4259,8 +4623,15 @@
         document.getElementById('btnSetDefaultLayout').addEventListener('click', setCurrentLayoutAsDefault);
         document.getElementById('btnResetLayout').addEventListener('click', resetLayoutToDefaultGrid);
 
-        // Group Dock Event Delegation (+1 / -1 on group cards)
-        document.getElementById('groupDockCards').addEventListener('click', function (e) {
+        // Group Dock Event Delegation (rename, then +1 / -1 on group cards)
+        const groupDockCards = document.getElementById('groupDockCards');
+        groupDockCards.addEventListener('click', function (e) {
+          const renameBtn = e.target.closest('[data-dock-group-rename]');
+          if (renameBtn) {
+            e.preventDefault();
+            beginGroupNameEdit(renameBtn.getAttribute('data-dock-group-rename'), 'dock', '');
+            return;
+          }
           const plusBtn = e.target.closest('[data-grp-plus]');
           if (plusBtn) {
             adjustGroupScore(plusBtn.getAttribute('data-grp-plus'), 1);
@@ -4271,6 +4642,8 @@
             adjustGroupScore(minusBtn.getAttribute('data-grp-minus'), -1);
           }
         });
+        groupDockCards.addEventListener('keydown', onGroupNameKeydown);
+        groupDockCards.addEventListener('focusout', onGroupNameFocusOut);
         document.getElementById('btnQuickAssignFromDock').addEventListener('click', openGroupModal);
 
         // Leaderboard Tabs, Filter & Score Buttons
