@@ -694,6 +694,21 @@
       }
       .studio-brand { align-self: center; width: 100%; }
     }
+    /* Toolbar band names. Same size and weight as the old “Quick Layout:”
+       label, kept in Title Case so they stay glanceable section headers. */
+    .studio-band-label {
+      flex-shrink: 0;
+      margin-right: 0.125rem;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      line-height: 1;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+    .studio-band {
+      min-width: 0;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
@@ -823,54 +838,13 @@
     </div>
   </header>
 
-  <!-- SECONDARY CLASSROOM LAYOUT & GROUPING TOOLBAR -->
+  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right; wraps by band) -->
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
-    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-2">
-      
-      <!-- Left: Freeform Layout Templates & Canvas Controls -->
-      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
-          <svg class="w-3.5 h-3.5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          Quick Layout:
-        </span>
-        <!-- Custom Rows x Columns Grid Quick Setup -->
-        <div class="inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 py-0.5 shadow-2xs" title="Custom Rows × Columns Quick Grid Setup">
-          <span class="text-[11px] font-bold text-indigo-800">Grid:</span>
-          <label for="quickRowsInput" class="text-[10px] font-bold text-slate-500 uppercase">Rows</label>
-          <input id="quickRowsInput" type="number" min="1" max="15" value="4" aria-label="Number of Rows" class="w-11 px-1 py-0.5 text-xs font-bold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <span class="text-xs font-bold text-slate-400">×</span>
-          <label for="quickColsInput" class="text-[10px] font-bold text-slate-500 uppercase">Cols</label>
-          <input id="quickColsInput" type="number" min="1" max="12" value="6" aria-label="Number of Columns" class="w-11 px-1 py-0.5 text-xs font-bold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <button id="btnApplyCustomGrid" type="button" class="ml-0.5 px-2.5 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-2xs">
-            Apply Grid
-          </button>
-        </div>
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
-        <button type="button" data-layout="rows" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
-        <button type="button" data-layout="pairs" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns: tight gap inside each pair, wider left–right aisle between pairs">Paired Desks</button>
-        <button type="button" data-layout="pods4" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block: tight inside each pod, wider left–right aisle between pods">4-Desk Pods</button>
-        <button type="button" data-layout="groupClusters" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather each team into a tight cluster, with a wider left–right aisle between clusters">
-          <span>🧲</span>
-          <span>Cluster by Group</span>
-        </button>
-
-        <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
-
-        <!-- Snap to Grid Toggle -->
-        <button id="btnToggleSnapGrid" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Snap desks to a clean grid when dragging">
-          <span>📏</span>
-          <span id="snapGridText">Snap: ON</span>
-        </button>
-
-        <!-- Flip Room View (Front at Top vs Bottom) -->
-        <button id="btnFlipRoom" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Flip Classroom Orientation (FRONT OF ROOM at Top vs Bottom)">
-          <span>🔄</span>
-          <span id="flipRoomText">Front: Bottom</span>
-        </button>
-      </div>
-
-      <!-- Right: Manual Grouping Controls & Bulk Scoring Actions -->
-      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+      <!-- Register -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">Register</span>
         <!-- Manual Group Paint Brush Toggle -->
         <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Click a team color and tap desks on the floor plan to assign groups manually">
           <span>🎨</span>
@@ -892,15 +866,62 @@
         <button id="btnToggleEditName" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm" title="Stop Editing" aria-label="Edit" aria-pressed="true">
           Edit
         </button>
+      </div>
 
-        <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
+      <!-- Seating: grid, presets, More (Snap + Front), Lock -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">Seating</span>
+        <!-- Custom Rows x Columns Grid Quick Setup -->
+        <div class="inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 py-0.5 shadow-2xs" title="Custom Rows × Columns Quick Grid Setup">
+          <span class="text-[11px] font-bold text-indigo-800">Grid:</span>
+          <label for="quickRowsInput" class="text-[10px] font-bold text-slate-500 uppercase">Rows</label>
+          <input id="quickRowsInput" type="number" min="1" max="15" value="4" aria-label="Number of Rows" class="w-11 px-1 py-0.5 text-xs font-bold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <span class="text-xs font-bold text-slate-400">×</span>
+          <label for="quickColsInput" class="text-[10px] font-bold text-slate-500 uppercase">Cols</label>
+          <input id="quickColsInput" type="number" min="1" max="12" value="6" aria-label="Number of Columns" class="w-11 px-1 py-0.5 text-xs font-bold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button id="btnApplyCustomGrid" type="button" class="ml-0.5 px-2.5 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-2xs">
+            Apply Grid
+          </button>
+        </div>
 
-        <!-- Undo Layout · Redo Layout · Set as Default · Reset Layout · Lock Layout -->
+        <button type="button" data-layout="rows" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
+        <button type="button" data-layout="pairs" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns: tight gap inside each pair, wider left–right aisle between pairs">Paired Desks</button>
+        <button type="button" data-layout="pods4" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block: tight inside each pod, wider left–right aisle between pods">4-Desk Pods</button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn min-h-[44px] px-3 py-2 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather each team into a tight cluster, with a wider left–right aisle between clusters">
+          <span>🧲</span>
+          <span>Cluster by Group</span>
+        </button>
+
+        <!-- Snap and Front stay out of the main row. More reveals both on phone and desktop. -->
+        <div id="seatingMoreWrap" class="relative">
+          <button id="btnSeatingMore" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold whitespace-nowrap transition" aria-expanded="false" aria-controls="seatingMoreMenu" aria-haspopup="true" aria-label="More">
+            More
+          </button>
+          <div id="seatingMoreMenu" class="hidden items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-1" role="group" aria-label="More">
+            <button id="btnToggleSnapGrid" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition whitespace-nowrap" title="Snap desks to a clean grid when dragging">
+              <span aria-hidden="true">📏</span>
+              <span id="snapGridText">Snap: ON</span>
+            </button>
+            <button id="btnFlipRoom" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition whitespace-nowrap" title="Flip Classroom Orientation (FRONT OF ROOM at Top vs Bottom)">
+              <span aria-hidden="true">🔄</span>
+              <span id="flipRoomText">Front: Bottom</span>
+            </button>
+          </div>
+        </div>
+
+        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout — freeze desk drag" aria-label="Lock Layout" aria-pressed="false">
+          <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
+        </button>
+      </div>
+
+      <!-- History: icon-only Undo / Redo, then Set as Default and Reset Layout -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">History</span>
         <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
-          ↩️
+          <span aria-hidden="true">↩️</span>
         </button>
         <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo Layout" aria-label="Redo Layout">
-          ↪️
+          <span aria-hidden="true">↪️</span>
         </button>
         <button id="btnSetDefaultLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
           Set as Default
@@ -908,13 +929,11 @@
         <button id="btnResetLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
           🔄 Layout
         </button>
-        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout — freeze desk drag" aria-label="Lock Layout" aria-pressed="false">
-          <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
-        </button>
       </div>
 
-      <!-- Far right: class-wide scoring. ml-auto keeps these flushed right when the row wraps. -->
-      <div class="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+      <!-- Scores follows History in the same left-to-right flow. Not flushed right. -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">Scores</span>
         <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
@@ -2998,7 +3017,7 @@
           }
         }
 
-        // Lock sits beside Reset Layout. Aria is the action; the title is one line.
+        // Lock sits in the Seating band (icon only). Aria is the action; the title is one line.
         const lockIcon = document.getElementById('lockLayoutIcon');
         const btnLock = document.getElementById('btnToggleLockLayout');
         if (lockIcon && btnLock) {
@@ -4712,6 +4731,52 @@
         });
 
         document.getElementById('btnFlipRoom').addEventListener('click', flipClassroomOrientation);
+
+        // Seating “More” holds Snap and Front on phone and desktop.
+        const seatingMoreClosedClass = 'min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold whitespace-nowrap transition';
+        const seatingMoreOpenClass = 'min-h-[44px] px-3 py-2 rounded-lg bg-slate-800 text-white text-xs font-semibold whitespace-nowrap transition';
+
+        function seatingMoreIsOpen() {
+          const menu = document.getElementById('seatingMoreMenu');
+          return !!(menu && !menu.classList.contains('hidden'));
+        }
+
+        function closeSeatingMore() {
+          const menu = document.getElementById('seatingMoreMenu');
+          const btn = document.getElementById('btnSeatingMore');
+          if (menu) {
+            menu.classList.add('hidden');
+            menu.classList.remove('inline-flex');
+          }
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.className = seatingMoreClosedClass;
+          }
+        }
+
+        function openSeatingMore() {
+          const menu = document.getElementById('seatingMoreMenu');
+          const btn = document.getElementById('btnSeatingMore');
+          if (!menu || !btn) return;
+          menu.classList.remove('hidden');
+          menu.classList.add('inline-flex');
+          btn.setAttribute('aria-expanded', 'true');
+          btn.className = seatingMoreOpenClass;
+        }
+
+        document.getElementById('btnSeatingMore').addEventListener('click', function () {
+          if (seatingMoreIsOpen()) closeSeatingMore();
+          else openSeatingMore();
+        });
+        document.addEventListener('click', function (e) {
+          if (!seatingMoreIsOpen()) return;
+          const wrap = document.getElementById('seatingMoreWrap');
+          if (wrap && wrap.contains(e.target)) return;
+          closeSeatingMore();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && seatingMoreIsOpen()) closeSeatingMore();
+        });
 
         // Zoom Controls (− / typed % / ＋ / Fit). Typed percent commits on Enter or blur.
         document.getElementById('btnZoomIn').addEventListener('click', function () {
