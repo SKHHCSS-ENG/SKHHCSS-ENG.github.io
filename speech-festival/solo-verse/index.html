@@ -20,7 +20,7 @@
 .eq-bar{display:inline-block;width:3px;height:13px;background:currentColor;margin:0 1px;border-radius:2px;animation:eqPulse .65s infinite ease-in-out}
 .eq-bar:nth-child(2){animation-delay:.16s}.eq-bar:nth-child(3){animation-delay:.32s}
 .yt-oneclick-wrap{position:relative;overflow:hidden;display:inline-flex;min-height:44px}
-.yt-oneclick-iframe{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;border:0;z-index:-1}
+#ytAudioHost{position:fixed;left:0;bottom:0;width:320px;height:180px;opacity:0;pointer-events:none;border:0;z-index:0}
 .yt-oneclick-wrap>button{position:relative;z-index:2;min-height:44px}
 .yt-oneclick-wrap:hover>button{filter:brightness(1.06)}
 .sf-tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #e2e8f0;margin-bottom:1.25rem}
@@ -109,6 +109,7 @@ label.sf-label{font-size:11px;font-weight:700;color:#64748b;display:block;margin
   <div id="view-listen" class="space-y-5">
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
       <div class="bg-slate-900 text-white rounded-xl p-3.5 mb-5 space-y-3">
+        <div id="ytAudioHost" aria-hidden="true"></div>
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex flex-wrap items-center gap-2">
             <div id="wrap-main-FULL" class="yt-oneclick-wrap rounded-lg">
@@ -304,7 +305,8 @@ allPoems.forEach(p => {
 let filteredPoems = [...allPoems], currentPoemIndex = 0, attempts = [];
 try { attempts = JSON.parse(localStorage.getItem('sf_attempts_v7') || '[]'); } catch (e) { attempts = []; }
 let synth = window.speechSynthesis, recognition = null, isRecording = false, startTime = 0, timerInterval = null, recordedTranscript = "", isScriptVisible = true;
-let activeSlotId = null, activeStanzaIndex = null, loopStanzaEnabled = false, ytMonitorInterval = null, simulatedCurrentTime = 0, slotMetaMap = {};
+let activeSlotId = null, activeStanzaIndex = null, loopStanzaEnabled = false, ytMonitorInterval = null;
+let ytPlayer = null, ytReady = false, ytPending = null, activeRange = null, loadedVideoId = null, ytApiRequested = false, ytErrorLock = false;
 
 function fmt(sec) {
   const s = Math.max(0, Math.floor(sec || 0));
@@ -318,87 +320,263 @@ function showToast(msg) {
 }
 function hideToast() { $id('appToast')?.classList.add('hidden'); }
 
-function buildEmbedlyYouTubeUrl(videoId, startSec, endSec, autoplay = 0, slotUid = '') {
-  const s = Math.max(0, Math.floor(startSec || 0)), e = Math.max(s + 1, Math.ceil(endSec || s + 30));
-  const ytEmbed = `https://www.youtube.com/embed/${videoId}?feature=oembed&enablejsapi=1&autoplay=${autoplay}&start=${s}&end=${e}&rel=0&modestbranding=1&playsinline=1`;
-  const uid = slotUid ? `&_uid=${encodeURIComponent(slotUid)}` : '';
-  return `https://cdn.embedly.com/widgets/media.html?src=${encodeURIComponent(ytEmbed)}&display_name=YouTube&url=${encodeURIComponent('https://www.youtube.com/watch?v=' + videoId)}&image=${encodeURIComponent('https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg')}&type=text%2Fhtml&schema=youtube${uid}`;
+function ensureYouTubeApi() {
+  if (window.YT && window.YT.Player) {
+    if (!ytPlayer) createYtPlayer();
+    return;
+  }
+  if (ytApiRequested) return;
+  ytApiRequested = true;
+  const prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function () {
+    if (typeof prev === 'function') { try { prev(); } catch (e) {} }
+    createYtPlayer();
+  };
+  const s = document.createElement('script');
+  s.id = 'yt-iframe-api';
+  s.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
 }
 
-function mountOneClickSlotIframe(slotId, videoId, startSec, endSec, labelText, stanzaIdx, lineStart, linesCount, autoplay = 0) {
-  slotMetaMap[slotId] = { slotId, videoId, start: startSec, end: endSec, label: labelText, stanzaIdx, lineStart: lineStart || 0, linesCount: linesCount || 1 };
-  const mountEl = $id(`mount-${slotId}`);
-  if (!mountEl) return;
-  const cueUrl = buildEmbedlyYouTubeUrl(videoId, startSec, endSec, autoplay ? 1 : 0, `${slotId}_${Date.now()}`);
-  mountEl.innerHTML = `<iframe id="yt-slot-${slotId}" data-slot-id="${slotId}" src="${cueUrl}" class="yt-oneclick-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" title="${labelText}" tabindex="-1" aria-hidden="true"></iframe>`;
-}
-
-function mountAllOneClickOverlays() {
+function createYtPlayer() {
+  if (ytPlayer || !window.YT || !window.YT.Player) return;
+  const host = $id('ytAudioHost');
   const poem = filteredPoems[currentPoemIndex];
-  if (!poem) return;
-  slotMetaMap = {};
-  const allLines = poem.content.split('\n').map(l => l.trim()).filter(Boolean);
-  mountOneClickSlotIframe('main-FULL', poem.youtubeId, poem.youtubeStart, poem.youtubeEnd, 'Full Poem', 'FULL', 0, allLines.length);
-  (poem.stanzas || []).forEach((st, sIdx) => {
-    const lCount = Math.max((st.lines || []).length, 1);
-    mountOneClickSlotIframe(`top-${sIdx}`, poem.youtubeId, st.start, st.end, st.label, sIdx, st.lineStart, lCount);
-    mountOneClickSlotIframe(`card-${sIdx}`, poem.youtubeId, st.start, st.end, st.label, sIdx, st.lineStart, lCount);
+  if (!host || !poem) return;
+  ytPlayer = new YT.Player('ytAudioHost', {
+    width: '320',
+    height: '180',
+    videoId: poem.youtubeId,
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      modestbranding: 1,
+      playsinline: 1,
+      rel: 0,
+      origin: location.origin,
+      enablejsapi: 1,
+      iv_load_policy: 3
+    },
+    events: { onReady: onYtReady, onStateChange: onYtStateChange, onError: onYtError }
   });
 }
 
-function checkActiveIframeFocus() {
-  const activeEl = document.activeElement;
-  if (!activeEl || activeEl.tagName !== 'IFRAME') return;
-  const slotId = activeEl.getAttribute('data-slot-id');
-  if (slotId && slotMetaMap[slotId] && activeSlotId !== slotId) onOneClickSlotActivated(slotId);
+function prepareYtIframe() {
+  if (!ytPlayer || typeof ytPlayer.getIframe !== 'function') return;
+  const iframe = ytPlayer.getIframe();
+  if (!iframe) return;
+  iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+  iframe.setAttribute('playsinline', '1');
+  iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+  iframe.tabIndex = -1;
+  iframe.style.pointerEvents = 'none';
 }
-// Iframes are pointer-events:none; play starts from buttons only (Scout Block #1)
-// window.addEventListener('blur', ...); setInterval(checkActiveIframeFocus, ...);
 
-function onOneClickSlotActivated(slotId) {
-  const meta = slotMetaMap[slotId];
-  if (!meta) return;
-  if (activeSlotId && activeSlotId !== slotId && slotMetaMap[activeSlotId]) {
-    const p = slotMetaMap[activeSlotId];
-    mountOneClickSlotIframe(activeSlotId, p.videoId, p.start, p.end, p.label, p.stanzaIdx, p.lineStart, p.linesCount);
+function onYtReady() {
+  ytReady = true;
+  prepareYtIframe();
+  try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
+  const pending = ytPending;
+  ytPending = null;
+  if (pending) { beginPlayback(pending); return; }
+  syncPlayerToCurrentPoem();
+}
+
+function onYtError() {
+  if (ytErrorLock) return;
+  ytErrorLock = true;
+  showToast('Could not play this recording — tap again');
+  stopAudio(false);
+  setTimeout(() => { ytErrorLock = false; }, 600);
+}
+
+function syncPlayerToCurrentPoem() {
+  const poem = filteredPoems[currentPoemIndex];
+  if (!poem || !ytPlayer || !ytReady || activeRange) return;
+  if (loadedVideoId === poem.youtubeId) return;
+  try {
+    ytPlayer.cueVideoById({
+      videoId: poem.youtubeId,
+      startSeconds: Math.max(0, Number(poem.youtubeStart) || 0)
+    });
+    loadedVideoId = poem.youtubeId;
+  } catch (e) {}
+}
+
+function sfPlaybackSnapshot() {
+  const snap = {
+    ready: !!ytReady,
+    state: -1,
+    t: 0,
+    muted: true,
+    volume: 0,
+    videoId: '',
+    stanza: activeStanzaIndex,
+    start: activeRange ? activeRange.start : null,
+    end: activeRange ? activeRange.end : null
+  };
+  if (!ytPlayer || !ytReady) return snap;
+  try { snap.t = ytPlayer.getCurrentTime() || 0; } catch (e) {}
+  try { snap.state = ytPlayer.getPlayerState(); } catch (e) {}
+  try { snap.muted = !!ytPlayer.isMuted(); } catch (e) {}
+  try { snap.volume = ytPlayer.getVolume(); } catch (e) {}
+  try { snap.videoId = (ytPlayer.getVideoData() || {}).video_id || ''; } catch (e) {}
+  return snap;
+}
+
+function updatePlaybackUi(meta, t) {
+  const totalDur = Math.max(meta.end - meta.start, 0.25);
+  const inRange = t >= meta.start - 0.35;
+  const shown = inRange ? Math.min(Math.max(t, meta.start), meta.end) : meta.start;
+  const elapsed = Math.max(0, shown - meta.start);
+  const pct = Math.min(100, Math.round((elapsed / totalDur) * 100));
+  if ($id('ytStanzaProgressBar')) $id('ytStanzaProgressBar').style.width = pct + '%';
+  if (typeof meta.stanzaIdx === 'number' && $id('stanza-prog-' + meta.stanzaIdx)) $id('stanza-prog-' + meta.stanzaIdx).style.width = pct + '%';
+  if ($id('ytTimeCounter')) $id('ytTimeCounter').innerText = fmt(shown) + ' / ' + fmt(meta.end);
+  if (!inRange) return;
+  const estLocalIdx = Math.min(meta.linesCount - 1, Math.floor((elapsed / totalDur) * meta.linesCount));
+  const globalIdx = meta.lineStart + estLocalIdx;
+  document.querySelectorAll('.poem-line-row').forEach(el => el.classList.remove('line-row-active'));
+  const row = $id('poem-line-row-' + globalIdx);
+  if (row) row.classList.add('line-row-active');
+}
+
+function finishOrLoop() {
+  const meta = activeRange;
+  if (!meta || !ytPlayer) return;
+  if (loopStanzaEnabled) {
+    meta.armed = false;
+    try {
+      ytPlayer.seekTo(meta.start, true);
+      ytPlayer.playVideo();
+    } catch (e) { stopAudio(); }
+    return;
   }
-  activeSlotId = slotId; activeStanzaIndex = meta.stanzaIdx; simulatedCurrentTime = meta.start;
-  highlightActiveStanzaUI(meta.stanzaIdx, meta.label, meta.start, meta.end);
-  setTimeout(() => {
-    if (activeSlotId === slotId) {
-      const ifr = $id(`yt-slot-${slotId}`);
-      if (ifr) ifr.style.pointerEvents = 'none';
-      try { window.focus(); } catch (e) {}
-    }
-  }, 650);
-  startStanzaProgressMonitor(meta);
+  stopAudio();
 }
 
-function startStanzaProgressMonitor(meta) {
+function startRealProgressMonitor(meta) {
   if (ytMonitorInterval) clearInterval(ytMonitorInterval);
-  const totalDur = Math.max(meta.end - meta.start, 1);
   ytMonitorInterval = setInterval(() => {
-    if (activeSlotId !== meta.slotId) return;
-    simulatedCurrentTime += 0.25;
-    const elapsed = Math.max(0, simulatedCurrentTime - meta.start);
-    const pct = Math.min(100, Math.round((elapsed / totalDur) * 100));
-    if ($id('ytStanzaProgressBar')) $id('ytStanzaProgressBar').style.width = `${pct}%`;
-    if (typeof meta.stanzaIdx === 'number' && $id(`stanza-prog-${meta.stanzaIdx}`)) $id(`stanza-prog-${meta.stanzaIdx}`).style.width = `${pct}%`;
-    if ($id('ytTimeCounter')) $id('ytTimeCounter').innerText = `${fmt(Math.min(simulatedCurrentTime, meta.end))} / ${fmt(meta.end)}`;
-    const estLocalIdx = Math.min(meta.linesCount - 1, Math.floor((elapsed / totalDur) * meta.linesCount));
-    const globalIdx = meta.lineStart + estLocalIdx;
-    document.querySelectorAll('.poem-line-row').forEach(el => el.classList.remove('line-row-active'));
-    $id(`poem-line-row-${globalIdx}`)?.classList.add('line-row-active');
-    if (simulatedCurrentTime >= meta.end + 0.5) {
-      if (loopStanzaEnabled) {
-        const ifr = $id(`yt-slot-${meta.slotId}`);
-        if (ifr && window.playerjs) {
-          try { const p = new playerjs.Player(ifr); p.setCurrentTime(meta.start); p.play(); simulatedCurrentTime = meta.start; return; } catch (e) {}
-        }
-      }
-      stopAudio();
+    if (!ytPlayer || !ytReady || activeRange !== meta) return;
+    let t = NaN, state = -1;
+    try { t = ytPlayer.getCurrentTime(); } catch (e) { return; }
+    try { state = ytPlayer.getPlayerState(); } catch (e) {}
+    if (!isFinite(t)) return;
+    updatePlaybackUi(meta, t);
+    const playing = state === 1 || state === 3;
+    if (!meta.armed) {
+      if (playing && t >= meta.start - 0.45 && t < meta.end - 0.2) meta.armed = true;
+      return;
     }
+    if (t >= meta.end - 0.12) finishOrLoop();
   }, 250);
+}
+
+function beginPlayback(meta) {
+  const start = Math.max(0, Number(meta.start) || 0);
+  const end = Math.max(start + 0.5, Number(meta.end) || start + 1);
+  meta.start = start;
+  meta.end = end;
+  meta.armed = false;
+  activeRange = meta;
+  activeSlotId = meta.slotId;
+  activeStanzaIndex = meta.stanzaIdx;
+  highlightActiveStanzaUI(meta.stanzaIdx, meta.label, meta.start, meta.end);
+  try {
+    prepareYtIframe();
+    ytPlayer.unMute();
+    ytPlayer.setVolume(100);
+    loadedVideoId = meta.videoId;
+    ytPlayer.loadVideoById({ videoId: meta.videoId, startSeconds: start, endSeconds: end });
+    ytPlayer.playVideo();
+  } catch (e) {
+    showToast('Could not play this recording — tap again');
+    stopAudio(false);
+    return;
+  }
+  startRealProgressMonitor(meta);
+}
+
+function isRangeAudiblyActive(stanzaIdx) {
+  if (!ytReady || !ytPlayer || activeStanzaIndex !== stanzaIdx) return false;
+  let state = -1;
+  try { state = ytPlayer.getPlayerState(); } catch (e) {}
+  return state === 1 || state === 3;
+}
+
+function playCue(meta) {
+  if (isRangeAudiblyActive(meta.stanzaIdx)) { stopAudio(); return; }
+  if (!ytPlayer || !ytReady || typeof ytPlayer.loadVideoById !== 'function') {
+    ytPending = meta;
+    ensureYouTubeApi();
+    showToast('Player is still loading — tap once more');
+    return;
+  }
+  beginPlayback(meta);
+}
+
+function cueFromPoem(stanzaIdx) {
+  const poem = filteredPoems[currentPoemIndex];
+  if (!poem) return null;
+  if (stanzaIdx === 'FULL') {
+    const allLines = poem.content.split('\n').map(l => l.trim()).filter(Boolean);
+    return {
+      videoId: poem.youtubeId,
+      start: poem.youtubeStart,
+      end: poem.youtubeEnd,
+      label: 'Full Poem',
+      stanzaIdx: 'FULL',
+      lineStart: 0,
+      linesCount: Math.max(allLines.length, 1),
+      slotId: 'main-FULL'
+    };
+  }
+  const st = (poem.stanzas || [])[stanzaIdx];
+  if (!st) return null;
+  return {
+    videoId: poem.youtubeId,
+    start: st.start,
+    end: st.end,
+    label: st.label,
+    stanzaIdx: stanzaIdx,
+    lineStart: st.lineStart || 0,
+    linesCount: Math.max((st.lines || []).length, 1),
+    slotId: 'stanza-' + stanzaIdx
+  };
+}
+
+function onYtStateChange(ev) {
+  const meta = activeRange;
+  if (!meta || !ytPlayer) return;
+  const st = ev && ev.data;
+  if (st === 1) {
+    try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (e) {}
+    let t = 0;
+    try { t = ytPlayer.getCurrentTime() || 0; } catch (e) {}
+    if (t >= meta.start - 0.45 && t < meta.end - 0.2) meta.armed = true;
+    updatePlaybackUi(meta, t);
+    return;
+  }
+  if ((st === 0 || st === 2) && meta.armed) {
+    let t = 0;
+    try { t = ytPlayer.getCurrentTime() || 0; } catch (e) {}
+    if (st === 0 || t >= meta.end - 0.35) finishOrLoop();
+  }
+}
+
+function playStanzaVoiceover(stanzaIdx) {
+  const meta = cueFromPoem(stanzaIdx);
+  if (!meta) return;
+  playCue(meta);
+}
+
+function playCurrentPoem() {
+  const meta = cueFromPoem('FULL');
+  if (!meta) return;
+  playCue(meta);
 }
 
 function highlightActiveStanzaUI(stanzaIdx, labelText, startSec, endSec) {
@@ -435,26 +613,6 @@ function resetStanzaUI() {
   });
 }
 
-function cueSlotPlay(slotId) {
-  const meta = slotMetaMap[slotId];
-  if (!meta) return;
-  if (activeSlotId && activeSlotId !== slotId && slotMetaMap[activeSlotId]) {
-    const p = slotMetaMap[activeSlotId];
-    mountOneClickSlotIframe(activeSlotId, p.videoId, p.start, p.end, p.label, p.stanzaIdx, p.lineStart, p.linesCount, 0);
-  }
-  mountOneClickSlotIframe(slotId, meta.videoId, meta.start, meta.end, meta.label, meta.stanzaIdx, meta.lineStart, meta.linesCount, 1);
-  onOneClickSlotActivated(slotId);
-}
-function playStanzaVoiceover(stanzaIdx) {
-  if (activeStanzaIndex === stanzaIdx) { stopAudio(); return; }
-  const slotId = slotMetaMap[`top-${stanzaIdx}`] ? `top-${stanzaIdx}` : `card-${stanzaIdx}`;
-  cueSlotPlay(slotId);
-}
-function playCurrentPoem() {
-  if (activeStanzaIndex === 'FULL') { stopAudio(); return; }
-  cueSlotPlay('main-FULL');
-}
-
 function toggleLoopStanza() {
   loopStanzaEnabled = !loopStanzaEnabled;
   if ($id('loopStanzaText')) $id('loopStanzaText').innerText = loopStanzaEnabled ? "Loop: ON" : "Loop: OFF";
@@ -476,7 +634,7 @@ function initSpeechRecognition() {
   if (note) note.textContent = 'Live mic scoring works in Chrome/Edge. On iOS Safari (including iOS Chrome), Speech Recognition is unavailable — upload a Voice Memo below instead.';
 }
 
-window.onload = () => { initSpeechRecognition(); filterCategory(); renderHistoryTable(); };
+window.onload = () => { initSpeechRecognition(); filterCategory(); renderHistoryTable(); ensureYouTubeApi(); };
 
 function filterCategory() {
   const cat = $id('categorySelect').value;
@@ -537,7 +695,7 @@ function renderCurrentPoem() {
     }).join('');
   }
 
-  mountAllOneClickOverlays();
+  syncPlayerToCurrentPoem();
   $id('vocabPoemTitle').innerText = `${poem.youtubeCode} • ${poem.title}`;
   $id('vocabList').innerHTML = (poem.vocab || []).map(v => `<div class="p-3.5 border rounded-xl bg-slate-50 space-y-1"><div class="flex justify-between items-center"><h3 class="font-bold text-sm text-indigo-700">${v.word}</h3><button onclick="speakSingleWord('${v.word.replace(/'/g, "\\'")}')" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold hover:bg-indigo-200">🔊</button></div><p class="text-xs font-mono text-slate-500">${v.phonetics}</p><p class="text-xs text-slate-800">${v.meaning}</p></div>`).join('');
   $id('practicePoemHeader').innerText = `${poem.youtubeCode} • ${poem.title}`;
@@ -563,12 +721,15 @@ function speakSingleWord(word) {
 
 function stopAudio(reCueActive = true) {
   if (ytMonitorInterval) { clearInterval(ytMonitorInterval); ytMonitorInterval = null; }
-  const prevSlot = activeSlotId;
-  activeSlotId = null; activeStanzaIndex = null; resetStanzaUI();
-  if (reCueActive && prevSlot && slotMetaMap[prevSlot]) {
-    const m = slotMetaMap[prevSlot];
-    mountOneClickSlotIframe(prevSlot, m.videoId, m.start, m.end, m.label, m.stanzaIdx, m.lineStart, m.linesCount);
+  activeSlotId = null;
+  activeStanzaIndex = null;
+  activeRange = null;
+  ytPending = null;
+  resetStanzaUI();
+  if (ytPlayer && ytReady && typeof ytPlayer.pauseVideo === 'function') {
+    try { ytPlayer.pauseVideo(); } catch (e) {}
   }
+  if (reCueActive) syncPlayerToCurrentPoem();
 }
 
 function toggleScriptDisplay() {
@@ -694,6 +855,7 @@ function exportHtmlFile() {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
+ensureYouTubeApi();
 </script>
 
 
