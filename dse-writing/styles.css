@@ -814,6 +814,105 @@ body.zh-on .gloss-key { display: block; }
   }
 }
 
+/* Irregular verbs — nested banks; keep three aligned columns on phone */
+.irreg-group {
+  margin: 0 0 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.irreg-group:last-child { margin-bottom: 0; }
+.irreg-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  color: var(--navy);
+  font-size: .95rem;
+  font-weight: 800;
+  line-height: 1.3;
+  background: var(--bg);
+}
+.irreg-group > summary::-webkit-details-marker { display: none; }
+.irreg-group > summary::marker { content: ""; }
+.irreg-group > summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+.irreg-group[open] > summary .section-chevron {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+}
+.irreg-body {
+  padding: 12px 12px 14px;
+  border-top: 1px solid var(--border);
+}
+.irreg-body .part:last-child { margin-bottom: 0; }
+.vocab-table-irreg {
+  table-layout: fixed;
+  width: 100%;
+}
+.vocab-table-irreg th,
+.vocab-table-irreg td {
+  width: 33.33%;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.vocab-table-irreg tbody th {
+  width: 33.33%;
+}
+@media (max-width: 560px) {
+  body.vocab-hub details[data-section="irregular"] > .section-body {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .irreg-body { padding: 10px 6px 12px; }
+  body.vocab-hub .vocab-table.vocab-table-irreg {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    font-size: .78rem;
+  }
+  body.vocab-hub .vocab-table.vocab-table-irreg thead { display: table-header-group; }
+  body.vocab-hub .vocab-table.vocab-table-irreg tbody { display: table-row-group; }
+  body.vocab-hub .vocab-table.vocab-table-irreg tr {
+    display: table-row;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+  body.vocab-hub .vocab-table.vocab-table-irreg th,
+  body.vocab-hub .vocab-table.vocab-table-irreg td {
+    display: table-cell;
+    width: 33.33%;
+    border: 1px solid var(--border);
+    padding: 7px 4px;
+    vertical-align: top;
+  }
+  body.vocab-hub .vocab-table.vocab-table-irreg thead th {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: .72rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  body.vocab-hub .vocab-table.vocab-table-irreg tbody th {
+    width: 33.33%;
+    background: var(--bg);
+    color: var(--navy);
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
 
 
 /* Useful vocabulary hub — keep footer clear of collapsed 🛠 chip */
@@ -920,6 +1019,9 @@ body.sentence-patterns.zh-on details.format-section {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
   border-radius: 6px;
+}
+body.grammar-junior .pattern-card > .more-vocab {
+  margin: 2px 0 0;
 }
 .more-vocab .more-vocab-hint {
   display: block;
