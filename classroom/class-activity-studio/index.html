@@ -54,12 +54,114 @@
       overflow: hidden;
     }
     .desk-card .desk-action-btn {
-      /* Flat horizontal chips — short row, wide tap */
-      height: 32px;
-      min-height: 32px;
-      max-height: 32px;
+      /* Compact face so the desk card is shorter. Hit slop reaches ~44px
+         downward into the gap between desks, not up into the name or Team+1. */
+      height: 22px;
+      min-height: 22px;
+      max-height: 22px;
       border-radius: 999px;
       line-height: 1;
+      font-size: 14px;
+      position: relative;
+    }
+    .desk-card .desk-action-btn::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: -22px;
+    }
+    .desk-name-btn,
+    .desk-name-static,
+    .desk-name-input {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 0 2px;
+      padding: 1px 2px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.875rem;
+      line-height: 1.15;
+      color: #0f172a;
+      text-align: left;
+    }
+    .desk-name-btn {
+      cursor: text;
+      min-height: 26px;
+      touch-action: manipulation;
+    }
+    .desk-name-btn:hover,
+    .desk-name-btn:focus-visible {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      outline: none;
+    }
+    .desk-name-static {
+      cursor: default;
+      min-height: 26px;
+    }
+    .desk-name-input {
+      user-select: text;
+      -webkit-user-select: text;
+      touch-action: manipulation;
+      background: #fffbeb;
+      border-color: #f59e0b;
+      min-height: 28px;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
+    }
+    .desk-name-input:focus {
+      outline: none;
+      border-color: #d97706;
+    }
+    .desk-name-input::placeholder {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    @media (max-width: 480px) {
+      .desk-name-btn {
+        /* Full card width; keep the face clear of the score chips below. */
+        min-height: 36px;
+      }
+      .desk-name-input {
+        min-height: 40px;
+        font-size: 16px;
+      }
+    }
+    .score-step {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      min-height: 22px;
+      border-radius: 7px;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .score-step::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      right: -6px;
+      top: -11px;
+      bottom: -11px;
+    }
+    .team-score-step {
+      position: relative;
+      min-height: 28px;
+    }
+    @media (max-width: 480px) {
+      .score-step::before {
+        left: -11px;
+        right: -11px;
+      }
+      .team-score-step {
+        min-height: 44px;
+      }
     }
     .desk-card {
       position: absolute;
@@ -364,6 +466,11 @@
           <span>＋ Desk</span>
         </button>
 
+        <!-- Edit Name: bulk rename and fill Empty seats from the board -->
+        <button id="btnToggleEditName" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Rename students on the seating board, including empty seats" aria-pressed="false">
+          Edit Name
+        </button>
+
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
 
         <!-- Undo Layout · Redo Layout · Set as Default · Reset Layout · All +1 · Reset Scores -->
@@ -442,7 +549,7 @@
             <span id="currentClassBadge" class="px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white font-display font-bold text-xs">1A English</span>
             <span id="studentCountBadge" class="text-xs font-semibold text-slate-600">24 Students</span>
             <span class="text-slate-300">|</span>
-            <span id="modeStatusHint" class="text-xs font-medium text-slate-500">Drag desks freely to customize layout • Tap +1 / -1 to score</span>
+            <span id="modeStatusHint" class="text-xs font-medium text-slate-500">Drag desks freely to customise layout • Tap a name to rename • Tap − or + to score</span>
           </div>
           <!-- Zoom & View Controls -->
           <div class="flex items-center gap-1.5">
@@ -1387,6 +1494,8 @@
         zoom: 1,
         soundEnabled: true,
         brushMode: false,
+        editNameMode: false,
+        editingStudentId: '',
         activeBrushGroupId: 'grp_1',
         leaderboardTab: 'students', // 'students' | 'groups' | 'feed'
         lbSearch: '',
@@ -1409,6 +1518,7 @@
 
       let timerIntervalId = null;
       let pickerSpinIntervalId = null;
+      let nameEditLock = false;
 
       // Load or Initialize State
       function loadState() {
@@ -1494,6 +1604,71 @@
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;');
+      }
+
+      // Every desk is a roster student. An empty seat is that student with a
+      // blank name or the placeholder "Empty" — renaming updates the same record.
+      function isEmptySeatName(name) {
+        var n = String(name == null ? '' : name).replace(/\s+/g, ' ').trim();
+        return n === '' || /^empty$/i.test(n);
+      }
+
+      function normaliseStudentName(rawText) {
+        var next = String(rawText == null ? '' : rawText).replace(/\s+/g, ' ').trim();
+        if (isEmptySeatName(next)) return 'Empty';
+        if (next.length > 48) next = next.slice(0, 48).trim();
+        return next || 'Empty';
+      }
+
+      function commitStudentName(studentId, rawText) {
+        const cls = getCurrentClass();
+        if (!cls || !studentId) return false;
+        const st = cls.students.find(function (s) { return s.id === studentId; });
+        if (!st) return false;
+        const next = normaliseStudentName(rawText);
+        if (st.name === next) return false;
+        st.name = next;
+        saveState();
+        showToast(next === 'Empty' ? 'Seat left empty' : ('Renamed to ' + next), '✏️');
+        return true;
+      }
+
+      function syncOpenRosterName(studentId) {
+        if (!studentId || studentId.indexOf('"') !== -1) return;
+        const cls = getCurrentClass();
+        if (!cls) return;
+        const st = cls.students.find(function (s) { return s.id === studentId; });
+        if (!st) return;
+        const field = document.querySelector('#rosterStudentList [data-edit-st-name="' + studentId + '"]');
+        if (field && document.activeElement !== field) field.value = st.name;
+        const titleEl = document.getElementById('pickerResultTitle');
+        if (titleEl && state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === studentId) {
+          titleEl.textContent = '#' + st.classNo + ' ' + st.name;
+        }
+      }
+
+      function deskNameIsEditable(st) {
+        if (state.editNameMode) return true;
+        if (state.editingStudentId && state.editingStudentId === st.id) return true;
+        return false;
+      }
+
+      function renderDeskNameControl(st) {
+        const empty = isEmptySeatName(st.name);
+        if (deskNameIsEditable(st)) {
+          const shown = empty ? '' : st.name;
+          const label = empty ? 'Empty seat name' : ('Student name, ' + st.name);
+          return '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="48" ' +
+            'class="desk-name-input" data-desk-name-input="' + escapeHtml(st.id) + '" ' +
+            'data-original-name="' + escapeHtml(shown) + '" ' +
+            'value="' + escapeHtml(shown) + '" placeholder="Empty" aria-label="' + escapeHtml(label) + '" />';
+        }
+        if (!empty) {
+          return '<button type="button" class="desk-name-btn line-clamp-2" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+            'title="Rename ' + escapeHtml(st.name) + '" aria-label="Rename ' + escapeHtml(st.name) + '">' +
+            escapeHtml(st.name) + '</button>';
+        }
+        return '<div class="desk-name-static line-clamp-2" title="Empty">Empty</div>';
       }
 
       // ===================================================================
@@ -2082,7 +2257,7 @@
         const scoreBadge = deskEl.querySelector('.desk-score-value');
         if (scoreBadge) {
           scoreBadge.textContent = String(newScore);
-          scoreBadge.className = 'desk-score-value font-display font-extrabold text-lg leading-none px-2 py-0.5 rounded-md ' +
+          scoreBadge.className = 'desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' +
             (newScore > 0 ? 'bg-emerald-100 text-emerald-800' : (newScore < 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'));
         }
 
@@ -2199,6 +2374,14 @@
         if (soundIcon) soundIcon.textContent = state.soundEnabled ? '🔊' : '🔇';
         if (soundLabel) soundLabel.textContent = state.soundEnabled ? 'Sound' : 'Muted';
 
+        const btnEditName = document.getElementById('btnToggleEditName');
+        if (btnEditName) {
+          btnEditName.setAttribute('aria-pressed', state.editNameMode ? 'true' : 'false');
+          btnEditName.className = state.editNameMode
+            ? 'min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm'
+            : 'min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition';
+        }
+
         // Subheader badges
         const clsBadge = document.getElementById('currentClassBadge');
         const countBadge = document.getElementById('studentCountBadge');
@@ -2206,12 +2389,16 @@
         if (cls && clsBadge && countBadge && modeHint) {
           clsBadge.textContent = cls.name;
           countBadge.textContent = cls.students.length + ' Students';
-          if (state.brushMode) {
+          if (state.editNameMode) {
+            modeHint.textContent = 'Edit Name is on • Tap a name or Empty to type. Enter saves, Escape cancels.';
+          } else if (state.brushMode) {
             modeHint.innerHTML = '<strong class="text-fuchsia-600">🖌️ Group Paint Mode Active:</strong> Click any student desk to assign them to the selected team!';
           } else if (state.activityMode === 'group') {
-            modeHint.textContent = 'Group Work Mode • Score teams above (+1/-1 adds to all members) or score individual desks below';
+            modeHint.textContent = 'Group Work Mode • Score teams above or use − / + on a desk • Tap a name to rename';
           } else {
-            modeHint.textContent = state.layoutLocked ? 'Layout locked for rapid scoring • Tap +1 or -1 on any desk' : 'Drag any desk freely to customize layout • Tap +1 or -1 to score';
+            modeHint.textContent = state.layoutLocked
+              ? 'Layout locked for rapid scoring • Tap − or + on any desk • Tap a name to rename'
+              : 'Drag any desk freely to customise layout • Tap a name to rename • Tap − or + to score';
           }
         }
       }
@@ -2302,8 +2489,8 @@
               '</span>' +
             '</div>' +
             '<div class="grid grid-cols-2 gap-1.5 mt-1">' +
-              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="py-1.5 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-xs transition shadow-2xs" title="Subtract 1 from group and each member">−1</button>' +
-              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="py-1.5 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-xs transition shadow-xs" title="Add +1 to group and each member">＋1 ★</button>' +
+              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-sm transition shadow-2xs" aria-label="Minus one" title="Minus one for this team and each member">−</button>' +
+              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Plus one for this team and each member">+</button>' +
             '</div>' +
           '</div>';
         }).join('');
@@ -2330,6 +2517,13 @@
         const stage = document.getElementById('classroomStage');
         if (!cls || !container || !boardBar || !stage) return;
 
+        const active = document.activeElement;
+        if (!nameEditLock && active && active.getAttribute && active.getAttribute('data-desk-name-input') && container.contains(active)) {
+          if (active.dataset.cancelName !== '1') {
+            commitStudentName(active.getAttribute('data-desk-name-input'), active.value);
+          }
+        }
+
         // Dynamically size stage so all desks fit with breathing room
         const bounds = getDynamicStageBounds(cls);
         stage.style.width = bounds.width + 'px';
@@ -2348,6 +2542,7 @@
           boardBar.style.top = 'auto';
         }
 
+        nameEditLock = true;
         container.innerHTML = cls.students.map(function (st) {
           const grp = getGroupById(cls, st.groupId);
           const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
@@ -2375,31 +2570,30 @@
             'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
             '<!-- Top Color Accent Bar -->' +
             '<div class="h-1 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
-            '<div class="px-1.5 pt-1 pb-1.5">' +
+            '<div class="px-1.5 pt-0.5 pb-1">' +
               '<!-- Row 1: Class No + Score Badge -->' +
-              '<div class="flex items-center justify-between gap-1 mb-0.5">' +
+              '<div class="flex items-center justify-between gap-1">' +
                 '<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">#' + escapeHtml(st.classNo) + '</span>' +
-                '<span class="desk-score-value font-display font-extrabold text-lg leading-none px-2 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
+                '<span class="desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
               '</div>' +
-              '<!-- Row 2: Student Name -->' +
-              '<div class="font-display font-bold text-sm sm:text-base text-slate-900 leading-tight line-clamp-2 mb-0.5" title="' + escapeHtml(st.name) + '">' +
-                escapeHtml(st.name) +
-              '</div>' +
+              '<!-- Row 2: Student Name (tap to rename; Empty stays plain until Edit Name) -->' +
+              renderDeskNameControl(st) +
               '<!-- Row 3: Team Badge -->' +
-              '<div class="flex items-center justify-between mb-1">' +
+              '<div class="flex items-center justify-between mb-0.5">' +
                 groupBadgeHtml +
                 (state.activityMode === 'group' && grp
                   ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
                   : '') +
               '</div>' +
-              '<!-- Row 4: Live -1 / +1 flat chips -->' +
+              '<!-- Row 4: Compact − / + ; aria keeps the “one” for screen readers -->' +
               '<div class="grid grid-cols-2 gap-1">' +
-                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn h-8 min-h-[32px] max-h-8 px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold text-[11px] leading-none transition flex items-center justify-center">−1</button>' +
-                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn h-8 min-h-[32px] max-h-8 px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-[11px] leading-none transition shadow-2xs flex items-center justify-center">＋1</button>' +
+                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one" title="Minus one">−</button>' +
+                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold leading-none transition shadow-2xs flex items-center justify-center" aria-label="Plus one" title="Plus one">+</button>' +
               '</div>' +
             '</div>' +
           '</div>';
         }).join('');
+        nameEditLock = false;
       }
 
       // Render Right Sidebar: Live Leaderboard, Pulse Stats, & History Feed
@@ -2489,9 +2683,9 @@
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1">' +
-                '<button type="button" data-lb-st-minus="' + escapeHtml(st.id) + '" class="w-6 h-6 rounded-lg bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-slate-200 font-bold text-xs flex items-center justify-center transition">−</button>' +
+                '<button type="button" data-lb-st-minus="' + escapeHtml(st.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-slate-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Minus one">−</button>' +
                 '<span class="w-8 text-center font-display font-bold text-sm ' + (st.score > 0 ? 'text-emerald-700' : (st.score < 0 ? 'text-rose-600' : 'text-slate-600')) + '">' + st.score + '</span>' +
-                '<button type="button" data-lb-st-plus="' + escapeHtml(st.id) + '" class="w-6 h-6 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center transition">＋</button>' +
+                '<button type="button" data-lb-st-plus="' + escapeHtml(st.id) + '" class="score-step bg-emerald-500 hover:bg-emerald-600 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Plus one">+</button>' +
               '</div>' +
             '</div>';
           }).join('');
@@ -2528,9 +2722,9 @@
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1.5 shrink-0">' +
-                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="w-7 h-7 rounded-lg bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold text-xs flex items-center justify-center transition">−1</button>' +
-                '<span class="px-2.5 py-1 rounded-lg bg-white font-display font-extrabold text-sm ' + pal.text + ' border ' + pal.border + '">' + grp.score + '</span>' +
-                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="w-7 h-7 rounded-lg ' + pal.headerBg + ' hover:opacity-90 text-white font-bold text-xs flex items-center justify-center transition">＋1</button>' +
+                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Minus one">−</button>' +
+                '<span class="px-2 py-0.5 rounded-lg bg-white font-display font-extrabold text-sm ' + pal.text + ' border ' + pal.border + '">' + grp.score + '</span>' +
+                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="score-step ' + pal.headerBg + ' hover:opacity-90 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Plus one">+</button>' +
               '</div>' +
             '</div>';
           }).join('');
@@ -2567,6 +2761,68 @@
         const container = document.getElementById('desksContainer');
         if (!container) return;
 
+        container.addEventListener('click', function (e) {
+          const nameBtn = e.target.closest('[data-desk-rename]');
+          if (!nameBtn || state.editNameMode) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const id = nameBtn.getAttribute('data-desk-rename');
+          if (!id) return;
+          state.editingStudentId = id;
+          renderClassroomCanvas(false);
+          const input = container.querySelector('[data-desk-name-input="' + id + '"]');
+          if (input) {
+            input.focus();
+            try { input.select(); } catch (err) {}
+          }
+        });
+
+        container.addEventListener('keydown', function (e) {
+          const input = e.target;
+          if (!input || !input.getAttribute || !input.getAttribute('data-desk-name-input')) return;
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            input.blur();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            input.dataset.cancelName = '1';
+            input.value = input.getAttribute('data-original-name') || '';
+            input.blur();
+          }
+        });
+
+        container.addEventListener('focusout', function (e) {
+          const input = e.target;
+          if (!input || !input.getAttribute || !input.getAttribute('data-desk-name-input')) return;
+          if (nameEditLock) return;
+          const id = input.getAttribute('data-desk-name-input');
+          const cancel = input.dataset.cancelName === '1';
+          if (!cancel) {
+            commitStudentName(id, input.value);
+            if (state.editNameMode && input.isConnected) {
+              const clsNow = getCurrentClass();
+              const stNow = clsNow && clsNow.students.find(function (s) { return s.id === id; });
+              if (stNow) {
+                const shown = isEmptySeatName(stNow.name) ? '' : stNow.name;
+                input.value = shown;
+                input.setAttribute('data-original-name', shown);
+              }
+            }
+          }
+          syncOpenRosterName(id);
+          renderLeaderboardAndStats();
+          // Defer closing a one-off edit so a tap on another name still lands.
+          if (!state.editNameMode && state.editingStudentId === id) {
+            const closingId = id;
+            setTimeout(function () {
+              if (state.editNameMode) return;
+              if (state.editingStudentId !== closingId) return;
+              state.editingStudentId = '';
+              renderClassroomCanvas(false);
+            }, 0);
+          }
+        });
+
         container.addEventListener('pointerdown', function (e) {
           const plusBtn = e.target.closest('[data-desk-plus]');
           if (plusBtn) {
@@ -2584,6 +2840,11 @@
           if (teamPlusBtn) {
             e.stopPropagation();
             adjustGroupScore(teamPlusBtn.getAttribute('data-desk-team-plus'), 1);
+            return;
+          }
+
+          // Name editing must not start a drag or paint a team.
+          if (e.target.closest('[data-desk-rename], [data-desk-name-input]')) {
             return;
           }
 
@@ -3435,6 +3696,18 @@
           saveState();
           renderAll();
           showToast('Switched to Group Work Mode (Team points also add to each member!)', '🛡️');
+        });
+
+        document.getElementById('btnToggleEditName').addEventListener('click', function () {
+          const active = document.activeElement;
+          if (active && active.getAttribute && active.getAttribute('data-desk-name-input')) {
+            active.blur();
+          }
+          state.editNameMode = !state.editNameMode;
+          state.editingStudentId = '';
+          renderHeaderControls();
+          renderClassroomCanvas(false);
+          showToast(state.editNameMode ? 'Edit Name is on — empty seats are open too' : 'Edit Name is off', '✏️');
         });
 
         // Sound Toggle
