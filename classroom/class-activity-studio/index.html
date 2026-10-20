@@ -423,22 +423,85 @@
       transform-origin: bottom;
       animation: growUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
+    /* Mast: Back stays on the left. SKHHCSS + the studio title are one
+       centred group and do not share that centre with the Back link. */
+    .studio-mast {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: 0.75rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0.5rem 0.75rem 0.15rem;
+    }
+    @media (min-width: 640px) {
+      .studio-mast { padding: 0.55rem 1.25rem 0.1rem; }
+    }
+    .studio-back {
+      grid-column: 1;
+      justify-self: start;
+      align-self: center;
+    }
+    .studio-brand {
+      grid-column: 2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem 0.5rem;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .studio-school {
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1;
+      padding: 0.22rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.92);
+      color: #020617;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+    }
+    .studio-brand h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.1;
+      color: #fff;
+      white-space: nowrap;
+      font-size: 1.5rem;
+    }
+    @media (min-width: 640px) {
+      .studio-brand h1 { font-size: 1.8rem; }
+    }
+    @media (max-width: 860px) {
+      .studio-mast {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        row-gap: 0.15rem;
+      }
+      .studio-back { align-self: flex-start; }
+      .studio-brand { align-self: center; width: 100%; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
 
   <!-- TOP NAVIGATION & ACTIVITY BAR -->
   <header class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
-      
-      <!-- Brand -->
-      <div class="flex items-center gap-3 min-w-0">
-        <a href="../" class="shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" title="Back to Classroom">← Back to Classroom</a>
-        <div class="min-w-0 flex flex-col items-start">
-          <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/90 text-slate-950 shadow-sm">SKHHCSS English</span>
-          <h1 class="font-display text-base sm:text-lg font-bold tracking-tight leading-tight text-white">Class Activity Studio</h1>
-        </div>
+    <div class="studio-mast">
+      <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" title="Back to Classroom">← Back to Classroom</a>
+      <div class="studio-brand">
+        <span class="studio-school">SKHHCSS</span>
+        <h1>Class Activity Studio</h1>
       </div>
+    </div>
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
 
       <!-- Center Controls: Class Preset Selector + Mode Switcher -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -553,12 +616,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Teacher tip: best on tablet / projector -->
-  <div class="bg-[#e8f7fb] border-b border-[#d3e8ef] px-3 sm:px-5 py-1.5 text-[11px] sm:text-xs text-[#0c5a70] font-medium text-center">
-    Teacher tool · Best on tablet or projector · Scores stay on this device (localStorage)
-  </div>
-
 
   <!-- SECONDARY CLASSROOM LAYOUT & GROUPING TOOLBAR -->
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
