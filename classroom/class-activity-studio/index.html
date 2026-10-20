@@ -258,7 +258,8 @@
       border-color: #fcd34d;
       outline: none;
     }
-    .desk-name-btn.desk-name-empty {
+    .desk-name-btn.desk-name-empty,
+    .desk-name-static.desk-name-empty {
       color: #64748b;
       font-weight: 600;
     }
@@ -288,7 +289,8 @@
       font-weight: 600;
     }
     @media (max-width: 480px) {
-      .desk-name-btn {
+      .desk-name-btn,
+      .desk-name-static {
         /* Full card width; keep the face clear of the score chips below. */
         min-height: 36px;
       }
@@ -393,6 +395,15 @@
       background: #fffbeb;
       border-color: #fcd34d;
       outline: none;
+    }
+    /* Locked scoreboard name: same chip, not a rename control. */
+    .dock-group-static {
+      cursor: default;
+    }
+    .dock-group-static:hover,
+    .dock-group-static:focus-visible {
+      background: transparent;
+      border-color: transparent;
     }
     .dock-group-edit {
       display: flex;
@@ -776,7 +787,7 @@
 
   <!-- SECONDARY CLASSROOM LAYOUT & GROUPING TOOLBAR -->
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
-    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-2">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-2">
       
       <!-- Left: Freeform Layout Templates & Canvas Controls -->
       <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -806,12 +817,6 @@
         </button>
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
-
-        <!-- Lock / Unlock Freeform Dragging -->
-        <button id="btnToggleLockLayout" type="button" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold flex items-center gap-1 transition" title="Unlock to drag desks anywhere on the canvas, or lock during rapid scoring">
-          <span id="lockLayoutIcon">🔓</span>
-          <span id="lockLayoutText">Freeform Drag: ON</span>
-        </button>
 
         <!-- Snap to Grid Toggle -->
         <button id="btnToggleSnapGrid" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold flex items-center gap-1 transition" title="Snap desks to a clean grid when dragging">
@@ -852,7 +857,7 @@
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
 
-        <!-- Undo Layout · Redo Layout · Set as Default · Reset Layout · All +1 · Reset Scores -->
+        <!-- Undo Layout · Redo Layout · Set as Default · Reset Layout · Lock Layout -->
         <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
           ↩️
         </button>
@@ -862,14 +867,21 @@
         <button id="btnSetDefaultLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
           Set as Default
         </button>
-        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset Layout — restore this class’s saved default seating and grouping (scores kept). A saved or dragged board keeps its old positions until you reseed with a Quick Layout button." aria-label="Reset Layout">
-          🔃
+        <button id="btnResetLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
+          🔄 Layout
         </button>
-        <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
+        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout" aria-label="Lock Layout" aria-pressed="false">
+          <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
+        </button>
+      </div>
+
+      <!-- Far right: class-wide scoring. ml-auto keeps these flushed right when the row wraps. -->
+      <div class="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+        <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
-        <button id="btnOpenResetModal" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
-          🔄
+        <button id="btnOpenResetModal" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Reset Scores" aria-label="Reset Scores">
+          🔄 Scores
         </button>
       </div>
     </div>
@@ -1887,7 +1899,7 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
-        layoutLocked: false,
+        layoutLocked: false, // persisted with the studio payload; default unlocked
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
@@ -1952,6 +1964,8 @@
               state.activityMode = parsed.activityMode || 'individual';
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+              // Absent or false keeps names, seat numbers, group names, and desk drag editable.
+              state.layoutLocked = parsed.layoutLocked === true;
               readZoomChipPref(parsed);
               var pitchMigrated = false;
               state.classes.forEach(function (c) {
@@ -1978,6 +1992,7 @@
             activityMode: state.activityMode,
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
+            layoutLocked: state.layoutLocked === true,
             layoutPitchVersion: LAYOUT_PITCH_VERSION
           };
           if (hasSavedZoomChip()) {
@@ -2158,7 +2173,7 @@
       }
 
       function beginGroupNameEdit(groupId) {
-        if (!groupId) return;
+        if (!groupId || state.layoutLocked) return;
         groupEditToken += 1;
         state.editingClassNoId = '';
         state.editingStudentId = '';
@@ -2210,15 +2225,22 @@
       }
 
       function renderDeskGroupLabel(grp, pal) {
+        // data-desk-team-badge: read-only chip. Pointer on it must not start a desk drag.
         if (!grp || !pal) {
-          return '<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-400">No Team</span>';
+          return '<span data-desk-team-badge="1" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-400 cursor-default">No Team</span>';
         }
-        return '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold ' + pal.badgeBg + ' ' + pal.text + ' max-w-[88px] truncate" title="' + escapeHtml(grp.name) + '">' +
+        return '<span data-desk-team-badge="1" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold cursor-default ' + pal.badgeBg + ' ' + pal.text + ' max-w-[88px] truncate" title="' + escapeHtml(grp.name) + '">' +
           escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
           '</span>';
       }
 
       function renderDockGroupNameControl(grp) {
+        if (state.layoutLocked) {
+          return '<span class="dock-group-btn dock-group-static" title="' + escapeHtml(grp.name) + '" aria-label="' + escapeHtml(grp.name) + '">' +
+            '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
+            '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
+            '</span>';
+        }
         const editingHere = state.editingGroupId === grp.id && state.editingGroupAnchor === 'dock';
         if (editingHere) {
           return '<span class="dock-group-edit">' +
@@ -2238,6 +2260,9 @@
 
       function renderDeskClassNoControl(st) {
         const no = String(st.classNo == null ? '' : st.classNo);
+        if (state.layoutLocked) {
+          return '<span class="desk-classno-static" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</span>';
+        }
         if (state.editingClassNoId === st.id) {
           return '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12" ' +
             'class="desk-classno-input" data-desk-classno-input="' + escapeHtml(st.id) + '" ' +
@@ -2250,6 +2275,7 @@
       }
 
       function deskNameIsEditable(st) {
+        if (state.layoutLocked) return false;
         if (state.editingStudentId && state.editingStudentId === st.id) return true;
         // Edit Name opens named seats for bulk rename. Empty stays a button
         // until tapped, so a cleared name is never plain locked text.
@@ -2259,6 +2285,12 @@
 
       function renderDeskNameControl(st) {
         const empty = isEmptySeatName(st.name);
+        if (state.layoutLocked) {
+          if (empty) {
+            return '<span class="desk-name-static desk-name-empty line-clamp-2">Empty</span>';
+          }
+          return '<span class="desk-name-static line-clamp-2">' + escapeHtml(st.name) + '</span>';
+        }
         if (deskNameIsEditable(st)) {
           const shown = empty ? '' : st.name;
           const label = empty ? 'Empty seat name' : ('Student name, ' + st.name);
@@ -2922,20 +2954,19 @@
           }
         }
 
-        // Lock / Snap / Flip buttons
+        // Lock sits beside Reset Layout. Label is the action; pressed means the board is locked.
         const lockIcon = document.getElementById('lockLayoutIcon');
-        const lockText = document.getElementById('lockLayoutText');
         const btnLock = document.getElementById('btnToggleLockLayout');
-        if (lockIcon && lockText && btnLock) {
-          if (state.layoutLocked) {
-            lockIcon.textContent = '🔒';
-            lockText.textContent = 'Desks Locked';
-            btnLock.className = 'px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 hover:bg-amber-200 text-xs font-bold flex items-center gap-1 transition';
-          } else {
-            lockIcon.textContent = '🔓';
-            lockText.textContent = 'Freeform Drag: ON';
-            btnLock.className = 'px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold flex items-center gap-1 transition';
-          }
+        if (lockIcon && btnLock) {
+          const locked = state.layoutLocked === true;
+          const actionLabel = locked ? 'Unlock Layout' : 'Lock Layout';
+          lockIcon.textContent = locked ? '🔒' : '🔓';
+          btnLock.title = actionLabel;
+          btnLock.setAttribute('aria-label', actionLabel);
+          btnLock.setAttribute('aria-pressed', locked ? 'true' : 'false');
+          btnLock.className = locked
+            ? 'min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-950 text-base font-bold transition'
+            : 'min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition';
         }
 
         const snapText = document.getElementById('snapGridText');
@@ -2984,10 +3015,17 @@
 
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
-          btnEditName.setAttribute('aria-pressed', state.editNameMode ? 'true' : 'false');
-          btnEditName.className = state.editNameMode
-            ? 'min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm'
-            : 'min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition';
+          const editsLocked = state.layoutLocked === true;
+          btnEditName.disabled = editsLocked;
+          btnEditName.setAttribute('aria-disabled', editsLocked ? 'true' : 'false');
+          btnEditName.setAttribute('aria-pressed', !editsLocked && state.editNameMode ? 'true' : 'false');
+          if (editsLocked) {
+            btnEditName.className = 'min-h-[44px] px-3 py-2 rounded-lg bg-slate-100 text-slate-400 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition opacity-60 cursor-default';
+          } else {
+            btnEditName.className = state.editNameMode
+              ? 'min-h-[44px] px-3 py-2 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs sm:text-sm font-bold whitespace-nowrap transition shadow-sm'
+              : 'min-h-[44px] px-3 py-2 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs sm:text-sm font-bold whitespace-nowrap transition';
+          }
         }
       }
 
@@ -3384,6 +3422,7 @@
           if (noBtn) {
             e.preventDefault();
             e.stopPropagation();
+            if (state.layoutLocked) return;
             const id = noBtn.getAttribute('data-desk-classno');
             if (!id) return;
             state.editingClassNoId = id;
@@ -3405,6 +3444,7 @@
           if (!nameBtn) return;
           e.preventDefault();
           e.stopPropagation();
+          if (state.layoutLocked) return;
           const id = nameBtn.getAttribute('data-desk-rename');
           if (!id) return;
           state.editingClassNoId = '';
@@ -3573,7 +3613,12 @@
             return;
           }
 
-          // Otherwise, if layout is unlocked, start freeform drag!
+          // Otherwise, if layout is unlocked, start freeform drag.
+          // The read-only team chip is not a drag handle (name and seat # already returned above).
+          if (e.target.closest('[data-desk-team-badge]')) {
+            e.stopPropagation();
+            return;
+          }
           if (state.layoutLocked) return;
 
           e.preventDefault();
@@ -3913,7 +3958,10 @@
             return '<div class="p-2.5 rounded-xl border-2 ' + pal.border + ' ' + pal.bg + ' flex flex-col gap-2">' +
               '<div class="flex items-center gap-1.5">' +
                 '<input type="text" data-edit-grp-icon="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.icon) + '" aria-label="Team Emoji" class="w-10 px-1.5 py-1 text-center text-sm bg-white border border-slate-200 rounded-lg" />' +
-                '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Team Name" class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold bg-white border border-slate-200 rounded-lg" />' +
+                '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Team Name"' +
+                  (state.layoutLocked ? ' readonly aria-readonly="true"' : '') +
+                  ' class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg ' +
+                  (state.layoutLocked ? 'bg-slate-100 text-slate-500 cursor-default' : 'bg-white') + '" />' +
                 '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" title="Delete Team">✕</button>' +
               '</div>' +
               '<div class="flex items-center justify-between text-[11px]">' +
@@ -4555,6 +4603,7 @@
         });
 
         document.getElementById('btnToggleEditName').addEventListener('click', function () {
+          if (state.layoutLocked) return;
           const active = document.activeElement;
           if (active && active.getAttribute && (active.getAttribute('data-desk-name-input') || active.getAttribute('data-desk-classno-input') || active.getAttribute('data-dock-group-input'))) {
             active.blur();
@@ -4606,12 +4655,36 @@
           });
         });
 
-        // Lock / Snap / Flip Room
+        // Lock / Snap / Flip Room. Lock is the button beside Reset Layout.
         document.getElementById('btnToggleLockLayout').addEventListener('click', function () {
+          if (!state.layoutLocked) {
+            const active = document.activeElement;
+            if (active && active.blur && active.getAttribute && (
+              active.getAttribute('data-desk-name-input') ||
+              active.getAttribute('data-desk-classno-input') ||
+              active.getAttribute('data-dock-group-input') ||
+              active.getAttribute('data-edit-grp-name')
+            )) {
+              active.blur();
+            }
+            state.editNameMode = false;
+            state.editingStudentId = '';
+            state.editingClassNoId = '';
+            groupEditToken += 1;
+            state.editingGroupId = '';
+            state.editingGroupAnchor = '';
+            state.editingGroupDeskId = '';
+          }
           state.layoutLocked = !state.layoutLocked;
+          saveState();
           renderHeaderControls();
+          renderGroupScoreDock();
           renderClassroomCanvas(false);
-          showToast(state.layoutLocked ? 'Desk positions locked for fast scoring' : 'Freeform desk dragging enabled', state.layoutLocked ? '🔒' : '🔓');
+          const groupModal = document.getElementById('groupModal');
+          if (groupModal && !groupModal.classList.contains('hidden')) {
+            renderGroupModalContents();
+          }
+          showToast(state.layoutLocked ? 'Layout locked' : 'Layout unlocked', state.layoutLocked ? '🔒' : '🔓');
         });
 
         document.getElementById('btnToggleSnapGrid').addEventListener('click', function () {
@@ -5071,6 +5144,7 @@
           }
           const nameGrpId = e.target.getAttribute('data-edit-grp-name');
           if (nameGrpId) {
+            if (state.layoutLocked) return;
             const g = getGroupById(cls, nameGrpId);
             if (g) {
               g.name = e.target.value;
