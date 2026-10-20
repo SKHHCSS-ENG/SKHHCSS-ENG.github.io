@@ -364,7 +364,7 @@
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
 
-        <!-- All +1 · Reset Scores · Undo layout · Redo layout · Reset layout -->
+        <!-- All +1 · Reset Scores · Undo layout · Redo layout · Set as Default · Reset layout -->
         <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
@@ -377,7 +377,10 @@
         <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo layout" aria-label="Redo layout">
           ↪️
         </button>
-        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset layout to class default seating" aria-label="Reset layout to class default seating">
+        <button id="btnSetDefaultLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
+          Set as Default
+        </button>
+        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset layout — restore this class’s saved default seating and grouping (scores kept)" aria-label="Reset layout">
           🔃
         </button>
       </div>
@@ -868,7 +871,7 @@
       const STAGE_HEIGHT = 640;
       const DESK_W = 148;
       const DESK_H = 123;
-      // Bump when desk size or step formula changes — reseeds defaultPositions only (not live seats)
+      // Bump when desk size or step formula changes — reseeds factory defaultPositions only (not a saved custom default, and not live seats)
       const LAYOUT_PITCH_VERSION = 'desk-148x123-stepY+26';
       const GRID_SIZE = 20;
 
@@ -1241,6 +1244,18 @@
         }
       }
 
+      // Team list + membership only. Scores are session data and are never copied into a default.
+      function snapshotGroupDefaults(groups, students) {
+        return {
+          groups: (groups || []).map(function (g) {
+            return { id: g.id, name: g.name, icon: g.icon, color: g.color };
+          }),
+          assignments: (students || []).map(function (st) {
+            return { id: st.id, groupId: st.groupId || '' };
+          })
+        };
+      }
+
       // Build initial sample preset classes
       function createFactoryPresets() {
         const names1A = [
@@ -1323,7 +1338,8 @@
             groups: groups1A,
             students: students1A,
             layoutPitchVersion: LAYOUT_PITCH_VERSION,
-            defaultPositions: students1A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
+            defaultPositions: students1A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; }),
+            defaultGroupSnapshot: snapshotGroupDefaults(groups1A, students1A)
           },
           {
             id: 'cls_3b',
@@ -1335,7 +1351,8 @@
             groups: groups3B,
             students: students3B,
             layoutPitchVersion: LAYOUT_PITCH_VERSION,
-            defaultPositions: students3B.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
+            defaultPositions: students3B.map(function (st) { return { id: st.id, x: st.x, y: st.y }; }),
+            defaultGroupSnapshot: snapshotGroupDefaults(groups3B, students3B)
           },
           {
             id: 'cls_5a',
@@ -1347,7 +1364,8 @@
             groups: groups5A,
             students: students5A,
             layoutPitchVersion: LAYOUT_PITCH_VERSION,
-            defaultPositions: students5A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; })
+            defaultPositions: students5A.map(function (st) { return { id: st.id, x: st.x, y: st.y }; }),
+            defaultGroupSnapshot: snapshotGroupDefaults(groups5A, students5A)
           }
         ];
       }
@@ -1671,9 +1689,17 @@
       function ensureClassDefaultPositions(cls) {
         if (!cls) return false;
         var reseeds = false;
-        // Recompute factory/default seating when desk pitch changed (does NOT move live student seats)
-        if (!cls.defaultPositions || !cls.defaultPositions.length || cls.layoutPitchVersion !== LAYOUT_PITCH_VERSION) {
+        var custom = !!cls.customDefaultSaved;
+        // Factory seating follows desk pitch. A teacher-saved default is left exactly as saved.
+        if (!cls.defaultPositions || !cls.defaultPositions.length) {
+          cls.defaultPositions = custom ? snapshotLayoutPositions(cls) : buildDefaultPositionsFromGrid(cls);
+          cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
+          if (!custom) reseeds = true;
+        } else if (!custom && cls.layoutPitchVersion !== LAYOUT_PITCH_VERSION) {
           cls.defaultPositions = buildDefaultPositionsFromGrid(cls);
+          cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
+          reseeds = true;
+        } else if (cls.layoutPitchVersion !== LAYOUT_PITCH_VERSION) {
           cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
           reseeds = true;
         }
@@ -1689,7 +1715,27 @@
           }
         });
         cls.defaultPositions = next;
+        syncDefaultGroupAssignments(cls);
         return reseeds;
+      }
+
+      // Drop leavers from the saved membership list; newcomers keep the team they have now until Set as Default.
+      function syncDefaultGroupAssignments(cls) {
+        var snap = cls && cls.defaultGroupSnapshot;
+        if (!snap || !Array.isArray(snap.assignments)) return;
+        var byId = {};
+        snap.assignments.forEach(function (a) {
+          if (a && a.id) byId[a.id] = a.groupId || '';
+        });
+        var next = [];
+        (cls.students || []).forEach(function (st) {
+          if (Object.prototype.hasOwnProperty.call(byId, st.id)) {
+            next.push({ id: st.id, groupId: byId[st.id] });
+          } else {
+            next.push({ id: st.id, groupId: st.groupId || '' });
+          }
+        });
+        snap.assignments = next;
       }
 
       function rememberStudentDefaultPosition(cls, student) {
@@ -1705,6 +1751,18 @@
         });
         if (!found) {
           cls.defaultPositions.push({ id: student.id, x: student.x, y: student.y });
+        }
+        if (cls.defaultGroupSnapshot && Array.isArray(cls.defaultGroupSnapshot.assignments)) {
+          var foundGroup = false;
+          cls.defaultGroupSnapshot.assignments.forEach(function (a) {
+            if (a.id === student.id) {
+              a.groupId = student.groupId || '';
+              foundGroup = true;
+            }
+          });
+          if (!foundGroup) {
+            cls.defaultGroupSnapshot.assignments.push({ id: student.id, groupId: student.groupId || '' });
+          }
         }
         cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
       }
@@ -1780,22 +1838,81 @@
         showToast('Redid layout: ' + entry.label, '↪️');
       }
 
+      // Save the current class’s desks and teams as its default. Does not touch scores or layout undo history.
+      function setCurrentLayoutAsDefault() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        cls.defaultPositions = snapshotLayoutPositions(cls);
+        cls.defaultGroupSnapshot = snapshotGroupDefaults(cls.groups, cls.students);
+        cls.customDefaultSaved = true;
+        cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
+        saveState();
+        showToast('Default seating & grouping saved', '📌');
+      }
+
+      // Restore saved team names, icons, colours, order, and membership. Live scores stay on matching group ids.
+      function applyDefaultGrouping(cls) {
+        const snap = cls && cls.defaultGroupSnapshot;
+        if (!snap || !Array.isArray(snap.groups)) return false;
+        const liveById = {};
+        (cls.groups || []).forEach(function (g) { liveById[g.id] = g; });
+        const restored = snap.groups.map(function (g) {
+          const live = liveById[g.id];
+          return {
+            id: g.id,
+            name: g.name,
+            icon: g.icon,
+            color: g.color,
+            score: live ? (Number(live.score) || 0) : 0
+          };
+        });
+        cls.groups = restored;
+        const known = {};
+        restored.forEach(function (g) { known[g.id] = true; });
+        const assign = {};
+        (snap.assignments || []).forEach(function (a) {
+          if (a && a.id) assign[a.id] = a.groupId || '';
+        });
+        (cls.students || []).forEach(function (st) {
+          if (Object.prototype.hasOwnProperty.call(assign, st.id)) {
+            const gid = assign[st.id] || '';
+            st.groupId = gid && known[gid] ? gid : '';
+          } else if (st.groupId && !known[st.groupId]) {
+            st.groupId = '';
+          }
+        });
+        return true;
+      }
+
       function resetLayoutToDefaultGrid() {
         const cls = getCurrentClass();
         if (!cls || cls.students.length === 0) return;
         ensureClassDefaultPositions(cls);
         const before = snapshotLayoutPositions(cls);
         applyLayoutPositions(cls, cls.defaultPositions);
-        // Exact preset snap-back — scores/groups untouched; no spatial repack
+        // Exact preset snap-back — scores untouched; no spatial repack
         const locked = {};
         (cls.defaultPositions || []).forEach(function (p) { locked[p.id] = true; });
         ensureNoOverlapsProtecting(cls.students, locked);
         const after = snapshotLayoutPositions(cls);
-        pushLayoutHistory(before, after, 'Reset to class default seating');
+        pushLayoutHistory(before, after, 'Reset to saved default seating');
+        const groupingRestored = applyDefaultGrouping(cls);
         saveState();
         renderHeaderControls();
+        renderGroupBrushBar();
+        renderGroupScoreDock();
         renderClassroomCanvas(true);
-        showToast('Layout snapped back to class default seating (scores kept)', '🔃');
+        renderLeaderboardAndStats();
+        const groupModal = document.getElementById('groupModal');
+        if (groupModal && !groupModal.classList.contains('hidden')) {
+          renderGroupModalContents();
+        }
+        showToast(
+          groupingRestored
+            ? 'Seating and grouping restored to the saved default (scores kept)'
+            : 'Seating restored to the saved default (scores kept)',
+          '🔃'
+        );
       }
 
       function fitZoomToViewport() {
@@ -2440,7 +2557,7 @@
           if (state.layoutLocked) return;
 
           e.preventDefault();
-          deskEl.setPointerCapture(e.pointerId);
+          try { deskEl.setPointerCapture(e.pointerId); } catch (err) {}
           deskEl.classList.remove('smooth-move');
           deskEl.classList.add('dragging');
 
@@ -2713,7 +2830,10 @@
           gridCols: defaultCols,
           layoutStyle: 'rows',
           groups: groups,
-          students: students
+          students: students,
+          layoutPitchVersion: LAYOUT_PITCH_VERSION,
+          defaultPositions: students.map(function (st) { return { id: st.id, x: st.x, y: st.y }; }),
+          defaultGroupSnapshot: snapshotGroupDefaults(groups, students)
         };
 
         state.classes.push(newCls);
@@ -3377,6 +3497,7 @@
         });
         document.getElementById('btnUndoLayout').addEventListener('click', undoLayoutAction);
         document.getElementById('btnRedoLayout').addEventListener('click', redoLayoutAction);
+        document.getElementById('btnSetDefaultLayout').addEventListener('click', setCurrentLayoutAsDefault);
         document.getElementById('btnResetLayout').addEventListener('click', resetLayoutToDefaultGrid);
 
         // Group Dock Event Delegation (+1 / -1 on group cards)
