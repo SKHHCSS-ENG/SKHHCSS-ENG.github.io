@@ -23,6 +23,11 @@
     .font-display {
       font-family: var(--font-display);
     }
+    /* Body disables selection; the zoom field must stay typable. */
+    #zoomReadout {
+      user-select: text;
+      -webkit-user-select: text;
+    }
     /* Classroom Floor Grid Pattern */
     .classroom-floor {
       background-color: #f8fafc;
@@ -364,24 +369,24 @@
 
         <div class="h-4 w-px bg-slate-200 mx-0.5 hidden sm:block"></div>
 
-        <!-- All +1 · Reset Scores · Undo layout · Redo layout · Set as Default · Reset layout -->
-        <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
-          All +1
-        </button>
-        <button id="btnOpenResetModal" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
-          🔄
-        </button>
-        <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo layout" aria-label="Undo layout">
+        <!-- Undo Layout · Redo Layout · Set as Default · Reset Layout · All +1 · Reset Scores -->
+        <button id="btnUndoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
           ↩️
         </button>
-        <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo layout" aria-label="Redo layout">
+        <button id="btnRedoLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo Layout" aria-label="Redo Layout">
           ↪️
         </button>
         <button id="btnSetDefaultLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
           Set as Default
         </button>
-        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset layout — restore this class’s saved default seating and grouping (scores kept)" aria-label="Reset layout">
+        <button id="btnResetLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Reset Layout — restore this class’s saved default seating and grouping (scores kept)" aria-label="Reset Layout">
           🔃
+        </button>
+        <button id="btnAllPlusOne" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm" title="Give +1 to every student in the class">
+          All +1
+        </button>
+        <button id="btnOpenResetModal" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
+          🔄
         </button>
       </div>
     </div>
@@ -446,7 +451,10 @@
           <div class="flex items-center gap-1.5">
             <span class="text-[11px] font-semibold text-slate-400">Zoom:</span>
             <button id="btnZoomOut" type="button" class="min-h-[44px] min-w-[44px] rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-sm font-bold flex items-center justify-center" title="Zoom Out">−</button>
-            <span id="zoomReadout" class="text-xs font-bold text-slate-700 w-10 text-center">100%</span>
+            <label class="inline-flex items-center gap-0.5 min-h-[44px]">
+              <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" class="min-h-[44px] w-16 px-1 rounded-lg bg-white border border-slate-200 text-base font-bold text-slate-700 text-center focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+              <span class="text-xs font-bold text-slate-700 select-none" aria-hidden="true">%</span>
+            </label>
             <button id="btnZoomIn" type="button" class="min-h-[44px] min-w-[44px] rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-sm font-bold flex items-center justify-center" title="Zoom In">＋</button>
             <button id="btnZoomReset" type="button" class="min-h-[44px] px-3 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-600" title="Fit floor plan to viewport">Fit</button>
           </div>
@@ -874,6 +882,8 @@
       // Bump when desk size or step formula changes — reseeds factory defaultPositions only (not a saved custom default, and not live seats)
       const LAYOUT_PITCH_VERSION = 'desk-148x123-stepY+26';
       const GRID_SIZE = 20;
+      const ZOOM_MIN = 0.35;
+      const ZOOM_MAX = 1.25;
 
       // Team Color Palette Definitions
       const TEAM_PALETTES = {
@@ -1915,6 +1925,55 @@
         );
       }
 
+      function clampZoom(zoom) {
+        const z = Math.round(Number(zoom) * 100) / 100;
+        if (!isFinite(z)) return 1;
+        if (z < ZOOM_MIN) return ZOOM_MIN;
+        if (z > ZOOM_MAX) return ZOOM_MAX;
+        return z;
+      }
+
+      function zoomPercentLabel() {
+        return String(Math.round(state.zoom * 100));
+      }
+
+      // "75", "82", "75%" and "75 %" are percentages. Anything else is junk.
+      function parseZoomPercentInput(raw) {
+        let s = String(raw == null ? '' : raw).trim().replace(/\s+/g, '');
+        if (!s) return null;
+        if (s.charAt(s.length - 1) === '%') s = s.slice(0, -1);
+        if (s.indexOf(',') >= 0 && s.indexOf('.') < 0) s = s.replace(',', '.');
+        if (!/^\d+(\.\d+)?$/.test(s)) return null;
+        const n = parseFloat(s);
+        if (!isFinite(n)) return null;
+        return n;
+      }
+
+      function syncZoomReadout() {
+        const input = document.getElementById('zoomReadout');
+        if (!input || document.activeElement === input) return;
+        input.value = zoomPercentLabel();
+      }
+
+      function applyZoomTransform() {
+        const stage = document.getElementById('classroomStage');
+        if (stage) stage.style.transform = 'scale(' + state.zoom + ')';
+        syncZoomReadout();
+      }
+
+      function commitZoomReadout() {
+        const input = document.getElementById('zoomReadout');
+        if (!input) return;
+        const pct = parseZoomPercentInput(input.value);
+        if (pct == null) {
+          input.value = zoomPercentLabel();
+          return;
+        }
+        state.zoom = clampZoom(pct / 100);
+        input.value = zoomPercentLabel();
+        applyZoomTransform();
+      }
+
       function fitZoomToViewport() {
         const floor = document.getElementById('classroomViewport');
         const stage = document.getElementById('classroomStage');
@@ -1924,7 +1983,7 @@
         }
         const stageW = stage.offsetWidth || STAGE_WIDTH;
         const fit = Math.min(1, floor.clientWidth / Math.max(1, stageW));
-        state.zoom = Math.max(0.35, Math.min(1.25, Math.round(fit * 100) / 100));
+        state.zoom = clampZoom(fit);
       }
 
       function undoLastScoreAction() {
@@ -2272,7 +2331,6 @@
         const container = document.getElementById('desksContainer');
         const boardBar = document.getElementById('teacherBoardBar');
         const stage = document.getElementById('classroomStage');
-        const zoomReadout = document.getElementById('zoomReadout');
         if (!cls || !container || !boardBar || !stage) return;
 
         // Dynamically size stage so all desks fit with breathing room
@@ -2282,7 +2340,7 @@
 
         // Apply Zoom
         stage.style.transform = 'scale(' + state.zoom + ')';
-        if (zoomReadout) zoomReadout.textContent = Math.round(state.zoom * 100) + '%';
+        syncZoomReadout();
 
         // Position Teacher Smartboard at Top or Bottom
         if (cls.frontAtTop) {
@@ -3432,13 +3490,13 @@
 
         document.getElementById('btnFlipRoom').addEventListener('click', flipClassroomOrientation);
 
-        // Zoom Controls
+        // Zoom Controls (− / typed % / ＋ / Fit). Typed percent commits on Enter or blur.
         document.getElementById('btnZoomIn').addEventListener('click', function () {
-          state.zoom = Math.min(1.25, Math.round((state.zoom + 0.1) * 100) / 100);
+          state.zoom = clampZoom(state.zoom + 0.1);
           renderClassroomCanvas(false);
         });
         document.getElementById('btnZoomOut').addEventListener('click', function () {
-          state.zoom = Math.max(0.35, Math.round((state.zoom - 0.1) * 100) / 100);
+          state.zoom = clampZoom(state.zoom - 0.1);
           renderClassroomCanvas(false);
         });
         document.getElementById('btnZoomReset').addEventListener('click', function () {
@@ -3446,6 +3504,19 @@
           renderClassroomCanvas(false);
           showToast('Fit zoom ' + Math.round(state.zoom * 100) + '%', '🔍');
         });
+        const zoomReadoutInput = document.getElementById('zoomReadout');
+        if (zoomReadoutInput) {
+          zoomReadoutInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              zoomReadoutInput.blur();
+            }
+          });
+          zoomReadoutInput.addEventListener('blur', commitZoomReadout);
+          zoomReadoutInput.addEventListener('focus', function () {
+            setTimeout(function () { zoomReadoutInput.select(); }, 0);
+          });
+        }
 
         // Manual Group Brush Bar
         document.getElementById('btnToggleGroupBrush').addEventListener('click', function () {
@@ -3491,7 +3562,7 @@
           showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
         });
 
-        // Whole Class +1 · Layout Undo / Redo / Reset · (Reset Scores stays on modal btn)
+        // Layout Undo / Redo / Set as Default / Reset Layout, then All +1 · Reset Scores
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
         });
