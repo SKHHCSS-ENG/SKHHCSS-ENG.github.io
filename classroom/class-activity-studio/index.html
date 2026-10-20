@@ -60,6 +60,40 @@
       border: 1px solid rgba(203, 213, 225, 0.95);
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
     }
+    .zoom-chip-handle {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 44px;
+      min-height: 44px;
+      margin: 0;
+      padding: 0 6px 0 2px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: #64748b;
+      cursor: grab;
+      touch-action: none;
+    }
+    .zoom-chip-handle:hover,
+    .zoom-chip-handle:focus-visible {
+      background: #f1f5f9;
+      outline: none;
+    }
+    .zoom-chip-grip {
+      width: 10px;
+      height: 16px;
+      background: radial-gradient(circle, currentColor 1.25px, transparent 1.45px) 0 0 / 5px 5.4px;
+    }
+    .zoom-chip.is-dragging .zoom-chip-handle,
+    .zoom-chip.is-dragging {
+      cursor: grabbing;
+    }
+    .zoom-chip.is-dragging {
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+    }
     .zoom-chip-label {
       flex-shrink: 0;
       font-size: 11px;
@@ -78,7 +112,7 @@
       border: 1px solid #e2e8f0;
       color: #334155;
       font-weight: 700;
-      touch-action: manipulation;
+      touch-action: none;
     }
     .zoom-chip-btn {
       min-width: 44px;
@@ -987,7 +1021,10 @@
         </div>
         <!-- Bottom-left of the board viewport. The site Tools dock owns bottom-right. -->
         <div id="zoomChip" class="zoom-chip" role="group" aria-label="Zoom">
-          <span class="zoom-chip-label">Zoom</span>
+          <button type="button" class="zoom-chip-handle" aria-label="Move Zoom" title="Move Zoom">
+            <span class="zoom-chip-grip" aria-hidden="true"></span>
+            <span class="zoom-chip-label">Zoom</span>
+          </button>
           <button id="btnZoomOut" type="button" class="zoom-chip-btn" title="Zoom Out" aria-label="Zoom Out">−</button>
           <label class="zoom-chip-pct">
             <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" />
@@ -1940,6 +1977,8 @@
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
+        zoomChipLeft: null,
+        zoomChipTop: null,
         brushMode: false,
         editNameMode: false,
         editingStudentId: '',
@@ -1973,6 +2012,20 @@
       let groupEditToken = 0;
       let keepGroupEditOpen = false;
 
+      function hasSavedZoomChip() {
+        return typeof state.zoomChipLeft === 'number' && typeof state.zoomChipTop === 'number' &&
+          isFinite(state.zoomChipLeft) && isFinite(state.zoomChipTop);
+      }
+
+      function readZoomChipPref(parsed) {
+        if (!parsed || parsed.zoomChipLeft == null || parsed.zoomChipTop == null) return;
+        var left = Number(parsed.zoomChipLeft);
+        var top = Number(parsed.zoomChipTop);
+        if (!isFinite(left) || !isFinite(top)) return;
+        state.zoomChipLeft = left;
+        state.zoomChipTop = top;
+      }
+
       // Load or Initialize State
       function loadState() {
         try {
@@ -1985,6 +2038,7 @@
               state.activityMode = parsed.activityMode || 'individual';
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+              readZoomChipPref(parsed);
               var pitchMigrated = false;
               state.classes.forEach(function (c) {
                 if (ensureClassDefaultPositions(c)) pitchMigrated = true;
@@ -2012,6 +2066,10 @@
             soundEnabled: state.soundEnabled,
             layoutPitchVersion: LAYOUT_PITCH_VERSION
           };
+          if (hasSavedZoomChip()) {
+            payload.zoomChipLeft = state.zoomChipLeft;
+            payload.zoomChipTop = state.zoomChipTop;
+          }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
         } catch (e) {
           // Ignore storage quota / sandbox restrictions
@@ -4439,6 +4497,158 @@
       // EVENT LISTENERS WIRING
       // ===================================================================
 
+      var ZOOM_CHIP_DRAG_THRESHOLD = 8;
+      var zoomChipDrag = null;
+
+      function zoomChipBoardBox(chip) {
+        const board = chip.parentElement;
+        const rect = board.getBoundingClientRect();
+        const style = window.getComputedStyle(board);
+        const borderLeft = parseFloat(style.borderLeftWidth) || 0;
+        const borderTop = parseFloat(style.borderTopWidth) || 0;
+        return {
+          borderLeft: borderLeft,
+          borderTop: borderTop,
+          innerW: board.clientWidth,
+          innerH: board.clientHeight,
+          originX: rect.left + borderLeft,
+          originY: rect.top + borderTop
+        };
+      }
+
+      // Window bottom-right belongs to the site Tools wrench. If that chip is
+      // on the page, use it; otherwise keep a matching corner clear.
+      function toolsAvoidRect() {
+        const fold = document.querySelector('.dock-fold');
+        if (fold) {
+          const r = fold.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) {
+            return { left: r.left - 6, top: r.top - 6, right: r.right + 6, bottom: r.bottom + 6 };
+          }
+        }
+        const pad = 8;
+        const size = 60;
+        return {
+          left: window.innerWidth - pad - size,
+          top: window.innerHeight - pad - size,
+          right: window.innerWidth - pad,
+          bottom: window.innerHeight - pad
+        };
+      }
+
+      function clampZoomChip(chip, left, top) {
+        const box = zoomChipBoardBox(chip);
+        const w = chip.offsetWidth;
+        const h = chip.offsetHeight;
+        const maxL = Math.max(0, box.innerW - w);
+        const maxT = Math.max(0, box.innerH - h);
+        left = Math.min(maxL, Math.max(0, left));
+        top = Math.min(maxT, Math.max(0, top));
+
+        const avoid = toolsAvoidRect();
+        const screenLeft = box.originX + left;
+        const screenTop = box.originY + top;
+        const overlaps = (screenLeft + w) > avoid.left && screenLeft < avoid.right &&
+          (screenTop + h) > avoid.top && screenTop < avoid.bottom;
+        if (!overlaps) return { left: left, top: top };
+
+        const pushLeft = (avoid.left - box.originX) - w;
+        const pushUp = (avoid.top - box.originY) - h;
+        const leftOk = pushLeft >= 0 && pushLeft <= maxL;
+        const upOk = pushUp >= 0 && pushUp <= maxT;
+        if (leftOk && (!upOk || Math.abs(pushLeft - left) <= Math.abs(pushUp - top))) {
+          left = pushLeft;
+        } else if (upOk) {
+          top = pushUp;
+        }
+        return { left: left, top: top };
+      }
+
+      function placeZoomChip(left, top) {
+        const chip = document.getElementById('zoomChip');
+        if (!chip) return null;
+        const pos = clampZoomChip(chip, left, top);
+        chip.classList.add('is-placed');
+        chip.style.left = Math.round(pos.left) + 'px';
+        chip.style.top = Math.round(pos.top) + 'px';
+        chip.style.bottom = 'auto';
+        chip.style.right = 'auto';
+        return pos;
+      }
+
+      function applySavedZoomChip() {
+        if (!hasSavedZoomChip()) return;
+        placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
+      }
+
+      function currentZoomChipOffset(chip) {
+        const box = zoomChipBoardBox(chip);
+        const rect = chip.getBoundingClientRect();
+        return {
+          left: rect.left - box.originX,
+          top: rect.top - box.originY
+        };
+      }
+
+      function finishZoomChipDrag(e) {
+        if (!zoomChipDrag) return;
+        if (e && e.pointerId !== zoomChipDrag.pointerId) return;
+        const chip = zoomChipDrag.chip;
+        const moved = zoomChipDrag.moved;
+        zoomChipDrag = null;
+        chip.classList.remove('is-dragging');
+        if (!moved) return;
+        chip.dataset.suppressClick = '1';
+        const offset = currentZoomChipOffset(chip);
+        state.zoomChipLeft = Math.round(offset.left);
+        state.zoomChipTop = Math.round(offset.top);
+        saveState();
+      }
+
+      function initZoomChipDrag(chip) {
+        chip.addEventListener('pointerdown', function (e) {
+          if (e.button != null && e.button !== 0) return;
+          if (e.target.closest && e.target.closest('#zoomReadout')) return;
+          const offset = currentZoomChipOffset(chip);
+          zoomChipDrag = {
+            chip: chip,
+            pointerId: e.pointerId,
+            startX: e.clientX,
+            startY: e.clientY,
+            origLeft: offset.left,
+            origTop: offset.top,
+            moved: false
+          };
+        });
+        chip.addEventListener('pointermove', function (e) {
+          if (!zoomChipDrag || e.pointerId !== zoomChipDrag.pointerId) return;
+          const dx = e.clientX - zoomChipDrag.startX;
+          const dy = e.clientY - zoomChipDrag.startY;
+          if (!zoomChipDrag.moved) {
+            if (Math.hypot(dx, dy) < ZOOM_CHIP_DRAG_THRESHOLD) return;
+            zoomChipDrag.moved = true;
+            chip.classList.add('is-dragging');
+            try { chip.setPointerCapture(e.pointerId); } catch (err) {}
+          }
+          e.preventDefault();
+          placeZoomChip(zoomChipDrag.origLeft + dx, zoomChipDrag.origTop + dy);
+        });
+        chip.addEventListener('pointerup', finishZoomChipDrag);
+        chip.addEventListener('pointercancel', finishZoomChipDrag);
+        document.addEventListener('pointerup', finishZoomChipDrag);
+        document.addEventListener('pointercancel', finishZoomChipDrag);
+        chip.addEventListener('click', function (e) {
+          if (chip.dataset.suppressClick !== '1') return;
+          chip.dataset.suppressClick = '';
+          e.preventDefault();
+          e.stopPropagation();
+        }, true);
+        window.addEventListener('resize', function () {
+          if (!hasSavedZoomChip()) return;
+          placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
+        });
+      }
+
       function bindAllEvents() {
         // Class Preset Selector
         document.getElementById('classSelect').addEventListener('change', function (e) {
@@ -4568,6 +4778,7 @@
             floor.scrollBy({ left: e.deltaX, top: e.deltaY });
             e.preventDefault();
           }, { passive: false });
+          initZoomChipDrag(zoomChip);
         }
 
         // Manual Group Brush Bar
@@ -5159,6 +5370,7 @@
         bindAllEvents();
         renderTimerUI();
         renderAll();
+        applySavedZoomChip();
       });
     })();
   </script>
