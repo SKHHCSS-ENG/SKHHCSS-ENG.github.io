@@ -287,6 +287,25 @@
       background: #f1f5f9;
       outline: none;
     }
+    /* Edit ON: same peach fill and thin amber border as the open name field.
+       Border width stays 1px so the name row does not move. */
+    .desk-name-btn.is-editable,
+    .desk-classno-btn.is-editable,
+    .dock-group-btn.is-editable,
+    #groupManagerList input.is-editable[data-edit-grp-name] {
+      background: #fffbeb;
+      border-color: #f59e0b;
+    }
+    .desk-name-btn.is-editable:hover,
+    .desk-name-btn.is-editable:focus-visible,
+    .desk-classno-btn.is-editable:hover,
+    .desk-classno-btn.is-editable:focus-visible,
+    .dock-group-btn.is-editable:hover,
+    .dock-group-btn.is-editable:focus-visible {
+      background: #fffbeb;
+      border-color: #f59e0b;
+      outline: none;
+    }
     .desk-name-static {
       cursor: default;
       min-height: 26px;
@@ -342,7 +361,6 @@
       cursor: text;
       touch-action: manipulation;
     }
-    .desk-classno-btn,
     .desk-classno-static {
       border: none;
     }
@@ -890,7 +908,7 @@
         <button id="btnResetLayout" type="button" class="min-h-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs sm:text-sm font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
           🔄 Layout
         </button>
-        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Edit &amp; Drag — freeze layout and names" aria-label="Lock Edit &amp; Drag" aria-pressed="false">
+        <button id="btnToggleLockLayout" type="button" class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout — freeze desk drag" aria-label="Lock Layout" aria-pressed="false">
           <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
         </button>
       </div>
@@ -1919,14 +1937,14 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
-        layoutLocked: false, // persisted; default unlocked. Lock wins over Edit.
+        layoutLocked: false, // persisted; default unlocked. Freezes desk drag only.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
         zoomChipLeft: null,
         zoomChipTop: null,
         brushMode: false,
-        editMode: true, // persisted; default on so taps can rename. Lock still freezes edits.
+        editMode: true, // persisted; default on. Independent of Lock.
         editingStudentId: '',
         editingClassNoId: '',
         editingGroupId: '',
@@ -2028,9 +2046,19 @@
         }
       }
 
-      // Lock wins over Edit. editMode only opens name, seat #, and team rename while unlocked.
+      // Edit gates name, seat #, and team rename. Lock only freezes desk drag.
       function boardEditsAllowed() {
-        return state.editMode !== false && state.layoutLocked !== true;
+        return state.editMode !== false;
+      }
+
+      function syncDeskDragCursor() {
+        var cards = document.querySelectorAll('.desk-card');
+        for (var i = 0; i < cards.length; i++) {
+          cards[i].classList.remove('cursor-grab', 'cursor-default', 'cursor-pointer');
+          if (state.brushMode) cards[i].classList.add('cursor-pointer');
+          else if (state.layoutLocked) cards[i].classList.add('cursor-default');
+          else cards[i].classList.add('cursor-grab');
+        }
       }
 
       function getCurrentClass() {
@@ -2279,7 +2307,7 @@
             'value="' + escapeHtml(grp.name) + '" aria-label="Team name" />' +
             '</span>';
         }
-        return '<button type="button" class="dock-group-btn" data-dock-group-rename="' + escapeHtml(grp.id) + '" ' +
+        return '<button type="button" class="dock-group-btn is-editable" data-dock-group-rename="' + escapeHtml(grp.id) + '" ' +
           'title="Rename ' + escapeHtml(grp.name) + '" aria-label="Rename team ' + escapeHtml(grp.name) + '">' +
           '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
           '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
@@ -2294,10 +2322,9 @@
             'data-original-classno="' + escapeHtml(no) + '" ' +
             'value="' + escapeHtml(no) + '" aria-label="Class number" />';
         }
-        // Same button box when edits are frozen, so locking does not move the name row.
-        const frozen = !boardEditsAllowed();
-        return '<button type="button" class="desk-classno-btn' + (frozen ? ' is-frozen' : '') + '" data-desk-classno="' + escapeHtml(st.id) + '" ' +
-          'title="' + (frozen ? ('Class number ' + escapeHtml(no)) : 'Edit class number') + '" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
+        const cue = boardEditsAllowed() ? ' is-editable' : ' is-frozen';
+        return '<button type="button" class="desk-classno-btn' + cue + '" data-desk-classno="' + escapeHtml(st.id) + '" ' +
+          'title="' + (cue === ' is-frozen' ? ('Class number ' + escapeHtml(no)) : 'Edit class number') + '" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
       }
 
       function deskNameIsEditable(st) {
@@ -2315,13 +2342,13 @@
             'data-original-name="' + escapeHtml(shown) + '" ' +
             'value="' + escapeHtml(shown) + '" placeholder="Empty" aria-label="' + escapeHtml(label) + '" />';
         }
-        const frozen = !boardEditsAllowed();
+        const cue = boardEditsAllowed() ? ' is-editable' : ' is-frozen';
         if (empty) {
-          return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2' + (frozen ? ' is-frozen' : '') + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
-            'title="' + (frozen ? 'Empty' : 'Type a name') + '" aria-label="' + (frozen ? 'Empty' : 'Empty seat, type a name') + '">Empty</button>';
+          return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+            'title="' + (cue === ' is-frozen' ? 'Empty' : 'Type a name') + '" aria-label="' + (cue === ' is-frozen' ? 'Empty' : 'Empty seat, type a name') + '">Empty</button>';
         }
-        return '<button type="button" class="desk-name-btn line-clamp-2' + (frozen ? ' is-frozen' : '') + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
-          'title="' + (frozen ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '" aria-label="' + (frozen ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '">' +
+        return '<button type="button" class="desk-name-btn line-clamp-2' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+          'title="' + (cue === ' is-frozen' ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '" aria-label="' + (cue === ' is-frozen' ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '">' +
           escapeHtml(st.name) + '</button>';
       }
 
@@ -2978,9 +3005,9 @@
           const locked = state.layoutLocked === true;
           lockIcon.textContent = locked ? '🔒' : '🔓';
           btnLock.title = locked
-            ? 'Unlock Edit & Drag — allow desk drag and name / # / team edits'
-            : 'Lock Edit & Drag — freeze layout and names';
-          btnLock.setAttribute('aria-label', locked ? 'Unlock Edit & Drag' : 'Lock Edit & Drag');
+            ? 'Unlock Layout — allow desk drag'
+            : 'Lock Layout — freeze desk drag';
+          btnLock.setAttribute('aria-label', locked ? 'Unlock Layout' : 'Lock Layout');
           btnLock.setAttribute('aria-pressed', locked ? 'true' : 'false');
           btnLock.className = locked
             ? 'min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-950 text-base font-bold transition'
@@ -3974,7 +4001,7 @@
                 '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Team Name"' +
                   (boardEditsAllowed() ? '' : ' readonly aria-readonly="true"') +
                   ' class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg ' +
-                  (boardEditsAllowed() ? 'bg-white' : 'bg-slate-100 text-slate-500 cursor-default') + '" />' +
+                  (boardEditsAllowed() ? 'is-editable' : 'bg-slate-100 text-slate-500 cursor-default') + '" />' +
                 '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" title="Delete Team">✕</button>' +
               '</div>' +
               '<div class="flex items-center justify-between text-[11px]">' +
@@ -4631,10 +4658,7 @@
           renderHeaderControls();
           renderGroupScoreDock();
           renderClassroomCanvas(false);
-          const groupModal = document.getElementById('groupModal');
-          if (groupModal && !groupModal.classList.contains('hidden')) {
-            renderGroupModalContents();
-          }
+          renderGroupModalContents();
           showToast(state.editMode !== false ? 'Editing on' : 'Editing off', '✏️');
         });
 
@@ -4672,35 +4696,13 @@
           });
         });
 
-        // Lock / Snap / Flip Room. Lock is the button beside Reset Layout.
+        // Lock only freezes desk drag. It does not close name, seat, or team editors.
         document.getElementById('btnToggleLockLayout').addEventListener('click', function () {
-          if (!state.layoutLocked) {
-            const active = document.activeElement;
-            if (active && active.blur && active.getAttribute && (
-              active.getAttribute('data-desk-name-input') ||
-              active.getAttribute('data-desk-classno-input') ||
-              active.getAttribute('data-dock-group-input') ||
-              active.getAttribute('data-edit-grp-name')
-            )) {
-              active.blur();
-            }
-            state.editingStudentId = '';
-            state.editingClassNoId = '';
-            groupEditToken += 1;
-            state.editingGroupId = '';
-            state.editingGroupAnchor = '';
-            state.editingGroupDeskId = '';
-          }
           state.layoutLocked = !state.layoutLocked;
           saveState();
           renderHeaderControls();
-          renderGroupScoreDock();
-          renderClassroomCanvas(false);
-          const groupModal = document.getElementById('groupModal');
-          if (groupModal && !groupModal.classList.contains('hidden')) {
-            renderGroupModalContents();
-          }
-          showToast(state.layoutLocked ? 'Locked' : 'Unlocked', state.layoutLocked ? '🔒' : '🔓');
+          syncDeskDragCursor();
+          showToast(state.layoutLocked ? 'Desk drag locked' : 'Desk drag unlocked', state.layoutLocked ? '🔒' : '🔓');
         });
 
         document.getElementById('btnToggleSnapGrid').addEventListener('click', function () {
