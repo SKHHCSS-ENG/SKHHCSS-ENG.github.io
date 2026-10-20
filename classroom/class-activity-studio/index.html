@@ -763,9 +763,20 @@
       padding-top: 0;
       padding-bottom: 0;
     }
-    /* History follows Lock. This margin stacks with the row gap (gap-x-3,
-       12px) so Lock → History is wider than the chip gap (gap-1.5 is 6px,
-       sm:gap-2 is 8px) and wider than the join between the other bands. */
+    /* Lock and History wrap as one unit. The full Seating band is too wide
+       for History to sit beside it at a typical ~1280px window, so this group
+       drops to the next row together and the wider Lock → History gap stays
+       visible. column-gap matches the toolbar's gap-x-3 (12px); the 1rem
+       margin stacks on top of it (~28px), wider than the chip gap (gap-1.5
+       is 6px, sm:gap-2 is 8px) and wider than the join between other bands. */
+    .studio-lock-history {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      max-width: 100%;
+      column-gap: 0.75rem;
+      row-gap: 0.5rem;
+    }
     .studio-history-gap {
       margin-left: 1rem;
     }
@@ -898,7 +909,7 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right; extra air between Lock and History) -->
+  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right). Lock travels with History so the wider Lock → History gap stays on one row. -->
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
@@ -928,7 +939,7 @@
         </button>
       </div>
 
-      <!-- Seating: grid, presets, Snap, Front, Lock -->
+      <!-- Seating: grid, presets, Snap, Front. Lock wraps with History below. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Seating</span>
         <!-- Custom Rows x Columns Grid Quick Setup -->
@@ -959,27 +970,29 @@
         <button id="btnFlipRoom" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Flip Classroom Orientation (FRONT OF ROOM at Top vs Bottom)">
           <span id="flipRoomText">Front: Bottom</span>
         </button>
+      </div>
 
+      <!-- Lock + History wrap together. studio-band keeps the 26px chip height on Lock. -->
+      <div class="studio-band studio-lock-history">
         <button id="btnToggleLockLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout — freeze desk drag" aria-label="Lock Layout" aria-pressed="false">
           <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
         </button>
-      </div>
 
-      <!-- History follows Lock, with extra left margin so the gap is wider than the chip gap. -->
-      <div class="studio-band studio-history-gap flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">History</span>
-        <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
-          <span aria-hidden="true">↩️</span>
-        </button>
-        <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo Layout" aria-label="Redo Layout">
-          <span aria-hidden="true">↪️</span>
-        </button>
-        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
-          Set as Default
-        </button>
-        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
-          🔄 Layout
-        </button>
+        <div class="studio-band studio-history-gap flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+          <span class="studio-band-label">History</span>
+          <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
+            <span aria-hidden="true">↩️</span>
+          </button>
+          <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo Layout" aria-label="Redo Layout">
+            <span aria-hidden="true">↪️</span>
+          </button>
+          <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
+            Set as Default
+          </button>
+          <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
+            🔄 Layout
+          </button>
+        </div>
       </div>
 
       <!-- Scores follows History in the same left-to-right flow. -->
