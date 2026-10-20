@@ -167,11 +167,8 @@
       <!-- Brand -->
       <div class="flex items-center gap-3 min-w-0">
         <a href="../" class="shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" title="Back to Classroom">← Back to Classroom</a>
-        <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/90 text-slate-950 shadow-sm">SKHHCSS English</span>
-            <span class="hidden sm:inline-block text-xs text-sky-100 font-medium">Class Activity Studio</span>
-          </div>
+        <div class="min-w-0 flex flex-col items-start">
+          <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/90 text-slate-950 shadow-sm">SKHHCSS English</span>
           <h1 class="font-display text-base sm:text-lg font-bold tracking-tight leading-tight text-white">Class Activity Studio</h1>
         </div>
       </div>
@@ -276,9 +273,9 @@
         </button>
 
         <!-- Sound Toggle -->
-        <button id="btnToggleSound" type="button" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-semibold flex items-center gap-1 transition" title="Toggle sound" aria-label="Toggle sound">
+        <button id="btnToggleSound" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Toggle sound" aria-label="Toggle sound">
           <span id="soundIcon">🔊</span>
-          <span id="soundLabel" class="hidden lg:inline text-xs">Sound</span>
+          <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
         <!-- Export CSV Button -->
