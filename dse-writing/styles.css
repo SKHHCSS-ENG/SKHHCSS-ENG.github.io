@@ -1032,8 +1032,14 @@ body.grammar-junior .grammar-table tbody th {
   background: var(--bg);
   color: var(--navy);
   font-weight: 700;
+  width: auto;
+  white-space: nowrap;
 }
-body.grammar-junior .grammar-corner { width: 1%; }
+/* Empty corner must not set the row-header column to 1% (that crushed labels). */
+body.grammar-junior .grammar-corner {
+  width: auto;
+  white-space: nowrap;
+}
 @media (max-width: 560px) {
   body.grammar-junior .grammar-table,
   body.grammar-junior .grammar-table thead,
