@@ -763,6 +763,12 @@
       padding-top: 0;
       padding-bottom: 0;
     }
+    /* History follows Lock. This margin stacks with the row gap (gap-x-3,
+       12px) so Lock → History is wider than the chip gap (gap-1.5 is 6px,
+       sm:gap-2 is 8px) and wider than the join between the other bands. */
+    .studio-history-gap {
+      margin-left: 1rem;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
@@ -892,7 +898,7 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: Register · Seating · Scores, then History alone on the right -->
+  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right; extra air between Lock and History) -->
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
@@ -959,19 +965,8 @@
         </button>
       </div>
 
-      <!-- Scores follows Seating on the left. It does not sit with History. -->
-      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">Scores</span>
-        <button id="btnAllPlusOne" type="button" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
-          All +1
-        </button>
-        <button id="btnOpenResetModal" type="button" class="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold whitespace-nowrap transition" title="Reset Scores" aria-label="Reset Scores">
-          🔄 Scores
-        </button>
-      </div>
-
-      <!-- History alone on the far right: Undo, Redo, Set as Default, Reset Layout -->
-      <div class="studio-band ml-auto flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+      <!-- History follows Lock, with extra left margin so the gap is wider than the chip gap. -->
+      <div class="studio-band studio-history-gap flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">History</span>
         <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo Layout" aria-label="Undo Layout">
           <span aria-hidden="true">↩️</span>
@@ -984,6 +979,17 @@
         </button>
         <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
           🔄 Layout
+        </button>
+      </div>
+
+      <!-- Scores follows History in the same left-to-right flow. -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">Scores</span>
+        <button id="btnAllPlusOne" type="button" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
+          All +1
+        </button>
+        <button id="btnOpenResetModal" type="button" class="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold whitespace-nowrap transition" title="Reset Scores" aria-label="Reset Scores">
+          🔄 Scores
         </button>
       </div>
     </div>
