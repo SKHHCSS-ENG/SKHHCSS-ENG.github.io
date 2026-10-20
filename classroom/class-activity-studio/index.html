@@ -116,37 +116,37 @@
     #classroomStage {
       margin-bottom: 72px;
     }
-    /* Front-of-room strip only. No smartboard graphic and no teacher's desk. */
+    /* Front-of-room label only. No smartboard graphic and no teacher's desk.
+       All-caps source text stays "FRONT OF ROOM". The amber pill is the frame. */
     .front-of-room {
       position: absolute;
       left: 50%;
       z-index: 4;
       pointer-events: none;
       transform: translateX(-50%);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      width: 360px;
+      box-sizing: border-box;
+      width: auto;
       max-width: calc(100% - 32px);
-      height: 22px;
+      height: 32px;
       margin: 0;
-      padding: 0;
-      background: transparent;
-      border: 0;
-      color: #64748b;
+      padding: 0 18px;
+      background: #fffbeb;
+      border: 3px solid #b45309;
+      border-radius: 999px;
+      color: #78350f;
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.16em;
       line-height: 1;
+      text-transform: uppercase;
       white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(120, 53, 15, 0.2);
     }
-    .front-of-room::before,
-    .front-of-room::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #94a3b8;
+    #pickerResultSub:empty {
+      display: none;
     }
     /* Classroom Floor Grid Pattern */
     .classroom-floor {
@@ -1093,7 +1093,6 @@
           <span class="text-2xl">🎲</span>
           <div>
             <h2 class="font-display text-lg font-bold leading-tight">Random Spotlight Picker</h2>
-            <p class="text-xs font-medium text-slate-800">Pick a random student or team and score them live</p>
           </div>
         </div>
         <button id="btnClosePickerModal" type="button" class="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center font-bold">✕</button>
@@ -1130,7 +1129,7 @@
         <div id="pickerStageBox" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 text-white rounded-2xl p-6 text-center shadow-inner mb-4 min-h-[170px] flex flex-col items-center justify-center relative overflow-hidden">
           <div id="pickerBadge" class="text-xs font-bold uppercase tracking-widest px-3 py-0.5 rounded-full bg-white/15 text-amber-300 mb-2">Ready to Spin</div>
           <div id="pickerResultTitle" class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Tap "Draw Now"</div>
-          <div id="pickerResultSub" class="text-xs sm:text-sm text-indigo-200 mt-1">Spotlight will highlight on the classroom map</div>
+          <div id="pickerResultSub" class="text-xs sm:text-sm text-indigo-200 mt-1"></div>
 
           <!-- Instant Score Controls (Enabled once a student/group is picked) -->
           <div id="pickerQuickScoreBar" class="hidden mt-4 pt-3 border-t border-white/15 flex items-center justify-center gap-3 w-full">
@@ -1239,21 +1238,25 @@
       // Desktop paints about 105px, so a row gap of 10px reads as about 20px of white there.
       const DESK_H = 115;
       const ROW_GAP_Y = 10;
-      const POD_ROW_AISLE_Y = 12;
-      // Within-pod / within-pair pack stays at 10px. Horizontal aisles between
-      // pods and pairs move toward that density (was 56 / 54). Exam columns
-      // use one even gap, tightened from 24 so a full row is not looser than the aisles.
+      // Within-pod / within-pair pack stays at 10px. Between-pod, between-pair,
+      // and between-cluster aisles use that same 10px so those layouts read as
+      // one even grid (was 16px horizontal / 12px vertical, which still looked
+      // like blocks). Exam columns stay on their own even 16px gap.
       const POD_INNER_GAP_X = 10;
-      const POD_AISLE_GAP_X = 16;
+      const POD_AISLE_GAP_X = 10;
+      const POD_ROW_AISLE_Y = 10;
       const EXAM_COL_GAP_X = 16;
-      // FRONT OF ROOM strip is 22px tall and stays 10px from the facing desk row.
+      // Framed FRONT OF ROOM pill is 32px tall and stays 10px from the facing desk row.
       // A fresh front-at-top layout also leaves 8px above the strip.
-      const FRONT_LABEL_H = 22;
+      const FRONT_LABEL_H = 32;
       const FRONT_EDGE = 8;
       const FRONT_ROW_GAP = 10;
       // Bump when desk size or step formula changes. Factory defaults reseed.
-      // Untouched factory seats move with the new pitch; a saved custom default and dragged seats stay put.
-      const LAYOUT_PITCH_VERSION = 'desk-148x115-aisleX16-front10';
+      // Untouched factory seats move with the new pitch. A saved custom default
+      // (Set as Default) and any dragged seats keep their old positions until
+      // the teacher presses a Quick Layout button (or Reset Layout on a class
+      // that was still on the factory grid).
+      const LAYOUT_PITCH_VERSION = 'desk-148x115-evenAisle10-frontframe';
       const GRID_SIZE = 20;
       const ZOOM_MIN = 0.35;
       const ZOOM_MAX = 1.25;
@@ -1489,9 +1492,9 @@
             });
           }
         } else if (layoutType === 'pairs') {
-          // Paired Desks applied to (customRows x cols) grid:
-          // Adjacent column pairs sit at the within-pair gap. The aisle between pairs
-          // is only slightly wider, so the row matches that density.
+          // Paired Desks applied to (customRows x cols) grid.
+          // Within-pair and between-pair gaps are the same even 10px, so the
+          // row does not open a wider aisle than Exam Rows' even grid.
           const pairInnerGap = POD_INNER_GAP_X;
           const pairAisleGap = POD_AISLE_GAP_X;
           function getPairColOffset(c) {
@@ -1513,7 +1516,8 @@
           }
         } else if (layoutType === 'pods4') {
           // 4-Desk Pods applied to (customRows x cols) grid:
-          // Every 2x2 block in the (Rows x Cols) grid (cols 0&1 with rows 0&1, cols 2&3 with rows 0&1, etc.) clusters into a 4-desk pod!
+          // Every 2x2 block keeps its seats together, but the gap inside a pod
+          // and the gap between pods are the same even 10px (horizontal and vertical).
           const podInnerGapX = POD_INNER_GAP_X;
           const podAisleGapX = POD_AISLE_GAP_X;
           const podInnerGapY = ROW_GAP_Y;
@@ -1578,7 +1582,9 @@
                 };
               });
             });
-            currentBandY += maxRowsInBand * (DESK_H + ROW_GAP_Y) + POD_ROW_AISLE_Y;
+            // Between-band gutter is the same 10px already included in each row
+            // step. Do not add a second aisle (that used to make a 22px moat).
+            currentBandY += maxRowsInBand * (DESK_H + ROW_GAP_Y);
           }
 
           for (let i = 0; i < count; i++) {
