@@ -1,5 +1,7 @@
 /* Speech Festival — DSE-style sticky Tools dock (U47 / U66)
    Compact: 🛠 chip collapsed by default; expand → 譯 · ✍️ · 🎙 + hw row.
+   🛠 stays pinned bottom-right. When ink is open it shares the handwrite
+   row (chips narrow; Clear does not sit under the wrench). 譯 stays left.
    Warm SF palette (--gold / --asphalt). Does not affect Solo Verse. */
 :root {
   --sf-dock-accent: #C45C26;
@@ -21,13 +23,13 @@ body.sf-tools.dock-open {
   padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
 }
 body.sf-tools.dock-open.hw-on {
-  padding-bottom: calc(200px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(204px + env(safe-area-inset-bottom, 0px));
 }
 body.sf-tools.dock-open.rec-on {
   padding-bottom: calc(210px + env(safe-area-inset-bottom, 0px));
 }
 body.sf-tools.dock-open.hw-on.rec-on {
-  padding-bottom: calc(250px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(254px + env(safe-area-inset-bottom, 0px));
 }
 
 html.sf-tools {
@@ -120,19 +122,34 @@ body:not(.dock-open) .rec-bar {
   outline: 3px solid var(--sf-dock-ink);
   outline-offset: 2px;
 }
+/* Expanded: pin 🛠 to the dock corner, not the chrome row.
+   In-flow margin-left:auto left it above the ink row, so Clear sat under it.
+   譯 / Handwrite / Record stay in the chrome row and are not shoved. */
 body.dock-open .dock-fold {
-  margin-left: auto;
+  position: absolute;
+  right: 8px;
+  bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  z-index: 3;
   box-shadow: 0 2px 8px rgba(44, 41, 38, 0.14);
 }
 .dock-chrome {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 2px;
   min-height: 44px;
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
   width: 100%;
+}
+/* 譯 stays at the left. The pinned 🛠 occupies the corner, so keep it out of the chips.
+   overflow must stay visible: 🛠 is absolutely positioned against the dock and
+   would be clipped by the chrome scroller once it drops onto the ink row. */
+body.dock-open .dock-chrome {
+  padding-right: 48px;
+  overflow: visible;
 }
 body:not(.dock-open) .dock-chrome {
   width: auto;
@@ -178,8 +195,13 @@ body:not(.dock-open) .dock-chrome {
   display: none;
   flex-direction: column;
   gap: 0;
-  padding: 0 0 2px;
+  padding: 0;
+  min-width: 0;
 }
+/* Ink row is the bottom row when both ink and Record are open,
+   so the pinned 🛠 shares that line and stays in the corner. */
+body.dock-open.hw-on .dock-inner > .rec-bar { order: 1; }
+body.dock-open.hw-on .dock-inner > .hw-bar { order: 2; }
 body.hw-on .hw-bar {
   display: flex;
 }
@@ -193,9 +215,12 @@ body.hw-on .hw-bar:not([hidden]) {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 1px;
-  min-height: 40px;
+  justify-content: flex-start;
+  gap: 3px;
+  min-height: 44px;
+  min-width: 0;
+  /* 44px 🛠 + 4px gap, sitting on this row's right end */
+  padding-right: 48px;
 }
 .hw-chip {
   border: 1px solid var(--sf-dock-border);
@@ -204,18 +229,18 @@ body.hw-on .hw-bar:not([hidden]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  min-height: 40px;
-  height: 40px;
-  padding: 4px 2px;
+  min-width: 0;
+  min-height: 44px;
+  height: 44px;
+  padding: 0;
   border-radius: 999px;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
   flex: 1 1 0;
-  max-width: none;
+  max-width: 48px;
   font-family: "Segoe UI", system-ui, -apple-system, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "PingFang HK", "Noto Sans TC", sans-serif;
   touch-action: manipulation;
   -webkit-user-select: none;
@@ -240,11 +265,11 @@ body.hw-on .hw-bar:not([hidden]) {
   border-color: rgba(185, 28, 28, 0.35);
   color: var(--sf-dock-warn);
   flex: 1 1 0;
-  max-width: none;
+  max-width: 48px;
 }
 .hw-chip.hw-colour-btn {
   width: 40px;
-  min-width: 40px;
+  min-width: 28px;
   max-width: 40px;
   height: 40px;
   min-height: 40px;
@@ -253,11 +278,15 @@ body.hw-on .hw-bar:not([hidden]) {
   border: 2px solid #fff;
   box-shadow: 0 0 0 1.5px var(--sf-dock-border);
   background: #C2410C;
-  flex: 0 0 40px;
+  flex: 0 1 40px;
   font-size: 0;
   line-height: 0;
   color: transparent;
   overflow: hidden;
+}
+/* Record is the bottom row only when ink is off — keep its controls left of 🛠. */
+body.dock-open.rec-on:not(.hw-on) .rec-bar {
+  padding-right: 52px;
 }
 
 /* Record row (file picker + local playback — no upload) */
@@ -356,13 +385,13 @@ body.dock-open .yt-persist {
   bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
 }
 body.dock-open.hw-on .yt-persist {
-  bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(112px + env(safe-area-inset-bottom, 0px)) !important;
 }
 body.dock-open.rec-on .yt-persist {
   bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
 }
 body.dock-open.hw-on.rec-on .yt-persist {
-  bottom: calc(160px + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(164px + env(safe-area-inset-bottom, 0px)) !important;
 }
 .yt-persist.expanded {
   bottom: auto !important;

@@ -51,8 +51,8 @@ body.tools-page.dock-open {
   padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
 }
 body.tools-page.dock-open.hw-on {
-  /* chrome + 1 handwrite tools row */
-  padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
+  /* chrome + 1 handwrite tools row (44px, sharing the line with 🛠) */
+  padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Page shell + school brand (restored — was dropped in e549619) */
@@ -321,7 +321,9 @@ details.format-section[data-section="skeleton"] > summary {
 
 
 /* Sticky Tools dock — 🛠 always bottom-right; toggles expand/collapse.
-   Collapsed: hug the chip. Expanded: dense chrome row, 🛠 at far right (no ▾ strip). */
+   Collapsed: hug the chip. Expanded: 譯 stays at the left of the chrome row.
+   🛠 is pinned to the dock's bottom-right corner (same line as the handwrite
+   chips when ink is open — Clear must not park underneath it). */
 .bottom-dock {
   position: fixed;
   bottom: 0;
@@ -404,20 +406,33 @@ body:not(.dock-open) .rec-bar {
   outline: 3px solid var(--navy);
   outline-offset: 2px;
 }
-/* Expanded: same 🛠 chip stays at far right of chrome row */
+/* Expanded: pin 🛠 to the dock corner, not the chrome row.
+   In-flow margin-left:auto left it above the ink row, so Clear sat under it. */
 body.dock-open .dock-fold {
-  margin-left: auto;
+  position: absolute;
+  right: 8px;
+  bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  z-index: 3;
   box-shadow: 0 2px 8px rgba(18, 58, 77, 0.14);
 }
 .dock-chrome {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 2px;
   min-height: 44px;
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
   width: 100%;
+}
+/* 譯 stays at the left. The pinned 🛠 occupies the corner, so keep it out of the chips.
+   overflow must stay visible: 🛠 is absolutely positioned against the dock and
+   would be clipped by the chrome scroller once it drops onto the ink row. */
+body.dock-open .dock-chrome {
+  padding-right: 48px;
+  overflow: visible;
 }
 body:not(.dock-open) .dock-chrome {
   width: auto;
@@ -457,7 +472,8 @@ body:not(.dock-open) .dock-chrome {
   display: none;
   flex-direction: column;
   gap: 0;
-  padding: 0 0 2px;
+  padding: 0;
+  min-width: 0;
 }
 body.hw-on .hw-bar {
   display: flex;
@@ -472,9 +488,12 @@ body.hw-on .hw-bar:not([hidden]) {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 1px;
-  min-height: 40px;
+  justify-content: flex-start;
+  gap: 3px;
+  min-height: 44px;
+  min-width: 0;
+  /* 44px 🛠 + 4px gap, sitting on this row's right end */
+  padding-right: 48px;
 }
 .hw-chip {
   border: 1px solid var(--border);
@@ -483,18 +502,18 @@ body.hw-on .hw-bar:not([hidden]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  min-height: 40px;
-  height: 40px;
-  padding: 4px 2px;
+  min-width: 0;
+  min-height: 44px;
+  height: 44px;
+  padding: 0;
   border-radius: 999px;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
   flex: 1 1 0;
-  max-width: none;
+  max-width: 48px;
 }
 .hw-chip:disabled {
   opacity: .4;
@@ -515,7 +534,7 @@ body.hw-on .hw-bar:not([hidden]) {
   border-color: #fed7aa;
   color: var(--warn);
   flex: 1 1 0;
-  max-width: none;
+  max-width: 48px;
 }
 .dock-chip,
 .hw-chip {
@@ -530,7 +549,7 @@ body.hw-on .hw-bar:not([hidden]) {
 /* Colour = filled ball of current ink (no "Colour" label) */
 .hw-chip.hw-colour-btn {
   width: 40px;
-  min-width: 40px;
+  min-width: 28px;
   max-width: 40px;
   height: 40px;
   min-height: 40px;
@@ -539,7 +558,7 @@ body.hw-on .hw-bar:not([hidden]) {
   border: 2px solid #fff;
   box-shadow: 0 0 0 1.5px var(--border);
   background: #0e6b7a;
-  flex: 0 0 40px;
+  flex: 0 1 40px;
   font-size: 0;
   line-height: 0;
   color: transparent;
@@ -1190,7 +1209,7 @@ body.grammar-junior.tools-page.dock-open {
   padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
 }
 body.grammar-junior.tools-page.dock-open.hw-on {
-  padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Grammar (Junior) Core 譯: Chinese after-text may wrap at ~390px (mirror vocab / sentence patterns) */
