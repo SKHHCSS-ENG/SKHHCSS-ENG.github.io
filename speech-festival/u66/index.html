@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<link rel="stylesheet" href="../tools-dock.css?v=20261018k">
+<link rel="stylesheet" href="../tools-dock.css?v=20261020d">
 <title>U66 Solo Verse — Late Home V1.7 | Practice Guide</title>
 <style>
  :root {
@@ -55,6 +55,12 @@
  }
  .top-row {
  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+ }
+ .sf-back {
+ display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+ box-sizing: border-box; min-width: 44px; min-height: 44px; padding: 0 10px;
+ border-radius: 10px; background: rgba(196,92,38,.14); color: var(--gold);
+ font-size: 16px; font-weight: 700; line-height: 1; text-decoration: none;
  }
  .title-block { min-width: 0; flex: 1; }
  .app-title {
@@ -359,6 +365,7 @@
 
 <header>
  <div class="top-row">
+ <a class="sf-back" href="../" aria-label="Back to Speech Festival">←</a>
  <div class="title-block" id="titlePlay" role="button" tabindex="0" data-yt-start="0.5" data-yt-end="5.8" title="Play title and poet">
  <h1 class="app-title">🎭 <span>Late Home</span></h1>
  <p class="poet-byline">Gervase Phinn</p>
@@ -1064,6 +1071,6 @@ syncYtLayout(document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem
 </script>
 
 <p class="school-brand"><a href="../../">SKH Holy Carpenter Secondary School · English</a></p>
-<script src="../tools-dock.js?v=20261018k"></script>
+<script src="../tools-dock.js?v=20261020d"></script>
 </body>
 </html>
