@@ -275,10 +275,10 @@
           <span class="hidden sm:inline">Podium</span>
         </button>
 
-        <!-- Subtle Sound Toggle -->
-        <button id="btnToggleSound" type="button" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-semibold flex items-center gap-1 transition" title="Toggle Subtle Sound Effects">
+        <!-- Sound Toggle -->
+        <button id="btnToggleSound" type="button" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-semibold flex items-center gap-1 transition" title="Toggle sound" aria-label="Toggle sound">
           <span id="soundIcon">🔊</span>
-          <span id="soundLabel" class="hidden lg:inline text-xs">Subtle SFX</span>
+          <span id="soundLabel" class="hidden lg:inline text-xs">Sound</span>
         </button>
 
         <!-- Export CSV Button -->
@@ -2200,7 +2200,7 @@
         const soundIcon = document.getElementById('soundIcon');
         const soundLabel = document.getElementById('soundLabel');
         if (soundIcon) soundIcon.textContent = state.soundEnabled ? '🔊' : '🔇';
-        if (soundLabel) soundLabel.textContent = state.soundEnabled ? 'Subtle SFX' : 'Muted';
+        if (soundLabel) soundLabel.textContent = state.soundEnabled ? 'Sound' : 'Muted';
 
         // Subheader badges
         const clsBadge = document.getElementById('currentClassBadge');
@@ -3446,7 +3446,7 @@
           if (state.soundEnabled) playSubtleSound('plus');
           saveState();
           renderHeaderControls();
-          showToast(state.soundEnabled ? 'Subtle sound effects enabled' : 'Sound effects muted', state.soundEnabled ? '🔊' : '🔇');
+          showToast(state.soundEnabled ? 'Sound on' : 'Muted', state.soundEnabled ? '🔊' : '🔇');
         });
 
         // Export CSV
