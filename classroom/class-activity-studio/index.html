@@ -583,16 +583,34 @@
     #pickerBadge[hidden] {
       display: none !important;
     }
-    /* Settled draw: the name is the result. No status pill, no map line. */
+    /* Settled draw: the name is the result. No status pill, no map line.
+       Font size is fitted in JS: shrink on one line, then two lines.
+       Ellipsis is only the two-line clamp when the floor still cannot hold it. */
     #pickerResultTitle.is-result {
+      align-self: stretch;
       width: 100%;
       max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
       font-size: clamp(2.35rem, 11vw, 3.5rem);
       line-height: 1.05;
       letter-spacing: -0.02em;
       overflow: hidden;
-      text-overflow: ellipsis;
+      text-overflow: clip;
       white-space: nowrap;
+    }
+    #pickerResultTitle.is-result.is-name-wrap {
+      white-space: normal;
+      overflow-wrap: break-word;
+      line-height: 1.2;
+      text-align: center;
+    }
+    #pickerResultTitle.is-result.is-name-clamp {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      text-overflow: ellipsis;
     }
     #pickerStageBox.is-result {
       min-height: 0;
@@ -662,10 +680,26 @@
       color: #0f172a;
       text-align: left;
     }
+    /* One line at the design size, then a smaller size, then two lines.
+       No ellipsis until two lines at the floor still overflow. */
     .desk-name-btn,
     .desk-name-static {
       white-space: nowrap;
       overflow: hidden;
+      text-overflow: clip;
+    }
+    .desk-name-btn.is-name-wrap,
+    .desk-name-static.is-name-wrap {
+      white-space: normal;
+      overflow-wrap: break-word;
+      line-height: 1.2;
+    }
+    .desk-name-btn.is-name-clamp,
+    .desk-name-static.is-name-clamp {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
       text-overflow: ellipsis;
     }
     .desk-name-btn {
@@ -2929,6 +2963,7 @@
         const titleEl = document.getElementById('pickerResultTitle');
         if (titleEl && state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === studentId) {
           titleEl.textContent = '#' + st.classNo + ' ' + st.name;
+          fitPickerTitle();
         }
       }
 
@@ -2989,6 +3024,7 @@
         const titleEl = document.getElementById('pickerResultTitle');
         if (titleEl && state.lastPickedTarget && state.lastPickedTarget.type === 'group' && state.lastPickedTarget.id === groupId) {
           titleEl.textContent = grp.icon + ' ' + grp.name;
+          fitPickerTitle();
         }
         const field = elementByAttr('#groupManagerList [data-edit-grp-name]', 'data-edit-grp-name', groupId);
         if (field && document.activeElement !== field) field.value = grp.name;
@@ -4441,6 +4477,88 @@
         return { width: Math.ceil(maxX), height: Math.ceil(maxY) };
       }
 
+      // Desk cards and the spotlight name share this fit.
+      // One line at the design size, then smaller, down to a 12px floor.
+      // Still too long: wrap to two lines at that floor. Ellipsis only if
+      // two lines at 12px cannot hold the name.
+      var NAME_FIT_FLOOR_PX = 12;
+      var nameFitQueued = false;
+
+      function nameTextOverflows(el) {
+        return el.scrollWidth > el.clientWidth + 0.5;
+      }
+
+      function fitDisplayedName(el, floorPx) {
+        if (!el || el.clientWidth < 8) return;
+        el.classList.remove('is-name-wrap', 'is-name-clamp');
+        el.style.fontSize = '';
+        el.style.minHeight = '';
+        var maxPx = parseFloat(window.getComputedStyle(el).fontSize);
+        if (!isFinite(maxPx) || maxPx <= 0) return;
+        var floor = floorPx > maxPx ? maxPx : floorPx;
+
+        if (!nameTextOverflows(el)) return;
+
+        var lo = floor;
+        var hi = maxPx;
+        var best = -1;
+        var steps = 0;
+        while (hi - lo > 0.25 && steps < 12) {
+          steps += 1;
+          var mid = (lo + hi) / 2;
+          el.style.fontSize = mid.toFixed(2) + 'px';
+          if (!nameTextOverflows(el)) {
+            best = mid;
+            lo = mid;
+          } else {
+            hi = mid;
+          }
+        }
+
+        if (best >= floor) {
+          var size = best;
+          el.style.fontSize = size.toFixed(2) + 'px';
+          while (size - 0.5 >= floor && nameTextOverflows(el)) {
+            size -= 0.5;
+            el.style.fontSize = size.toFixed(2) + 'px';
+          }
+          if (!nameTextOverflows(el)) return;
+        }
+
+        el.style.fontSize = floor.toFixed(2) + 'px';
+        if (!nameTextOverflows(el)) return;
+
+        el.classList.add('is-name-wrap');
+        el.style.minHeight = '0px';
+        var linePx = parseFloat(window.getComputedStyle(el).lineHeight);
+        if (!isFinite(linePx) || linePx <= 0) linePx = floor * 1.2;
+        var needsClamp = el.scrollHeight > linePx * 2.5;
+        el.style.minHeight = '';
+        if (needsClamp) el.classList.add('is-name-clamp');
+      }
+
+      function fitDeskNames(root) {
+        var scope = root && root.querySelectorAll ? root : document;
+        var nodes = scope.querySelectorAll('.desk-name-btn, .desk-name-static');
+        for (var i = 0; i < nodes.length; i++) fitDisplayedName(nodes[i], NAME_FIT_FLOOR_PX);
+      }
+
+      function fitPickerTitle() {
+        var titleEl = document.getElementById('pickerResultTitle');
+        if (!titleEl || !titleEl.classList.contains('is-result')) return;
+        fitDisplayedName(titleEl, NAME_FIT_FLOOR_PX);
+      }
+
+      function scheduleNameFit() {
+        if (nameFitQueued) return;
+        nameFitQueued = true;
+        requestAnimationFrame(function () {
+          nameFitQueued = false;
+          fitDeskNames();
+          fitPickerTitle();
+        });
+      }
+
       // Render Freeform Classroom Floor Plan & Desks
       function renderClassroomCanvas(smoothTransition) {
         const cls = getCurrentClass();
@@ -4543,6 +4661,7 @@
           '</div>';
         }).join('');
         nameEditLock = false;
+        fitDeskNames(container);
       }
 
       // Render Right Sidebar: Live Leaderboard, Pulse Stats, & History Feed
@@ -5305,6 +5424,7 @@
         populatePickerGroupFilter();
         updatePickerModalUI();
         document.getElementById('pickerModal').classList.remove('hidden');
+        fitPickerTitle();
       }
 
       function closePickerModal() {
@@ -5412,6 +5532,7 @@
           titleEl.textContent = text;
           titleEl.title = text;
           titleEl.classList.add('is-result');
+          fitPickerTitle();
         }
       }
 
@@ -6908,8 +7029,13 @@
         setZoomChipOpen(state.zoomChipOpen);
         refreshZoomChipFrame();
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(function () { refreshZoomChipFrame(); });
+          document.fonts.ready.then(function () {
+            refreshZoomChipFrame();
+            fitDeskNames();
+            fitPickerTitle();
+          });
         }
+        window.addEventListener('resize', scheduleNameFit);
       });
     })();
   </script>
