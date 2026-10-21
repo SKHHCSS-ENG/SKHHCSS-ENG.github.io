@@ -1207,54 +1207,45 @@
         padding: 3px 7px;
       }
     }
-    /* One Show/Hide for the whole toolbar. The same top-right slot holds
-       Hide when the bands are open and Show when they are collapsed.
-       It does not drop onto the History row. */
-    #studioToolbarRow {
-      position: relative;
-      padding-right: 4.75rem;
-    }
-    @media (min-width: 640px) {
-      #studioToolbarRow {
-        padding-right: 5.75rem;
-      }
+    /* Show/Hide sits in the header, immediately after Export CSV.
+       The pair stays at the right of that row. Collapsing the bands
+       does not change the header, so the button does not move. */
+    .studio-header-export {
+      margin-left: auto;
     }
     .studio-toolbar-toggle {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.75rem;
-      z-index: 2;
       box-sizing: border-box;
-      height: 26px;
-      padding: 0 10px;
-      border-radius: 0.5rem;
-      border: 1px solid rgba(42, 143, 173, 0.45);
-      background: rgba(42, 143, 173, 0.08);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      min-width: 4.5rem;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: #fff;
       color: #123a4d;
       font-size: 12px;
       font-weight: 800;
       line-height: 1;
     }
-    @media (min-width: 640px) {
-      .studio-toolbar-toggle {
-        right: 1.25rem;
-      }
-    }
     .studio-toolbar-toggle:hover,
     .studio-toolbar-toggle:focus-visible {
-      background: rgba(42, 143, 173, 0.16);
+      background: #e7f3f7;
     }
     .studio-toolbar-toggle:focus-visible {
-      outline: 2px solid #123a4d;
+      outline: 2px solid #fff;
       outline-offset: 2px;
     }
     #studioToolbar.is-collapsed .studio-band {
       display: none;
     }
     #studioToolbar.is-collapsed #studioToolbarRow {
-      min-height: 2.625rem;
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
+      display: none;
+    }
+    #studioToolbar.is-collapsed:not(:has(#groupBrushBar:not(.hidden))) {
+      display: none;
     }
     .studio-band button {
       box-sizing: border-box;
@@ -1331,7 +1322,7 @@
         </div>
       </div>
     </div>
-    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
+    <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
 
       <!-- Center Controls: Class Preset Selector + Mode Switcher -->
       <div class="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -1360,7 +1351,7 @@
       </div>
 
       <!-- Right Utilities: Timer, Random Picker, Podium, Sound, Export -->
-      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+      <div class="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
         <!-- Live Countdown Timer Button -->
         <div class="relative">
           <button id="btnToggleTimerPanel" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Open the countdown timer">
@@ -1438,11 +1429,14 @@
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
-        <!-- Export CSV Button -->
-        <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span class="hidden sm:inline">Export CSV</span>
-        </button>
+        <!-- Export CSV stays with Show/Hide so the pair sits at the header’s right. -->
+        <div class="studio-header-export flex items-center gap-1.5 shrink-0">
+          <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="hidden sm:inline">Export CSV</span>
+          </button>
+          <button type="button" id="btnToggleStudioBands" class="studio-toolbar-toggle" aria-expanded="true" aria-controls="studioToolbarRow">Hide</button>
+        </div>
       </div>
     </div>
   </header>
@@ -1477,6 +1471,9 @@
         <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Tap a group colour, then tap desks">
           <span aria-hidden="true">🎨</span>
           <span id="groupBrushBtnLabel">Assign Groups</span>
+        </button>
+        <button id="btnClearGroups" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold whitespace-nowrap transition" title="Clear every student’s group assignment. Teams and scores stay.">
+          Clear Groups
         </button>
       </div>
 
@@ -1540,7 +1537,6 @@
           <span aria-hidden="true">🔄</span>
         </button>
       </div>
-      <button type="button" id="btnToggleStudioBands" class="studio-toolbar-toggle" aria-expanded="true" aria-controls="studioToolbarRow">Hide</button>
     </div>
 
     <!-- MANUAL GROUP PAINT BRUSH BAR (Visible when Paint Mode is active or in Group Mode) -->
@@ -1989,6 +1985,18 @@
         <button id="btnCancelResetModal" type="button" class="w-full py-2 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition">
           Cancel
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear group assignments. Teams and scores stay. -->
+  <div id="clearGroupsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6" role="dialog" aria-modal="true" aria-labelledby="clearGroupsTitle">
+      <h3 id="clearGroupsTitle" class="font-display text-lg font-bold text-slate-800">Clear all group assignments?</h3>
+      <p class="text-sm text-slate-500 mt-2">Students stay on the board. The team list and scores stay. Only who is on which team is cleared.</p>
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-5">
+        <button id="btnCancelClearGroups" type="button" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition">Cancel</button>
+        <button id="btnConfirmClearGroups" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm transition">Clear</button>
       </div>
     </div>
   </div>
@@ -3041,6 +3049,29 @@
         renderLeaderboardAndStats();
         renderIfModalOpen();
         showToast(grp ? grp.name : 'No Group', '🛡️');
+        return true;
+      }
+
+      function clearAllGroupAssignments() {
+        const cls = getCurrentClass();
+        if (!cls) return false;
+        const before = snapshotBoardEdit(cls);
+        var changed = 0;
+        (cls.students || []).forEach(function (st) {
+          if (st.groupId) {
+            st.groupId = '';
+            changed += 1;
+          }
+        });
+        if (!changed) return false;
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Clear group assignments');
+        saveState();
+        renderGroupBrushBar();
+        renderGroupScoreDock();
+        renderClassroomCanvas(false);
+        renderLeaderboardAndStats();
+        renderIfModalOpen();
+        showToast('Group assignments cleared', '🛡️');
         return true;
       }
 
@@ -5973,6 +6004,23 @@
         }
 
         // Manual Group Brush Bar
+        document.getElementById('btnClearGroups').addEventListener('click', function () {
+          const cls = getCurrentClass();
+          if (!cls) return;
+          const any = (cls.students || []).some(function (st) { return !!st.groupId; });
+          if (!any) {
+            showToast('No group assignments', '🛡️');
+            return;
+          }
+          document.getElementById('clearGroupsModal').classList.remove('hidden');
+        });
+        document.getElementById('btnCancelClearGroups').addEventListener('click', function () {
+          document.getElementById('clearGroupsModal').classList.add('hidden');
+        });
+        document.getElementById('btnConfirmClearGroups').addEventListener('click', function () {
+          document.getElementById('clearGroupsModal').classList.add('hidden');
+          clearAllGroupAssignments();
+        });
         document.getElementById('btnToggleGroupBrush').addEventListener('click', function () {
           state.brushMode = !state.brushMode;
           renderHeaderControls();
