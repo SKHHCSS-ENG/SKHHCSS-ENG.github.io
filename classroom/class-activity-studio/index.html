@@ -771,8 +771,9 @@
       transform-origin: bottom;
       animation: growUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
-    /* Mast: Back stays on the left. SKHHCSS + the studio title are one
-       centred group and do not share that centre with the Back link. */
+    /* Mast: Back stays on the left. Class Activity Studio is the centred
+       title. The SKHHCSS badge sits beside that title and is not part of
+       the centred string. */
     .studio-mast {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -797,15 +798,26 @@
     .studio-brand {
       grid-column: 2;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 0.15rem 0.5rem;
       min-width: 0;
       max-width: 100%;
     }
+    /* Shrink-wraps to the title so the badge can hang off its left
+       without pulling the title off centre. Sits above the Back link's
+       44px tap padding, which hangs into this row on small screens. */
+    .studio-title {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+    }
     .studio-school {
-      flex: 0 0 auto;
+      position: absolute;
+      right: calc(100% + 0.5rem);
+      top: 50%;
+      transform: translateY(-50%);
       font-size: 11px;
       font-weight: 800;
       letter-spacing: 0.06em;
@@ -816,6 +828,7 @@
       background: rgba(251, 191, 36, 0.92);
       color: #020617;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+      white-space: nowrap;
     }
     .studio-brand h1 {
       margin: 0;
@@ -825,7 +838,9 @@
       line-height: 1.1;
       color: #fff;
       white-space: nowrap;
-      font-size: 1.5rem;
+      /* 5.6vw keeps the badge inside the mast padding at ~390px.
+         The cap is the same 1.5rem phone size as before. */
+      font-size: clamp(1.25rem, 5.6vw, 1.5rem);
     }
     @media (min-width: 640px) {
       .studio-brand h1 { font-size: 1.8rem; }
@@ -939,8 +954,10 @@
     <div class="studio-mast">
       <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap">← Back to Classroom</a>
       <div class="studio-brand">
-        <span class="studio-school">SKHHCSS</span>
-        <h1>Class Activity Studio</h1>
+        <div class="studio-title">
+          <span class="studio-school">SKHHCSS</span>
+          <h1>Class Activity Studio</h1>
+        </div>
       </div>
     </div>
     <div class="max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
