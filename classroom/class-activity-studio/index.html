@@ -3464,7 +3464,8 @@
       function renderDeskGroupLabel(st, cls) {
         const grp = st ? getGroupById(cls, st.groupId) : null;
         const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
-        const shown = (!grp || !pal) ? 'No Group' : ((grp.icon ? grp.icon + ' ' : '') + grp.name);
+        // Unassigned is a blank slot. The menu still offers No Group so a teacher can clear a team.
+        const shown = (!grp || !pal) ? '' : ((grp.icon ? grp.icon + ' ' : '') + grp.name);
         const nameHtml = '<span class="group-name-label">' + escapeHtml(shown) + '</span>';
         // Edit Off keeps the group-name chip as text. It is not a menu.
         if (!boardEditsAllowed()) {
