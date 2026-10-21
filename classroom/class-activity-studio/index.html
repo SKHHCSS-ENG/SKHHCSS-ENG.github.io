@@ -399,15 +399,18 @@
       text-align: center;
     }
     /* The tab stays on the right edge of the classroom frame, at the
-       vertical middle. Panels open: ▶ tucks them. Panels tucked: ◀
-       brings them back. Width stays the slim tab. Height stays a 44px
-       touch target. The same width is reserved past the page padding
-       so the tab sits beside the cards. The slot does not move when
-       the panels tuck or return. */
-    .side-panels-tab {
+       vertical middle of the viewport. Panels open: ▶ tucks them.
+       Panels tucked: ◀ brings them back. Width stays the slim tab.
+       Height stays a 44px touch target. The same width is reserved
+       past the page padding so the tab sits beside the cards. The slot
+       does not move when the panels tuck or return.
+       Centre with top, not a bottom length. bottom: auto cancels any
+       lower-edge offset. The id beats a later single-class utility. */
+    #btnToggleSidePanels.side-panels-tab {
       position: fixed;
       z-index: 36;
       top: 50%;
+      bottom: auto;
       right: max(0px, calc((100vw - 1600px) / 2));
       transform: translateY(-50%);
       box-sizing: border-box;
