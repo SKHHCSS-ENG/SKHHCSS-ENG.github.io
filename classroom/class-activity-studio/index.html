@@ -1161,6 +1161,16 @@
          and Scores. 26px is a text-xs line (16px) plus py-1 (8px) plus a
          1px border — the Assign Groups / ＋ Desk size, not the 44px targets. */
       --studio-chip-h: 26px;
+      /* Quiet frame. One light stroke, same 8px radius as the chips
+         (rounded-lg). The label stays inside, Title Case, no colon. */
+      border: 1px solid rgba(42, 143, 173, 0.4);
+      border-radius: 0.5rem;
+      padding: 2px 5px;
+    }
+    @media (min-width: 640px) {
+      .studio-band {
+        padding: 3px 7px;
+      }
     }
     .studio-band button {
       box-sizing: border-box;
