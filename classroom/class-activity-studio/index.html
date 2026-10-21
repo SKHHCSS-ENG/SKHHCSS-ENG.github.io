@@ -28,7 +28,8 @@
       user-select: text;
       -webkit-user-select: text;
       width: 3.25rem;
-      min-height: 44px;
+      height: 40px;
+      min-height: 40px;
       padding: 0 2px;
       border-radius: 10px;
       background: #fff;
@@ -37,87 +38,130 @@
       font-size: 16px;
       font-weight: 700;
       color: #334155;
+      box-sizing: border-box;
     }
     #zoomReadout:focus {
       outline: none;
       border-color: #818cf8;
       box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.45);
     }
-    /* Floating Zoom on the seating canvas. Bottom-left stays clear of the
-       site Tools dock, which is fixed to the window's bottom-right. */
+    /* Resting Zoom sits in the gutter under the floor, not on the desks.
+       Collapsed it is one 40px Tools-style pill. Expanded it is − / % / ＋ / Fit
+       on one row, wrapping only if the row cannot fit. The right edge stays
+       clear of the site Tools dock (fixed window bottom-right). Drag still
+       lifts the chip onto the board. */
+    .zoom-slot {
+      flex: none;
+      height: 56px;
+      pointer-events: none;
+    }
     .zoom-chip {
       position: absolute;
       z-index: 40;
       left: 8px;
       bottom: 8px;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 4px;
+      width: max-content;
       max-width: calc(100% - 72px);
-      padding: 4px 6px 4px 8px;
-      border-radius: 14px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      touch-action: none;
+    }
+    .zoom-chip.is-open {
+      padding: 4px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.96);
       border: 1px solid rgba(203, 213, 225, 0.95);
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
     }
-    .zoom-chip-handle {
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      min-width: 44px;
-      min-height: 44px;
-      margin: 0;
-      padding: 0 6px 0 2px;
-      border: 0;
-      border-radius: 10px;
-      background: transparent;
-      color: #64748b;
-      cursor: grab;
-      touch-action: none;
-    }
-    .zoom-chip-handle:hover,
-    .zoom-chip-handle:focus-visible {
-      background: #f1f5f9;
-      outline: none;
-    }
-    .zoom-chip-grip {
-      width: 10px;
-      height: 16px;
-      background: radial-gradient(circle, currentColor 1.25px, transparent 1.45px) 0 0 / 5px 5.4px;
-    }
-    .zoom-chip.is-dragging .zoom-chip-handle,
-    .zoom-chip.is-dragging {
+    .zoom-chip.is-dragging,
+    .zoom-chip.is-dragging .zoom-chip-fold {
       cursor: grabbing;
     }
     .zoom-chip.is-dragging {
       box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
     }
-    .zoom-chip-label {
-      flex-shrink: 0;
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
+    .zoom-chip-fold {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      margin: 0;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1.5px solid #5bbad5;
+      background: #fff;
+      color: #0c5a70;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+      cursor: pointer;
+      touch-action: none;
+      -webkit-user-select: none;
       user-select: none;
+    }
+    .zoom-chip.is-collapsed .zoom-chip-fold {
+      box-shadow: 0 4px 14px rgba(18, 58, 77, 0.18);
+    }
+    .zoom-chip-fold:hover {
+      background: #e8f7fb;
+    }
+    .zoom-chip-fold:focus-visible,
+    .zoom-chip-btn:focus-visible,
+    .zoom-chip-fit:focus-visible {
+      outline: 3px solid #123a4d;
+      outline-offset: 2px;
+    }
+    .zoom-chip-tools {
+      display: flex;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .zoom-chip-tools[hidden] {
+      display: none !important;
+    }
+    .zoom-chip-btn,
+    .zoom-chip-fit,
+    .zoom-chip-pct {
+      flex: 0 0 auto;
     }
     .zoom-chip-btn,
     .zoom-chip-fit {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
+      box-sizing: border-box;
+      min-width: 40px;
+      min-height: 40px;
+      height: 40px;
       border-radius: 10px;
       background: #fff;
       border: 1px solid #e2e8f0;
       color: #334155;
       font-weight: 700;
       touch-action: none;
+      cursor: pointer;
     }
     .zoom-chip-btn {
-      min-width: 44px;
       font-size: 16px;
       line-height: 1;
+      padding: 0;
     }
     .zoom-chip-fit {
       padding: 0 12px;
@@ -132,7 +176,8 @@
       display: inline-flex;
       align-items: center;
       gap: 2px;
-      min-height: 44px;
+      min-height: 40px;
+      cursor: pointer;
     }
     .zoom-chip-pct span {
       font-size: 12px;
@@ -146,9 +191,10 @@
         bottom: 10px;
       }
     }
-    /* Extra scroll room so the last row can move clear of the floating Zoom chip. */
+    /* Small end padding. The Zoom chip rests in the gutter below the floor,
+       so the last desk row does not need a tall clearance band. */
     #classroomStage {
-      margin-bottom: 72px;
+      margin-bottom: 16px;
     }
     /* Front-of-room label only. No smartboard graphic and no teacher's desk.
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
@@ -1230,19 +1276,20 @@
             <div id="desksContainer" class="absolute inset-0"></div>
           </div>
         </div>
-        <!-- Bottom-left of the board viewport. The site Tools dock owns bottom-right. -->
-        <div id="zoomChip" class="zoom-chip" role="group" aria-label="Zoom">
-          <button type="button" class="zoom-chip-handle" aria-label="Move zoom controls" title="Drag to move the zoom controls">
-            <span class="zoom-chip-grip" aria-hidden="true"></span>
-            <span class="zoom-chip-label">Zoom</span>
-          </button>
-          <button id="btnZoomOut" type="button" class="zoom-chip-btn" aria-label="Zoom out">−</button>
-          <label class="zoom-chip-pct">
-            <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" />
-            <span aria-hidden="true">%</span>
-          </label>
-          <button id="btnZoomIn" type="button" class="zoom-chip-btn" aria-label="Zoom in">＋</button>
-          <button id="btnZoomReset" type="button" class="zoom-chip-fit" title="Fit the floor plan to the window">Fit</button>
+        <!-- Gutter under the floor. The chip rests here so it does not cover desks.
+             Drag can still move it. The right side stays clear of the Tools dock. -->
+        <div id="zoomSlot" class="zoom-slot" aria-hidden="true"></div>
+        <div id="zoomChip" class="zoom-chip is-collapsed" role="group" aria-label="Zoom">
+          <button type="button" id="btnZoomFold" class="zoom-chip-fold" aria-expanded="false" aria-controls="zoomChipTools" aria-label="Expand Zoom">Zoom</button>
+          <div id="zoomChipTools" class="zoom-chip-tools" hidden>
+            <button id="btnZoomOut" type="button" class="zoom-chip-btn" aria-label="Zoom out">−</button>
+            <label class="zoom-chip-pct">
+              <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" />
+              <span aria-hidden="true">%</span>
+            </label>
+            <button id="btnZoomIn" type="button" class="zoom-chip-btn" aria-label="Zoom in">＋</button>
+            <button id="btnZoomReset" type="button" class="zoom-chip-fit" title="Fit the floor plan to the window">Fit</button>
+          </div>
         </div>
       </section>
     </div>
@@ -2189,6 +2236,7 @@
         soundEnabled: true,
         zoomChipLeft: null,
         zoomChipTop: null,
+        zoomChipOpen: false,
         brushMode: false,
         editMode: true, // persisted; default on. Off is teach mode: no rename, delete, desk drag, or layout tools.
         editingStudentId: '',
@@ -2257,6 +2305,7 @@
               // Missing flag stays on. Explicit false is teach mode (no rename, delete, drag, or layout tools).
               // Older saves may still carry layoutLocked; Edit Off replaced that control, so it is ignored.
               state.editMode = parsed.editMode !== false;
+              state.zoomChipOpen = parsed.zoomChipOpen === true;
               readZoomChipPref(parsed);
               var pitchMigrated = false;
               state.classes.forEach(function (c) {
@@ -2284,6 +2333,7 @@
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
             editMode: state.editMode !== false,
+            zoomChipOpen: state.zoomChipOpen === true,
             layoutPitchVersion: LAYOUT_PITCH_VERSION
           };
           if (hasSavedZoomChip()) {
@@ -5217,6 +5267,40 @@
         placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
       }
 
+      // Collapsed: one "Zoom" pill. Expanded: − / % / ＋ / Fit.
+      // The gutter under the floor grows with the bar so desks stay clear.
+      function setZoomChipOpen(open) {
+        state.zoomChipOpen = open === true;
+        const chip = document.getElementById('zoomChip');
+        const tools = document.getElementById('zoomChipTools');
+        const fold = document.getElementById('btnZoomFold');
+        if (!chip || !fold) return;
+        chip.classList.toggle('is-collapsed', !state.zoomChipOpen);
+        chip.classList.toggle('is-open', state.zoomChipOpen);
+        if (tools) {
+          if (state.zoomChipOpen) tools.removeAttribute('hidden');
+          else tools.setAttribute('hidden', '');
+        }
+        fold.setAttribute('aria-expanded', state.zoomChipOpen ? 'true' : 'false');
+        fold.setAttribute('aria-label', state.zoomChipOpen ? 'Collapse Zoom' : 'Expand Zoom');
+        fold.title = state.zoomChipOpen ? 'Collapse Zoom' : 'Expand Zoom';
+      }
+
+      function syncZoomSlot() {
+        if (zoomChipDrag) return;
+        const chip = document.getElementById('zoomChip');
+        const slot = document.getElementById('zoomSlot');
+        if (!chip || !slot) return;
+        const h = Math.max(56, chip.offsetHeight + 16);
+        slot.style.height = h + 'px';
+      }
+
+      function refreshZoomChipFrame() {
+        syncZoomSlot();
+        if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
+        syncZoomSlot();
+      }
+
       function currentZoomChipOffset(chip) {
         const box = zoomChipBoardBox(chip);
         const rect = chip.getBoundingClientRect();
@@ -5280,8 +5364,7 @@
           e.stopPropagation();
         }, true);
         window.addEventListener('resize', function () {
-          if (!hasSavedZoomChip()) return;
-          placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
+          refreshZoomChipFrame();
         });
       }
 
@@ -5378,7 +5461,17 @@
 
         document.getElementById('btnFlipRoom').addEventListener('click', flipClassroomOrientation);
 
-        // Zoom Controls (− / typed % / ＋ / Fit). Typed percent commits on Enter or blur.
+        // Zoom: collapsed "Zoom" pill, or − / typed % / ＋ / Fit. Typed percent commits on Enter or blur.
+        const btnZoomFold = document.getElementById('btnZoomFold');
+        if (btnZoomFold) {
+          btnZoomFold.addEventListener('click', function () {
+            const chip = document.getElementById('zoomChip');
+            if (chip && chip.dataset.suppressClick === '1') return;
+            setZoomChipOpen(!state.zoomChipOpen);
+            refreshZoomChipFrame();
+            saveState();
+          });
+        }
         document.getElementById('btnZoomIn').addEventListener('click', function () {
           state.zoom = clampZoom(state.zoom + 0.1);
           renderClassroomCanvas(false);
@@ -6021,7 +6114,8 @@
         bindAllEvents();
         renderTimerUI();
         renderAll();
-        applySavedZoomChip();
+        setZoomChipOpen(state.zoomChipOpen);
+        refreshZoomChipFrame();
       });
     })();
   </script>
