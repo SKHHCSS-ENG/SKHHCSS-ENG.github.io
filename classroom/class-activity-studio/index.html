@@ -281,27 +281,27 @@
          right-hand score buttons. */
       scrollbar-gutter: stable;
     }
-    /* The scoreboard floats on the floor. Open or closed, it does not
-       change the desk viewport height. Team cards scroll inside the dock. */
+    /* The scoreboard sits above the desk canvas, in the card column.
+       It must not paint over desk numbers or names. Collapsed it is one
+       slim bar so the floor keeps the rest of the card. Open, the team
+       cards scroll inside a capped dock and the desks keep the space below. */
     .group-score-dock {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 6;
-      flex: none;
+      position: relative;
+      flex: 0 0 auto;
+      width: 100%;
       background: #fff;
       border-bottom: 1px solid #e2e8f0;
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
       padding: 0.4rem 0.75rem 0.45rem;
     }
-    /* :not(.hidden) so this does not beat Tailwind .hidden in Individual Work. */
+    /* :not(.hidden) so this does not beat Tailwind .hidden in Individual Work.
+       The dock keeps its own height. It does not shrink to uncover the floor
+       by sliding over the desks. */
     #groupScoreDock.is-open:not(.hidden) {
-      max-height: 11.5rem;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      flex: 0 0 auto;
+      display: block;
+      overflow: visible;
     }
     /* Heading and Show/Hide sit together in the middle of the bar. */
     .group-score-dock-bar {
@@ -333,11 +333,15 @@
       display: none;
     }
     #groupScoreDock.is-open #groupDockCards {
-      flex: 1 1 auto;
-      min-height: 0;
-      max-height: none;
+      flex: none;
+      max-height: 8.75rem;
       overflow: auto;
       margin-top: 0.5rem;
+    }
+    @media (max-width: 1023px) {
+      #groupScoreDock.is-open #groupDockCards {
+        max-height: 7.25rem;
+      }
     }
     #studioFloorSection.has-dock #classroomViewport {
       border-top-left-radius: 0;
@@ -1474,7 +1478,7 @@
 
       <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
       <section id="studioFloorSection" class="studio-floor-section relative rounded-2xl shadow-sm border border-slate-200/90 flex flex-col min-h-0">
-        <!-- Team scoreboard floats on the floor. Opening it does not shrink the desks. -->
+        <!-- Team scoreboard sits above the desks. It does not cover the cards. -->
         <section id="groupScoreDock" class="group-score-dock is-collapsed hidden">
           <div class="group-score-dock-bar">
             <h2 class="font-display font-bold text-slate-800 text-sm">Team Scoreboard</h2>
@@ -5564,9 +5568,9 @@
       }
 
       // Desktop: the floor card and the leaderboard flex to the same column.
-      // The dotted canvas fills that card to the bottom edge. A pixel height
-      // would pin it short, so inline sizes are cleared. Individual and Group
-      // use this same rule. The zoom pill floats on the canvas.
+      // The dotted canvas fills the card below the scoreboard. A pixel height
+      // would pin it short, so inline sizes are cleared. Individual Work has
+      // no scoreboard, so that floor is the full card. The zoom pill floats.
       // Narrow screens: the card fills the first screen. The leaderboard follows.
       function fitFloorAboveZoomGutter() {
         if (zoomChipDrag) return;
@@ -5580,17 +5584,30 @@
           lb.style.height = '';
           lb.style.maxHeight = '';
         }
+        const dock = document.getElementById('groupScoreDock');
+        if (dock) dock.style.maxHeight = '';
         if (desktopFloorFill()) {
           floor.style.height = '';
           return;
         }
-        const minH = 140;
+        const minH = 168;
         const limit = window.innerHeight - 1;
         const border = section.offsetHeight - section.clientHeight;
         const top = section.getBoundingClientRect().top;
-        // The scoreboard is absolute and the zoom slot is 0, so the floor
-        // fills the card the same way in Individual and Group Work.
-        let floorH = Math.floor(limit - top - border);
+        const available = Math.floor(limit - top - border);
+        // The dock is in the card column, above the canvas. The zoom slot
+        // stays at 0. Individual Work has no dock, so its floor is unchanged.
+        let dockH = (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
+        let floorH = available - dockH;
+        // Only tighten the dock. A larger inline max-height would undo the CSS cap.
+        if (dock && dockH > 0 && floorH < minH) {
+          const cap = Math.max(40, available - minH);
+          if (cap < dockH) {
+            dock.style.maxHeight = cap + 'px';
+            dockH = dock.offsetHeight;
+            floorH = available - dockH;
+          }
+        }
         floor.style.height = Math.max(minH, floorH) + 'px';
         const overflow = section.getBoundingClientRect().bottom - limit;
         if (overflow > 1) {
