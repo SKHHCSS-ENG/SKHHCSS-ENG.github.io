@@ -12,7 +12,7 @@
     :root {
       --font-display: 'Fredoka', 'Inter', sans-serif;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      /* Chevron only. 44px was the vertical Show/Hide word. */
+      /* Triangle only. 44px was the vertical Show/Hide word. */
       --side-panels-tab-w: 22px;
     }
     body {
@@ -399,8 +399,8 @@
       text-align: center;
     }
     /* The tab stays on the right edge of the classroom frame. Panels open:
-       > tucks them. Panels tucked: < brings them back. Width is only the
-       chevron. Height stays a 44px touch target. The same width is reserved
+       ▶ tucks them. Panels tucked: ◀ brings them back. Width stays the slim
+       tab. Height stays a 44px touch target. The same width is reserved
        past the page padding so the tab sits beside the cards. */
     .side-panels-tab {
       position: fixed;
@@ -1843,7 +1843,7 @@
         </div>
       </div>
     </aside>
-    <button type="button" id="btnToggleSidePanels" class="side-panels-tab" aria-expanded="true" aria-controls="studioSideCol" aria-label="Hide"><span class="side-panels-mark" aria-hidden="true">&gt;</span></button>
+    <button type="button" id="btnToggleSidePanels" class="side-panels-tab" aria-expanded="true" aria-controls="studioSideCol" aria-label="Hide"><span class="side-panels-mark" aria-hidden="true">▶</span></button>
   </main>
 
   <!-- ===================================================================== -->
@@ -4207,7 +4207,7 @@
         if (floorCol) floorCol.classList.toggle('is-wide', !open);
         if (btn) {
           const mark = btn.querySelector('.side-panels-mark');
-          if (mark) mark.textContent = open ? '>' : '<';
+          if (mark) mark.textContent = open ? '▶' : '◀';
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
           btn.setAttribute('aria-label', open ? 'Hide' : 'Show');
         }
