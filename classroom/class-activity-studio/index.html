@@ -298,12 +298,15 @@
     /* :not(.hidden) so this does not beat Tailwind .hidden in Individual Work.
        The dock keeps its own height. It does not shrink to uncover the floor
        by sliding over the desks. */
-    /* Clip at the dock edge. Team cards must not paint onto the desks. */
+    /* Hard clip. overflow:clip was still letting wrapped cards paint onto
+       the desks. Hidden on the dock and on the cards box stops that. */
     #groupScoreDock.is-open:not(.hidden) {
       flex: 0 0 auto;
       display: flex;
       flex-direction: column;
-      overflow: clip;
+      overflow: hidden;
+      contain: paint;
+      max-height: 13rem;
     }
     /* Title stays centred on the dock. Show/Hide sits on the right. */
     .group-score-dock-bar {
@@ -331,6 +334,12 @@
     #groupDockCards {
       min-width: 0;
     }
+    .group-dock-scroll {
+      max-height: 8.75rem;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
     .group-dock-cards-row {
       display: flex;
       flex-wrap: wrap;
@@ -353,15 +362,19 @@
     }
     #groupScoreDock.is-open #groupDockCards {
       display: block;
-      flex: none;
+      flex: 0 1 auto;
+      align-self: stretch;
       min-height: 0;
       max-height: 8.75rem;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden;
       margin-top: 0.5rem;
     }
     @media (max-width: 1023px) {
-      #groupScoreDock.is-open #groupDockCards {
+      #groupScoreDock.is-open:not(.hidden) {
+        max-height: 11rem;
+      }
+      #groupScoreDock.is-open #groupDockCards,
+      .group-dock-scroll {
         max-height: 7.25rem;
       }
     }
@@ -4193,13 +4206,13 @@
         dock.classList.remove('hidden');
 
         if (cls.groups.length === 0) {
-          container.innerHTML = '<div class="group-dock-cards-row"><div class="col-span-full text-center py-4 text-xs text-slate-500">No groups configured yet. Click "Manage Groups" to add groups!</div></div>';
+          container.innerHTML = '<div class="group-dock-scroll"><div class="group-dock-cards-row"><div class="col-span-full text-center py-4 text-xs text-slate-500">No groups configured yet. Click "Manage Groups" to add groups!</div></div></div>';
           scheduleFloorFit();
           return;
         }
 
         nameEditLock = true;
-        container.innerHTML = '<div class="group-dock-cards-row">' + cls.groups.map(function (grp) {
+        container.innerHTML = '<div class="group-dock-scroll"><div class="group-dock-cards-row">' + cls.groups.map(function (grp) {
           const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
           const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
           const editing = boardEditsAllowed();
@@ -4223,7 +4236,7 @@
               '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Give +1 to this team and each member">+</button>' +
             '</div>' +
           '</div>';
-        }).join('') + '</div>';
+        }).join('') + '</div></div>';
         nameEditLock = false;
         scheduleFloorFit();
       }
