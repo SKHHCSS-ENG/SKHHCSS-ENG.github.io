@@ -626,6 +626,56 @@
         min-height: 44px;
       }
     }
+    /* Group-name row. Edit On: this chip is the team menu. Edit Off: the same chip, not a control. */
+    .desk-team-row {
+      min-width: 0;
+    }
+    .desk-team-static,
+    .desk-team-select {
+      box-sizing: border-box;
+      max-width: 100%;
+      min-width: 0;
+      height: 18px;
+      margin: 0;
+      padding: 0 6px;
+      border: 0;
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .desk-team-static {
+      display: block;
+      flex: 0 1 auto;
+      cursor: default;
+    }
+    .desk-team-select {
+      display: block;
+      flex: 1 1 0;
+      width: 0;
+      padding-right: 14px;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3E%3Cpath fill='%23475569' d='M1 1.2l3 3 3-3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 4px center;
+      background-size: 8px 6px;
+    }
+    .desk-team-select.is-none {
+      background-color: #f1f5f9;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .desk-team-select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+    }
     .desk-card {
       position: absolute;
       width: 148px;
@@ -832,8 +882,7 @@
       line-height: 1;
       font-size: 12px;
     }
-    /* Icon-only Lock, Undo, and Redo stay square at that same height. */
-    #btnToggleLockLayout,
+    /* Icon-only Undo and Redo stay square at that same height. */
     #btnUndoLayout,
     #btnRedoLayout {
       width: var(--studio-chip-h);
@@ -870,22 +919,15 @@
       padding-top: 0;
       padding-bottom: 0;
     }
-    /* Lock and History wrap as one unit. The full Seating band is too wide
-       for History to sit beside it at a typical ~1280px window, so this group
-       drops to the next row together and the wider Lock → History gap stays
-       visible. column-gap matches the toolbar's gap-x-3 (12px); the 1rem
-       margin stacks on top of it (~28px), wider than the chip gap (gap-1.5
-       is 6px, sm:gap-2 is 8px) and wider than the join between other bands. */
-    .studio-lock-history {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      max-width: 100%;
-      column-gap: 0.75rem;
-      row-gap: 0.5rem;
-    }
-    .studio-history-gap {
-      margin-left: 1rem;
+    /* Edit Off is teach mode: seating layout tools stay in place but do not fire.
+       The band label stays full strength so the row still reads Register · Seating · History · Scores. */
+    #studioSeatingBand.is-teach-frozen .studio-grid-setup,
+    #studioSeatingBand.is-teach-frozen .layout-preset-btn,
+    #studioSeatingBand.is-teach-frozen #btnToggleSnapGrid,
+    #studioSeatingBand.is-teach-frozen #btnFlipRoom,
+    #btnClusterAfterBrush:disabled {
+      opacity: 0.4;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -1016,7 +1058,7 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right). Lock travels with History so the wider Lock → History gap stays on one row. -->
+  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right). -->
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
@@ -1040,15 +1082,15 @@
           <span>＋ Desk</span>
         </button>
 
-        <!-- Edit: gate for name, seat number, team rename, and delete. On by default. -->
+        <!-- Edit: ON edits names, seat #, team names, delete, desk drag, and layout tools. OFF is teach mode. -->
         <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit On" aria-pressed="true">
           <span class="edit-switch-name">Edit</span>
           <span class="edit-switch-value" aria-hidden="true">ON</span>
         </button>
       </div>
 
-      <!-- Seating: grid, presets, Snap, Front. Lock wraps with History below. -->
-      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+      <!-- Seating: grid, presets, Snap, Front. Edit Off freezes these with desk drag. -->
+      <div id="studioSeatingBand" class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Seating</span>
         <!-- Custom Rows x Columns Grid Quick Setup -->
         <div class="studio-grid-setup inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 shadow-2xs" title="Custom Rows × Columns Quick Grid Setup">
@@ -1080,27 +1122,21 @@
         </button>
       </div>
 
-      <!-- Lock + History wrap together. studio-band keeps the 26px chip height on Lock. -->
-      <div class="studio-band studio-lock-history">
-        <button id="btnToggleLockLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition" title="Lock Layout — freeze desk drag" aria-label="Lock Layout" aria-pressed="false">
-          <span id="lockLayoutIcon" aria-hidden="true">🔓</span>
+      <!-- History sits in the same left-to-right flow as the other bands. -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">History</span>
+        <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo" aria-label="Undo">
+          <span aria-hidden="true">↩️</span>
         </button>
-
-        <div class="studio-band studio-history-gap flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-          <span class="studio-band-label">History</span>
-          <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo" aria-label="Undo">
-            <span aria-hidden="true">↩️</span>
-          </button>
-          <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
-            <span aria-hidden="true">↪️</span>
-          </button>
-          <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save this class’s current seating and team grouping as the default. Scores stay as they are." aria-label="Set as Default">
-            Set as Default
-          </button>
-          <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Reset Layout" aria-label="Reset Layout">
-            🔄 Layout
-          </button>
-        </div>
+        <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
+          <span aria-hidden="true">↪️</span>
+        </button>
+        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save Layout" aria-label="Save Layout">
+          Save Layout
+        </button>
+        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Restore Layout" aria-label="Restore Layout">
+          Restore Layout
+        </button>
       </div>
 
       <!-- Scores follows History in the same left-to-right flow. -->
@@ -1608,7 +1644,7 @@
       // Bump when desk size or step formula changes. Factory Quick Layout
       // buttons (Exam Rows, Paired Desks, 4-Desk Pods, Cluster by Group, Apply
       // Grid) always emit this pitch. Untouched factory seats reseed with it.
-      // Saved boards (Set as Default), dragged seats, and Reset Layout on a
+      // Saved boards (Save Layout), dragged seats, and Restore Layout on a
       // class whose saved default was captured before this pitch keep the old
       // positions until the teacher reseeds with a Quick Layout button.
       const LAYOUT_PITCH_VERSION = 'desk-148x115-groupLr-8within-36aisle';
@@ -2128,14 +2164,13 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
-        layoutLocked: false, // persisted; default unlocked. Freezes desk drag only.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
         zoomChipLeft: null,
         zoomChipTop: null,
         brushMode: false,
-        editMode: true, // persisted; default on. Independent of Lock.
+        editMode: true, // persisted; default on. Off is teach mode: no rename, delete, desk drag, or layout tools.
         editingStudentId: '',
         editingClassNoId: '',
         editingGroupId: '',
@@ -2199,9 +2234,8 @@
               state.activityMode = parsed.activityMode || 'individual';
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
-              // Absent or false keeps names, seat numbers, group names, and desk drag editable.
-              state.layoutLocked = parsed.layoutLocked === true;
-              // Missing flag stays on: taps already rename today. Explicit false turns Edit off.
+              // Missing flag stays on. Explicit false is teach mode (no rename, delete, drag, or layout tools).
+              // Older saves may still carry layoutLocked; Edit Off replaced that control, so it is ignored.
               state.editMode = parsed.editMode !== false;
               readZoomChipPref(parsed);
               var pitchMigrated = false;
@@ -2229,7 +2263,6 @@
             activityMode: state.activityMode,
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
-            layoutLocked: state.layoutLocked === true,
             editMode: state.editMode !== false,
             layoutPitchVersion: LAYOUT_PITCH_VERSION
           };
@@ -2243,19 +2276,33 @@
         }
       }
 
-      // Edit gates name, seat #, and team rename. Lock only freezes desk drag.
+      // Edit On: names, seat #, team names, delete, desk drag, and layout tools.
+      // Edit Off is teach mode. Score ±1 stays available either way.
       function boardEditsAllowed() {
         return state.editMode !== false;
       }
 
-      function syncDeskDragCursor() {
-        var cards = document.querySelectorAll('.desk-card');
-        for (var i = 0; i < cards.length; i++) {
-          cards[i].classList.remove('cursor-grab', 'cursor-default', 'cursor-pointer');
-          if (state.brushMode) cards[i].classList.add('cursor-pointer');
-          else if (state.layoutLocked) cards[i].classList.add('cursor-default');
-          else cards[i].classList.add('cursor-grab');
-        }
+      function setControlFrozen(el, frozen) {
+        if (!el) return;
+        el.disabled = frozen;
+        if (frozen) el.setAttribute('aria-disabled', 'true');
+        else el.removeAttribute('aria-disabled');
+      }
+
+      // Grey Snap, Front, presets, and the grid while Edit is off. History stays live.
+      function syncLayoutToolGate() {
+        var frozen = !boardEditsAllowed();
+        var seating = document.getElementById('studioSeatingBand');
+        if (seating) seating.classList.toggle('is-teach-frozen', frozen);
+        setControlFrozen(document.getElementById('btnApplyCustomGrid'), frozen);
+        setControlFrozen(document.getElementById('btnToggleSnapGrid'), frozen);
+        setControlFrozen(document.getElementById('btnFlipRoom'), frozen);
+        setControlFrozen(document.getElementById('quickRowsInput'), frozen);
+        setControlFrozen(document.getElementById('quickColsInput'), frozen);
+        setControlFrozen(document.getElementById('btnClusterAfterBrush'), frozen);
+        document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
+          setControlFrozen(btn, frozen);
+        });
       }
 
       function getCurrentClass() {
@@ -2372,7 +2419,7 @@
       }
 
       // Blank or oversized team names fall back to the previous name. The live
-      // group record is what localStorage, Set as Default, and Reset already use.
+      // group record is what localStorage, Save Layout, and Restore Layout already use.
       function normaliseGroupName(rawText, previous) {
         var prev = String(previous == null ? '' : previous);
         var next = String(rawText == null ? '' : rawText).replace(/\s+/g, ' ').trim();
@@ -2552,14 +2599,54 @@
         return true;
       }
 
-      function renderDeskGroupLabel(grp, pal) {
-        // data-desk-team-badge: read-only chip. Pointer on it must not start a desk drag.
-        if (!grp || !pal) {
-          return '<span data-desk-team-badge="1" class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-400 cursor-default">No Team</span>';
+      function assignDeskTeam(studentId, groupId) {
+        if (!boardEditsAllowed()) return false;
+        const cls = getCurrentClass();
+        if (!cls || !studentId) return false;
+        const st = cls.students.find(function (s) { return s.id === studentId; });
+        if (!st) return false;
+        var next = groupId || '';
+        if (next && !getGroupById(cls, next)) next = '';
+        if ((st.groupId || '') === next) return false;
+        const before = snapshotBoardEdit(cls);
+        st.groupId = next;
+        const grp = getGroupById(cls, next);
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Set team to ' + (grp ? grp.name : 'No Team'));
+        saveState();
+        renderGroupBrushBar();
+        renderGroupScoreDock();
+        renderClassroomCanvas(false);
+        renderLeaderboardAndStats();
+        renderIfModalOpen();
+        showToast(grp ? grp.name : 'No Team', '🛡️');
+        return true;
+      }
+
+      function renderDeskGroupLabel(st, cls) {
+        const grp = st ? getGroupById(cls, st.groupId) : null;
+        const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
+        // Edit Off keeps the group-name chip as text. It is not a menu.
+        if (!boardEditsAllowed()) {
+          if (!grp || !pal) {
+            return '<span data-desk-team-badge="1" class="desk-team-static bg-slate-100 text-slate-400 font-semibold">No Team</span>';
+          }
+          return '<span data-desk-team-badge="1" class="desk-team-static ' + pal.badgeBg + ' ' + pal.text + '">' +
+            escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
+            '</span>';
         }
-        return '<span data-desk-team-badge="1" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold cursor-default ' + pal.badgeBg + ' ' + pal.text + ' max-w-[88px] truncate" title="' + escapeHtml(grp.name) + '">' +
-          escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
-          '</span>';
+        // Edit On: the group-name row itself is the menu. The closed face is the current team.
+        var matched = false;
+        var options = (cls.groups || []).map(function (g) {
+          var selected = st.groupId === g.id;
+          if (selected) matched = true;
+          return '<option value="' + escapeHtml(g.id) + '"' + (selected ? ' selected' : '') + '>' +
+            escapeHtml((g.icon ? g.icon + ' ' : '') + g.name) + '</option>';
+        }).join('');
+        options = '<option value=""' + (matched ? '' : ' selected') + '>No Team</option>' + options;
+        var tone = (!grp || !pal) ? 'desk-team-select is-none' : ('desk-team-select ' + pal.badgeBg + ' ' + pal.text);
+        return '<select data-desk-team-badge="1" data-desk-team-select="' + escapeHtml(st.id) + '" class="' + tone + '" aria-label="Choose Team">' +
+          options +
+          '</select>';
       }
 
       function renderDockGroupNameControl(grp) {
@@ -2989,7 +3076,7 @@
         return reseeds;
       }
 
-      // Drop leavers from the saved membership list; newcomers keep the team they have now until Set as Default.
+      // Drop leavers from the saved membership list; newcomers keep the team they have now until Save Layout.
       function syncDefaultGroupAssignments(cls) {
         var snap = cls && cls.defaultGroupSnapshot;
         if (!snap || !Array.isArray(snap.assignments)) return;
@@ -3196,7 +3283,7 @@
         cls.customDefaultSaved = true;
         cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
         saveState();
-        showToast('Default seating & grouping saved', '📌');
+        showToast('Layout saved. Scores stay as they are.', '📌');
       }
 
       // Restore saved team names, icons, colours, order, and membership. Live scores stay on matching group ids.
@@ -3244,7 +3331,7 @@
         (cls.defaultPositions || []).forEach(function (p) { locked[p.id] = true; });
         ensureNoOverlapsProtecting(cls.students, locked);
         const groupingRestored = applyDefaultGrouping(cls);
-        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Reset to saved default seating');
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Restore Layout');
         saveState();
         renderHeaderControls();
         renderGroupBrushBar();
@@ -3257,8 +3344,8 @@
         }
         showToast(
           groupingRestored
-            ? 'Seating and grouping restored to the saved default (scores kept)'
-            : 'Seating restored to the saved default (scores kept)',
+            ? 'Layout restored. Scores kept.'
+            : 'Seating restored. Scores kept.',
           '🔃'
         );
       }
@@ -3522,22 +3609,6 @@
           }
         }
 
-        // Lock sits in the Seating band (icon only). Aria is the action; the title is one line.
-        const lockIcon = document.getElementById('lockLayoutIcon');
-        const btnLock = document.getElementById('btnToggleLockLayout');
-        if (lockIcon && btnLock) {
-          const locked = state.layoutLocked === true;
-          lockIcon.textContent = locked ? '🔒' : '🔓';
-          btnLock.title = locked
-            ? 'Unlock Layout — allow desk drag'
-            : 'Lock Layout — freeze desk drag';
-          btnLock.setAttribute('aria-label', locked ? 'Unlock Layout' : 'Lock Layout');
-          btnLock.setAttribute('aria-pressed', locked ? 'true' : 'false');
-          btnLock.className = locked
-            ? 'studio-icon-chip px-0 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-950 text-base font-bold transition'
-            : 'studio-icon-chip px-0 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-base font-bold transition';
-        }
-
         const snapText = document.getElementById('snapGridText');
         const viewport = document.getElementById('classroomViewport');
         if (snapText) snapText.textContent = state.snapToGrid ? 'Snap: ON' : 'Snap: OFF';
@@ -3595,6 +3666,7 @@
           btnEditName.removeAttribute('title');
           if (valueEl) valueEl.textContent = editing ? 'ON' : 'OFF';
         }
+        syncLayoutToolGate();
       }
 
       // Render Manual Group Paint Brush Bar
@@ -3780,7 +3852,7 @@
           const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
           const borderClass = pal ? ('border-2 ' + pal.border) : 'border-2 border-slate-200';
           const topStripClass = pal ? pal.headerBg : 'bg-slate-700';
-          const groupBadgeHtml = renderDeskGroupLabel(grp, pal);
+          const groupBadgeHtml = renderDeskGroupLabel(st, cls);
 
           const scoreVal = Number(st.score) || 0;
           const scoreBadgeClass = scoreVal > 0
@@ -3789,7 +3861,7 @@
 
           const cursorClass = state.brushMode
             ? 'cursor-pointer'
-            : (state.layoutLocked ? 'cursor-default' : 'cursor-grab');
+            : (boardEditsAllowed() ? 'cursor-grab' : 'cursor-default');
 
           const isSpotlight = state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === st.id;
           const editing = boardEditsAllowed();
@@ -3810,11 +3882,11 @@
               '</div>' +
               '<!-- Row 2: Student Name (tap to rename, including Empty) -->' +
               renderDeskNameControl(st) +
-              '<!-- Row 3: Team label (read-only; rename on the scoreboard) -->' +
-              '<div class="flex items-center justify-between mb-0.5 gap-1">' +
+              '<!-- Row 3: Group name. Edit On turns this chip into the team menu. -->' +
+              '<div class="desk-team-row flex items-center justify-between mb-0.5 gap-1">' +
                 groupBadgeHtml +
                 (state.activityMode === 'group' && grp
-                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
+                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
                   : '') +
               '</div>' +
               '<!-- Row 4: Compact − / + ; aria keeps the “one” for screen readers -->' +
@@ -4152,6 +4224,12 @@
           }
         });
 
+        container.addEventListener('change', function (e) {
+          const sel = e.target && e.target.closest ? e.target.closest('[data-desk-team-select]') : null;
+          if (!sel) return;
+          assignDeskTeam(sel.getAttribute('data-desk-team-select'), sel.value);
+        });
+
         container.addEventListener('pointerdown', function (e) {
           if (e.target.closest('[data-desk-delete]')) return;
           const plusBtn = e.target.closest('[data-desk-plus]');
@@ -4173,8 +4251,8 @@
             return;
           }
 
-          // Name and class-number editing must not start a drag, paint a team, or score.
-          if (e.target.closest('[data-desk-rename], [data-desk-name-input], [data-desk-classno], [data-desk-classno-input]')) {
+          // Name, seat number, and the team menu must not start a drag, paint a team, or score.
+          if (e.target.closest('[data-desk-rename], [data-desk-name-input], [data-desk-classno], [data-desk-classno-input], [data-desk-team-select]')) {
             return;
           }
 
@@ -4205,7 +4283,7 @@
             e.stopPropagation();
             return;
           }
-          if (state.layoutLocked) return;
+          if (!boardEditsAllowed()) return;
 
           e.preventDefault();
           try { deskEl.setPointerCapture(e.pointerId); } catch (err) {}
@@ -4291,7 +4369,7 @@
       // Apply a quick layout template ('rows', 'pairs', 'pods4', 'groupClusters') onto the user's customized Rows x Cols grid
       function applyQuickLayout(layoutType) {
         const cls = getCurrentClass();
-        if (!cls) return;
+        if (!cls || !boardEditsAllowed()) return;
         const before = snapshotBoardEdit(cls);
         const grid = syncGridInputsToClass(cls);
         cls.layoutStyle = layoutType;
@@ -4335,7 +4413,7 @@
       // Apply user-specified custom Rows x Columns grid using the active layout style (Exam Rows, Paired Desks, or 4-Desk Pods)
       function applyCustomRowsColsGrid() {
         const cls = getCurrentClass();
-        if (!cls) return;
+        if (!cls || !boardEditsAllowed()) return;
         const before = snapshotBoardEdit(cls);
         const grid = syncGridInputsToClass(cls);
         const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
@@ -4366,7 +4444,7 @@
       // Flip Classroom View Vertically (Front at Top vs Front at Bottom)
       function flipClassroomOrientation() {
         const cls = getCurrentClass();
-        if (!cls) return;
+        if (!cls || !boardEditsAllowed()) return;
         const bounds = getDynamicStageBounds(cls);
         cls.frontAtTop = !cls.frontAtTop;
         cls.students.forEach(function (st) {
@@ -5193,6 +5271,10 @@
           state.editingGroupId = '';
           state.editingGroupAnchor = '';
           state.editingGroupDeskId = '';
+          if (dragContext) {
+            if (dragContext.deskEl) dragContext.deskEl.classList.remove('dragging');
+            dragContext = null;
+          }
           saveState();
           renderHeaderControls();
           renderGroupScoreDock();
@@ -5230,21 +5312,14 @@
         // Layout Preset Buttons
         document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
           btn.addEventListener('click', function () {
+            if (!boardEditsAllowed()) return;
             const layoutType = btn.getAttribute('data-layout');
             applyQuickLayout(layoutType);
           });
         });
 
-        // Lock only freezes desk drag. It does not close name, seat, or team editors.
-        document.getElementById('btnToggleLockLayout').addEventListener('click', function () {
-          state.layoutLocked = !state.layoutLocked;
-          saveState();
-          renderHeaderControls();
-          syncDeskDragCursor();
-          showToast(state.layoutLocked ? 'Desk drag locked' : 'Desk drag unlocked', state.layoutLocked ? '🔒' : '🔓');
-        });
-
         document.getElementById('btnToggleSnapGrid').addEventListener('click', function () {
+          if (!boardEditsAllowed()) return;
           state.snapToGrid = !state.snapToGrid;
           saveState();
           renderHeaderControls();
@@ -5332,10 +5407,10 @@
           rememberStudentDefaultPosition(cls, newSt);
           saveState();
           renderAll();
-          showToast('Added desk #' + newSt.classNo + ' — drag it anywhere!', '🪑');
+          showToast('Added desk #' + newSt.classNo + (boardEditsAllowed() ? ' — drag it anywhere!' : ''), '🪑');
         });
 
-        // History Undo / Redo (layout and edits) / Set as Default / Reset Layout, then All +1 · Reset Scores
+        // History Undo / Redo (layout and edits) / Save Layout / Restore Layout, then All +1 · Reset Scores
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
         });
