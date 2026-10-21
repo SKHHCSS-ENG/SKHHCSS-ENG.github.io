@@ -288,6 +288,49 @@ details.format-section[data-section="skeleton"] > summary {
   border-left-color: var(--accent);
 }
 
+/* Expand All / Collapse All — same pill language as the Tools chips */
+.section-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+.section-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: var(--card);
+  color: var(--accent-ink);
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+  font-size: .95rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.section-toggle-btn:hover {
+  background: var(--accent-soft);
+}
+.section-toggle-btn:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 2px;
+}
+.section-toggle-btn:active {
+  background: var(--accent-on);
+  color: #fff;
+  border-color: #0a5561;
+}
+
 /* Coloured [placeholders] in Skeleton only */
 .skel-slot {
   font-weight: 700;
@@ -1068,6 +1111,7 @@ footer {
 }
 @media print {
   body { background: #fff; padding-bottom: 0; }
+  .section-toggle { display: none !important; }
   .bottom-dock { display: none !important; }
   .hw-canvas { display: none !important; }
   section.block, details.format-section, a.card { box-shadow: none; break-inside: avoid; }
