@@ -382,8 +382,70 @@
       border-top-left-radius: 0;
       border-top-right-radius: 0;
     }
+    /* Live Class Pulse and Live Leaderboard use the Team Scoreboard bar:
+       title centred, Show/Hide on the right. Collapsed is only that bar. */
+    .panel-toggle-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      flex: 0 0 auto;
+      min-height: 26px;
+      padding: 0.4rem 0.75rem;
+    }
+    .panel-toggle-bar h2 {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      margin: 0;
+      text-align: center;
+      pointer-events: none;
+    }
+    .panel-toggle-bar .panel-toggle-btn {
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: end;
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    #pulseCard {
+      flex: 0 0 auto;
+    }
+    #pulseCard h2 {
+      color: #fff;
+    }
+    #pulseBody {
+      padding: 0 0.85rem 0.85rem;
+    }
+    #pulseCard.is-collapsed #pulseBody,
+    #leaderboardCard.is-collapsed #leaderboardPanel {
+      display: none;
+    }
+    #leaderboardCard.is-collapsed {
+      flex: 0 0 auto;
+      min-height: 0;
+    }
+    #leaderboardCard.is-open {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    #leaderboardCard.is-open #leaderboardPanel {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
     #leaderboardBody {
       max-height: 500px;
+    }
+    /* Phones stack the panels under the floor. An open card keeps its own
+       height (the title bar stays). A short screen scrolls the panel body
+       instead of squashing that bar. */
+    @media (max-width: 1023px) {
+      #leaderboardCard.is-open {
+        flex: 0 0 auto;
+      }
+    }
+    #studioSideCol.is-capped {
+      overflow: auto;
+      overscroll-behavior: contain;
     }
     /* Desktop: one fill for both modes. The workspace locks to the viewport,
        the floor card grows through the old empty strip, and the leaderboard
@@ -416,7 +478,7 @@
         min-height: 0;
         height: auto !important;
       }
-      #leaderboardCard {
+      #leaderboardCard.is-open {
         flex: 1 1 auto;
         min-height: 0;
       }
@@ -1612,36 +1674,40 @@
     <!-- RIGHT COLUMN: LIVE LEADERBOARD & SESSION FEED -->
     <aside id="studioSideCol" class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3 min-h-0">
       
-      <!-- Live Summary Metrics Card -->
-      <div class="bg-gradient-to-br from-[#123a4d] via-[#2a8fad] to-[#5bbad5] rounded-2xl p-4 text-white shadow-md">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-200">Live Class Pulse</span>
+      <!-- Live Class Pulse. Title stays centred; Show/Hide sits on the right. -->
+      <div id="pulseCard" class="pulse-card is-open bg-gradient-to-br from-[#123a4d] via-[#2a8fad] to-[#5bbad5] rounded-2xl text-white shadow-md">
+        <div class="panel-toggle-bar">
+          <h2 class="font-display font-bold text-sm">Live Class Pulse</h2>
+          <button type="button" id="btnToggleClassPulse" class="panel-toggle-btn px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition" aria-expanded="true" aria-controls="pulseBody">Hide</button>
         </div>
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
-            <div class="text-[11px] text-indigo-100">Total Points</div>
-            <div id="statTotalPoints" class="font-display text-xl font-bold text-amber-300">0</div>
-          </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
-            <div class="text-[11px] text-indigo-100">Top Student</div>
-            <div id="statTopStudent" class="font-display text-xs font-bold text-white truncate mt-1">—</div>
-          </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
-            <div class="text-[11px] text-indigo-100">Leading Team</div>
-            <div id="statTopGroup" class="font-display text-xs font-bold text-emerald-300 truncate mt-1">—</div>
+        <div id="pulseBody">
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
+              <div class="text-[11px] text-indigo-100">Total Points</div>
+              <div id="statTotalPoints" class="font-display text-xl font-bold text-amber-300">0</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
+              <div class="text-[11px] text-indigo-100">Top Student</div>
+              <div id="statTopStudent" class="font-display text-xs font-bold text-white truncate mt-1">—</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
+              <div class="text-[11px] text-indigo-100">Leading Team</div>
+              <div id="statTopGroup" class="font-display text-xs font-bold text-emerald-300 truncate mt-1">—</div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Live Leaderboard Card -->
-      <div id="leaderboardCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col overflow-hidden min-h-0">
-        <!-- Leaderboard Header & Tabs -->
-        <div class="p-3 border-b border-slate-100 bg-slate-50/70">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-1.5">
-              <span class="text-base">🏆</span>
-              <h2 class="font-display font-bold text-slate-800 text-base">Live Leaderboard</h2>
-            </div>
+      <div id="leaderboardCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col overflow-hidden min-h-0 is-open">
+        <div class="panel-toggle-bar border-b border-slate-100 bg-slate-50/70">
+          <h2 class="font-display font-bold text-slate-800 text-sm">Live Leaderboard</h2>
+          <button type="button" id="btnToggleLeaderboard" class="panel-toggle-btn px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition" aria-expanded="true" aria-controls="leaderboardPanel">Hide</button>
+        </div>
+        <div id="leaderboardPanel" class="flex flex-col min-h-0 flex-1 overflow-hidden">
+        <!-- Leaderboard tabs -->
+        <div class="px-3 pt-2 pb-3 border-b border-slate-100 bg-slate-50/70">
+          <div class="flex items-center justify-end mb-2">
             <span id="leaderboardSortHint" class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Real-Time Rank</span>
           </div>
 
@@ -1666,6 +1732,7 @@
 
         <!-- Leaderboard List Body -->
         <div id="leaderboardBody" class="p-3 space-y-2 overflow-y-auto"></div>
+        </div>
       </div>
     </aside>
   </main>
@@ -2558,7 +2625,9 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
-        teamScoreboardOpen: false, // Group Work only. Closed keeps the floor as tall as Individual Work.
+        teamScoreboardOpen: false, // Group Work only. Entering Group Work opens it; Hide sticks until the next switch in.
+        classPulseOpen: true, // Live Class Pulse. Closed returns that panel’s height to the floor.
+        leaderboardOpen: true, // Live Leaderboard. Independent of the pulse panel.
         studioBandsOpen: true, // One Show/Hide for Register, Seating, History, and Scores.
         snapToGrid: true,
         zoom: 1,
@@ -2630,6 +2699,8 @@
               state.currentClassId = parsed.currentClassId || parsed.classes[0].id;
               state.activityMode = parsed.activityMode || 'individual';
               state.teamScoreboardOpen = parsed.teamScoreboardOpen === true;
+              state.classPulseOpen = parsed.classPulseOpen !== false;
+              state.leaderboardOpen = parsed.leaderboardOpen !== false;
               state.studioBandsOpen = parsed.studioBandsOpen !== false;
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
@@ -2664,6 +2735,8 @@
             currentClassId: state.currentClassId,
             activityMode: state.activityMode,
             teamScoreboardOpen: state.teamScoreboardOpen === true,
+            classPulseOpen: state.classPulseOpen !== false,
+            leaderboardOpen: state.leaderboardOpen !== false,
             studioBandsOpen: state.studioBandsOpen !== false,
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
@@ -4003,8 +4076,30 @@
         }
       }
 
+      // Same Show/Hide contract as the Team Scoreboard. The two panels
+      // toggle independently; closing one does not close the other.
+      function applyPanelToggle(cardId, btnId, open, label) {
+        const card = document.getElementById(cardId);
+        const btn = document.getElementById(btnId);
+        if (card) {
+          card.classList.toggle('is-collapsed', !open);
+          card.classList.toggle('is-open', open);
+        }
+        if (btn) {
+          btn.textContent = open ? 'Hide' : 'Show';
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', (open ? 'Hide ' : 'Show ') + label);
+        }
+      }
+
+      function applySidePanels() {
+        applyPanelToggle('pulseCard', 'btnToggleClassPulse', state.classPulseOpen !== false, 'Live Class Pulse');
+        applyPanelToggle('leaderboardCard', 'btnToggleLeaderboard', state.leaderboardOpen !== false, 'Live Leaderboard');
+      }
+
       function renderAll() {
         applyStudioBands();
+        applySidePanels();
         renderHeaderControls();
         renderGroupBrushBar();
         renderGroupScoreDock();
@@ -5709,17 +5804,106 @@
         return window.matchMedia('(min-width: 1024px)').matches;
       }
 
+      function workspaceRowGap() {
+        const ws = document.getElementById('studioWorkspace');
+        if (!ws) return 16;
+        const style = getComputedStyle(ws);
+        const raw = style.rowGap || style.gap || '16px';
+        const n = parseFloat(raw);
+        return isFinite(n) ? n : 16;
+      }
+
+      function clearSidePanelLimits() {
+        ['pulseBody', 'leaderboardPanel'].forEach(function (id) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.maxHeight = '';
+          el.style.overflow = '';
+        });
+        const side = document.getElementById('studioSideCol');
+        if (side) {
+          side.style.maxHeight = '';
+          side.classList.remove('is-capped');
+        }
+      }
+
+      // Open bodies have a preferred height. On a short screen they shrink
+      // together and scroll, and the title bars stay. A hidden panel is only
+      // its bar, so the floor receives the body height it released.
+      function limitSideBodies(side, sideBudget) {
+        const pulseOpen = state.classPulseOpen !== false;
+        const lbOpen = state.leaderboardOpen !== false;
+        let pulseCap = pulseOpen ? 78 : 0;
+        let lbCap = lbOpen ? 148 : 0;
+        function apply() {
+          clearSidePanelLimits();
+          if (pulseOpen) {
+            const body = document.getElementById('pulseBody');
+            if (body) {
+              body.style.maxHeight = pulseCap + 'px';
+              body.style.overflow = 'auto';
+            }
+          }
+          if (lbOpen) {
+            const panel = document.getElementById('leaderboardPanel');
+            if (panel) {
+              panel.style.maxHeight = lbCap + 'px';
+              panel.style.overflow = 'auto';
+            }
+          }
+          return side.offsetHeight;
+        }
+        let sideH = apply();
+        let guard = 0;
+        while (sideH > sideBudget && guard < 6) {
+          guard += 1;
+          const over = sideH - sideBudget;
+          if (lbOpen && lbCap > 64) {
+            lbCap = Math.max(64, lbCap - over);
+          } else if (pulseOpen && pulseCap > 48) {
+            pulseCap = Math.max(48, pulseCap - over);
+          } else {
+            break;
+          }
+          sideH = apply();
+        }
+        // Last resort: share whatever is left under the two title bars so
+        // neither Show/Hide scrolls off the screen.
+        if (sideH > sideBudget) {
+          const pulseBar = side.querySelector('#pulseCard .panel-toggle-bar');
+          const lbBar = side.querySelector('#leaderboardCard .panel-toggle-bar');
+          const bars = (pulseBar ? pulseBar.offsetHeight : 0) + (lbBar ? lbBar.offsetHeight : 0) + 12;
+          const room = Math.max(0, sideBudget - bars);
+          const openCount = (pulseOpen ? 1 : 0) + (lbOpen ? 1 : 0);
+          const each = openCount ? Math.floor(room / openCount) : 0;
+          if (pulseOpen) pulseCap = each;
+          if (lbOpen) lbCap = each;
+          sideH = apply();
+        }
+        if (sideH > sideBudget + 1) {
+          side.style.maxHeight = Math.max(72, sideBudget) + 'px';
+          side.classList.add('is-capped');
+          sideH = side.offsetHeight;
+        }
+        return sideH;
+      }
+
       // Desktop: the floor card and the leaderboard flex to the same column.
       // The dotted canvas fills the card below the scoreboard. A pixel height
       // would pin it short, so inline sizes are cleared. Individual Work has
       // no scoreboard, so that floor is the full card. The zoom pill floats.
-      // Narrow screens: the card fills the first screen. The leaderboard follows.
+      // Hiding a side panel drops that card to its title bar. It does not keep
+      // a tall empty slot. The floor is already the full column.
+      // Narrow screens: the floor and the side panels share the first screen.
+      // Hiding Live Class Pulse or Live Leaderboard returns that panel’s height
+      // to #classroomViewport. The zoom slot stays 0.
       function fitFloorAboveZoomGutter() {
         if (zoomChipDrag) return;
         const floor = document.getElementById('classroomViewport');
         const slot = document.getElementById('zoomSlot');
         const section = document.getElementById('studioFloorSection');
         const lb = document.getElementById('leaderboardBody');
+        const side = document.getElementById('studioSideCol');
         if (!floor || !slot || !section) return;
         syncZoomSlot();
         if (lb) {
@@ -5728,32 +5912,59 @@
         }
         const dock = document.getElementById('groupScoreDock');
         if (dock) dock.style.maxHeight = '';
+        clearSidePanelLimits();
         if (desktopFloorFill()) {
           floor.style.height = '';
           return;
         }
-        const minH = 168;
-        const limit = window.innerHeight - 1;
+        const gap = workspaceRowGap();
+        const limit = window.innerHeight - 2;
         const border = section.offsetHeight - section.clientHeight;
         const top = section.getBoundingClientRect().top;
         const available = Math.floor(limit - top - border);
-        // The dock is in the card column, above the canvas. The zoom slot
-        // stays at 0. Individual Work has no dock, so its floor is unchanged.
         let dockH = (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
-        let floorH = available - dockH;
-        // Only tighten the dock. A larger inline max-height would undo the CSS cap.
-        if (dock && dockH > 0 && floorH < minH) {
-          const cap = Math.max(40, available - minH);
-          if (cap < dockH) {
-            dock.style.maxHeight = cap + 'px';
+        // First-screen floor, before the side panels. This is the tall floor
+        // a phone keeps when the panels do not fit beside it.
+        const shareRoom = available - gap - dockH;
+        // Share the screen only when a 220px floor and a real panel both fit.
+        // Otherwise the floor fills the first screen and the panels follow.
+        const canShare = shareRoom >= 220 + 130;
+        if (!canShare) {
+          const minH = 168;
+          if (dock && dockH > 0 && available - dockH < minH) {
+            const dockCap = Math.max(40, available - minH);
+            if (dockCap < dockH) {
+              dock.style.maxHeight = dockCap + 'px';
+              dockH = dock.offsetHeight;
+            }
+          }
+          let floorH = Math.max(minH, available - dockH);
+          floor.style.height = floorH + 'px';
+          const overflow = section.getBoundingClientRect().bottom - limit;
+          if (overflow > 1) {
+            floor.style.height = Math.max(minH, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
+          }
+          return;
+        }
+        let minH = shareRoom >= 520 ? 240 : 220;
+        if (dock && dockH > 0 && shareRoom < minH + 100) {
+          const dockCap = Math.max(40, available - gap - minH - 100);
+          if (dockCap < dockH) {
+            dock.style.maxHeight = dockCap + 'px';
             dockH = dock.offsetHeight;
-            floorH = available - dockH;
           }
         }
-        floor.style.height = Math.max(minH, floorH) + 'px';
-        const overflow = section.getBoundingClientRect().bottom - limit;
+        const sideBudget = Math.max(88, available - gap - dockH - minH - 6);
+        const sideH = side ? limitSideBodies(side, sideBudget) : 0;
+        let floorH = available - dockH - gap - sideH;
+        if (floorH < minH) floorH = minH;
+        floor.style.height = floorH + 'px';
+        const sideBottom = (side && side.offsetHeight > 0)
+          ? side.getBoundingClientRect().bottom
+          : section.getBoundingClientRect().bottom;
+        const overflow = sideBottom - limit;
         if (overflow > 1) {
-          floor.style.height = Math.max(minH, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
+          floor.style.height = Math.max(minH - 12, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
         }
       }
 
@@ -5863,6 +6074,9 @@
         });
         document.getElementById('btnModeGroup').addEventListener('click', function () {
           state.activityMode = 'group';
+          // Every switch into Group Work starts the scoreboard open. A stored
+          // Hide from an earlier visit does not win. Hide still works after this.
+          state.teamScoreboardOpen = true;
           saveState();
           renderAll();
           showToast('Switched to Group Work Mode. Tap a name to rename. Team points also add to each member.', '🛡️');
@@ -5882,6 +6096,24 @@
             state.studioBandsOpen = state.studioBandsOpen === false;
             saveState();
             applyStudioBands();
+            scheduleFloorFit();
+          });
+        }
+        const btnClassPulse = document.getElementById('btnToggleClassPulse');
+        if (btnClassPulse) {
+          btnClassPulse.addEventListener('click', function () {
+            state.classPulseOpen = state.classPulseOpen === false;
+            saveState();
+            applySidePanels();
+            scheduleFloorFit();
+          });
+        }
+        const btnLeaderboard = document.getElementById('btnToggleLeaderboard');
+        if (btnLeaderboard) {
+          btnLeaderboard.addEventListener('click', function () {
+            state.leaderboardOpen = state.leaderboardOpen === false;
+            saveState();
+            applySidePanels();
             scheduleFloorFit();
           });
         }
