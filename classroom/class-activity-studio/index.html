@@ -937,7 +937,7 @@
   <!-- TOP NAVIGATION & ACTIVITY BAR -->
   <header class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
     <div class="studio-mast">
-      <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" title="Back to Classroom">← Back to Classroom</a>
+      <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap">← Back to Classroom</a>
       <div class="studio-brand">
         <span class="studio-school">SKHHCSS</span>
         <h1>Class Activity Studio</h1>
@@ -952,8 +952,8 @@
           <label for="classSelect" class="text-xs font-semibold px-2 text-sky-100 hidden md:inline">Class:</label>
           <select id="classSelect" aria-label="Select Preset Class" class="bg-white text-slate-800 text-xs sm:text-sm font-bold rounded-lg px-2.5 py-1.5 pr-7 focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer shadow-sm">
           </select>
-          <button id="btnOpenClassModal" type="button" class="ml-1.5 px-2.5 py-1.5 rounded-lg bg-[#0c5a70]/50 hover:bg-[#0c5a70]/80 text-xs font-semibold text-white flex items-center gap-1 transition" title="Customize Preset Classes & Student Roster">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <button id="btnOpenClassModal" type="button" class="ml-1.5 px-2.5 py-1.5 rounded-lg bg-[#0c5a70]/50 hover:bg-[#0c5a70]/80 text-xs font-semibold text-white flex items-center gap-1 transition" title="Edit class lists and student names">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             <span>Classes</span>
           </button>
         </div>
@@ -975,8 +975,8 @@
       <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
         <!-- Live Countdown Timer Button -->
         <div class="relative">
-          <button id="btnToggleTimerPanel" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Classroom Countdown Timer">
-            <span>⏱️</span>
+          <button id="btnToggleTimerPanel" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Open the countdown timer">
+            <span aria-hidden="true">⏱️</span>
             <span id="headerTimerDisplay" class="font-mono tracking-wider text-amber-200">03:00</span>
           </button>
 
@@ -987,7 +987,7 @@
                 <span class="text-lg">⏱️</span>
                 <h3 class="font-display font-bold text-slate-800 text-base">Activity Timer</h3>
               </div>
-              <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">✕</button>
+              <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg" aria-label="Close">✕</button>
             </div>
 
             <!-- Big Timer Readout -->
@@ -1033,26 +1033,26 @@
         </div>
 
         <!-- Random Picker Button -->
-        <button id="btnOpenPickerModal" type="button" class="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Pick a Random Student or Group">
-          <span>🎲</span>
+        <button id="btnOpenPickerModal" type="button" class="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Pick a random student or group">
+          <span aria-hidden="true">🎲</span>
           <span>Random Picker</span>
         </button>
 
         <!-- Podium Celebration Button -->
-        <button id="btnOpenPodiumModal" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Show Live Podium Celebration">
-          <span>🏆</span>
+        <button id="btnOpenPodiumModal" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Show the live podium" aria-label="Podium">
+          <span aria-hidden="true">🏆</span>
           <span class="hidden sm:inline">Podium</span>
         </button>
 
         <!-- Sound Toggle -->
-        <button id="btnToggleSound" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Toggle sound" aria-label="Toggle sound">
+        <button id="btnToggleSound" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" aria-label="Sound">
           <span id="soundIcon">🔊</span>
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
         <!-- Export CSV Button -->
-        <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Export Class & Group Scores to CSV">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           <span class="hidden sm:inline">Export CSV</span>
         </button>
       </div>
@@ -1063,34 +1063,32 @@
   <section class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
-      <!-- Register -->
+      <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Manage Groups, Assign Groups. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Register</span>
-        <!-- Manual Group Paint Brush Toggle -->
-        <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Click a team color and tap desks on the floor plan to assign groups manually">
-          <span>🎨</span>
-          <span id="groupBrushBtnLabel">Assign Groups (Paint)</span>
-        </button>
-
-        <!-- Manual Grouping Modal Button -->
-        <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition" title="Manage Groups" aria-label="Manage Groups">
-          <span>🛡️</span>
-          <span>Manage Groups</span>
-        </button>
-
-        <button id="btnQuickAddGroup" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition" title="Add Group" aria-label="Add Group">
-          <span>＋ Group</span>
-        </button>
-
-        <!-- Quick Add Student Button -->
-        <button id="btnQuickAddStudent" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition" title="Add a student desk to this class">
-          <span>＋ Desk</span>
-        </button>
-
         <!-- Edit: ON edits names, seat #, team names, delete, desk drag, and layout tools. OFF is teach mode. -->
         <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit On" aria-pressed="true">
           <span class="edit-switch-name">Edit</span>
           <span class="edit-switch-value" aria-hidden="true">ON</span>
+        </button>
+
+        <button id="btnQuickAddStudent" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition" title="Add a student desk">
+          <span>＋ Desk</span>
+        </button>
+
+        <button id="btnQuickAddGroup" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition">
+          <span>＋ Group</span>
+        </button>
+
+        <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition">
+          <span aria-hidden="true">🛡️</span>
+          <span>Manage Groups</span>
+        </button>
+
+        <!-- Paint: pick a group colour, then tap desks. Label stays Assign Groups. -->
+        <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Tap a group colour, then tap desks">
+          <span aria-hidden="true">🎨</span>
+          <span id="groupBrushBtnLabel">Assign Groups</span>
         </button>
       </div>
 
@@ -1098,7 +1096,7 @@
       <div id="studioSeatingBand" class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Seating</span>
         <!-- Custom Rows x Columns Grid Quick Setup -->
-        <div class="studio-grid-setup inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 shadow-2xs" title="Custom Rows × Columns Quick Grid Setup">
+        <div class="studio-grid-setup inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 shadow-2xs">
           <span class="text-xs font-semibold text-indigo-800">Grid:</span>
           <label for="quickRowsInput" class="text-xs font-semibold text-slate-500 uppercase">Rows</label>
           <input id="quickRowsInput" type="number" min="1" max="15" value="4" aria-label="Number of Rows" class="w-11 px-1 py-0 text-xs font-semibold text-center bg-white border border-indigo-200 rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
@@ -1110,19 +1108,19 @@
           </button>
         </div>
 
-        <button type="button" data-layout="rows" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space out your Rows × Cols grid into individual exam desks">Exam Rows</button>
-        <button type="button" data-layout="pairs" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns: tight gap inside each pair, wider left–right aisle between pairs">Paired Desks</button>
-        <button type="button" data-layout="pods4" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group every 2×2 block: tight inside each pod, wider left–right aisle between pods">4-Desk Pods</button>
-        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather each team into a tight cluster, with a wider left–right aisle between clusters">
-          <span>🧲</span>
+        <button type="button" data-layout="rows" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space the grid into separate exam desks">Exam Rows</button>
+        <button type="button" data-layout="pairs" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns, with a wider aisle between pairs">Paired Desks</button>
+        <button type="button" data-layout="pods4" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group desks into 2×2 pods, with a wider aisle between pods">4-Desk Pods</button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather each team into a cluster, with a wider aisle between clusters">
+          <span aria-hidden="true">🧲</span>
           <span>Cluster by Group</span>
         </button>
 
-        <button id="btnToggleSnapGrid" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Snap desks to a clean grid when dragging">
+        <button id="btnToggleSnapGrid" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Snap desks to a grid when dragging">
           <span aria-hidden="true">📏</span>
           <span id="snapGridText">Snap: ON</span>
         </button>
-        <button id="btnFlipRoom" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Flip Classroom Orientation (FRONT OF ROOM at Top vs Bottom)">
+        <button id="btnFlipRoom" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Move the front of the room to the top or the bottom">
           <span id="flipRoomText">Front: Bottom</span>
         </button>
       </div>
@@ -1130,16 +1128,16 @@
       <!-- History sits in the same left-to-right flow as the other bands. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">History</span>
-        <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Undo" aria-label="Undo">
+        <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Undo">
           <span aria-hidden="true">↩️</span>
         </button>
-        <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
+        <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Redo">
           <span aria-hidden="true">↪️</span>
         </button>
-        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save" aria-label="Save">
+        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save current desk layout">
           Save
         </button>
-        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Load" aria-label="Load">
+        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Load saved desk layout">
           Load
         </button>
       </div>
@@ -1150,7 +1148,7 @@
         <button id="btnAllPlusOne" type="button" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
-        <button id="btnOpenResetModal" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
+        <button id="btnOpenResetModal" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset all scores to 0" aria-label="Reset scores">
           <span aria-hidden="true">🔄</span>
         </button>
       </div>
@@ -1217,17 +1215,17 @@
         </div>
         <!-- Bottom-left of the board viewport. The site Tools dock owns bottom-right. -->
         <div id="zoomChip" class="zoom-chip" role="group" aria-label="Zoom">
-          <button type="button" class="zoom-chip-handle" aria-label="Move Zoom" title="Move Zoom">
+          <button type="button" class="zoom-chip-handle" aria-label="Move zoom controls" title="Drag to move the zoom controls">
             <span class="zoom-chip-grip" aria-hidden="true"></span>
             <span class="zoom-chip-label">Zoom</span>
           </button>
-          <button id="btnZoomOut" type="button" class="zoom-chip-btn" title="Zoom Out" aria-label="Zoom Out">−</button>
+          <button id="btnZoomOut" type="button" class="zoom-chip-btn" aria-label="Zoom out">−</button>
           <label class="zoom-chip-pct">
             <input id="zoomReadout" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" spellcheck="false" maxlength="8" aria-label="Zoom percentage" value="100" />
             <span aria-hidden="true">%</span>
           </label>
-          <button id="btnZoomIn" type="button" class="zoom-chip-btn" title="Zoom In" aria-label="Zoom In">＋</button>
-          <button id="btnZoomReset" type="button" class="zoom-chip-fit" title="Fit floor plan to viewport">Fit</button>
+          <button id="btnZoomIn" type="button" class="zoom-chip-btn" aria-label="Zoom in">＋</button>
+          <button id="btnZoomReset" type="button" class="zoom-chip-fit" title="Fit the floor plan to the window">Fit</button>
         </div>
       </section>
     </div>
@@ -1303,7 +1301,7 @@
         <div>
           <h2 class="font-display text-lg sm:text-xl font-bold">Manage Preset Classes &amp; Student Roster</h2>
         </div>
-        <button id="btnCloseClassModal" type="button" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold">✕</button>
+        <button id="btnCloseClassModal" type="button" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold" aria-label="Close">✕</button>
       </div>
 
       <!-- Modal Content -->
@@ -1417,7 +1415,7 @@
         <div>
           <h2 class="font-display text-lg sm:text-xl font-bold">🛡️ Manual Grouping &amp; Team Manager</h2>
         </div>
-        <button id="btnCloseGroupModal" type="button" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold">✕</button>
+        <button id="btnCloseGroupModal" type="button" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold" aria-label="Close">✕</button>
       </div>
 
       <!-- Body -->
@@ -1434,7 +1432,7 @@
 
           <div class="bg-violet-50 rounded-2xl p-3.5 border border-violet-100 mt-auto">
             <div class="text-xs font-bold text-violet-950 mb-1">💡 Fast Canvas Grouping Tip</div>
-            <p class="text-[11px] text-violet-800 mb-2">You can also click <strong>"Assign Groups (Paint)"</strong> on the main toolbar, pick a team color, and tap desks directly on the classroom map!</p>
+            <p class="text-[11px] text-violet-800 mb-2">You can also click <strong>Assign Groups</strong> on the main toolbar, pick a team colour, and tap desks on the classroom map.</p>
             <button id="btnSwitchToBrushFromModal" type="button" class="w-full py-1.5 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs transition">
               🎨 Switch to Canvas Group Brush
             </button>
@@ -1449,7 +1447,7 @@
               <p class="text-xs text-slate-500">Select a team for each student below, or use quick actions</p>
             </div>
             <div class="flex items-center gap-1.5">
-              <button id="btnEvenDistributeGroups" type="button" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition" title="Distribute students evenly in order across active teams (you can still adjust manually)">
+              <button id="btnEvenDistributeGroups" type="button" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition" title="Share students evenly across the teams, in class order">
                 Auto-Fill Evenly
               </button>
               <button id="btnClearAllGroupAssignments" type="button" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition">
@@ -1487,7 +1485,7 @@
             <h2 class="font-display text-lg font-bold leading-tight">Random Spotlight Picker</h2>
           </div>
         </div>
-        <button id="btnClosePickerModal" type="button" class="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center font-bold">✕</button>
+        <button id="btnClosePickerModal" type="button" class="w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center font-bold" aria-label="Close">✕</button>
       </div>
 
       <!-- Body -->
@@ -1558,7 +1556,7 @@
             <p id="podiumSubTitle" class="text-xs text-indigo-200">Live Standings — Individual &amp; Team Leaders</p>
           </div>
         </div>
-        <button id="btnClosePodiumModal" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center font-bold">✕</button>
+        <button id="btnClosePodiumModal" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center font-bold" aria-label="Close">✕</button>
       </div>
 
       <!-- Body -->
@@ -2464,7 +2462,7 @@
 
       function renderEditDeleteButton(dataAttr, id, ariaLabel) {
         if (!boardEditsAllowed()) return '';
-        return '<button type="button" class="board-delete-btn" ' + dataAttr + '="' + escapeHtml(id) + '" aria-label="' + ariaLabel + '" title="' + ariaLabel + '"><span aria-hidden="true">✕</span></button>';
+        return '<button type="button" class="board-delete-btn" ' + dataAttr + '="' + escapeHtml(id) + '" aria-label="' + ariaLabel + '"><span aria-hidden="true">✕</span></button>';
       }
 
       function studentHistoryLabel(st) {
@@ -2712,7 +2710,8 @@
         }
         const cue = boardEditsAllowed() ? ' is-editable' : ' is-frozen';
         return '<button type="button" class="desk-classno-btn' + cue + '" data-desk-classno="' + escapeHtml(st.id) + '" ' +
-          'title="' + (cue === ' is-frozen' ? ('Class number ' + escapeHtml(no)) : 'Edit class number') + '" aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
+          (cue === ' is-frozen' ? '' : 'title="Edit class number" ') +
+          'aria-label="Class number ' + escapeHtml(no) + '">#' + escapeHtml(no) + '</button>';
       }
 
       function deskNameIsEditable(st) {
@@ -2733,7 +2732,8 @@
         const cue = boardEditsAllowed() ? ' is-editable' : ' is-frozen';
         if (empty) {
           return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
-            'title="' + (cue === ' is-frozen' ? 'Empty' : 'Type a name') + '" aria-label="' + (cue === ' is-frozen' ? 'Empty' : 'Empty seat, type a name') + '">Empty</button>';
+            (cue === ' is-frozen' ? '' : 'title="Type a name" ') +
+            'aria-label="' + (cue === ' is-frozen' ? 'Empty' : 'Empty seat, type a name') + '">Empty</button>';
         }
         return '<button type="button" class="desk-name-btn line-clamp-2' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
           'title="' + (cue === ' is-frozen' ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '" aria-label="' + (cue === ' is-frozen' ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '">' +
@@ -3682,6 +3682,11 @@
         const soundLabel = document.getElementById('soundLabel');
         if (soundIcon) soundIcon.textContent = state.soundEnabled ? '🔊' : '🔇';
         if (soundLabel) soundLabel.textContent = state.soundEnabled ? 'Sound' : 'Muted';
+        const soundBtn = document.getElementById('btnToggleSound');
+        if (soundBtn) {
+          soundBtn.removeAttribute('title');
+          soundBtn.setAttribute('aria-label', state.soundEnabled ? 'Sound' : 'Muted');
+        }
 
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
@@ -3801,8 +3806,8 @@
               '</span>' +
             '</div>' +
             '<div class="grid grid-cols-2 gap-1.5 mt-1">' +
-              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-sm transition shadow-2xs" aria-label="Minus one" title="Minus one for this team and each member">−</button>' +
-              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Plus one for this team and each member">+</button>' +
+              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-sm transition shadow-2xs" aria-label="Minus one" title="Take 1 from this team and each member">−</button>' +
+              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Give +1 to this team and each member">+</button>' +
             '</div>' +
           '</div>';
         }).join('');
@@ -3915,13 +3920,13 @@
               '<div class="desk-team-row flex items-center justify-between mb-0.5 gap-1">' +
                 groupBadgeHtml +
                 (state.activityMode === 'group' && grp
-                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole group (' + escapeHtml(grp.name) + ')">Group+1</button>'
+                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Give +1 to this team and each member">Group+1</button>'
                   : '') +
               '</div>' +
               '<!-- Row 4: Compact − / + ; aria keeps the “one” for screen readers -->' +
               '<div class="grid grid-cols-2 gap-1">' +
-                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one" title="Minus one">−</button>' +
-                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold leading-none transition shadow-2xs flex items-center justify-center" aria-label="Plus one" title="Plus one">+</button>' +
+                '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one">−</button>' +
+                '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold leading-none transition shadow-2xs flex items-center justify-center" aria-label="Plus one">+</button>' +
               '</div>' +
             '</div>' +
           '</div>';
@@ -4016,9 +4021,9 @@
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1">' +
-                '<button type="button" data-lb-st-minus="' + escapeHtml(st.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-slate-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Minus one">−</button>' +
+                '<button type="button" data-lb-st-minus="' + escapeHtml(st.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-slate-200 font-bold flex items-center justify-center transition" aria-label="Minus one">−</button>' +
                 '<span class="w-8 text-center font-display font-bold text-sm ' + (st.score > 0 ? 'text-emerald-700' : (st.score < 0 ? 'text-rose-600' : 'text-slate-600')) + '">' + st.score + '</span>' +
-                '<button type="button" data-lb-st-plus="' + escapeHtml(st.id) + '" class="score-step bg-emerald-500 hover:bg-emerald-600 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Plus one">+</button>' +
+                '<button type="button" data-lb-st-plus="' + escapeHtml(st.id) + '" class="score-step bg-emerald-500 hover:bg-emerald-600 text-white font-bold flex items-center justify-center transition" aria-label="Plus one">+</button>' +
               '</div>' +
             '</div>';
           }).join('');
@@ -4055,9 +4060,9 @@
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1.5 shrink-0">' +
-                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Minus one">−</button>' +
+                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Take 1 from this team and each member">−</button>' +
                 '<span class="px-2 py-0.5 rounded-lg bg-white font-display font-extrabold text-sm ' + pal.text + ' border ' + pal.border + '">' + grp.score + '</span>' +
-                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="score-step ' + pal.headerBg + ' hover:opacity-90 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Plus one">+</button>' +
+                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="score-step ' + pal.headerBg + ' hover:opacity-90 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Give +1 to this team and each member">+</button>' +
               '</div>' +
             '</div>';
           }).join('');
@@ -4516,7 +4521,7 @@
               '<div class="flex items-center gap-1">' +
                 (isActive ? '<span class="px-2 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-bold">Active</span>' : '<button type="button" data-switch-class="' + escapeHtml(c.id) + '" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold">Load</button>') +
                 (state.classes.length > 1
-                  ? '<button type="button" data-delete-class="' + escapeHtml(c.id) + '" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Delete Class Preset">🗑️</button>'
+                  ? '<button type="button" data-delete-class="' + escapeHtml(c.id) + '" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" aria-label="Delete class preset">🗑️</button>'
                   : '') +
               '</div>' +
             '</div>';
@@ -4542,7 +4547,7 @@
                 '</div>' +
                 '<div class="flex items-center gap-2">' +
                   '<span class="text-[11px] font-mono text-slate-400">Pts: ' + st.score + '</span>' +
-                  '<button type="button" data-remove-student="' + escapeHtml(st.id) + '" class="text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded-lg text-xs font-bold" title="Delete Student" aria-label="Delete Student">✕</button>' +
+                  '<button type="button" data-remove-student="' + escapeHtml(st.id) + '" class="text-slate-400 hover:text-rose-600 px-1.5 py-1 rounded-lg text-xs font-bold" aria-label="Delete student">✕</button>' +
                 '</div>' +
               '</div>';
             }).join('');
@@ -4648,7 +4653,7 @@
                   (boardEditsAllowed() ? '' : ' readonly aria-readonly="true"') +
                   ' class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg ' +
                   (boardEditsAllowed() ? 'is-editable' : 'bg-slate-100 text-slate-500 cursor-default') + '" />' +
-                '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" title="Delete Team">✕</button>' +
+                '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" aria-label="Delete team">✕</button>' +
               '</div>' +
               '<div class="flex items-center justify-between text-[11px]">' +
                 '<select data-edit-grp-color="' + escapeHtml(grp.id) + '" aria-label="Team Color" class="bg-white border border-slate-200 rounded-lg px-2 py-0.5 font-semibold text-slate-700">' +
