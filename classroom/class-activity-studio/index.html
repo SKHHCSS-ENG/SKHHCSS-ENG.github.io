@@ -1323,7 +1323,7 @@
         padding: 3px 7px;
       }
     }
-    /* Hide Tools / Show Tools sits in the header, immediately after Export CSV.
+    /* Tools ON / Tools OFF sits in the header, immediately after Export CSV.
        The pair stays at the right of that row. Collapsing the bands
        does not change the header, so the button does not move.
        The width fits either label so the slot stays put. */
@@ -1553,7 +1553,7 @@
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span class="hidden sm:inline">Export CSV</span>
           </button>
-          <button type="button" id="btnToggleStudioBands" class="studio-toolbar-toggle" aria-expanded="true" aria-controls="studioToolbarRow" aria-label="Hide Tools">Hide Tools</button>
+          <button type="button" id="btnToggleStudioBands" class="studio-toolbar-toggle" aria-expanded="true" aria-controls="studioToolbarRow" aria-label="Tools ON">Tools ON</button>
         </div>
       </div>
     </div>
@@ -4130,9 +4130,9 @@
         const btn = document.getElementById('btnToggleStudioBands');
         if (bar) bar.classList.toggle('is-collapsed', !open);
         if (btn) {
-          btn.textContent = open ? 'Hide Tools' : 'Show Tools';
+          btn.textContent = open ? 'Tools ON' : 'Tools OFF';
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-          btn.setAttribute('aria-label', open ? 'Hide Tools' : 'Show Tools');
+          btn.setAttribute('aria-label', open ? 'Tools ON' : 'Tools OFF');
         }
       }
 
