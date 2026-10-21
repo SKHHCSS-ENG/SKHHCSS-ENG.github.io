@@ -2625,7 +2625,7 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
-        teamScoreboardOpen: false, // Group Work only. Closed keeps the floor as tall as Individual Work.
+        teamScoreboardOpen: false, // Group Work only. Entering Group Work opens it; Hide sticks until the next switch in.
         classPulseOpen: true, // Live Class Pulse. Closed returns that panel’s height to the floor.
         leaderboardOpen: true, // Live Leaderboard. Independent of the pulse panel.
         studioBandsOpen: true, // One Show/Hide for Register, Seating, History, and Scores.
@@ -6074,6 +6074,9 @@
         });
         document.getElementById('btnModeGroup').addEventListener('click', function () {
           state.activityMode = 'group';
+          // Every switch into Group Work starts the scoreboard open. A stored
+          // Hide from an earlier visit does not win. Hide still works after this.
+          state.teamScoreboardOpen = true;
           saveState();
           renderAll();
           showToast('Switched to Group Work Mode. Tap a name to rename. Team points also add to each member.', '🛡️');
