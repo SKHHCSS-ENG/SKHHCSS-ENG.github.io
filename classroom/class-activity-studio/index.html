@@ -1485,14 +1485,16 @@
        ("Snap: OFF", "Front: Bottom"), so ON and Top do not shrink the chip.
        Padding, height, and radius stay the seating-chip values (px-3, 26px, rounded-lg). */
     #btnToggleSnapGrid {
-      /* 7.54ch is "Snap: OFF" in this 12px semibold face.
+      /* "Snap: OFF" measures 7.54ch in this 12px semibold face.
+         7.56ch sits just above that so glyph rounding cannot slip past the floor.
          1.25em is the ruler, 0.25rem is gap-1, 1.5rem is horizontal px-3.
          border-box, so the padding is inside the min-width. */
-      min-width: calc(7.54ch + 1.25em + 1.75rem);
+      min-width: calc(7.56ch + 1.25em + 1.75rem);
     }
     #btnFlipRoom {
-      /* 9.93ch is "Front: Bottom". 1.5rem is the shared px-3. */
-      min-width: calc(9.93ch + 1.5rem);
+      /* "Front: Bottom" measures 9.93ch. 9.95ch is the same small step above it.
+         1.5rem is the shared px-3. */
+      min-width: calc(9.95ch + 1.5rem);
     }
     .studio-grid-setup {
       box-sizing: border-box;
