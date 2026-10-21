@@ -1605,15 +1605,17 @@
       padding-right: 0;
       font-size: 15px;
     }
-    /* Snap and Front keep one width. The floor is the longer label
-       ("Snap: OFF", "Front: Bottom"), so ON and Top do not shrink the chip.
+    /* Snap is one fixed border box. Front keeps its own longer-label floor.
        Padding, height, and radius stay the seating-chip values (px-3, 26px, rounded-lg). */
     #btnToggleSnapGrid {
-      /* "Snap: OFF" measures 7.54ch in this 12px semibold face.
-         7.56ch sits just above that so glyph rounding cannot slip past the floor.
-         1.25em is the ruler, 0.25rem is gap-1, 1.5rem is horizontal px-3.
-         border-box, so the padding is inside the min-width. */
-      min-width: calc(7.56ch + 1.25em + 1.75rem);
+      /* Snap: OFF with the ruler, gap-1, and px-3 measures 102.7px
+         (ruler 15px in this face). 108px is that full border box, slightly
+         above, so a wider color-emoji ruler still fits inside the chip.
+         width and max-width keep ON on the same box. */
+      flex: 0 0 108px;
+      width: 108px;
+      min-width: 108px;
+      max-width: 108px;
     }
     #btnFlipRoom {
       /* "Front: Bottom" measures 9.93ch. 9.95ch is the same small step above it.
