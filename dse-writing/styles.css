@@ -288,8 +288,8 @@ details.format-section[data-section="skeleton"] > summary {
   border-left-color: var(--accent);
 }
 
-/* Expand All / Collapse All — same pill language as the Tools chips,
-   sized to the dock chip (40px) so the labels stay compact under the hero. */
+/* One Expand All / Collapse All chip — same pill language as the Tools
+   chips, 40px tall, so a single label stays compact under the hero. */
 .section-toggle {
   display: flex;
   flex-wrap: wrap;

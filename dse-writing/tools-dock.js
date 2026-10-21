@@ -492,14 +492,33 @@
     });
   })();
 
-  /* Expand All / Collapse All — native <details> (top-level and nested). */
+  /* Expand All ↔ Collapse All — one chip. Native <details>, top-level and nested.
+     The label is the next action: Expand All while any section is closed,
+     Collapse All only when every section (including nested banks) is open.
+     A heading still toggles on its own; the chip follows that state.
+     Older pages that still ship the two-button pair keep that behaviour. */
   (function () {
     var bar = document.querySelector('.section-toggle');
     if (!bar) return;
+    var toggleBtn = bar.querySelector('[data-sections="toggle"]');
     var expandBtn = bar.querySelector('[data-sections="expand"]');
     var collapseBtn = bar.querySelector('[data-sections="collapse"]');
+
+    function detailsNodes() {
+      return document.querySelectorAll('.wrap details');
+    }
+
+    function allOpen() {
+      var nodes = detailsNodes();
+      if (!nodes.length) return false;
+      for (var i = 0; i < nodes.length; i++) {
+        if (!nodes[i].open) return false;
+      }
+      return true;
+    }
+
     function setAll(open) {
-      var nodes = document.querySelectorAll('.wrap details');
+      var nodes = detailsNodes();
       for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].open !== open) nodes[i].open = open;
       }
@@ -507,6 +526,25 @@
         requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
       }
     }
+
+    function syncChip() {
+      if (!toggleBtn) return;
+      toggleBtn.textContent = allOpen() ? 'Collapse All' : 'Expand All';
+    }
+
+    if (toggleBtn) {
+      var nodes = detailsNodes();
+      for (var i = 0; i < nodes.length; i++) {
+        nodes[i].addEventListener('toggle', syncChip);
+      }
+      toggleBtn.addEventListener('click', function () {
+        setAll(!allOpen());
+        syncChip();
+      });
+      syncChip();
+      return;
+    }
+
     if (expandBtn) expandBtn.addEventListener('click', function () { setAll(true); });
     if (collapseBtn) collapseBtn.addEventListener('click', function () { setAll(false); });
   })();
