@@ -52,9 +52,12 @@
        Resting position is the gutter under the desk grid, inside the first screen,
        with room under the pill so the collapsed chip is not cut off at ~390.
        The right edge stays clear of the site Tools dock. */
+    /* Same dotted floor as the canvas. Height only keeps the zoom pill
+       clear of the score buttons. It is not a white footer. */
     .zoom-slot {
       flex: none;
       height: 72px;
+      background: transparent;
       pointer-events: none;
     }
     .zoom-chip {
@@ -247,11 +250,29 @@
     #classroomViewport {
       height: calc(100dvh - 320px);
       min-height: 140px;
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
+      border-radius: 1rem;
     }
-    .studio-floor-section {
+    /* One dotted floor for the canvas and the zoom band, so the card
+       has no white strip along the bottom. The team bar paints its own white. */
+    #studioFloorSection {
       overflow: visible;
+      background-color: #f8fafc;
+      background-image:
+        radial-gradient(#cbd5e1 1.35px, transparent 1.35px),
+        radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+    #studioFloorSection:has(.classroom-floor.snap-active) {
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+        radial-gradient(#94a3b8 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    #classroomViewport {
+      background-color: transparent;
+      background-image: none;
     }
     /* Team scoreboard sits inside the floor card. Collapsed it is one bar, so
        it does not take a row of height from the desks. Open, the team cards
@@ -264,12 +285,39 @@
       border-top-right-radius: 1rem;
       padding: 0.4rem 0.75rem 0.45rem;
     }
-    .group-score-dock.is-collapsed #groupDockCards {
+    /* Heading and Show/Hide sit together in the middle of the bar. */
+    .group-score-dock-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    /* Team cards stay a centred group for 1 team or many. They do not
+       stretch into a left-aligned row with an empty side. */
+    #groupDockCards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+    .group-dock-card {
+      flex: 1 1 10.5rem;
+      max-width: 14rem;
+      min-width: min(100%, 9rem);
+      box-sizing: border-box;
+    }
+    #groupDockCards > .col-span-full {
+      flex: 1 0 100%;
+      text-align: center;
+    }
+    #groupScoreDock.is-collapsed #groupDockCards {
       display: none;
     }
-    .group-score-dock.is-open #groupDockCards {
+    #groupScoreDock.is-open #groupDockCards {
       max-height: 15rem;
       overflow: auto;
+      margin-top: 0.5rem;
     }
     #studioFloorSection.has-dock #classroomViewport {
       border-top-left-radius: 0;
@@ -280,7 +328,7 @@
     }
     /* Desktop: one fill for both modes. The workspace locks to the viewport,
        the floor card grows through the old empty strip, and the leaderboard
-       column matches that card. The zoom gutter stays inside the card. */
+       column matches that card. The dotted floor reaches the card edge. */
     @media (min-width: 1024px) {
       html,
       body {
@@ -319,7 +367,7 @@
         max-height: none;
       }
     }
-    /* Last row can scroll fully above the gutter. The chip itself is not on the floor. */
+    /* Last row can scroll clear of the zoom pill. */
     #classroomStage {
       margin-bottom: 20px;
     }
@@ -1076,10 +1124,10 @@
       flex-shrink: 0;
       margin-right: 0.125rem;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.05em;
       line-height: 1;
-      color: #94a3b8;
+      color: #123a4d;
       white-space: nowrap;
     }
     .studio-band {
@@ -1404,14 +1452,14 @@
     <div id="studioFloorCol" class="lg:col-span-8 xl:col-span-9 flex flex-col min-h-0">
 
       <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
-      <section id="studioFloorSection" class="studio-floor-section relative bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col min-h-0">
+      <section id="studioFloorSection" class="studio-floor-section relative rounded-2xl shadow-sm border border-slate-200/90 flex flex-col min-h-0">
         <!-- Team scoreboard. One bar unless opened, so it does not steal the floor. -->
         <section id="groupScoreDock" class="group-score-dock is-collapsed hidden">
-          <div class="flex items-center justify-between gap-2">
+          <div class="group-score-dock-bar">
             <h2 class="font-display font-bold text-slate-800 text-sm">Team Scoreboard</h2>
             <button type="button" id="btnToggleTeamScoreboard" class="px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition" aria-expanded="false" aria-controls="groupDockCards">Show</button>
           </div>
-          <div id="groupDockCards" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2 mt-2"></div>
+          <div id="groupDockCards"></div>
         </section>
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
@@ -1425,8 +1473,8 @@
             <div id="desksContainer" class="absolute inset-0"></div>
           </div>
         </div>
-        <!-- Gutter under the floor. The bar rests here so it does not cover desks.
-             Drag can still move it. The right side stays clear of the Tools dock. -->
+        <!-- Kept at no height so the dotted floor reaches the card edge.
+             The pill floats on that floor. Drag can still move it. -->
         <div id="zoomSlot" class="zoom-slot" aria-hidden="true"></div>
         <div id="zoomChip" class="zoom-chip is-open" role="group" aria-label="Zoom">
           <button type="button" id="btnZoomGrip" class="zoom-chip-handle" aria-label="Move zoom controls" title="Drag to move the zoom controls">
@@ -5480,10 +5528,13 @@
         if (zoomChipDrag) return;
         const chip = document.getElementById('zoomChip');
         const slot = document.getElementById('zoomSlot');
+        const stage = document.getElementById('classroomStage');
         if (!chip || !slot) return;
-        // Gap above keeps score ± off the pill. Gap below keeps the pill fully on screen.
+        // The band under the canvas is the same dotted floor, not a white bar.
+        // Gap above keeps score ± off the pill. Gap below keeps the pill on screen.
         const h = Math.max(72, chip.offsetHeight + ZOOM_CHIP_GAP_ABOVE + ZOOM_CHIP_GAP_BELOW);
         slot.style.height = h + 'px';
+        if (stage) stage.style.marginBottom = '20px';
       }
 
       function desktopFloorFill() {
@@ -5491,11 +5542,10 @@
       }
 
       // Desktop: the floor card and the leaderboard flex to the same column.
-      // A pixel height pins the canvas short and leaves an empty strip under
-      // the desks, so those inline sizes are cleared. Individual and Group
-      // use this same rule. The zoom gutter stays the slot under the canvas.
-      // Narrow screens: size the canvas so the card fills the first screen.
-      // The leaderboard follows on the page scroll.
+      // The dotted canvas fills that card to the bottom edge. A pixel height
+      // would pin it short, so inline sizes are cleared. Individual and Group
+      // use this same rule. The zoom pill floats on the canvas.
+      // Narrow screens: the card fills the first screen. The leaderboard follows.
       function fitFloorAboveZoomGutter() {
         if (zoomChipDrag) return;
         const floor = document.getElementById('classroomViewport');
@@ -5508,21 +5558,35 @@
           lb.style.height = '';
           lb.style.maxHeight = '';
         }
+        const cards = document.getElementById('groupDockCards');
         if (desktopFloorFill()) {
           floor.style.height = '';
+          if (cards) cards.style.maxHeight = '';
           return;
         }
         const minH = 140;
         const limit = window.innerHeight - 1;
         const border = section.offsetHeight - section.clientHeight;
         const dock = document.getElementById('groupScoreDock');
-        const dockH = (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
-        let floorH = Math.max(minH, Math.floor(limit - section.getBoundingClientRect().top - dockH - slot.offsetHeight - border));
-        floor.style.height = floorH + 'px';
+        if (cards) cards.style.maxHeight = '';
+        let top = section.getBoundingClientRect().top;
+        let dockH = (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
+        let floorH = Math.floor(limit - top - dockH - slot.offsetHeight - border);
+        // An open scoreboard must not push the zoom pill off the first screen.
+        if (floorH < minH && dock && cards && !dock.classList.contains('hidden') && dock.classList.contains('is-open')) {
+          const cardsH = cards.offsetHeight;
+          const chrome = dock.offsetHeight - cardsH;
+          const room = limit - top - border - slot.offsetHeight - minH - chrome;
+          cards.style.maxHeight = Math.max(64, Math.floor(room)) + 'px';
+          dockH = dock.offsetHeight;
+          top = section.getBoundingClientRect().top;
+          floorH = Math.floor(limit - top - dockH - slot.offsetHeight - border);
+        }
+        floor.style.height = Math.max(minH, floorH) + 'px';
         syncZoomSlot();
         const overflow = section.getBoundingClientRect().bottom - limit;
         if (overflow > 1) {
-          floor.style.height = Math.max(minH, Math.floor(floorH - overflow)) + 'px';
+          floor.style.height = Math.max(minH, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
           syncZoomSlot();
         }
       }
