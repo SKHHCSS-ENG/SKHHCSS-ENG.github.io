@@ -491,4 +491,23 @@
       });
     });
   })();
+
+  /* Expand All / Collapse All — native <details> (top-level and nested). */
+  (function () {
+    var bar = document.querySelector('.section-toggle');
+    if (!bar) return;
+    var expandBtn = bar.querySelector('[data-sections="expand"]');
+    var collapseBtn = bar.querySelector('[data-sections="collapse"]');
+    function setAll(open) {
+      var nodes = document.querySelectorAll('.wrap details');
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].open !== open) nodes[i].open = open;
+      }
+      if (typeof window.hwResize === 'function') {
+        requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
+      }
+    }
+    if (expandBtn) expandBtn.addEventListener('click', function () { setAll(true); });
+    if (collapseBtn) collapseBtn.addEventListener('click', function () { setAll(false); });
+  })();
 })();
