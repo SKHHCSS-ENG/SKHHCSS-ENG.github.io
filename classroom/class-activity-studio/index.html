@@ -1006,8 +1006,10 @@
       flex: none;
       min-width: 0;
     }
-    /* Edit + ON/OFF. Compact chip on the Register band. */
-    .studio-band #btnToggleEditName.edit-switch {
+    /* Edit + ON/OFF. Compact chip on the Register band.
+       Tools, beside Export CSV, uses this same switch. */
+    .studio-band #btnToggleEditName.edit-switch,
+    #btnToggleStudioBands.edit-switch {
       gap: 5px;
       padding-left: 8px;
       padding-right: 3px;
@@ -1031,29 +1033,35 @@
       letter-spacing: 0.04em;
       line-height: 1;
     }
-    #btnToggleEditName.edit-switch.is-on {
+    #btnToggleEditName.edit-switch.is-on,
+    #btnToggleStudioBands.edit-switch.is-on {
       background: #fcd34d;
       color: #0f172a;
       border: 1px solid #f59e0b;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
     }
-    #btnToggleEditName.edit-switch.is-on:hover {
+    #btnToggleEditName.edit-switch.is-on:hover,
+    #btnToggleStudioBands.edit-switch.is-on:hover {
       background: #fde68a;
     }
-    #btnToggleEditName.edit-switch.is-on .edit-switch-value {
+    #btnToggleEditName.edit-switch.is-on .edit-switch-value,
+    #btnToggleStudioBands.edit-switch.is-on .edit-switch-value {
       background: #fff;
       color: #92400e;
     }
-    #btnToggleEditName.edit-switch.is-off {
+    #btnToggleEditName.edit-switch.is-off,
+    #btnToggleStudioBands.edit-switch.is-off {
       background: #fff;
       color: #334155;
       border: 1px solid #cbd5e1;
       box-shadow: none;
     }
-    #btnToggleEditName.edit-switch.is-off:hover {
+    #btnToggleEditName.edit-switch.is-off:hover,
+    #btnToggleStudioBands.edit-switch.is-off:hover {
       background: #fffbeb;
     }
-    #btnToggleEditName.edit-switch.is-off .edit-switch-value {
+    #btnToggleEditName.edit-switch.is-off .edit-switch-value,
+    #btnToggleStudioBands.edit-switch.is-off .edit-switch-value {
       background: #e2e8f0;
       color: #475569;
     }
@@ -1377,36 +1385,28 @@
         padding: 3px 7px;
       }
     }
-    /* Tools ON / Tools OFF sits in the header, immediately after Export CSV.
-       The pair stays at the right of that row. Collapsing the bands
-       does not change the header, so the button does not move.
-       The width fits either label so the slot stays put. */
+    /* Tools sits in the header, immediately after Export CSV.
+       Chrome is the Edit switch (.edit-switch / .is-on / .is-off).
+       These metrics match the Register chip, which Tools does not inherit.
+       Collapsing the bands does not move this slot. */
     .studio-header-export {
       margin-left: auto;
     }
-    .studio-toolbar-toggle {
+    #btnToggleStudioBands.edit-switch {
       box-sizing: border-box;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
-      min-width: 7.25rem;
-      height: 34px;
-      padding: 0 12px;
-      border-radius: 0.75rem;
-      border: 1px solid rgba(255, 255, 255, 0.45);
-      background: #fff;
-      color: #123a4d;
+      height: 26px;
+      min-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
       font-size: 12px;
-      font-weight: 800;
       line-height: 1;
       white-space: nowrap;
     }
-    .studio-toolbar-toggle:hover,
-    .studio-toolbar-toggle:focus-visible {
-      background: #e7f3f7;
-    }
-    .studio-toolbar-toggle:focus-visible {
+    #btnToggleStudioBands.edit-switch:focus-visible {
       outline: 2px solid #fff;
       outline-offset: 2px;
     }
@@ -1607,7 +1607,10 @@
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span class="hidden sm:inline">Export CSV</span>
           </button>
-          <button type="button" id="btnToggleStudioBands" class="studio-toolbar-toggle" aria-expanded="true" aria-controls="studioToolbarRow" aria-label="Tools ON">Tools ON</button>
+          <button type="button" id="btnToggleStudioBands" class="edit-switch is-on" aria-expanded="true" aria-pressed="true" aria-controls="studioToolbarRow" aria-label="Tools On">
+            <span class="edit-switch-name">Tools</span>
+            <span class="edit-switch-value" aria-hidden="true">ON</span>
+          </button>
         </div>
       </div>
     </div>
@@ -4187,9 +4190,12 @@
         const btn = document.getElementById('btnToggleStudioBands');
         if (bar) bar.classList.toggle('is-collapsed', !open);
         if (btn) {
-          btn.textContent = open ? 'Tools ON' : 'Tools OFF';
+          const valueEl = btn.querySelector('.edit-switch-value');
+          btn.className = 'edit-switch ' + (open ? 'is-on' : 'is-off');
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-          btn.setAttribute('aria-label', open ? 'Tools ON' : 'Tools OFF');
+          btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', open ? 'Tools On' : 'Tools Off');
+          if (valueEl) valueEl.textContent = open ? 'ON' : 'OFF';
         }
       }
 
