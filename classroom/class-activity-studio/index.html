@@ -531,57 +531,6 @@
       flex: none;
       min-width: 0;
     }
-    /* Edit + ON/OFF. Compact chip on the Register band. */
-    .studio-band #btnToggleEditName.edit-switch {
-      gap: 5px;
-      padding-left: 8px;
-      padding-right: 3px;
-      border-radius: 999px;
-      font-weight: 700;
-    }
-    .edit-switch-name {
-      line-height: 1;
-    }
-    .edit-switch-value {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      min-width: 30px;
-      height: 16px;
-      padding: 0 5px;
-      border-radius: 999px;
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      line-height: 1;
-    }
-    #btnToggleEditName.edit-switch.is-on {
-      background: #fcd34d;
-      color: #0f172a;
-      border: 1px solid #f59e0b;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
-    }
-    #btnToggleEditName.edit-switch.is-on:hover {
-      background: #fde68a;
-    }
-    #btnToggleEditName.edit-switch.is-on .edit-switch-value {
-      background: #fff;
-      color: #92400e;
-    }
-    #btnToggleEditName.edit-switch.is-off {
-      background: #fff;
-      color: #334155;
-      border: 1px solid #cbd5e1;
-      box-shadow: none;
-    }
-    #btnToggleEditName.edit-switch.is-off:hover {
-      background: #fffbeb;
-    }
-    #btnToggleEditName.edit-switch.is-off .edit-switch-value {
-      background: #e2e8f0;
-      color: #475569;
-    }
     @media (min-width: 640px) {
       .dock-group-btn {
         font-size: 0.875rem;
@@ -1041,9 +990,8 @@
         </button>
 
         <!-- Edit: gate for name, seat number, team rename, and delete. On by default. -->
-        <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit On" aria-pressed="true">
-          <span class="edit-switch-name">Edit</span>
-          <span class="edit-switch-value" aria-hidden="true">ON</span>
+        <button id="btnToggleEditName" type="button" class="px-3 py-1 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs font-bold whitespace-nowrap transition shadow-sm" title="Stop Editing" aria-label="Edit" aria-pressed="true">
+          Edit
         </button>
       </div>
 
@@ -3586,14 +3534,15 @@
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
           const editing = state.editMode !== false;
-          const valueEl = btnEditName.querySelector('.edit-switch-value');
           btnEditName.disabled = false;
           btnEditName.removeAttribute('aria-disabled');
-          btnEditName.className = 'edit-switch ' + (editing ? 'is-on' : 'is-off');
-          btnEditName.setAttribute('aria-label', editing ? 'Edit On' : 'Edit Off');
+          btnEditName.textContent = 'Edit';
+          btnEditName.setAttribute('aria-label', 'Edit');
+          btnEditName.title = editing ? 'Stop Editing' : 'Edit';
           btnEditName.setAttribute('aria-pressed', editing ? 'true' : 'false');
-          btnEditName.removeAttribute('title');
-          if (valueEl) valueEl.textContent = editing ? 'ON' : 'OFF';
+          btnEditName.className = editing
+            ? 'px-3 py-1 rounded-lg bg-amber-300 hover:bg-amber-200 text-slate-950 border border-amber-400 text-xs font-bold whitespace-nowrap transition shadow-sm'
+            : 'px-3 py-1 rounded-lg bg-white hover:bg-amber-50 text-slate-800 border border-slate-200 text-xs font-bold whitespace-nowrap transition';
         }
       }
 
@@ -5198,7 +5147,7 @@
           renderGroupScoreDock();
           renderClassroomCanvas(false);
           renderGroupModalContents();
-          showToast(state.editMode !== false ? 'Edit On' : 'Edit Off', '✏️');
+          showToast(state.editMode !== false ? 'Editing on' : 'Editing off', '✏️');
         });
 
         // Sound Toggle
