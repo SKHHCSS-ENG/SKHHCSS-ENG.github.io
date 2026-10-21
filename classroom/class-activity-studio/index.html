@@ -46,19 +46,22 @@
       box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.45);
     }
     /* Classic zoom bar: 6-dot grip, Zoom, minus, percent, plus, Fit.
-       The Zoom word folds the bar down to that word alone, then opens it again.
-       Resting position is the gutter under the desk grid, inside the first screen.
-       The right edge stays clear of the site Tools dock. Drag still moves the bar. */
+       The Zoom word folds the tools. Collapsed and open both keep the grip,
+       so the resting pill reads "grip Zoom" and can still be dragged.
+       Only the grip drags. A tap on Zoom folds or opens the tools.
+       Resting position is the gutter under the desk grid, inside the first screen,
+       with room under the pill so the collapsed chip is not cut off at ~390.
+       The right edge stays clear of the site Tools dock. */
     .zoom-slot {
       flex: none;
-      height: 64px;
+      height: 72px;
       pointer-events: none;
     }
     .zoom-chip {
       position: absolute;
       z-index: 40;
       left: 8px;
-      bottom: 8px;
+      bottom: 20px;
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
@@ -239,15 +242,37 @@
         left: 10px;
       }
     }
-    /* Floor height is tightened in JS so the gutter below it stays on screen.
-       These caps are the fallback before that measurement. */
+    /* Floor height is set in JS so the floor plus the zoom gutter fill the
+       remaining viewport. This is only the first-paint fallback. */
     #classroomViewport {
-      height: min(600px, calc(100dvh - 430px));
-      min-height: 260px;
+      height: calc(100dvh - 320px);
+      min-height: 140px;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
     }
-    @media (min-width: 640px) {
-      #classroomViewport {
-        height: min(650px, calc(100dvh - 300px));
+    .studio-floor-section {
+      overflow: visible;
+    }
+    #leaderboardBody {
+      max-height: 500px;
+    }
+    /* Side-by-side: the leaderboard card fills the same column height as the floor. */
+    @media (min-width: 1024px) {
+      #studioWorkspace {
+        align-items: stretch;
+      }
+      #studioSideCol {
+        min-height: 0;
+        height: 100%;
+      }
+      #leaderboardCard {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+      #leaderboardBody {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
       }
     }
     /* Last row can scroll fully above the gutter. The chip itself is not on the floor. */
@@ -286,6 +311,24 @@
     }
     #pickerResultSub:empty {
       display: none;
+    }
+    #pickerBadge[hidden] {
+      display: none !important;
+    }
+    /* Settled draw: the name is the result. No status pill, no map line. */
+    #pickerResultTitle.is-result {
+      width: 100%;
+      max-width: 100%;
+      font-size: clamp(2.35rem, 11vw, 3.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #pickerStageBox.is-result {
+      min-height: 0;
+      padding: 1.25rem 1rem 1.1rem;
     }
     /* Classroom Floor Grid Pattern */
     .classroom-floor {
@@ -339,17 +382,23 @@
       display: block;
       width: 100%;
       max-width: 100%;
-      margin: 0 0 2px;
-      padding: 1px 2px;
+      margin: 0;
+      padding: 0 2px;
       border-radius: 6px;
       background: transparent;
       border: 1px solid transparent;
       font-family: var(--font-display);
       font-weight: 700;
-      font-size: 0.875rem;
+      font-size: 1.125rem;
       line-height: 1.15;
       color: #0f172a;
       text-align: left;
+    }
+    .desk-name-btn,
+    .desk-name-static {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .desk-name-btn {
       cursor: text;
@@ -523,8 +572,8 @@
       color: #0f172a;
       font-family: var(--font-display);
       font-weight: 700;
-      font-size: 0.75rem;
-      line-height: 1.2;
+      font-size: 1rem;
+      line-height: 1.15;
       text-align: left;
       cursor: text;
       touch-action: manipulation;
@@ -686,10 +735,17 @@
       background: #e2e8f0;
       color: #475569;
     }
-    @media (min-width: 640px) {
-      .dock-group-btn {
-        font-size: 0.875rem;
-      }
+    .group-score-value {
+      font-size: 22px;
+      line-height: 1;
+      padding: 1px 7px;
+      border-radius: 12px;
+    }
+    .desk-score-value {
+      font-size: 20px;
+      line-height: 1;
+      padding: 0 5px;
+      border-radius: 6px;
     }
     @media (max-width: 480px) {
       .dock-group-btn {
@@ -739,15 +795,15 @@
       box-sizing: border-box;
       max-width: 100%;
       min-width: 0;
-      height: 18px;
+      height: 20px;
       margin: 0;
       padding: 0 6px;
       border: 0;
       border-radius: 6px;
       font-family: var(--font-display);
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 700;
-      line-height: 18px;
+      line-height: 20px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1298,30 +1354,23 @@
   </section>
 
   <!-- MAIN WORKSPACE: LEFT/CENTER CLASSROOM CANVAS + RIGHT LIVE LEADERBOARD -->
-  <main class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-5 py-3 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+  <main id="studioWorkspace" class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-5 pt-3 pb-0 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
     
     <!-- LEFT / CENTER COLUMN: GROUP SCOREBOARD DOCK (IN GROUP MODE) + FREEFORM CLASSROOM FLOOR PLAN -->
-    <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-3">
+    <div id="studioFloorCol" class="lg:col-span-8 xl:col-span-9 flex flex-col gap-3 min-h-0">
       
       <!-- GROUP WORK LIVE SCORE DOCK (Shown in Group Work mode, or toggleable) -->
       <section id="groupScoreDock" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3.5 transition-all">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold uppercase tracking-wider">Group Work Active</span>
-            <h2 class="font-display font-bold text-slate-800 text-sm sm:text-base">Live Team Scoreboard</h2>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="btnQuickAssignFromDock" type="button" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline">
-              Assign / Edit Groups
-            </button>
-          </div>
+        <div class="flex flex-wrap items-center gap-2 mb-2.5">
+          <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold uppercase tracking-wider">Group Work Active</span>
+          <h2 class="font-display font-bold text-slate-800 text-sm sm:text-base">Live Team Scoreboard</h2>
         </div>
         <!-- Group Cards Grid -->
         <div id="groupDockCards" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5"></div>
       </section>
 
       <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
-      <section class="relative bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col">
+      <section id="studioFloorSection" class="studio-floor-section relative bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col">
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
           <!-- Scaled Inner Stage -->
@@ -1356,7 +1405,7 @@
     </div>
 
     <!-- RIGHT COLUMN: LIVE LEADERBOARD & SESSION FEED -->
-    <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3">
+    <aside id="studioSideCol" class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3 min-h-0">
       
       <!-- Live Summary Metrics Card -->
       <div class="bg-gradient-to-br from-[#123a4d] via-[#2a8fad] to-[#5bbad5] rounded-2xl p-4 text-white shadow-md">
@@ -1380,7 +1429,7 @@
       </div>
 
       <!-- Live Leaderboard Card -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col overflow-hidden">
+      <div id="leaderboardCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col overflow-hidden min-h-0">
         <!-- Leaderboard Header & Tabs -->
         <div class="p-3 border-b border-slate-100 bg-slate-50/70">
           <div class="flex items-center justify-between mb-2">
@@ -1411,7 +1460,7 @@
         </div>
 
         <!-- Leaderboard List Body -->
-        <div id="leaderboardBody" class="p-3 space-y-2 max-h-[500px] overflow-y-auto"></div>
+        <div id="leaderboardBody" class="p-3 space-y-2 overflow-y-auto"></div>
       </div>
     </aside>
   </main>
@@ -2862,11 +2911,11 @@
         }
         const cue = boardEditsAllowed() ? ' is-editable' : ' is-frozen';
         if (empty) {
-          return '<button type="button" class="desk-name-btn desk-name-empty line-clamp-2' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+          return '<button type="button" class="desk-name-btn desk-name-empty' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
             (cue === ' is-frozen' ? '' : 'title="Type a name" ') +
             'aria-label="' + (cue === ' is-frozen' ? 'Empty' : 'Empty seat, type a name') + '">Empty</button>';
         }
-        return '<button type="button" class="desk-name-btn line-clamp-2' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
+        return '<button type="button" class="desk-name-btn' + cue + '" data-desk-rename="' + escapeHtml(st.id) + '" ' +
           'title="' + (cue === ' is-frozen' ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '" aria-label="' + (cue === ' is-frozen' ? escapeHtml(st.name) : ('Rename ' + escapeHtml(st.name))) + '">' +
           escapeHtml(st.name) + '</button>';
       }
@@ -3670,7 +3719,7 @@
         const scoreBadge = deskEl.querySelector('.desk-score-value');
         if (scoreBadge) {
           scoreBadge.textContent = String(newScore);
-          scoreBadge.className = 'desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' +
+          scoreBadge.className = 'desk-score-value font-display font-extrabold ' +
             (newScore > 0 ? 'bg-emerald-100 text-emerald-800' : (newScore < 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'));
         }
 
@@ -3702,6 +3751,7 @@
         renderGroupScoreDock();
         renderClassroomCanvas();
         renderLeaderboardAndStats();
+        scheduleFloorFit();
       }
 
       // True when the live desks are still the arrangement that preset would draw.
@@ -3855,6 +3905,7 @@
           if (btnBrush) {
             btnBrush.className = 'px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition';
           }
+          scheduleFloorFit();
           return;
         }
 
@@ -3883,6 +3934,7 @@
           '<span>🧹</span><span>Unassigned</span></button>';
 
         chipsContainer.innerHTML = html;
+        scheduleFloorFit();
       }
 
       // Render Group Work Score Dock
@@ -3921,8 +3973,8 @@
           const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
           const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
           const editing = boardEditsAllowed();
-          return '<div class="group-dock-card relative rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2.5 flex flex-col justify-between shadow-xs transition hover:shadow-md">' +
-            '<div class="group-dock-head flex items-start justify-between gap-1 mb-1.5">' +
+          return '<div class="group-dock-card relative rounded-2xl border-2 ' + pal.border + ' ' + pal.bg + ' p-2 flex flex-col justify-between shadow-xs transition hover:shadow-md">' +
+            '<div class="group-dock-head flex items-start justify-between gap-1 mb-1">' +
               '<div class="min-w-0 flex-1">' +
                 '<div class="flex items-center gap-1 min-w-0">' +
                   renderDockGroupNameControl(grp) +
@@ -3930,7 +3982,7 @@
                 '<div class="text-[11px] font-medium text-slate-500 mt-0.5">' + memberCount + ' member' + (memberCount === 1 ? '' : 's') + '</div>' +
               '</div>' +
               '<span class="group-score-row">' +
-                '<span class="shrink-0 font-display font-extrabold text-base sm:text-lg px-2 py-0.5 rounded-xl bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
+                '<span class="group-score-value shrink-0 font-display font-extrabold bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
                   (grp.score > 0 ? '+' + grp.score : grp.score) +
                 '</span>' +
                 (editing ? renderEditDeleteButton('data-dock-delete-group', grp.id, 'Delete Team') : '') +
@@ -4041,7 +4093,7 @@
               '<div class="desk-top-row flex items-center justify-between gap-1">' +
                 renderDeskClassNoControl(st) +
                 '<span class="desk-score-row">' +
-                  '<span class="desk-score-value font-display font-extrabold text-base leading-none px-1.5 py-0.5 rounded-md ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
+                  '<span class="desk-score-value font-display font-extrabold ' + scoreBadgeClass + '">' + scoreVal + '</span>' +
                   (editing ? renderEditDeleteButton('data-desk-delete', st.id, 'Delete Student') : '') +
                 '</span>' +
               '</div>' +
@@ -4917,6 +4969,24 @@
         }
       }
 
+      function showPickerResult(text) {
+        const badgeEl = document.getElementById('pickerBadge');
+        const titleEl = document.getElementById('pickerResultTitle');
+        const subEl = document.getElementById('pickerResultSub');
+        const stage = document.getElementById('pickerStageBox');
+        if (badgeEl) {
+          badgeEl.textContent = '';
+          badgeEl.hidden = true;
+        }
+        if (subEl) subEl.textContent = '';
+        if (stage) stage.classList.add('is-result');
+        if (titleEl) {
+          titleEl.textContent = text;
+          titleEl.title = text;
+          titleEl.classList.add('is-result');
+        }
+      }
+
       function triggerRandomPick() {
         const cls = getCurrentClass();
         if (!cls) return;
@@ -4925,9 +4995,6 @@
           pickerSpinIntervalId = null;
         }
 
-        const badgeEl = document.getElementById('pickerBadge');
-        const titleEl = document.getElementById('pickerResultTitle');
-        const subEl = document.getElementById('pickerResultSub');
         const scoreBar = document.getElementById('pickerQuickScoreBar');
         if (scoreBar) scoreBar.classList.add('hidden');
 
@@ -4946,13 +5013,11 @@
 
           let ticks = 0;
           const totalTicks = 14;
-          badgeEl.textContent = 'Selecting Student...';
+          showPickerResult('#' + pool[0].classNo + ' ' + pool[0].name);
 
           pickerSpinIntervalId = setInterval(function () {
             const candidate = pool[Math.floor(Math.random() * pool.length)];
-            titleEl.textContent = '#' + candidate.classNo + ' ' + candidate.name;
-            const g = getGroupById(cls, candidate.groupId);
-            subEl.textContent = g ? (g.icon + ' ' + g.name) : 'Individual Student';
+            showPickerResult('#' + candidate.classNo + ' ' + candidate.name);
             playSubtleSound('tick');
             ticks++;
 
@@ -4964,10 +5029,7 @@
                 state.pickedStudentIds.push(winner.id);
               }
               state.lastPickedTarget = { type: 'student', id: winner.id };
-              const winGrp = getGroupById(cls, winner.groupId);
-              badgeEl.textContent = '🎉 Selected Student!';
-              titleEl.textContent = '#' + winner.classNo + ' ' + winner.name;
-              subEl.textContent = winGrp ? (winGrp.icon + ' ' + winGrp.name + ' • Highlighted on classroom map') : 'Highlighted on classroom map';
+              showPickerResult('#' + winner.classNo + ' ' + winner.name);
               playSubtleSound('fanfare');
               updatePickerModalUI();
               renderClassroomCanvas(false);
@@ -4982,12 +5044,11 @@
           }
           let ticks = 0;
           const totalTicks = 12;
-          badgeEl.textContent = 'Selecting Team...';
+          showPickerResult(cls.groups[0].icon + ' ' + cls.groups[0].name);
 
           pickerSpinIntervalId = setInterval(function () {
             const candidate = cls.groups[Math.floor(Math.random() * cls.groups.length)];
-            titleEl.textContent = candidate.icon + ' ' + candidate.name;
-            subEl.textContent = 'Team Score: ' + candidate.score;
+            showPickerResult(candidate.icon + ' ' + candidate.name);
             playSubtleSound('tick');
             ticks++;
 
@@ -4996,10 +5057,7 @@
               pickerSpinIntervalId = null;
               const winner = cls.groups[Math.floor(Math.random() * cls.groups.length)];
               state.lastPickedTarget = { type: 'group', id: winner.id };
-              const memberCount = cls.students.filter(function (s) { return s.groupId === winner.id; }).length;
-              badgeEl.textContent = '🛡️ Selected Team!';
-              titleEl.textContent = winner.icon + ' ' + winner.name;
-              subEl.textContent = memberCount + ' team members • Awarding +1/-1 updates all members!';
+              showPickerResult(winner.icon + ' ' + winner.name);
               playSubtleSound('fanfare');
               updatePickerModalUI();
             }
@@ -5331,8 +5389,13 @@
         placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
       }
 
-      // Expanded: grip, Zoom, minus, percent, plus, Fit. Collapsed: the word Zoom only.
-      // The gutter under the floor grows with the bar so desks stay clear.
+      // Expanded: grip, Zoom, minus, percent, plus, Fit.
+      // Collapsed: grip and the word Zoom. The grip stays so the pill can be dragged.
+      // Room under the pill (ZOOM_CHIP_GAP_BELOW) keeps the collapsed chip,
+      // including its shadow, inside the card and on the first screen at ~390.
+      var ZOOM_CHIP_GAP_ABOVE = 12;
+      var ZOOM_CHIP_GAP_BELOW = 20;
+
       function setZoomChipOpen(open) {
         state.zoomChipOpen = open === true;
         const chip = document.getElementById('zoomChip');
@@ -5342,11 +5405,11 @@
         if (!chip || !fold) return;
         chip.classList.toggle('is-collapsed', !state.zoomChipOpen);
         chip.classList.toggle('is-open', state.zoomChipOpen);
-        [grip, tools].forEach(function (el) {
-          if (!el) return;
-          if (state.zoomChipOpen) el.removeAttribute('hidden');
-          else el.setAttribute('hidden', '');
-        });
+        if (grip) grip.removeAttribute('hidden');
+        if (tools) {
+          if (state.zoomChipOpen) tools.removeAttribute('hidden');
+          else tools.setAttribute('hidden', '');
+        }
         fold.setAttribute('aria-expanded', state.zoomChipOpen ? 'true' : 'false');
         fold.setAttribute('aria-label', state.zoomChipOpen ? 'Collapse Zoom' : 'Expand Zoom');
         fold.title = state.zoomChipOpen ? 'Collapse Zoom' : 'Expand Zoom';
@@ -5357,38 +5420,68 @@
         const chip = document.getElementById('zoomChip');
         const slot = document.getElementById('zoomSlot');
         if (!chip || !slot) return;
-        // 12px of gutter above the chip, 8px below. Keeps score ± off the pill.
-        const h = Math.max(64, chip.offsetHeight + 20);
+        // Gap above keeps score ± off the pill. Gap below keeps the pill fully on screen.
+        const h = Math.max(72, chip.offsetHeight + ZOOM_CHIP_GAP_ABOVE + ZOOM_CHIP_GAP_BELOW);
         slot.style.height = h + 'px';
       }
 
-      // Default chip uses bottom anchoring inside the gutter. Shorten the floor
-      // until that gutter's bottom edge is on the first screen. A dragged chip
-      // keeps its saved top/left.
+      function elementDocTop(el) {
+        return el.getBoundingClientRect().top + window.scrollY;
+      }
+
+      // Grow the floor so the card, zoom gutter, and chip fill the remaining
+      // viewport. The chip stays inside the gutter, clear of score ± and the
+      // bottom edge. A dragged chip keeps its saved top/left.
       function fitFloorAboveZoomGutter() {
         if (zoomChipDrag) return;
         const floor = document.getElementById('classroomViewport');
         const slot = document.getElementById('zoomSlot');
-        if (!floor || !slot) return;
-        const cap = window.innerWidth >= 640 ? 650 : 600;
-        const minH = 260;
-        floor.style.height = cap + 'px';
+        const section = floor && floor.parentElement;
+        if (!floor || !slot || !section) return;
+        const minH = 140;
         syncZoomSlot();
-        const limit = window.innerHeight - 8;
-        let guard = 0;
-        while (guard < 6) {
-          const bottom = slot.getBoundingClientRect().bottom;
-          if (bottom <= limit + 0.5) break;
-          const cur = floor.getBoundingClientRect().height;
-          const next = Math.max(minH, Math.floor(cur - (bottom - limit)));
-          if (next >= cur - 0.5) break;
-          floor.style.height = next + 'px';
+        const limit = document.documentElement.clientHeight - 1;
+        const border = section.offsetHeight - section.clientHeight;
+        let floorH = Math.max(minH, Math.floor(limit - elementDocTop(section) - slot.offsetHeight - border));
+        floor.style.height = floorH + 'px';
+        syncZoomSlot();
+        const overflow = (elementDocTop(section) + section.offsetHeight) - limit;
+        if (overflow > 1) {
+          floor.style.height = Math.max(minH, Math.floor(floorH - overflow)) + 'px';
           syncZoomSlot();
-          guard++;
         }
+        fitLeaderboardColumn();
+      }
+
+      // Beside the floor, the leaderboard list fills down to the same bottom
+      // edge and scrolls inside the card. Stacked layouts keep the shorter list.
+      function fitLeaderboardColumn() {
+        const section = document.getElementById('studioFloorSection');
+        const body = document.getElementById('leaderboardBody');
+        if (!section || !body) return;
+        if (window.innerWidth < 1024) {
+          body.style.height = '';
+          body.style.maxHeight = '';
+          return;
+        }
+        const sectionBottom = elementDocTop(section) + section.offsetHeight;
+        const bodyH = Math.max(80, Math.floor(sectionBottom - elementDocTop(body) - 1));
+        body.style.height = bodyH + 'px';
+        body.style.maxHeight = bodyH + 'px';
+      }
+
+      var floorFitQueued = false;
+      function scheduleFloorFit() {
+        if (floorFitQueued) return;
+        floorFitQueued = true;
+        requestAnimationFrame(function () {
+          floorFitQueued = false;
+          refreshZoomChipFrame();
+        });
       }
 
       function refreshZoomChipFrame() {
+        if (zoomChipDrag) return;
         syncZoomSlot();
         fitFloorAboveZoomGutter();
         if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
@@ -5421,7 +5514,9 @@
       function initZoomChipDrag(chip) {
         chip.addEventListener('pointerdown', function (e) {
           if (e.button != null && e.button !== 0) return;
-          if (e.target.closest && e.target.closest('#zoomReadout')) return;
+          // Only the 6-dot grip moves the bar. A tap on Zoom still folds it,
+          // even when the pointer travels a few pixels.
+          if (!e.target.closest || !e.target.closest('#btnZoomGrip')) return;
           const offset = currentZoomChipOffset(chip);
           zoomChipDrag = {
             chip: chip,
@@ -5691,8 +5786,6 @@
         });
         groupDockCards.addEventListener('keydown', onGroupNameKeydown);
         groupDockCards.addEventListener('focusout', onGroupNameFocusOut);
-        document.getElementById('btnQuickAssignFromDock').addEventListener('click', openGroupModal);
-
         // Leaderboard Tabs, Filter & Score Buttons
         document.getElementById('tabLbStudents').addEventListener('click', function () {
           state.leaderboardTab = 'students';
@@ -6209,6 +6302,9 @@
         renderAll();
         setZoomChipOpen(state.zoomChipOpen);
         refreshZoomChipFrame();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(function () { refreshZoomChipFrame(); });
+        }
       });
     })();
   </script>
