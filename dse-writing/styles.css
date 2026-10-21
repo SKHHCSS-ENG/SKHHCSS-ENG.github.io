@@ -288,7 +288,8 @@ details.format-section[data-section="skeleton"] > summary {
   border-left-color: var(--accent);
 }
 
-/* Expand All / Collapse All — same pill language as the Tools chips */
+/* Expand All / Collapse All — same pill language as the Tools chips,
+   sized to the dock chip (40px) so the labels stay compact under the hero. */
 .section-toggle {
   display: flex;
   flex-wrap: wrap;
@@ -300,16 +301,17 @@ details.format-section[data-section="skeleton"] > summary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 8px 14px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0 10px;
   border-radius: 999px;
   border: 1.5px solid var(--accent);
   background: var(--card);
   color: var(--accent-ink);
   font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
-  font-size: .95rem;
+  font-size: .8125rem;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1;
   letter-spacing: 0;
   cursor: pointer;
   white-space: nowrap;
