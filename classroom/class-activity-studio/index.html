@@ -882,9 +882,10 @@
       line-height: 1;
       font-size: 12px;
     }
-    /* Icon-only Undo and Redo stay square at that same height. */
+    /* Icon-only Undo, Redo, and Reset Scores stay square at that same height. */
     #btnUndoLayout,
-    #btnRedoLayout {
+    #btnRedoLayout,
+    #btnOpenResetModal {
       width: var(--studio-chip-h);
       min-width: var(--studio-chip-h);
       padding-left: 0;
@@ -1131,11 +1132,11 @@
         <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled title="Redo" aria-label="Redo">
           <span aria-hidden="true">↪️</span>
         </button>
-        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save Layout" aria-label="Save Layout">
-          Save Layout
+        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save" aria-label="Save">
+          Save
         </button>
-        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Restore Layout" aria-label="Restore Layout">
-          Restore Layout
+        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Load" aria-label="Load">
+          Load
         </button>
       </div>
 
@@ -1145,8 +1146,8 @@
         <button id="btnAllPlusOne" type="button" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
-        <button id="btnOpenResetModal" type="button" class="px-3 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold whitespace-nowrap transition" title="Reset Scores" aria-label="Reset Scores">
-          🔄 Scores
+        <button id="btnOpenResetModal" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset Scores" aria-label="Reset Scores">
+          <span aria-hidden="true">🔄</span>
         </button>
       </div>
     </div>
@@ -1644,7 +1645,7 @@
       // Bump when desk size or step formula changes. Factory Quick Layout
       // buttons (Exam Rows, Paired Desks, 4-Desk Pods, Cluster by Group, Apply
       // Grid) always emit this pitch. Untouched factory seats reseed with it.
-      // Saved boards (Save Layout), dragged seats, and Restore Layout on a
+      // Saved boards (Save), dragged seats, and Load on a
       // class whose saved default was captured before this pitch keep the old
       // positions until the teacher reseeds with a Quick Layout button.
       const LAYOUT_PITCH_VERSION = 'desk-148x115-groupLr-8within-36aisle';
@@ -2419,7 +2420,7 @@
       }
 
       // Blank or oversized team names fall back to the previous name. The live
-      // group record is what localStorage, Save Layout, and Restore Layout already use.
+      // group record is what localStorage, Save, and Load already use.
       function normaliseGroupName(rawText, previous) {
         var prev = String(previous == null ? '' : previous);
         var next = String(rawText == null ? '' : rawText).replace(/\s+/g, ' ').trim();
@@ -3076,7 +3077,7 @@
         return reseeds;
       }
 
-      // Drop leavers from the saved membership list; newcomers keep the team they have now until Save Layout.
+      // Drop leavers from the saved membership list; newcomers keep the team they have now until Save.
       function syncDefaultGroupAssignments(cls) {
         var snap = cls && cls.defaultGroupSnapshot;
         if (!snap || !Array.isArray(snap.assignments)) return;
@@ -3331,7 +3332,7 @@
         (cls.defaultPositions || []).forEach(function (p) { locked[p.id] = true; });
         ensureNoOverlapsProtecting(cls.students, locked);
         const groupingRestored = applyDefaultGrouping(cls);
-        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Restore Layout');
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Load');
         saveState();
         renderHeaderControls();
         renderGroupBrushBar();
@@ -5410,7 +5411,7 @@
           showToast('Added desk #' + newSt.classNo + (boardEditsAllowed() ? ' — drag it anywhere!' : ''), '🪑');
         });
 
-        // History Undo / Redo (layout and edits) / Save Layout / Restore Layout, then All +1 · Reset Scores
+        // History Undo / Redo (layout and edits) / Save / Load, then All +1 · Reset Scores
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
         });
