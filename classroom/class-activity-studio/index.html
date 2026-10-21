@@ -242,8 +242,8 @@
         left: 10px;
       }
     }
-    /* Floor height is set in JS so the floor plus the zoom gutter fill the
-       remaining viewport. This is only the first-paint fallback. */
+    /* First-paint fallback before flex (desktop) or the mobile fit runs.
+       Individual Work and Group Work share this rule. */
     #classroomViewport {
       height: calc(100dvh - 320px);
       min-height: 140px;
@@ -253,17 +253,61 @@
     .studio-floor-section {
       overflow: visible;
     }
+    /* Team scoreboard sits inside the floor card. Collapsed it is one bar, so
+       it does not take a row of height from the desks. Open, the team cards
+       scroll inside the bar instead of pushing the floor short. */
+    .group-score-dock {
+      flex: none;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      padding: 0.4rem 0.75rem 0.45rem;
+    }
+    .group-score-dock.is-collapsed #groupDockCards {
+      display: none;
+    }
+    .group-score-dock.is-open #groupDockCards {
+      max-height: 15rem;
+      overflow: auto;
+    }
+    #studioFloorSection.has-dock #classroomViewport {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
     #leaderboardBody {
       max-height: 500px;
     }
-    /* Side-by-side: the leaderboard card fills the same column height as the floor. */
+    /* Desktop: one fill for both modes. The workspace locks to the viewport,
+       the floor card grows through the old empty strip, and the leaderboard
+       column matches that card. The zoom gutter stays inside the card. */
     @media (min-width: 1024px) {
+      html,
+      body {
+        height: 100dvh;
+        overflow: hidden;
+      }
       #studioWorkspace {
         align-items: stretch;
+        min-height: 0;
+        grid-template-rows: minmax(0, 1fr);
       }
+      #studioFloorCol,
       #studioSideCol {
         min-height: 0;
         height: 100%;
+      }
+      #studioSideCol {
+        overflow: hidden;
+      }
+      #studioFloorSection {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+      #classroomViewport {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto !important;
       }
       #leaderboardCard {
         flex: 1 1 auto;
@@ -1357,20 +1401,18 @@
   <main id="studioWorkspace" class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-5 pt-3 pb-0 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
     
     <!-- LEFT / CENTER COLUMN: GROUP SCOREBOARD DOCK (IN GROUP MODE) + FREEFORM CLASSROOM FLOOR PLAN -->
-    <div id="studioFloorCol" class="lg:col-span-8 xl:col-span-9 flex flex-col gap-3 min-h-0">
-      
-      <!-- GROUP WORK LIVE SCORE DOCK (Shown in Group Work mode, or toggleable) -->
-      <section id="groupScoreDock" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200/90 p-3.5 transition-all">
-        <div class="flex flex-wrap items-center gap-2 mb-2.5">
-          <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold uppercase tracking-wider">Group Work Active</span>
-          <h2 class="font-display font-bold text-slate-800 text-sm sm:text-base">Live Team Scoreboard</h2>
-        </div>
-        <!-- Group Cards Grid -->
-        <div id="groupDockCards" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5"></div>
-      </section>
+    <div id="studioFloorCol" class="lg:col-span-8 xl:col-span-9 flex flex-col min-h-0">
 
       <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
-      <section id="studioFloorSection" class="studio-floor-section relative bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col">
+      <section id="studioFloorSection" class="studio-floor-section relative bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col min-h-0">
+        <!-- Team scoreboard. One bar unless opened, so it does not steal the floor. -->
+        <section id="groupScoreDock" class="group-score-dock is-collapsed hidden">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="font-display font-bold text-slate-800 text-sm">Team Scoreboard</h2>
+            <button type="button" id="btnToggleTeamScoreboard" class="px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition" aria-expanded="false" aria-controls="groupDockCards">Show</button>
+          </div>
+          <div id="groupDockCards" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2 mt-2"></div>
+        </section>
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
           <!-- Scaled Inner Stage -->
@@ -2341,6 +2383,7 @@
         classes: [],
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
+        teamScoreboardOpen: false, // Group Work only. Closed keeps the floor as tall as Individual Work.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
@@ -2410,6 +2453,7 @@
               state.classes = parsed.classes;
               state.currentClassId = parsed.currentClassId || parsed.classes[0].id;
               state.activityMode = parsed.activityMode || 'individual';
+              state.teamScoreboardOpen = parsed.teamScoreboardOpen === true;
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
               // Missing flag stays on. Explicit false is teach mode (no rename, delete, drag, or layout tools).
@@ -2442,6 +2486,7 @@
             classes: state.classes,
             currentClassId: state.currentClassId,
             activityMode: state.activityMode,
+            teamScoreboardOpen: state.teamScoreboardOpen === true,
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
             editMode: state.editMode !== false,
@@ -3941,6 +3986,7 @@
       function renderGroupScoreDock() {
         const dock = document.getElementById('groupScoreDock');
         const container = document.getElementById('groupDockCards');
+        const section = document.getElementById('studioFloorSection');
         const cls = getCurrentClass();
         if (!dock || !container || !cls) return;
 
@@ -3957,14 +4003,28 @@
           state.editingGroupDeskId = '';
         }
 
-        if (state.activityMode !== 'group') {
-          dock.classList.add('hidden');
+        const group = state.activityMode === 'group';
+        const open = state.teamScoreboardOpen === true;
+        dock.classList.toggle('hidden', !group);
+        dock.classList.toggle('is-collapsed', !open);
+        dock.classList.toggle('is-open', open);
+        if (section) section.classList.toggle('has-dock', group);
+        const toggle = document.getElementById('btnToggleTeamScoreboard');
+        if (toggle) {
+          toggle.textContent = open ? 'Hide' : 'Show';
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          toggle.setAttribute('aria-label', open ? 'Hide Team Scoreboard' : 'Show Team Scoreboard');
+        }
+
+        if (!group) {
+          scheduleFloorFit();
           return;
         }
         dock.classList.remove('hidden');
 
         if (cls.groups.length === 0) {
           container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-500">No groups configured yet. Click "Manage Groups" to add groups!</div>';
+          scheduleFloorFit();
           return;
         }
 
@@ -3995,6 +4055,7 @@
           '</div>';
         }).join('');
         nameEditLock = false;
+        scheduleFloorFit();
       }
 
       // Compute dynamic stage bounds so large grids or tall layouts never clip
@@ -5425,49 +5486,45 @@
         slot.style.height = h + 'px';
       }
 
-      function elementDocTop(el) {
-        return el.getBoundingClientRect().top + window.scrollY;
+      function desktopFloorFill() {
+        return window.matchMedia('(min-width: 1024px)').matches;
       }
 
-      // Grow the floor so the card, zoom gutter, and chip fill the remaining
-      // viewport. The chip stays inside the gutter, clear of score ± and the
-      // bottom edge. A dragged chip keeps its saved top/left.
+      // Desktop: the floor card and the leaderboard flex to the same column.
+      // A pixel height pins the canvas short and leaves an empty strip under
+      // the desks, so those inline sizes are cleared. Individual and Group
+      // use this same rule. The zoom gutter stays the slot under the canvas.
+      // Narrow screens: size the canvas so the card fills the first screen.
+      // The leaderboard follows on the page scroll.
       function fitFloorAboveZoomGutter() {
         if (zoomChipDrag) return;
         const floor = document.getElementById('classroomViewport');
         const slot = document.getElementById('zoomSlot');
-        const section = floor && floor.parentElement;
+        const section = document.getElementById('studioFloorSection');
+        const lb = document.getElementById('leaderboardBody');
         if (!floor || !slot || !section) return;
-        const minH = 140;
         syncZoomSlot();
-        const limit = document.documentElement.clientHeight - 1;
+        if (lb) {
+          lb.style.height = '';
+          lb.style.maxHeight = '';
+        }
+        if (desktopFloorFill()) {
+          floor.style.height = '';
+          return;
+        }
+        const minH = 140;
+        const limit = window.innerHeight - 1;
         const border = section.offsetHeight - section.clientHeight;
-        let floorH = Math.max(minH, Math.floor(limit - elementDocTop(section) - slot.offsetHeight - border));
+        const dock = document.getElementById('groupScoreDock');
+        const dockH = (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
+        let floorH = Math.max(minH, Math.floor(limit - section.getBoundingClientRect().top - dockH - slot.offsetHeight - border));
         floor.style.height = floorH + 'px';
         syncZoomSlot();
-        const overflow = (elementDocTop(section) + section.offsetHeight) - limit;
+        const overflow = section.getBoundingClientRect().bottom - limit;
         if (overflow > 1) {
           floor.style.height = Math.max(minH, Math.floor(floorH - overflow)) + 'px';
           syncZoomSlot();
         }
-        fitLeaderboardColumn();
-      }
-
-      // Beside the floor, the leaderboard list fills down to the same bottom
-      // edge and scrolls inside the card. Stacked layouts keep the shorter list.
-      function fitLeaderboardColumn() {
-        const section = document.getElementById('studioFloorSection');
-        const body = document.getElementById('leaderboardBody');
-        if (!section || !body) return;
-        if (window.innerWidth < 1024) {
-          body.style.height = '';
-          body.style.maxHeight = '';
-          return;
-        }
-        const sectionBottom = elementDocTop(section) + section.offsetHeight;
-        const bodyH = Math.max(80, Math.floor(sectionBottom - elementDocTop(body) - 1));
-        body.style.height = bodyH + 'px';
-        body.style.maxHeight = bodyH + 'px';
       }
 
       var floorFitQueued = false;
@@ -5580,6 +5637,15 @@
           renderAll();
           showToast('Switched to Group Work Mode. Tap a name to rename. Team points also add to each member.', '🛡️');
         });
+        const btnTeamScoreboard = document.getElementById('btnToggleTeamScoreboard');
+        if (btnTeamScoreboard) {
+          btnTeamScoreboard.addEventListener('click', function () {
+            state.teamScoreboardOpen = state.teamScoreboardOpen !== true;
+            saveState();
+            renderGroupScoreDock();
+            scheduleFloorFit();
+          });
+        }
 
         document.getElementById('btnToggleEditName').addEventListener('click', function () {
           const active = document.activeElement;
