@@ -435,6 +435,9 @@
     }
     .side-panels-mark {
       display: block;
+      /* Face only. 75% of the 22px tab so ▶ / ◀ read smaller inside
+         the same 22×44 hit target. */
+      font-size: 0.75em;
       line-height: 1;
       pointer-events: none;
     }
@@ -1006,10 +1009,9 @@
       flex: none;
       min-width: 0;
     }
-    /* Edit + ON/OFF. Compact chip on the Register band.
-       Tools, beside Export CSV, uses this same switch. */
-    .studio-band #btnToggleEditName.edit-switch,
-    #btnToggleStudioBands.edit-switch {
+    /* Edit + ON/OFF. Compact pill on the Register band.
+       Tools keeps these ON/OFF colours; its outer frame is set with the header chips. */
+    .studio-band #btnToggleEditName.edit-switch {
       gap: 5px;
       padding-left: 8px;
       padding-right: 3px;
@@ -1386,8 +1388,10 @@
       }
     }
     /* Tools sits in the header, immediately after Export CSV.
-       Chrome is the Edit switch (.edit-switch / .is-on / .is-off).
-       These metrics match the Register chip, which Tools does not inherit.
+       ON/OFF fill and the inner capsule stay the Edit switch
+       (.is-on / .is-off and .edit-switch-value). The outer frame and
+       the Tools word match Podium and Sound in this bar: 12px radius,
+       6×12 padding, 1px white/25 border, text-xs then text-sm from 640px.
        Collapsing the bands does not move this slot. */
     .studio-header-export {
       margin-left: auto;
@@ -1398,13 +1402,34 @@
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
-      height: 26px;
+      gap: 6px;
+      height: auto;
       min-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
+      margin: 0;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
       font-size: 12px;
-      line-height: 1;
+      font-weight: 700;
+      line-height: 16px;
       white-space: nowrap;
+    }
+    @media (min-width: 640px) {
+      #btnToggleStudioBands.edit-switch {
+        font-size: 14px;
+        line-height: 20px;
+      }
+    }
+    #btnToggleStudioBands .edit-switch-name {
+      font-size: inherit;
+      line-height: inherit;
+    }
+    /* Same specificity as the shared Edit border, later in the file,
+       so only the Tools frame picks up the header stroke. */
+    #btnToggleStudioBands.edit-switch.is-on,
+    #btnToggleStudioBands.edit-switch.is-off {
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: none;
     }
     #btnToggleStudioBands.edit-switch:focus-visible {
       outline: 2px solid #fff;
