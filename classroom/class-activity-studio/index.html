@@ -45,14 +45,15 @@
       border-color: #818cf8;
       box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.45);
     }
-    /* Resting Zoom sits in the gutter under the floor, not on the desks.
+    /* Resting Zoom sits in the gutter under the desk grid, not on the cards.
+       The floor height is capped so that gutter is inside the first screen.
        Collapsed it is one 40px Tools-style pill. Expanded it is − / % / ＋ / Fit
        on one row, wrapping only if the row cannot fit. The right edge stays
        clear of the site Tools dock (fixed window bottom-right). Drag still
        lifts the chip onto the board. */
     .zoom-slot {
       flex: none;
-      height: 56px;
+      height: 64px;
       pointer-events: none;
     }
     .zoom-chip {
@@ -188,13 +189,22 @@
     @media (min-width: 640px) {
       .zoom-chip {
         left: 10px;
-        bottom: 10px;
       }
     }
-    /* Small end padding. The Zoom chip rests in the gutter below the floor,
-       so the last desk row does not need a tall clearance band. */
+    /* Floor height is tightened in JS so the gutter below it stays on screen.
+       These caps are the fallback before that measurement. */
+    #classroomViewport {
+      height: min(600px, calc(100dvh - 430px));
+      min-height: 260px;
+    }
+    @media (min-width: 640px) {
+      #classroomViewport {
+        height: min(650px, calc(100dvh - 300px));
+      }
+    }
+    /* Last row can scroll fully above the gutter. The chip itself is not on the floor. */
     #classroomStage {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
     /* Front-of-room label only. No smartboard graphic and no teacher's desk.
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
@@ -1265,7 +1275,7 @@
       <!-- FREEFORM CLASSROOM FLOOR PLAN CONTAINER -->
       <section class="relative bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col">
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
-        <div id="classroomViewport" class="classroom-floor snap-active w-full h-[600px] sm:h-[650px] relative select-none">
+        <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
           <!-- Scaled Inner Stage -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
             
@@ -5291,14 +5301,41 @@
         const chip = document.getElementById('zoomChip');
         const slot = document.getElementById('zoomSlot');
         if (!chip || !slot) return;
-        const h = Math.max(56, chip.offsetHeight + 16);
+        // 12px of gutter above the chip, 8px below. Keeps score ± off the pill.
+        const h = Math.max(64, chip.offsetHeight + 20);
         slot.style.height = h + 'px';
+      }
+
+      // Default chip uses bottom anchoring inside the gutter. Shorten the floor
+      // until that gutter's bottom edge is on the first screen. A dragged chip
+      // keeps its saved top/left.
+      function fitFloorAboveZoomGutter() {
+        if (zoomChipDrag) return;
+        const floor = document.getElementById('classroomViewport');
+        const slot = document.getElementById('zoomSlot');
+        if (!floor || !slot) return;
+        const cap = window.innerWidth >= 640 ? 650 : 600;
+        const minH = 260;
+        floor.style.height = cap + 'px';
+        syncZoomSlot();
+        const limit = window.innerHeight - 8;
+        let guard = 0;
+        while (guard < 6) {
+          const bottom = slot.getBoundingClientRect().bottom;
+          if (bottom <= limit + 0.5) break;
+          const cur = floor.getBoundingClientRect().height;
+          const next = Math.max(minH, Math.floor(cur - (bottom - limit)));
+          if (next >= cur - 0.5) break;
+          floor.style.height = next + 'px';
+          syncZoomSlot();
+          guard++;
+        }
       }
 
       function refreshZoomChipFrame() {
         syncZoomSlot();
+        fitFloorAboveZoomGutter();
         if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
-        syncZoomSlot();
       }
 
       function currentZoomChipOffset(chip) {
