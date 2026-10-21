@@ -1041,7 +1041,7 @@
         </button>
 
         <!-- Edit: gate for name, seat number, team rename, and delete. On by default. -->
-        <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit on" aria-pressed="true">
+        <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit On" aria-pressed="true">
           <span class="edit-switch-name">Edit</span>
           <span class="edit-switch-value" aria-hidden="true">ON</span>
         </button>
@@ -3590,7 +3590,7 @@
           btnEditName.disabled = false;
           btnEditName.removeAttribute('aria-disabled');
           btnEditName.className = 'edit-switch ' + (editing ? 'is-on' : 'is-off');
-          btnEditName.setAttribute('aria-label', editing ? 'Edit on' : 'Edit off');
+          btnEditName.setAttribute('aria-label', editing ? 'Edit On' : 'Edit Off');
           btnEditName.setAttribute('aria-pressed', editing ? 'true' : 'false');
           btnEditName.removeAttribute('title');
           if (valueEl) valueEl.textContent = editing ? 'ON' : 'OFF';
@@ -5198,7 +5198,7 @@
           renderGroupScoreDock();
           renderClassroomCanvas(false);
           renderGroupModalContents();
-          showToast(state.editMode !== false ? 'Editing on' : 'Editing off', '✏️');
+          showToast(state.editMode !== false ? 'Edit On' : 'Edit Off', '✏️');
         });
 
         // Sound Toggle
