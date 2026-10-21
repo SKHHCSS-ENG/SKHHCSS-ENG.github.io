@@ -1194,12 +1194,23 @@
         padding: 3px 7px;
       }
     }
-    /* One Show/Hide for the whole band row. It sits in the empty space
-       at the right-hand end of that row. Hide removes every band frame. */
+    /* One Show/Hide for the whole toolbar. The same top-right slot holds
+       Hide when the bands are open and Show when they are collapsed.
+       It does not drop onto the History row. */
+    #studioToolbarRow {
+      position: relative;
+      padding-right: 4.75rem;
+    }
+    @media (min-width: 640px) {
+      #studioToolbarRow {
+        padding-right: 5.75rem;
+      }
+    }
     .studio-toolbar-toggle {
-      margin-left: auto;
-      align-self: center;
-      flex: 0 0 auto;
+      position: absolute;
+      top: 0.5rem;
+      right: 0.75rem;
+      z-index: 2;
       box-sizing: border-box;
       height: 26px;
       padding: 0 10px;
@@ -1210,6 +1221,11 @@
       font-size: 12px;
       font-weight: 800;
       line-height: 1;
+    }
+    @media (min-width: 640px) {
+      .studio-toolbar-toggle {
+        right: 1.25rem;
+      }
     }
     .studio-toolbar-toggle:hover,
     .studio-toolbar-toggle:focus-visible {
@@ -1223,8 +1239,9 @@
       display: none;
     }
     #studioToolbar.is-collapsed #studioToolbarRow {
-      padding-top: 0.35rem;
-      padding-bottom: 0.35rem;
+      min-height: 2.625rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
     }
     .studio-band button {
       box-sizing: border-box;
