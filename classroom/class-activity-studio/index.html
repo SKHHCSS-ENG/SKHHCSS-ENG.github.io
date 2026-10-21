@@ -398,18 +398,18 @@
       margin: 0;
       text-align: center;
     }
-    /* The tab stays on the right edge of the classroom frame. Panels open:
-       ▶ tucks them. Panels tucked: ◀ brings them back. Width stays the slim
-       tab. Height stays a 44px touch target. The same width is reserved
-       past the page padding so the tab sits beside the cards. */
+    /* The tab stays on the right edge of the classroom frame, at the
+       vertical middle. Panels open: ▶ tucks them. Panels tucked: ◀
+       brings them back. Width stays the slim tab. Height stays a 44px
+       touch target. The same width is reserved past the page padding
+       so the tab sits beside the cards. The slot does not move when
+       the panels tuck or return. */
     .side-panels-tab {
       position: fixed;
       z-index: 36;
-      /* Lower edge of the classroom, clear of the header and the
-         bottom-right tools corner. The slot does not move when the
-         panels tuck or return. */
-      bottom: 96px;
+      top: 50%;
       right: max(0px, calc((100vw - 1600px) / 2));
+      transform: translateY(-50%);
       box-sizing: border-box;
       display: inline-flex;
       align-items: center;
