@@ -1073,9 +1073,13 @@
         </button>
 
         <!-- Manual Grouping Modal Button -->
-        <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition" title="Open Manual Team & Group Manager">
+        <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition" title="Manage Groups" aria-label="Manage Groups">
           <span>🛡️</span>
-          <span>Manage Teams</span>
+          <span>Manage Groups</span>
+        </button>
+
+        <button id="btnQuickAddGroup" type="button" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1 transition" title="Add Group" aria-label="Add Group">
+          <span>＋ Group</span>
         </button>
 
         <!-- Quick Add Student Button -->
@@ -2204,7 +2208,7 @@
       let nameEditLock = false;
       let groupEditToken = 0;
       let keepGroupEditOpen = false;
-      // Roster / Manage Teams fields commit one history step on blur, not per key.
+      // Roster / Manage Groups fields commit one history step on blur, not per key.
       let fieldEditBefore = null;
       let fieldEditLabel = '';
       let skipEditCommit = false;
@@ -2527,6 +2531,30 @@
         return true;
       }
 
+      // Same team list as Manage Groups → ＋ Add Team. One new group, on the shared edit stack.
+      function addNewGroup() {
+        const cls = getCurrentClass();
+        if (!cls) return null;
+        const nextNum = cls.groups.length + 1;
+        const colorKey = PALETTE_KEYS[(nextNum - 1) % PALETTE_KEYS.length];
+        const icons = ['🦅', '🐬', '🐉', '🔥', '🦄', '🐯', '🦁', '⚡'];
+        const before = snapshotBoardEdit(cls);
+        const grp = {
+          id: 'grp_' + Date.now(),
+          name: 'Team ' + nextNum,
+          icon: icons[(nextNum - 1) % icons.length],
+          color: colorKey,
+          score: 0
+        };
+        cls.groups.push(grp);
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Add group ' + grp.name);
+        saveState();
+        renderAll();
+        renderIfModalOpen();
+        showToast(grp.name, grp.icon);
+        return grp;
+      }
+
       function focusGroupInput(input) {
         if (!input) return;
         input.focus();
@@ -2612,14 +2640,14 @@
         const before = snapshotBoardEdit(cls);
         st.groupId = next;
         const grp = getGroupById(cls, next);
-        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Set team to ' + (grp ? grp.name : 'No Team'));
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Set group to ' + (grp ? grp.name : 'No Group'));
         saveState();
         renderGroupBrushBar();
         renderGroupScoreDock();
         renderClassroomCanvas(false);
         renderLeaderboardAndStats();
         renderIfModalOpen();
-        showToast(grp ? grp.name : 'No Team', '🛡️');
+        showToast(grp ? grp.name : 'No Group', '🛡️');
         return true;
       }
 
@@ -2629,7 +2657,7 @@
         // Edit Off keeps the group-name chip as text. It is not a menu.
         if (!boardEditsAllowed()) {
           if (!grp || !pal) {
-            return '<span data-desk-team-badge="1" class="desk-team-static bg-slate-100 text-slate-400 font-semibold">No Team</span>';
+            return '<span data-desk-team-badge="1" class="desk-team-static bg-slate-100 text-slate-400 font-semibold">No Group</span>';
           }
           return '<span data-desk-team-badge="1" class="desk-team-static ' + pal.badgeBg + ' ' + pal.text + '">' +
             escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
@@ -2643,9 +2671,9 @@
           return '<option value="' + escapeHtml(g.id) + '"' + (selected ? ' selected' : '') + '>' +
             escapeHtml((g.icon ? g.icon + ' ' : '') + g.name) + '</option>';
         }).join('');
-        options = '<option value=""' + (matched ? '' : ' selected') + '>No Team</option>' + options;
+        options = '<option value=""' + (matched ? '' : ' selected') + '>No Group</option>' + options;
         var tone = (!grp || !pal) ? 'desk-team-select is-none' : ('desk-team-select ' + pal.badgeBg + ' ' + pal.text);
-        return '<select data-desk-team-badge="1" data-desk-team-select="' + escapeHtml(st.id) + '" class="' + tone + '" aria-label="Choose Team">' +
+        return '<select data-desk-team-badge="1" data-desk-team-select="' + escapeHtml(st.id) + '" class="' + tone + '" aria-label="Choose Group">' +
           options +
           '</select>';
       }
@@ -3748,7 +3776,7 @@
         dock.classList.remove('hidden');
 
         if (cls.groups.length === 0) {
-          container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-500">No teams configured yet. Click "Manage Teams" to add groups!</div>';
+          container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-500">No groups configured yet. Click "Manage Groups" to add groups!</div>';
           return;
         }
 
@@ -3887,7 +3915,7 @@
               '<div class="desk-team-row flex items-center justify-between mb-0.5 gap-1">' +
                 groupBadgeHtml +
                 (state.activityMode === 'group' && grp
-                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole team (' + escapeHtml(grp.name) + ')">Team+1</button>'
+                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Add +1 to whole group (' + escapeHtml(grp.name) + ')">Group+1</button>'
                   : '') +
               '</div>' +
               '<!-- Row 4: Compact − / + ; aria keeps the “one” for screen readers -->' +
@@ -5411,6 +5439,8 @@
           showToast('Added desk #' + newSt.classNo + (boardEditsAllowed() ? ' — drag it anywhere!' : ''), '🪑');
         });
 
+        document.getElementById('btnQuickAddGroup').addEventListener('click', addNewGroup);
+
         // History Undo / Redo (layout and edits) / Save / Load, then All +1 · Reset Scores
         document.getElementById('btnAllPlusOne').addEventListener('click', function () {
           adjustWholeClassScore(1);
@@ -5766,23 +5796,7 @@
         document.getElementById('btnCloseGroupModal').addEventListener('click', closeGroupModal);
         document.getElementById('btnDoneGroupModal').addEventListener('click', closeGroupModal);
 
-        document.getElementById('btnAddNewGroup').addEventListener('click', function () {
-          const cls = getCurrentClass();
-          if (!cls) return;
-          const nextNum = cls.groups.length + 1;
-          const colorKey = PALETTE_KEYS[(nextNum - 1) % PALETTE_KEYS.length];
-          const icons = ['🦅', '🐬', '🐉', '🔥', '🦄', '🐯', '🦁', '⚡'];
-          cls.groups.push({
-            id: 'grp_' + Date.now(),
-            name: 'Team ' + nextNum,
-            icon: icons[(nextNum - 1) % icons.length],
-            color: colorKey,
-            score: 0
-          });
-          saveState();
-          renderAll();
-          renderGroupModalContents();
-        });
+        document.getElementById('btnAddNewGroup').addEventListener('click', addNewGroup);
 
         document.getElementById('groupManagerList').addEventListener('input', function (e) {
           const cls = getCurrentClass();
