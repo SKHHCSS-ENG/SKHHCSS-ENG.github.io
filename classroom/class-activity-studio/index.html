@@ -298,21 +298,40 @@
     /* :not(.hidden) so this does not beat Tailwind .hidden in Individual Work.
        The dock keeps its own height. It does not shrink to uncover the floor
        by sliding over the desks. */
+    /* Clip at the dock edge. Team cards must not paint onto the desks. */
     #groupScoreDock.is-open:not(.hidden) {
       flex: 0 0 auto;
-      display: block;
-      overflow: visible;
-    }
-    /* Heading and Show/Hide sit together in the middle of the bar. */
-    .group-score-dock-bar {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+      flex-direction: column;
+      overflow: clip;
     }
-    /* Team cards stay a centred group for 1 team or many. They do not
-       stretch into a left-aligned row with an empty side. */
+    /* Title stays centred on the dock. Show/Hide sits on the right. */
+    .group-score-dock-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      min-height: 26px;
+    }
+    .group-score-dock-bar h2 {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      margin: 0;
+      text-align: center;
+      pointer-events: none;
+    }
+    #btnToggleTeamScoreboard {
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: end;
+      position: relative;
+      z-index: 1;
+    }
+    /* The scroller is a block. A flex container was letting wrapped cards
+       paint past max-height onto the desks. The row inside does the wrap. */
     #groupDockCards {
+      min-width: 0;
+    }
+    .group-dock-cards-row {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -325,7 +344,7 @@
       min-width: min(100%, 9rem);
       box-sizing: border-box;
     }
-    #groupDockCards > .col-span-full {
+    .group-dock-cards-row > .col-span-full {
       flex: 1 0 100%;
       text-align: center;
     }
@@ -333,9 +352,12 @@
       display: none;
     }
     #groupScoreDock.is-open #groupDockCards {
+      display: block;
       flex: none;
+      min-height: 0;
       max-height: 8.75rem;
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
       margin-top: 0.5rem;
     }
     @media (max-width: 1023px) {
@@ -1172,6 +1194,38 @@
         padding: 3px 7px;
       }
     }
+    /* One Show/Hide for the whole band row. It sits in the empty space
+       at the right-hand end of that row. Hide removes every band frame. */
+    .studio-toolbar-toggle {
+      margin-left: auto;
+      align-self: center;
+      flex: 0 0 auto;
+      box-sizing: border-box;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(42, 143, 173, 0.45);
+      background: rgba(42, 143, 173, 0.08);
+      color: #123a4d;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .studio-toolbar-toggle:hover,
+    .studio-toolbar-toggle:focus-visible {
+      background: rgba(42, 143, 173, 0.16);
+    }
+    .studio-toolbar-toggle:focus-visible {
+      outline: 2px solid #123a4d;
+      outline-offset: 2px;
+    }
+    #studioToolbar.is-collapsed .studio-band {
+      display: none;
+    }
+    #studioToolbar.is-collapsed #studioToolbarRow {
+      padding-top: 0.35rem;
+      padding-bottom: 0.35rem;
+    }
     .studio-band button {
       box-sizing: border-box;
       height: var(--studio-chip-h);
@@ -1364,8 +1418,8 @@
   </header>
 
   <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right). -->
-  <section class="bg-white border-b border-slate-200 shadow-sm z-30">
-    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+  <section id="studioToolbar" class="bg-white border-b border-slate-200 shadow-sm z-30">
+    <div id="studioToolbarRow" class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
       <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Manage Groups, Assign Groups. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
@@ -1456,6 +1510,7 @@
           <span aria-hidden="true">🔄</span>
         </button>
       </div>
+      <button type="button" id="btnToggleStudioBands" class="studio-toolbar-toggle" aria-expanded="true" aria-controls="studioToolbarRow">Hide</button>
     </div>
 
     <!-- MANUAL GROUP PAINT BRUSH BAR (Visible when Paint Mode is active or in Group Mode) -->
@@ -2466,6 +2521,7 @@
         currentClassId: '',
         activityMode: 'individual', // 'individual' | 'group'
         teamScoreboardOpen: false, // Group Work only. Closed keeps the floor as tall as Individual Work.
+        studioBandsOpen: true, // One Show/Hide for Register, Seating, History, and Scores.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
@@ -2536,6 +2592,7 @@
               state.currentClassId = parsed.currentClassId || parsed.classes[0].id;
               state.activityMode = parsed.activityMode || 'individual';
               state.teamScoreboardOpen = parsed.teamScoreboardOpen === true;
+              state.studioBandsOpen = parsed.studioBandsOpen !== false;
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
               // Missing flag stays on. Explicit false is teach mode (no rename, delete, drag, or layout tools).
@@ -2569,6 +2626,7 @@
             currentClassId: state.currentClassId,
             activityMode: state.activityMode,
             teamScoreboardOpen: state.teamScoreboardOpen === true,
+            studioBandsOpen: state.studioBandsOpen !== false,
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
             editMode: state.editMode !== false,
@@ -3872,7 +3930,20 @@
       // RENDER FUNCTIONS: HEADER, GROUP DOCK, DESKS CANVAS, LEADERBOARD
       // ===================================================================
 
+      function applyStudioBands() {
+        const open = state.studioBandsOpen !== false;
+        const bar = document.getElementById('studioToolbar');
+        const btn = document.getElementById('btnToggleStudioBands');
+        if (bar) bar.classList.toggle('is-collapsed', !open);
+        if (btn) {
+          btn.textContent = open ? 'Hide' : 'Show';
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', open ? 'Hide' : 'Show');
+        }
+      }
+
       function renderAll() {
+        applyStudioBands();
         renderHeaderControls();
         renderGroupBrushBar();
         renderGroupScoreDock();
@@ -4105,13 +4176,13 @@
         dock.classList.remove('hidden');
 
         if (cls.groups.length === 0) {
-          container.innerHTML = '<div class="col-span-full text-center py-4 text-xs text-slate-500">No groups configured yet. Click "Manage Groups" to add groups!</div>';
+          container.innerHTML = '<div class="group-dock-cards-row"><div class="col-span-full text-center py-4 text-xs text-slate-500">No groups configured yet. Click "Manage Groups" to add groups!</div></div>';
           scheduleFloorFit();
           return;
         }
 
         nameEditLock = true;
-        container.innerHTML = cls.groups.map(function (grp) {
+        container.innerHTML = '<div class="group-dock-cards-row">' + cls.groups.map(function (grp) {
           const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
           const memberCount = cls.students.filter(function (s) { return s.groupId === grp.id; }).length;
           const editing = boardEditsAllowed();
@@ -4135,7 +4206,7 @@
               '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Give +1 to this team and each member">+</button>' +
             '</div>' +
           '</div>';
-        }).join('');
+        }).join('') + '</div>';
         nameEditLock = false;
         scheduleFloorFit();
       }
@@ -5741,6 +5812,15 @@
             state.teamScoreboardOpen = state.teamScoreboardOpen !== true;
             saveState();
             renderGroupScoreDock();
+            scheduleFloorFit();
+          });
+        }
+        const btnStudioBands = document.getElementById('btnToggleStudioBands');
+        if (btnStudioBands) {
+          btnStudioBands.addEventListener('click', function () {
+            state.studioBandsOpen = state.studioBandsOpen === false;
+            saveState();
+            applyStudioBands();
             scheduleFloorFit();
           });
         }
