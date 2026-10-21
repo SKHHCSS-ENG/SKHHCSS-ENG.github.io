@@ -1009,8 +1009,8 @@
       flex: none;
       min-width: 0;
     }
-    /* Edit + ON/OFF. Compact pill on the Register band.
-       Tools keeps these ON/OFF colours; its outer frame is set with the header chips. */
+    /* Edit + ON/OFF. Compact pill on the Register band only.
+       The header Tools chip does not use this frame. */
     .studio-band #btnToggleEditName.edit-switch {
       gap: 5px;
       padding-left: 8px;
@@ -1035,35 +1035,29 @@
       letter-spacing: 0.04em;
       line-height: 1;
     }
-    #btnToggleEditName.edit-switch.is-on,
-    #btnToggleStudioBands.edit-switch.is-on {
+    #btnToggleEditName.edit-switch.is-on {
       background: #fcd34d;
       color: #0f172a;
       border: 1px solid #f59e0b;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
     }
-    #btnToggleEditName.edit-switch.is-on:hover,
-    #btnToggleStudioBands.edit-switch.is-on:hover {
+    #btnToggleEditName.edit-switch.is-on:hover {
       background: #fde68a;
     }
-    #btnToggleEditName.edit-switch.is-on .edit-switch-value,
-    #btnToggleStudioBands.edit-switch.is-on .edit-switch-value {
+    #btnToggleEditName.edit-switch.is-on .edit-switch-value {
       background: #fff;
       color: #92400e;
     }
-    #btnToggleEditName.edit-switch.is-off,
-    #btnToggleStudioBands.edit-switch.is-off {
+    #btnToggleEditName.edit-switch.is-off {
       background: #fff;
       color: #334155;
       border: 1px solid #cbd5e1;
       box-shadow: none;
     }
-    #btnToggleEditName.edit-switch.is-off:hover,
-    #btnToggleStudioBands.edit-switch.is-off:hover {
+    #btnToggleEditName.edit-switch.is-off:hover {
       background: #fffbeb;
     }
-    #btnToggleEditName.edit-switch.is-off .edit-switch-value,
-    #btnToggleStudioBands.edit-switch.is-off .edit-switch-value {
+    #btnToggleEditName.edit-switch.is-off .edit-switch-value {
       background: #e2e8f0;
       color: #475569;
     }
@@ -1388,15 +1382,16 @@
       }
     }
     /* Tools sits in the header, immediately after Export CSV.
-       ON/OFF fill and the inner capsule stay the Edit switch
-       (.is-on / .is-off and .edit-switch-value). The outer frame and
-       the Tools word match Podium and Sound in this bar: 12px radius,
-       6×12 padding, 1px white/25 border, text-xs then text-sm from 640px.
-       Collapsing the bands does not move this slot. */
+       The outer chip matches Podium and Sound: white/15 fill, white/25
+       border, rounded-xl, text-xs then text-sm from 640px. Amber and
+       muted live only on the inner ON/OFF capsule. Collapsing the bands
+       does not move this slot. */
     .studio-header-export {
       margin-left: auto;
     }
-    #btnToggleStudioBands.edit-switch {
+    #btnToggleStudioBands.edit-switch,
+    #btnToggleStudioBands.edit-switch.is-on,
+    #btnToggleStudioBands.edit-switch.is-off {
       box-sizing: border-box;
       display: inline-flex;
       align-items: center;
@@ -1404,32 +1399,49 @@
       flex: 0 0 auto;
       gap: 6px;
       height: auto;
-      min-height: 0;
+      min-height: 30px;
       margin: 0;
       padding: 6px 12px;
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      box-shadow: none;
       font-size: 12px;
       font-weight: 700;
       line-height: 16px;
       white-space: nowrap;
     }
     @media (min-width: 640px) {
-      #btnToggleStudioBands.edit-switch {
+      #btnToggleStudioBands.edit-switch,
+      #btnToggleStudioBands.edit-switch.is-on,
+      #btnToggleStudioBands.edit-switch.is-off {
+        min-height: 34px;
         font-size: 14px;
         line-height: 20px;
       }
     }
+    #btnToggleStudioBands.edit-switch:hover,
+    #btnToggleStudioBands.edit-switch.is-on:hover,
+    #btnToggleStudioBands.edit-switch.is-off:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
     #btnToggleStudioBands .edit-switch-name {
       font-size: inherit;
       line-height: inherit;
+      color: inherit;
     }
-    /* Same specificity as the shared Edit border, later in the file,
-       so only the Tools frame picks up the header stroke. */
-    #btnToggleStudioBands.edit-switch.is-on,
-    #btnToggleStudioBands.edit-switch.is-off {
-      border-color: rgba(255, 255, 255, 0.25);
-      box-shadow: none;
+    /* Inner capsule only. Same amber / muted pair as Edit, not the outer chip. */
+    #btnToggleStudioBands.edit-switch.is-on .edit-switch-value {
+      background: #fcd34d;
+      color: #0f172a;
+      border: 1px solid #f59e0b;
+    }
+    #btnToggleStudioBands.edit-switch.is-off .edit-switch-value {
+      background: #e2e8f0;
+      color: #475569;
+      border: 1px solid #cbd5e1;
     }
     #btnToggleStudioBands.edit-switch:focus-visible {
       outline: 2px solid #fff;
