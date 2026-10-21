@@ -12,6 +12,8 @@
     :root {
       --font-display: 'Fredoka', 'Inter', sans-serif;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      /* Chevron only. 44px was the vertical Show/Hide word. */
+      --side-panels-tab-w: 22px;
     }
     body {
       font-family: var(--font-sans);
@@ -396,10 +398,10 @@
       margin: 0;
       text-align: center;
     }
-    /* The tab stays on the right edge of the classroom frame. Hide and Show
-       are the same box; only the word changes. 44px matches the page
-       padding plus the gutter on the column, so the tab sits beside the
-       cards instead of covering them. */
+    /* The tab stays on the right edge of the classroom frame. Panels open:
+       > tucks them. Panels tucked: < brings them back. Width is only the
+       chevron. Height stays a 44px touch target. The same width is reserved
+       past the page padding so the tab sits beside the cards. */
     .side-panels-tab {
       position: fixed;
       z-index: 36;
@@ -412,25 +414,29 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 92px;
+      width: var(--side-panels-tab-w);
+      min-width: var(--side-panels-tab-w);
+      height: 44px;
+      min-height: 44px;
       margin: 0;
-      padding: 8px 0;
+      padding: 0;
       border: 1px solid rgba(42, 143, 173, 0.55);
       border-right: 0;
-      border-radius: 12px 0 0 12px;
+      border-radius: 10px 0 0 10px;
       background: #fff;
       color: #123a4d;
       font-family: inherit;
-      font-size: 13px;
+      font-size: 22px;
       font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: 0.04em;
-      writing-mode: vertical-rl;
-      text-orientation: upright;
+      line-height: 1;
       cursor: pointer;
       touch-action: manipulation;
       box-shadow: -2px 1px 8px rgba(15, 23, 42, 0.14);
+    }
+    .side-panels-mark {
+      display: block;
+      line-height: 1;
+      pointer-events: none;
     }
     .side-panels-tab:hover,
     .side-panels-tab:focus-visible {
@@ -441,21 +447,21 @@
       outline-offset: 2px;
     }
     #studioSideCol {
-      padding-right: calc(44px - 12px);
+      padding-right: calc(var(--side-panels-tab-w) - 12px);
     }
     @media (min-width: 640px) {
       #studioSideCol {
-        padding-right: calc(44px - 20px);
+        padding-right: calc(var(--side-panels-tab-w) - 20px);
       }
     }
     @media (max-width: 1023px) {
       #studioFloorCol {
-        padding-right: calc(44px - 12px);
+        padding-right: calc(var(--side-panels-tab-w) - 12px);
       }
     }
     @media (min-width: 640px) and (max-width: 1023px) {
       #studioFloorCol {
-        padding-right: calc(44px - 20px);
+        padding-right: calc(var(--side-panels-tab-w) - 20px);
       }
     }
     #studioSideCol.is-tucked {
@@ -466,7 +472,7 @@
     }
     @media (min-width: 1024px) {
       #studioFloorCol.is-wide {
-        padding-right: calc(44px - 20px);
+        padding-right: calc(var(--side-panels-tab-w) - 20px);
       }
     }
     #pulseCard {
@@ -1789,7 +1795,7 @@
         </div>
       </div>
     </aside>
-    <button type="button" id="btnToggleSidePanels" class="side-panels-tab" aria-expanded="true" aria-controls="studioSideCol" aria-label="Hide">Hide</button>
+    <button type="button" id="btnToggleSidePanels" class="side-panels-tab" aria-expanded="true" aria-controls="studioSideCol" aria-label="Hide"><span class="side-panels-mark" aria-hidden="true">&gt;</span></button>
   </main>
 
   <!-- ===================================================================== -->
@@ -2754,6 +2760,7 @@
               state.currentClassId = parsed.currentClassId || parsed.classes[0].id;
               state.activityMode = parsed.activityMode || 'individual';
               state.teamScoreboardOpen = parsed.teamScoreboardOpen === true;
+              // No saved flag opens both. Explicit false is a tuck to remember.
               state.classPulseOpen = parsed.classPulseOpen !== false;
               state.leaderboardOpen = parsed.leaderboardOpen !== false;
               // One Show/Hide for both panels. An older save that closed only one closes the pair.
@@ -4149,7 +4156,8 @@
         if (side) side.classList.toggle('is-tucked', !open);
         if (floorCol) floorCol.classList.toggle('is-wide', !open);
         if (btn) {
-          btn.textContent = open ? 'Hide' : 'Show';
+          const mark = btn.querySelector('.side-panels-mark');
+          if (mark) mark.textContent = open ? '>' : '<';
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
           btn.setAttribute('aria-label', open ? 'Hide' : 'Show');
         }
