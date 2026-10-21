@@ -359,6 +359,17 @@
       flex: 1 0 100%;
       text-align: center;
     }
+    /* A name that still overflows beside the score takes the whole card width,
+       then the score sits under it. Two lines at 12px can then show the name. */
+    .group-dock-head.is-name-block {
+      flex-wrap: wrap;
+    }
+    .group-dock-head.is-name-block > .min-w-0 {
+      flex: 1 0 100%;
+    }
+    .group-dock-head.is-name-block > .group-score-row {
+      margin-left: auto;
+    }
     #groupScoreDock.is-collapsed #groupDockCards {
       display: none;
     }
@@ -663,6 +674,19 @@
       font-size: 14px;
       position: relative;
     }
+    .desk-score-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .desk-score-actions.is-grouped {
+      grid-template-columns: 1fr auto 1fr;
+    }
+    .desk-card .desk-action-btn[data-desk-team-plus] {
+      font-size: 10px;
+      padding-left: 6px;
+      padding-right: 6px;
+    }
     .desk-card .desk-action-btn::before {
       content: "";
       position: absolute;
@@ -689,7 +713,7 @@
       font-size: 1.125rem;
       line-height: 1.15;
       color: #0f172a;
-      text-align: left;
+      text-align: center;
     }
     /* The label is the fitted surface. Buttons do not clamp reliably.
        One line, then a smaller size, then two lines. Ellipsis only after that. */
@@ -701,6 +725,7 @@
       white-space: nowrap;
       text-overflow: clip;
       line-height: 1.15;
+      text-align: center;
     }
     .desk-name-label.is-name-wrap {
       white-space: normal;
@@ -727,6 +752,46 @@
     .desk-name-btn:focus-visible .desk-name-label.is-name-clamp::after,
     .desk-name-btn.is-editable .desk-name-label.is-name-clamp::after {
       background: #fffbeb;
+    }
+    /* Group names share the student-name fit: one line, then smaller, then
+       two lines. Ellipsis only after a 12px two-line name still overflows.
+       Inside a button, Chrome drops the line-clamp ellipsis, so that leftover
+       case paints one. --name-fit-bg matches the chip behind the glyph. */
+    .group-name-label {
+      display: block;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: clip;
+      line-height: 1.2;
+    }
+    .group-name-label.is-name-wrap {
+      white-space: normal;
+      overflow-wrap: break-word;
+      line-height: 1.2;
+    }
+    .group-name-label.is-name-clamp {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      max-height: calc(1.2em * 2);
+      overflow: hidden;
+    }
+    button .group-name-label.is-name-clamp {
+      display: block;
+      position: relative;
+      -webkit-line-clamp: unset;
+      -webkit-box-orient: unset;
+    }
+    button .group-name-label.is-name-clamp::after {
+      content: "…";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      padding-left: 0.2em;
+      line-height: 1.2;
+      background: var(--name-fit-bg, #fff);
     }
     .desk-name-btn {
       cursor: text;
@@ -777,6 +842,9 @@
       background: #fffbeb;
       border-color: #f59e0b;
     }
+    .dock-group-btn.is-editable {
+      --name-fit-bg: #fffbeb;
+    }
     .desk-name-btn.is-editable:hover,
     .desk-name-btn.is-editable:focus-visible,
     .desk-classno-btn.is-editable:hover,
@@ -813,6 +881,12 @@
       .desk-name-static {
         /* Full card width; keep the face clear of the score chips below. */
         min-height: 36px;
+      }
+      /* A two-line group name borrows a little of this tap height so the
+         card still clears the next desk. The name stays centred. */
+      .desk-card:has(.group-name-label.is-name-wrap) .desk-name-btn,
+      .desk-card:has(.group-name-label.is-name-wrap) .desk-name-static {
+        min-height: 28px;
       }
       .desk-name-input {
         min-height: 40px;
@@ -887,9 +961,10 @@
     }
     /* Live Team Scoreboard name. Tap opens the same inline field. */
     .dock-group-btn {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 0.25rem;
+      width: 100%;
       max-width: 100%;
       min-width: 0;
       margin: 0;
@@ -908,12 +983,21 @@
       appearance: none;
       -webkit-appearance: none;
       overflow: hidden;
+      --name-fit-bg: var(--name-fit-rest, #fff);
+    }
+    .dock-group-btn .group-name-label {
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .dock-group-btn:hover,
     .dock-group-btn:focus-visible {
       background: #fffbeb;
       border-color: #fcd34d;
       outline: none;
+    }
+    .dock-group-btn:hover:not(.dock-group-static),
+    .dock-group-btn:focus-visible:not(.dock-group-static) {
+      --name-fit-bg: #fffbeb;
     }
     /* Locked scoreboard name: same chip, not a rename control. */
     .dock-group-static {
@@ -1115,55 +1199,95 @@
         min-height: 44px;
       }
     }
-    /* Group-name row. Edit On: this chip is the team menu. Edit Off: the same chip, not a control. */
+    /* Group-name row. Edit On: this chip is the team menu. Edit Off: the same chip, not a control.
+       The visible name is a fitted label (shrink, then two lines). The select stays
+       on top of that label so the menu still opens. */
     .desk-team-row {
       min-width: 0;
     }
     .desk-team-static,
-    .desk-team-select {
+    .desk-team-face {
       box-sizing: border-box;
       max-width: 100%;
       min-width: 0;
-      height: 20px;
+      min-height: 20px;
       margin: 0;
-      padding: 0 6px;
+      padding: 1px 6px;
       border: 0;
       border-radius: 6px;
       font-family: var(--font-display);
       font-size: 13px;
       font-weight: 700;
-      line-height: 20px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.2;
     }
     .desk-team-static {
       display: block;
       flex: 0 1 auto;
       cursor: default;
     }
-    .desk-team-select {
-      display: block;
+    .desk-team-static .group-name-label,
+    .desk-team-face .group-name-label {
+      width: 100%;
+    }
+    .desk-team-face {
+      position: relative;
+      display: flex;
+      align-items: center;
       flex: 1 1 0;
       width: 0;
       padding-right: 14px;
-      appearance: none;
-      -webkit-appearance: none;
       cursor: pointer;
-      touch-action: manipulation;
+    }
+    .desk-team-chevron {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      width: 8px;
+      height: 6px;
+      transform: translateY(-50%);
+      pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'%3E%3Cpath fill='%23475569' d='M1 1.2l3 3 3-3'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 4px center;
+      background-position: center;
       background-size: 8px 6px;
     }
-    .desk-team-select.is-none {
+    .desk-team-face .group-name-label,
+    .desk-team-chevron {
+      pointer-events: none;
+    }
+    .desk-team-face .desk-team-select {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      opacity: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      font-size: 16px;
+    }
+    .desk-team-face.is-none {
       background-color: #f1f5f9;
       color: #64748b;
       font-weight: 600;
     }
-    .desk-team-select:focus {
+    .desk-team-face:focus-within {
       outline: none;
       box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+    }
+    .group-name-chip {
+      display: block;
+      min-width: 0;
+      max-width: 100%;
+      flex: 0 1 auto;
+    }
+    .group-name-chip .group-name-label {
+      width: 100%;
     }
     .desk-card {
       position: absolute;
@@ -1859,7 +1983,7 @@
             </div>
             <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
               <div class="text-[11px] text-indigo-100">Leading Team</div>
-              <div id="statTopGroup" class="font-display text-xs font-bold text-emerald-300 truncate mt-1">—</div>
+              <div id="statTopGroup" class="group-name-label font-display text-xs font-bold text-emerald-300 mt-1">—</div>
             </div>
           </div>
         </div>
@@ -2289,7 +2413,8 @@
           headerBg: 'bg-rose-500',
           text: 'text-rose-700',
           badgeBg: 'bg-rose-100',
-          hex: '#f43f5e'
+          hex: '#f43f5e',
+          soft: '#fff1f2'
         },
         blue: {
           name: 'Ocean Blue',
@@ -2298,7 +2423,8 @@
           headerBg: 'bg-sky-500',
           text: 'text-sky-700',
           badgeBg: 'bg-sky-100',
-          hex: '#0ea5e9'
+          hex: '#0ea5e9',
+          soft: '#f0f9ff'
         },
         green: {
           name: 'Emerald Green',
@@ -2307,7 +2433,8 @@
           headerBg: 'bg-emerald-500',
           text: 'text-emerald-700',
           badgeBg: 'bg-emerald-100',
-          hex: '#10b981'
+          hex: '#10b981',
+          soft: '#ecfdf5'
         },
         amber: {
           name: 'Amber Gold',
@@ -2316,7 +2443,8 @@
           headerBg: 'bg-amber-500',
           text: 'text-amber-800',
           badgeBg: 'bg-amber-100',
-          hex: '#f59e0b'
+          hex: '#f59e0b',
+          soft: '#fffbeb'
         },
         purple: {
           name: 'Royal Purple',
@@ -2325,7 +2453,8 @@
           headerBg: 'bg-violet-500',
           text: 'text-violet-700',
           badgeBg: 'bg-violet-100',
-          hex: '#8b5cf6'
+          hex: '#8b5cf6',
+          soft: '#f5f3ff'
         },
         teal: {
           name: 'Lagoon Teal',
@@ -2334,7 +2463,8 @@
           headerBg: 'bg-teal-500',
           text: 'text-teal-700',
           badgeBg: 'bg-teal-100',
-          hex: '#14b8a6'
+          hex: '#14b8a6',
+          soft: '#f0fdfa'
         }
       };
 
@@ -3323,19 +3453,28 @@
         return true;
       }
 
+      function groupNameFitStyle(color) {
+        var pal = TEAM_PALETTES[color] || TEAM_PALETTES.blue;
+        var soft = pal.soft || '#ffffff';
+        return '--name-fit-rest:' + soft;
+      }
+
       function renderDeskGroupLabel(st, cls) {
         const grp = st ? getGroupById(cls, st.groupId) : null;
         const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
+        const shown = (!grp || !pal) ? 'No Group' : ((grp.icon ? grp.icon + ' ' : '') + grp.name);
+        const nameHtml = '<span class="group-name-label">' + escapeHtml(shown) + '</span>';
         // Edit Off keeps the group-name chip as text. It is not a menu.
         if (!boardEditsAllowed()) {
           if (!grp || !pal) {
-            return '<span data-desk-team-badge="1" class="desk-team-static bg-slate-100 text-slate-400 font-semibold">No Group</span>';
+            return '<span data-desk-team-badge="1" class="desk-team-static bg-slate-100 text-slate-400 font-semibold">' + nameHtml + '</span>';
           }
           return '<span data-desk-team-badge="1" class="desk-team-static ' + pal.badgeBg + ' ' + pal.text + '">' +
-            escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) +
+            nameHtml +
             '</span>';
         }
         // Edit On: the group-name row itself is the menu. The closed face is the current team.
+        // A native select cannot wrap, so the fitted label is the face and the select sits over it.
         var matched = false;
         var options = (cls.groups || []).map(function (g) {
           var selected = st.groupId === g.id;
@@ -3344,17 +3483,22 @@
             escapeHtml((g.icon ? g.icon + ' ' : '') + g.name) + '</option>';
         }).join('');
         options = '<option value=""' + (matched ? '' : ' selected') + '>No Group</option>' + options;
-        var tone = (!grp || !pal) ? 'desk-team-select is-none' : ('desk-team-select ' + pal.badgeBg + ' ' + pal.text);
-        return '<select data-desk-team-badge="1" data-desk-team-select="' + escapeHtml(st.id) + '" class="' + tone + '" aria-label="Choose Group">' +
+        var tone = (!grp || !pal) ? 'desk-team-face is-none' : ('desk-team-face ' + pal.badgeBg + ' ' + pal.text);
+        return '<span data-desk-team-badge="1" class="' + tone + '">' +
+          '<span class="group-name-label" aria-hidden="true">' + escapeHtml(shown) + '</span>' +
+          '<span class="desk-team-chevron" aria-hidden="true"></span>' +
+          '<select data-desk-team-select="' + escapeHtml(st.id) + '" class="desk-team-select" aria-label="Choose Group">' +
           options +
-          '</select>';
+          '</select></span>';
       }
 
       function renderDockGroupNameControl(grp) {
+        var fitStyle = groupNameFitStyle(grp.color);
+        var nameHtml = '<span class="group-name-label">' + escapeHtml(grp.name) + '</span>';
         if (!boardEditsAllowed()) {
-          return '<button type="button" class="dock-group-btn dock-group-static" title="' + escapeHtml(grp.name) + '" aria-label="' + escapeHtml(grp.name) + '">' +
+          return '<button type="button" class="dock-group-btn dock-group-static" style="' + fitStyle + '" title="' + escapeHtml(grp.name) + '" aria-label="' + escapeHtml(grp.name) + '">' +
             '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
-            '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
+            nameHtml +
             '</button>';
         }
         const editingHere = state.editingGroupId === grp.id && state.editingGroupAnchor === 'dock';
@@ -3367,10 +3511,10 @@
             'value="' + escapeHtml(grp.name) + '" aria-label="Team name" />' +
             '</span>';
         }
-        return '<button type="button" class="dock-group-btn is-editable" data-dock-group-rename="' + escapeHtml(grp.id) + '" ' +
+        return '<button type="button" class="dock-group-btn is-editable" data-dock-group-rename="' + escapeHtml(grp.id) + '" style="' + fitStyle + '" ' +
           'title="Rename ' + escapeHtml(grp.name) + '" aria-label="Rename team ' + escapeHtml(grp.name) + '">' +
           '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
-          '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
+          nameHtml +
           '</button>';
       }
 
@@ -4272,6 +4416,7 @@
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
           btn.setAttribute('aria-label', open ? 'Hide' : 'Show');
         }
+        scheduleNameFit();
       }
 
       function renderAll() {
@@ -4541,6 +4686,7 @@
           '</div>';
         }).join('') + '</div></div>';
         nameEditLock = false;
+        fitGroupNames(container);
         scheduleFloorFit();
       }
 
@@ -4633,6 +4779,28 @@
         for (var i = 0; i < nodes.length; i++) fitDisplayedName(nodes[i], NAME_FIT_FLOOR_PX);
       }
 
+      function fitGroupNames(root) {
+        var scope = root && root.querySelectorAll ? root : document;
+        if (scope.classList && scope.classList.contains('group-name-label')) {
+          fitDisplayedName(scope, NAME_FIT_FLOOR_PX);
+        }
+        var nodes = scope.querySelectorAll('.group-name-label');
+        for (var i = 0; i < nodes.length; i++) fitDisplayedName(nodes[i], NAME_FIT_FLOOR_PX);
+        // Beside a score or Group+1, two lines at 12px can still be too narrow.
+        // Give that name the full chip width and fit once more.
+        var widened = false;
+        for (var j = 0; j < nodes.length; j++) {
+          if (!nodes[j].classList.contains('is-name-clamp')) continue;
+          var head = nodes[j].closest('.group-dock-head');
+          if (head && !head.classList.contains('is-name-block')) {
+            head.classList.add('is-name-block');
+            widened = true;
+          }
+        }
+        if (!widened) return;
+        for (var k = 0; k < nodes.length; k++) fitDisplayedName(nodes[k], NAME_FIT_FLOOR_PX);
+      }
+
       function fitPickerTitle() {
         var titleEl = document.getElementById('pickerResultTitle');
         if (!titleEl || !titleEl.classList.contains('is-result')) return;
@@ -4645,6 +4813,7 @@
         requestAnimationFrame(function () {
           nameFitQueued = false;
           fitDeskNames();
+          fitGroupNames();
           fitPickerTitle();
         });
       }
@@ -4738,13 +4907,13 @@
               '<!-- Row 3: Group name. Edit On turns this chip into the team menu. -->' +
               '<div class="desk-team-row flex items-center justify-between mb-0.5 gap-1">' +
                 groupBadgeHtml +
-                (state.activityMode === 'group' && grp
-                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 transition" title="Give +1 to this team and each member">Group+1</button>'
-                  : '') +
               '</div>' +
-              '<!-- Row 4: Compact − / + ; aria keeps the “one” for screen readers -->' +
-              '<div class="grid grid-cols-2 gap-1">' +
+              '<!-- Row 4: Compact − / + ; Group+1 sits with them so the name can use the full card. -->' +
+              '<div class="desk-score-actions' + (state.activityMode === 'group' && grp ? ' is-grouped' : '') + '">' +
                 '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one">−</button>' +
+                (state.activityMode === 'group' && grp
+                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="desk-action-btn px-1.5 rounded-full bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 font-display font-bold leading-none transition flex items-center justify-center text-[10px] whitespace-nowrap" title="Give +1 to this team and each member" aria-label="Group plus one">Group+1</button>'
+                  : '') +
                 '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold leading-none transition shadow-2xs flex items-center justify-center" aria-label="Plus one">+</button>' +
               '</div>' +
             '</div>' +
@@ -4752,6 +4921,7 @@
         }).join('');
         nameEditLock = false;
         fitDeskNames(container);
+        fitGroupNames(container);
       }
 
       // Render Right Sidebar: Live Leaderboard, Pulse Stats, & History Feed
@@ -4781,6 +4951,7 @@
         if (elTopGrp) {
           const topG = sortedGroups[0];
           elTopGrp.textContent = (topG && topG.score > 0) ? (topG.icon + ' ' + topG.name + ' (' + topG.score + ')') : '—';
+          fitDisplayedName(elTopGrp, NAME_FIT_FLOOR_PX);
         }
         updateLayoutUndoRedoButtons();
 
@@ -4832,8 +5003,8 @@
                     '<span class="text-[11px] font-mono font-bold text-slate-400">#' + escapeHtml(st.classNo) + '</span>' +
                     '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
                   '</div>' +
-                  '<div class="flex items-center gap-2 mt-1">' +
-                    (grp ? '<span class="text-[10px] font-bold px-1.5 py-0.2 rounded ' + pal.badgeBg + ' ' + pal.text + '">' + escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) + '</span>' : '<span class="text-[10px] text-slate-400">Unassigned</span>') +
+                  '<div class="flex items-center gap-2 mt-1 min-w-0">' +
+                    (grp ? '<span class="group-name-chip text-[10px] font-bold px-1.5 py-0.2 rounded ' + pal.badgeBg + ' ' + pal.text + '"><span class="group-name-label">' + escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) + '</span></span>' : '<span class="text-[10px] text-slate-400">Unassigned</span>') +
                     '<div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden max-w-[70px]">' +
                       '<div class="h-full bg-indigo-500 rounded-full" style="width:' + pct + '%"></div>' +
                     '</div>' +
@@ -4847,6 +5018,7 @@
               '</div>' +
             '</div>';
           }).join('');
+          fitGroupNames(body);
 
         } else if (state.leaderboardTab === 'groups') {
           const filteredGroups = sortedGroups.filter(function (g) {
@@ -4867,12 +5039,12 @@
             const combinedMemberScore = members.reduce(function (sum, m) { return sum + (Number(m.score) || 0); }, 0);
 
             return '<div class="p-3 rounded-xl border-2 ' + pal.border + ' ' + pal.bg + ' flex items-center justify-between gap-2">' +
-              '<div class="flex items-center gap-2.5 min-w-0">' +
-                '<span class="font-display font-bold text-sm w-6 text-center">' + medal + '</span>' +
-                '<div class="min-w-0">' +
-                  '<div class="font-display font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1">' +
-                    '<span>' + escapeHtml(grp.icon) + '</span>' +
-                    '<span class="truncate">' + escapeHtml(grp.name) + '</span>' +
+              '<div class="flex items-center gap-2.5 min-w-0 flex-1">' +
+                '<span class="font-display font-bold text-sm w-6 text-center shrink-0">' + medal + '</span>' +
+                '<div class="min-w-0 flex-1">' +
+                  '<div class="font-display font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1 min-w-0">' +
+                    '<span class="shrink-0">' + escapeHtml(grp.icon) + '</span>' +
+                    '<span class="group-name-label">' + escapeHtml(grp.name) + '</span>' +
                   '</div>' +
                   '<div class="text-[11px] text-slate-600">' +
                     members.length + ' members • Combined indiv pts: <strong>' + combinedMemberScore + '</strong>' +
@@ -4886,6 +5058,7 @@
               '</div>' +
             '</div>';
           }).join('');
+          fitGroupNames(body);
 
         } else {
           // Activity History Feed
@@ -4896,9 +5069,10 @@
           }
           body.innerHTML = classHistory.map(function (item) {
             const isPos = item.delta > 0;
+            const labelClass = item.type === 'group' ? 'group-name-label' : 'truncate';
             return '<div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-2 text-xs">' +
-              '<div class="min-w-0">' +
-                '<div class="font-bold text-slate-800 truncate">' + escapeHtml(item.label) + '</div>' +
+              '<div class="min-w-0 flex-1">' +
+                '<div class="font-bold text-slate-800 ' + labelClass + '">' + escapeHtml(item.label) + '</div>' +
                 '<div class="text-[11px] text-slate-500">' + escapeHtml(item.note) + ' • ' + escapeHtml(item.timestamp) + '</div>' +
               '</div>' +
               '<span class="px-2 py-0.5 rounded-lg font-display font-bold ' + (isPos ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700') + '">' +
@@ -4906,6 +5080,7 @@
               '</span>' +
             '</div>';
           }).join('');
+          fitGroupNames(body);
         }
       }
 
@@ -5755,7 +5930,7 @@
             if (!grp) return '<div class="flex-1"></div>';
             return '<div class="flex-1 flex flex-col items-center text-center">' +
               '<div class="text-lg mb-0.5">' + escapeHtml(grp.icon) + '</div>' +
-              '<div class="text-xs font-bold text-white truncate max-w-[115px] mb-0.5">' + escapeHtml(grp.name) + '</div>' +
+              '<div class="group-name-label text-xs font-bold text-white max-w-[115px] mb-0.5">' + escapeHtml(grp.name) + '</div>' +
               '<div class="text-[11px] font-mono text-emerald-300 mb-2">' + grp.score + ' team pts</div>' +
               '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-center p-2.5 shadow-lg">' +
                 '<span class="font-display font-extrabold text-xs sm:text-sm">' + stMedals[idx] + '</span>' +
@@ -5765,6 +5940,7 @@
         }
 
         document.getElementById('podiumModal').classList.remove('hidden');
+        fitGroupNames(document.getElementById('podiumModal'));
       }
 
       // ===================================================================
@@ -7122,6 +7298,7 @@
           document.fonts.ready.then(function () {
             refreshZoomChipFrame();
             fitDeskNames();
+            fitGroupNames();
             fitPickerTitle();
           });
         }
