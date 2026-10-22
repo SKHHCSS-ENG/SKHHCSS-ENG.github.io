@@ -289,8 +289,8 @@ details.format-section[data-section="skeleton"] > summary {
   border-left-color: var(--accent);
 }
 
-/* One Expand All / Collapse All chip — same pill language as the Tools
-   chips, 40px tall, so a single label stays compact under the hero. */
+/* One Expand All / Collapse All chip — same pill on every accordion page.
+   44px tall so the touch target meets the minimum. */
 .section-toggle {
   display: flex;
   flex-wrap: wrap;
@@ -302,8 +302,8 @@ details.format-section[data-section="skeleton"] > summary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  min-height: 40px;
+  height: 44px;
+  min-height: 44px;
   padding: 0 10px;
   border-radius: 999px;
   border: 1.5px solid var(--accent);
