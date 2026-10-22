@@ -451,9 +451,9 @@
 
   /* ---------- Format page sections: multi-open + localStorage ---------- */
   (function () {
-    /* Defaults in HTML: Structure + Skeleton open; PAT / phrases collapsed.
-       Sections open/close independently (no accordion) so Structure + Skeleton
-       can stay open together. */
+    /* HTML defaults are closed. Sections open and close independently
+       (no accordion) so Expand All can leave every section open together.
+       A saved choice in localStorage is restored when one exists. */
     var KEY = 'dse-writing-format-sections-v2-' + pageSlug;
     var sections = Array.prototype.slice.call(
       document.querySelectorAll('details.format-section[data-section]')
