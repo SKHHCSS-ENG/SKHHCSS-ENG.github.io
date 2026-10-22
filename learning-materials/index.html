@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261022a -->
+<!-- cache 20261022b -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -90,7 +90,18 @@
     color: var(--muted);
     font-size: .92rem;
   }
-  .cards { display: grid; gap: 14px; margin-top: 16px; }
+  .hub-section { margin-top: 26px; }
+  .hub-section:first-of-type { margin-top: 22px; }
+  .hub-heading {
+    margin: 0 0 10px;
+    padding: 2px 0 2px 12px;
+    border-left: 4px solid var(--accent-deep);
+    font-size: 1.12rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+  }
+  .cards { display: grid; gap: 14px; margin-top: 0; }
   a.card {
     display: block;
     text-decoration: none;
@@ -125,9 +136,10 @@
   }
   .card .badge { color: var(--accent-ink); background: var(--accent-soft); }
   .card-kicker .badge + .badge { margin-left: 6px; }
-  .card h2 {
+  .card h3 {
     margin: 0 0 6px;
     font-size: 1.15rem;
+    font-weight: 800;
     color: var(--navy);
   }
   .card p {
@@ -149,6 +161,10 @@
     font-size: .78rem;
     color: var(--muted);
     text-align: center;
+  }
+  @media (min-width: 640px) {
+    .hub-section { margin-top: 32px; }
+    .hub-heading { font-size: 1.18rem; }
   }
   @media print {
     body { background: #fff; }
@@ -172,43 +188,65 @@
       </div>
     </header>
 
-    <div class="cards">
-      <a class="card" href="../speech-festival/">
-        <p class="card-kicker"><span class="badge">Competition</span></p>
-        <h2>Speech Festival</h2>
-        <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
-        <span class="card-arrow">Open →</span>
-      </a>
-      <a class="card" href="../dse-writing/">
-        <p class="card-kicker"><span class="badge">DSE</span></p>
-        <h2>DSE Writing Formats</h2>
-        <p>Letter to the Editor, Article, Proposal, Report, Speech — PAT, structure, skeleton &amp; Useful Phrases.</p>
-        <span class="card-arrow">Open →</span>
-      </a>
-      <a class="card" href="useful-vocabulary/">
-        <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
-        <h2>Useful Vocabulary</h2>
-        <p>Shared vocab banks for DSE writing — Cohesion, Tone &amp; Attitude, spelling, jobs / HK Places, Formality Pairs, Irregular Verbs.</p>
-        <span class="card-arrow">Open →</span>
-      </a>
-      <a class="card" href="sentence-patterns/">
-        <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
-        <h2>Sentence Patterns</h2>
-        <p>Basic · Building · Exam-Ready frames with Hong Kong examples — pick 2–3 per writing task.</p>
-        <span class="card-arrow">Open →</span>
-      </a>
-      <a class="card" href="speaking-paper-4/">
-        <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
-        <h2>Speaking (Paper 4)</h2>
-        <span class="card-arrow">Open →</span>
-      </a>
-      <a class="card" href="grammar-junior/">
-        <p class="card-kicker"><span class="badge">Junior</span></p>
-        <h2>Grammar</h2>
-        <p>Tenses, passive, reported speech and conditionals for S1–S3.</p>
-        <span class="card-arrow">Open →</span>
-      </a>
-    </div>
+    <section class="hub-section" aria-labelledby="sec-competitions">
+      <h2 class="hub-heading" id="sec-competitions">Competitions</h2>
+      <div class="cards">
+        <a class="card" href="../speech-festival/">
+          <p class="card-kicker"><span class="badge">Competition</span></p>
+          <h3>Speech Festival</h3>
+          <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="hub-section" aria-labelledby="sec-junior">
+      <h2 class="hub-heading" id="sec-junior">Junior</h2>
+      <div class="cards">
+        <a class="card" href="grammar-junior/">
+          <p class="card-kicker"><span class="badge">Junior</span></p>
+          <h3>Junior Grammar</h3>
+          <p>Tenses, passive, reported speech and conditionals for S1–S3.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="hub-section" aria-labelledby="sec-dse">
+      <h2 class="hub-heading" id="sec-dse">DSE</h2>
+      <div class="cards">
+        <a class="card" href="../dse-writing/">
+          <p class="card-kicker"><span class="badge">DSE</span></p>
+          <h3>Writing (Paper 2)</h3>
+          <p>Letter to the Editor, Article, Proposal, Report, Speech — formats with PAT, structure, skeleton &amp; Useful Phrases.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+        <a class="card" href="speaking-paper-4/">
+          <p class="card-kicker"><span class="badge">DSE</span></p>
+          <h3>Speaking (Paper 4)</h3>
+          <p>Paper 4 speaking practice — vocab · patterns for group discussion and individual response.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="hub-section" aria-labelledby="sec-all-levels">
+      <h2 class="hub-heading" id="sec-all-levels">All Levels</h2>
+      <div class="cards">
+        <a class="card" href="useful-vocabulary/">
+          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
+          <h3>Useful Vocabulary</h3>
+          <p>Shared vocab banks for DSE writing — Cohesion, Tone &amp; Attitude, spelling, jobs / HK Places, Formality Pairs, Irregular Verbs.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+        <a class="card" href="sentence-patterns/">
+          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
+          <h3>Sentence Patterns</h3>
+          <p>Basic · Building · Exam-Ready frames with Hong Kong examples — pick 2–3 per writing task.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+      </div>
+    </section>
 
     <footer>
       聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
