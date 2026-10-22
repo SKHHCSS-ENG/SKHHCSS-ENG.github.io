@@ -3,7 +3,7 @@
  * 譯 (Chinese gloss) + Handwrite (Colour · Pen · Highlighter · Eraser · Undo · Redo · Clear)
  * + Record (device file / voice memo, local playback only)
  * Collapsible dock (🛠 toggles expand/collapse; always bottom-right). Canvas overlays stanzas — no blank spacer.
- * Adapted from dse-writing/tools-dock.js; does not load on Solo Verse.
+ * Adapted from learning-materials/paper-2-writing/tools-dock.js; does not load on Solo Verse.
  */
 (function () {
   var pageSlug = (function () {

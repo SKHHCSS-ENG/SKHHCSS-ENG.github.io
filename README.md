@@ -8,14 +8,14 @@ Public GitHub Pages site for the English panel.
 - **What's New:** https://skhhcss-eng.github.io/whats-new/
 - **Class Activity Studio:** https://skhhcss-eng.github.io/classroom/class-activity-studio/
 - **Speech Festival:** https://skhhcss-eng.github.io/speech-festival/
-- **DSE Writing:** https://skhhcss-eng.github.io/dse-writing/
+- **Paper 2 - Writing:** https://skhhcss-eng.github.io/learning-materials/paper-2-writing/
 
 ## Contents
 
 | Path | What |
 |------|------|
 | `/` | English Department home (Learning Materials · Classroom · What's New) |
-| `/learning-materials/` | Student practice hub (Speech Festival, DSE Writing) |
+| `/learning-materials/` | Student practice hub (Speech Festival, Paper 2 - Writing) |
 | `/classroom/` | Teacher tools hub |
 | `/classroom/class-activity-studio/` | Class Activity Studio (live scoreboard / desks / points) |
 | `/whats-new/` | Site updates (newest first) |
@@ -23,7 +23,11 @@ Public GitHub Pages site for the English panel.
 | `/speech-festival/u41/` | U41 *Last Day* (Clare Bevan) — S3 Girls |
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |
 | `/speech-festival/u66/` | U66 *Late Home* (Gervase Phinn) — S3 Boys |
-| `/dse-writing/` | DSE Writing Formats |
+| `/learning-materials/paper-1-reading/` | Paper 1 - Reading |
+| `/learning-materials/reading-paper-1/` | Paper 1 - Reading (Practice) |
+| `/learning-materials/paper-2-writing/` | Paper 2 - Writing |
+| `/learning-materials/paper-4-speaking/` | Paper 4 - Speaking |
+| `/learning-materials/grammar/` | Grammar |
 
 ## For teachers
 
