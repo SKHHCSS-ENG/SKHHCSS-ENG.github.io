@@ -18,6 +18,7 @@ Public GitHub Pages site for the English panel.
 | `/classroom/` | Teacher tools hub |
 | `/classroom/class-activity-studio/` | Class Activity Studio (live scoreboard / desks / points) |
 | `/speech-festival/` | Speech Festival hub |
+| `/speech-festival/u41/` | U41 *Last Day* (Clare Bevan) — S3 Girls |
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |
 | `/speech-festival/u66/` | U66 *Late Home* (Gervase Phinn) — S3 Boys |
 | `/dse-writing/` | DSE Writing Formats |

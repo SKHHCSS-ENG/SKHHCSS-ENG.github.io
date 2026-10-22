@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="stylesheet" href="../tools-dock.css?v=20261020p">
+<title>U41 Solo Verse — Last Day | Practice Guide</title>
+<style>
+ :root {
+ --bg: #F5EDE0;
+ --panel: #FFF8EE;
+ --card: #FBF3E6;
+ --text: #2C2926;
+ --muted: #6B6560;
+ --gold: #C45C26;
+ --sky: #CA8A04;
+ --heat: #C2410C;
+ --cool: #2563EB;
+ --sharp: #15803D;
+ --ok: #3D7A5A;
+ --danger: #B91C1C;
+ --asphalt: #1C1917;
+ --border: #C4B8A8;
+ }
+ * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+ body {
+ margin: 0;
+ /* Room for tools dock (~72px) + fixed Model play bar (~56px) + gap */
+ padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px));
+ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+ background: var(--bg);
+ color: var(--text);
+ line-height: 1.45;
+ overflow-x: hidden;
+ }
+
+ header {
+ position: sticky; top: 0; z-index: 40;
+ background: rgba(245, 237, 224, 0.94);
+ backdrop-filter: blur(12px);
+ -webkit-backdrop-filter: blur(12px);
+ border-bottom: 1px solid var(--border);
+ padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 8px;
+ }
+ html {
+  scroll-padding-top: calc(120px + env(safe-area-inset-top, 0px));
+  scroll-padding-bottom: calc(200px + env(safe-area-inset-bottom, 0px));
+ }
+ .stanza.focused, .stanza.playing {
+  scroll-margin-top: calc(120px + env(safe-area-inset-top, 0px));
+  scroll-margin-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
+ }
+ .top-row {
+ display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+ }
+ .sf-back {
+ display: inline-flex; align-items: center; justify-content: flex-start; flex: 1 0 100%;
+ box-sizing: border-box; min-height: 44px; width: auto; margin: 0; padding: 0 2px;
+ border-radius: 8px; background: transparent; color: var(--gold);
+ font-size: .8rem; font-weight: 700; line-height: 1.2; text-decoration: none;
+ }
+ .title-block { min-width: 0; flex: 1; }
+ .app-title {
+ font-size: 1.05rem; font-weight: 800; margin: 0;
+ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+ }
+ .app-title span { color: var(--gold); }
+ .poet-byline {
+ margin: 2px 0 0;
+ font-size: .78rem;
+ font-weight: 600;
+ color: var(--muted);
+ letter-spacing: .02em;
+ }
+ .sub-badge {
+ font-size: .72rem; background: rgba(196,92,38,.14); color: var(--gold);
+ padding: 3px 8px; border-radius: 99px; font-weight: 700; flex-shrink: 0;
+ }
+
+ .nav-tabs {
+ display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+ margin-top: 8px; background: #EDE4D4; padding: 4px; border-radius: 10px;
+ }
+ .tab-btn {
+ border: none; background: transparent; color: var(--muted);
+ padding: 8px 2px; border-radius: 8px; font-weight: 700; font-size: .75rem;
+ cursor: pointer; transition: .15s; text-align: center; white-space: nowrap;
+ }
+ .tab-btn.active {
+ background: var(--panel); color: var(--asphalt); box-shadow: 0 2px 6px rgba(44,41,38,.12);
+ border: 1px solid var(--border);
+ }
+ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, label:focus-within {
+ outline: 3px solid var(--gold); outline-offset: 3px;
+ }
+ @media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+ }
+
+ .quick-toggles {
+ display: flex; gap: 6px; padding: 10px 14px 4px; overflow-x: auto;
+ scrollbar-width: none;
+ }
+ .quick-toggles::-webkit-scrollbar { display: none; }
+ .chip-toggle {
+ border: 1px solid var(--border); background: var(--panel);
+ color: var(--muted); padding: 6px 11px; border-radius: 99px;
+ font-size: .76rem; font-weight: 700; white-space: nowrap; cursor: pointer;
+ }
+ .chip-toggle.on {
+ background: rgba(196,92,38,.16); border-color: var(--gold); color: var(--heat);
+ }
+
+ main { max-width: 680px; margin: 0 auto; padding: 8px 14px; }
+ .view-section { display: none; }
+ .view-section.active { display: block; }
+
+ details.arc-card {
+ background: var(--panel); border-radius: 12px; padding: 10px 14px;
+ margin-bottom: 12px; border: 1px solid var(--border);
+ }
+ details.arc-card summary {
+ font-weight: 700; font-size: .86rem; color: var(--gold); cursor: pointer;
+ list-style: none; display: flex; justify-content: space-between; align-items: center;
+ }
+ details.arc-card summary::after { content: "▼"; font-size: .7rem; color: var(--muted); }
+ details[open].arc-card summary::after { content: "▲"; }
+ .arc-body { margin-top: 8px; font-size: .83rem; color: var(--text); }
+ .arc-grid {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;
+ }
+ .arc-pill {
+ padding: 8px 10px; border-radius: 10px; font-size: .76rem; font-weight: 800;
+ border: 2px solid; border-left-width: 6px; line-height: 1.25;
+ box-shadow: 0 1px 4px rgba(44,41,38,.08);
+ }
+ .arc-pill small { display: block; margin-top: 2px; font-weight: 600; opacity: .9; }
+ .arc-sky { background: #FDE68A; border-color: #CA8A04; color: #713F12; }
+ .arc-heat { background: #F8D4B8; border-color: #C2410C; color: #7C2D12; }
+ .arc-cool { background: #BFDBFE; border-color: #2563EB; color: #1E3A8A; }
+ .arc-sharp { background: #BBF7D0; border-color: #15803D; color: #14532D; }
+
+ .practice-note { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; border-left: 3px solid var(--gold); background: var(--panel); color: var(--text); font-size: .83rem; }
+ .stanza-list { display: flex; flex-direction: column; gap: 10px; }
+ .stanza {
+ border-radius: 14px; padding: 12px 14px;
+ box-shadow: 0 2px 8px rgba(44,41,38,.08);
+ border: 1.5px solid var(--border);
+ border-left: 8px solid var(--sky);
+ transition: background .15s, box-shadow .15s;
+ }
+ .stanza.focused { outline: 2px solid var(--gold); box-shadow: 0 0 0 3px rgba(196,92,38,.2); }
+ .stanza[data-arc="sky"] {
+ background: #FEF3C7;
+ border-color: #F6D060;
+ border-left-color: #CA8A04;
+ }
+ .stanza[data-arc="heat"] {
+ background: #FDEBDC;
+ border-color: #E8B48A;
+ border-left-color: #C2410C;
+ }
+ .stanza[data-arc="cool"] {
+ background: #DBEAFE;
+ border-color: #93C5FD;
+ border-left-color: #2563EB;
+ }
+ .stanza[data-arc="sharp"] {
+ background: #DCFCE7;
+ border-color: #86EFAC;
+ border-left-color: #15803D;
+ }
+ .stanza[data-arc="sky"].focused { background: #FDE68A; }
+ .stanza[data-arc="heat"].focused { background: #FAD9BC; }
+ .stanza[data-arc="cool"].focused { background: #BFDBFE; }
+ .stanza[data-arc="sharp"].focused { background: #BBF7D0; }
+
+ .st-header {
+ display: flex; justify-content: space-between; align-items: center;
+ margin-bottom: 6px;
+ }
+ .st-tag {
+ font-size: .72rem; font-weight: 800;
+ text-transform: uppercase; letter-spacing: .05em;
+ }
+ .stanza[data-arc="sky"] .st-tag { color: #713F12; }
+ .stanza[data-arc="heat"] .st-tag { color: #7C2D12; }
+ .stanza[data-arc="cool"] .st-tag { color: #1E3A8A; }
+ .stanza[data-arc="sharp"] .st-tag { color: #14532D; }
+ .badge-row { display: flex; flex-wrap: wrap; gap: 5px; }
+ .cue-badge {
+ font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+ background: rgba(196,92,38,.12); color: var(--asphalt);
+ }
+
+ .poem-lines {
+ font-family: Georgia, "Times New Roman", serif;
+ font-size: 1.12rem; line-height: 1.68; color: var(--asphalt);
+ margin: 4px 0 8px;
+ }
+ .stress {
+ color: var(--asphalt); font-weight: 800;
+ text-decoration: underline rgba(28,25,23,.85);
+ text-underline-offset: 3px;
+ text-decoration-thickness: 2px;
+ }
+ .hide-stress .stress { color: inherit; font-weight: inherit; text-decoration: none; }
+
+ .runon {
+ display: inline-block; margin-left: 4px; padding: 1px 6px;
+ border-radius: 5px; background: rgba(91, 138, 138, 0.18);
+ color: #2F5555; font-family: -apple-system, sans-serif;
+ font-size: .7rem; font-weight: 800; vertical-align: middle;
+ border: 1px solid rgba(91,138,138,.35);
+ }
+ .hide-runon .runon { display: none; }
+
+ .zh-gloss {
+ display: inline-block;
+ font-family: -apple-system, "PingFang HK", "Microsoft JhengHei", sans-serif;
+ font-size: .74rem; font-weight: 600; color: #3F5F5A;
+ background: rgba(107, 143, 138, 0.16); border: 1px solid rgba(107, 143, 138, 0.35);
+ padding: 0 5px; margin: 0 2px; border-radius: 5px; vertical-align: baseline; line-height: 1.35;
+ }
+ .hide-zh .zh-gloss { display: none; }
+
+ .cues {
+ font-size: .82rem; color: #4A453F; background: rgba(196,184,168,.28);
+ padding: 8px 10px; border-radius: 9px; border-top: 1px solid var(--border);
+ }
+ .hide-cues .cues, .hide-cues .badge-row { display: none; }
+ .eye-cue { color: #3D6666; display: block; margin-top: 4px; font-size: .78rem; }
+
+ /* Pronunciation Tab */
+ .pron-card { background: var(--panel); border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); }
+ .pron-display {
+ display: none;
+ position: sticky; top: 108px; z-index: 20;
+ background: #FFF8EE; border: 1.5px solid var(--gold); border-radius: 12px;
+ padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 6px 18px rgba(44,41,38,.12);
+ }
+ .pron-display.has-content { display: block; }
+ .pron-display .word-title { font-size: 1.1rem; font-weight: 800; color: var(--asphalt); }
+ .pron-display .ipa { color: var(--gold); font-family: monospace; font-size: .95rem; margin-left: 6px; }
+ .pron-display .zh-tag { color: #3F5F5A; font-size: .88rem; margin-left: 6px; font-weight: 700; }
+ .pron-display .tip { font-size: .84rem; color: var(--text); margin-top: 4px; }
+
+ .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+ .vocab-chip {
+ background: var(--card); border: 1px solid var(--border);
+ color: var(--asphalt); padding: 10px 12px; border-radius: 10px;
+ text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 3px;
+ }
+ .vocab-chip:active { transform: scale(.98); border-color: var(--gold); }
+ .vocab-chip strong { font-size: .92rem; display: flex; justify-content: space-between; }
+ .vocab-chip .chip-sub { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+ .vocab-chip .ipa-txt { color: var(--gold); font-size: .74rem; font-family: monospace; }
+ .vocab-chip .zh-txt { color: #3F5F5A; font-size: .74rem; font-weight: 600; }
+
+ /* YouTube Sample Model Speech Tab */
+ .model-card {
+ background: var(--panel); border-radius: 14px; padding: 16px; margin-bottom: 12px;
+ border: 1px solid var(--border);
+ }
+ .model-card h3 { margin: 0 0 6px; color: var(--gold); font-size: 1.05rem; }
+ .model-card p { font-size: .84rem; color: var(--muted); margin: 0 0 12px; }
+ .video-container {
+ position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+ border-radius: 10px; overflow: hidden; background: #2C2926; margin-bottom: 12px;
+ }
+ .video-container iframe {
+ position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+ }
+ .btn-yt-ext {
+ display: block; text-align: center; background: rgba(196,92,38,.14); color: #9A3412;
+ border: 1px solid var(--gold); padding: 10px; border-radius: 10px; font-weight: 700;
+ font-size: .84rem; text-decoration: none; margin-bottom: 12px;
+ }
+
+ .model-tips {
+ font-size: .84rem; background: rgba(196,184,168,.28);
+ padding: 12px; border-radius: 10px; border-left: 3px solid var(--sky);
+ }
+ .model-tips ul { margin: 6px 0 0; padding-left: 18px; color: var(--text); }
+ .model-tips li { margin-bottom: 6px; }
+
+ /* Self-Check Tab */
+ .check-card { background: var(--panel); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+ .check-item {
+ display: flex; gap: 10px; align-items: flex-start;
+ padding: 10px 8px; border-bottom: 1px solid var(--border);
+ font-size: .88rem; cursor: pointer;
+ }
+ .check-item:last-child { border-bottom: none; }
+ .check-item input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--ok); flex-shrink: 0; }
+
+ /* Bottom dock + handwrite chrome: see ../tools-dock.css */
+
+ .yt-persist {
+  position: fixed; left: 10px; right: 10px; bottom: calc(72px + env(safe-area-inset-bottom, 0px)); z-index: 45;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(44,41,38,.18); overflow: hidden;
+  display: flex; flex-direction: column; max-width: 520px; margin: 0 auto;
+ }
+ .yt-persist.compact .yt-frame-wrap {
+  display: none !important; height: 0 !important; max-height: 0 !important;
+  aspect-ratio: auto !important; opacity: 0; pointer-events: none; overflow: hidden;
+ }
+ .yt-persist.compact { flex-direction: row; align-items: center; gap: 6px; padding: 4px 8px; min-height: 40px; }
+ .yt-persist.expanded { bottom: auto; top: auto; position: relative; left: auto; right: auto;
+  margin: 0 0 12px; max-width: none; box-shadow: none; }
+ .yt-persist.expanded .yt-frame-wrap { height: auto; opacity: 1; pointer-events: auto; }
+ .yt-frame-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; transition: .15s; }
+ .yt-frame-wrap iframe, .yt-frame-wrap > div { position: absolute; inset: 0; width: 100%; height: 100%; }
+ .yt-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; flex: 1; min-width: 0; }
+ .yt-persist.expanded .yt-bar { border-top: 1px solid var(--border); }
+ .yt-status { font-size: .72rem; font-weight: 700; color: var(--asphalt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+ .yt-status span { color: var(--gold); }
+ .yt-ctrl { border: 1px solid var(--border); background: var(--card); border-radius: 8px; padding: 6px 10px; font-weight: 700; font-size: .75rem; cursor: pointer; color: var(--asphalt); }
+ .yt-ctrl:disabled { opacity: .45; cursor: default; }
+ .stanza.playing { outline: 2px solid var(--cool); box-shadow: 0 0 0 3px rgba(37,99,235,.18); }
+ .title-block { cursor: pointer; border-radius: 8px; }
+ .title-block:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+ .tap-hint { font-size: .72rem; color: var(--muted); padding: 0 14px 6px; margin: 0; }
+ #modelAudio { display: none; }
+
+ .school-brand {
+  text-align: center;
+  font-size: .68rem;
+  color: var(--muted, #64748b);
+  padding: 10px 14px 18px;
+  margin: 0;
+  border-top: 1px solid var(--border, #e2e8f0);
+ }
+ .school-brand a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+ <div class="top-row">
+ <a class="sf-back" href="../">← Back to Speech Festival</a>
+ <div class="title-block" id="titlePlay" role="button" tabindex="0" data-start="0" data-end="8.1" data-yt-start="0" data-yt-end="8.1" title="Play title and poet">
+ <h1 class="app-title">🎭 <span>Last Day</span></h1>
+ <p class="poet-byline">Clare Bevan</p>
+ </div>
+ <span class="sub-badge">U41 · S3 Girls</span>
+ </div>
+ <nav class="nav-tabs" aria-label="Lesson sections">
+ <button type="button" class="tab-btn active" data-tab="viewPoem" aria-current="page">📜 Poem</button>
+ <button type="button" class="tab-btn" data-tab="viewPron">🔊 Pronounce</button>
+ <button type="button" class="tab-btn" data-tab="viewSample">🎧 Model</button>
+ <button type="button" class="tab-btn" data-tab="viewCheck">✅ Check</button>
+ </nav>
+</header>
+
+<div class="quick-toggles" id="poemToggles">
+ <button type="button" class="chip-toggle on" id="togRunon" aria-pressed="true">↪ Run-on</button>
+ <button type="button" class="chip-toggle on" id="togStress" aria-pressed="true">★ Stress</button>
+ <button type="button" class="chip-toggle on" id="togCues" aria-pressed="true">💡 Notes</button>
+</div>
+<p class="tap-hint" id="tapHint">Tap a stanza (or the title) to hear that part · 點一節聽示範. <strong>Show</strong> opens the video.</p>
+
+<main>
+ <!-- Cue times checked against Miss Wan model gTc918Co0Qc (1:50).
+      Title 0–8.1; St1 8.1–11.6; St2 11.6–22.3; St3 22.3–34.3; St4 34.3–55.1;
+      St5 55.1–66.4; St6 66.4–80.8; St7 80.8–96.4; St8 96.4–101.0; St9 101.0–110.2.
+      ASR captions + silence gaps. Cue map is complete. -->
+ <section id="viewPoem" class="view-section active">
+ <details class="arc-card">
+ <summary>📖 Poem arc</summary>
+ <div class="arc-body">
+  An ordinary class that still felt special — hard to walk away on the last day.
+  <div class="arc-grid">
+ <div class="arc-pill arc-sky">St. 1 · Opening<br><small>Quiet pride</small></div>
+ <div class="arc-pill arc-cool">St. 2–3 · Ordinary<br><small>No drama</small></div>
+ <div class="arc-pill arc-sky">St. 4 · Soft year<br><small>Ordinary debris</small></div>
+ <div class="arc-pill arc-heat">St. 5 · Sparkle<br><small>Chalk-dust glitter</small></div>
+ <div class="arc-pill arc-cool">St. 6 · Hard to name<br><small>Build to the desk</small></div>
+ <div class="arc-pill arc-sharp">St. 7 · Gifts<br><small>Love in small things</small></div>
+ <div class="arc-pill arc-sharp">St. 8–9 · Leaving<br><small>Back to the first line</small></div>
+ </div>
+ </div>
+ </details>
+
+ <div class="stanza-list" id="stanzaContainer">
+ <div class="stanza" role="button" tabindex="0" data-arc="sky" data-start="8.1" data-end="11.6" data-yt-start="8.1" data-yt-end="11.6">
+ <div class="st-header">
+ <span class="st-tag">Stanza 1</span>
+ <div class="badge-row"><span class="cue-badge">🔉 柔</span><span class="cue-badge">😌 溫暖肯定</span><span class="cue-badge">⏱ 稍慢</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="0">
+ <div class="poem-lines">
+ This class was special<span class="zh-gloss">特別的</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="0" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 不要喊。像對自己誠實地說一句事實。句末微笑感，不要掉下來。
+ <span class="eye-cue">👀 與觀眾有短暫溫暖眼神接觸。</span>
+ <span class="eye-cue">譯 <em>special</em> — 特別的（不是「特別差／特別好」的誇張，而是心裡認定）</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="cool" data-start="11.6" data-end="22.3" data-yt-start="11.6" data-yt-end="22.3">
+ <div class="st-header">
+ <span class="st-tag">Stanza 2</span>
+ <div class="badge-row"><span class="cue-badge">⚡ 列舉稍快</span><span class="cue-badge">🔉 中等</span><span class="cue-badge">😊 帶一點輕描淡寫</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="1">
+ <div class="poem-lines">
+ No one was par<span class="stress">tic</span>ularly clever,<br>
+ Par<span class="stress">tic</span>ularly naughty,<br>
+ Par<span class="stress">tic</span>ularly messy,<br>
+ Par<span class="stress">tic</span>ularly <span class="stress">an</span>ything.
+ </div>
+ <canvas class="hw-canvas" data-hw="1" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 四個 <em>Particularly</em> 節奏整齊；最後 <em>anything</em> 輕輕收，像搖頭一笑。不要讀成批評學生。
+ <span class="eye-cue">👀 可微微搖頭（「沒有特別怎樣」）。</span>
+ <span class="eye-cue">Stress: par-<b>tic</b>-u-lar-ly · <b>an</b>-y-thing</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="cool" data-start="22.3" data-end="34.3" data-yt-start="22.3" data-yt-end="34.3">
+ <div class="st-header">
+ <span class="st-tag">Stanza 3</span>
+ <div class="badge-row"><span class="cue-badge">🔉 中柔</span><span class="cue-badge">😌 平靜否定</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="2">
+ <div class="poem-lines">
+ Nothing mi<span class="stress">rac</span>ulous<span class="zh-gloss">奇蹟般的</span> happened,<br>
+ Nothing <span class="stress">stun</span>ning<span class="zh-gloss">令人驚嘆的</span>,<br>
+ Or funny, or <span class="stress">fright</span>ening, or strange.
+ </div>
+ <canvas class="hw-canvas" data-hw="2" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>Nothing</em> 對仗 stanza 2；<em>Or funny, or frightening, or strange</em> 一氣連讀，逗號處短頓即可。
+ <span class="eye-cue">Stress: mi-<b>rac</b>-u-lous · <b>stun</b>-ning · <b>fright</b>-en-ing</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="sky" data-start="34.3" data-end="55.1" data-yt-start="34.3" data-yt-end="55.1">
+ <div class="st-header">
+ <span class="st-tag">Stanza 4</span>
+ <div class="badge-row"><span class="cue-badge">⏱ 緩慢</span><span class="cue-badge">🔉 柔</span><span class="cue-badge">🍃 時間悄悄流過</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="3">
+ <div class="poem-lines">
+ Each day was much like another<br>
+ As the year <span class="stress">crept</span> softly by, <span class="runon">↪</span><br>
+ Leaving its or<span class="stress">di</span>nary de<span class="stress">bris</span> <span class="runon">↪</span><br>
+ Of drawings and stories<br>
+ And small successes<br>
+ And unre<span class="stress">mark</span>able memories.
+ </div>
+ <canvas class="hw-canvas" data-hw="3" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>crept softly</em> 拉長元音；<em>debris</em> 英式 /ˈdeb.riː/；<em>unremarkable</em> 不要讀成「差」——是平凡但珍貴。最後三個 <em>And…</em> 像輕輕放下三樣東西。
+ <span class="eye-cue">👀 視線略低，像回想課室一角。</span>
+ <span class="eye-cue">Stress: <b>crept</b> soft-ly · or-<b>di</b>-na-ry de-<b>bris</b> · un-re-<b>mark</b>-a-ble</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="heat" data-start="55.1" data-end="66.4" data-yt-start="55.1" data-yt-end="66.4">
+ <div class="st-header">
+ <span class="st-tag">Stanza 5</span>
+ <div class="badge-row"><span class="cue-badge">✨ 轉折</span><span class="cue-badge">🔊 稍亮</span><span class="cue-badge">☀️ 陽光感</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="4">
+ <div class="poem-lines">
+ <span class="stress">Yet</span> something hung between us<span class="zh-gloss">在我們之間縈繞</span>,<br>
+ Something that <span class="stress">glit</span>tered like <span class="stress">chalk</span> dust<span class="zh-gloss">粉筆灰</span><br>
+ On a <span class="stress">sun</span>ny day.
+ </div>
+ <canvas class="hw-canvas" data-hw="4" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>Yet</em> 是轉折——前面「平凡」，這裡開始「特別」。<em>chalk dust</em> 要輕、閃，不要厚重。
+ <span class="eye-cue">Stress: <b>Yet</b> · <b>glit</b>-tered · <b>chalk</b> dust · <b>sun</b>-ny</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="cool" data-start="66.4" data-end="80.8" data-yt-start="66.4" data-yt-end="80.8">
+ <div class="st-header">
+ <span class="st-tag">Stanza 6</span>
+ <div class="badge-row"><span class="cue-badge">🔎 尋找用詞</span><span class="cue-badge">⏱ define 後稍頓</span><span class="cue-badge">📦 引向禮物</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="5">
+ <div class="poem-lines">
+ It was nothing you could touch,<br>
+ Or <span class="stress">cap</span>ture,<br>
+ Or ex<span class="stress">act</span>ly de<span class="stress">fine</span>,<br>
+ But when I see the <span class="stress">scat</span>tered <span class="stress">of</span>ferings<span class="zh-gloss">心意小物</span> <span class="runon">↪</span><br>
+ Left on my desk –
+ </div>
+ <canvas class="hw-canvas" data-hw="5" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 三個 <em>Or…</em> 像想說卻說不清；<em>But when I see</em> 語氣轉實、轉柔。破折號停住，接 stanza 7。
+ <span class="eye-cue">Stress: <b>cap</b>-ture · ex-<b>act</b>-ly de-<b>fine</b> · <b>scat</b>-tered <b>of</b>-fer-ings</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="sharp" data-start="80.8" data-end="96.4" data-yt-start="80.8" data-yt-end="96.4">
+ <div class="st-header">
+ <span class="st-tag">Stanza 7</span>
+ <div class="badge-row"><span class="cue-badge">💝 溫柔清單</span><span class="cue-badge">🔉 柔</span><span class="cue-badge">😊 愛意</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="6">
+ <div class="poem-lines">
+ A <span class="stress">neck</span>lace of shells,<br>
+ A giant pot of <span class="stress">tal</span>cum<span class="zh-gloss">爽身粉</span><br>
+ Smelling of yesterday,<br>
+ A <span class="stress">limp</span><span class="zh-gloss">軟軟垂下的</span> bunch of yellow flowers,<br>
+ A <span class="stress">crum</span>pled<span class="zh-gloss">皺了的</span> card<br>
+ Signed with <span class="stress">love</span> –
+ </div>
+ <canvas class="hw-canvas" data-hw="6" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 每樣禮物稍頓；<em>talcum</em> /ˈtæl.kəm/；<em>limp</em> 不要嫌棄——是真實的小花；<em>Signed with love</em> 最柔。破折號後接 stanza 8。
+ <span class="eye-cue">Stress: <b>neck</b>-lace · <b>tal</b>-cum · <b>limp</b> · <b>crum</b>-pled · <b>love</b></span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="sharp" data-start="96.4" data-end="101.0" data-yt-start="96.4" data-yt-end="101.0">
+ <div class="st-header">
+ <span class="st-tag">Stanza 8</span>
+ <div class="badge-row"><span class="cue-badge">💔 收束</span><span class="cue-badge">⏱ 很慢</span><span class="cue-badge">🔉 柔但清楚</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="7">
+ <div class="poem-lines">
+ I can hardly bear <span class="runon">↪</span><br>
+ To walk away.
+ </div>
+ <canvas class="hw-canvas" data-hw="7" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ <em>hardly bear</em> 情緒高點但仍克制——不要哭腔過度。<em>walk away</em> 放慢。
+ <span class="eye-cue">👀 可短暫移開視線，再回來。</span>
+ </div>
+ </div>
+
+ <div class="stanza" role="button" tabindex="0" data-arc="sharp" data-start="101.0" data-end="110.2" data-yt-start="101.0" data-yt-end="110.2">
+ <div class="st-header">
+ <span class="st-tag">Stanza 9</span>
+ <div class="badge-row"><span class="cue-badge">🎯 有力但柔的收結</span><span class="cue-badge">🔁 呼應開頭</span></div>
+ </div>
+ <div class="hw-wrap" data-hw="8">
+ <div class="poem-lines">
+ This class was special<span class="zh-gloss">特別的</span>.
+ </div>
+ <canvas class="hw-canvas" data-hw="8" aria-hidden="true"></canvas>
+</div>
+ <div class="cues">
+ 與 stanza 1 同句，但更滿、更確定。停夠再鞠躬。
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <section id="viewPron" class="view-section">
+ <div class="pron-display" id="pronBox" aria-live="polite">
+ </div>
+ <div class="pron-card">
+ <div class="vocab-grid" id="vocabGrid"></div>
+ </div>
+ </section>
+
+ <section id="viewSample" class="view-section">
+ <div class="model-card">
+ <h3>🎧 Model</h3>
+ <p>Miss Wan's Learning Hub · 78th Hong Kong Schools Speech Festival</p>
+ <div class="video-container" id="ytModelSlot">
+ </div>
+
+ <a href="https://www.youtube.com/watch?v=gTc918Co0Qc" target="_blank" rel="noopener noreferrer" class="btn-yt-ext">
+ ↗ Open Video directly in YouTube App
+ </a>
+
+ <div class="model-tips">
+ <strong>💡 聽聽這些對比：</strong>
+ <ul>
+ <li><strong>第1節與第9節：</strong>同一句。開頭柔而暖；結尾更滿、更確定。</li>
+ <li><strong>第2–3節：</strong><em>Particularly</em> 與 <em>Nothing</em> 輕而整齊，不要讀成批評。</li>
+ <li><strong>第5節：</strong><em>Yet</em> 把詩轉向「特別」；<em>chalk dust</em> 要輕、要亮。</li>
+ <li><strong>第7–8節：</strong>禮物清單有愛意；<em>I can hardly bear / To walk away</em> 放慢。</li>
+ </ul>
+ </div>
+ </div>
+ </section>
+
+ <section id="viewCheck" class="view-section">
+ <div class="check-card">
+ <h3 style="margin:0 0 8px;color:var(--gold);font-size:1rem;">錄音後自我檢查</h3>
+ <p style="margin:0 0 10px;font-size:.8rem;color:var(--muted);">開頭／結尾柔而暖；<em>Particularly</em> 不趕不兇；<em>Yet</em> 有轉折；禮物段有愛意；<em>hardly bear</em> 放慢；最後一句比第一句更滿。</p>
+ <label class="check-item"><input type="checkbox"> <span>Did I keep stanza 1 and 9 soft-warm (not shouted)?</span></label>
+ <label class="check-item"><input type="checkbox"> <span>Did the four <em>Particularly</em> lines stay even and light?</span></label>
+ <label class="check-item"><input type="checkbox"> <span>Did <em>Yet</em> clearly turn the poem toward “special”?</span></label>
+ <label class="check-item"><input type="checkbox"> <span>Did the gift list sound loving, not like a shopping list?</span></label>
+ <label class="check-item"><input type="checkbox"> <span>Did <em>I can hardly bear / To walk away</em> slow down enough?</span></label>
+ <label class="check-item"><input type="checkbox"> <span>Did the last <em>This class was special</em> feel fuller than the first?</span></label>
+ </div>
+ </section>
+</main>
+
+
+<!-- Collapsible Tools dock: 譯 · Handwrite · Record (DSE pattern; no timer) -->
+<div class="bottom-dock" id="bottomDock" role="toolbar" aria-label="Tools">
+ <div class="dock-inner" id="dockInner">
+ <div class="dock-chrome">
+ <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false" aria-label="Chinese gloss" title="Chinese gloss">譯</button>
+ <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false" aria-label="Handwrite" title="Handwrite">✍️</button>
+ <button type="button" class="dock-chip" id="togRecord" aria-pressed="false" aria-label="Record" title="Record or choose a voice memo">🎙</button>
+ <button type="button" class="dock-fold" id="dockFold" aria-expanded="false" aria-controls="dockInner" aria-label="Expand tools" title="Tools">🛠</button>
+ </div>
+ <div class="hw-bar" id="hwBar" aria-label="Handwrite tools" hidden>
+ <div class="hw-row" role="group" aria-label="Handwrite tools">
+ <button type="button" class="hw-chip hw-colour-btn" id="hwColour" title="Ink colour" aria-label="Colour: heat"></button>
+ <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" aria-label="Pen" title="Pen">✏️</button>
+ <button type="button" class="hw-chip" id="hwHighlight" aria-pressed="false" aria-label="Highlighter" title="Highlighter">🖍</button>
+ <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" aria-label="Eraser" title="Eraser">🩹</button>
+ <button type="button" class="hw-chip" id="hwUndo" aria-label="Undo" title="Undo" disabled>↶</button>
+ <button type="button" class="hw-chip" id="hwRedo" aria-label="Redo" title="Redo" disabled>↷</button>
+ <button type="button" class="hw-chip danger-chip" id="hwClearAll" aria-label="Clear all" title="Clear all">🗑</button>
+ </div>
+ </div>
+ <div class="rec-bar" id="recBar" aria-label="Recording" hidden>
+ <div class="rec-row">
+ <label class="btn-native" id="lblNativeRec" role="button" tabindex="0">
+ 📲 Record or Choose a Voice Memo
+ <input type="file" id="nativeAudioInput" accept="audio/*" style="display:none" aria-label="Choose an audio recording from your device" />
+ </label>
+ <div class="audio-bar" id="audioBar">
+ <audio id="audioPlayer" controls playsinline></audio>
+ <button type="button" class="btn-mini" id="btnChangeTake">🔄 New</button>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+
+
+
+<!-- Hidden local model audio (primary stanza play on https Pages) -->
+<audio id="modelAudio" src="u41.m4a" preload="auto" playsinline></audio>
+
+<!-- Persistent YouTube host (visual Model / Show — not required for stanza sound) -->
+<div class="yt-persist compact" id="ytPersist" aria-label="Model recital player">
+ <div class="yt-frame-wrap">
+ <div id="ytPlayer" title="U41 Last Day Model"></div>
+ </div>
+ <div class="yt-bar">
+ <div class="yt-status" id="ytStatus">🎧 Tap a stanza to play</div>
+ <button type="button" class="yt-ctrl" id="ytExpandBtn" title="Show video">Show</button>
+ <button type="button" class="yt-ctrl" id="ytStopBtn" disabled>Stop</button>
+ </div>
+</div>
+
+<script>
+// 1. Navigation Tabs
+const tabBtns = document.querySelectorAll(".tab-btn");
+const views = document.querySelectorAll(".view-section");
+const poemToggles = document.getElementById("poemToggles");
+
+tabBtns.forEach(btn => {
+ btn.onclick = () => {
+ tabBtns.forEach(b => b.classList.remove("active"));
+ views.forEach(v => v.classList.remove("active"));
+ btn.classList.add("active");
+ const target = btn.dataset.tab;
+ document.getElementById(target).classList.add("active");
+ tabBtns.forEach(b => b.setAttribute("aria-current", b === btn ? "page" : "false"));
+ poemToggles.style.display = target === "viewPoem" ? "flex" : "none";
+ const tapHint = document.getElementById("tapHint");
+ if (tapHint) tapHint.style.display = target === "viewPoem" ? "block" : "none";
+ if (target === "viewPoem") requestAnimationFrame(() => window.hwResize && window.hwResize());
+ syncYtLayout(target);
+ window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+ };
+});
+
+// 2. Toggles
+const container = document.getElementById("stanzaContainer");
+function bindToggle(btnId, className) {
+ const btn = document.getElementById(btnId);
+ btn.onclick = () => {
+ const isHidden = container.classList.toggle(className);
+ btn.classList.toggle("on", !isHidden);
+ btn.setAttribute("aria-pressed", String(!isHidden));
+ };
+}
+bindToggle("togRunon", "hide-runon");
+bindToggle("togStress", "hide-stress");
+bindToggle("togCues", "hide-cues");
+
+document.querySelectorAll(".stanza").forEach(st => {
+ st.onclick = (ev) => {
+ if (document.body.classList.contains("hw-on") && ev.target.closest(".hw-canvas")) return;
+ document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
+ st.classList.add("focused", "playing");
+ try { st.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {}
+ const a = +(st.dataset.start || st.dataset.ytStart), b = +(st.dataset.end || st.dataset.ytEnd);
+ if (!Number.isNaN(a) && !Number.isNaN(b)) playYtRange(a, b, st.querySelector(".st-tag")?.textContent || "Stanza");
+ };
+ st.onkeydown = event => {
+ if (event.key === "Enter" || event.key === " ") {
+ event.preventDefault();
+ st.click();
+ }
+ };
+});
+
+const titlePlay = document.getElementById("titlePlay");
+if (titlePlay) {
+ titlePlay.onclick = () => {
+ document.querySelectorAll(".stanza").forEach(x => x.classList.remove("focused", "playing"));
+ playYtRange(+(titlePlay.dataset.start || titlePlay.dataset.ytStart), +(titlePlay.dataset.end || titlePlay.dataset.ytEnd), "Title + poet");
+ };
+ titlePlay.onkeydown = (event) => {
+ if (event.key === "Enter" || event.key === " ") { event.preventDefault(); titlePlay.click(); }
+ };
+}
+
+// 3. Pronunciation Coach
+const VOCAB_TRAPS = [
+ { word: "particularly", zh: "", ipa: "/pəˈtɪk.jə.lə.li/", tip: "四次重複時節奏一致。重音 par-TIC-u-lar-ly。" },
+ { word: "miraculous", zh: "奇蹟般的", ipa: "/mɪˈræk.jə.ləs/", tip: "重音在 rac。" },
+ { word: "debris", zh: "", ipa: "/ˈdeb.riː/", tip: "英式重音在前。" },
+ { word: "unremarkable", zh: "平凡但珍貴", ipa: "/ˌʌn.rɪˈmɑː.kə.bəl/", tip: "重音 mark。不要讀成「差」。" },
+ { word: "glittered", zh: "", ipa: "/ˈɡlɪt.əd/", tip: "雙 t 輕快。" },
+ { word: "chalk dust", zh: "粉筆灰", ipa: "/tʃɔːk dʌst/", tip: "chalk 長元音。要輕、要閃，不要厚重。" },
+ { word: "offerings", zh: "心意小物", ipa: "/ˈɒf.ər.ɪŋz/", tip: "重音在 of。" },
+ { word: "talcum", zh: "爽身粉", ipa: "/ˈtæl.kəm/", tip: "讀 /ˈtæl.kəm/。" },
+ { word: "crumpled", zh: "皺了的", ipa: "/ˈkrʌm.pəld/", tip: "重音在 crum。" },
+ { word: "hardly bear", zh: "忍受", ipa: "/ˈhɑːd.li beə/", tip: "bear = 忍受，不是動物。" }
+];
+
+const grid = document.getElementById("vocabGrid");
+const pronBox = document.getElementById("pronBox");
+
+VOCAB_TRAPS.forEach(item => {
+ const btn = document.createElement("button");
+ btn.type = "button";
+ btn.className = "vocab-chip";
+ btn.innerHTML = `
+ <strong>${item.word} <span>🔊</span></strong>
+ <div class="chip-sub">
+ <span class="ipa-txt">${item.ipa}</span>
+ <span class="zh-txt">${item.zh}</span>
+ </div>
+ `;
+ btn.onclick = () => {
+ pronBox.innerHTML = `
+ <div class="word-title">${item.word} <span class="ipa">${item.ipa}</span> <span class="zh-tag">${item.zh}</span></div>
+ <div class="tip">${item.tip}</div>
+ `;
+ pronBox.classList.add("has-content");
+ if ("speechSynthesis" in window) {
+ try { window.speechSynthesis.cancel(); window.speechSynthesis.resume(); } catch (e) {}
+ const u = new SpeechSynthesisUtterance(item.word);
+ u.lang = "en-GB";
+ u.rate = 0.85;
+ window.speechSynthesis.speak(u);
+ }
+ };
+ grid.appendChild(btn);
+});
+
+// 4–7. Tools dock (譯 · Handwrite · Record) — see ../tools-dock.js
+// Timer removed per How Ch (2026-10-18).
+
+// --- V22: local HTML5 audio for stanza cues; YouTube optional (Show / Model tab) ---
+const YT_ID = "gTc918Co0Qc";
+const MODEL_AUDIO_SRC = "u41.m4a";
+const ytPersist = document.getElementById("ytPersist");
+const ytStatus = document.getElementById("ytStatus");
+const ytStopBtn = document.getElementById("ytStopBtn");
+const ytExpandBtn = document.getElementById("ytExpandBtn");
+const ytModelSlot = document.getElementById("ytModelSlot");
+const modelAudio = document.getElementById("modelAudio");
+let ytForceExpand = false;
+let ytPlayingLabel = "";
+let ytPlayer = null;
+let ytApiReady = false;
+let ytPendingPlay = null; // unused for https audio path; kept for file:// popup only
+let ytPollTimer = null;
+let ytRangeEnd = 0;
+let audioEndTimer = null;
+let audioRangeEnd = 0;
+let audioLabel = "";
+
+function setYtStatus(label) {
+ if (ytStatus) ytStatus.innerHTML = "🎧 <span>" + label + "</span>";
+}
+
+function idleYtTip() {
+ return isFilePage
+  ? "Tap · YouTube window (file://)"
+  : "Tap a stanza to play";
+}
+
+function ytEmbedUrl(start, end, autoplay) {
+ const s = Math.max(0, Math.floor(start));
+ const e = Math.max(s + 1, Math.floor(end));
+ let u = "https://www.youtube.com/embed/" + YT_ID +
+  "?start=" + s + "&end=" + e + "&rel=0&modestbranding=1&playsinline=1&enablejsapi=1";
+ if (autoplay) u += "&autoplay=1";
+ return u;
+}
+
+function syncYtLayout(tab) {
+ if (!ytPersist) return;
+ const wantExpand = ytForceExpand || tab === "viewSample";
+ if (wantExpand && ytModelSlot && tab === "viewSample") {
+  ytPersist.classList.remove("compact");
+  ytPersist.classList.add("expanded");
+  ytModelSlot.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Hide";
+ } else if (wantExpand && tab !== "viewSample") {
+  ytPersist.classList.remove("compact");
+  ytPersist.classList.add("expanded");
+  const dock = document.getElementById("bottomDock");
+  if (dock && dock.parentNode) dock.parentNode.insertBefore(ytPersist, dock);
+  else document.body.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Hide";
+ } else {
+  ytPersist.classList.add("compact");
+  ytPersist.classList.remove("expanded");
+  const dock = document.getElementById("bottomDock");
+  if (dock && dock.parentNode) dock.parentNode.insertBefore(ytPersist, dock);
+  else document.body.appendChild(ytPersist);
+  if (ytExpandBtn) ytExpandBtn.textContent = "Show";
+ }
+}
+
+const isFilePage = (location.protocol === "file:");
+let ytPopup = null;
+
+function clearYtTimers() {
+ if (ytPollTimer) { clearInterval(ytPollTimer); ytPollTimer = null; }
+}
+
+function clearAudioTimers() {
+ if (audioEndTimer) { clearTimeout(audioEndTimer); audioEndTimer = null; }
+}
+
+function pauseYtQuiet() {
+ clearYtTimers();
+ if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+  try { ytPlayer.pauseVideo(); } catch (e) {}
+ }
+}
+
+function pauseModelAudioQuiet() {
+ clearAudioTimers();
+ if (modelAudio) {
+  try { modelAudio.pause(); } catch (e) {}
+ }
+}
+
+function finishAudioRange() {
+ clearAudioTimers();
+ if (modelAudio) {
+  try { modelAudio.pause(); } catch (e) {}
+ }
+ document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ if (ytStopBtn) ytStopBtn.disabled = true;
+ ytPlayingLabel = "";
+ audioLabel = "";
+ setYtStatus(idleYtTip());
+}
+
+function onModelTimeUpdate() {
+ if (!modelAudio) return;
+ if (audioRangeEnd > 0 && modelAudio.currentTime >= audioRangeEnd - 0.05) {
+  finishAudioRange();
+ }
+}
+
+function playWithLocalAudio(start, end, label) {
+ if (!modelAudio) {
+  setYtStatus("Audio missing — use https Pages link · 請用網頁連結");
+  return;
+ }
+ const s = Math.max(0, Number(start) || 0);
+ const e = Math.max(s + 0.5, Number(end) || s + 1);
+ const rangeTxt = Math.floor(s) + "s–" + Math.floor(e) + "s";
+ pauseYtQuiet();
+ clearAudioTimers();
+ audioRangeEnd = e;
+ audioLabel = label || "Playing";
+ ytPlayingLabel = audioLabel;
+ setYtStatus(audioLabel + " · " + rangeTxt);
+ if (ytStopBtn) ytStopBtn.disabled = false;
+
+ const startPlay = () => {
+  try {
+   modelAudio.currentTime = s;
+  } catch (err) {}
+  const p = modelAudio.play();
+  if (p && typeof p.then === "function") {
+   p.then(() => {
+    // schedule a backup stop in case timeupdate is sparse
+    const ms = Math.max(200, (e - s) * 1000 + 150);
+    clearAudioTimers();
+    audioEndTimer = setTimeout(() => {
+     if (modelAudio && !modelAudio.paused && modelAudio.currentTime >= e - 0.15) {
+      finishAudioRange();
+     }
+    }, ms);
+   }).catch(() => {
+    setYtStatus("Could not play audio — tap again · 請再點一次");
+    if (ytStopBtn) ytStopBtn.disabled = true;
+   });
+  } else {
+   const ms = Math.max(200, (e - s) * 1000 + 150);
+   clearAudioTimers();
+   audioEndTimer = setTimeout(() => {
+    if (modelAudio && !modelAudio.paused && modelAudio.currentTime >= e - 0.15) {
+     finishAudioRange();
+    }
+   }, ms);
+  }
+ };
+
+ // Seek then play inside the user-gesture handler
+ if (modelAudio.readyState >= 1) {
+  startPlay();
+ } else {
+  const once = () => { modelAudio.removeEventListener("loadedmetadata", once); startPlay(); };
+  modelAudio.addEventListener("loadedmetadata", once);
+  try { modelAudio.load(); } catch (e2) {}
+  // Still attempt play immediately (iOS often needs play() in the gesture)
+  startPlay();
+ }
+}
+
+function onYtStateChange(ev) {
+ // 1 = PLAYING — pause local audio so they don't overlap
+ if (ev.data === 1) {
+  pauseModelAudioQuiet();
+  document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ }
+ if (ev.data === 0) {
+  clearYtTimers();
+  document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+  if (ytStopBtn) ytStopBtn.disabled = true;
+  ytPlayingLabel = "";
+  setYtStatus(idleYtTip());
+ }
+}
+
+function playYtRange(start, end, label) {
+ ytPlayingLabel = label || "Playing";
+ const rangeTxt = Math.floor(start) + "s–" + Math.floor(end) + "s";
+ if (ytStopBtn) ytStopBtn.disabled = false;
+
+ // file:// : relative m4a usually won't load — keep YouTube popup fallback
+ if (isFilePage) {
+  pauseModelAudioQuiet();
+  const url = ytEmbedUrl(start, end, true);
+  try {
+   if (ytPopup && !ytPopup.closed) {
+    ytPopup.location.href = url;
+    ytPopup.focus();
+   } else {
+    ytPopup = window.open(url, "u41ModelPlayer", "popup=yes,width=560,height=320");
+   }
+   if (!ytPopup) {
+    setYtStatus("Allow pop-ups once, then tap again · 請允許彈出式視窗 — or open the https Pages link for audio");
+    return;
+   }
+   setYtStatus(ytPlayingLabel + " · " + rangeTxt + " · YouTube window");
+  } catch (e) {
+   setYtStatus("Use https Pages for audio · 請用網頁連結聽音訊");
+  }
+  return;
+ }
+
+ // https / http: local HTML5 audio (user-gesture seek+play) — no YouTube autoplay needed
+ playWithLocalAudio(start, end, label);
+}
+
+function stopYt() {
+ clearYtTimers();
+ clearAudioTimers();
+ ytPendingPlay = null;
+ pauseModelAudioQuiet();
+ if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+  try { ytPlayer.pauseVideo(); } catch (e) {}
+ }
+ if (ytPopup && !ytPopup.closed) {
+  try { ytPopup.close(); } catch (e) {}
+ }
+ ytPopup = null;
+ ytPlayingLabel = "";
+ audioLabel = "";
+ audioRangeEnd = 0;
+ if (ytStopBtn) ytStopBtn.disabled = true;
+ document.querySelectorAll(".stanza.playing").forEach(x => x.classList.remove("playing"));
+ setYtStatus(idleYtTip());
+}
+
+if (modelAudio) {
+ modelAudio.addEventListener("timeupdate", onModelTimeUpdate);
+ modelAudio.addEventListener("ended", finishAudioRange);
+}
+
+ytStopBtn && (ytStopBtn.onclick = (ev) => { ev.stopPropagation(); stopYt(); });
+ytExpandBtn && (ytExpandBtn.onclick = (ev) => {
+ ev.stopPropagation();
+ ytForceExpand = !ytForceExpand;
+ const tab = document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem";
+ syncYtLayout(tab);
+});
+
+// Tap the status bar itself → play title+poet (open cue)
+ytPersist && ytPersist.querySelector(".yt-bar")?.addEventListener("click", (ev) => {
+ if (ev.target.closest("button")) return;
+ const titlePlay = document.getElementById("titlePlay");
+ if (titlePlay) titlePlay.click();
+});
+
+window.onYouTubeIframeAPIReady = function () {
+ ytApiReady = true;
+ if (isFilePage) return;
+ if (document.getElementById("ytPlayer") == null && !ytPlayer) return;
+ const playerVars = {
+  playsinline: 1,
+  rel: 0,
+  modestbranding: 1,
+  enablejsapi: 1,
+  origin: (location.protocol === "https:" || location.protocol === "http:") ? location.origin : undefined
+ };
+ if (!playerVars.origin) delete playerVars.origin;
+ const host = document.getElementById("ytPlayer");
+ if (!host && ytPlayer) return;
+ ytPlayer = new YT.Player(host || "ytPlayer", {
+  videoId: YT_ID,
+  width: "100%",
+  height: "100%",
+  playerVars: playerVars,
+  events: {
+   onReady: function (ev) {
+    ytPlayer = ev.target;
+   },
+   onStateChange: onYtStateChange,
+   onError: function () {
+    setYtStatus("Video error — audio still works from stanza taps · 影片出錯，點詩節仍可聽音訊");
+   }
+  }
+ });
+};
+
+// Load YouTube API only for visual Model / Show (not required for stanza sound)
+if (!isFilePage) {
+ const tag = document.createElement("script");
+ tag.src = "https://www.youtube.com/iframe_api";
+ const firstScript = document.getElementsByTagName("script")[0];
+ firstScript.parentNode.insertBefore(tag, firstScript);
+}
+
+if (isFilePage) {
+ setYtStatus(idleYtTip());
+ const hint = document.getElementById("tapHint");
+ if (hint) hint.innerHTML = "Local file mode: stanza audio needs the https Pages site (relative m4a will not load from Downloads). Each stanza can open a YouTube window instead — allow pop-ups once. · 本機檔聽不到本頁音訊，請用網頁連結；或允許彈出式視窗開 YouTube。";
+} else {
+ setYtStatus(idleYtTip());
+}
+syncYtLayout(document.querySelector(".tab-btn.active")?.dataset.tab || "viewPoem");
+
+</script>
+
+<p class="school-brand"><a href="../../">SKH Holy Carpenter Secondary School · English</a></p>
+<script src="../tools-dock.js?v=20261020p"></script>
+</body>
+</html>
