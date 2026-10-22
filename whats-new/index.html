@@ -2,7 +2,10 @@
 <!-- cache 20261022o -->
 <!-- Newest first. Dates are Asia/Hong_Kong calendar days, shown as D Month YYYY.
      Each day: area headings (only areas that shipped), then short bullets.
-     Each bullet starts with an Added, Changed, or Fixed tag. -->
+     Each bullet starts with an Added, Changed, or Fixed tag.
+     Site version: under the newest date only, one muted line (not an A/C/F bullet):
+     <p class="release-version" data-site-version-echo>Site version: <span data-site-version-label>SHA · D Mon YYYY</span></p>
+     Copy the label from /site-version.js. Move this line onto the new day at end of day. -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -154,6 +157,17 @@
     background: #fde8ea;
     color: #8e2436;
   }
+  .release-version {
+    margin: -4px 0 12px;
+    padding-left: 12px;
+    font-size: .75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: #64748b;
+    overflow-wrap: anywhere;
+    user-select: text;
+    -webkit-user-select: text;
+  }
   footer {
     margin-top: 36px;
     padding-top: 16px;
@@ -187,6 +201,7 @@
     <div class="log">
       <article class="release">
         <h2><time datetime="2026-10-22">22 October 2026</time></h2>
+        <p class="release-version" data-site-version-echo>Site version: <span data-site-version-label>0000000 · 00 Mon 0000</span></p>
         <section>
           <h3>English Home</h3>
           <ul>
@@ -275,5 +290,6 @@
       Materials for school use
     </footer>
   </div>
+<script src="../site-version.js?v=pending"></script>
 </body>
 </html>
