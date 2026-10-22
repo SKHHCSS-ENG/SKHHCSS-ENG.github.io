@@ -1035,15 +1035,18 @@ body.reading-skills .part-label {
   border-radius: 8px;
   padding: 3px 10px;
 }
-body.reading-skills .skill-tip {
-  margin: 8px 0 0;
-  padding: 8px 10px;
-  font-size: .86rem;
-  font-weight: 600;
+body.reading-skills .timing-tip .part-label {
   color: var(--warn);
   background: var(--warn-bg);
+}
+body.reading-skills .timing-tip ul {
+  margin-top: 8px;
+  padding: 8px 12px 8px 1.4rem;
+  background: var(--warn-bg);
   border-radius: 8px;
-  line-height: 1.4;
+}
+body.reading-skills .part .table-scroll + ul {
+  margin-top: 10px;
 }
 body.reading-skills .exam-key,
 body.reading-skills .level-stars {
