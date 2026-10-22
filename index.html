@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261022l -->
+<!-- cache 20261023a -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -22,6 +22,10 @@
     --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
     --teacher: #0c5a70;
     --teacher-soft: #e6f4f8;
+    --phone: #2f6b3c;
+    --phone-soft: #e7f6ea;
+    --desktop: #3d4570;
+    --desktop-soft: #eceef8;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -145,9 +149,19 @@
     background: var(--teacher-soft);
     color: var(--teacher);
   }
+  .badge-phone {
+    background: var(--phone-soft);
+    color: var(--phone);
+  }
+  .badge-desktop {
+    background: var(--desktop-soft);
+    color: var(--desktop);
+  }
   .card .badge { color: var(--accent-ink); }
   .card .badge-student { color: var(--accent-ink); background: var(--accent-soft); }
   .card .badge-teacher { color: var(--teacher); background: var(--teacher-soft); }
+  .card .badge-phone { color: var(--phone); background: var(--phone-soft); }
+  .card .badge-desktop { color: var(--desktop); background: var(--desktop-soft); }
   .card-kicker .badge + .badge { margin-left: 6px; }
   footer {
     margin-top: 36px;
@@ -178,7 +192,7 @@
 
     <div class="cards">
       <a class="card" href="learning-materials/">
-        <p class="card-kicker"><span class="badge badge-student">Student</span></p>
+        <p class="card-kicker"><span class="badge badge-student">Student</span><span class="badge badge-phone">Phone</span></p>
         <h2>Learning Materials</h2>
         <p>Speech Festival, Paper 2 - Writing, and Useful Vocabulary — self-learn and classroom practice.</p>
         <span class="card-arrow">Open materials →</span>
