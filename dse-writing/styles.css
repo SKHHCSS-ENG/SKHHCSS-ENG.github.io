@@ -1027,6 +1027,63 @@ body.speaking-paper-4.zh-on details.format-section {
   overflow: visible;
 }
 
+/* Paper 1 - Reading study notes — same bank shell as speaking / vocab */
+body.reading-skills .level-stars {
+  white-space: nowrap;
+}
+body.reading-skills footer {
+  margin-top: 110px;
+}
+body.reading-skills.tools-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.reading-skills.tools-page.dock-open {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.zh-on .gloss:not([data-zh])::after,
+body.zh-on .gloss[data-zh=""]::after {
+  content: none;
+}
+/* Keep B1/B2 comparison as a real table so headers stay visible (no cell prefixes) */
+@media (max-width: 560px) {
+  body.reading-skills .vocab-table {
+    display: table;
+    width: 100%;
+    min-width: 0;
+    font-size: .78rem;
+  }
+  body.reading-skills .vocab-table thead { display: table-header-group; }
+  body.reading-skills .vocab-table tbody { display: table-row-group; }
+  body.reading-skills .vocab-table tr {
+    display: table-row;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+  body.reading-skills .vocab-table th,
+  body.reading-skills .vocab-table td {
+    display: table-cell;
+    border: 1px solid var(--border);
+    padding: 7px 6px;
+    vertical-align: top;
+  }
+  body.reading-skills .vocab-table thead th {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: .72rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  body.reading-skills .vocab-table tbody th {
+    width: auto;
+    background: var(--bg);
+    color: var(--navy);
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
 /* Sentence patterns — pattern cards */
 .pattern-card {
   margin: 0 0 14px;
