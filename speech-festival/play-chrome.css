@@ -1,0 +1,179 @@
+/* Speech Festival scroll-hide header + narrow draggable play pill.
+   Port of U41 chrome (9c0db4b) for pages that opt in with .sf-play-pill
+   on <html> and <body>. U41 keeps its own copy and must not link this file.
+   tools-dock.css pins every .yt-persist with !important; these selectors
+   outrank that so the pill stays narrow and clear of the 🛠 dock. */
+
+html.sf-play-pill {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  scroll-padding-top: calc(var(--sf-header-h, 112px) + 8px);
+}
+html.sf-play-pill.chrome-hidden {
+  scroll-padding-top: calc(12px + env(safe-area-inset-top, 0px));
+}
+
+body.sf-play-pill {
+  /* Tools chip + floating play pill share the bottom edge.
+     Specificity stays below body.sf-tools.dock-open so an open Tools
+     dock can still add bottom padding from tools-dock.css. */
+  padding-top: var(--sf-header-h, 112px);
+  padding-bottom: calc(96px + var(--sab));
+}
+
+body.sf-play-pill header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  transition: transform .26s ease;
+}
+/* Notch stays tinted after the header slides away */
+body.sf-play-pill::before {
+  content: "";
+  position: fixed;
+  z-index: 39;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--sat);
+  background: rgba(245, 237, 224, 0.94);
+  pointer-events: none;
+}
+html.sf-play-pill.chrome-hidden header {
+  transform: translate3d(0, -100%, 0);
+  pointer-events: none;
+}
+
+html.sf-play-pill .stanza.focused,
+html.sf-play-pill .stanza.playing {
+  scroll-margin-top: calc(var(--sf-header-h, 112px) + 8px);
+  scroll-margin-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+}
+html.sf-play-pill.chrome-hidden .stanza.focused,
+html.sf-play-pill.chrome-hidden .stanza.playing {
+  scroll-margin-top: calc(16px + env(safe-area-inset-top, 0px));
+}
+
+html.sf-play-pill .pron-display {
+  top: calc(var(--sf-header-h, 112px) + 8px);
+}
+html.sf-play-pill.chrome-hidden .pron-display {
+  top: calc(8px + env(safe-area-inset-top, 0px));
+}
+
+html body.sf-play-pill .yt-persist.compact {
+  position: fixed !important;
+  right: auto !important;
+  width: max-content !important;
+  max-width: min(17.5rem, calc(100vw - 6.25rem - 10px - var(--sal) - var(--sar))) !important;
+  margin: 0 !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px 4px 4px;
+  min-height: 44px;
+  border-radius: 999px;
+  z-index: 45;
+  overflow: visible;
+  box-shadow: 0 8px 22px rgba(44, 41, 38, .22);
+}
+html body.sf-play-pill .yt-persist.compact:not(.is-placed) {
+  left: max(10px, var(--sal)) !important;
+  top: auto !important;
+  bottom: calc(12px + var(--sab)) !important;
+}
+/* Sit above the full-width Tools bar. No bottom transition: a slide would
+   cross the 🛠 / 譯 row while the dock is opening. */
+html body.sf-play-pill.dock-open .yt-persist.compact:not(.is-placed) {
+  bottom: calc(80px + var(--sab)) !important;
+}
+html body.sf-play-pill.dock-open.hw-on .yt-persist.compact:not(.is-placed) {
+  bottom: calc(128px + var(--sab)) !important;
+}
+html body.sf-play-pill.dock-open.rec-on .yt-persist.compact:not(.is-placed) {
+  bottom: calc(136px + var(--sab)) !important;
+}
+html body.sf-play-pill.dock-open.hw-on.rec-on .yt-persist.compact:not(.is-placed) {
+  bottom: calc(184px + var(--sab)) !important;
+}
+html body.sf-play-pill .yt-persist.compact.is-placed,
+html body.sf-play-pill.dock-open .yt-persist.compact.is-placed,
+html body.sf-play-pill.dock-open.hw-on .yt-persist.compact.is-placed,
+html body.sf-play-pill.dock-open.rec-on .yt-persist.compact.is-placed,
+html body.sf-play-pill.dock-open.hw-on.rec-on .yt-persist.compact.is-placed {
+  left: var(--playdock-x) !important;
+  top: var(--playdock-y) !important;
+  right: auto !important;
+  bottom: auto !important;
+  transition: none;
+}
+html body.sf-play-pill .yt-persist.compact.is-dragging { transition: none; }
+html body.sf-play-pill .yt-persist.expanded,
+html body.sf-play-pill.dock-open .yt-persist.expanded,
+html body.sf-play-pill.dock-open.hw-on .yt-persist.expanded,
+html body.sf-play-pill.dock-open.rec-on .yt-persist.expanded,
+html body.sf-play-pill.dock-open.hw-on.rec-on .yt-persist.expanded {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 0 12px !important;
+  transform: none !important;
+  border-radius: 12px;
+}
+
+.sf-play-pill .yt-drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 32px;
+  min-width: 32px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+  flex-shrink: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.sf-play-pill .yt-drag:active,
+.sf-play-pill .yt-persist.is-dragging .yt-drag { cursor: grabbing; }
+.sf-play-pill .yt-persist.expanded .yt-drag { display: none; }
+.sf-play-pill .yt-grip {
+  width: 10px;
+  height: 16px;
+  display: block;
+  background-image: radial-gradient(circle, currentColor 1.25px, transparent 1.45px);
+  background-size: 5px 5.5px;
+  background-repeat: repeat;
+}
+html body.sf-play-pill .yt-persist.compact .yt-bar {
+  padding: 0 2px 0 0;
+  gap: 4px;
+  min-width: 0;
+}
+html body.sf-play-pill .yt-persist.compact .yt-status {
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .01em;
+}
+html body.sf-play-pill .yt-persist.compact .yt-ctrl {
+  flex-shrink: 0;
+  border-radius: 999px;
+  min-height: 32px;
+  padding: 6px 10px;
+  touch-action: manipulation;
+}
