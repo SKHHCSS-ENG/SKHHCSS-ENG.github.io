@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="sf-play-pill">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <link rel="stylesheet" href="../tools-dock.css?v=20261020p">
+<link rel="stylesheet" href="../play-chrome.css?v=20261022a">
 <title>U47 Solo Verse — One Moment in Summer V22 | Practice Guide</title>
 <style>
  :root {
@@ -335,7 +336,7 @@
  .school-brand a { color: inherit; text-decoration: none; }
 </style>
 </head>
-<body>
+<body class="sf-play-pill">
 
 <header>
  <div class="top-row">
@@ -353,6 +354,7 @@
  <button type="button" class="tab-btn" data-tab="viewCheck">✅ Check</button>
  </nav>
 </header>
+<script src="../play-chrome.js?v=20261022a"></script>
 
 <div class="quick-toggles" id="poemToggles">
  <button type="button" class="chip-toggle on" id="togRunon" aria-pressed="true">↪ Run-on</button>
@@ -663,8 +665,11 @@
  <div class="yt-frame-wrap">
  <div id="ytPlayer" title="U47 One Moment in Summer Model"></div>
  </div>
+ <button type="button" class="yt-drag" id="ytDrag" aria-label="Move player" title="Drag">
+  <span class="yt-grip" aria-hidden="true"></span>
+ </button>
  <div class="yt-bar">
- <div class="yt-status" id="ytStatus">🎧 Tap a stanza to play</div>
+ <div class="yt-status" id="ytStatus">Tap to Play</div>
  <button type="button" class="yt-ctrl" id="ytExpandBtn" title="Show video">Show</button>
  <button type="button" class="yt-ctrl" id="ytStopBtn" disabled>Stop</button>
  </div>
@@ -808,13 +813,16 @@ let audioRangeEnd = 0;
 let audioLabel = "";
 
 function setYtStatus(label) {
- if (ytStatus) ytStatus.innerHTML = "🎧 <span>" + label + "</span>";
+ if (!ytStatus) return;
+ if (label === "Tap to Play") ytStatus.textContent = "Tap to Play";
+ else ytStatus.innerHTML = "🎧 <span>" + label + "</span>";
+ if (window.sfSyncPlayDock) requestAnimationFrame(window.sfSyncPlayDock);
 }
 
 function idleYtTip() {
  return isFilePage
   ? "Tap · YouTube window (file://)"
-  : "Tap a stanza to play";
+  : "Tap to Play";
 }
 
 function ytEmbedUrl(start, end, autoplay) {
@@ -849,6 +857,7 @@ function syncYtLayout(tab) {
   else document.body.appendChild(ytPersist);
   if (ytExpandBtn) ytExpandBtn.textContent = "Show";
  }
+ if (window.sfSyncPlayDock) window.sfSyncPlayDock();
 }
 
 const isFilePage = (location.protocol === "file:");
