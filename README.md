@@ -5,6 +5,7 @@ Public GitHub Pages site for the English panel.
 - **Home:** https://skhhcss-eng.github.io/
 - **Learning materials:** https://skhhcss-eng.github.io/learning-materials/
 - **Classroom:** https://skhhcss-eng.github.io/classroom/
+- **What's New:** https://skhhcss-eng.github.io/whats-new/
 - **Class Activity Studio:** https://skhhcss-eng.github.io/classroom/class-activity-studio/
 - **Speech Festival:** https://skhhcss-eng.github.io/speech-festival/
 - **DSE Writing:** https://skhhcss-eng.github.io/dse-writing/
@@ -13,10 +14,11 @@ Public GitHub Pages site for the English panel.
 
 | Path | What |
 |------|------|
-| `/` | English Department home (Learning materials · Classroom) |
+| `/` | English Department home (Learning Materials · Classroom · What's New) |
 | `/learning-materials/` | Student practice hub (Speech Festival, DSE Writing) |
 | `/classroom/` | Teacher tools hub |
 | `/classroom/class-activity-studio/` | Class Activity Studio (live scoreboard / desks / points) |
+| `/whats-new/` | Site updates (newest first) |
 | `/speech-festival/` | Speech Festival hub |
 | `/speech-festival/u41/` | U41 *Last Day* (Clare Bevan) — S3 Girls |
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |
