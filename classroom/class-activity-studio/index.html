@@ -855,6 +855,22 @@
       border-color: #f59e0b;
       outline: none;
     }
+    /* Unassigned class number: empty slot, not a number chip (no #, no 0, no grey pill). */
+    .desk-classno-btn.is-blank,
+    .desk-classno-btn.is-blank.is-editable,
+    .desk-classno-btn.is-blank:hover,
+    .desk-classno-btn.is-blank:focus-visible,
+    .desk-classno-btn.is-blank.is-editable:hover,
+    .desk-classno-btn.is-blank.is-editable:focus-visible {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      outline: none;
+      color: transparent;
+      padding: 0;
+      min-width: 1.25rem;
+      min-height: 14px;
+    }
     .desk-name-static {
       cursor: default;
       min-height: 26px;
@@ -1095,6 +1111,10 @@
       gap: 2px;
       flex: none;
       min-width: 0;
+    }
+    /* Score stays on the right when the class-number slot is empty. */
+    .desk-score-row {
+      margin-left: auto;
     }
     /* Edit + ON/OFF. Compact pill on the Register band only.
        The header Tools chip does not use this frame. */
@@ -3168,21 +3188,41 @@
         const field = document.querySelector('#rosterStudentList [data-edit-st-name="' + studentId + '"]');
         if (field && document.activeElement !== field) field.value = st.name;
         const noField = document.querySelector('#rosterStudentList [data-edit-st-no="' + studentId + '"]');
-        if (noField && document.activeElement !== noField) noField.value = st.classNo;
+        if (noField && document.activeElement !== noField) noField.value = classNoText(st.classNo);
         const assignNo = document.querySelector('#studentGroupAssignList [data-assign-st-no="' + studentId + '"]');
-        if (assignNo) assignNo.textContent = '#' + st.classNo;
+        if (assignNo) assignNo.textContent = formatClassNoMark(st.classNo);
         const titleEl = document.getElementById('pickerResultTitle');
         if (titleEl && state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === studentId) {
-          titleEl.textContent = '#' + st.classNo + ' ' + st.name;
+          titleEl.textContent = formatStudentLabel(st.classNo, st.name);
           fitPickerTitle();
         }
       }
 
+      // Blank, whitespace, or a lone # means no class number. A typed number stays, including 0.
+      function classNoText(value) {
+        var raw = String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
+        if (raw.charAt(0) === '#') raw = raw.slice(1).trim();
+        return raw;
+      }
+
+      function formatClassNoMark(value) {
+        var no = classNoText(value);
+        return no ? ('#' + no) : '';
+      }
+
+      function formatStudentLabel(classNo, name) {
+        var mark = formatClassNoMark(classNo);
+        var label = String(name == null ? '' : name).trim();
+        if (mark && label) return mark + ' ' + label;
+        return mark || label;
+      }
+
       // Writes the roster classNo field. One to three digits pad to two, so #7 matches #07.
-      function normaliseClassNo(rawText, previous) {
+      // A cleared field stays empty. It does not fall back to the previous number or a desk index.
+      function normaliseClassNo(rawText) {
         var next = String(rawText == null ? '' : rawText).replace(/\s+/g, ' ').trim();
         if (next.charAt(0) === '#') next = next.slice(1).trim();
-        if (!next) return String(previous == null ? '' : previous);
+        if (!next) return '';
         if (next.length > 12) next = next.slice(0, 12).trim();
         if (/^\d{1,3}$/.test(next)) return next.padStart(2, '0');
         return next;
@@ -3193,13 +3233,13 @@
         if (!cls || !studentId) return false;
         const st = cls.students.find(function (s) { return s.id === studentId; });
         if (!st) return false;
-        const next = normaliseClassNo(rawText, st.classNo);
+        const next = normaliseClassNo(rawText);
         if (String(st.classNo) === next) return false;
         const before = snapshotBoardEdit(cls);
         st.classNo = next;
-        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Edit seat number');
+        pushLayoutHistory(before, snapshotBoardEdit(cls), next ? 'Edit seat number' : 'Clear class number');
         saveState();
-        showToast('Class number set to #' + next, '✏️');
+        showToast(next ? ('Class number set to #' + next) : 'Class number cleared', '✏️');
         return true;
       }
 
@@ -3250,9 +3290,9 @@
 
       function studentHistoryLabel(st) {
         if (!st) return 'student';
-        var no = st.classNo ? ('#' + st.classNo + ' ') : '';
+        var mark = formatClassNoMark(st.classNo);
         var name = isEmptySeatName(st.name) ? 'Empty' : st.name;
-        return no + name;
+        return mark ? (mark + ' ' + name) : name;
       }
 
       // Same removal as the roster ✕: the desk leaves the class. Scores on everyone else stay.
@@ -3522,12 +3562,18 @@
       }
 
       function renderDeskClassNoControl(st) {
-        const no = String(st.classNo == null ? '' : st.classNo);
+        const no = classNoText(st.classNo);
         if (state.editingClassNoId === st.id && boardEditsAllowed()) {
           return '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12" ' +
             'class="desk-classno-input" data-desk-classno-input="' + escapeHtml(st.id) + '" ' +
             'data-original-classno="' + escapeHtml(no) + '" ' +
             'value="' + escapeHtml(no) + '" aria-label="Class number" />';
+        }
+        // Same idea as an unassigned group: the slot is empty. No #, no 0, no number pill.
+        if (!no) {
+          if (!boardEditsAllowed()) return '';
+          return '<button type="button" class="desk-classno-btn is-blank is-editable" data-desk-classno="' + escapeHtml(st.id) + '" ' +
+            'title="Add class number" aria-label="Add class number"></button>';
         }
         const cue = boardEditsAllowed() ? ' is-editable' : ' is-frozen';
         return '<button type="button" class="desk-classno-btn' + cue + '" data-desk-classno="' + escapeHtml(st.id) + '" ' +
@@ -3579,7 +3625,7 @@
           type: 'student',
           classId: cls.id,
           studentId: st.id,
-          label: st.classNo + ' ' + st.name,
+          label: (classNoText(st.classNo) ? (classNoText(st.classNo) + ' ' + st.name) : st.name),
           delta: delta,
           note: sourceLabel || 'Individual score',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -5003,7 +5049,7 @@
                 '<span class="w-7 text-center font-display font-bold text-xs ' + (rank <= 3 && st.score > 0 ? 'text-base' : 'text-slate-400') + '">' + medal + '</span>' +
                 '<div class="min-w-0 flex-1">' +
                   '<div class="flex items-center gap-1.5">' +
-                    '<span class="text-[11px] font-mono font-bold text-slate-400">#' + escapeHtml(st.classNo) + '</span>' +
+                    (formatClassNoMark(st.classNo) ? '<span class="text-[11px] font-mono font-bold text-slate-400">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
                     '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
                   '</div>' +
                   '<div class="flex items-center gap-2 mt-1 min-w-0">' +
@@ -5373,7 +5419,7 @@
           if (dragContext.hasMoved) {
             const cls = getCurrentClass();
             if (cls && dragContext.student && dragContext.beforeBoard) {
-              pushLayoutHistory(dragContext.beforeBoard, snapshotBoardEdit(cls), 'Move ' + (dragContext.student.classNo || '') + ' ' + (dragContext.student.name || 'desk'));
+              pushLayoutHistory(dragContext.beforeBoard, snapshotBoardEdit(cls), 'Move ' + (formatStudentLabel(dragContext.student.classNo, dragContext.student.name) || 'desk'));
             }
             saveState();
             renderHeaderControls();
@@ -5540,7 +5586,7 @@
             rosterEl.innerHTML = cls.students.map(function (st) {
               return '<div class="px-3 py-2 flex items-center justify-between gap-2 hover:bg-slate-50">' +
                 '<div class="flex items-center gap-2 flex-1 min-w-0">' +
-                  '<input type="text" data-edit-st-no="' + escapeHtml(st.id) + '" value="' + escapeHtml(st.classNo) + '" aria-label="Class Number" class="w-14 px-2 py-1 text-xs font-mono font-bold border border-slate-200 rounded-lg text-center" />' +
+                  '<input type="text" data-edit-st-no="' + escapeHtml(st.id) + '" value="' + escapeHtml(classNoText(st.classNo)) + '" aria-label="Class Number" class="w-14 px-2 py-1 text-xs font-mono font-bold border border-slate-200 rounded-lg text-center" />' +
                   '<input type="text" data-edit-st-name="' + escapeHtml(st.id) + '" value="' + escapeHtml(st.name) + '" aria-label="Student Name" class="flex-1 min-w-0 px-2.5 py-1 text-xs font-semibold border border-slate-200 rounded-lg" />' +
                 '</div>' +
                 '<div class="flex items-center gap-2">' +
@@ -5567,7 +5613,7 @@
         for (let i = 0; i < count; i++) {
           students.push({
             id: 'st_' + Date.now() + '_' + i,
-            classNo: String(i + 1).padStart(2, '0'),
+            classNo: '',
             name: 'Student ' + String(i + 1).padStart(2, '0'),
             groupId: groups[i % 4].id,
             score: 0,
@@ -5599,10 +5645,10 @@
         showToast('Created preset class "' + rawName + '" with ' + count + ' desks!', '🎉');
       }
 
-      function parseBulkRosterLines(rawText, startIdx) {
+      function parseBulkRosterLines(rawText) {
         const lines = String(rawText || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
-        return lines.map(function (line, idx) {
-          // Match optional leading number e.g. "01, Chan Tai Man" or "1. Chan Tai Man"
+        return lines.map(function (line) {
+          // A leading number is explicit. A name-only line stays unnumbered.
           const match = line.match(/^(\d{1,3})\s*[,.\-\t:]\s*(.+)$/);
           if (match) {
             return {
@@ -5611,7 +5657,7 @@
             };
           }
           return {
-            classNo: String(startIdx + idx + 1).padStart(2, '0'),
+            classNo: '',
             name: line
           };
         });
@@ -5673,7 +5719,7 @@
 
             return '<div class="px-3 py-2 flex items-center justify-between gap-2 hover:bg-slate-50">' +
               '<div class="flex items-center gap-2 min-w-0">' +
-                '<span class="text-xs font-mono font-bold text-slate-400 w-8" data-assign-st-no="' + escapeHtml(st.id) + '">#' + escapeHtml(st.classNo) + '</span>' +
+                '<span class="text-xs font-mono font-bold text-slate-400 w-8" data-assign-st-no="' + escapeHtml(st.id) + '">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' +
                 '<span class="text-xs font-bold text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
               '</div>' +
               '<select data-assign-student-grp="' + escapeHtml(st.id) + '" aria-label="Assign Team for ' + escapeHtml(st.name) + '" class="px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:ring-2 focus:ring-violet-400">' +
@@ -5830,11 +5876,11 @@
 
           let ticks = 0;
           const totalTicks = 14;
-          showPickerResult('#' + pool[0].classNo + ' ' + pool[0].name);
+          showPickerResult(formatStudentLabel(pool[0].classNo, pool[0].name));
 
           pickerSpinIntervalId = setInterval(function () {
             const candidate = pool[Math.floor(Math.random() * pool.length)];
-            showPickerResult('#' + candidate.classNo + ' ' + candidate.name);
+            showPickerResult(formatStudentLabel(candidate.classNo, candidate.name));
             playSubtleSound('tick');
             ticks++;
 
@@ -5846,7 +5892,7 @@
                 state.pickedStudentIds.push(winner.id);
               }
               state.lastPickedTarget = { type: 'student', id: winner.id };
-              showPickerResult('#' + winner.classNo + ' ' + winner.name);
+              showPickerResult(formatStudentLabel(winner.classNo, winner.name));
               playSubtleSound('fanfare');
               updatePickerModalUI();
               renderClassroomCanvas(false);
@@ -5916,7 +5962,7 @@
               '<div class="text-[11px] font-mono text-amber-300 mb-2">' + st.score + ' pts</div>' +
               '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-between p-2.5 shadow-lg">' +
                 '<span class="font-display font-extrabold text-xs sm:text-sm">' + stMedals[idx] + '</span>' +
-                '<span class="text-[10px] opacity-80 font-mono">#' + escapeHtml(st.classNo) + '</span>' +
+                (formatClassNoMark(st.classNo) ? '<span class="text-[10px] opacity-80 font-mono">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
               '</div>' +
             '</div>';
           }).join('');
@@ -6723,7 +6769,7 @@
           const nextNum = cls.students.length + 1;
           const newSt = {
             id: 'st_' + Date.now(),
-            classNo: String(nextNum).padStart(2, '0'),
+            classNo: '',
             name: 'Student ' + String(nextNum).padStart(2, '0'),
             groupId: cls.groups[0] ? cls.groups[0].id : '',
             score: 0,
@@ -6734,7 +6780,7 @@
           rememberStudentDefaultPosition(cls, newSt);
           saveState();
           renderAll();
-          showToast('Added desk #' + newSt.classNo + (boardEditsAllowed() ? ' — drag it anywhere!' : ''), '🪑');
+          showToast('Added a desk' + (boardEditsAllowed() ? ' — drag it anywhere!' : ''), '🪑');
         });
 
         document.getElementById('btnQuickAddGroup').addEventListener('click', addNewGroup);
@@ -6928,8 +6974,8 @@
           if (!cls) return;
           const noInput = document.getElementById('addStudentNoInput');
           const nameInput = document.getElementById('addStudentNameInput');
-          const classNo = (noInput.value || '').trim() || String(cls.students.length + 1).padStart(2, '0');
-          const name = (nameInput.value || '').trim() || ('Student ' + classNo);
+          const classNo = normaliseClassNo(noInput ? noInput.value : '');
+          const name = (nameInput.value || '').trim() || (classNo ? ('Student ' + classNo) : 'Student');
           const idx = cls.students.length;
           cls.students.push({
             id: 'st_' + Date.now(),
@@ -6999,7 +7045,7 @@
         document.getElementById('btnBulkReplaceRoster').addEventListener('click', function () {
           const cls = getCurrentClass();
           const raw = document.getElementById('bulkPasteTextarea').value;
-          const entries = parseBulkRosterLines(raw, 0);
+          const entries = parseBulkRosterLines(raw);
           if (!cls || entries.length === 0) {
             showToast('Please paste at least one student name first.', '⚠️');
             return;
@@ -7026,7 +7072,7 @@
         document.getElementById('btnBulkAppendRoster').addEventListener('click', function () {
           const cls = getCurrentClass();
           const raw = document.getElementById('bulkPasteTextarea').value;
-          const entries = parseBulkRosterLines(raw, cls ? cls.students.length : 0);
+          const entries = parseBulkRosterLines(raw);
           if (!cls || entries.length === 0) {
             showToast('Please paste at least one student name first.', '⚠️');
             return;

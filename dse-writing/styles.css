@@ -22,8 +22,9 @@
   --slot-topic-bg: #ede9fe;
   --slot-detail: #9a3412;
   --slot-detail-bg: #ffedd5;
-  --slot-other: #0369a1;
-  --slot-other-bg: #e0f2fe;
+  /* Forest green, not sky blue: thesis stays school teal (~193°) and other sits ~50° away. */
+  --slot-other: #14532d;
+  --slot-other-bg: #dcfce7;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html {
