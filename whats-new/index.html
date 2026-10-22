@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<!-- cache 20261022f -->
+<!-- cache 20261022g -->
 <!-- Newest first. Dates are Asia/Hong_Kong calendar days, shown as D Month YYYY.
-     Each day: area heading, then short bullets. -->
+     Each day: area headings (only areas that shipped), then short bullets.
+     Each bullet starts with an Added, Changed, or Fixed tag. -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -115,16 +116,43 @@
   }
   .release section:first-of-type h3 { margin-top: 2px; }
   .release ul {
+    list-style: none;
     margin: 0 0 4px;
-    padding-left: 1.2rem;
+    padding: 0;
   }
   .release li {
-    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 8px;
     font-size: .92rem;
-    line-height: 1.45;
+    line-height: 1.4;
   }
-  .release li::marker { color: var(--accent-deep); }
-  .release strong { font-weight: 800; color: var(--navy); }
+  .tag {
+    flex: 0 0 4.7rem;
+    box-sizing: border-box;
+    padding: 1px 6px 2px;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+    line-height: 1.35;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .tag-added {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .tag-changed {
+    background: #fff;
+    color: var(--accent-ink);
+    box-shadow: inset 0 0 0 1.5px var(--accent-deep);
+  }
+  .tag-fixed {
+    background: var(--accent-ink);
+    color: #fff;
+  }
   footer {
     margin-top: 36px;
     padding-top: 16px;
@@ -161,25 +189,26 @@
         <section>
           <h3>Learning Materials</h3>
           <ul>
-            <li>Hub sorted into Competitions · Junior · DSE · All Levels (tap a section to fold).</li>
-            <li>Cards renamed <strong>Paper 2 - Writing</strong> and <strong>Paper 4 - Speaking</strong>.</li>
-            <li><strong>Paper 1 - Reading</strong> added under DSE.</li>
-            <li>Speaking page shows the DSE badge only.</li>
+            <li><span class="tag tag-added">Added</span> Paper 1 - Reading under DSE</li>
+            <li><span class="tag tag-added">Added</span> Speaking (Paper 4) practice banks</li>
+            <li><span class="tag tag-changed">Changed</span> hub into Competitions · Junior · DSE · All Levels (tap to fold)</li>
+            <li><span class="tag tag-changed">Changed</span> cards to Paper 2 - Writing · Paper 4 - Speaking; Speaking page DSE badge only</li>
           </ul>
         </section>
         <section>
           <h3>Speech Festival</h3>
           <ul>
-            <li><strong>U41 Last Day</strong> (S3 Girls) live.</li>
-            <li>Clearer play controls on U41, U47 and U66: <strong>Tap to Play · Show · Stop</strong> (header hides when you scroll down; narrow pill you can drag).</li>
+            <li><span class="tag tag-added">Added</span> U41 · Last Day (S3 Girls)</li>
+            <li><span class="tag tag-changed">Changed</span> U41 / U47 / U66: scroll-hide header + Tap to Play · Show · Stop pill</li>
           </ul>
         </section>
         <section>
           <h3>Classroom Studio</h3>
           <ul>
-            <li>Team Scoreboard + seating floor resize with the window.</li>
-            <li>Leaderboard ranks as 1st / 2nd / 3rd…</li>
-            <li>Edit mode: empty class-number slots stay blank until you fill them; yellow fields when Edit is on.</li>
+            <li><span class="tag tag-changed">Changed</span> floor + Team Scoreboard follow the window</li>
+            <li><span class="tag tag-changed">Changed</span> leaderboard places to 1st / 2nd / 3rd…</li>
+            <li><span class="tag tag-changed">Changed</span> empty class-number slots stay blank (Edit shows the yellow field)</li>
+            <li><span class="tag tag-changed">Changed</span> DSE Writing skeleton colours clearer</li>
           </ul>
         </section>
       </article>
@@ -189,7 +218,40 @@
         <section>
           <h3>Classroom Studio</h3>
           <ul>
-            <li>Tools ON/OFF chrome, Pulse &amp; Leaderboard edge tab, Snap/Front width, full group names, blank empty group slots, seating floor fills the space.</li>
+            <li><span class="tag tag-changed">Changed</span> Edit ON/OFF and Tools chrome</li>
+            <li><span class="tag tag-added">Added</span> Show Tools / Hide Tools; Pulse &amp; Leaderboard edge tab</li>
+            <li><span class="tag tag-changed">Changed</span> blank empty group slots; Zoom fold; seating floor fill</li>
+            <li><span class="tag tag-changed">Changed</span> Register · Seating · History · Scores labels (Title Case)</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Learning Materials</h3>
+          <ul>
+            <li><span class="tag tag-changed">Changed</span> Expand All / Collapse All on bank pages</li>
+          </ul>
+        </section>
+      </article>
+
+      <article class="release">
+        <h2><time datetime="2026-10-20">20 October 2026</time></h2>
+        <section>
+          <h3>Learning Materials</h3>
+          <ul>
+            <li><span class="tag tag-added">Added</span> Grammar (Junior)</li>
+            <li><span class="tag tag-changed">Changed</span> clearer ← Back to … links (parent page Title Case destinations)</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Classroom Studio</h3>
+          <ul>
+            <li><span class="tag tag-changed">Changed</span> toolbar bands Register · Seating · History · Scores</li>
+            <li><span class="tag tag-changed">Changed</span> simpler − / + score chips; dropped helper blurbs under roster / grouping / scoreboard</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Home / Tools</h3>
+          <ul>
+            <li><span class="tag tag-changed">Changed</span> Tools dock (🛠) kept bottom-right</li>
           </ul>
         </section>
       </article>
