@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261022d -->
+<!-- cache 20261022k -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -20,6 +20,7 @@
     --bg: #f5fafc;
     --border: #d3e8ef;
     --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
+    --accent-on: #0e6b7a;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -196,6 +197,50 @@
     font-weight: 700;
     color: var(--accent-ink);
   }
+  /* One Expand All / Collapse All chip — same pill as Useful Vocabulary. */
+  .section-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 14px;
+  }
+  .section-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--accent);
+    background: var(--card);
+    color: var(--accent-ink);
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    font-size: .8125rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .section-toggle-btn:hover {
+    background: var(--accent-soft);
+  }
+  .section-toggle-btn:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 2px;
+  }
+  .section-toggle-btn:active {
+    background: var(--accent-on);
+    color: #fff;
+    border-color: #0a5561;
+  }
+  .wrap > .section-toggle + .hub-section { margin-top: 0; }
   footer {
     margin-top: 36px;
     padding-top: 16px;
@@ -213,6 +258,7 @@
     a.card { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
     .hub-chevron { display: none; }
+    .section-toggle { display: none !important; }
   }
 </style>
 </head>
@@ -231,6 +277,10 @@
       </div>
     </header>
 
+    <div class="section-toggle">
+      <button type="button" class="section-toggle-btn" data-sections="toggle">Expand All</button>
+    </div>
+
     <details class="hub-section" open>
       <summary class="hub-heading" id="sec-competitions">
         <h2 class="hub-heading-text">Competitions</h2>
@@ -241,21 +291,6 @@
           <p class="card-kicker"><span class="badge">Competition</span></p>
           <h3>Speech Festival</h3>
           <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-      </div>
-    </details>
-
-    <details class="hub-section" open>
-      <summary class="hub-heading" id="sec-junior">
-        <h2 class="hub-heading-text">Junior</h2>
-        <span class="hub-chevron" aria-hidden="true"></span>
-      </summary>
-      <div class="cards">
-        <a class="card" href="grammar-junior/">
-          <p class="card-kicker"><span class="badge">Junior</span></p>
-          <h3>Junior Grammar</h3>
-          <p>Tenses, passive, reported speech and conditionals for S1–S3.</p>
           <span class="card-arrow">Open →</span>
         </a>
       </div>
@@ -289,6 +324,21 @@
     </details>
 
     <details class="hub-section" open>
+      <summary class="hub-heading" id="sec-junior">
+        <h2 class="hub-heading-text">Junior</h2>
+        <span class="hub-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="cards">
+        <a class="card" href="grammar-junior/">
+          <p class="card-kicker"><span class="badge">Junior</span></p>
+          <h3>Junior Grammar</h3>
+          <p>Tenses, passive, reported speech and conditionals for S1–S3.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+      </div>
+    </details>
+
+    <details class="hub-section" open>
       <summary class="hub-heading" id="sec-all-levels">
         <h2 class="hub-heading-text">All Levels</h2>
         <span class="hub-chevron" aria-hidden="true"></span>
@@ -314,5 +364,60 @@
       Materials for school use
     </footer>
   </div>
+  <script>
+  /* Expand All ↔ Collapse All — one chip. Same behaviour as Useful Vocabulary
+     (dse-writing/tools-dock.js): native <details>, label is the next action. */
+  (function () {
+    var bar = document.querySelector('.section-toggle');
+    if (!bar) return;
+    var toggleBtn = bar.querySelector('[data-sections="toggle"]');
+    var expandBtn = bar.querySelector('[data-sections="expand"]');
+    var collapseBtn = bar.querySelector('[data-sections="collapse"]');
+
+    function detailsNodes() {
+      return document.querySelectorAll('.wrap details');
+    }
+
+    function allOpen() {
+      var nodes = detailsNodes();
+      if (!nodes.length) return false;
+      for (var i = 0; i < nodes.length; i++) {
+        if (!nodes[i].open) return false;
+      }
+      return true;
+    }
+
+    function setAll(open) {
+      var nodes = detailsNodes();
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].open !== open) nodes[i].open = open;
+      }
+      if (typeof window.hwResize === 'function') {
+        requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
+      }
+    }
+
+    function syncChip() {
+      if (!toggleBtn) return;
+      toggleBtn.textContent = allOpen() ? 'Collapse All' : 'Expand All';
+    }
+
+    if (toggleBtn) {
+      var nodes = detailsNodes();
+      for (var i = 0; i < nodes.length; i++) {
+        nodes[i].addEventListener('toggle', syncChip);
+      }
+      toggleBtn.addEventListener('click', function () {
+        setAll(!allOpen());
+        syncChip();
+      });
+      syncChip();
+      return;
+    }
+
+    if (expandBtn) expandBtn.addEventListener('click', function () { setAll(true); });
+    if (collapseBtn) collapseBtn.addEventListener('click', function () { setAll(false); });
+  })();
+  </script>
 </body>
 </html>
