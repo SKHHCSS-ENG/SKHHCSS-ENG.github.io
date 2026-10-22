@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- cache 20261022e -->
-<!-- Newest first. Dates are Asia/Hong_Kong calendar days (YYYY-MM-DD).
-     Under each date, include only the headings that have items: Added, Changed, Fixed. -->
+<!-- cache 20261022f -->
+<!-- Newest first. Dates are Asia/Hong_Kong calendar days, shown as D Month YYYY.
+     Each day: area heading, then short bullets. -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -105,16 +105,18 @@
     line-height: 1.25;
   }
   .release h3 {
-    margin: 12px 0 4px;
-    font-size: .95rem;
+    margin: 14px 0 4px;
+    padding-left: 10px;
+    border-left: 3px solid var(--accent);
+    font-size: 1rem;
     font-weight: 800;
     color: var(--navy);
     line-height: 1.3;
   }
-  .release section:first-of-type h3 { margin-top: 0; }
+  .release section:first-of-type h3 { margin-top: 2px; }
   .release ul {
-    margin: 0 0 10px;
-    padding-left: 1.15rem;
+    margin: 0 0 4px;
+    padding-left: 1.2rem;
   }
   .release li {
     margin: 0 0 6px;
@@ -122,6 +124,7 @@
     line-height: 1.45;
   }
   .release li::marker { color: var(--accent-deep); }
+  .release strong { font-weight: 800; color: var(--navy); }
   footer {
     margin-top: 36px;
     padding-top: 16px;
@@ -154,19 +157,39 @@
 
     <div class="log">
       <article class="release">
-        <h2><time datetime="2026-10-22">2026-10-22</time></h2>
+        <h2><time datetime="2026-10-22">22 October 2026</time></h2>
         <section>
-          <h3>Added</h3>
+          <h3>Learning Materials</h3>
           <ul>
-            <li>Paper 1 - Reading practice hub under Learning Materials → DSE (with explanations).</li>
-            <li>What's New page (this page) so you can see site updates.</li>
+            <li>Hub sorted into Competitions · Junior · DSE · All Levels (tap a section to fold).</li>
+            <li>Cards renamed <strong>Paper 2 - Writing</strong> and <strong>Paper 4 - Speaking</strong>.</li>
+            <li><strong>Paper 1 - Reading</strong> added under DSE.</li>
+            <li>Speaking page shows the DSE badge only.</li>
           </ul>
         </section>
         <section>
-          <h3>Changed</h3>
+          <h3>Speech Festival</h3>
           <ul>
-            <li>Learning Materials hub: sections Competitions · Junior · DSE · All Levels (tap a heading to fold); Paper 2 - Writing and Paper 4 - Speaking titles.</li>
-            <li>Speech Festival U41, U47 and U66: the header hides when you scroll down; a narrow Tap to Play / Show / Stop pill you can drag (keeps Tools clear).</li>
+            <li><strong>U41 Last Day</strong> (S3 Girls) live.</li>
+            <li>Clearer play controls on U41, U47 and U66: <strong>Tap to Play · Show · Stop</strong> (header hides when you scroll down; narrow pill you can drag).</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Classroom Studio</h3>
+          <ul>
+            <li>Team Scoreboard + seating floor resize with the window.</li>
+            <li>Leaderboard ranks as 1st / 2nd / 3rd…</li>
+            <li>Edit mode: empty class-number slots stay blank until you fill them; yellow fields when Edit is on.</li>
+          </ul>
+        </section>
+      </article>
+
+      <article class="release">
+        <h2><time datetime="2026-10-21">21 October 2026</time></h2>
+        <section>
+          <h3>Classroom Studio</h3>
+          <ul>
+            <li>Tools ON/OFF chrome, Pulse &amp; Leaderboard edge tab, Snap/Front width, full group names, blank empty group slots, seating floor fills the space.</li>
           </ul>
         </section>
       </article>
