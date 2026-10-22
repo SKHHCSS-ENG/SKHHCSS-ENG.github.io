@@ -565,6 +565,29 @@
         max-height: none;
       }
     }
+    /* Place column on Students and Groups. Ordinals only (1st, 22nd, 100th).
+       # stays on the class number. Width holds a 3-digit place in Fredoka
+       or the Inter fallback at 12px, nowrap, and does not shrink into the name. */
+    .lb-rank {
+      flex: 0 0 auto;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 2.75rem;
+      padding: 0;
+      color: #94a3b8;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .lb-rank.is-podium {
+      color: #0f172a;
+    }
     /* Front-row score buttons can scroll clear of the floating pill
        and of the horizontal scrollbar. This margin is inside the floor. */
     #classroomStage {
@@ -3234,6 +3257,22 @@
         return no ? ('#' + no) : '';
       }
 
+      // Leaderboard place. An English ordinal, never a #, so it cannot be read as a class number.
+      // Teens stay "th" (11th, 12th, 13th). 21st, 22nd, and 23rd follow the last digit.
+      function formatRankOrdinal(rank) {
+        var n = Math.floor(Number(rank));
+        if (!isFinite(n) || n < 1) return '';
+        var teen = n % 100;
+        var suffix = 'th';
+        if (teen < 11 || teen > 13) {
+          var last = n % 10;
+          if (last === 1) suffix = 'st';
+          else if (last === 2) suffix = 'nd';
+          else if (last === 3) suffix = 'rd';
+        }
+        return String(n) + suffix;
+      }
+
       function formatStudentLabel(classNo, name) {
         var mark = formatClassNoMark(classNo);
         var label = String(name == null ? '' : name).trim();
@@ -5064,14 +5103,15 @@
 
           body.innerHTML = filtered.map(function (st) {
             const rank = sortedStudents.findIndex(function (s) { return s.id === st.id; }) + 1;
-            const medal = rank === 1 && st.score > 0 ? '🥇' : (rank === 2 && st.score > 0 ? '🥈' : (rank === 3 && st.score > 0 ? '🥉' : '#' + rank));
+            const place = formatRankOrdinal(rank);
+            const podium = rank <= 3 && st.score > 0;
             const grp = getGroupById(cls, st.groupId);
             const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
             const pct = st.score > 0 ? Math.min(100, Math.round((st.score / maxScore) * 100)) : 0;
 
             return '<div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-indigo-200 transition flex items-center justify-between gap-2">' +
               '<div class="flex items-center gap-2.5 min-w-0 flex-1">' +
-                '<span class="w-7 text-center font-display font-bold text-xs ' + (rank <= 3 && st.score > 0 ? 'text-base' : 'text-slate-400') + '">' + medal + '</span>' +
+                '<span class="lb-rank' + (podium ? ' is-podium' : '') + '">' + place + '</span>' +
                 '<div class="min-w-0 flex-1">' +
                   '<div class="flex items-center gap-1.5">' +
                     (formatClassNoMark(st.classNo) ? '<span class="text-[11px] font-mono font-bold text-slate-400">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
@@ -5107,14 +5147,15 @@
 
           body.innerHTML = filteredGroups.map(function (grp, idx) {
             const rank = idx + 1;
-            const medal = rank === 1 && grp.score > 0 ? '🥇' : (rank === 2 && grp.score > 0 ? '🥈' : (rank === 3 && grp.score > 0 ? '🥉' : '#' + rank));
+            const place = formatRankOrdinal(rank);
+            const podium = rank <= 3 && grp.score > 0;
             const pal = TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue;
             const members = cls.students.filter(function (s) { return s.groupId === grp.id; });
             const combinedMemberScore = members.reduce(function (sum, m) { return sum + (Number(m.score) || 0); }, 0);
 
             return '<div class="p-3 rounded-xl border-2 ' + pal.border + ' ' + pal.bg + ' flex items-center justify-between gap-2">' +
               '<div class="flex items-center gap-2.5 min-w-0 flex-1">' +
-                '<span class="font-display font-bold text-sm w-6 text-center shrink-0">' + medal + '</span>' +
+                '<span class="lb-rank' + (podium ? ' is-podium' : '') + '">' + place + '</span>' +
                 '<div class="min-w-0 flex-1">' +
                   '<div class="font-display font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1 min-w-0">' +
                     '<span class="shrink-0">' + escapeHtml(grp.icon) + '</span>' +
