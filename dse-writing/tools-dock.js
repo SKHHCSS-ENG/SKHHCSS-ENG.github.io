@@ -505,7 +505,7 @@
     var collapseBtn = bar.querySelector('[data-sections="collapse"]');
 
     function detailsNodes() {
-      return document.querySelectorAll('.wrap details');
+      return document.querySelectorAll('.wrap details:not(.example-fold)');
     }
 
     function allOpen() {

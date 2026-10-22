@@ -1028,8 +1028,75 @@ body.speaking-paper-4.zh-on details.format-section {
 }
 
 /* Paper 1 - Reading study notes — same bank shell as speaking / vocab */
+body.reading-skills .part-label {
+  display: inline-block;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 3px 10px;
+}
+body.reading-skills .skill-tip {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-size: .86rem;
+  font-weight: 600;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-radius: 8px;
+  line-height: 1.4;
+}
+body.reading-skills .exam-key,
 body.reading-skills .level-stars {
   white-space: nowrap;
+  font-weight: 800;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 0 .2em;
+}
+body.reading-skills details.example-fold {
+  margin: 6px 0 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+body.reading-skills details.example-fold > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
+  list-style: none;
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+body.reading-skills details.example-fold > summary::-webkit-details-marker { display: none; }
+body.reading-skills details.example-fold > summary::marker { content: ""; }
+body.reading-skills details.example-fold > summary::after {
+  content: " ▸";
+  font-size: .75em;
+}
+body.reading-skills details.example-fold[open] > summary::after {
+  content: " ▾";
+}
+body.reading-skills details.example-fold > summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+body.reading-skills details.example-fold > p {
+  margin: 0 0 2px;
+  padding: 8px 10px;
+  font-size: .88rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  line-height: 1.45;
 }
 body.reading-skills footer {
   margin-top: 110px;
@@ -1040,8 +1107,8 @@ body.reading-skills.tools-page {
 body.reading-skills.tools-page.dock-open {
   padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
 }
-body.zh-on .gloss:not([data-zh])::after,
-body.zh-on .gloss[data-zh=""]::after {
+body.reading-skills.zh-on .gloss:not([data-zh])::after,
+body.reading-skills.zh-on .gloss[data-zh=""]::after {
   content: none;
 }
 /* Keep B1/B2 comparison as a real table so headers stay visible (no cell prefixes) */
