@@ -855,13 +855,11 @@
       border-color: #f59e0b;
       outline: none;
     }
-    /* Unassigned class number: empty slot, not a number chip (no #, no 0, no grey pill). */
-    .desk-classno-btn.is-blank,
-    .desk-classno-btn.is-blank.is-editable,
-    .desk-classno-btn.is-blank:hover,
-    .desk-classno-btn.is-blank:focus-visible,
-    .desk-classno-btn.is-blank.is-editable:hover,
-    .desk-classno-btn.is-blank.is-editable:focus-visible {
+    /* A blank number that is not in edit mode stays invisible: no #, no 0, no grey pill.
+       Edit mode always pairs is-blank with is-editable, and that pair is the yellow field below. */
+    .desk-classno-btn.is-blank:not(.is-editable),
+    .desk-classno-btn.is-blank:not(.is-editable):hover,
+    .desk-classno-btn.is-blank:not(.is-editable):focus-visible {
       background: transparent;
       border-color: transparent;
       box-shadow: none;
@@ -909,7 +907,8 @@
         font-size: 16px;
       }
     }
-    /* Class number chip. Resting size matches the old #01 label so the card stays short. */
+    /* Class number chip. Edit Off keeps the old short #01 label.
+       Edit On uses the yellow field rule under .desk-classno-input. */
     .desk-classno-btn,
     .desk-classno-static,
     .desk-classno-input {
@@ -968,11 +967,36 @@
       outline: none;
       border-color: #d97706;
     }
+    /* Edit ON: every class-number control is this yellow field before anyone taps it.
+       Empty (is-blank) and filled share .desk-classno-input's box, fill, border, and ring.
+       Edit Off uses .is-frozen for a filled #NN and renders no control when the number is empty. */
+    .desk-classno-btn.is-editable,
+    .desk-classno-btn.is-editable:hover,
+    .desk-classno-btn.is-editable:focus-visible {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.25rem;
+      min-width: 3.25rem;
+      max-width: 4.5rem;
+      min-height: 18px;
+      padding: 2px 4px;
+      text-align: center;
+      background: #fffbeb;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.28);
+      outline: none;
+      color: #0f172a;
+      font-size: 12px;
+    }
     @media (max-width: 480px) {
-      .desk-classno-input {
+      .desk-classno-input,
+      .desk-classno-btn.is-editable {
         font-size: 16px;
         min-height: 32px;
         width: 3.5rem;
+        min-width: 3.5rem;
       }
     }
     /* Live Team Scoreboard name. Tap opens the same inline field. */
@@ -3569,7 +3593,8 @@
             'data-original-classno="' + escapeHtml(no) + '" ' +
             'value="' + escapeHtml(no) + '" aria-label="Class number" />';
         }
-        // Same idea as an unassigned group: the slot is empty. No #, no 0, no number pill.
+        // Edit Off: an empty number is absent. No #, no 0, no grey pill.
+        // Edit On: the same yellow field as the open input, before the teacher taps it.
         if (!no) {
           if (!boardEditsAllowed()) return '';
           return '<button type="button" class="desk-classno-btn is-blank is-editable" data-desk-classno="' + escapeHtml(st.id) + '" ' +
