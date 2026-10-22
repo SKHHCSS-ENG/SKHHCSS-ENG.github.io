@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261022p -->
+<!-- cache 20261023a -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -21,6 +21,10 @@
     --border: #d3e8ef;
     --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
     --accent-on: #0e6b7a;
+    --phone: #2f6b3c;
+    --phone-soft: #e7f6ea;
+    --desktop: #3d4570;
+    --desktop-soft: #eceef8;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -177,7 +181,17 @@
     background: var(--accent-soft);
     color: var(--accent-ink);
   }
+  .badge-phone {
+    background: var(--phone-soft);
+    color: var(--phone);
+  }
+  .badge-desktop {
+    background: var(--desktop-soft);
+    color: var(--desktop);
+  }
   .card .badge { color: var(--accent-ink); background: var(--accent-soft); }
+  .card .badge-phone { color: var(--phone); background: var(--phone-soft); }
+  .card .badge-desktop { color: var(--desktop); background: var(--desktop-soft); }
   .card-kicker .badge + .badge { margin-left: 6px; }
   .card h3 {
     margin: 0 0 6px;
@@ -288,7 +302,7 @@
       </summary>
       <div class="cards">
         <a class="card" href="../speech-festival/">
-          <p class="card-kicker"><span class="badge">Competition</span></p>
+          <p class="card-kicker"><span class="badge">Competition</span><span class="badge badge-phone">Phone</span></p>
           <h3>Speech Festival</h3>
           <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
           <span class="card-arrow">Open →</span>
@@ -303,25 +317,25 @@
       </summary>
       <div class="cards">
         <a class="card" href="paper-1-reading/">
-          <p class="card-kicker"><span class="badge">DSE</span></p>
+          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Paper 1 - Reading</h3>
           <p>Study notes overview for HKDSE Paper 1 — paper map, reading skills and exam habits.</p>
           <span class="card-arrow">Open →</span>
         </a>
         <a class="card" href="reading-paper-1/">
-          <p class="card-kicker"><span class="badge">DSE</span></p>
+          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-desktop">Desktop</span></p>
           <h3>Paper 1 - Reading (Practice)</h3>
           <p>Practice and explanations for HKDSE Paper 1 Reading — question types, topics and past papers.</p>
           <span class="card-arrow">Open →</span>
         </a>
         <a class="card" href="paper-2-writing/">
-          <p class="card-kicker"><span class="badge">DSE</span></p>
+          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Paper 2 - Writing</h3>
           <p>Letter to the Editor, Article, Proposal, Report, Speech — formats with PAT, structure, skeleton &amp; Useful Phrases.</p>
           <span class="card-arrow">Open →</span>
         </a>
         <a class="card" href="paper-4-speaking/">
-          <p class="card-kicker"><span class="badge">DSE</span></p>
+          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Paper 4 - Speaking</h3>
           <p>Paper 4 speaking practice — vocab · patterns for group discussion and individual response.</p>
           <span class="card-arrow">Open →</span>
@@ -336,7 +350,7 @@
       </summary>
       <div class="cards">
         <a class="card" href="grammar/">
-          <p class="card-kicker"><span class="badge">Junior</span></p>
+          <p class="card-kicker"><span class="badge">Junior</span><span class="badge badge-phone">Phone</span></p>
           <h3>Junior Grammar</h3>
           <p>Tenses, passive, reported speech and conditionals for S1–S3.</p>
           <span class="card-arrow">Open →</span>
@@ -351,13 +365,13 @@
       </summary>
       <div class="cards">
         <a class="card" href="useful-vocabulary/">
-          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
+          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Useful Vocabulary</h3>
           <p>Shared vocab banks for DSE writing — Cohesion, Tone &amp; Attitude, spelling, jobs / HK Places, Formality Pairs, Irregular Verbs.</p>
           <span class="card-arrow">Open →</span>
         </a>
         <a class="card" href="sentence-patterns/">
-          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span></p>
+          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Sentence Patterns</h3>
           <p>Basic · Building · Exam-Ready frames with Hong Kong examples — pick 2–3 per writing task.</p>
           <span class="card-arrow">Open →</span>
