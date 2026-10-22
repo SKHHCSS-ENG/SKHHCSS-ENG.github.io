@@ -1006,6 +1006,26 @@ body.sentence-patterns.zh-on details.format-section {
   overflow: visible;
 }
 
+/* Speaking (Paper 4) — same bank shell as vocab / sentence patterns */
+body.speaking-paper-4 .hero-body .badge + .badge {
+  margin-left: 6px;
+}
+body.speaking-paper-4 footer {
+  margin-top: 110px;
+}
+body.speaking-paper-4.tools-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.speaking-paper-4.tools-page.dock-open {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.speaking-paper-4.zh-on .gloss::after {
+  white-space: normal;
+}
+body.speaking-paper-4.zh-on details.format-section {
+  overflow: visible;
+}
+
 /* Sentence patterns — pattern cards */
 .pattern-card {
   margin: 0 0 14px;
