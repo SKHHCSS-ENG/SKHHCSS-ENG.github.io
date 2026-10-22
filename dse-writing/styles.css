@@ -1154,6 +1154,89 @@ body.reading-skills.zh-on .gloss[data-zh=""]::after {
   }
 }
 
+/* Paper 2 - Writing study notes — same chips as Paper 1 Reading */
+body.writing-notes .part-label {
+  display: inline-block;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 3px 10px;
+}
+body.writing-notes .timing-tip .part-label {
+  color: var(--warn);
+  background: var(--warn-bg);
+}
+body.writing-notes .timing-tip ul {
+  margin-top: 8px;
+  padding: 8px 12px 8px 1.4rem;
+  background: var(--warn-bg);
+  border-radius: 8px;
+}
+body.writing-notes details.example-fold {
+  margin: 6px 0 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+body.writing-notes details.example-fold > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
+  list-style: none;
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+body.writing-notes details.example-fold > summary::-webkit-details-marker { display: none; }
+body.writing-notes details.example-fold > summary::marker { content: ""; }
+body.writing-notes details.example-fold > summary::after {
+  content: " ▸";
+  font-size: .75em;
+}
+body.writing-notes details.example-fold[open] > summary::after {
+  content: " ▾";
+}
+body.writing-notes details.example-fold > summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+body.writing-notes details.example-fold > p {
+  margin: 0 0 2px;
+  padding: 8px 10px;
+  font-size: .88rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  line-height: 1.45;
+}
+body.writing-notes details.format-section > .section-body > details.format-group:last-child {
+  margin-bottom: 0;
+}
+body.writing-notes .section-body > ul {
+  margin: 0 0 12px;
+  padding-left: 1.15rem;
+}
+body.writing-notes .section-body > ul li { margin: 0 0 4px; }
+body.writing-notes .section-body > p {
+  margin: 0 0 14px;
+}
+body.writing-notes footer {
+  margin-top: 110px;
+}
+body.writing-notes.tools-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+body.writing-notes.tools-page.dock-open {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+
 /* Sentence patterns — pattern cards */
 .pattern-card {
   margin: 0 0 14px;
