@@ -252,14 +252,22 @@
       }
     }
     /* First-paint fallback before flex (desktop) or the mobile fit runs.
-       Individual Work and Group Work share this rule. */
+       Individual Work and Group Work share this rule. The height tracks
+       the window instead of a fixed board; JS then fills the card exactly. */
     #classroomViewport {
-      height: calc(100dvh - 320px);
-      min-height: 140px;
+      height: clamp(72px, calc(100dvh - 18rem), 720px);
+      min-height: 72px;
+      max-width: 100%;
+      min-width: 0;
       border-radius: 1rem;
     }
     /* One dotted floor for the canvas and the zoom band, so the card
        has no white strip along the bottom. The team bar paints its own white. */
+    #studioFloorCol,
+    #studioFloorSection {
+      min-width: 0;
+      max-width: 100%;
+    }
     #studioFloorSection {
       overflow: visible;
       background-color: #f8fafc;
@@ -286,20 +294,25 @@
     /* The scoreboard sits above the desk canvas, in the card column.
        It must not paint over desk numbers or names. Collapsed it is one
        slim bar so the floor keeps the rest of the card. Open, the team
-       cards scroll inside a capped dock and the desks keep the space below. */
+       cards scroll inside the dock. The dock's cap follows the window
+       (JS sets the used max-height) so a short screen keeps a floor and
+       a tall screen can show more teams. It does not spill sideways. */
     .group-score-dock {
       position: relative;
       flex: 0 0 auto;
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
       background: #fff;
       border-bottom: 1px solid #e2e8f0;
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
       padding: 0.4rem 0.75rem 0.45rem;
+      overflow-x: hidden;
     }
     /* :not(.hidden) so this does not beat Tailwind .hidden in Individual Work.
-       The dock keeps its own height. It does not shrink to uncover the floor
-       by sliding over the desks. */
+       The dock keeps its own height up to the window cap. It does not shrink
+       to uncover the floor by sliding over the desks. */
     /* Hard clip. overflow:clip was still letting wrapped cards paint onto
        the desks. Hidden on the dock and on the cards box stops that. */
     #groupScoreDock.is-open:not(.hidden) {
@@ -308,7 +321,8 @@
       flex-direction: column;
       overflow: hidden;
       contain: paint;
-      max-height: 13rem;
+      min-height: 0;
+      max-height: min(40dvh, calc(100dvh - 14rem));
     }
     /* Title stays centred on the dock. Show/Hide sits on the right. */
     .group-score-dock-bar {
@@ -331,13 +345,20 @@
       position: relative;
       z-index: 1;
     }
-    /* The scroller is a block. A flex container was letting wrapped cards
-       paint past max-height onto the desks. The row inside does the wrap. */
+    /* The scroller fills the dock under the title. Its only cap is the
+       dock, so a window resize cannot leave a fixed rem box spilling
+       out of a shorter bar or sitting in a tiny strip on a tall screen.
+       The row inside does the wrap. No sideways scroll. */
     #groupDockCards {
       min-width: 0;
+      max-width: 100%;
     }
     .group-dock-scroll {
-      max-height: 8.75rem;
+      flex: 1 1 auto;
+      min-height: 0;
+      min-width: 0;
+      max-width: 100%;
+      max-height: none;
       overflow-x: hidden;
       overflow-y: auto;
       overscroll-behavior: contain;
@@ -351,7 +372,7 @@
     }
     .group-dock-card {
       flex: 1 1 10.5rem;
-      max-width: 14rem;
+      max-width: min(14rem, 100%);
       min-width: min(100%, 9rem);
       box-sizing: border-box;
     }
@@ -374,22 +395,15 @@
       display: none;
     }
     #groupScoreDock.is-open #groupDockCards {
-      display: block;
-      flex: 0 1 auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
       align-self: stretch;
       min-height: 0;
-      max-height: 8.75rem;
+      min-width: 0;
+      max-height: none;
       overflow: hidden;
       margin-top: 0.5rem;
-    }
-    @media (max-width: 1023px) {
-      #groupScoreDock.is-open:not(.hidden) {
-        max-height: 11rem;
-      }
-      #groupScoreDock.is-open #groupDockCards,
-      .group-dock-scroll {
-        max-height: 7.25rem;
-      }
     }
     #studioFloorSection.has-dock #classroomViewport {
       border-top-left-radius: 0;
@@ -553,6 +567,7 @@
       #classroomViewport {
         flex: 1 1 auto;
         min-height: 0;
+        max-height: none;
         height: auto !important;
       }
       #leaderboardCard.is-open {
@@ -4819,6 +4834,49 @@
         return { width: Math.ceil(maxX), height: Math.ceil(maxY) };
       }
 
+      // Tight box around the desks and the FRONT OF ROOM strip.
+      // Desk cards stay their fixed pixel size; this does not scale them.
+      // The visible stage then grows up to the window around this box.
+      function getContentStageBounds(cls) {
+        let maxX = 240;
+        let maxY = 160;
+        let bottom = 0;
+        if (cls && cls.students && cls.students.length) {
+          cls.students.forEach(function (st) {
+            const right = (Number(st.x) || 0) + DESK_W;
+            const deskBottom = (Number(st.y) || 0) + DESK_H;
+            if (right + 4 > maxX) maxX = right + 4;
+            if (deskBottom > bottom) bottom = deskBottom;
+          });
+          if (cls.frontAtTop) {
+            if (bottom + 16 > maxY) maxY = bottom + 16;
+          } else {
+            bottom += FRONT_ROW_GAP + FRONT_LABEL_H;
+            if (bottom + 12 > maxY) maxY = bottom + 12;
+          }
+        }
+        return {
+          width: Math.ceil(maxX),
+          height: Math.ceil(maxY),
+          bottom: Math.ceil(bottom)
+        };
+      }
+
+      // The dotted floor fills the card. When the window is wider or taller
+      // than the desks, the canvas grows with it (no fixed board, no empty
+      // margin). When the desks are larger than the window, the canvas keeps
+      // their pixel size and the floor scrolls inside the card.
+      function syncStageToWindow() {
+        const floor = document.getElementById('classroomViewport');
+        const stage = document.getElementById('classroomStage');
+        if (!floor || !stage) return;
+        const content = getContentStageBounds(getCurrentClass());
+        const viewW = Math.max(1, floor.clientWidth);
+        const viewH = Math.max(1, floor.clientHeight);
+        stage.style.width = Math.ceil(Math.max(content.width, viewW)) + 'px';
+        stage.style.height = Math.ceil(Math.max(content.height, viewH)) + 'px';
+      }
+
       // Desk cards and the spotlight name share this fit.
       // One line at the design size, then smaller, down to a 12px floor.
       // Still too long: wrap to two lines at that floor. Ellipsis only if
@@ -4949,10 +5007,8 @@
           }
         }
 
-        // Dynamically size stage so all desks fit with breathing room
-        const bounds = getDynamicStageBounds(cls);
-        stage.style.width = bounds.width + 'px';
-        stage.style.height = bounds.height + 'px';
+        // Size the canvas to the window, keeping every desk at its pixel size.
+        syncStageToWindow();
 
         // Apply Zoom
         stage.style.transform = 'scale(' + state.zoom + ')';
@@ -5465,10 +5521,10 @@
           }
 
           const stageEl = document.getElementById('classroomStage');
-          const curStageW = stageEl ? stageEl.offsetWidth : STAGE_WIDTH;
-          const curStageH = stageEl ? stageEl.offsetHeight : STAGE_HEIGHT;
-          nextX = Math.max(8, Math.min(Math.max(STAGE_WIDTH, curStageW) - DESK_W - 8, nextX));
-          nextY = Math.max(8, Math.min(Math.max(STAGE_HEIGHT, curStageH) - DESK_H - 8, nextY));
+          const curStageW = stageEl && stageEl.offsetWidth ? stageEl.offsetWidth : STAGE_WIDTH;
+          const curStageH = stageEl && stageEl.offsetHeight ? stageEl.offsetHeight : STAGE_HEIGHT;
+          nextX = Math.max(8, Math.min(curStageW - DESK_W - 8, nextX));
+          nextY = Math.max(8, Math.min(curStageH - DESK_H - 8, nextY));
 
           dragContext.student.x = nextX;
           dragContext.student.y = nextY;
@@ -6354,10 +6410,62 @@
         // No reserved gutter. The pill floats on the floor.
         // The stage margin lets the front-row score buttons scroll clear of it.
         slot.style.height = '0px';
-        if (stage) {
-          const pad = chip.offsetHeight + ZOOM_CHIP_GAP_BELOW + 12;
-          stage.style.marginBottom = pad + 'px';
+        if (!stage) return;
+        const floor = document.getElementById('classroomViewport');
+        const pad = chip.offsetHeight + ZOOM_CHIP_GAP_BELOW + 12;
+        // Only add scroll room when the desks sit under the floating pill.
+        // A tall window already has floor under the front row, so the canvas
+        // does not grow a fixed strip past the window.
+        const content = getContentStageBounds(getCurrentClass());
+        const zoom = state.zoom || 1;
+        const roomBelow = floor ? (floor.clientHeight - content.bottom * zoom) : 0;
+        if (roomBelow >= pad) stage.style.marginBottom = '0px';
+        else stage.style.marginBottom = Math.ceil(pad - Math.max(0, roomBelow)) + 'px';
+      }
+
+      // Open Team Scoreboard: as tall as the team cards, capped so the floor
+      // keeps the rest of the card. A short window shrinks the cap and the
+      // cards scroll inside the dock. A tall window can show more teams.
+      // Collapsed and Individual Work stay a single bar (or hidden).
+      function applyScoreboardBudget(cardSpace) {
+        const dock = document.getElementById('groupScoreDock');
+        if (!dock) return 0;
+        const open = !dock.classList.contains('hidden') && dock.classList.contains('is-open');
+        if (!open) {
+          dock.style.maxHeight = '';
+          dock.style.height = '';
+          return dock.classList.contains('hidden') ? 0 : dock.offsetHeight;
         }
+        const space = Math.max(0, cardSpace || 0);
+        const title = dock.querySelector('.group-score-dock-bar');
+        const titleH = title ? title.offsetHeight : 36;
+        const dockStyle = getComputedStyle(dock);
+        const padY = (parseFloat(dockStyle.paddingTop) || 0) + (parseFloat(dockStyle.paddingBottom) || 0);
+        const chrome = titleH + padY;
+        // The row's own height, not the scroller. The scroller already
+        // clips, so its box is shorter than the teams.
+        const row = dock.querySelector('.group-dock-cards-row');
+        const cardsNatural = row ? row.offsetHeight : 0;
+        const natural = chrome + cardsNatural + (cardsNatural ? 8 : 0);
+        const oneRow = cardsNatural > 0 ? Math.min(112, cardsNatural) : 0;
+        const usable = chrome + oneRow + (oneRow ? 8 : 0);
+        const floorKeep = Math.round(Math.min(320, Math.max(space * 0.55, Math.min(120, space * 0.45))));
+        let budget = Math.min(natural, Math.max(chrome, space - floorKeep));
+        if (space >= usable + 100) {
+          budget = Math.min(natural, Math.max(budget, Math.min(usable, space - 88)));
+        }
+        const viewCap = Math.max(chrome, Math.round(window.innerHeight * 0.42));
+        budget = Math.min(budget, viewCap);
+        const floorStrip = Math.round(Math.min(100, Math.max(56, space * 0.42)));
+        budget = Math.min(budget, Math.max(chrome, space - floorStrip));
+        budget = Math.max(Math.min(chrome, space), budget);
+        if (!isFinite(budget) || budget < 0) budget = chrome;
+        // Explicit height, not only a cap. A flex sibling was shrinking the
+        // dock below the teams even when the window had room for them.
+        const used = Math.max(Math.min(chrome, space), Math.min(natural, budget));
+        dock.style.maxHeight = Math.ceil(used) + 'px';
+        dock.style.height = Math.ceil(used) + 'px';
+        return dock.offsetHeight;
       }
 
       function desktopFloorFill() {
@@ -6457,6 +6565,7 @@
       // Narrow screens: the floor and the side panels share the first screen.
       // Hiding both panels removes them, so #classroomViewport keeps the
       // height they used. The zoom slot stays 0.
+      // The scoreboard cap and the canvas both follow this same card height.
       function fitFloorAboveZoomGutter() {
         if (zoomChipDrag) return;
         const floor = document.getElementById('classroomViewport');
@@ -6465,66 +6574,77 @@
         const lb = document.getElementById('leaderboardBody');
         const side = document.getElementById('studioSideCol');
         if (!floor || !slot || !section) return;
-        syncZoomSlot();
         if (lb) {
           lb.style.height = '';
           lb.style.maxHeight = '';
         }
-        const dock = document.getElementById('groupScoreDock');
-        if (dock) dock.style.maxHeight = '';
         clearSidePanelLimits();
+        const dock = document.getElementById('groupScoreDock');
+        function dockHeight() {
+          return (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
+        }
         if (desktopFloorFill()) {
           floor.style.height = '';
+          floor.style.minHeight = '';
+          applyScoreboardBudget(section.clientHeight);
+          syncStageToWindow();
+          syncZoomSlot();
           return;
         }
         const gap = workspaceRowGap();
         const limit = window.innerHeight - 2;
         const border = section.offsetHeight - section.clientHeight;
-        const top = section.getBoundingClientRect().top;
-        const available = Math.floor(limit - top - border);
-        let dockH = (dock && !dock.classList.contains('hidden')) ? dock.offsetHeight : 0;
+        // Document position, so a scrolled page does not inflate the card
+        // and push the floor past the window.
+        const docTop = section.getBoundingClientRect().top + window.scrollY;
+        const available = Math.max(120, Math.floor(limit - docTop - border));
+        applyScoreboardBudget(available);
+        let dockH = dockHeight();
         // First-screen floor, before the side panels. This is the tall floor
         // a phone keeps when the panels do not fit beside it.
         const shareRoom = available - gap - dockH;
         // Share the screen only when a 220px floor and a real panel both fit.
         // Otherwise the floor fills the first screen and the panels follow.
-        const canShare = shareRoom >= 220 + 130;
-        if (!sidePanelsAreOpen() || !canShare) {
-          const minH = 168;
-          if (dock && dockH > 0 && available - dockH < minH) {
-            const dockCap = Math.max(40, available - minH);
-            if (dockCap < dockH) {
-              dock.style.maxHeight = dockCap + 'px';
-              dockH = dock.offsetHeight;
-            }
-          }
-          let floorH = Math.max(minH, available - dockH);
+        const canShare = sidePanelsAreOpen() && shareRoom >= 220 + 130;
+        if (!canShare) {
+          let floorH = Math.max(72, available - dockH);
+          floor.style.minHeight = '0px';
           floor.style.height = floorH + 'px';
-          const overflow = section.getBoundingClientRect().bottom - limit;
-          if (overflow > 1) {
-            floor.style.height = Math.max(minH, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
-          }
+          trimFloorToWindow();
+          syncStageToWindow();
+          syncZoomSlot();
           return;
         }
-        let minH = shareRoom >= 520 ? 240 : 220;
-        if (dock && dockH > 0 && shareRoom < minH + 100) {
-          const dockCap = Math.max(40, available - gap - minH - 100);
-          if (dockCap < dockH) {
-            dock.style.maxHeight = dockCap + 'px';
-            dockH = dock.offsetHeight;
-          }
-        }
+        const minH = shareRoom >= 520 ? 240 : 220;
         const sideBudget = Math.max(88, available - gap - dockH - minH - 6);
         const sideH = side ? limitSideBodies(side, sideBudget) : 0;
-        let floorH = available - dockH - gap - sideH;
-        if (floorH < minH) floorH = minH;
+        const cardSpace = Math.max(120, available - gap - sideH);
+        applyScoreboardBudget(cardSpace);
+        dockH = dockHeight();
+        let floorH = cardSpace - dockH;
+        if (floorH < 72) floorH = 72;
+        floor.style.minHeight = '0px';
         floor.style.height = floorH + 'px';
-        const sideBottom = (side && side.offsetHeight > 0)
-          ? side.getBoundingClientRect().bottom
-          : section.getBoundingClientRect().bottom;
-        const overflow = sideBottom - limit;
+        const sideDocBottom = (side && side.offsetHeight > 0)
+          ? (side.getBoundingClientRect().bottom + window.scrollY)
+          : (docTop + section.offsetHeight);
+        const overflow = sideDocBottom - (window.innerHeight - 2);
         if (overflow > 1) {
-          floor.style.height = Math.max(minH - 12, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
+          floor.style.height = Math.max(72, Math.floor(parseFloat(floor.style.height) - overflow)) + 'px';
+        }
+        trimFloorToWindow();
+        syncStageToWindow();
+        syncZoomSlot();
+      }
+
+      function trimFloorToWindow() {
+        const floor = document.getElementById('classroomViewport');
+        const section = document.getElementById('studioFloorSection');
+        if (!floor || !section || desktopFloorFill()) return;
+        const top = section.getBoundingClientRect().top + window.scrollY;
+        const overflow = top + section.offsetHeight - (window.innerHeight - 2);
+        if (overflow > 1) {
+          floor.style.height = Math.max(72, Math.floor(floor.clientHeight - overflow)) + 'px';
         }
       }
 
