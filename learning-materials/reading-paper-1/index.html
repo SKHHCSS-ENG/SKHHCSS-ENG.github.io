@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Paper 1 - Reading (Practice) · Learning Materials · SKH Holy Carpenter Secondary School</title>
+  <title>HKDSE English Paper 1 Quest Hub</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +37,9 @@
       background: #94a3b8;
     }
     .question-card {
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      content-visibility: auto;
+      contain-intrinsic-size: 0 380px;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .question-card:hover {
       transform: translateY(-2px);
@@ -67,14 +69,6 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row text-slate-900">
-  <a class="back" href="../">← Back to Learning Materials</a>
-  <style>
-    a.back{display:block;box-sizing:border-box;width:100%;margin:0;padding:8px 14px 6px;font-size:.85rem;font-weight:700;line-height:1.3;color:#0c5a70;text-decoration:none}
-    a.back:hover,a.back:focus-visible{text-decoration:underline}
-    a.back:focus-visible{outline:3px solid #5bbad5;outline-offset:2px;border-radius:4px}
-    @media(min-width:1024px){body{flex-wrap:wrap}a.back{flex:0 0 100%;padding-left:calc(18rem + 2rem)}}
-    @media(min-width:1280px){a.back{padding-left:calc(20rem + 2rem)}}
-  </style>
 
   <!-- Top-Left Mobile Navigation Toggle Bar (Visible only on phones/tablets < lg) -->
   <div class="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-indigo-100 px-3.5 py-2.5 flex items-center justify-between shadow-sm">
@@ -89,7 +83,7 @@
         <div class="w-7 h-7 shrink-0 rounded-lg bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 flex items-center justify-center text-white font-extrabold text-xs shadow-sm">
           DSE
         </div>
-        <span class="text-sm font-extrabold tracking-tight text-slate-900 truncate">Paper 1 - Reading (Practice)</span>
+        <span class="text-sm font-extrabold tracking-tight text-slate-900 truncate">HKDSE Paper 1 Hub</span>
       </div>
     </div>
     <div class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg shrink-0">
@@ -114,7 +108,7 @@
             </div>
             <div class="min-w-0">
               <h1 id="appMainTitle" class="text-base sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-950 via-indigo-800 to-violet-800 bg-clip-text text-transparent truncate">
-                Paper 1 - Reading (Practice)
+                HKDSE Paper 1 Hub
               </h1>
               <p class="text-[11px] font-semibold text-slate-500">Reading Comprehension Quest</p>
             </div>
@@ -35628,7 +35622,7 @@
 ];
 
     // =========================================================================
-    // 3. APPLICATION STATE & STORAGE HELPERS
+    // 3. APPLICATION STATE, PRE-INDEXING & FAST STORAGE HELPERS
     // =========================================================================
     const DSE_LEVEL_ORDER = ["5**", "5*", "5", "4", "3", "2", "1"];
 
@@ -35733,14 +35727,18 @@
     }
 
     function getQuestionLevelInfo(q) {
+      if (q._levelInfo) return q._levelInfo;
       let rate = typeof q.correctRate === "number" ? q.correctRate : 55;
       let lvl = q.dseLevel || computeLevelFromRate(rate, q.part);
       const meta = DSE_LEVEL_META[lvl] || DSE_LEVEL_META["4"];
-      return { rate, level: lvl, meta };
+      q._levelInfo = { rate, level: lvl, meta };
+      return q._levelInfo;
     }
 
-    const STORAGE_KEY_QUESTIONS = "hkdse_p1_questions_v19";
+    // Only custom user-created questions are stored in localStorage so we never serialize/parse 895 questions on startup
+    const STORAGE_KEY_CUSTOM_QUESTIONS = "hkdse_p1_custom_questions_v1";
     const STORAGE_KEY_PROGRESS = "hkdse_p1_progress_v2";
+    const PAGE_SIZE = 20;
 
     let state = {
       mode: "by-type", // 'by-type' | 'by-topic' | 'by-year' | 'by-level' | 'analytics' | 'manager'
@@ -35750,9 +35748,13 @@
       filterLevel: "ALL",
       filterStatus: "ALL",
       searchKeyword: "",
+      visibleLimit: PAGE_SIZE,
       filterBarCollapsed: false,
-      showFullPassage: true,
+      showFullPassage: false,
       questions: [],
+      customQuestions: [],
+      questionMap: new Map(),
+      cachedCounts: { byType: {}, byTopic: {}, byYear: {}, byLevel: {} },
       // userProgress[questionId] = { userValue, checked, isCorrect, subResults, bookmarked, showExplanation, showHint }
       userProgress: {},
       streak: 0,
@@ -35762,6 +35764,55 @@
       exportFilename: "hkdse-paper1-questions.json"
     };
 
+    // Pre-index questions and pre-calculate category counts for O(1) lookups & <1ms filtering
+    function rebuildQuestionIndex() {
+      state.questionMap.clear();
+      const byType = {};
+      const byTopic = {};
+      const byYear = {};
+      const byLevel = {};
+
+      for (let i = 0; i < state.questions.length; i++) {
+        const q = state.questions[i];
+        state.questionMap.set(q.id, q);
+        const lvlInfo = getQuestionLevelInfo(q);
+
+        if (!q._searchText) {
+          q._searchText = [
+            q.year,
+            q.part,
+            q.qNum,
+            "level " + lvlInfo.level,
+            "lv." + lvlInfo.level,
+            q.questionType,
+            q.secondarySkill || "",
+            q.topic,
+            q.passageTitle,
+            q.prompt,
+            q.excerpt,
+            q.explanationEn,
+            q.explanationZh
+          ]
+            .join(" ")
+            .toLowerCase();
+        }
+
+        if (!q._parsedPrompt) {
+          q._parsedPrompt = parsePromptOptionGroups(q.prompt);
+        }
+
+        byType[q.questionType] = (byType[q.questionType] || 0) + 1;
+        if (q.secondarySkill && q.secondarySkill !== q.questionType) {
+          byType[q.secondarySkill] = (byType[q.secondarySkill] || 0) + 1;
+        }
+        byTopic[q.topic] = (byTopic[q.topic] || 0) + 1;
+        byYear[q.year] = (byYear[q.year] || 0) + 1;
+        byLevel[lvlInfo.level] = (byLevel[lvlInfo.level] || 0) + 1;
+      }
+
+      state.cachedCounts = { byType, byTopic, byYear, byLevel };
+    }
+
     // Helper for bilingual vs English-only UI strings
     function uiText(enStr, biStr) {
       return state.langMode === "en" ? enStr : (biStr || enStr);
@@ -35769,42 +35820,52 @@
 
     function loadFromStorage() {
       try {
-        const savedQ = localStorage.getItem(STORAGE_KEY_QUESTIONS);
-        if (savedQ) {
-          const parsed = JSON.parse(savedQ);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            state.questions = parsed.filter((q) => String(q.year) !== "2025");
-          } else {
-            state.questions = JSON.parse(JSON.stringify(INITIAL_QUESTIONS));
-          }
-        } else {
-          state.questions = JSON.parse(JSON.stringify(INITIAL_QUESTIONS));
-        }
+        // Clean up legacy 2.7MB full-question-bank localStorage keys to free browser memory
+        try {
+          localStorage.removeItem("hkdse_p1_questions_v19");
+        } catch (e) {}
 
+        const savedCustom = localStorage.getItem(STORAGE_KEY_CUSTOM_QUESTIONS);
+        if (savedCustom) {
+          const parsed = JSON.parse(savedCustom);
+          if (Array.isArray(parsed)) {
+            state.customQuestions = parsed;
+          }
+        }
+      } catch (err) {
+        state.customQuestions = [];
+      }
+
+      // Reference INITIAL_QUESTIONS directly in memory without deep-cloning 895 objects
+      state.questions = [...state.customQuestions, ...INITIAL_QUESTIONS];
+
+      try {
         const savedProg = localStorage.getItem(STORAGE_KEY_PROGRESS);
         if (savedProg) {
           state.userProgress = JSON.parse(savedProg) || {};
         }
       } catch (err) {
-        state.questions = JSON.parse(JSON.stringify(INITIAL_QUESTIONS));
         state.userProgress = {};
       }
+
+      rebuildQuestionIndex();
     }
 
     function saveQuestionsToStorage() {
       try {
-        localStorage.setItem(STORAGE_KEY_QUESTIONS, JSON.stringify(state.questions));
+        localStorage.setItem(STORAGE_KEY_CUSTOM_QUESTIONS, JSON.stringify(state.customQuestions));
       } catch (err) {
         // Ignore storage quota errors inside sandboxed iframe
       }
     }
 
     function saveProgressToStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(state.userProgress));
-      } catch (err) {
-        // Ignore storage quota errors inside sandboxed iframe
-      }
+      if (window._saveProgTimer) clearTimeout(window._saveProgTimer);
+      window._saveProgTimer = setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(state.userProgress));
+        } catch (err) {}
+      }, 120);
     }
 
     function showToast(msg) {
@@ -35815,21 +35876,25 @@
       if (window._toastTimer) clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => {
         banner.classList.add("hidden");
-      }, 2800);
+      }, 2500);
     }
 
     function triggerConfetti() {
       const colors = ["#4f46e5", "#10b981", "#f59e0b", "#ec4899", "#06b6d4"];
-      for (let i = 0; i < 18; i++) {
+      const frag = document.createDocumentFragment();
+      const dots = [];
+      for (let i = 0; i < 12; i++) {
         const dot = document.createElement("div");
         dot.className = "confetti-dot";
         dot.style.backgroundColor = colors[i % colors.length];
         dot.style.left = Math.round(35 + Math.random() * 30) + "vw";
         dot.style.top = Math.round(15 + Math.random() * 20) + "vh";
         dot.style.transform = `translateX(${(Math.random() - 0.5) * 160}px)`;
-        document.body.appendChild(dot);
-        setTimeout(() => dot.remove(), 950);
+        frag.appendChild(dot);
+        dots.push(dot);
       }
+      document.body.appendChild(frag);
+      setTimeout(() => dots.forEach((d) => d.remove()), 950);
     }
 
     function escapeHtml(str) {
@@ -35883,8 +35948,10 @@
           const uRaw = userMap[b.key] || "";
           if (uRaw.trim()) anyInput = true;
           const uNorm = normalizeAnswer(uRaw);
-          const acceptedNorms = (b.accepted || []).map(normalizeAnswer);
-          const ok = uNorm.length > 0 && acceptedNorms.includes(uNorm);
+          if (!b._acceptedNorms) {
+            b._acceptedNorms = (b.accepted || []).map(normalizeAnswer);
+          }
+          const ok = uNorm.length > 0 && b._acceptedNorms.includes(uNorm);
           subResults[b.key] = ok;
           if (!ok) allCorrect = false;
         });
@@ -35902,7 +35969,10 @@
         return { hasInput: false, isCorrect: false, subResults: {} };
       }
 
-      const acceptedList = (q.acceptedAnswers || []).map(normalizeAnswer);
+      if (!q._acceptedNorms) {
+        q._acceptedNorms = (q.acceptedAnswers || []).map(normalizeAnswer);
+      }
+      const acceptedList = q._acceptedNorms;
       let isMatch = acceptedList.includes(normVal);
 
       // For open-ended reference / metaphor questions, also check if key phrases match
@@ -36086,18 +36156,23 @@
       let correct = 0;
       let xp = 0;
 
-      state.questions.forEach((q) => {
-        const p = state.userProgress[q.id];
+      const progKeys = Object.keys(state.userProgress);
+      for (let i = 0; i < progKeys.length; i++) {
+        const qid = progKeys[i];
+        const p = state.userProgress[qid];
         if (p && p.checked) {
-          completed++;
-          if (p.isCorrect) {
-            correct++;
-            xp += (Number(q.marks) || 1) * 15;
-          } else {
-            xp += 3; // Effort XP
+          const q = state.questionMap.get(qid);
+          if (q) {
+            completed++;
+            if (p.isCorrect) {
+              correct++;
+              xp += (Number(q.marks) || 1) * 15;
+            } else {
+              xp += 3;
+            }
           }
         }
-      });
+      }
 
       const acc = completed > 0 ? Math.round((correct / completed) * 100) : 0;
       document.getElementById("headerCompletedCount").textContent = String(completed);
@@ -36178,15 +36253,16 @@
     }
 
     // =========================================================================
-    // 6. RENDERING PRACTICE WORKSPACE (BY TYPE, BY TOPIC, BY YEAR)
+    // 6. RENDERING PRACTICE WORKSPACE (BY TYPE, BY TOPIC, BY YEAR, BY LEVEL)
     // =========================================================================
     function getPrimaryPillsForCurrentMode() {
+      const counts = state.cachedCounts;
       if (state.mode === "by-type") {
         const metaTypes = Object.keys(QUESTION_TYPE_META);
-        const dynamicTypes = Array.from(new Set(state.questions.map((q) => q.questionType)));
+        const dynamicTypes = Object.keys(counts.byType || {});
         const allTypes = Array.from(new Set([...metaTypes, ...dynamicTypes]));
         return allTypes.map((t) => {
-          const count = state.questions.filter((q) => q.questionType === t || q.secondarySkill === t).length;
+          const count = counts.byType[t] || 0;
           const meta = QUESTION_TYPE_META[t];
           const icon = meta && meta.icon ? meta.icon + " " : "";
           const zhShort = meta ? meta.zhLabel.split(" ")[0] : "自訂題型";
@@ -36213,9 +36289,9 @@
           "Psychology & Lifestyle": "心理與生活",
           "Education & Career": "教育與職涯"
         };
-        const topics = Array.from(new Set(state.questions.map((q) => q.topic)));
+        const topics = Object.keys(counts.byTopic || {});
         return topics.map((tp) => {
-          const count = state.questions.filter((q) => q.topic === tp).length;
+          const count = counts.byTopic[tp] || 0;
           const ic = topicIcons[tp] ? topicIcons[tp] + " " : "📘 ";
           const zh = topicZh[tp] ? ` (${topicZh[tp]})` : "";
           return {
@@ -36226,12 +36302,12 @@
         });
       }
       if (state.mode === "by-year") {
-        const years = Array.from(new Set(state.questions.map((q) => q.year)))
+        const years = Object.keys(counts.byYear || {})
           .filter((yr) => String(yr) !== "2025")
           .sort()
           .reverse();
         return years.map((yr) => {
-          const count = state.questions.filter((q) => q.year === yr).length;
+          const count = counts.byYear[yr] || 0;
           return {
             key: yr,
             label: state.langMode === "en" ? `📅 HKDSE ${yr}` : `📅 HKDSE ${yr} (${yr}年試題)`,
@@ -36242,7 +36318,7 @@
       if (state.mode === "by-level") {
         return DSE_LEVEL_ORDER.map((lvl) => {
           const meta = DSE_LEVEL_META[lvl];
-          const count = state.questions.filter((q) => getQuestionLevelInfo(q).level === lvl).length;
+          const count = counts.byLevel[lvl] || 0;
           const label =
             state.langMode === "en"
               ? `${meta.icon} ${meta.labelEn} (${meta.rateRange})`
@@ -36379,9 +36455,10 @@
 
       // Filter Questions
       const filtered = getFilteredQuestions();
+      const shownCount = Math.min(filtered.length, state.visibleLimit);
       document.getElementById("filteredCountLabel").textContent = uiText(
-        `Showing ${filtered.length} question${filtered.length === 1 ? "" : "s"}`,
-        `顯示 ${filtered.length} 題`
+        `Showing ${shownCount} of ${filtered.length} question${filtered.length === 1 ? "" : "s"}`,
+        `顯示 ${shownCount} / ${filtered.length} 題`
       );
 
       // Update Collapsible Filter Bar UI
@@ -36400,7 +36477,7 @@
           const activePillLabel = state.selectedPrimaryPill === "ALL" ? uiText("All", "全部") : state.selectedPrimaryPill;
           collapsedSummary.textContent = uiText(
             `${activePillLabel} • ${filtered.length} Qs`,
-            `${activePillLabel} • 顯示 ${filtered.length} 題`
+            `${activePillLabel} • 共 ${filtered.length} 題`
           );
           collapsedSummary.classList.remove("hidden");
         } else {
@@ -36412,7 +36489,7 @@
         }
       }
 
-      // Full Passage Banner in 'by-year' mode
+      // Full Passage Banner in 'by-year' mode (only render body DOM when expanded)
       const fullPassageBanner = document.getElementById("fullPassageBanner");
       if (state.mode === "by-year" && filtered.length > 0) {
         fullPassageBanner.classList.remove("hidden");
@@ -36422,21 +36499,20 @@
         document.getElementById("fullPassageMeta").textContent = `HKDSE ${firstQ.year} • ${firstQ.part} • ${firstQ.topic}`;
         document.getElementById("fullPassageTitle").textContent = firstQ.passageTitle;
 
-        const seenParas = new Set();
-        const paraBlocks = [];
-        yearQuestions.forEach((yq) => {
-          const key = yq.paraRef + "::" + yq.excerpt;
-          if (!seenParas.has(key)) {
-            seenParas.add(key);
-            paraBlocks.push({
-              paraRef: yq.paraRef,
-              excerpt: yq.excerpt
-            });
-          }
-        });
-
         const bodyEl = document.getElementById("fullPassageBody");
         if (state.showFullPassage) {
+          const seenParas = new Set();
+          const paraBlocks = [];
+          yearQuestions.forEach((yq) => {
+            const key = yq.paraRef + "::" + yq.excerpt;
+            if (!seenParas.has(key)) {
+              seenParas.add(key);
+              paraBlocks.push({
+                paraRef: yq.paraRef,
+                excerpt: yq.excerpt
+              });
+            }
+          });
           bodyEl.classList.remove("hidden");
           bodyEl.innerHTML = paraBlocks
             .map(
@@ -36450,57 +36526,46 @@
             .join("");
         } else {
           bodyEl.classList.add("hidden");
+          bodyEl.innerHTML = "";
         }
       } else {
         fullPassageBanner.classList.add("hidden");
       }
 
-      // Render Question Cards
+      // Render Question Cards (paginated for instant DOM updates)
       renderQuestionCards(filtered);
     }
 
     function getFilteredQuestions() {
+      const kw = state.searchKeyword.trim().toLowerCase();
+      const hasKw = kw.length > 0;
+      const pill = state.selectedPrimaryPill;
+      const mode = state.mode;
+      const fPart = state.filterPart;
+      const fLevel = state.filterLevel;
+      const fStatus = state.filterStatus;
+
       return state.questions.filter((q) => {
-        if (String(q.year) === "2025") return false;
-        if (state.selectedPrimaryPill !== "ALL") {
-          if (
-            state.mode === "by-type" &&
-            q.questionType !== state.selectedPrimaryPill &&
-            q.secondarySkill !== state.selectedPrimaryPill
-          )
-            return false;
-          if (state.mode === "by-topic" && q.topic !== state.selectedPrimaryPill) return false;
-          if (state.mode === "by-year" && q.year !== state.selectedPrimaryPill) return false;
-          if (state.mode === "by-level" && getQuestionLevelInfo(q).level !== state.selectedPrimaryPill) return false;
+        if (pill !== "ALL") {
+          if (mode === "by-type" && q.questionType !== pill && q.secondarySkill !== pill) return false;
+          if (mode === "by-topic" && q.topic !== pill) return false;
+          if (mode === "by-year" && q.year !== pill) return false;
+          if (mode === "by-level" && getQuestionLevelInfo(q).level !== pill) return false;
         }
 
-        if (state.filterPart !== "ALL" && q.part !== state.filterPart) return false;
-        if (state.filterLevel !== "ALL" && getQuestionLevelInfo(q).level !== state.filterLevel) return false;
+        if (fPart !== "ALL" && q.part !== fPart) return false;
+        if (fLevel !== "ALL" && getQuestionLevelInfo(q).level !== fLevel) return false;
 
-        const prog = state.userProgress[q.id] || {};
-        if (state.filterStatus === "UNANSWERED" && prog.checked) return false;
-        if (state.filterStatus === "CORRECT" && (!prog.checked || !prog.isCorrect)) return false;
-        if (state.filterStatus === "INCORRECT" && (!prog.checked || prog.isCorrect)) return false;
-        if (state.filterStatus === "BOOKMARKED" && !prog.bookmarked) return false;
+        if (fStatus !== "ALL") {
+          const prog = state.userProgress[q.id] || {};
+          if (fStatus === "UNANSWERED" && prog.checked) return false;
+          if (fStatus === "CORRECT" && (!prog.checked || !prog.isCorrect)) return false;
+          if (fStatus === "INCORRECT" && (!prog.checked || prog.isCorrect)) return false;
+          if (fStatus === "BOOKMARKED" && !prog.bookmarked) return false;
+        }
 
-        if (state.searchKeyword.trim() !== "") {
-          const kw = state.searchKeyword.toLowerCase().trim();
-          const haystack = [
-            q.year,
-            q.part,
-            q.qNum,
-            "level " + getQuestionLevelInfo(q).level,
-            "lv." + getQuestionLevelInfo(q).level,
-            q.questionType,
-            q.topic,
-            q.passageTitle,
-            q.prompt,
-            q.excerpt,
-            q.explanationEn,
-            q.explanationZh
-          ]
-            .join(" ")
-            .toLowerCase();
+        if (hasKw) {
+          const haystack = q._searchText || "";
           if (!haystack.includes(kw)) return false;
         }
 
@@ -36533,10 +36598,8 @@
       return result;
     }
 
-
     function parsePromptOptionGroups(promptStr) {
       const raw = String(promptStr || "");
-      // Match bracketed block containing at least A: ... | B: ... (or 1: ... | 2: ... or i: ... | ii: ...)
       const bracketRegex = /\[([^\[\]]*?(?:[A-Z1-9]|i{1,3}|iv|v)\s*:\s*[^\[\]]+?\|[^\[\]]+?)\]/g;
       let match;
       let targetMatch = null;
@@ -36553,7 +36616,6 @@
         .replace(/\s+/g, " ")
         .trim();
 
-      // Check if inner has multiple sub-questions separated by // e.g. (i) A: ... // (ii) A: ...
       const groupSegments = inner.includes("//") ? inner.split(/\s*\/\/\s*/) : [inner];
       const groups = [];
 
@@ -36582,88 +36644,605 @@
     }
 
     function getClozeDropdownOptions(q, b, blankIdx, parsedGroups) {
-      // 1. If prompt had multi-group options like (i) A: ... // (ii) A: ... matching blank index
+      if (b._cachedDropdownOpts !== undefined) return b._cachedDropdownOpts;
+
+      let result = null;
       if (parsedGroups && parsedGroups.length > 1 && parsedGroups[blankIdx]) {
-        return parsedGroups[blankIdx].options.map((o) => ({
+        result = parsedGroups[blankIdx].options.map((o) => ({
           value: o.key,
           label: `${o.key}. ${o.text}`
         }));
-      }
-      // 2. If prompt had a single shared option pool [A: ... | B: ...] and posHint is letter-based
-      const hint = String(b.posHint || "").trim();
-      if (parsedGroups && parsedGroups.length === 1 && parsedGroups[0].options.length >= 2) {
-        const firstKey = parsedGroups[0].options[0].key;
-        if (/^[A-Z]$/i.test(firstKey) && (/^[A-Z]\s*[\-–\/]\s*[A-Z]/i.test(hint) || hint === "A/B/C/D")) {
-          const opts = parsedGroups[0].options.map((o) => ({
-            value: o.key,
-            label: `${o.key}. ${o.text}`
-          }));
-          // Check if posHint mentions an extra letter like F (Not Stated) or D (Not Stated) not in bracket
-          const rangeMatch = hint.match(/^([A-Z])\s*[\-–]\s*([A-Z])$/);
-          if (rangeMatch) {
-            const startCode = rangeMatch[1].charCodeAt(0);
-            const endCode = rangeMatch[2].charCodeAt(0);
-            const existingKeys = new Set(opts.map((x) => x.value));
-            for (let c = startCode; c <= endCode; c++) {
-              const letter = String.fromCharCode(c);
-              if (!existingKeys.has(letter)) {
-                opts.push({ value: letter, label: letter });
+      } else {
+        const hint = String(b.posHint || "").trim();
+        if (parsedGroups && parsedGroups.length === 1 && parsedGroups[0].options.length >= 2) {
+          const firstKey = parsedGroups[0].options[0].key;
+          if (/^[A-Z]$/i.test(firstKey) && (/^[A-Z]\s*[\-–\/]\s*[A-Z]/i.test(hint) || hint === "A/B/C/D")) {
+            const opts = parsedGroups[0].options.map((o) => ({
+              value: o.key,
+              label: `${o.key}. ${o.text}`
+            }));
+            const rangeMatch = hint.match(/^([A-Z])\s*[\-–]\s*([A-Z])$/);
+            if (rangeMatch) {
+              const startCode = rangeMatch[1].charCodeAt(0);
+              const endCode = rangeMatch[2].charCodeAt(0);
+              const existingKeys = new Set(opts.map((x) => x.value));
+              for (let c = startCode; c <= endCode; c++) {
+                const letter = String.fromCharCode(c);
+                if (!existingKeys.has(letter)) {
+                  opts.push({ value: letter, label: letter });
+                }
+              }
+            }
+            result = opts;
+          }
+        }
+
+        if (!result && q.clozeTemplate) {
+          const escapedKey = b.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const inlineRegex = new RegExp(`\\[([^\\[\\]]*?A\\s*:\\s*[^\\[\\]]+?)\\][\\s\\S]{0,25}?\\{\\{${escapedKey}\\}\\}`);
+          const inlineMatch = q.clozeTemplate.match(inlineRegex);
+          if (inlineMatch) {
+            const optParts = inlineMatch[1].split(/\s*\|\s*/);
+            const opts = [];
+            optParts.forEach((op) => {
+              const m = op.match(/^([A-Za-z0-9]+)\s*:\s*(.+)$/);
+              if (m) {
+                opts.push({ value: m[1].trim(), label: `${m[1].trim()}. ${m[2].trim()}` });
+              }
+            });
+            if (opts.length > 0) result = opts;
+          }
+        }
+
+        if (!result) {
+          if (hint === "A/B/C/D") {
+            result = ["A", "B", "C", "D"].map((k) => ({ value: k, label: k }));
+          } else {
+            const letterRange = hint.match(/^([A-Z])\s*[\-–]\s*([A-Z])$/);
+            if (letterRange) {
+              const start = letterRange[1].charCodeAt(0);
+              const end = letterRange[2].charCodeAt(0);
+              if (end > start && end - start <= 10) {
+                const arr = [];
+                for (let c = start; c <= end; c++) {
+                  const l = String.fromCharCode(c);
+                  arr.push({ value: l, label: l });
+                }
+                result = arr;
+              }
+            } else if (hint === "JOB A/B/C/D") {
+              result = ["JOB A", "JOB B", "JOB C", "JOB D"].map((k) => ({ value: k, label: k }));
+            } else if (hint.includes("/") && !hint.includes(" ") && /^[A-Za-z0-9\/]+$/.test(hint)) {
+              const parts = hint.split("/").map((s) => s.trim()).filter(Boolean);
+              if (parts.length >= 2 && parts.length <= 8) {
+                result = parts.map((k) => ({ value: k, label: k }));
+              }
+            } else if (hint.includes(" / ") && !hint.toLowerCase().includes("or") && !hint.toLowerCase().includes("word")) {
+              const parts = hint.split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean);
+              if (parts.length >= 2 && parts.length <= 6 && parts.every((p) => p.length <= 28)) {
+                result = parts.map((k) => ({ value: k, label: k }));
               }
             }
           }
-          return opts;
         }
       }
-      // 3. Check if clozeTemplate has inline [A: ... | B: ... | C: ... | D: ...] right before {{blankKey}}
-      if (q.clozeTemplate) {
-        const escapedKey = b.key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const inlineRegex = new RegExp(`\\[([^\\[\\]]*?A\\s*:\\s*[^\\[\\]]+?)\\][\\s\\S]{0,25}?\\{\\{${escapedKey}\\}\\}`);
-        const inlineMatch = q.clozeTemplate.match(inlineRegex);
-        if (inlineMatch) {
-          const optParts = inlineMatch[1].split(/\s*\|\s*/);
-          const opts = [];
-          optParts.forEach((op) => {
-            const m = op.match(/^([A-Za-z0-9]+)\s*:\s*(.+)$/);
-            if (m) {
-              opts.push({ value: m[1].trim(), label: `${m[1].trim()}. ${m[2].trim()}` });
-            }
-          });
-          if (opts.length > 0) return opts;
-        }
+
+      b._cachedDropdownOpts = result;
+      return result;
+    }
+
+    // Build HTML for a single question card (used for both list rendering and instant in-place single-card updates)
+    function buildQuestionCardHtml(q) {
+      const prog = state.userProgress[q.id] || {};
+      const isChecked = Boolean(prog.checked);
+      const isCorrect = Boolean(prog.isCorrect);
+      const showExp = Boolean(prog.showExplanation || isChecked);
+      const showHint = Boolean(prog.showHint);
+      const isBookmarked = Boolean(prog.bookmarked);
+
+      const typeMeta = QUESTION_TYPE_META[q.questionType] || {
+        icon: "📝",
+        label: q.questionType,
+        zhLabel: q.questionType
+      };
+
+      const highlightedExcerpt = formatExcerptWithHighlight(
+        q.excerpt,
+        q.evidenceQuote,
+        showExp || showHint
+      );
+
+      const parsedPrompt = q._parsedPrompt || parsePromptOptionGroups(q.prompt);
+      const displayPromptText = parsedPrompt.groups.length > 0 ? parsedPrompt.cleanPrompt : q.prompt;
+
+      let formattedOptionsBlockHtml = "";
+      if (parsedPrompt.groups.length > 0) {
+        formattedOptionsBlockHtml = `
+          <div class="mt-3 p-3.5 rounded-xl bg-indigo-50/40 border border-indigo-100 space-y-3 text-xs sm:text-sm text-slate-800">
+            ${parsedPrompt.groups
+              .map(
+                (grp) => `
+              <div class="space-y-1">
+                ${
+                  grp.label
+                    ? `<div class="font-extrabold text-indigo-950">${escapeHtml(grp.label)}</div>`
+                    : ""
+                }
+                <div class="space-y-1 pl-1">
+                  ${grp.options
+                    .map(
+                      (opt) => `
+                    <div class="leading-relaxed">
+                      <span class="font-bold text-indigo-700 mr-1.5">${escapeHtml(opt.key)}.</span><span>${escapeHtml(opt.text)}</span>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                </div>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+      } else if (q.inputFormat === "mc" && Array.isArray(q.options) && q.options.length > 0) {
+        formattedOptionsBlockHtml = `
+          <div class="mt-3 p-3.5 rounded-xl bg-indigo-50/40 border border-indigo-100 space-y-1.5 text-xs sm:text-sm text-slate-800">
+            ${q.options
+              .map((opt) => {
+                const cleanOptText = String(opt.text || "").replace(/^[A-Z]\.\s*/, "");
+                return `
+                  <div class="leading-relaxed">
+                    <span class="font-bold text-indigo-700 mr-1.5">${escapeHtml(opt.key)}.</span><span>${escapeHtml(cleanOptText)}</span>
+                  </div>
+                `;
+              })
+              .join("")}
+          </div>
+        `;
       }
-      // 4. Check posHint patterns for letter ranges or slash-separated choices
-      if (hint === "A/B/C/D") {
-        return ["A", "B", "C", "D"].map((k) => ({ value: k, label: k }));
+
+      let statusBadgeHtml = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">${uiText("Unanswered", "Unanswered 未作答")}</span>`;
+      if (isChecked) {
+        statusBadgeHtml = isCorrect
+          ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ ${uiText("Correct", "Correct 答對")} (${q.marks || 1}/${q.marks || 1})</span>`
+          : `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">✗ ${uiText("Needs Review", "Needs Review 需重溫")}</span>`;
       }
-      const letterRange = hint.match(/^([A-Z])\s*[\-–]\s*([A-Z])$/);
-      if (letterRange) {
-        const start = letterRange[1].charCodeAt(0);
-        const end = letterRange[2].charCodeAt(0);
-        if (end > start && end - start <= 10) {
-          const arr = [];
-          for (let c = start; c <= end; c++) {
-            const l = String.fromCharCode(c);
-            arr.push({ value: l, label: l });
+
+      let inputHtml = "";
+      if (q.inputFormat === "tfng-group") {
+        const userMap = prog.userValue || {};
+        const subRes = prog.subResults || {};
+        inputHtml = `
+          <div class="space-y-3 mt-3">
+            ${(q.subItems || [])
+              .map((item) => {
+                const uChoice = userMap[item.id] || "";
+                const itemChecked = isChecked;
+                const itemOk = subRes[item.id];
+                return `
+                  <div class="p-3.5 rounded-xl border ${
+                    itemChecked
+                      ? itemOk
+                        ? "bg-emerald-50/50 border-emerald-200"
+                        : "bg-rose-50/50 border-rose-200"
+                      : "bg-slate-50 border-slate-200"
+                  }">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <p class="text-xs sm:text-sm font-medium text-slate-800">${escapeHtml(item.statement)}</p>
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        ${["T", "F", "NG"]
+                          .map((opt) => {
+                            const selected = uChoice === opt;
+                            return `
+                              <button type="button"
+                                data-action="select-tfng"
+                                data-qid="${escapeHtml(q.id)}"
+                                data-subid="${escapeHtml(item.id)}"
+                                data-val="${opt}"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
+                                  selected
+                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+                                }">
+                                ${opt}
+                              </button>
+                            `;
+                          })
+                          .join("")}
+                      </div>
+                    </div>
+                    ${
+                      showExp
+                        ? `
+                      <div class="mt-2.5 pt-2.5 border-t border-slate-200/80 text-xs space-y-1">
+                        <div class="font-bold ${itemOk ? "text-emerald-700" : "text-indigo-700"}">
+                          Official Answer: ${escapeHtml(item.answer)}
+                        </div>
+                        <p class="text-slate-700">${escapeHtml(item.expEn)}</p>
+                        ${
+                          state.langMode === "bilingual" && item.expZh
+                            ? `<p class="text-indigo-900 font-medium">${escapeHtml(item.expZh)}</p>`
+                            : ""
+                        }
+                      </div>
+                    `
+                        : ""
+                    }
+                  </div>
+                `;
+              })
+              .join("")}
+          </div>
+        `;
+      } else if (q.inputFormat === "cloze") {
+        const userMap = prog.userValue || {};
+        const subRes = prog.subResults || {};
+        let templateStr = String(q.clozeTemplate || "");
+
+        let renderedCloze = escapeHtml(templateStr).replace(
+          /\[([^\[\]]*?A\s*:\s*[^\[\]]+?\|[^\[\]]+?)\]/g,
+          (_, inner) => {
+            const items = inner
+              .split(/\s*\|\s*/)
+              .map((part) => {
+                const m = part.match(/^([A-Za-z0-9]+)\s*:\s*(.+)$/);
+                return m
+                  ? `<div class="leading-snug"><span class="font-bold text-indigo-700 mr-1.5">${m[1].trim()}.</span><span>${m[2].trim()}</span></div>`
+                  : `<div>${part}</div>`;
+              })
+              .join("");
+            return `<div class="my-2 p-2.5 rounded-lg bg-white border border-indigo-100 space-y-1">${items}</div>`;
           }
-          return arr;
+        );
+
+        if (renderedCloze.includes("||")) {
+          renderedCloze = renderedCloze
+            .split(/\s*\|\|\s*/)
+            .map((seg) => `<div class="py-1">${seg}</div>`)
+            .join("");
         }
-      }
-      if (hint === "JOB A/B/C/D") {
-        return ["JOB A", "JOB B", "JOB C", "JOB D"].map((k) => ({ value: k, label: k }));
-      }
-      if (hint.includes("/") && !hint.includes(" ") && /^[A-Za-z0-9\/]+$/.test(hint)) {
-        const parts = hint.split("/").map((s) => s.trim()).filter(Boolean);
-        if (parts.length >= 2 && parts.length <= 8) {
-          return parts.map((k) => ({ value: k, label: k }));
+
+        (q.blanks || []).forEach((b, blankIdx) => {
+          const val = userMap[b.key] || "";
+          const blankOk = subRes[b.key];
+          const borderClass = isChecked
+            ? blankOk
+              ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold"
+              : "border-rose-500 bg-rose-50 text-rose-900 font-bold"
+            : val
+            ? "border-indigo-600 bg-indigo-50/40 text-indigo-950 font-bold"
+            : "border-indigo-300 bg-white text-slate-900 focus:border-indigo-600";
+
+          const dropdownOpts = getClozeDropdownOptions(q, b, blankIdx, parsedPrompt.groups);
+          let controlHtml = "";
+          if (dropdownOpts && dropdownOpts.length > 0) {
+            const placeholderLabel = uiText("Select...", "選擇...");
+            controlHtml = `<select
+              data-action="input-cloze"
+              data-qid="${escapeHtml(q.id)}"
+              data-blank="${escapeHtml(b.key)}"
+              class="inline-block mx-1 px-2.5 py-1 rounded-lg border-2 text-xs sm:text-sm font-semibold cursor-pointer focus:outline-none transition ${borderClass}">
+              <option value="">— ${escapeHtml(placeholderLabel)} —</option>
+              ${dropdownOpts
+                .map((opt) => {
+                  const isSelected =
+                    val.trim().toUpperCase() === opt.value.trim().toUpperCase() ? "selected" : "";
+                  return `<option value="${escapeHtml(opt.value)}" ${isSelected}>${escapeHtml(opt.label)}</option>`;
+                })
+                .join("")}
+            </select>`;
+          } else {
+            controlHtml = `<input type="text"
+              data-action="input-cloze"
+              data-qid="${escapeHtml(q.id)}"
+              data-blank="${escapeHtml(b.key)}"
+              value="${escapeHtml(val)}"
+              placeholder="${escapeHtml(b.posHint || "answer")}"
+              class="inline-block mx-1 px-2.5 py-1 rounded-lg border-2 text-xs sm:text-sm font-semibold w-40 sm:w-48 focus:outline-none ${borderClass}" />`;
+          }
+          renderedCloze = renderedCloze.replace(`{{${b.key}}}`, controlHtml);
+        });
+
+        inputHtml = `
+          <div class="mt-3 p-4 rounded-xl bg-slate-50 border border-slate-200 leading-loose text-xs sm:text-sm text-slate-800">
+            ${renderedCloze}
+          </div>
+        `;
+      } else if (q.inputFormat === "mc") {
+        const uChoice = typeof prog.userValue === "string" ? prog.userValue : "";
+        const isAns = (q.acceptedAnswers || []).includes(uChoice);
+        let selectStyle = "border-indigo-300 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500";
+        if (isChecked) {
+          selectStyle = isAns
+            ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold"
+            : "border-rose-500 bg-rose-50 text-rose-900 font-bold";
+        } else if (uChoice) {
+          selectStyle = "border-indigo-600 bg-indigo-50/40 text-indigo-950 font-bold";
         }
+
+        const placeholderText = uiText(
+          "— Select your answer letter (A / B / C / D) —",
+          "— 請從下拉選單選擇答案字母 (A / B / C / D) —"
+        );
+
+        inputHtml = `
+          <div class="mt-3 space-y-2">
+            <label class="block text-xs font-bold text-slate-600">
+              ${uiText("Answer:", "作答（請選擇字母）：")}
+            </label>
+            <div class="relative">
+              <select
+                data-action="select-mc"
+                data-qid="${escapeHtml(q.id)}"
+                class="w-full sm:w-80 px-3.5 py-2.5 rounded-xl border-2 text-xs sm:text-sm transition cursor-pointer focus:outline-none ${selectStyle}">
+                <option value="">${escapeHtml(placeholderText)}</option>
+                ${(q.options || [])
+                  .map((opt) => {
+                    const selectedAttr = uChoice === opt.key ? "selected" : "";
+                    const ansMarker =
+                      isChecked && (q.acceptedAnswers || []).includes(opt.key) ? " ✓" : "";
+                    return `<option value="${escapeHtml(opt.key)}" ${selectedAttr}>${escapeHtml(opt.text)}${ansMarker}</option>`;
+                  })
+                  .join("")}
+              </select>
+            </div>
+          </div>
+        `;
+      } else {
+        const uText = typeof prog.userValue === "string" ? prog.userValue : "";
+        const borderStyle = isChecked
+          ? isCorrect
+            ? "border-emerald-500 bg-emerald-50/40"
+            : "border-rose-400 bg-rose-50/40"
+          : "border-slate-300 bg-white";
+        inputHtml = `
+          <div class="mt-3">
+            <input type="text"
+              data-action="input-text"
+              data-qid="${escapeHtml(q.id)}"
+              value="${escapeHtml(uText)}"
+              placeholder="${escapeHtml(uiText("Type your HKDSE answer here (press Enter or click Check Answer)...", "在此輸入你的 DSE 答案（按 Enter 或點擊核對答案）..."))}"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${borderStyle}" />
+          </div>
+        `;
       }
-      if (hint.includes(" / ") && !hint.toLowerCase().includes("or") && !hint.toLowerCase().includes("word")) {
-        const parts = hint.split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean);
-        if (parts.length >= 2 && parts.length <= 6 && parts.every((p) => p.length <= 28)) {
-          return parts.map((k) => ({ value: k, label: k }));
-        }
+
+      let officialAnswerDisplay = "";
+      if (q.inputFormat === "tfng-group") {
+        officialAnswerDisplay = (q.subItems || []).map((i) => `${i.id}: ${i.answer}`).join("  |  ");
+      } else if (q.inputFormat === "cloze") {
+        officialAnswerDisplay = (q.blanks || [])
+          .map((b) => `(${b.key}) ${b.accepted.join(" // ")}`)
+          .join("   •   ");
+      } else {
+        officialAnswerDisplay = (q.acceptedAnswers || []).join("  //  ");
       }
-      return null;
+
+      const typeBadgeText =
+        state.langMode === "en"
+          ? `${typeMeta.icon || "📝"} ${typeMeta.label}`
+          : `${typeMeta.icon || "📝"} ${typeMeta.label} (${typeMeta.zhLabel})`;
+
+      const lvlInfo = getQuestionLevelInfo(q);
+      const lvlBadgeText =
+        state.langMode === "en"
+          ? `${lvlInfo.meta.icon} Lv.${lvlInfo.level} • ${lvlInfo.rate}% Correct`
+          : `${lvlInfo.meta.icon} Lv.${lvlInfo.level} (${lvlInfo.rate}% 答對)`;
+      const lvlTooltip =
+        state.langMode === "en"
+          ? `${lvlInfo.meta.labelEn}: ${lvlInfo.rate}% candidate correct rate in ${q.year}`
+          : `${lvlInfo.meta.labelEn} (${lvlInfo.meta.labelZh})：${q.year}年考生答對率約 ${lvlInfo.rate}%`;
+
+      return `
+        <article id="qcard-${escapeHtml(q.id)}" class="question-card bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+          <!-- Question Top Metadata Bar -->
+          <div class="bg-gradient-to-r from-slate-50 via-indigo-50/30 to-slate-50 border-b border-slate-200/80 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-extrabold">
+                HKDSE ${escapeHtml(q.year)} • ${escapeHtml(q.part)} • ${escapeHtml(q.qNum)}
+              </span>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold flex items-center gap-1 ${lvlInfo.meta.badgeClass}" title="${escapeHtml(lvlTooltip)}">
+                ${escapeHtml(lvlBadgeText)}
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold">
+                ${escapeHtml(typeBadgeText)}
+              </span>
+              ${
+                q.secondarySkill
+                  ? `<span class="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold" title="Secondary / Hybrid Reading Skill">
+                      + ${escapeHtml(q.secondarySkill)}
+                    </span>`
+                  : ""
+              }
+              <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-medium">
+                ${escapeHtml(q.topic)}
+              </span>
+              <span class="text-xs text-slate-500 font-semibold">[${q.marks || 1} mark${(q.marks || 1) > 1 ? "s" : ""}]</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              ${statusBadgeHtml}
+              <button type="button"
+                data-action="toggle-bookmark"
+                data-qid="${escapeHtml(q.id)}"
+                class="px-2.5 py-1 rounded-lg border text-xs font-bold transition ${
+                  isBookmarked
+                    ? "bg-amber-100 text-amber-800 border-amber-300"
+                    : "bg-white text-slate-400 border-slate-200 hover:text-amber-600"
+                }"
+                title="Bookmark this question for review">
+                ★ ${isBookmarked ? uiText("Saved", "已收藏") : uiText("Save", "收藏")}
+              </button>
+            </div>
+          </div>
+
+          <!-- Split / Stacked Body: Specific Paragraph Excerpt + Question Interaction -->
+          <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- Left 5 Cols: Specific Paragraph Excerpt -->
+            <div class="lg:col-span-5 bg-amber-50/40 border border-amber-200/80 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 pb-2 mb-2.5 border-b border-amber-200/60">
+                  <div>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800 block">
+                      ${uiText("📖 Target Reading Excerpt", "📖 Target Reading Excerpt • 對應段落原文")}
+                    </span>
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900">${escapeHtml(q.passageTitle)}</h4>
+                  </div>
+                  <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 text-xs font-bold shrink-0">
+                    ${escapeHtml(q.paraRef)}
+                  </span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-800 leading-relaxed font-normal">
+                  ${highlightedExcerpt}
+                </p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-amber-200/50 flex items-center justify-between text-[11px] text-amber-800 font-medium">
+                <span>${
+                  showExp || showHint
+                    ? uiText("★ Yellow highlight shows the key evidence in passage", "★ 黃色高亮標示原文關鍵線索句")
+                    : uiText("💡 Click 'Hint' or 'Check Answer' to highlight evidence", "💡 點擊「提示」或「核對答案」高亮原文關鍵句")
+                }</span>
+              </div>
+            </div>
+
+            <!-- Right 7 Cols: Question Stem, Formatted Options, Answer Input & Bilingual Explanation -->
+            <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-1">
+                  ${uiText("Question Prompt", "Question Prompt • 題目要求")}
+                </div>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 leading-snug whitespace-pre-line">
+                  ${escapeHtml(displayPromptText)}
+                </h3>
+
+                ${formattedOptionsBlockHtml}
+
+                ${inputHtml}
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                <div class="flex flex-wrap items-center gap-2">
+                  <button type="button"
+                    data-action="check-answer"
+                    data-qid="${escapeHtml(q.id)}"
+                    class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold hover:from-indigo-700 hover:to-violet-700 shadow-sm transition">
+                    ✓ ${uiText("Check Answer", "Check Answer (核對答案)")}
+                  </button>
+                  <button type="button"
+                    data-action="toggle-hint"
+                    data-qid="${escapeHtml(q.id)}"
+                    class="px-3 py-2 rounded-xl border text-xs font-bold transition ${
+                      showHint
+                        ? "bg-amber-100 text-amber-900 border-amber-300"
+                        : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
+                    }">
+                    💡 ${showHint ? uiText("Hide Clue", "隱藏線索") : uiText("Clue Locator", "原文線索提示")}
+                  </button>
+                  <button type="button"
+                    data-action="toggle-explanation"
+                    data-qid="${escapeHtml(q.id)}"
+                    class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition">
+                    ${
+                      showExp
+                        ? uiText("Hide Explanation", "Hide Explanation (隱藏詳解)")
+                        : uiText("Show Explanation", "Show Explanation (查看詳解)")
+                    }
+                  </button>
+                </div>
+
+                <button type="button"
+                  data-action="retry-question"
+                  data-qid="${escapeHtml(q.id)}"
+                  class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-rose-50 transition">
+                  ${uiText("Clear / Retry", "重做此題")}
+                </button>
+              </div>
+
+              <!-- Marking Scheme & Step-by-Step Explanation Panel -->
+              ${
+                showExp
+                  ? `
+                <div class="rounded-xl bg-indigo-50/70 border border-indigo-200 p-4 space-y-3 text-xs sm:text-sm animate-pop">
+                  <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-indigo-200/70">
+                    <span class="font-extrabold text-indigo-950">
+                      ${uiText("Marking Scheme Answer:", "Marking Scheme Answer (評卷參考答案):")}
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-white text-indigo-900 font-mono font-bold border border-indigo-200">
+                      ${escapeHtml(officialAnswerDisplay)}
+                    </span>
+                  </div>
+
+                  ${
+                    q.inputFormat === "cloze" && q.blanks
+                      ? `
+                    <div class="space-y-1.5 bg-white/80 rounded-lg p-3 border border-indigo-100">
+                      <div class="font-bold text-slate-800 text-xs">${uiText("Per-Blank Breakdown:", "Per-Blank Breakdown (逐空詳解):")}</div>
+                      ${q.blanks
+                        .map(
+                          (b) => `
+                        <div class="text-xs text-slate-700">
+                          <span class="font-semibold text-indigo-800">${escapeHtml(b.expEn)}</span>
+                          ${
+                            state.langMode === "bilingual" && b.expZh
+                              ? `<div class="text-slate-800 mt-0.5">${escapeHtml(b.expZh)}</div>`
+                              : ""
+                          }
+                        </div>
+                      `
+                        )
+                        .join("")}
+                    </div>
+                  `
+                      : ""
+                  }
+
+                  <div class="space-y-1.5">
+                    <div class="font-bold text-slate-900">Step-by-Step Explanation:</div>
+                    <p class="text-slate-700 leading-relaxed">${escapeHtml(q.explanationEn)}</p>
+                  </div>
+
+                  ${
+                    state.langMode === "bilingual" && q.explanationZh
+                      ? `
+                    <div class="pt-2 border-t border-indigo-200/60 space-y-1">
+                      <div class="font-bold text-indigo-950">繁體中文解題分析：</div>
+                      <p class="text-slate-800 leading-relaxed">${escapeHtml(q.explanationZh)}</p>
+                    </div>
+                  `
+                      : ""
+                  }
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    // Surgical in-place update for a single question card (<2ms vs rebuilding all cards)
+    function updateSingleQuestionCard(qid) {
+      if (state.filterStatus !== "ALL") {
+        // If filtering by completion/bookmark status, the card may need to enter/leave the filtered view
+        renderPracticeWorkspace();
+        return;
+      }
+      const q = state.questionMap.get(qid);
+      if (!q) return;
+      const existingCard = document.getElementById(`qcard-${qid}`);
+      if (!existingCard) {
+        renderPracticeWorkspace();
+        return;
+      }
+      const temp = document.createElement("div");
+      temp.innerHTML = buildQuestionCardHtml(q).trim();
+      const newCard = temp.firstElementChild;
+      if (newCard) {
+        existingCard.replaceWith(newCard);
+      }
     }
 
     function renderQuestionCards(questions) {
@@ -36681,509 +37260,35 @@
         return;
       }
 
-      container.innerHTML = questions
-        .map((q) => {
-          const prog = state.userProgress[q.id] || {};
-          const isChecked = Boolean(prog.checked);
-          const isCorrect = Boolean(prog.isCorrect);
-          const showExp = Boolean(prog.showExplanation || isChecked);
-          const showHint = Boolean(prog.showHint);
-          const isBookmarked = Boolean(prog.bookmarked);
+      const sliceEnd = Math.min(questions.length, state.visibleLimit);
+      const visibleSlice = questions.slice(0, sliceEnd);
+      const remaining = questions.length - sliceEnd;
 
-          const typeMeta = QUESTION_TYPE_META[q.questionType] || {
-            icon: "📝",
-            label: q.questionType,
-            zhLabel: q.questionType
-          };
+      let cardsHtml = visibleSlice.map((q) => buildQuestionCardHtml(q)).join("");
 
-          const highlightedExcerpt = formatExcerptWithHighlight(
-            q.excerpt,
-            q.evidenceQuote,
-            showExp || showHint
-          );
+      if (remaining > 0) {
+        const nextBatchCount = Math.min(PAGE_SIZE, remaining);
+        cardsHtml += `
+          <div id="paginationLoadMoreBar" class="bg-white rounded-2xl border border-indigo-100 p-5 text-center shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="text-xs sm:text-sm font-bold text-slate-600">
+              ${uiText(
+                `Showing ${sliceEnd} of ${questions.length} questions (${remaining} more available)`,
+                `目前已顯示 ${sliceEnd} / ${questions.length} 題（尚有 ${remaining} 題）`
+              )}
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-2">
+              <button type="button" data-action="load-more-questions" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs sm:text-sm font-extrabold hover:from-indigo-700 hover:to-violet-700 shadow-sm transition cursor-pointer">
+                + ${uiText(`Load Next ${nextBatchCount} Questions`, `載入下 ${nextBatchCount} 題`)}
+              </button>
+              <button type="button" data-action="load-all-questions" class="px-3.5 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-bold transition cursor-pointer">
+                ${uiText(`Show All (${questions.length})`, `一次顯示全部 (${questions.length})`)}
+              </button>
+            </div>
+          </div>
+        `;
+      }
 
-          // Parse any bracketed option lists in q.prompt so we can display them cleanly as:
-          // (i)
-          // A. ...
-          // B. ...
-          const parsedPrompt = parsePromptOptionGroups(q.prompt);
-          const displayPromptText = parsedPrompt.groups.length > 0 ? parsedPrompt.cleanPrompt : q.prompt;
-
-          let formattedOptionsBlockHtml = "";
-          if (parsedPrompt.groups.length > 0) {
-            formattedOptionsBlockHtml = `
-              <div class="mt-3 p-3.5 rounded-xl bg-indigo-50/40 border border-indigo-100 space-y-3 text-xs sm:text-sm text-slate-800">
-                ${parsedPrompt.groups
-                  .map(
-                    (grp) => `
-                  <div class="space-y-1">
-                    ${
-                      grp.label
-                        ? `<div class="font-extrabold text-indigo-950">${escapeHtml(grp.label)}</div>`
-                        : ""
-                    }
-                    <div class="space-y-1 pl-1">
-                      ${grp.options
-                        .map(
-                          (opt) => `
-                        <div class="leading-relaxed">
-                          <span class="font-bold text-indigo-700 mr-1.5">${escapeHtml(opt.key)}.</span><span>${escapeHtml(opt.text)}</span>
-                        </div>
-                      `
-                        )
-                        .join("")}
-                    </div>
-                  </div>
-                `
-                  )
-                  .join("")}
-              </div>
-            `;
-          } else if (q.inputFormat === "mc" && Array.isArray(q.options) && q.options.length > 0) {
-            formattedOptionsBlockHtml = `
-              <div class="mt-3 p-3.5 rounded-xl bg-indigo-50/40 border border-indigo-100 space-y-1.5 text-xs sm:text-sm text-slate-800">
-                ${q.options
-                  .map((opt) => {
-                    const cleanOptText = String(opt.text || "").replace(/^[A-Z]\.\s*/, "");
-                    return `
-                      <div class="leading-relaxed">
-                        <span class="font-bold text-indigo-700 mr-1.5">${escapeHtml(opt.key)}.</span><span>${escapeHtml(cleanOptText)}</span>
-                      </div>
-                    `;
-                  })
-                  .join("")}
-              </div>
-            `;
-          }
-
-          // Status badge (respects EN Only vs EN + 繁中)
-          let statusBadgeHtml = `<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">${uiText("Unanswered", "Unanswered 未作答")}</span>`;
-          if (isChecked) {
-            statusBadgeHtml = isCorrect
-              ? `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ ${uiText("Correct", "Correct 答對")} (${q.marks || 1}/${q.marks || 1})</span>`
-              : `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">✗ ${uiText("Needs Review", "Needs Review 需重溫")}</span>`;
-          }
-
-          // Input Control HTML by inputFormat
-          let inputHtml = "";
-          if (q.inputFormat === "tfng-group") {
-            const userMap = prog.userValue || {};
-            const subRes = prog.subResults || {};
-            inputHtml = `
-              <div class="space-y-3 mt-3">
-                ${(q.subItems || [])
-                  .map((item) => {
-                    const uChoice = userMap[item.id] || "";
-                    const itemChecked = isChecked;
-                    const itemOk = subRes[item.id];
-                    return `
-                      <div class="p-3.5 rounded-xl border ${
-                        itemChecked
-                          ? itemOk
-                            ? "bg-emerald-50/50 border-emerald-200"
-                            : "bg-rose-50/50 border-rose-200"
-                          : "bg-slate-50 border-slate-200"
-                      }">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <p class="text-xs sm:text-sm font-medium text-slate-800">${escapeHtml(item.statement)}</p>
-                          <div class="flex items-center gap-1.5 shrink-0">
-                            ${["T", "F", "NG"]
-                              .map((opt) => {
-                                const selected = uChoice === opt;
-                                return `
-                                  <button type="button"
-                                    data-action="select-tfng"
-                                    data-qid="${escapeHtml(q.id)}"
-                                    data-subid="${escapeHtml(item.id)}"
-                                    data-val="${opt}"
-                                    class="px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
-                                      selected
-                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                                        : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
-                                    }">
-                                    ${opt}
-                                  </button>
-                                `;
-                              })
-                              .join("")}
-                          </div>
-                        </div>
-                        ${
-                          showExp
-                            ? `
-                          <div class="mt-2.5 pt-2.5 border-t border-slate-200/80 text-xs space-y-1">
-                            <div class="font-bold ${itemOk ? "text-emerald-700" : "text-indigo-700"}">
-                              Official Answer: ${escapeHtml(item.answer)}
-                            </div>
-                            <p class="text-slate-700">${escapeHtml(item.expEn)}</p>
-                            ${
-                              state.langMode === "bilingual" && item.expZh
-                                ? `<p class="text-indigo-900 font-medium">${escapeHtml(item.expZh)}</p>`
-                                : ""
-                            }
-                          </div>
-                        `
-                            : ""
-                        }
-                      </div>
-                    `;
-                  })
-                  .join("")}
-              </div>
-            `;
-          } else if (q.inputFormat === "cloze") {
-            const userMap = prog.userValue || {};
-            const subRes = prog.subResults || {};
-            let templateStr = String(q.clozeTemplate || "");
-
-            // Format any inline [A: ... | B: ... | C: ... | D: ...] inside clozeTemplate into vertical A. / B. / C. / D. lists
-            let renderedCloze = escapeHtml(templateStr).replace(
-              /\[([^\[\]]*?A\s*:\s*[^\[\]]+?\|[^\[\]]+?)\]/g,
-              (_, inner) => {
-                const items = inner
-                  .split(/\s*\|\s*/)
-                  .map((part) => {
-                    const m = part.match(/^([A-Za-z0-9]+)\s*:\s*(.+)$/);
-                    return m
-                      ? `<div class="leading-snug"><span class="font-bold text-indigo-700 mr-1.5">${m[1].trim()}.</span><span>${m[2].trim()}</span></div>`
-                      : `<div>${part}</div>`;
-                  })
-                  .join("");
-                return `<div class="my-2 p-2.5 rounded-lg bg-white border border-indigo-100 space-y-1">${items}</div>`;
-              }
-            );
-
-            // Split multi-part cloze templates on || into clean visual lines if present
-            if (renderedCloze.includes("||")) {
-              renderedCloze = renderedCloze
-                .split(/\s*\|\|\s*/)
-                .map((seg) => `<div class="py-1">${seg}</div>`)
-                .join("");
-            }
-
-            (q.blanks || []).forEach((b, blankIdx) => {
-              const val = userMap[b.key] || "";
-              const blankOk = subRes[b.key];
-              const borderClass = isChecked
-                ? blankOk
-                  ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold"
-                  : "border-rose-500 bg-rose-50 text-rose-900 font-bold"
-                : val
-                ? "border-indigo-600 bg-indigo-50/40 text-indigo-950 font-bold"
-                : "border-indigo-300 bg-white text-slate-900 focus:border-indigo-600";
-
-              const dropdownOpts = getClozeDropdownOptions(q, b, blankIdx, parsedPrompt.groups);
-              let controlHtml = "";
-              if (dropdownOpts && dropdownOpts.length > 0) {
-                const placeholderLabel = uiText("Select...", "選擇...");
-                controlHtml = `<select
-                  data-action="input-cloze"
-                  data-qid="${escapeHtml(q.id)}"
-                  data-blank="${escapeHtml(b.key)}"
-                  class="inline-block mx-1 px-2.5 py-1 rounded-lg border-2 text-xs sm:text-sm font-semibold cursor-pointer focus:outline-none transition ${borderClass}">
-                  <option value="">— ${escapeHtml(placeholderLabel)} —</option>
-                  ${dropdownOpts
-                    .map((opt) => {
-                      const isSelected =
-                        val.trim().toUpperCase() === opt.value.trim().toUpperCase() ? "selected" : "";
-                      return `<option value="${escapeHtml(opt.value)}" ${isSelected}>${escapeHtml(opt.label)}</option>`;
-                    })
-                    .join("")}
-                </select>`;
-              } else {
-                controlHtml = `<input type="text"
-                  data-action="input-cloze"
-                  data-qid="${escapeHtml(q.id)}"
-                  data-blank="${escapeHtml(b.key)}"
-                  value="${escapeHtml(val)}"
-                  placeholder="${escapeHtml(b.posHint || "answer")}"
-                  class="inline-block mx-1 px-2.5 py-1 rounded-lg border-2 text-xs sm:text-sm font-semibold w-40 sm:w-48 focus:outline-none ${borderClass}" />`;
-              }
-              renderedCloze = renderedCloze.replace(`{{${b.key}}}`, controlHtml);
-            });
-
-            inputHtml = `
-              <div class="mt-3 p-4 rounded-xl bg-slate-50 border border-slate-200 leading-loose text-xs sm:text-sm text-slate-800">
-                ${renderedCloze}
-              </div>
-            `;
-          } else if (q.inputFormat === "mc") {
-            // Dropdown menu for Multiple Choice questions!
-            const uChoice = typeof prog.userValue === "string" ? prog.userValue : "";
-            const isAns = (q.acceptedAnswers || []).includes(uChoice);
-            let selectStyle = "border-indigo-300 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500";
-            if (isChecked) {
-              selectStyle = isAns
-                ? "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold"
-                : "border-rose-500 bg-rose-50 text-rose-900 font-bold";
-            } else if (uChoice) {
-              selectStyle = "border-indigo-600 bg-indigo-50/40 text-indigo-950 font-bold";
-            }
-
-            const placeholderText = uiText(
-              "— Select your answer letter (A / B / C / D) —",
-              "— 請從下拉選單選擇答案字母 (A / B / C / D) —"
-            );
-
-            inputHtml = `
-              <div class="mt-3 space-y-2">
-                <label class="block text-xs font-bold text-slate-600">
-                  ${uiText("Answer:", "作答（請選擇字母）：")}
-                </label>
-                <div class="relative">
-                  <select
-                    data-action="select-mc"
-                    data-qid="${escapeHtml(q.id)}"
-                    class="w-full sm:w-80 px-3.5 py-2.5 rounded-xl border-2 text-xs sm:text-sm transition cursor-pointer focus:outline-none ${selectStyle}">
-                    <option value="">${escapeHtml(placeholderText)}</option>
-                    ${(q.options || [])
-                      .map((opt) => {
-                        const selectedAttr = uChoice === opt.key ? "selected" : "";
-                        const ansMarker =
-                          isChecked && (q.acceptedAnswers || []).includes(opt.key) ? " ✓" : "";
-                        return `<option value="${escapeHtml(opt.key)}" ${selectedAttr}>${escapeHtml(opt.text)}${ansMarker}</option>`;
-                      })
-                      .join("")}
-                  </select>
-                </div>
-              </div>
-            `;
-          } else {
-            // Standard short / reference / figurative text answer
-            const uText = typeof prog.userValue === "string" ? prog.userValue : "";
-            const borderStyle = isChecked
-              ? isCorrect
-                ? "border-emerald-500 bg-emerald-50/40"
-                : "border-rose-400 bg-rose-50/40"
-              : "border-slate-300 bg-white";
-            inputHtml = `
-              <div class="mt-3">
-                <input type="text"
-                  data-action="input-text"
-                  data-qid="${escapeHtml(q.id)}"
-                  value="${escapeHtml(uText)}"
-                  placeholder="${escapeHtml(uiText("Type your HKDSE answer here (press Enter or click Check Answer)...", "在此輸入你的 DSE 答案（按 Enter 或點擊核對答案）..."))}"
-                  class="w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${borderStyle}" />
-              </div>
-            `;
-          }
-
-          // Official Answer Display for Explanation Box
-          let officialAnswerDisplay = "";
-          if (q.inputFormat === "tfng-group") {
-            officialAnswerDisplay = (q.subItems || []).map((i) => `${i.id}: ${i.answer}`).join("  |  ");
-          } else if (q.inputFormat === "cloze") {
-            officialAnswerDisplay = (q.blanks || [])
-              .map((b) => `(${b.key}) ${b.accepted.join(" // ")}`)
-              .join("   •   ");
-          } else {
-            officialAnswerDisplay = (q.acceptedAnswers || []).join("  //  ");
-          }
-
-          const typeBadgeText =
-            state.langMode === "en"
-              ? `${typeMeta.icon || "📝"} ${typeMeta.label}`
-              : `${typeMeta.icon || "📝"} ${typeMeta.label} (${typeMeta.zhLabel})`;
-
-          const lvlInfo = getQuestionLevelInfo(q);
-          const lvlBadgeText =
-            state.langMode === "en"
-              ? `${lvlInfo.meta.icon} Lv.${lvlInfo.level} • ${lvlInfo.rate}% Correct`
-              : `${lvlInfo.meta.icon} Lv.${lvlInfo.level} (${lvlInfo.rate}% 答對)`;
-          const lvlTooltip =
-            state.langMode === "en"
-              ? `${lvlInfo.meta.labelEn}: ${lvlInfo.rate}% candidate correct rate in ${q.year}`
-              : `${lvlInfo.meta.labelEn} (${lvlInfo.meta.labelZh})：${q.year}年考生答對率約 ${lvlInfo.rate}%`;
-
-          return `
-            <article id="qcard-${escapeHtml(q.id)}" class="question-card bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
-              <!-- Question Top Metadata Bar -->
-              <div class="bg-gradient-to-r from-slate-50 via-indigo-50/30 to-slate-50 border-b border-slate-200/80 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-extrabold">
-                    HKDSE ${escapeHtml(q.year)} • ${escapeHtml(q.part)} • ${escapeHtml(q.qNum)}
-                  </span>
-                  <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold flex items-center gap-1 ${lvlInfo.meta.badgeClass}" title="${escapeHtml(lvlTooltip)}">
-                    ${escapeHtml(lvlBadgeText)}
-                  </span>
-                  <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold">
-                    ${escapeHtml(typeBadgeText)}
-                  </span>
-                  ${
-                    q.secondarySkill
-                      ? `<span class="px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold" title="Secondary / Hybrid Reading Skill">
-                          + ${escapeHtml(q.secondarySkill)}
-                        </span>`
-                      : ""
-                  }
-                  <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-xs font-medium">
-                    ${escapeHtml(q.topic)}
-                  </span>
-                  <span class="text-xs text-slate-500 font-semibold">[${q.marks || 1} mark${(q.marks || 1) > 1 ? "s" : ""}]</span>
-                </div>
-
-                <div class="flex items-center gap-2">
-                  ${statusBadgeHtml}
-                  <button type="button"
-                    data-action="toggle-bookmark"
-                    data-qid="${escapeHtml(q.id)}"
-                    class="px-2.5 py-1 rounded-lg border text-xs font-bold transition ${
-                      isBookmarked
-                        ? "bg-amber-100 text-amber-800 border-amber-300"
-                        : "bg-white text-slate-400 border-slate-200 hover:text-amber-600"
-                    }"
-                    title="Bookmark this question for review">
-                    ★ ${isBookmarked ? uiText("Saved", "已收藏") : uiText("Save", "收藏")}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Split / Stacked Body: Specific Paragraph Excerpt + Question Interaction -->
-              <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
-                <!-- Left 5 Cols: Specific Paragraph Excerpt -->
-                <div class="lg:col-span-5 bg-amber-50/40 border border-amber-200/80 rounded-xl p-4 flex flex-col justify-between">
-                  <div>
-                    <div class="flex items-center justify-between gap-2 pb-2 mb-2.5 border-b border-amber-200/60">
-                      <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800 block">
-                          ${uiText("📖 Target Reading Excerpt", "📖 Target Reading Excerpt • 對應段落原文")}
-                        </span>
-                        <h4 class="text-xs sm:text-sm font-bold text-slate-900">${escapeHtml(q.passageTitle)}</h4>
-                      </div>
-                      <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 text-xs font-bold shrink-0">
-                        ${escapeHtml(q.paraRef)}
-                      </span>
-                    </div>
-                    <p class="text-xs sm:text-sm text-slate-800 leading-relaxed font-normal">
-                      ${highlightedExcerpt}
-                    </p>
-                  </div>
-                  <div class="mt-3 pt-2 border-t border-amber-200/50 flex items-center justify-between text-[11px] text-amber-800 font-medium">
-                    <span>${
-                      showExp || showHint
-                        ? uiText("★ Yellow highlight shows the key evidence in passage", "★ 黃色高亮標示原文關鍵線索句")
-                        : uiText("💡 Click 'Hint' or 'Check Answer' to highlight evidence", "💡 點擊「提示」或「核對答案」高亮原文關鍵句")
-                    }</span>
-                  </div>
-                </div>
-
-                <!-- Right 7 Cols: Question Stem, Formatted Options, Answer Input & Bilingual Explanation -->
-                <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
-                  <div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-indigo-600 mb-1">
-                      ${uiText("Question Prompt", "Question Prompt • 題目要求")}
-                    </div>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900 leading-snug whitespace-pre-line">
-                      ${escapeHtml(displayPromptText)}
-                    </h3>
-
-                    ${formattedOptionsBlockHtml}
-
-                    ${inputHtml}
-                  </div>
-
-                  <!-- Action Buttons -->
-                  <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <button type="button"
-                        data-action="check-answer"
-                        data-qid="${escapeHtml(q.id)}"
-                        class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold hover:from-indigo-700 hover:to-violet-700 shadow-sm transition">
-                        ✓ ${uiText("Check Answer", "Check Answer (核對答案)")}
-                      </button>
-                      <button type="button"
-                        data-action="toggle-hint"
-                        data-qid="${escapeHtml(q.id)}"
-                        class="px-3 py-2 rounded-xl border text-xs font-bold transition ${
-                          showHint
-                            ? "bg-amber-100 text-amber-900 border-amber-300"
-                            : "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
-                        }">
-                        💡 ${showHint ? uiText("Hide Clue", "隱藏線索") : uiText("Clue Locator", "原文線索提示")}
-                      </button>
-                      <button type="button"
-                        data-action="toggle-explanation"
-                        data-qid="${escapeHtml(q.id)}"
-                        class="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition">
-                        ${
-                          showExp
-                            ? uiText("Hide Explanation", "Hide Explanation (隱藏詳解)")
-                            : uiText("Show Explanation", "Show Explanation (查看詳解)")
-                        }
-                      </button>
-                    </div>
-
-                    <button type="button"
-                      data-action="retry-question"
-                      data-qid="${escapeHtml(q.id)}"
-                      class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-rose-50 transition">
-                      ${uiText("Clear / Retry", "重做此題")}
-                    </button>
-                  </div>
-
-                  <!-- Marking Scheme & Step-by-Step Explanation Panel -->
-                  ${
-                    showExp
-                      ? `
-                    <div class="rounded-xl bg-indigo-50/70 border border-indigo-200 p-4 space-y-3 text-xs sm:text-sm animate-pop">
-                      <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-indigo-200/70">
-                        <span class="font-extrabold text-indigo-950">
-                          ${uiText("Marking Scheme Answer:", "Marking Scheme Answer (評卷參考答案):")}
-                        </span>
-                        <span class="px-2.5 py-1 rounded-lg bg-white text-indigo-900 font-mono font-bold border border-indigo-200">
-                          ${escapeHtml(officialAnswerDisplay)}
-                        </span>
-                      </div>
-
-                      ${
-                        q.inputFormat === "cloze" && q.blanks
-                          ? `
-                        <div class="space-y-1.5 bg-white/80 rounded-lg p-3 border border-indigo-100">
-                          <div class="font-bold text-slate-800 text-xs">${uiText("Per-Blank Breakdown:", "Per-Blank Breakdown (逐空詳解):")}</div>
-                          ${q.blanks
-                            .map(
-                              (b) => `
-                            <div class="text-xs text-slate-700">
-                              <span class="font-semibold text-indigo-800">${escapeHtml(b.expEn)}</span>
-                              ${
-                                state.langMode === "bilingual" && b.expZh
-                                  ? `<div class="text-slate-800 mt-0.5">${escapeHtml(b.expZh)}</div>`
-                                  : ""
-                              }
-                            </div>
-                          `
-                            )
-                            .join("")}
-                        </div>
-                      `
-                          : ""
-                      }
-
-                      <div class="space-y-1.5">
-                        <div class="font-bold text-slate-900">Step-by-Step Explanation:</div>
-                        <p class="text-slate-700 leading-relaxed">${escapeHtml(q.explanationEn)}</p>
-                      </div>
-
-                      ${
-                        state.langMode === "bilingual" && q.explanationZh
-                          ? `
-                        <div class="pt-2 border-t border-indigo-200/60 space-y-1">
-                          <div class="font-bold text-indigo-950">繁體中文解題分析：</div>
-                          <p class="text-slate-800 leading-relaxed">${escapeHtml(q.explanationZh)}</p>
-                        </div>
-                      `
-                          : ""
-                      }
-                    </div>
-                  `
-                      : ""
-                  }
-                </div>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
+      container.innerHTML = cardsHtml;
     }
 
     // =========================================================================
@@ -37197,7 +37302,8 @@
       const byType = {};
       const byTopic = {};
 
-      state.questions.forEach((q) => {
+      for (let i = 0; i < state.questions.length; i++) {
+        const q = state.questions[i];
         if (!byType[q.questionType]) byType[q.questionType] = { total: 0, attempted: 0, correct: 0 };
         if (!byTopic[q.topic]) byTopic[q.topic] = { total: 0, attempted: 0, correct: 0 };
 
@@ -37215,7 +37321,7 @@
             byTopic[q.topic].correct++;
           }
         }
-      });
+      }
 
       const overallAcc = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
       document.getElementById("statAttempted").textContent = `${attempted} / ${totalQ}`;
@@ -37303,11 +37409,7 @@
       const total = state.questions.length;
       document.getElementById("inventoryTotalBadge").textContent = `${total} Questions`;
 
-      const counts = {};
-      state.questions.forEach((q) => {
-        counts[q.questionType] = (counts[q.questionType] || 0) + 1;
-      });
-
+      const counts = state.cachedCounts.byType || {};
       const breakdownEl = document.getElementById("inventoryBreakdown");
       breakdownEl.innerHTML = Object.keys(counts)
         .map(
@@ -37326,6 +37428,7 @@
     function setupEventListeners() {
       // Language toggle (EN + 繁中 vs EN Only)
       document.getElementById("langBtnBilingual").addEventListener("click", () => {
+        if (state.langMode === "bilingual") return;
         state.langMode = "bilingual";
         document.getElementById("langBtnBilingual").className =
           "px-2 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition text-center";
@@ -37336,6 +37439,7 @@
       });
 
       document.getElementById("langBtnEn").addEventListener("click", () => {
+        if (state.langMode === "en") return;
         state.langMode = "en";
         document.getElementById("langBtnEn").className =
           "px-2 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition text-center";
@@ -37350,10 +37454,15 @@
         if (state.mode === "analytics" || state.mode === "manager") {
           state.mode = "by-type";
         }
-        const pool = getFilteredQuestions().filter((q) => !state.userProgress[q.id]?.checked);
-        const candidates = pool.length > 0 ? pool : getFilteredQuestions();
+        const allFiltered = getFilteredQuestions();
+        const pool = allFiltered.filter((q) => !state.userProgress[q.id]?.checked);
+        const candidates = pool.length > 0 ? pool : allFiltered;
         if (candidates.length === 0) return;
         const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        const chosenIdx = allFiltered.findIndex((q) => q.id === chosen.id);
+        if (chosenIdx >= state.visibleLimit) {
+          state.visibleLimit = Math.min(allFiltered.length, chosenIdx + 5);
+        }
         renderModeTabs();
         const cardEl = document.getElementById(`qcard-${chosen.id}`);
         if (cardEl) {
@@ -37421,6 +37530,7 @@
           const targetMode = btn.getAttribute("data-mode");
           state.mode = targetMode;
           state.selectedPrimaryPill = "ALL";
+          state.visibleLimit = PAGE_SIZE;
           renderModeTabs();
           closeMobileNav();
         });
@@ -37431,43 +37541,56 @@
         const pillBtn = e.target.closest(".primary-pill");
         if (!pillBtn) return;
         state.selectedPrimaryPill = pillBtn.getAttribute("data-pill") || "ALL";
+        state.visibleLimit = PAGE_SIZE;
         renderPracticeWorkspace();
       });
 
       // Secondary filters
       document.getElementById("filterPart").addEventListener("change", (e) => {
         state.filterPart = e.target.value;
+        state.visibleLimit = PAGE_SIZE;
         renderPracticeWorkspace();
       });
 
       document.getElementById("filterLevel").addEventListener("change", (e) => {
         state.filterLevel = e.target.value;
+        state.visibleLimit = PAGE_SIZE;
         renderPracticeWorkspace();
       });
 
       document.getElementById("filterStatus").addEventListener("change", (e) => {
         state.filterStatus = e.target.value;
+        state.visibleLimit = PAGE_SIZE;
         renderPracticeWorkspace();
       });
 
+      // Debounced search input so typing never lags
       const searchInput = document.getElementById("searchKeyword");
       const clearSearchBtn = document.getElementById("btnClearSearch");
+      let searchDebounceTimer = null;
       searchInput.addEventListener("input", (e) => {
-        state.searchKeyword = e.target.value;
-        clearSearchBtn.classList.toggle("hidden", !state.searchKeyword);
-        renderPracticeWorkspace();
+        const val = e.target.value;
+        clearSearchBtn.classList.toggle("hidden", !val);
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+          state.searchKeyword = val;
+          state.visibleLimit = PAGE_SIZE;
+          renderPracticeWorkspace();
+        }, 160);
       });
 
       clearSearchBtn.addEventListener("click", () => {
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
         state.searchKeyword = "";
+        state.visibleLimit = PAGE_SIZE;
         searchInput.value = "";
         clearSearchBtn.classList.add("hidden");
         renderPracticeWorkspace();
       });
 
-      // Check All Answered & Show All Explanations
+      // Check All Answered & Show All Explanations (applies to currently rendered cards)
       document.getElementById("btnCheckAllVisible").addEventListener("click", () => {
-        const visible = getFilteredQuestions();
+        const visible = getFilteredQuestions().slice(0, state.visibleLimit);
         let checkedCount = 0;
         visible.forEach((q) => {
           const prog = state.userProgress[q.id];
@@ -37493,7 +37616,7 @@
       });
 
       document.getElementById("btnRevealAllVisible").addEventListener("click", () => {
-        const visible = getFilteredQuestions();
+        const visible = getFilteredQuestions().slice(0, state.visibleLimit);
         visible.forEach((q) => {
           if (!state.userProgress[q.id]) state.userProgress[q.id] = {};
           state.userProgress[q.id].showExplanation = true;
@@ -37508,7 +37631,31 @@
       if (btnToggleFilterBar) {
         btnToggleFilterBar.addEventListener("click", () => {
           state.filterBarCollapsed = !state.filterBarCollapsed;
-          renderPracticeWorkspace();
+          const collapsibleEl = document.getElementById("filterBarCollapsible");
+          const toggleText = document.getElementById("toggleFilterBarText");
+          const toggleIcon = document.getElementById("toggleFilterBarIcon");
+          const collapsedSummary = document.getElementById("collapsedFilterSummary");
+          if (collapsibleEl && toggleText && toggleIcon && collapsedSummary) {
+            if (state.filterBarCollapsed) {
+              collapsibleEl.classList.add("hidden");
+              btnToggleFilterBar.setAttribute("aria-expanded", "false");
+              toggleText.textContent = uiText("Show Filters", "Show Filters (展開篩選)");
+              toggleIcon.classList.add("rotate-180");
+              const filteredLen = getFilteredQuestions().length;
+              const activePillLabel = state.selectedPrimaryPill === "ALL" ? uiText("All", "全部") : state.selectedPrimaryPill;
+              collapsedSummary.textContent = uiText(
+                `${activePillLabel} • ${filteredLen} Qs`,
+                `${activePillLabel} • 共 ${filteredLen} 題`
+              );
+              collapsedSummary.classList.remove("hidden");
+            } else {
+              collapsibleEl.classList.remove("hidden");
+              btnToggleFilterBar.setAttribute("aria-expanded", "true");
+              toggleText.textContent = uiText("Hide Filters", "Hide Filters (收起篩選)");
+              toggleIcon.classList.remove("rotate-180");
+              collapsedSummary.classList.add("hidden");
+            }
+          }
         });
       }
 
@@ -37545,10 +37692,10 @@
         document.getElementById("btnToggleTimer").textContent = "Start";
       });
 
-      // Question Cards Interaction Delegation
+      // Question Cards Interaction Delegation (with surgical single-card DOM updates!)
       const qContainer = document.getElementById("questionsContainer");
 
-      // Handle Multiple-Choice and Cloze <select> dropdown changes
+      // Handle Multiple-Choice and Cloze <select> dropdown changes without re-rendering the whole list
       qContainer.addEventListener("change", (e) => {
         const mcSelect = e.target.closest("select[data-action='select-mc']");
         if (mcSelect) {
@@ -37558,7 +37705,7 @@
           state.userProgress[qid].userValue = mcSelect.value;
           state.userProgress[qid].checked = false;
           saveProgressToStorage();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
           return;
         }
         const clozeSelect = e.target.closest("select[data-action='input-cloze']");
@@ -37574,7 +37721,7 @@
           prog.userValue[blankKey] = clozeSelect.value;
           prog.checked = false;
           saveProgressToStorage();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
         }
       });
 
@@ -37586,6 +37733,7 @@
           state.filterLevel = "ALL";
           state.filterStatus = "ALL";
           state.searchKeyword = "";
+          state.visibleLimit = PAGE_SIZE;
           document.getElementById("filterPart").value = "ALL";
           document.getElementById("filterLevel").value = "ALL";
           document.getElementById("filterStatus").value = "ALL";
@@ -37598,8 +37746,20 @@
         if (!actionEl || actionEl.tagName === "SELECT" || actionEl.tagName === "INPUT") return;
 
         const action = actionEl.getAttribute("data-action");
+
+        if (action === "load-more-questions") {
+          state.visibleLimit += PAGE_SIZE;
+          renderPracticeWorkspace();
+          return;
+        }
+        if (action === "load-all-questions") {
+          state.visibleLimit = state.questions.length;
+          renderPracticeWorkspace();
+          return;
+        }
+
         const qid = actionEl.getAttribute("data-qid");
-        const q = state.questions.find((item) => item.id === qid);
+        const q = state.questionMap.get(qid);
         if (!q) return;
 
         if (!state.userProgress[qid]) {
@@ -37616,7 +37776,7 @@
           prog.userValue[subId] = val;
           prog.checked = false;
           saveProgressToStorage();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
         } else if (action === "check-answer") {
           const evalRes = evaluateQuestion(q, prog);
           prog.checked = true;
@@ -37631,7 +37791,7 @@
           }
           saveProgressToStorage();
           updateHeaderStats();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
           showToast(
             evalRes.isCorrect
               ? uiText(
@@ -37646,7 +37806,7 @@
         } else if (action === "toggle-hint") {
           prog.showHint = !prog.showHint;
           saveProgressToStorage();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
           if (prog.showHint) {
             showToast(
               uiText(
@@ -37658,16 +37818,16 @@
         } else if (action === "toggle-explanation") {
           prog.showExplanation = !prog.showExplanation;
           saveProgressToStorage();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
         } else if (action === "retry-question") {
           delete state.userProgress[qid];
           saveProgressToStorage();
           updateHeaderStats();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
         } else if (action === "toggle-bookmark") {
           prog.bookmarked = !prog.bookmarked;
           saveProgressToStorage();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
           showToast(
             prog.bookmarked
               ? uiText("★ Saved to Bookmarked Questions", "★ 已加入收藏題目")
@@ -37706,7 +37866,7 @@
           const inputEl = e.target;
           const qid = inputEl.getAttribute("data-qid");
           if (!qid) return;
-          const q = state.questions.find((item) => item.id === qid);
+          const q = state.questionMap.get(qid);
           if (!q) return;
           if (!state.userProgress[qid]) state.userProgress[qid] = {};
           const prog = state.userProgress[qid];
@@ -37723,7 +37883,7 @@
           }
           saveProgressToStorage();
           updateHeaderStats();
-          renderPracticeWorkspace();
+          updateSingleQuestionCard(qid);
         }
       });
 
@@ -37733,6 +37893,7 @@
         if (typeBtn) {
           state.mode = "by-type";
           state.selectedPrimaryPill = typeBtn.getAttribute("data-type") || "ALL";
+          state.visibleLimit = PAGE_SIZE;
           renderModeTabs();
           return;
         }
@@ -37740,6 +37901,7 @@
         if (topicBtn) {
           state.mode = "by-topic";
           state.selectedPrimaryPill = topicBtn.getAttribute("data-topic") || "ALL";
+          state.visibleLimit = PAGE_SIZE;
           renderModeTabs();
         }
       });
@@ -37791,7 +37953,9 @@
           explanationZh
         };
 
+        state.customQuestions.unshift(newQuestion);
         state.questions.unshift(newQuestion);
+        rebuildQuestionIndex();
         saveQuestionsToStorage();
         updateHeaderStats();
         renderManagerInventory();
@@ -37844,7 +38008,7 @@
           let added = 0;
           list.forEach((item, idx) => {
             if (item && item.prompt && item.excerpt) {
-              state.questions.unshift({
+              const qObj = {
                 id: item.id || `batch-${Date.now()}-${idx}`,
                 year: String(item.year || "2024"),
                 part: item.part || "Part A",
@@ -37868,10 +38032,13 @@
                 evidenceQuote: item.evidenceQuote || "",
                 explanationEn: item.explanationEn || "",
                 explanationZh: item.explanationZh || ""
-              });
+              };
+              state.customQuestions.unshift(qObj);
+              state.questions.unshift(qObj);
               added++;
             }
           });
+          rebuildQuestionIndex();
           saveQuestionsToStorage();
           updateHeaderStats();
           renderManagerInventory();
@@ -37977,6 +38144,5 @@
       renderModeTabs();
     });
   </script>
-<script src="../../site-version.js?v=934660f"></script>
 </body>
 </html>
