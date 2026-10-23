@@ -290,7 +290,7 @@ details.format-section[data-section="skeleton"] > summary {
 }
 
 /* One Expand All / Collapse All chip — same pill on every accordion page.
-   44px tall so the touch target meets the minimum. */
+   32px tall so the chip sits lighter above the accordion. */
 .section-toggle {
   display: flex;
   flex-wrap: wrap;
@@ -302,9 +302,9 @@ details.format-section[data-section="skeleton"] > summary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  min-height: 44px;
-  padding: 0 10px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1.5px solid var(--accent);
   background: var(--card);
