@@ -547,6 +547,14 @@
         height: 100dvh;
         overflow: hidden;
       }
+      /* The shared site footer is flex: 1 0 100% so it wraps under a row
+         on other pages. This body is a column locked to the window, so
+         that basis is the full window height and flex-shrink: 0. The
+         floor row then shrinks to 0 and the desk cards clip. Size the
+         footer to its line so the floor keeps the rest of the window. */
+      body > footer.site-version-footer {
+        flex: 0 0 auto;
+      }
       #studioWorkspace {
         align-items: stretch;
         min-height: 0;
