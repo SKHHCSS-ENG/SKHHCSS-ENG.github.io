@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<!-- cache 20261023c -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="/learning-materials/paper-2-exam-skills/">
 <script>
 /* Old Formats bookmarks on this page now live on Writing Formats. */
 (function () {
   var raw = location.hash || '';
-  if (raw.length < 2) return;
   var dest = {
     '#formats': '#formats-h',
     '#formats-h': '#formats-h',
@@ -17,276 +16,17 @@
     '#g-school': '#g-school',
     '#g-speech': '#g-speech'
   }[raw.toLowerCase()];
-  if (!dest) return;
-  location.replace('/learning-materials/paper-2-writing-formats/' + location.search + dest);
+  if (dest) {
+    location.replace('/learning-materials/paper-2-writing-formats/' + location.search + dest);
+    return;
+  }
+  location.replace("/learning-materials/paper-2-exam-skills/" + location.search + location.hash);
 })();
 </script>
-<title>Paper 2 - Exam Skills · Learning Materials · SKH Holy Carpenter Secondary School</title>
-<meta name="description" content="HKDSE Paper 2 Writing exam skills — paper map, writing skills and exam habits.">
-<link rel="stylesheet" href="styles.css?v=20261023a">
+<meta http-equiv="refresh" content="0; url=/learning-materials/paper-2-exam-skills/">
+<title>Moved · Paper 2 - Exam Skills · SKH Holy Carpenter Secondary School</title>
 </head>
-<body class="tools-page writing-notes">
-  <div class="wrap">
-    <a class="back" href="../">← Back to Learning Materials</a>
-
-    <header class="hero">
-      <div class="hero-accent" aria-hidden="true"></div>
-      <div class="brand">
-        <img src="https://www.hcs.edu.hk/template/app/img/logo.png" width="276" height="58" alt="SKH Holy Carpenter Secondary School logo">
-      </div>
-      <div class="hero-body">
-        <span class="badge">DSE</span>
-        <h1>Paper 2 - Exam Skills</h1>
-        <p class="tip">HKDSE English Language · paper map, writing skills and exam habits</p>
-      </div>
-    </header>
-
-    <div class="section-toggle">
-      <button type="button" class="section-toggle-btn" data-sections="toggle">Expand All</button>
-    </div>
-
-    <details class="format-section hw-wrap" data-section="paper-map" aria-labelledby="map-h">
-      <summary id="map-h">
-        <span class="section-title"><span class="gloss" data-zh="試卷概覽">Paper Map</span></span>
-        <span class="section-chevron" aria-hidden="true"></span>
-      </summary>
-      <div class="section-body">
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="比重與時間">Weighting &amp; time</span></p>
-          <ul>
-            <li>Paper 2 Writing = <strong>25%</strong> of the subject</li>
-            <li><strong>2 hours</strong> for Parts A and B together</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="甲部">Part A</span> (<span class="gloss" data-zh="必考">Compulsory</span>) — 10%</p>
-          <ul>
-            <li>Everyone sits Part A — one short, guided task (~200 words)</li>
-            <li>Cover the given prompts; genres vary (article, email, blog…) — read the task carefully</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="乙部">Part B</span> — choose 1 of 4 questions — 15%</p>
-          <ul>
-            <li>Longer task (~400 words); from 2024: <strong>4</strong> questions (was 8)</li>
-            <li>Choose by topic + <span class="gloss" data-zh="文體／體裁">genre</span> you know — not by “looks easy”</li>
-            <li>Mark your choice with an <strong>X</strong> in the Question-Answer Book (question-number box)</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="評分準則">How you are marked</span></p>
-          <ul>
-            <li><strong><span class="gloss" data-zh="內容">Content</span></strong> — <span class="gloss" data-zh="完成任務／切題">task fulfilled</span>; relevant, developed ideas; <span class="gloss" data-zh="讀者意識">audience awareness</span></li>
-            <li><strong><span class="gloss" data-zh="語言">Language</span></strong> — accurate grammar; varied sentences; vocabulary and tone fit the genre</li>
-            <li><strong><span class="gloss" data-zh="組織結構">Organisation</span></strong> — clear structure; logical paragraphs; <span class="gloss" data-zh="銜接／連貫">cohesion</span> for the text type</li>
-          </ul>
-        </div>
-
-        <div class="part timing-tip">
-          <p class="part-label"><span class="gloss" data-zh="時間分配">Timing</span></p>
-          <ul>
-            <li>One clock for A + B — leave a clear block for Part B</li>
-            <li>Classroom guide (not HKEAA): ~40 min A · ~70–75 min B · leftover for plan / check — plan on the <span class="gloss" data-zh="草稿紙">rough-work sheet</span> only</li>
-          </ul>
-        </div>
-      </div>
-      <canvas class="hw-canvas" data-hw="paper-map" aria-hidden="true"></canvas>
-    </details>
-
-    <details class="format-section hw-wrap" data-section="writing-skills" aria-labelledby="skills-h">
-      <summary id="skills-h">
-        <span class="section-title"><span class="gloss" data-zh="寫作技巧">Writing Skills</span></span>
-        <span class="section-chevron" aria-hidden="true"></span>
-      </summary>
-      <div class="section-body">
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="目的">Purpose</span> · <span class="gloss" data-zh="讀者／對象">Audience</span> · <span class="gloss" data-zh="語氣">Tone</span></p>
-          <ul>
-            <li>Purpose — what must this text do? (<span class="gloss" data-zh="告知">inform</span>, <span class="gloss" data-zh="說服">persuade</span>, <span class="gloss" data-zh="建議">propose</span>, <span class="gloss" data-zh="投訴">complain</span>…)</li>
-            <li>Audience — who reads it? (editor / public, principal, classmates…)</li>
-            <li>Tone / <span class="gloss" data-zh="語域／正式程度">register</span> — formal, semi-formal, or friendly? Stay consistent; match genre features (greeting, headline, sign-off)</li>
-          </ul>
-          <details class="example-fold">
-            <summary>Example</summary>
-            <p>Letter to the SCMP about MTR crowding → persuade + complain; editor / public; formal, calm, evidence-based — not chatty WhatsApp.</p>
-          </details>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="完成任務">Task Fulfilment</span></p>
-          <ul>
-            <li>Underline every requirement (role, reader, points, word guide) — tick them off as you draft</li>
-            <li>Stay on the asked topic; missing a bullet costs Content marks</li>
-            <li>Part A: use the given information; Part B: develop your own ideas with enough support</li>
-          </ul>
-          <details class="example-fold">
-            <summary>Example</summary>
-            <p>Part A asks for three Open Day improvements → three clear, developed points, not one long story.</p>
-          </details>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="構思／計劃">Planning</span></p>
-          <ul>
-            <li>3–5 minutes: purpose / audience / 3–4 main points before writing</li>
-            <li>Decide paragraph order; for Part B, pick the question you can finish well</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="分段">Paragraphing</span></p>
-          <ul>
-            <li>One clear idea per paragraph; <span class="gloss" data-zh="主題句">topic sentence</span> when it helps</li>
-            <li>Short intro → developed body → ending that fits the genre — not one giant block</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="銜接／連貫">Cohesion</span></p>
-          <ul>
-            <li>Precise connectives (however, therefore, in addition) — not and / and / and</li>
-            <li>Pronouns and synonyms for flow; keep tense and viewpoint steady unless the genre shifts</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="得分語言">Language for Marks</span></p>
-          <ul>
-            <li>Clear over showy — HKEAA warns against over-ambitious language that confuses</li>
-            <li>Mix simple and complex sentences; exact topic words beat rare words used wrongly</li>
-            <li>Spelling and punctuation matter when a slip changes meaning</li>
-          </ul>
-        </div>
-      </div>
-      <canvas class="hw-canvas" data-hw="writing-skills" aria-hidden="true"></canvas>
-    </details>
-
-    <details class="format-section hw-wrap" data-section="exam-habits" aria-labelledby="habits-h">
-      <summary id="habits-h">
-        <span class="section-title"><span class="gloss" data-zh="應試習慣">Exam Habits</span></span>
-        <span class="section-chevron" aria-hidden="true"></span>
-      </summary>
-      <div class="section-body">
-        <div class="part timing-tip">
-          <p class="part-label"><span class="gloss" data-zh="乙部選題">Part B choice</span></p>
-          <ul>
-            <li>Choose by topic and genre you practise — not panic-picking in the room</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="動筆前">Before you write</span></p>
-          <ul>
-            <li>A few minutes on ideas + text type + audience before you write</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="清晰度">Clarity</span></p>
-          <ul>
-            <li>Clarity first — no rare words or ultra-long sentences that hide your meaning</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="緊扣任務">Stay on task</span></p>
-          <ul>
-            <li>Every paragraph should earn Content marks</li>
-          </ul>
-        </div>
-
-        <div class="part timing-tip">
-          <p class="part-label"><span class="gloss" data-zh="時間分配">Timing</span></p>
-          <ul>
-            <li>Manage the 2 hours: finish both parts with time to re-read for missing bullets and slips</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="答題簿">Answer book</span></p>
-          <ul>
-            <li>Write on every line where you can; plan on the rough-work sheet, then a clean answer in the book</li>
-            <li>Part B: put an <strong>X</strong> next to the question you chose</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="字數指引">Word guides</span></p>
-          <ul>
-            <li>~200 / ~400 are targets for a full sample — no automatic deduction for going over; empty padding does not help</li>
-          </ul>
-        </div>
-
-        <div class="part">
-          <p class="part-label"><span class="gloss" data-zh="最後檢查">Final check</span></p>
-          <ul>
-            <li>Leave 3–5 minutes: required points? Genre features? Tone? Obvious grammar slips?</li>
-          </ul>
-        </div>
-      </div>
-      <canvas class="hw-canvas" data-hw="exam-habits" aria-hidden="true"></canvas>
-    </details>
-
-    <p class="gloss-key"><strong>中文 gloss</strong>（denser for weaker classes）：<strong>Paper Map</strong> — 試卷概覽 · <strong>Weighting</strong> — 比重 · <strong>Part A</strong> — 甲部 · <strong>Compulsory</strong> — 必考 · <strong>Part B</strong> — 乙部 · <strong>Content</strong> — 內容 · <strong>Language</strong> — 語言 · <strong>Organisation</strong> — 組織結構 · <strong>Timing</strong> — 時間分配 · <strong>Purpose</strong> — 目的 · <strong>Audience</strong> — 讀者／對象 · <strong>Tone</strong> — 語氣 · <strong>register</strong> — 語域／正式程度 · <strong>Task Fulfilment</strong> — 完成任務 · <strong>Planning</strong> — 構思／計劃 · <strong>Paragraphing</strong> — 分段 · <strong>Cohesion</strong> — 銜接／連貫 · <strong>Language for Marks</strong> — 得分語言 · <strong>genre</strong> — 文體／體裁 · <strong>topic sentence</strong> — 主題句 · <strong>rough-work sheet</strong> — 草稿紙 · <strong>Word guides</strong> — 字數指引 · <strong>Final check</strong> — 最後檢查 · <strong>persuade</strong> — 說服 · <strong>complain</strong> — 投訴 · <strong>inform</strong> — 告知 · <strong>propose</strong> — 建議</p>
-
-    <footer>
-      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
-      Learning Materials · Paper 2 - Exam Skills
-    </footer>
-  </div>
-
-  <div class="bottom-dock" id="bottomDock" role="toolbar" aria-label="Tools">
-    <div class="dock-inner" id="dockInner">
-      <div class="dock-chrome">
-        <button type="button" class="dock-chip" id="zhToggle" aria-pressed="false" aria-label="Chinese gloss" title="Chinese gloss">譯</button>
-        <button type="button" class="dock-chip" id="togHandwrite" aria-pressed="false" aria-label="Handwrite" title="Handwrite">✍️</button>
-        <button type="button" class="dock-fold" id="dockFold" aria-expanded="false" aria-controls="dockInner" aria-label="Expand tools" title="Tools">🛠</button>
-      </div>
-      <div class="hw-bar" id="hwBar" aria-label="Handwrite tools" hidden>
-        <div class="hw-row" role="group" aria-label="Handwrite tools">
-          <button type="button" class="hw-chip hw-colour-btn" id="hwColour" title="Ink colour" aria-label="Colour: teal"></button>
-          <button type="button" class="hw-chip tool-on" id="hwPen" aria-pressed="true" aria-label="Pen" title="Pen">✏️</button>
-          <button type="button" class="hw-chip" id="hwHighlight" aria-pressed="false" aria-label="Highlighter" title="Highlighter">🖍</button>
-          <button type="button" class="hw-chip" id="hwEraser" aria-pressed="false" aria-label="Eraser" title="Eraser">🩹</button>
-          <button type="button" class="hw-chip" id="hwUndo" aria-label="Undo" title="Undo" disabled>↶</button>
-          <button type="button" class="hw-chip" id="hwRedo" aria-label="Redo" title="Redo" disabled>↷</button>
-          <button type="button" class="hw-chip danger-chip" id="hwClearAll" aria-label="Clear all" title="Clear all">🗑</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script src="tools-dock.js?v=20261022d"></script>
-  <script>
-  (function () {
-    function hwBump() {
-      if (typeof window.hwResize === 'function') {
-        requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
-      }
-    }
-    function openHash() {
-      var raw = location.hash;
-      if (!raw || raw.length < 2) return;
-      var el;
-      try { el = document.getElementById(decodeURIComponent(raw.slice(1))); }
-      catch (e) { return; }
-      if (!el) return;
-      var node = el;
-      while (node && node !== document.body) {
-        if (node.tagName === 'DETAILS') node.open = true;
-        node = node.parentElement;
-      }
-    }
-    openHash();
-    window.addEventListener('hashchange', openHash);
-    var folds = document.querySelectorAll('details.example-fold');
-    for (var i = 0; i < folds.length; i++) {
-      folds[i].addEventListener('toggle', hwBump);
-    }
-  })();
-  </script>
-<script src="../../site-version.js?v=2ef8042"></script>
+<body>
+<p>This page has moved to <a href="/learning-materials/paper-2-exam-skills/">Paper 2 - Exam Skills</a>.</p>
 </body>
 </html>
