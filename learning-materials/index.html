@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261023b -->
+<!-- cache 20261023c -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -147,6 +147,52 @@
   .hub-section[open] > summary .hub-chevron {
     transform: rotate(-135deg);
     margin-top: 3px;
+  }
+  /* Paper folders sit inside DSE — same summary/chevron as a hub section, indented. */
+  .hub-folders {
+    display: grid;
+    gap: 2px;
+    margin: 2px 0 4px 10px;
+  }
+  .hub-folder { margin: 0; overflow-anchor: none; }
+  .hub-folder > summary.hub-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: 44px;
+    margin: 0;
+    padding: 8px 4px 8px 12px;
+    border-left: 4px solid var(--accent);
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .hub-folder > summary.hub-heading::-webkit-details-marker { display: none; }
+  .hub-folder > summary.hub-heading::marker { content: ""; }
+  .hub-folder > summary.hub-heading:hover { color: var(--accent-ink); }
+  .hub-folder > summary.hub-heading:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .hub-folder[open] > summary .hub-chevron {
+    transform: rotate(-135deg);
+    margin-top: 3px;
+  }
+  .hub-folder > .cards { margin: 0 0 10px 12px; }
+  .coming-soon {
+    margin: 0 0 12px 16px;
+    color: var(--muted);
+    font-size: .9rem;
+    font-weight: 700;
   }
   .cards { display: grid; gap: 14px; margin-top: 0; }
   a.card {
@@ -316,31 +362,71 @@
         <h2 class="hub-heading-text">DSE</h2>
         <span class="hub-chevron" aria-hidden="true"></span>
       </summary>
-      <div class="cards">
-        <a class="card" href="paper-1-reading/">
-          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
-          <h3>Paper 1 - Reading</h3>
-          <p>Study notes overview for HKDSE Paper 1 — paper map, reading skills and exam habits.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-        <a class="card" href="reading-paper-1/">
-          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-desktop">Desktop</span></p>
-          <h3>Paper 1 - Reading (Practice)</h3>
-          <p>Practice and explanations for HKDSE Paper 1 Reading — question types, topics and past papers.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-        <a class="card" href="paper-2-writing/">
-          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
-          <h3>Paper 2 - Writing</h3>
-          <p>Letter to the Editor, Article, Proposal, Report, Speech — formats with PAT, structure, skeleton &amp; Useful Phrases.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-        <a class="card" href="paper-4-speaking/">
-          <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
-          <h3>Paper 4 - Speaking</h3>
-          <p>Paper 4 speaking practice — vocab · patterns for group discussion and individual response.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
+      <div class="hub-folders">
+        <details class="hub-folder">
+          <summary class="hub-heading" id="sec-dse-p1">
+            <h3 class="hub-heading-text">Paper 1 - Reading</h3>
+            <span class="hub-chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="cards">
+            <a class="card" href="paper-1-reading/">
+              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <h3>Paper 1 - Exam Skills</h3>
+              <p>Paper map, reading skills and exam habits.</p>
+              <span class="card-arrow">Open →</span>
+            </a>
+            <a class="card" href="reading-paper-1/">
+              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-desktop">Desktop</span></p>
+              <h3>Paper 1 - Exam Practice</h3>
+              <p>Question types, topics and past papers.</p>
+              <span class="card-arrow">Open →</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="hub-folder">
+          <summary class="hub-heading" id="sec-dse-p2">
+            <h3 class="hub-heading-text">Paper 2 - Writing</h3>
+            <span class="hub-chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="cards">
+            <a class="card" href="paper-2-writing/">
+              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <h3>Paper 2 - Exam Skills</h3>
+              <p>Paper map, writing skills and exam habits.</p>
+              <span class="card-arrow">Open →</span>
+            </a>
+            <a class="card" href="paper-2-writing-formats/">
+              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <h3>Paper 2 - Writing Formats</h3>
+              <p>Letters, magazine and web, school writing, and speech.</p>
+              <span class="card-arrow">Open →</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="hub-folder">
+          <summary class="hub-heading" id="sec-dse-p3">
+            <h3 class="hub-heading-text">Paper 3 - Listening &amp; Integrated Tasks</h3>
+            <span class="hub-chevron" aria-hidden="true"></span>
+          </summary>
+          <p class="coming-soon">Coming soon</p>
+        </details>
+
+        <details class="hub-folder">
+          <summary class="hub-heading" id="sec-dse-p4">
+            <h3 class="hub-heading-text">Paper 4 - Speaking</h3>
+            <span class="hub-chevron" aria-hidden="true"></span>
+          </summary>
+          <div class="cards">
+            <a class="card" href="paper-4-speaking/">
+              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <h3>Paper 4 - Speaking Expressions</h3>
+              <p>Vocab and patterns for group discussion and individual response.</p>
+              <span class="card-arrow">Open →</span>
+            </a>
+          </div>
+        </details>
       </div>
     </details>
 
