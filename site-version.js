@@ -23,8 +23,8 @@
  * to that sha.
  */
 (function () {
-  var sha = "c3b3cc8";
-  var date = "23 Oct 2026";
+  var sha = "4d27b5f";
+  var date = "26 Oct 2026";
   var label = sha + " \u00b7 " + date;
 
   window.SITE_VERSION = {
