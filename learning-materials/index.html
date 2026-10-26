@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261026e -->
+<!-- cache 20261026f -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -286,13 +286,47 @@
     appearance: none;
     -webkit-appearance: none;
   }
+  .mark-glyph {
+    width: 20px;
+    height: 20px;
+    display: block;
+    flex: 0 0 auto;
+    overflow: visible;
+    pointer-events: none;
+  }
+  /* Idle is a light outline. .is-on is the only filled state, so toggling it off clears the glyph. */
+  .card-mark:not(.is-on) {
+    color: #94a3b8;
+    background: transparent;
+  }
+  .card-mark:not(.is-on) .mark-glyph path:not(.mark-fill) {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
   .card-mark-star.is-on {
     color: var(--star);
-    background: var(--star-soft);
+    background: transparent;
+  }
+  .card-mark-star.is-on .mark-glyph path {
+    fill: currentColor;
+    stroke: none;
   }
   .card-mark-tick.is-on {
     color: var(--accent-ink);
     background: var(--accent-soft);
+  }
+  .card-mark-tick.is-on .mark-fill {
+    fill: currentColor;
+    stroke: none;
+  }
+  .card-mark-tick:not(.is-on) .mark-fill,
+  .card-mark-tick.is-on .mark-outline {
+    display: none;
+    fill: none;
+    stroke: none;
   }
   .card-mark:hover { color: var(--navy); }
   .card-mark-star.is-on:hover { color: var(--star); }
@@ -489,6 +523,7 @@
     outline-offset: 2px;
     border-color: var(--accent);
   }
+  /* Filter-only (AND with the content tag). Gold/slate soft-fill — not a content tag. */
   .hub-find-star {
     --pill-ink: var(--star);
     --pill-soft: var(--star-soft);
@@ -496,8 +531,9 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    flex: 0 0 auto;
     min-height: 36px;
-    margin-top: 10px;
+    margin: 0;
     padding: 0 12px;
     border-radius: 999px;
     border: 1.5px solid var(--pill-soft);
@@ -508,6 +544,7 @@
     font-weight: 800;
     line-height: 1;
     letter-spacing: 0;
+    font-variant-emoji: text;
     cursor: pointer;
     white-space: nowrap;
     touch-action: manipulation;
@@ -609,6 +646,7 @@
     <div class="hub-find">
       <div class="hub-find-pills" role="group" aria-label="Filter materials">
         <button type="button" class="hub-find-pill is-on" data-hub-tag="All" aria-pressed="true">All</button>
+        <button type="button" class="hub-find-star" data-hub-star aria-pressed="false">★ Bookmarked</button>
         <button type="button" class="hub-find-pill" data-hub-tag="DSE" aria-pressed="false">DSE</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Junior" aria-pressed="false">Junior</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Competition" aria-pressed="false">Competition</button>
@@ -617,7 +655,6 @@
         <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
       </div>
       <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
-      <button type="button" class="hub-find-star" data-hub-star aria-pressed="false">★ Bookmarked</button>
       <div class="hub-progress">
         <span data-hub-progress>0 of 0 reviewed (0%)</span>
         <button type="button" class="hub-progress-clear">Clear my marks</button>
@@ -970,6 +1007,7 @@
 
     if (pillBox) {
       pillBox.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-hub-star]')) return;
         var btn = e.target.closest ? e.target.closest('[data-hub-tag]') : null;
         if (!btn || !pillBox.contains(btn)) return;
         setTag(btn.getAttribute('data-hub-tag') || 'All');
@@ -1111,6 +1149,32 @@
       document.dispatchEvent(new Event('hub-marks-change'));
     }
 
+    function markIcon(kind) {
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('class', 'mark-glyph');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
+      if (kind === 'star') {
+        var starPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        starPath.setAttribute('d', 'M12 2.2l2.7 5.8 6.3.7-4.7 4.3 1.3 6.2L12 16.2 6.4 19.2l1.3-6.2-4.7-4.3 6.3-.7L12 2.2z');
+        starPath.setAttribute('fill', 'none');
+        svg.appendChild(starPath);
+      } else {
+        var outline = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        outline.setAttribute('class', 'mark-outline');
+        outline.setAttribute('d', 'M5.2 12.6 9.6 17 19 7.4');
+        outline.setAttribute('fill', 'none');
+        var solid = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        solid.setAttribute('class', 'mark-fill');
+        solid.setAttribute('d', 'M5 12.4l1.5-1.5 3.2 3.2 7.8-7.8 1.5 1.5-9.3 9.3z');
+        solid.setAttribute('fill', 'none');
+        svg.appendChild(outline);
+        svg.appendChild(solid);
+      }
+      return svg;
+    }
+
     function bindMark(btn, card, state, cards, which) {
       function toggle(e) {
         halt(e);
@@ -1139,13 +1203,13 @@
       star.className = 'card-mark card-mark-star';
       star.setAttribute('aria-label', 'Bookmarked');
       star.setAttribute('aria-pressed', 'false');
-      star.textContent = '★';
+      star.appendChild(markIcon('star'));
       var tick = document.createElement('button');
       tick.type = 'button';
       tick.className = 'card-mark card-mark-tick';
       tick.setAttribute('aria-label', 'Reviewed');
       tick.setAttribute('aria-pressed', 'false');
-      tick.textContent = '✓';
+      tick.appendChild(markIcon('tick'));
       wrap.appendChild(star);
       wrap.appendChild(tick);
       wrap.addEventListener('click', halt);
