@@ -188,6 +188,14 @@
     margin-top: 3px;
   }
   .hub-folder > .cards { margin: 0 0 10px 12px; }
+  /* WebKit keeps expanded .hub-folders row tracks when Collapse All closes
+     nested folders in the same turn as the DSE section. display:none pulls
+     that grid out of the box tree so reopening DSE lays the closed folders
+     out at summary height. The folder rule covers a section that stays open. */
+  .hub-folder:not([open]) > *:not(summary),
+  .hub-section:not([open]) > *:not(summary) {
+    display: none;
+  }
   .coming-soon {
     margin: 0 0 12px 16px;
     color: var(--muted);
@@ -407,7 +415,7 @@
 
         <details class="hub-folder">
           <summary class="hub-heading" id="sec-dse-p3">
-            <h3 class="hub-heading-text">Paper 3 - Listening &amp; Integrated Tasks</h3>
+            <h3 class="hub-heading-text">Paper 3 - Listening &amp; Integrated Skills</h3>
             <span class="hub-chevron" aria-hidden="true"></span>
           </summary>
           <p class="coming-soon">Coming soon</p>
