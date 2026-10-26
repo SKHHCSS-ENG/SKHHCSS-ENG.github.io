@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261026b -->
+<!-- cache 20261026c -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -25,6 +25,16 @@
     --phone-soft: #e7f6ea;
     --desktop: #3d4570;
     --desktop-soft: #eceef8;
+    --dse: #0c5a70;
+    --dse-soft: #e8f7fb;
+    --junior: #6b430c;
+    --junior-soft: #fff4dc;
+    --competition: #6b2a80;
+    --competition-soft: #f4e6fb;
+    --activity: #8f3d00;
+    --activity-soft: #ffead6;
+    --all-ink: #123a4d;
+    --all-soft: #e8eef2;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -235,15 +245,17 @@
     background: var(--accent-soft);
     color: var(--accent-ink);
   }
-  .badge-phone {
-    background: var(--phone-soft);
-    color: var(--phone);
-  }
-  .badge-desktop {
-    background: var(--desktop-soft);
-    color: var(--desktop);
-  }
+  .badge-dse { background: var(--dse-soft); color: var(--dse); }
+  .badge-junior { background: var(--junior-soft); color: var(--junior); }
+  .badge-competition { background: var(--competition-soft); color: var(--competition); }
+  .badge-activity { background: var(--activity-soft); color: var(--activity); }
+  .badge-phone { background: var(--phone-soft); color: var(--phone); }
+  .badge-desktop { background: var(--desktop-soft); color: var(--desktop); }
   .card .badge { color: var(--accent-ink); background: var(--accent-soft); }
+  .card .badge-dse { color: var(--dse); background: var(--dse-soft); }
+  .card .badge-junior { color: var(--junior); background: var(--junior-soft); }
+  .card .badge-competition { color: var(--competition); background: var(--competition-soft); }
+  .card .badge-activity { color: var(--activity); background: var(--activity-soft); }
   .card .badge-phone { color: var(--phone); background: var(--phone-soft); }
   .card .badge-desktop { color: var(--desktop); background: var(--desktop-soft); }
   .card-kicker .badge + .badge { margin-left: 6px; }
@@ -324,6 +336,8 @@
     max-width: 100%;
   }
   .hub-find-pill {
+    --pill-ink: var(--all-ink);
+    --pill-soft: var(--all-soft);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -331,9 +345,9 @@
     min-height: 36px;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1.5px solid var(--border);
-    background: var(--card);
-    color: var(--accent-ink);
+    border: 1.5px solid var(--pill-soft);
+    background: var(--pill-soft);
+    color: var(--pill-ink);
     font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
     font-size: .8125rem;
     font-weight: 800;
@@ -347,20 +361,27 @@
     user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .hub-find-pill:hover { background: var(--accent-soft); }
+  .hub-find-pill[data-hub-tag="All"] { --pill-ink: var(--all-ink); --pill-soft: var(--all-soft); }
+  .hub-find-pill[data-hub-tag="DSE"] { --pill-ink: var(--dse); --pill-soft: var(--dse-soft); }
+  .hub-find-pill[data-hub-tag="Junior"] { --pill-ink: var(--junior); --pill-soft: var(--junior-soft); }
+  .hub-find-pill[data-hub-tag="Competition"] { --pill-ink: var(--competition); --pill-soft: var(--competition-soft); }
+  .hub-find-pill[data-hub-tag="Activity"] { --pill-ink: var(--activity); --pill-soft: var(--activity-soft); }
+  .hub-find-pill[data-hub-tag="Phone"] { --pill-ink: var(--phone); --pill-soft: var(--phone-soft); }
+  .hub-find-pill[data-hub-tag="Desktop"] { --pill-ink: var(--desktop); --pill-soft: var(--desktop-soft); }
+  .hub-find-pill:hover { border-color: var(--pill-ink); }
   .hub-find-pill.is-on {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent-ink);
+    background: var(--pill-soft);
+    border-color: var(--pill-ink);
+    color: var(--pill-ink);
   }
   .hub-find-pill:focus-visible {
     outline: 3px solid var(--navy);
     outline-offset: 2px;
   }
   .hub-find-pill:active {
-    background: var(--accent-on);
+    background: var(--pill-ink);
     color: #fff;
-    border-color: #0a5561;
+    border-color: var(--pill-ink);
   }
   .hub-find-q {
     display: block;
@@ -428,12 +449,12 @@
     <div class="hub-find">
       <div class="hub-find-pills" role="group" aria-label="Filter materials">
         <button type="button" class="hub-find-pill is-on" data-hub-tag="All" aria-pressed="true">All</button>
-        <button type="button" class="hub-find-pill" data-hub-tag="Phone" aria-pressed="false">Phone</button>
-        <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
         <button type="button" class="hub-find-pill" data-hub-tag="DSE" aria-pressed="false">DSE</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Junior" aria-pressed="false">Junior</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Competition" aria-pressed="false">Competition</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Activity" aria-pressed="false">Activity</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Phone" aria-pressed="false">Phone</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
       </div>
       <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
     </div>
@@ -449,13 +470,13 @@
       </summary>
       <div class="cards">
         <a class="card" href="../speech-festival/">
-          <p class="card-kicker"><span class="badge">Competition</span><span class="badge badge-phone">Phone</span></p>
+          <p class="card-kicker"><span class="badge badge-competition">Competition</span><span class="badge badge-phone">Phone</span></p>
           <h3>Speech Festival</h3>
           <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
           <span class="card-arrow">Open →</span>
         </a>
         <a class="card" href="https://nets.edb.edcity.hk/page.php?p=339" target="_blank" rel="noopener noreferrer">
-          <p class="card-kicker"><span class="badge">Competition</span></p>
+          <p class="card-kicker"><span class="badge badge-competition">Competition</span></p>
           <h3>Speak Up – Act Out Drama Competition</h3>
           <p>NET Section drama competition for secondary schools — devise a short English drama.</p>
           <span class="card-arrow">Open →</span>
@@ -470,7 +491,7 @@
       </summary>
       <div class="cards">
         <a class="card" href="https://nets.edb.edcity.hk/page.php?p=671" target="_blank" rel="noopener noreferrer">
-          <p class="card-kicker"><span class="badge">Activity</span></p>
+          <p class="card-kicker"><span class="badge badge-activity">Activity</span></p>
           <h3>Roaming Mic Challenge</h3>
           <p>NET Section school-wide English speaking challenge — short reels with a shared mic.</p>
           <span class="card-arrow">Open →</span>
@@ -491,13 +512,13 @@
           </summary>
           <div class="cards">
             <a class="card" href="paper-1-exam-skills/">
-              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
               <h3>Paper 1 - Exam Skills</h3>
               <p>Paper map, reading skills and exam habits.</p>
               <span class="card-arrow">Open →</span>
             </a>
             <a class="card" href="paper-1-exam-practice/">
-              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-desktop">Desktop</span></p>
+              <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-desktop">Desktop</span></p>
               <h3>Paper 1 - Exam Practice</h3>
               <p>Question types, topics and past papers.</p>
               <span class="card-arrow">Open →</span>
@@ -512,13 +533,13 @@
           </summary>
           <div class="cards">
             <a class="card" href="paper-2-exam-skills/">
-              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
               <h3>Paper 2 - Exam Skills</h3>
               <p>Paper map, writing skills and exam habits.</p>
               <span class="card-arrow">Open →</span>
             </a>
             <a class="card" href="paper-2-writing-formats/">
-              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
               <h3>Paper 2 - Writing Formats</h3>
               <p>Letters, magazine and web, school writing, and speech.</p>
               <span class="card-arrow">Open →</span>
@@ -541,7 +562,7 @@
           </summary>
           <div class="cards">
             <a class="card" href="paper-4-speaking-expressions/">
-              <p class="card-kicker"><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+              <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
               <h3>Paper 4 - Speaking Expressions</h3>
               <p>Vocab and patterns for group discussion and individual response.</p>
               <span class="card-arrow">Open →</span>
@@ -558,7 +579,7 @@
       </summary>
       <div class="cards">
         <a class="card" href="grammar/">
-          <p class="card-kicker"><span class="badge">Junior</span><span class="badge badge-phone">Phone</span></p>
+          <p class="card-kicker"><span class="badge badge-junior">Junior</span><span class="badge badge-phone">Phone</span></p>
           <h3>Junior Grammar</h3>
           <p>Tenses, passive, reported speech and conditionals for S1–S3.</p>
           <span class="card-arrow">Open →</span>
@@ -573,13 +594,13 @@
       </summary>
       <div class="cards">
         <a class="card" href="useful-vocabulary/">
-          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+          <p class="card-kicker"><span class="badge badge-junior">Junior</span><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Useful Vocabulary</h3>
           <p>Shared vocab banks for DSE writing — Cohesion, Tone &amp; Attitude, spelling, jobs / HK Places, Formality Pairs, Irregular Verbs.</p>
           <span class="card-arrow">Open →</span>
         </a>
         <a class="card" href="sentence-patterns/">
-          <p class="card-kicker"><span class="badge">Junior</span><span class="badge">DSE</span><span class="badge badge-phone">Phone</span></p>
+          <p class="card-kicker"><span class="badge badge-junior">Junior</span><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Sentence Patterns</h3>
           <p>Basic · Building · Exam-Ready frames with Hong Kong examples — pick 2–3 per writing task.</p>
           <span class="card-arrow">Open →</span>
