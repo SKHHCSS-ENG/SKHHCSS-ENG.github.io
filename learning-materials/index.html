@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261026f -->
+<!-- cache 20261027a -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -523,7 +523,7 @@
     outline-offset: 2px;
     border-color: var(--accent);
   }
-  /* Filter-only (AND with the content tag). Gold/slate soft-fill — not a content tag. */
+  /* Filter-only (AND with the content tag). Idle = light outline; .is-on = gold soft-fill. */
   .hub-find-star {
     --pill-ink: var(--star);
     --pill-soft: var(--star-soft);
@@ -537,7 +537,7 @@
     padding: 0 12px;
     border-radius: 999px;
     border: 1.5px solid var(--pill-soft);
-    background: var(--pill-soft);
+    background: var(--card);
     color: var(--pill-ink);
     font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
     font-size: .8125rem;
@@ -551,9 +551,17 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
   }
-  .hub-find-star:hover { border-color: var(--pill-ink); }
-  .hub-find-star.is-on {
+  /* No idle :hover border — sticky tap-hover was leaving a dark outline after unselect. */
+  .hub-find-star:not(.is-on) {
+    background: var(--card);
+    border-color: var(--pill-soft);
+    color: var(--pill-ink);
+  }
+  .hub-find-star.is-on,
+  .hub-find-star[aria-pressed="true"] {
     background: var(--pill-soft);
     border-color: var(--pill-ink);
     color: var(--pill-ink);
