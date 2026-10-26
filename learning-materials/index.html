@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261026c -->
+<!-- cache 20261026e -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -35,8 +35,14 @@
     --activity-soft: #ffead6;
     --all-ink: #123a4d;
     --all-soft: #e8eef2;
+    --star: #6d5a2b;
+    --star-soft: #f3ead2;
+    --reviewed-soft: #eef6f8;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html {
+    scroll-padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  }
   body {
     margin: 0;
     min-height: 100dvh;
@@ -44,12 +50,13 @@
     color: var(--ink);
     background: var(--bg);
     line-height: 1.5;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    /* Collapsed 🛠 (~52px) and expanded chrome (~88px) plus a gap. */
+    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
   }
   .wrap {
     max-width: 720px;
     margin: 0 auto;
-    padding: calc(24px + env(safe-area-inset-top, 0px)) 18px 48px;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 18px 32px;
   }
   a.back {
     display: inline-block;
@@ -215,6 +222,7 @@
   .cards { display: grid; gap: 14px; margin-top: 0; }
   a.card {
     display: block;
+    position: relative;
     text-decoration: none;
     color: inherit;
     background: var(--card);
@@ -223,7 +231,7 @@
     padding: 18px 18px 16px;
     box-shadow: var(--shadow);
     min-height: 44px;
-    transition: border-color .15s ease, box-shadow .15s ease;
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
   }
   a.card:hover, a.card:focus-visible {
     border-color: var(--accent);
@@ -231,6 +239,68 @@
     box-shadow: 0 6px 20px rgba(91, 186, 213, 0.22);
   }
   a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  a.card.is-reviewed {
+    border-color: var(--accent-ink);
+    background: var(--reviewed-soft);
+  }
+  a.card.is-reviewed:hover, a.card.is-reviewed:focus-visible {
+    border-color: var(--accent-deep);
+    box-shadow: 0 6px 20px rgba(12, 90, 112, 0.16);
+  }
+  a.card.has-marks .card-kicker,
+  a.card.has-marks > h3 {
+    padding-right: 92px;
+  }
+  .card-marks {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+  }
+  .card-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #94a3b8;
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .card-mark-star.is-on {
+    color: var(--star);
+    background: var(--star-soft);
+  }
+  .card-mark-tick.is-on {
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+  }
+  .card-mark:hover { color: var(--navy); }
+  .card-mark-star.is-on:hover { color: var(--star); }
+  .card-mark-tick.is-on:hover { color: var(--accent-ink); }
+  .card-mark:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 2px;
+  }
   .card-kicker {
     margin: 0 0 6px;
   }
@@ -335,6 +405,17 @@
     gap: 8px;
     max-width: 100%;
   }
+  .hub-find-pill,
+  .hub-find-star {
+    scroll-margin-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+  @media (max-width: 639px) {
+    .hub-find-pills {
+      /* 44px 🛠 + 12px dock inset: last wrap (Desktop) stays left of the FAB. */
+      padding-right: calc(56px + env(safe-area-inset-right, 0px));
+      padding-bottom: 4px;
+    }
+  }
   .hub-find-pill {
     --pill-ink: var(--all-ink);
     --pill-soft: var(--all-soft);
@@ -408,6 +489,85 @@
     outline-offset: 2px;
     border-color: var(--accent);
   }
+  .hub-find-star {
+    --pill-ink: var(--star);
+    --pill-soft: var(--star-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 36px;
+    margin-top: 10px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--pill-soft);
+    background: var(--pill-soft);
+    color: var(--pill-ink);
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    font-size: .8125rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hub-find-star:hover { border-color: var(--pill-ink); }
+  .hub-find-star.is-on {
+    background: var(--pill-soft);
+    border-color: var(--pill-ink);
+    color: var(--pill-ink);
+  }
+  .hub-find-star:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 2px;
+  }
+  .hub-find-star:active {
+    background: var(--pill-ink);
+    color: #fff;
+    border-color: var(--pill-ink);
+  }
+  .hub-progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .hub-progress-clear {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    font-size: inherit;
+    font-weight: 700;
+    line-height: 1.3;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hub-progress-clear:hover { color: var(--navy); }
+  .hub-progress-clear:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
   .hub-find + .section-toggle { margin-top: 10px; }
   .hub-miss { display: none !important; }
   footer {
@@ -427,7 +587,7 @@
     a.card { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
     .hub-chevron { display: none; }
-    .section-toggle, .hub-find { display: none !important; }
+    .section-toggle, .hub-find, .card-marks { display: none !important; }
   }
 </style>
 </head>
@@ -457,6 +617,11 @@
         <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
       </div>
       <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
+      <button type="button" class="hub-find-star" data-hub-star aria-pressed="false">★ Bookmarked</button>
+      <div class="hub-progress">
+        <span data-hub-progress>0 of 0 reviewed (0%)</span>
+        <button type="button" class="hub-progress-clear">Clear my marks</button>
+      </div>
     </div>
 
     <div class="section-toggle">
@@ -674,10 +839,12 @@
     if (!root) return;
     var pillBox = root.querySelector('.hub-find-pills');
     var qInput = root.querySelector('.hub-find-q');
+    var starBtn = root.querySelector('[data-hub-star]');
     var pills = pillBox ? pillBox.querySelectorAll('[data-hub-tag]') : [];
     var cards = document.querySelectorAll('.wrap a.card');
     var details = document.querySelectorAll('.wrap details');
     var activeTag = 'All';
+    var starOn = false;
     var timer = null;
 
     function norm(s) {
@@ -756,12 +923,13 @@
     function apply() {
       var tag = activeTag;
       var q = query();
-      var filtering = norm(tag) !== 'all' || q !== '';
+      var filtering = norm(tag) !== 'all' || q !== '' || starOn;
       var i;
 
       for (i = 0; i < cards.length; i++) {
         var card = cards[i];
         var show = cardHasTag(card, tag);
+        if (show && starOn) show = card.classList.contains('is-bookmarked');
         if (show && q) show = cardHaystack(card).indexOf(q) !== -1;
         if (show) card.classList.remove('hub-miss');
         else card.classList.add('hub-miss');
@@ -808,6 +976,20 @@
       });
     }
 
+    if (starBtn) {
+      starBtn.addEventListener('click', function () {
+        starOn = !starOn;
+        if (starOn) starBtn.classList.add('is-on');
+        else starBtn.classList.remove('is-on');
+        starBtn.setAttribute('aria-pressed', starOn ? 'true' : 'false');
+        apply();
+      });
+    }
+
+    document.addEventListener('hub-marks-change', function () {
+      if (starOn) apply();
+    });
+
     if (qInput) {
       qInput.addEventListener('input', function () {
         if (timer) clearTimeout(timer);
@@ -819,7 +1001,194 @@
       });
     }
   })();
+
+  /* Leaf-card ★ Bookmarked + ✓ Reviewed. Persist href ids in localStorage. */
+  (function () {
+    var KEY = 'hcs_eng_progress';
+
+    function leafId(card) {
+      if (!card || card.tagName !== 'A' || !card.classList.contains('card')) return '';
+      var href = card.getAttribute('href');
+      if (href == null) return '';
+      var check = String(href).replace(/^\s+|\s+$/g, '');
+      if (!check || check === '#' || /^javascript:/i.test(check)) return '';
+      return href;
+    }
+
+    function leafCards() {
+      var nodes = document.querySelectorAll('.wrap details a.card');
+      var out = [];
+      for (var i = 0; i < nodes.length; i++) {
+        if (leafId(nodes[i])) out.push(nodes[i]);
+      }
+      return out;
+    }
+
+    function load() {
+      var empty = { completed: [], bookmarked: [] };
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (!raw) return empty;
+        var data = JSON.parse(raw);
+        if (!data || typeof data !== 'object') return empty;
+        return {
+          completed: Array.isArray(data.completed) ? data.completed.map(String) : [],
+          bookmarked: Array.isArray(data.bookmarked) ? data.bookmarked.map(String) : []
+        };
+      } catch (err) {
+        return empty;
+      }
+    }
+
+    function save(state) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify({
+          completed: state.completed,
+          bookmarked: state.bookmarked
+        }));
+      } catch (err) {}
+    }
+
+    function has(list, id) {
+      return list.indexOf(id) !== -1;
+    }
+
+    function flip(list, id) {
+      var i = list.indexOf(id);
+      if (i === -1) list.push(id);
+      else list.splice(i, 1);
+    }
+
+    function halt(e) {
+      if (!e) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+    }
+
+    function stop(e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+
+    function paint(card, state) {
+      var id = leafId(card);
+      var starred = has(state.bookmarked, id);
+      var done = has(state.completed, id);
+      if (starred) card.classList.add('is-bookmarked');
+      else card.classList.remove('is-bookmarked');
+      if (done) card.classList.add('is-reviewed');
+      else card.classList.remove('is-reviewed');
+      var star = card.querySelector('.card-mark-star');
+      var tick = card.querySelector('.card-mark-tick');
+      if (star) {
+        if (starred) star.classList.add('is-on');
+        else star.classList.remove('is-on');
+        star.setAttribute('aria-pressed', starred ? 'true' : 'false');
+      }
+      if (tick) {
+        if (done) tick.classList.add('is-on');
+        else tick.classList.remove('is-on');
+        tick.setAttribute('aria-pressed', done ? 'true' : 'false');
+      }
+    }
+
+    function progressLine(state, cards) {
+      var y = cards.length;
+      var x = 0;
+      for (var i = 0; i < cards.length; i++) {
+        if (has(state.completed, leafId(cards[i]))) x++;
+      }
+      var z = y ? Math.round((x / y) * 100) : 0;
+      return x + ' of ' + y + ' reviewed (' + z + '%)';
+    }
+
+    function renderProgress(state, cards) {
+      var node = document.querySelector('[data-hub-progress]');
+      if (node) node.textContent = progressLine(state, cards);
+    }
+
+    function emit() {
+      document.dispatchEvent(new Event('hub-marks-change'));
+    }
+
+    function bindMark(btn, card, state, cards, which) {
+      function toggle(e) {
+        halt(e);
+        var id = leafId(card);
+        if (!id) return;
+        if (which === 'star') flip(state.bookmarked, id);
+        else flip(state.completed, id);
+        save(state);
+        paint(card, state);
+        renderProgress(state, cards);
+        emit();
+      }
+      btn.addEventListener('click', toggle);
+      btn.addEventListener('pointerdown', stop);
+      btn.addEventListener('pointerup', stop);
+      btn.addEventListener('touchstart', stop, { passive: true });
+      btn.addEventListener('touchend', stop);
+    }
+
+    function inject(card, state, cards) {
+      if (card.querySelector('.card-marks')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'card-marks';
+      var star = document.createElement('button');
+      star.type = 'button';
+      star.className = 'card-mark card-mark-star';
+      star.setAttribute('aria-label', 'Bookmarked');
+      star.setAttribute('aria-pressed', 'false');
+      star.textContent = '★';
+      var tick = document.createElement('button');
+      tick.type = 'button';
+      tick.className = 'card-mark card-mark-tick';
+      tick.setAttribute('aria-label', 'Reviewed');
+      tick.setAttribute('aria-pressed', 'false');
+      tick.textContent = '✓';
+      wrap.appendChild(star);
+      wrap.appendChild(tick);
+      wrap.addEventListener('click', halt);
+      wrap.addEventListener('pointerdown', stop);
+      wrap.addEventListener('pointerup', stop);
+      card.classList.add('has-marks');
+      card.appendChild(wrap);
+      card.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t && t.closest && t.closest('.card-marks')) halt(e);
+      });
+      bindMark(star, card, state, cards, 'star');
+      bindMark(tick, card, state, cards, 'tick');
+    }
+
+    function boot() {
+      var cards = leafCards();
+      var state = load();
+      var i;
+      for (i = 0; i < cards.length; i++) inject(cards[i], state, cards);
+      for (i = 0; i < cards.length; i++) paint(cards[i], state);
+      renderProgress(state, cards);
+
+      var clearBtn = document.querySelector('.hub-progress-clear');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+          state.completed = [];
+          state.bookmarked = [];
+          save(state);
+          for (var c = 0; c < cards.length; c++) paint(cards[c], state);
+          renderProgress(state, cards);
+          emit();
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+  })();
   </script>
-<script src="../site-version.js?v=ea9b4c7"></script>
+<script src="../site-version.js?v=3181b77"></script>
 </body>
 </html>
