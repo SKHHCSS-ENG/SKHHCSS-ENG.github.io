@@ -2672,7 +2672,8 @@
         return audioCtx;
       }
 
-      function playSubtleSound(type) {
+      // longerHold is only for the timer's time-up fanfare. Other cues ignore it.
+      function playSubtleSound(type, longerHold) {
         if (!state.soundEnabled) return;
         const ctx = getAudioContext();
         if (!ctx) return;
@@ -2738,45 +2739,30 @@
             osc.start(now);
             osc.stop(now + 0.04);
           } else if (type === 'fanfare') {
-            // Gentle celebration chord (C5 - E5 - G5 - C6)
+            // Gentle celebration chord (C5 - E5 - G5 - C6).
+            // Picker and Podium keep the short chord: each note stops 0.48s
+            // after it starts, so the last note ends at 0.69s.
+            // Timer time-up holds that same chord. The last note then stops
+            // at 2s, and every oscillator stops itself. The 5-second ticks
+            // are a different cue and stay short.
             const notes = [523.25, 659.25, 783.99, 1046.5];
+            const stagger = 0.07;
+            const tail = 0.48;
+            const hold = longerHold ? (2 - (notes.length - 1) * stagger - tail) : 0;
             notes.forEach(function (freq, idx) {
               const osc = ctx.createOscillator();
               const gain = ctx.createGain();
+              const t = now + idx * stagger;
               osc.type = 'sine';
-              osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-              gain.gain.setValueAtTime(0.001, now + idx * 0.07);
-              gain.gain.linearRampToValueAtTime(0.08, now + idx * 0.07 + 0.02);
-              gain.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.07 + 0.45);
+              osc.frequency.setValueAtTime(freq, t);
+              gain.gain.setValueAtTime(0.001, t);
+              gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
+              if (hold) gain.gain.setValueAtTime(0.08, t + 0.02 + hold);
+              gain.gain.exponentialRampToValueAtTime(0.0008, t + 0.45 + hold);
               osc.connect(gain);
               gain.connect(ctx.destination);
-              osc.start(now + idx * 0.07);
-              osc.stop(now + idx * 0.07 + 0.48);
-            });
-          } else if (type === 'alarm') {
-            // Timer time-up only. Three bell pairs, one shot of about 1.7s,
-            // then each oscillator stops itself. Not looped. The Sound
-            // on/off check above is the same gate as the other cues.
-            const hits = [
-              { t: 0, freq: 830.61 },
-              { t: 0.13, freq: 1244.51 },
-              { t: 0.58, freq: 830.61 },
-              { t: 0.71, freq: 1244.51 },
-              { t: 1.16, freq: 830.61 },
-              { t: 1.29, freq: 1244.51 }
-            ];
-            hits.forEach(function (hit) {
-              const osc = ctx.createOscillator();
-              const gain = ctx.createGain();
-              osc.type = 'sine';
-              osc.frequency.setValueAtTime(hit.freq, now + hit.t);
-              gain.gain.setValueAtTime(0.001, now + hit.t);
-              gain.gain.linearRampToValueAtTime(0.14, now + hit.t + 0.012);
-              gain.gain.exponentialRampToValueAtTime(0.0008, now + hit.t + 0.42);
-              osc.connect(gain);
-              gain.connect(ctx.destination);
-              osc.start(now + hit.t);
-              osc.stop(now + hit.t + 0.44);
+              osc.start(t);
+              osc.stop(t + tail + hold);
             });
           }
         } catch (err) {
@@ -6317,7 +6303,7 @@
               clearInterval(timerIntervalId);
               timerIntervalId = null;
               state.timerRunning = false;
-              playSubtleSound('alarm');
+              playSubtleSound('fanfare', true);
               renderTimerUI();
               showToast('⏰ Classroom Timer Finished!', '🔔');
             }
