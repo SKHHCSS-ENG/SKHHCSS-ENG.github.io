@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261022e -->
+<!-- cache 20261026a -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -7,6 +7,33 @@
 <title>Paper 4 - Speaking Expressions · Learning Materials · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="DSE Paper 4 speaking function banks — group discussion and individual response.">
 <link rel="stylesheet" href="../paper-2-writing/styles.css?v=20261023a">
+<style>
+/* Nested GI / IR folders — reuse format-group, tighten for phone like Junior Grammar. */
+body.speaking-paper-4 details.format-group > .group-body {
+  padding: 10px 10px 2px;
+  border-top: 1px solid var(--border);
+}
+body.speaking-paper-4 details.format-group .format-section:last-child {
+  margin-bottom: 10px;
+}
+/* WebKit keeps expanded row tracks when Collapse All closes nested folders.
+   display:none pulls that content out of the box tree so a closed outer
+   folder lays out at summary height. */
+body.speaking-paper-4 details.format-group:not([open]) > *:not(summary) {
+  display: none;
+}
+body.speaking-paper-4.zh-on details.format-group {
+  overflow: visible;
+}
+@media (min-width: 640px) {
+  body.speaking-paper-4 details.format-group > .group-body {
+    padding: 12px 12px 2px;
+  }
+  body.speaking-paper-4 details.format-group .format-section:last-child {
+    margin-bottom: 12px;
+  }
+}
+</style>
 </head>
 <body class="tools-page speaking-paper-4">
   <div class="wrap">
@@ -26,6 +53,13 @@
     <div class="section-toggle">
       <button type="button" class="section-toggle-btn" data-sections="toggle">Expand All</button>
     </div>
+
+    <details class="format-group" id="group-interaction" data-group="group-interaction">
+      <summary id="gi-h">
+        <span class="group-title">Group Interaction</span>
+        <span class="group-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="group-body">
 
     <!-- 1. Beginning a Discussion (Core) -->
     <details class="format-section hw-wrap" data-section="beginning-discussion" aria-labelledby="begin-h">
@@ -315,6 +349,16 @@
       <canvas class="hw-canvas" data-hw="summing-up" aria-hidden="true"></canvas>
     </details>
 
+      </div>
+    </details>
+
+    <details class="format-group" id="individual-response" data-group="individual-response">
+      <summary id="ir-h">
+        <span class="group-title">Individual Response</span>
+        <span class="group-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="group-body">
+
     <!-- 8. Beginning and Organising a Response (Stretch — collapsed) -->
     <details class="format-section hw-wrap" data-section="beginning-organising-response" aria-labelledby="org-h">
       <summary id="org-h">
@@ -339,6 +383,9 @@
         </div>
       </div>
       <canvas class="hw-canvas" data-hw="beginning-organising-response" aria-hidden="true"></canvas>
+    </details>
+
+      </div>
     </details>
 
     <footer>
