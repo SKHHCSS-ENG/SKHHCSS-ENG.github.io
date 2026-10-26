@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261026a -->
+<!-- cache 20261026b -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -310,6 +310,85 @@
     border-color: #0a5561;
   }
   .wrap > .section-toggle + .hub-section { margin-top: 0; }
+  /* Tag pills + light search — wrap on phone; no horizontal scroll. */
+  .hub-find {
+    margin: 16px 0 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .hub-find-pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+  }
+  .hub-find-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--accent-ink);
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    font-size: .8125rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hub-find-pill:hover { background: var(--accent-soft); }
+  .hub-find-pill.is-on {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  .hub-find-pill:focus-visible {
+    outline: 3px solid var(--navy);
+    outline-offset: 2px;
+  }
+  .hub-find-pill:active {
+    background: var(--accent-on);
+    color: #fff;
+    border-color: #0a5561;
+  }
+  .hub-find-q {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .hub-find-q::placeholder { color: var(--muted); font-weight: 600; }
+  .hub-find-q:focus, .hub-find-q:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    border-color: var(--accent);
+  }
+  .hub-find + .section-toggle { margin-top: 10px; }
+  .hub-miss { display: none !important; }
   footer {
     margin-top: 36px;
     padding-top: 16px;
@@ -327,7 +406,7 @@
     a.card { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
     .hub-chevron { display: none; }
-    .section-toggle { display: none !important; }
+    .section-toggle, .hub-find { display: none !important; }
   }
 </style>
 </head>
@@ -345,6 +424,19 @@
         <p class="subject">English Language</p>
       </div>
     </header>
+
+    <div class="hub-find">
+      <div class="hub-find-pills" role="group" aria-label="Filter materials">
+        <button type="button" class="hub-find-pill is-on" data-hub-tag="All" aria-pressed="true">All</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Phone" aria-pressed="false">Phone</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="DSE" aria-pressed="false">DSE</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Junior" aria-pressed="false">Junior</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Competition" aria-pressed="false">Competition</button>
+        <button type="button" class="hub-find-pill" data-hub-tag="Activity" aria-pressed="false">Activity</button>
+      </div>
+      <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
+    </div>
 
     <div class="section-toggle">
       <button type="button" class="section-toggle-btn" data-sections="toggle">Expand All</button>
@@ -511,7 +603,7 @@
     var collapseBtn = bar.querySelector('[data-sections="collapse"]');
 
     function detailsNodes() {
-      return document.querySelectorAll('.wrap details');
+      return document.querySelectorAll('.wrap details:not(.hub-miss)');
     }
 
     function allOpen() {
@@ -553,6 +645,158 @@
 
     if (expandBtn) expandBtn.addEventListener('click', function () { setAll(true); });
     if (collapseBtn) collapseBtn.addEventListener('click', function () { setAll(false); });
+  })();
+
+  /* Tag pills + search: show matching a.card nodes; open ancestors; hide empty details. */
+  (function () {
+    var root = document.querySelector('.hub-find');
+    if (!root) return;
+    var pillBox = root.querySelector('.hub-find-pills');
+    var qInput = root.querySelector('.hub-find-q');
+    var pills = pillBox ? pillBox.querySelectorAll('[data-hub-tag]') : [];
+    var cards = document.querySelectorAll('.wrap a.card');
+    var details = document.querySelectorAll('.wrap details');
+    var activeTag = 'All';
+    var timer = null;
+
+    function norm(s) {
+      return String(s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    }
+
+    function tagKeys(tag) {
+      var t = norm(tag);
+      if (t === 'activity' || t === 'activities') return ['activity', 'activities'];
+      return [t];
+    }
+
+    function cardBadges(card) {
+      var nodes = card.querySelectorAll('.badge');
+      var out = [];
+      for (var i = 0; i < nodes.length; i++) out.push(norm(nodes[i].textContent));
+      return out;
+    }
+
+    function cardHasTag(card, tag) {
+      if (norm(tag) === 'all') return true;
+      var want = tagKeys(tag);
+      var have = cardBadges(card);
+      for (var i = 0; i < have.length; i++) {
+        for (var j = 0; j < want.length; j++) {
+          if (have[i] === want[j]) return true;
+        }
+      }
+      return false;
+    }
+
+    function cardHaystack(card) {
+      var parts = [];
+      var title = card.querySelector('h3');
+      if (title) parts.push(title.textContent);
+      var badges = card.querySelectorAll('.badge');
+      for (var i = 0; i < badges.length; i++) parts.push(badges[i].textContent);
+      var paras = card.querySelectorAll('p');
+      for (var p = 0; p < paras.length; p++) {
+        if (paras[p].classList.contains('card-kicker')) continue;
+        parts.push(paras[p].textContent);
+      }
+      return norm(parts.join(' '));
+    }
+
+    function presentTagKeys() {
+      var seen = {};
+      for (var i = 0; i < cards.length; i++) {
+        var badges = cardBadges(cards[i]);
+        for (var j = 0; j < badges.length; j++) {
+          if (badges[j] === 'activity' || badges[j] === 'activities') seen.activity = true;
+          else seen[badges[j]] = true;
+        }
+      }
+      return seen;
+    }
+
+    function dropUnusedPills() {
+      var seen = presentTagKeys();
+      for (var i = 0; i < pills.length; i++) {
+        var tag = pills[i].getAttribute('data-hub-tag') || '';
+        if (norm(tag) === 'all') continue;
+        var keys = tagKeys(tag);
+        var ok = false;
+        for (var k = 0; k < keys.length; k++) {
+          if (seen[keys[k]]) { ok = true; break; }
+        }
+        if (!ok) pills[i].hidden = true;
+      }
+    }
+
+    function query() {
+      return qInput ? norm(qInput.value) : '';
+    }
+
+    function apply() {
+      var tag = activeTag;
+      var q = query();
+      var filtering = norm(tag) !== 'all' || q !== '';
+      var i;
+
+      for (i = 0; i < cards.length; i++) {
+        var card = cards[i];
+        var show = cardHasTag(card, tag);
+        if (show && q) show = cardHaystack(card).indexOf(q) !== -1;
+        if (show) card.classList.remove('hub-miss');
+        else card.classList.add('hub-miss');
+      }
+
+      for (i = 0; i < details.length; i++) {
+        var node = details[i];
+        var visible = node.querySelector('a.card:not(.hub-miss)');
+        if (!filtering) {
+          node.classList.remove('hub-miss');
+          if (node.open) node.open = false;
+        } else if (visible) {
+          node.classList.remove('hub-miss');
+          if (!node.open) node.open = true;
+        } else {
+          node.classList.add('hub-miss');
+          if (node.open) node.open = false;
+        }
+      }
+
+      if (typeof window.hwResize === 'function') {
+        requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
+      }
+    }
+
+    function setTag(tag) {
+      activeTag = tag;
+      for (var i = 0; i < pills.length; i++) {
+        var on = (pills[i].getAttribute('data-hub-tag') || '') === tag;
+        if (on) pills[i].classList.add('is-on');
+        else pills[i].classList.remove('is-on');
+        pills[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+      apply();
+    }
+
+    dropUnusedPills();
+
+    if (pillBox) {
+      pillBox.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('[data-hub-tag]') : null;
+        if (!btn || !pillBox.contains(btn)) return;
+        setTag(btn.getAttribute('data-hub-tag') || 'All');
+      });
+    }
+
+    if (qInput) {
+      qInput.addEventListener('input', function () {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(apply, 120);
+      });
+      qInput.addEventListener('search', function () {
+        if (timer) clearTimeout(timer);
+        apply();
+      });
+    }
   })();
   </script>
 <script src="../site-version.js?v=a1d48f4"></script>
