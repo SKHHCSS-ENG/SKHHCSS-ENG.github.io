@@ -14,6 +14,20 @@
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       /* Triangle only. 44px was the vertical Show/Hide word. */
       --side-panels-tab-w: 22px;
+      /* Random Picker. Wider than the old 32rem dialog. The name stage
+         keeps this height after a draw. Only the settled name uses the
+         name size; prompt, buttons, and score chips stay on utilities. */
+      --picker-popup-max: 44rem;
+      --picker-stage-min: 16.5rem;
+      --picker-name-size: clamp(3.5rem, 6.8vw, 5.25rem);
+      /* Timer popover. Wider than the old 20rem panel. Only the digits
+         use the digit size; status, presets, and buttons stay put. */
+      --timer-popup-width: 30rem;
+      --timer-stage-min: 10.5rem;
+      --timer-digits-size: clamp(4.25rem, 9vw, 5.75rem);
+      /* Podium shell stays max-w-4xl. Names and 1st/2nd/3rd only. */
+      --podium-name-size: 1.5rem;
+      --podium-rank-size: 2rem;
     }
     body {
       font-family: var(--font-sans);
@@ -667,16 +681,17 @@
       display: none !important;
     }
     /* Settled draw: the name is the result. No status pill, no map line.
-       Font size is fitted in JS: shrink on one line, then two lines.
-       Ellipsis is only the two-line clamp when the floor still cannot hold it. */
+       Font size is fitted in JS from --picker-name-size: shrink on one
+       line, then two lines. Ellipsis is only the two-line clamp when the
+       floor still cannot hold it. The idle prompt stays on its utilities. */
     #pickerResultTitle.is-result {
       align-self: stretch;
       width: 100%;
       max-width: 100%;
       min-width: 0;
       box-sizing: border-box;
-      font-size: clamp(2.35rem, 11vw, 3.5rem);
-      line-height: 1.2;
+      font-size: var(--picker-name-size);
+      line-height: 1.15;
       letter-spacing: -0.02em;
       overflow: hidden;
       text-overflow: clip;
@@ -694,9 +709,36 @@
       -webkit-line-clamp: 2;
       overflow: hidden;
     }
+    /* Wider dialog than the old max-w-lg. The stage keeps its minimum
+       after a draw so the name has room. A short phone scrolls the shell. */
+    #pickerModal .picker-dialog {
+      width: 100%;
+      max-width: var(--picker-popup-max);
+      max-height: calc(100dvh - 1.5rem);
+      overflow: auto;
+    }
+    #pickerStageBox {
+      min-height: var(--picker-stage-min);
+    }
     #pickerStageBox.is-result {
-      min-height: 0;
-      padding: 1.25rem 1rem 1.1rem;
+      min-height: var(--picker-stage-min);
+      padding: 1.85rem 1.35rem 1.6rem;
+    }
+    /* Timer shell is wider than the old 20rem panel. The time stage is
+       taller. Digits alone use --timer-digits-size. */
+    #timerPopover {
+      width: min(var(--timer-popup-width), calc(100vw - 24px));
+      max-width: calc(100vw - 24px);
+    }
+    #timerCardBox {
+      box-sizing: border-box;
+      min-height: var(--timer-stage-min);
+      padding-top: 1.75rem;
+      padding-bottom: 1.85rem;
+    }
+    #timerBigDisplay {
+      font-size: var(--timer-digits-size);
+      line-height: 1.05;
     }
     /* Classroom Floor Grid Pattern */
     .classroom-floor {
@@ -1488,6 +1530,43 @@
       transform-origin: bottom;
       animation: growUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
+    /* Window size is unchanged. Student and team names, and the place
+       words 1st / 2nd / 3rd, grow. Medals stay at the old label size. */
+    #podiumModal .podium-name {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+      width: 100%;
+      max-width: 100%;
+      margin-bottom: 0.125rem;
+      font-weight: 700;
+      font-size: var(--podium-name-size);
+      line-height: 1.15;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+    #podiumModal .podium-place {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.28rem;
+      max-width: 100%;
+    }
+    #podiumModal .podium-medal {
+      font-size: 0.75rem;
+      line-height: 1;
+    }
+    #podiumModal .podium-rank {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--podium-rank-size);
+      line-height: 1;
+    }
+    @media (min-width: 640px) {
+      #podiumModal .podium-medal { font-size: 0.875rem; }
+    }
     /* Mast: Back stays on the left. Class Activity Studio is the centred
        title. The SKHHCSS badge sits beside that title and is not part of
        the centred string. */
@@ -1829,7 +1908,7 @@
             <!-- Big Timer Readout -->
             <div id="timerCardBox" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl p-4 text-center mb-3 relative overflow-hidden">
               <div id="timerProgressBar" class="absolute bottom-0 left-0 h-1.5 bg-emerald-400 transition-all duration-300" style="width: 100%;"></div>
-              <div id="timerBigDisplay" class="font-mono text-4xl font-extrabold tracking-widest text-amber-300">03:00</div>
+              <div id="timerBigDisplay" class="timer-digits font-mono font-extrabold tracking-widest text-amber-300">03:00</div>
               <div id="timerStatusText" class="text-[11px] uppercase tracking-wider text-indigo-200 mt-1">Ready to start</div>
             </div>
 
@@ -2319,7 +2398,7 @@
   <!-- MODAL 3: RANDOM STUDENT / GROUP SPOTLIGHT PICKER                      -->
   <!-- ===================================================================== -->
   <div id="pickerModal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
-    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden">
+    <div class="picker-dialog bg-white rounded-3xl shadow-2xl border border-slate-200 w-full">
       <!-- Header -->
       <div class="px-6 py-4 bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 text-slate-950 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -2507,8 +2586,10 @@
       // positions until the teacher reseeds with a Quick Layout button.
       const LAYOUT_PITCH_VERSION = 'desk-148x115-groupLr-8within-36aisle';
       const GRID_SIZE = 20;
+      // Floor zoom. Minus and plus still step by 0.1. Minimum stays 35%.
+      // Ceiling is 200% (was 125%).
       const ZOOM_MIN = 0.35;
-      const ZOOM_MAX = 1.25;
+      const ZOOM_MAX = 2;
 
       // Team Color Palette Definitions
       const TEAM_PALETTES = {
@@ -2591,7 +2672,8 @@
         return audioCtx;
       }
 
-      function playSubtleSound(type) {
+      // longerHold is only for the timer's time-up fanfare. Other cues ignore it.
+      function playSubtleSound(type, longerHold) {
         if (!state.soundEnabled) return;
         const ctx = getAudioContext();
         if (!ctx) return;
@@ -2657,20 +2739,30 @@
             osc.start(now);
             osc.stop(now + 0.04);
           } else if (type === 'fanfare') {
-            // Gentle celebration chord (C5 - E5 - G5 - C6)
+            // Gentle celebration chord (C5 - E5 - G5 - C6).
+            // Picker and Podium keep the short chord: each note stops 0.48s
+            // after it starts, so the last note ends at 0.69s.
+            // Timer time-up holds that same chord. The last note then stops
+            // at 2s, and every oscillator stops itself. The 5-second ticks
+            // are a different cue and stay short.
             const notes = [523.25, 659.25, 783.99, 1046.5];
+            const stagger = 0.07;
+            const tail = 0.48;
+            const hold = longerHold ? (2 - (notes.length - 1) * stagger - tail) : 0;
             notes.forEach(function (freq, idx) {
               const osc = ctx.createOscillator();
               const gain = ctx.createGain();
+              const t = now + idx * stagger;
               osc.type = 'sine';
-              osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-              gain.gain.setValueAtTime(0.001, now + idx * 0.07);
-              gain.gain.linearRampToValueAtTime(0.08, now + idx * 0.07 + 0.02);
-              gain.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.07 + 0.45);
+              osc.frequency.setValueAtTime(freq, t);
+              gain.gain.setValueAtTime(0.001, t);
+              gain.gain.linearRampToValueAtTime(0.08, t + 0.02);
+              if (hold) gain.gain.setValueAtTime(0.08, t + 0.02 + hold);
+              gain.gain.exponentialRampToValueAtTime(0.0008, t + 0.45 + hold);
               osc.connect(gain);
               gain.connect(ctx.destination);
-              osc.start(now + idx * 0.07);
-              osc.stop(now + idx * 0.07 + 0.48);
+              osc.start(t);
+              osc.stop(t + tail + hold);
             });
           }
         } catch (err) {
@@ -6090,7 +6182,14 @@
         });
         const top3St = [sortedSt[1], sortedSt[0], sortedSt[2]]; // 2nd, 1st, 3rd visual layout
         const stHeights = ['h-28', 'h-36', 'h-24'];
-        const stMedals = ['🥈 2nd', '🥇 1st', '🥉 3rd'];
+        const placeMedals = ['🥈', '🥇', '🥉'];
+        const placeLabels = ['2nd', '1st', '3rd'];
+        function podiumPlaceHtml(idx) {
+          return '<span class="podium-place">' +
+            '<span class="podium-medal" aria-hidden="true">' + placeMedals[idx] + '</span>' +
+            '<span class="podium-rank">' + placeLabels[idx] + '</span>' +
+          '</span>';
+        }
         const stGradients = [
           'from-slate-400 to-slate-600',
           'from-amber-300 via-amber-400 to-orange-500 text-slate-950',
@@ -6102,10 +6201,10 @@
           stContainer.innerHTML = top3St.map(function (st, idx) {
             if (!st) return '<div class="flex-1"></div>';
             return '<div class="flex-1 flex flex-col items-center text-center">' +
-              '<div class="text-xs font-bold text-white truncate max-w-[115px] mb-0.5">' + escapeHtml(st.name) + '</div>' +
+              '<div class="podium-name text-white">' + escapeHtml(st.name) + '</div>' +
               '<div class="text-[11px] font-mono text-amber-300 mb-2">' + st.score + ' pts</div>' +
               '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-between p-2.5 shadow-lg">' +
-                '<span class="font-display font-extrabold text-xs sm:text-sm">' + stMedals[idx] + '</span>' +
+                podiumPlaceHtml(idx) +
                 (formatClassNoMark(st.classNo) ? '<span class="text-[10px] opacity-80 font-mono">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
               '</div>' +
             '</div>';
@@ -6123,10 +6222,10 @@
             if (!grp) return '<div class="flex-1"></div>';
             return '<div class="flex-1 flex flex-col items-center text-center">' +
               '<div class="text-lg mb-0.5">' + escapeHtml(grp.icon) + '</div>' +
-              '<div class="group-name-label text-xs font-bold text-white max-w-[115px] mb-0.5">' + escapeHtml(grp.name) + '</div>' +
+              '<div class="group-name-label podium-name text-white">' + escapeHtml(grp.name) + '</div>' +
               '<div class="text-[11px] font-mono text-emerald-300 mb-2">' + grp.score + ' team pts</div>' +
               '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-center p-2.5 shadow-lg">' +
-                '<span class="font-display font-extrabold text-xs sm:text-sm">' + stMedals[idx] + '</span>' +
+                podiumPlaceHtml(idx) +
               '</div>' +
             '</div>';
           }).join('');
@@ -6162,7 +6261,7 @@
         }
         if (bigDisp) {
           bigDisp.textContent = formatted;
-          bigDisp.className = 'font-mono text-4xl font-extrabold tracking-widest ' + (state.timerRemainingSec <= 15 && state.timerRemainingSec > 0 ? 'text-rose-400 animate-pulse' : 'text-amber-300');
+          bigDisp.className = 'timer-digits font-mono font-extrabold tracking-widest ' + (state.timerRemainingSec <= 15 && state.timerRemainingSec > 0 ? 'text-rose-400 animate-pulse' : 'text-amber-300');
         }
         if (statusText) {
           statusText.textContent = state.timerRunning ? 'Timer Running...' : (state.timerRemainingSec === 0 ? 'Time is up!' : 'Paused / Ready');
@@ -6204,7 +6303,7 @@
               clearInterval(timerIntervalId);
               timerIntervalId = null;
               state.timerRunning = false;
-              playSubtleSound('fanfare');
+              playSubtleSound('fanfare', true);
               renderTimerUI();
               showToast('⏰ Classroom Timer Finished!', '🔔');
             }
@@ -7080,7 +7179,7 @@
           const pop = document.getElementById('timerPopover');
           if (!btn || !pop || pop.classList.contains('hidden')) return;
           const rect = btn.getBoundingClientRect();
-          const popW = Math.min(320, window.innerWidth - 24);
+          const popW = Math.min(pop.offsetWidth || 320, window.innerWidth - 24);
           const popH = pop.offsetHeight || 340;
           let left = rect.right - popW;
           if (left < 12) left = 12;
