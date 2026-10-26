@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261027a -->
+<!-- cache 20261027b -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -664,7 +664,6 @@
       </div>
       <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
       <div class="hub-progress">
-        <span data-hub-progress>0 of 0 reviewed (0%)</span>
         <button type="button" class="hub-progress-clear">Clear my marks</button>
       </div>
     </div>
@@ -1138,21 +1137,6 @@
       }
     }
 
-    function progressLine(state, cards) {
-      var y = cards.length;
-      var x = 0;
-      for (var i = 0; i < cards.length; i++) {
-        if (has(state.completed, leafId(cards[i]))) x++;
-      }
-      var z = y ? Math.round((x / y) * 100) : 0;
-      return x + ' of ' + y + ' reviewed (' + z + '%)';
-    }
-
-    function renderProgress(state, cards) {
-      var node = document.querySelector('[data-hub-progress]');
-      if (node) node.textContent = progressLine(state, cards);
-    }
-
     function emit() {
       document.dispatchEvent(new Event('hub-marks-change'));
     }
@@ -1183,7 +1167,7 @@
       return svg;
     }
 
-    function bindMark(btn, card, state, cards, which) {
+    function bindMark(btn, card, state, which) {
       function toggle(e) {
         halt(e);
         var id = leafId(card);
@@ -1192,7 +1176,6 @@
         else flip(state.completed, id);
         save(state);
         paint(card, state);
-        renderProgress(state, cards);
         emit();
       }
       btn.addEventListener('click', toggle);
@@ -1202,7 +1185,7 @@
       btn.addEventListener('touchend', stop);
     }
 
-    function inject(card, state, cards) {
+    function inject(card, state) {
       if (card.querySelector('.card-marks')) return;
       var wrap = document.createElement('div');
       wrap.className = 'card-marks';
@@ -1229,17 +1212,16 @@
         var t = e.target;
         if (t && t.closest && t.closest('.card-marks')) halt(e);
       });
-      bindMark(star, card, state, cards, 'star');
-      bindMark(tick, card, state, cards, 'tick');
+      bindMark(star, card, state, 'star');
+      bindMark(tick, card, state, 'tick');
     }
 
     function boot() {
       var cards = leafCards();
       var state = load();
       var i;
-      for (i = 0; i < cards.length; i++) inject(cards[i], state, cards);
+      for (i = 0; i < cards.length; i++) inject(cards[i], state);
       for (i = 0; i < cards.length; i++) paint(cards[i], state);
-      renderProgress(state, cards);
 
       var clearBtn = document.querySelector('.hub-progress-clear');
       if (clearBtn) {
@@ -1248,7 +1230,6 @@
           state.bookmarked = [];
           save(state);
           for (var c = 0; c < cards.length; c++) paint(cards[c], state);
-          renderProgress(state, cards);
           emit();
         });
       }
