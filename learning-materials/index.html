@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261027c -->
+<!-- cache 20261027d -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -252,31 +252,31 @@
   }
   a.card.has-marks .card-kicker,
   a.card.has-marks > h3 {
-    padding-right: 76px;
+    padding-right: 54px;
   }
   .card-marks {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 4px;
+    right: 4px;
     display: flex;
     align-items: center;
     gap: 0;
     z-index: 2;
   }
-  .card-mark + .card-mark { margin-left: -10px; }
   .card-mark {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: 12px;
+    border-radius: 8px;
     background: transparent;
     color: #94a3b8;
     font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
@@ -291,9 +291,15 @@
     appearance: none;
     -webkit-appearance: none;
   }
+  /* Layout stays 28px; expand the tap a little without stealing title room. */
+  .card-mark::before {
+    content: "";
+    position: absolute;
+    inset: -6px -2px;
+  }
   .mark-glyph {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     display: block;
     flex: 0 0 auto;
     overflow: visible;
