@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261027b -->
+<!-- cache 20261027c -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -165,11 +165,14 @@
     transform: rotate(-135deg);
     margin-top: 3px;
   }
-  /* Paper folders sit inside DSE — same summary/chevron as a hub section, indented. */
+  /* Paper folders sit inside DSE. One continuous rail with the section bar
+     (no per-row nest rails) so Paper 3 wrap does not stagger the stack. */
+  .hub-section:has(> .hub-folders) > summary.hub-heading { margin-bottom: 0; }
   .hub-folders {
     display: grid;
-    gap: 2px;
-    margin: 2px 0 4px 10px;
+    gap: 0;
+    margin: 0 0 4px;
+    border-left: 4px solid var(--accent-deep);
   }
   .hub-folder { margin: 0; overflow-anchor: none; }
   .hub-folder > summary.hub-heading {
@@ -178,10 +181,10 @@
     justify-content: space-between;
     gap: 12px;
     box-sizing: border-box;
-    min-height: 44px;
+    min-height: 48px;
     margin: 0;
-    padding: 8px 4px 8px 12px;
-    border-left: 4px solid var(--accent);
+    padding: 10px 4px 10px 12px;
+    border-left: 0;
     font-size: 1.02rem;
     font-weight: 800;
     color: var(--navy);
@@ -249,7 +252,7 @@
   }
   a.card.has-marks .card-kicker,
   a.card.has-marks > h3 {
-    padding-right: 92px;
+    padding-right: 76px;
   }
   .card-marks {
     position: absolute;
@@ -257,8 +260,10 @@
     right: 2px;
     display: flex;
     align-items: center;
+    gap: 0;
     z-index: 2;
   }
+  .card-mark + .card-mark { margin-left: -10px; }
   .card-mark {
     display: inline-flex;
     align-items: center;
@@ -369,6 +374,10 @@
     font-weight: 800;
     color: var(--navy);
   }
+  /* Long leaf titles (Roaming Mic Challenge) stay one line; marks keep their column. */
+  a.card.has-marks > h3.card-title-single {
+    white-space: nowrap;
+  }
   .card p {
     margin: 0;
     color: var(--muted);
@@ -385,8 +394,9 @@
      .section-toggle-btn in paper-2-writing/styles.css. */
   .section-toggle {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
     margin: 16px 0 14px;
   }
@@ -575,32 +585,25 @@
     color: #fff;
     border-color: var(--pill-ink);
   }
-  .hub-progress {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 12px;
-    margin-top: 8px;
-    color: var(--muted);
-    font-size: .78rem;
-    font-weight: 700;
-    line-height: 1.3;
-  }
   .hub-progress-clear {
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
-    margin: 0;
-    padding: 0;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin: 0 0 0 auto;
+    padding: 0 2px;
+    min-height: 32px;
     border: 0;
     background: none;
     color: var(--muted);
     font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
-    font-size: inherit;
+    font-size: .78rem;
     font-weight: 700;
     line-height: 1.3;
+    letter-spacing: 0;
     text-decoration: underline;
     text-underline-offset: 2px;
+    white-space: nowrap;
     cursor: pointer;
     touch-action: manipulation;
     -webkit-user-select: none;
@@ -622,6 +625,9 @@
     font-size: .78rem;
     color: var(--muted);
     text-align: center;
+  }
+  @media (max-width: 430px) {
+    a.card.has-marks > h3.card-title-single { font-size: 1.08rem; }
   }
   @media (min-width: 640px) {
     .hub-section { margin-top: 32px; }
@@ -663,13 +669,11 @@
         <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
       </div>
       <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
-      <div class="hub-progress">
-        <button type="button" class="hub-progress-clear">Clear my marks</button>
-      </div>
     </div>
 
     <div class="section-toggle">
       <button type="button" class="section-toggle-btn" data-sections="toggle">Expand All</button>
+      <button type="button" class="hub-progress-clear">Clear my marks</button>
     </div>
 
     <details class="hub-section">
@@ -701,7 +705,7 @@
       <div class="cards">
         <a class="card" href="https://nets.edb.edcity.hk/page.php?p=671" target="_blank" rel="noopener noreferrer">
           <p class="card-kicker"><span class="badge badge-activity">Activity</span></p>
-          <h3>Roaming Mic Challenge</h3>
+          <h3 class="card-title-single">Roaming Mic Challenge</h3>
           <p>NET Section school-wide English speaking challenge — short reels with a shared mic.</p>
           <span class="card-arrow">Open →</span>
         </a>
