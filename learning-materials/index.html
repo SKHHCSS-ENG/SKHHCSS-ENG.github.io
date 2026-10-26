@@ -554,12 +554,12 @@
     appearance: none;
     -webkit-appearance: none;
   }
+  /* No idle :hover border — sticky tap-hover was leaving a dark outline after unselect. */
   .hub-find-star:not(.is-on) {
     background: var(--card);
     border-color: var(--pill-soft);
     color: var(--pill-ink);
   }
-  .hub-find-star:hover { border-color: var(--pill-ink); }
   .hub-find-star.is-on,
   .hub-find-star[aria-pressed="true"] {
     background: var(--pill-soft);
