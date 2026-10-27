@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261027e -->
+<!-- cache 20261027f -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -467,6 +467,7 @@
     max-width: 100%;
     overflow-x: clip;
   }
+  /* Content-sized chips (no flex-grow) so mixed widths pack more per row. */
   .hub-find-pills {
     display: flex;
     flex-wrap: wrap;
@@ -494,16 +495,16 @@
     justify-content: center;
     box-sizing: border-box;
     min-height: 36px;
-    padding: 0 10px;
+    padding: 0 8px;
     border-radius: 999px;
     border: 1.5px solid var(--pill-soft);
     background: var(--pill-soft);
     color: var(--pill-ink);
     font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
-    font-size: .8125rem;
+    font-size: .75rem;
     font-weight: 800;
     line-height: 1;
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
     cursor: pointer;
     white-space: nowrap;
     flex: 0 0 auto;
@@ -570,16 +571,16 @@
     flex: 0 0 auto;
     min-height: 36px;
     margin: 0;
-    padding: 0 10px;
+    padding: 0 8px;
     border-radius: 999px;
     border: 1.5px solid var(--pill-soft);
     background: var(--card);
     color: var(--pill-ink);
     font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
-    font-size: .8125rem;
+    font-size: .75rem;
     font-weight: 800;
     line-height: 1;
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
     font-variant-emoji: text;
     cursor: pointer;
     white-space: nowrap;
