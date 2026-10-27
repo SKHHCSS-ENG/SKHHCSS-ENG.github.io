@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261027f -->
+<!-- cache 20261027g -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -358,9 +358,13 @@
     fill: none;
     stroke: none;
   }
-  .card-mark:hover { color: var(--navy); }
-  .card-mark-star.is-on:hover { color: var(--star); }
-  .card-mark-tick.is-on:hover { color: var(--accent-ink); }
+  /* Navy hover only when the device can hover. Ungated :hover stays sticky
+     after an iPhone tap, so toggle-off ✓ looked darker than never-touched. */
+  @media (hover: hover) {
+    .card-mark:hover { color: var(--navy); }
+    .card-mark-star.is-on:hover { color: var(--star); }
+    .card-mark-tick.is-on:hover { color: var(--accent-ink); }
+  }
   .card-mark:focus-visible {
     outline: 3px solid var(--navy);
     outline-offset: 2px;
