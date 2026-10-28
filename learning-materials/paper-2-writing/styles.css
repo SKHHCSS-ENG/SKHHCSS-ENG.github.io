@@ -1260,6 +1260,19 @@ body.writing-notes.tools-page.dock-open {
   color: var(--ink);
   line-height: 1.45;
 }
+/* Pale amber soft highlight for key phrases (Sentence Patterns examples and
+   Cohesion sample-sheet linkers). Normal weight, square corners.
+   Not a pill — pills on this site mean tappable. */
+mark.cohesion-hl {
+  font-weight: 400;
+  font-style: inherit;
+  color: inherit;
+  background: #fdedad;
+  padding: 0.05em 0.12em;
+  border-radius: 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
 .pattern-tip {
   margin: 0 0 10px;
   padding: 8px 10px;
