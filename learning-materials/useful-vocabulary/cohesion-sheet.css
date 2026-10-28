@@ -128,6 +128,10 @@ body.vocab-hub [data-section="cohesion"] .vocab-example:focus-visible {
   overflow-wrap: break-word;
 }
 
+.example-sheet-text strong {
+  font-weight: 800;
+}
+
 @media (max-width: 420px) {
   .example-sheet-inner {
     border-radius: 14px 14px 0 0;

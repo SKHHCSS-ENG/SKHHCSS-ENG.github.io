@@ -21,6 +21,17 @@
 
   var current = null;
 
+  /* Samples may include <strong> around linker phrases. Escape everything,
+     then put only those tags back so the sheet never grows other markup. */
+  function exampleHtml(raw) {
+    return String(raw)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/&lt;strong&gt;/gi, '<strong>')
+      .replace(/&lt;\/strong&gt;/gi, '</strong>');
+  }
+
   function place() {
     var h = Math.ceil(dock.getBoundingClientRect().height);
     document.documentElement.style.setProperty('--example-dock-h', h + 'px');
@@ -56,7 +67,7 @@
     var li = btn.closest('li');
     if (li) li.classList.add('is-selected');
     labelEl.textContent = (btn.textContent || '').replace(/\s+/g, ' ').trim();
-    textEl.textContent = example;
+    textEl.innerHTML = exampleHtml(example);
     place();
     backdrop.hidden = false;
     sheet.hidden = false;
