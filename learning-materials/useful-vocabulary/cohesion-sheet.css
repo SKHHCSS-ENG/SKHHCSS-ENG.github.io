@@ -1,0 +1,143 @@
+/* Cohesion samples — fixed sheet above the Tools dock.
+   Out of flow: opening it must not move chips or the handwrite canvas.
+   Pill frames stay only on Cohesion chips (the words students can press).
+   Other banks keep the same box (border width + padding) with no visible frame,
+   so saved ink on those sections does not shift. */
+
+body.vocab-hub .vocab-chips li {
+  background: transparent;
+  border-color: transparent;
+}
+
+body.vocab-hub [data-section="cohesion"] .vocab-chips li {
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--navy);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+body.vocab-hub [data-section="cohesion"] .vocab-chips li.is-selected {
+  background: #d4f0f8;
+  border-color: var(--accent-deep);
+}
+
+/* Handwrite on: chips must not take the tap — drawing passes through. */
+body.hw-on [data-section="cohesion"] .vocab-chips li {
+  pointer-events: none;
+  cursor: auto;
+}
+
+/* Span, not button: a real button adds a pixel of line box and shifts saved ink. */
+body.vocab-hub [data-section="cohesion"] .vocab-example:focus {
+  outline: none;
+}
+
+body.vocab-hub [data-section="cohesion"] .vocab-example:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.example-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(18, 58, 77, 0.18);
+  /* Taps pass through to chips (second tap) and the page (backdrop dismiss). */
+  pointer-events: none;
+}
+
+.example-backdrop[hidden] {
+  display: none !important;
+}
+
+.example-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--example-dock-h, 0px);
+  z-index: 90;
+  pointer-events: none;
+  padding: 0;
+}
+
+.example-sheet[hidden] {
+  display: none !important;
+}
+
+.example-sheet-inner {
+  pointer-events: auto;
+  max-width: 820px;
+  margin: 0 auto;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-top: 4px solid var(--accent-deep);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 24px rgba(18, 58, 77, 0.16);
+  padding: 10px 12px 12px;
+}
+
+.example-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.example-sheet-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 6px 0 0;
+  font-size: .95rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--navy);
+  overflow-wrap: anywhere;
+}
+
+.example-sheet-close {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--navy);
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.example-sheet-close:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.example-sheet-text {
+  margin: 2px 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 420px) {
+  .example-sheet-inner {
+    border-radius: 14px 14px 0 0;
+    padding: 8px 12px 12px;
+  }
+}
+
+@media print {
+  .example-backdrop,
+  .example-sheet {
+    display: none !important;
+  }
+}
