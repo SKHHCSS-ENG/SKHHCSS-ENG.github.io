@@ -105,6 +105,14 @@
     closeSheet();
   });
 
+  var summary = cohesion.querySelector('summary');
+  if (summary) {
+    summary.addEventListener('click', function () {
+      /* Close in this turn. The details toggle event is queued, so waiting
+         for it leaves the sheet up for a frame after the section shuts. */
+      if (current) closeSheet();
+    });
+  }
   cohesion.addEventListener('toggle', function () {
     if (!cohesion.open && current) closeSheet();
   });
