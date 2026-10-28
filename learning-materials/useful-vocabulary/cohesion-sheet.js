@@ -21,15 +21,16 @@
 
   var current = null;
 
-  /* Samples may include <strong> around linker phrases. Escape everything,
-     then put only those tags back so the sheet never grows other markup. */
+  /* Samples wrap linker phrases in <strong>. Escape everything, then restore
+     those tags as <mark class="cohesion-hl"> so the sheet never grows other
+     markup and highlight is not bold weight. */
   function exampleHtml(raw) {
     return String(raw)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/&lt;strong&gt;/gi, '<strong>')
-      .replace(/&lt;\/strong&gt;/gi, '</strong>');
+      .replace(/&lt;strong&gt;/gi, '<mark class="cohesion-hl">')
+      .replace(/&lt;\/strong&gt;/gi, '</mark>');
   }
 
   function place() {
