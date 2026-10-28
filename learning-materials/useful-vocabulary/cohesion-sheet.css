@@ -128,17 +128,8 @@ body.vocab-hub [data-section="cohesion"] .vocab-example:focus-visible {
   overflow-wrap: break-word;
 }
 
-/* Linker phrases: pale amber mark, normal weight. Not a pill — pills mean tappable. */
-.example-sheet-text .cohesion-hl {
-  font-weight: 400;
-  font-style: inherit;
-  color: inherit;
-  background: #fdedad;
-  padding: 0.05em 0.12em;
-  border-radius: 0;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
+/* Linker highlight: mark.cohesion-hl in ../paper-2-writing/styles.css
+   (shared with Sentence Patterns — same #fdedad, weight 400, square corners). */
 
 @media (max-width: 420px) {
   .example-sheet-inner {
