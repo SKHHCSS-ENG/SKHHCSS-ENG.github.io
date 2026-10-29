@@ -60,7 +60,7 @@
   function makeButton() {
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "explain-btn explain-api-pill";
+    btn.className = "explain-btn explain-api-pill api-mesh";
     if (configured()) {
       btn.textContent = "Explain";
       btn.setAttribute("aria-expanded", "false");
