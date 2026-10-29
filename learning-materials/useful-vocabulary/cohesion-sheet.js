@@ -1,15 +1,23 @@
 /**
- * Useful Vocabulary — Cohesion sample sentences.
+ * Useful Vocabulary — Cohesion and Aspects sample sentences.
  * Handwrite off: a chip opens one sample in a fixed sheet above the Tools dock.
  * The sheet is position:fixed, so the chip list and handwriting canvas do not move.
  * Handwrite on: chips do not receive taps (see cohesion-sheet.css).
  */
 (function () {
-  var cohesion = document.querySelector('details[data-section="cohesion"]');
+  var sections = document.querySelectorAll(
+    'details[data-section="cohesion"], details[data-section="aspects"]'
+  );
   var dock = document.getElementById('bottomDock');
-  if (!cohesion || !dock) return;
+  if (!sections.length || !dock) return;
 
-  var chips = cohesion.querySelectorAll('.vocab-example[data-example]');
+  var chips = [];
+  var s;
+  for (s = 0; s < sections.length; s++) {
+    var found = sections[s].querySelectorAll('.vocab-example[data-example]');
+    var c;
+    for (c = 0; c < found.length; c++) chips.push(found[c]);
+  }
   if (!chips.length) return;
 
   var backdrop = document.getElementById('exampleBackdrop');
@@ -47,13 +55,20 @@
     }
   }
 
+  function sectionOf(node) {
+    return node && node.closest(
+      'details[data-section="cohesion"], details[data-section="aspects"]'
+    );
+  }
+
   function closeSheet(opts) {
     var btn = current;
+    var section = sectionOf(btn);
     current = null;
     clearSelected();
     sheet.hidden = true;
     backdrop.hidden = true;
-    if (btn && opts && opts.restoreFocus && cohesion.open) {
+    if (btn && opts && opts.restoreFocus && section && section.open) {
       btn.focus({ preventScroll: true });
     }
   }
@@ -77,7 +92,7 @@
 
   function chipFromEvent(e) {
     var li = e.target.closest('.vocab-chips li');
-    if (!li || !cohesion.contains(li)) return null;
+    if (!li || !sectionOf(li)) return null;
     return li.querySelector('.vocab-example[data-example]');
   }
 
@@ -89,14 +104,16 @@
     else openSheet(btn);
   }
 
-  cohesion.addEventListener('click', onChipActivate);
-  cohesion.addEventListener('keydown', function (e) {
-    if (e.repeat) return;
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    if (!e.target.closest('.vocab-example')) return;
-    e.preventDefault();
-    onChipActivate(e);
-  });
+  for (s = 0; s < sections.length; s++) {
+    sections[s].addEventListener('click', onChipActivate);
+    sections[s].addEventListener('keydown', function (e) {
+      if (e.repeat) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (!e.target.closest('.vocab-example')) return;
+      e.preventDefault();
+      onChipActivate(e);
+    });
+  }
 
   closeBtn.addEventListener('click', function () {
     closeSheet({ restoreFocus: true });
@@ -117,17 +134,21 @@
     closeSheet();
   });
 
-  var summary = cohesion.querySelector('summary');
-  if (summary) {
-    summary.addEventListener('click', function () {
-      /* Close in this turn. The details toggle event is queued, so waiting
-         for it leaves the sheet up for a frame after the section shuts. */
-      if (current) closeSheet();
-    });
+  for (s = 0; s < sections.length; s++) {
+    (function (section) {
+      var summary = section.querySelector('summary');
+      if (summary) {
+        summary.addEventListener('click', function () {
+          /* Close in this turn. The details toggle event is queued, so waiting
+             for it leaves the sheet up for a frame after the section shuts. */
+          if (current && section.contains(current)) closeSheet();
+        });
+      }
+      section.addEventListener('toggle', function () {
+        if (!section.open && current && section.contains(current)) closeSheet();
+      });
+    })(sections[s]);
   }
-  cohesion.addEventListener('toggle', function () {
-    if (!cohesion.open && current) closeSheet();
-  });
 
   if (window.ResizeObserver) {
     var ro = new ResizeObserver(function () { place(); });
