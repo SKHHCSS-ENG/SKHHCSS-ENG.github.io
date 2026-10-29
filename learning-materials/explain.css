@@ -1,9 +1,9 @@
 /* Explain — quiet control under a sample. Reply sits in the open sheet or under the card.
-   .explain-api-pill is the shared API-action chrome (Cohesion, Aspects, Sentence Patterns):
-   a soft 2-stop gradient pill, deepened coral #b4594a → lilac #866993.
-   Same coral→lilac family as #e87461 → #c9a0dc, darkened so the white label
-   clears WCAG AA (about 4.70:1 on coral, 4.71:1 on lilac, 4.81:1 at the middle).
-   Vocab gloss chips stay solid fills; this gradient is the API control.
+   .explain-api-pill.api-mesh is the API-action chrome (Cohesion, Aspects, Sentence Patterns).
+   The mesh wash lives on .api-mesh in ask.css (pages load both sheets):
+   blue → violet → magenta → orange → yellow, 10s, or a static fill when
+   the reader prefers reduced motion. Label ink is soft off-white #f4f0e8.
+   Vocab gloss chips stay solid fills. This wash is the API control.
    Unconfigured: quiet “Explain soon”, no gradient. */
 
 .explain-row {
@@ -40,12 +40,14 @@
   isolation: isolate;
   justify-content: center;
   padding: 0 9px;
-  color: #ffffff;
+  color: #f4f0e8;
   font-size: .8rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   line-height: 1;
   text-align: center;
   text-decoration: none;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -59,7 +61,6 @@
   height: 22px;
   transform: translateY(-50%);
   border-radius: 999px;
-  background-image: linear-gradient(90deg, #b4594a 0%, #866993 100%);
   pointer-events: none;
 }
 
@@ -96,7 +97,7 @@
 }
 
 .explain-btn.explain-api-pill.is-busy:not(:disabled) {
-  color: #ffffff;
+  color: #f4f0e8;
 }
 
 .explain-panel {

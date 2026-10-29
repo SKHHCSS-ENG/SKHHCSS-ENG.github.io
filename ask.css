@@ -1,12 +1,61 @@
-/* Ask — floating circle, bottom-left. Same coral→lilac family as
-   .explain-api-pill (#b4594a → #866993) with a white label.
-   Explain under samples stays a pill. This file does not restyle it.
-   Tools dock (🛠, bottom-right) is untouched. If the circle would cover
-   the dock, ask.js lifts it; if it still overlaps, the circle soft-fails. */
+/* Ask — draggable circle, bottom-left until the reader moves it.
+   .api-mesh is the shared API wash for this circle and the Explain pill.
+   Pill geometry stays in learning-materials/explain.css.
+   Blue → violet → magenta → orange → yellow, one 10s loop.
+   Ink is soft off-white #f4f0e8. Warm stops are deep enough that this ink
+   stays about 4.7:1 or better on every sRGB blend (lightest stop #7c6906).
+   The wash does not use Competition purple #6b2a80.
+   Send keeps its coral→lilac fill. Tools dock CSS is untouched.
+   ask.js clamps the circle, stores the last spot, and snaps clear of the
+   dock, an open Cohesion sheet, and Explain pills. */
+
+.api-mesh {
+  --api-mesh-ink: #f4f0e8;
+  --api-mesh-image: linear-gradient(
+    122deg,
+    #1458d6 0%,
+    #3a3ad0 24%,
+    #c42670 50%,
+    #be3a16 76%,
+    #7c6906 100%
+  );
+}
+
+@keyframes api-mesh-wash {
+  0% { background-position: 0% 40%; }
+  50% { background-position: 100% 60%; }
+  100% { background-position: 0% 40%; }
+}
+
+.ask-floater.api-mesh,
+.explain-btn.api-mesh:not(:disabled)::before {
+  background-color: #1458d6;
+  background-image: var(--api-mesh-image);
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  background-position: 0% 40%;
+  animation: api-mesh-wash 10s ease-in-out infinite;
+}
+
+.explain-btn.api-mesh:not(:disabled) {
+  color: var(--api-mesh-ink, #f4f0e8);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-floater.api-mesh,
+  .explain-btn.api-mesh:not(:disabled)::before {
+    animation: none !important;
+    background-size: 100% 100%;
+    background-position: 0% 50%;
+  }
+}
 
 .ask-floater {
   position: fixed;
-  z-index: 40;
+  z-index: 85;
   left: 12px;
   bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   width: 56px;
@@ -15,19 +64,25 @@
   padding: 0;
   border: 0;
   border-radius: 999px;
-  color: #ffffff;
+  color: var(--api-mesh-ink, #f4f0e8);
   font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
   font-size: .85rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: .01em;
-  background-color: #b4594a;
-  background-image: linear-gradient(135deg, #b4594a 0%, #866993 100%);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   box-shadow: 0 4px 14px rgba(18, 58, 77, 0.22);
-  cursor: pointer;
-  touch-action: manipulation;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.ask-floater.is-dragging {
+  cursor: grabbing;
 }
 
 .ask-floater:focus {
