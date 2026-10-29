@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { SYSTEM_PROMPT, buildUserMessage, handleRequest } from "../src/index.js";
+import { ASK_SYSTEM_PROMPT, ASK_TASK, SYSTEM_PROMPT, buildAskUserMessage, buildUserMessage, handleRequest } from "../src/index.js";
 
 const TESS_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
 
@@ -66,13 +66,18 @@ test("user message fills the template and does not invent a reply", () => {
 });
 
 test("source has no key and no canned soft-sample replies", () => {
-  const src = readFileSync(new URL("../src/index.js", import.meta.url), "utf8");
+  const src = [
+    readFileSync(new URL("../src/index.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../src/askPrompt.js", import.meta.url), "utf8"),
+  ].join("\n");
   assert.equal(src.includes("PLACEHOLDER_SYSTEM_PROMPT"), false);
   assert.equal(src.includes(KEY), false);
   assert.equal(src.includes("sk-"), false);
   assert.equal(src.includes("adds another supporting point"), false);
   assert.equal(src.includes("introduces a reason and is followed"), false);
   assert.equal(src.includes("links a degree to a result"), false);
+  assert.equal(src.includes("在 Paper 2 - Writing Formats 下的書信區"), false);
+  assert.equal(src.includes("今晚吃什麼"), false);
 });
 
 test("requests: cors, validation, rate limit, and a live API call", async () => {
@@ -155,6 +160,8 @@ test("requests: cors, validation, rate limit, and a live API call", async () => 
     assert.match(sent.messages[1].content, /Highlight: Furthermore/);
     assert.match(sent.messages[1].content, /Gloss: 此外/);
     assert.equal(sent.messages[1].content.includes("en-GB"), false);
+    assert.equal(sent.max_tokens, 220);
+    assert.equal(sent.messages[0].content.includes("繁體中文"), false);
     assert.equal(lastInit.init.headers.Authorization, "Bearer " + KEY);
     assert.equal(JSON.stringify(okJson).includes(KEY), false);
 
@@ -200,6 +207,87 @@ test("requests: cors, validation, rate limit, and a live API call", async () => 
     assert.match(logText, /deepseek_fetch_failed/);
   } finally {
     console.error = originalError;
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Ask user message follows Tess’s template", () => {
+  const message = buildAskUserMessage({
+    pagePath: "/learning-materials/useful-vocabulary/",
+    turn: 1,
+    findHits: "Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/\nCohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
+    message: "讀者來函在哪",
+  });
+  assert.equal(
+    message,
+    [
+      "Page context: /learning-materials/useful-vocabulary/",
+      "Turn: 1 / 3",
+      "Find hits (optional): Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
+      "Cohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
+      "Student: 讀者來函在哪",
+      "Task: " + ASK_TASK,
+    ].join("\n")
+  );
+  assert.match(ASK_SYSTEM_PROMPT, /繁體中文/);
+  assert.match(ASK_SYSTEM_PROMPT, /這次 Ask 已達 3 輪/);
+  assert.equal(SYSTEM_PROMPT.includes("繁體中文"), false);
+});
+
+test("Ask is a page mode on the same worker and does not replace Explain", async () => {
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  let lastInit = null;
+  globalThis.fetch = async function (url, init) {
+    calls += 1;
+    lastInit = { url: String(url), init: init };
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "Letter to the Editor 在寫作格式頁。可開啟 learning-materials/paper-2-exam-skills/letter-to-the-editor/ 。" } }],
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const askBody = {
+      page: "Ask",
+      pagePath: "site",
+      turn: 1,
+      findHits: "",
+      message: "讀者來函在哪",
+    };
+    const missing = await handleRequest(post({ page: "Ask", turn: 1, message: "  " }, "203.0.113.60"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(missing.status, 400);
+    assert.equal((await missing.json()).error, "Type a short question.");
+    assert.equal(calls, 0);
+
+    const fourth = await handleRequest(post({ page: "Ask", turn: 4, message: "hello" }, "203.0.113.61"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(fourth.status, 400);
+    assert.equal((await fourth.json()).error, "Ask allows 3 turns in this open.");
+    assert.equal(calls, 0);
+
+    const ok = await handleRequest(post(askBody, "203.0.113.62"), { DEEPSEEK_API_KEY: KEY });
+    const okJson = await ok.json();
+    assert.equal(ok.status, 200);
+    assert.equal(typeof okJson.reply, "string");
+    assert.equal(okJson.explanation, undefined);
+    assert.equal(calls, 1);
+    const sent = JSON.parse(lastInit.init.body);
+    assert.equal(sent.messages[0].content, ASK_SYSTEM_PROMPT);
+    assert.equal(sent.max_tokens, 360);
+    assert.match(sent.messages[1].content, /^Page context: site\nTurn: 1 \/ 3\n/);
+    assert.equal(sent.messages[0].content === SYSTEM_PROMPT, false);
+
+    const explain = await handleRequest(post(cohesionBody, "203.0.113.63"), { DEEPSEEK_API_KEY: KEY });
+    const explainJson = await explain.json();
+    assert.equal(explain.status, 200);
+    assert.equal(typeof explainJson.explanation, "string");
+    assert.equal(explainJson.reply, undefined);
+    const explainSent = JSON.parse(lastInit.init.body);
+    assert.equal(explainSent.messages[0].content, SYSTEM_PROMPT);
+    assert.equal(explainSent.max_tokens, 220);
+
+    const bare = await handleRequest(post(askBody, "203.0.113.64"), {});
+    assert.equal(bare.status, 503);
+    assert.equal((await bare.json()).error, "Ask is not available yet.");
+  } finally {
     globalThis.fetch = originalFetch;
   }
 });

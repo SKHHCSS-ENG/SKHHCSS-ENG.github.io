@@ -1,11 +1,17 @@
 /**
- * DeepSeek Explain proxy for the Eng subject site.
+ * DeepSeek proxy for the Eng subject site.
+ * Explain pages: Cohesion, Sentence Patterns.
+ * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.
  * Do not hardcode it, and do not log it.
  *
- * System prompt: Tess 2026-10-29 (verbatim). Soft samples in the prompt pack
+ * Prompts: Tess 2026-10-29 (verbatim). Soft samples in the prompt packs
  * are tone reference only — this worker always calls the API.
  */
+
+import { ASK_SYSTEM_PROMPT, ASK_TASK } from "./askPrompt.js";
+
+export { ASK_SYSTEM_PROMPT, ASK_TASK };
 
 /** Tess 2026-10-29. Do not paraphrase. */
 export const SYSTEM_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
@@ -39,7 +45,20 @@ const LIMITS = {
   highlight: 240,
   gloss: 80,
   locale: 35,
+  message: 400,
+  pagePath: 200,
+  findHits: 500,
 };
+
+export function buildAskUserMessage(fields) {
+  return [
+    "Page context: " + (fields.pagePath || "site"),
+    "Turn: " + fields.turn + " / 3",
+    "Find hits (optional): " + (fields.findHits || ""),
+    "Student: " + fields.message,
+    "Task: " + ASK_TASK,
+  ].join("\n");
+}
 
 const buckets = new Map();
 
@@ -136,6 +155,8 @@ function asHighlight(value) {
 function readFields(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) return null;
   const page = asLimitedString(data.page, LIMITS.page);
+  if (!page.ok) return { error: "field" };
+  if (page.value === "Ask") return readAskFields(data);
   const label = asLimitedString(
     data.itemLabel != null ? data.itemLabel : data.label,
     LIMITS.label
@@ -179,15 +200,65 @@ function messageText(content) {
   return out.trim();
 }
 
-function capExplanation(text) {
-  if (text.length <= MAX_EXPLANATION_CHARS) return text;
-  return text.slice(0, MAX_EXPLANATION_CHARS).trim();
+function capExplanation(text, max) {
+  const limit = max || MAX_EXPLANATION_CHARS;
+  if (text.length <= limit) return text;
+  return text.slice(0, limit).trim();
 }
 
-async function callDeepSeek(env, userMessage) {
+function asHitText(value, max) {
+  if (value == null || value === "") return { ok: true, value: "" };
+  if (typeof value !== "string") return { ok: false, empty: false };
+  const lines = value.split(/\r?\n/).map(function (line) {
+    return line.replace(/[ \t\f\v]+/g, " ").trim();
+  }).filter(Boolean).slice(0, 3);
+  const joined = lines.join("\n");
+  if (joined.length > max) return { ok: false, empty: false };
+  return { ok: true, value: joined };
+}
+
+function readTurn(value) {
+  let turn = value;
+  if (typeof turn === "string" && /^[1-3]$/.test(turn.trim())) turn = Number(turn.trim());
+  if (turn !== 1 && turn !== 2 && turn !== 3) return null;
+  return turn;
+}
+
+function readAskFields(data) {
+  const message = asLimitedString(data.message, LIMITS.message);
+  const pagePath = asLimitedString(
+    data.pagePath == null || data.pagePath === "" ? "site" : data.pagePath,
+    LIMITS.pagePath
+  );
+  const findHits = asHitText(data.findHits == null ? "" : data.findHits, LIMITS.findHits);
+  const turn = readTurn(data.turn);
+  const checked = [message, pagePath, findHits];
+  for (let i = 0; i < checked.length; i++) {
+    if (!checked[i].ok) return { mode: "ask", error: "field" };
+  }
+  if (!turn) return { mode: "ask", error: "turn" };
+  if (!message.value) return { mode: "ask", error: "required" };
+  return {
+    mode: "ask",
+    fields: {
+      pagePath: pagePath.value || "site",
+      turn: turn,
+      findHits: findHits.value,
+      message: message.value,
+    },
+  };
+}
+
+async function callDeepSeek(env, userMessage, options) {
+  const opts = options || {};
+  const system = opts.system || SYSTEM_PROMPT;
+  const maxTokens = opts.maxTokens || 220;
+  const unavailable = opts.unavailable || "Explain is unavailable just now.";
+  const unconfigured = opts.unconfigured || "Explain is not available yet.";
+  const maxChars = opts.maxChars || MAX_EXPLANATION_CHARS;
   const key = env && env.DEEPSEEK_API_KEY;
   if (!key || typeof key !== "string" || !key.trim()) {
-    return { ok: false, status: 503, error: "Explain is not available yet." };
+    return { ok: false, status: 503, error: unconfigured };
   }
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, UPSTREAM_TIMEOUT_MS);
@@ -203,36 +274,36 @@ async function callDeepSeek(env, userMessage) {
       body: JSON.stringify({
         model: MODEL,
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: system },
           { role: "user", content: userMessage },
         ],
         temperature: 0.3,
-        max_tokens: 220,
+        max_tokens: maxTokens,
         stream: false,
       }),
     });
   } catch (e) {
     console.error("deepseek_fetch_failed");
-    return { ok: false, status: 502, error: "Explain is unavailable just now." };
+    return { ok: false, status: 502, error: unavailable };
   } finally {
     clearTimeout(timer);
   }
   if (!res.ok) {
     console.error("deepseek_upstream " + res.status);
-    return { ok: false, status: 502, error: "Explain is unavailable just now." };
+    return { ok: false, status: 502, error: unavailable };
   }
   let data;
   try {
     data = await res.json();
   } catch (e) {
     console.error("deepseek_bad_json");
-    return { ok: false, status: 502, error: "Explain is unavailable just now." };
+    return { ok: false, status: 502, error: unavailable };
   }
   const choice = data && data.choices && data.choices[0] && data.choices[0].message;
-  const text = capExplanation(messageText(choice && choice.content));
+  const text = capExplanation(messageText(choice && choice.content), maxChars);
   if (!text) {
     console.error("deepseek_empty");
-    return { ok: false, status: 502, error: "Explain is unavailable just now." };
+    return { ok: false, status: 502, error: unavailable };
   }
   return { ok: true, explanation: text };
 }
@@ -300,6 +371,28 @@ export async function handleRequest(request, env) {
   const parsed = readFields(data);
   if (!parsed) {
     return jsonResponse(400, { error: "Request body must be JSON." }, origin);
+  }
+  if (parsed.mode === "ask") {
+    if (parsed.error === "turn") {
+      return jsonResponse(400, { error: "Ask allows 3 turns in this open." }, origin);
+    }
+    if (parsed.error === "required") {
+      return jsonResponse(400, { error: "Type a short question." }, origin);
+    }
+    if (parsed.error === "field") {
+      return jsonResponse(400, { error: "One of the fields is too long." }, origin);
+    }
+    const asked = await callDeepSeek(env, buildAskUserMessage(parsed.fields), {
+      system: ASK_SYSTEM_PROMPT,
+      maxTokens: 360,
+      maxChars: 900,
+      unavailable: "Ask is unavailable just now.",
+      unconfigured: "Ask is not available yet.",
+    });
+    if (!asked.ok) {
+      return jsonResponse(asked.status, { error: asked.error }, origin);
+    }
+    return jsonResponse(200, { reply: asked.explanation }, origin);
   }
   if (parsed.error === "required") {
     return jsonResponse(400, { error: "Page, item and sample are required." }, origin);

@@ -1,0 +1,280 @@
+/* Ask — floating circle, bottom-left. Same coral→lilac family as
+   .explain-api-pill (#b4594a → #866993) with a white label.
+   Explain under samples stays a pill. This file does not restyle it.
+   Tools dock (🛠, bottom-right) is untouched. If the circle would cover
+   the dock, ask.js lifts it; if it still overlaps, the circle soft-fails. */
+
+.ask-floater {
+  position: fixed;
+  z-index: 40;
+  left: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .01em;
+  background-color: #b4594a;
+  background-image: linear-gradient(135deg, #b4594a 0%, #866993 100%);
+  box-shadow: 0 4px 14px rgba(18, 58, 77, 0.22);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ask-floater:focus {
+  outline: none;
+}
+
+.ask-floater:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #123a4d;
+}
+
+.ask-floater[data-ask-overlap="1"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ask-scrim {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(18, 58, 77, 0.12);
+  cursor: pointer;
+}
+
+.ask-sheet {
+  position: fixed;
+  z-index: 41;
+  left: 12px;
+  right: auto;
+  width: min(360px, calc(100vw - 84px));
+  max-height: min(70dvh, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  color: #1e293b;
+  background: #ffffff;
+  border: 1px solid #eadfe8;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(18, 58, 77, 0.18);
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+  box-sizing: border-box;
+}
+
+.ask-scrim[hidden],
+.ask-sheet[hidden] {
+  display: none !important;
+}
+
+.ask-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.ask-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #123a4d;
+}
+
+.ask-close {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #123a4d;
+  font: 700 .9rem/1 inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ask-close:focus-visible,
+.ask-hit:focus-visible,
+.ask-send:focus-visible,
+.ask-find:focus-visible,
+.ask-q:focus-visible {
+  outline: 2px solid #123a4d;
+  outline-offset: 2px;
+}
+
+.ask-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  font-size: .78rem;
+  font-weight: 800;
+  color: #123a4d;
+}
+
+.ask-find,
+.ask-q {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #d3e8ef;
+  border-radius: 12px;
+  background: #f8fbfc;
+  color: #1e293b;
+  font: 600 16px/1.3 inherit;
+  box-sizing: border-box;
+}
+
+.ask-hint {
+  margin: 0;
+  font-size: .85rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #64748b;
+}
+
+.ask-hits {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-hits li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-hit {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f7f4f8;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ask-hit-title {
+  font-size: .92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #123a4d;
+}
+
+.ask-hit-path {
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #64748b;
+  overflow-wrap: anywhere;
+}
+
+.ask-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid #eadfe8;
+}
+
+.ask-kicker {
+  margin: 0;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: #866993;
+}
+
+.ask-log {
+  max-height: 28dvh;
+  overflow: auto;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.ask-mine,
+.ask-reply {
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+
+.ask-mine {
+  color: #334155;
+  font-weight: 600;
+}
+
+.ask-reply a {
+  color: #0c5a70;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.ask-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ask-q {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ask-send {
+  flex: 0 0 auto;
+  min-width: 64px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  color: #ffffff;
+  font: 700 .85rem/1 inherit;
+  background-color: #b4594a;
+  background-image: linear-gradient(90deg, #b4594a 0%, #866993 100%);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ask-send:disabled,
+.ask-q:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media print {
+  .ask-floater,
+  .ask-scrim,
+  .ask-sheet {
+    display: none !important;
+  }
+}

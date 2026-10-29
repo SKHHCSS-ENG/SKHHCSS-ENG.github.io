@@ -4,6 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="../ask.css?v=20261029e">
 <title>English Learning Materials · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="English Language learning materials for SKH Holy Carpenter Secondary School.">
 <style>
@@ -927,6 +928,7 @@
     var timer = null;
 
     function norm(s) {
+      if (window.SiteFind && window.SiteFind.norm) return window.SiteFind.norm(s);
       return String(s || '').replace(/\s+/g, ' ').trim().toLowerCase();
     }
 
@@ -965,6 +967,9 @@
       for (var p = 0; p < paras.length; p++) {
         if (paras[p].classList.contains('card-kicker')) continue;
         parts.push(paras[p].textContent);
+      }
+      if (window.SiteFind && window.SiteFind.extraHaystack) {
+        parts.push(window.SiteFind.extraHaystack(card.getAttribute('href')));
       }
       return norm(parts.join(' '));
     }
@@ -1009,7 +1014,12 @@
         var card = cards[i];
         var show = cardHasTag(card, tag);
         if (show && starOn) show = card.classList.contains('is-bookmarked');
-        if (show && q) show = cardHaystack(card).indexOf(q) !== -1;
+        if (show && q) {
+          var hay = cardHaystack(card);
+          show = window.SiteFind && window.SiteFind.matches
+            ? window.SiteFind.matches(hay, q)
+            : hay.indexOf(q) !== -1;
+        }
         if (show) card.classList.remove('hub-miss');
         else card.classList.add('hub-miss');
       }
@@ -1293,6 +1303,8 @@
     }
   })();
   </script>
+<script src="../site-find.js?v=20261029e"></script>
+<script src="../ask.js?v=20261029e"></script>
 <script src="../site-version.js?v=c2fd3eb"></script>
 </body>
 </html>
