@@ -1,6 +1,6 @@
 # DeepSeek Explain worker
 
-Short explanations for the Cohesion sheet and Sentence Patterns samples. The browser calls this Worker. The Worker calls DeepSeek. The API key stays here.
+Short explanations for the Cohesion sheet and Sentence Patterns samples, and a short Ask chat (`page: "Ask"`). The browser calls this Worker. The Worker calls DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Explain and Ask share that binding. There is no second key.
 
 Live site origin: `https://skhhcss-eng.github.io`  
 Soft local origins: `http://localhost`, `http://127.0.0.1` (any port), and `https` on those hosts.
@@ -61,6 +61,32 @@ An empty string keeps the control quiet (`Explain soon`, not tappable). The clie
 `page` must be `Cohesion` or `Sentence Patterns`. `itemLabel` and `sampleText` are required. `label` and `sample` are accepted as aliases. `category`, `highlight` (string or short list), `gloss`, and `locale` are optional. `locale` does not change the language: replies stay British English.
 
 The user message is built from that body (Tess’s template). `gloss` is added only when the page sent one, so a Chinese gloss in the input can be used once. Soft sample replies in the prompt pack are not stored here. Every accepted request calls `https://api.deepseek.com/chat/completions` (`deepseek-chat`).
+
+Explain pages are unchanged: `page` must still be `Cohesion` or `Sentence Patterns`, and the reply is still `{ "explanation": "…" }` in British English.
+
+## Ask
+
+Same URL, same secret, same origin allowlist (`https://skhhcss-eng.github.io`, plus loopback for local dev). `page` must be `Ask`. Find itself does not call this Worker.
+
+```json
+{
+  "page": "Ask",
+  "pagePath": "/learning-materials/useful-vocabulary/",
+  "turn": 1,
+  "findHits": "Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
+  "message": "讀者來函在哪"
+}
+```
+
+`turn` is 1, 2, or 3 for this open. `message` is required. `pagePath` defaults to `site`. `findHits` is optional, up to three `title — path` lines. The Ask system prompt is Tess’s 2026-10-29 text (Traditional Chinese 書面語). Soft sample replies are not stored here.
+
+Success:
+
+```json
+{ "reply": "…" }
+```
+
+A 4th turn is rejected with 400 before any API call. The browser also stops at 3 replies per open. There is no daily cap. Ask shares the Explain rate limit (about 10 requests per minute per IP).
 
 Success:
 
