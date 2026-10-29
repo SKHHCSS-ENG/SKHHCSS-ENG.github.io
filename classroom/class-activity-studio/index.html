@@ -7303,7 +7303,7 @@
               resolve(id || '');
             }
             folderFinish = function () { finish(''); };
-            openSheet('Studio plans');
+            openSheet(SD.FOLDER_NAME);
             if (!folders.length) {
               setBody('<div class="plan-sheet-pad"><button type="button" id="btnCreateStudioFolder" class="plan-action">Create</button></div>');
               document.getElementById('btnCreateStudioFolder').addEventListener('click', function () {

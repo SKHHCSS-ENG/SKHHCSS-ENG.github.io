@@ -155,8 +155,11 @@ test('Drive client lists the folder, creates, and overwrites without a new paren
     if (url.indexOf('/upload/') !== -1 && (init.method === 'POST' || init.method === 'PATCH')) {
       return { ok: true, status: 200, text: async function () { return JSON.stringify({ id: 'file1', name: '3A English.json' }); } };
     }
-    if (url.indexOf('mimeType') !== -1 && url.indexOf('Studio') !== -1) {
-      return { ok: true, status: 200, text: async function () { return JSON.stringify({ files: [{ id: 'folder1', name: 'Studio plans', owners: [{ displayName: 'Howard' }] }] }); } };
+    if (init && init.method === 'POST' && url.indexOf('/upload/') === -1) {
+      return { ok: true, status: 200, text: async function () { return JSON.stringify({ id: 'createdFolder', name: 'Class Activity Studio' }); } };
+    }
+    if (url.indexOf('mimeType') !== -1 && (url.indexOf('Class+Activity+Studio') !== -1 || url.indexOf('Class%20Activity%20Studio') !== -1)) {
+      return { ok: true, status: 200, text: async function () { return JSON.stringify({ files: [{ id: 'folder1', name: 'Class Activity Studio', owners: [{ displayName: 'Howard' }] }] }); } };
     }
     if (url.indexOf('in+parents') !== -1 || url.indexOf('in%20parents') !== -1 || url.indexOf("in parents") !== -1) {
       return { ok: true, status: 200, text: async function () { return JSON.stringify({ files: [{ id: 'file9', name: '3A English.json', modifiedTime: '2026-10-29T06:05:00.000Z', lastModifyingUser: { displayName: 'Ada Wong' } }] }); } };
@@ -178,24 +181,39 @@ test('Drive client lists the folder, creates, and overwrites without a new paren
   assert.equal(folders[0].id, 'folder1');
   assert.equal(SD.folderWho(folders[0]), 'Howard');
   assert.match(calls[0].url, /supportsAllDrives=true/);
-  assert.match(decoded(calls[0].url), /Studio plans/);
+  assert.match(decoded(calls[0].url), /name = 'Class Activity Studio'/);
+  var created = await client.createFolder();
+  assert.equal(created.name, 'Class Activity Studio');
+  assert.match(calls[1].body, /"name":"Class Activity Studio"/);
 
   var plans = await client.listPlans('folder1');
   assert.equal(plans[0].id, 'file9');
   assert.equal(SD.formatSavedStamp(plans[0].modifiedTime, SD.planWho(plans[0])), '29 Oct 14:05 · Ada Wong');
-  assert.match(decoded(calls[1].url), /'folder1' in parents/);
+  assert.match(decoded(calls[2].url), /'folder1' in parents/);
 
   var payload = SD.buildPlanPayload(sampleClass(), { name: '3A English', savedAt: '2026-10-29T06:05:00.000Z' });
   await client.createPlan('folder1', '3A English.json', payload);
-  assert.equal(calls[2].method, 'POST');
-  assert.match(calls[2].body, /"parents":\["folder1"\]/);
-  assert.match(calls[2].body, /"kind": "skhhcss-studio-plan"/);
-  assert.match(calls[2].headers.Authorization, /Bearer token-1/);
+  assert.equal(calls[3].method, 'POST');
+  assert.match(calls[3].body, /"parents":\["folder1"\]/);
+  assert.match(calls[3].body, /"kind": "skhhcss-studio-plan"/);
+  assert.match(calls[3].headers.Authorization, /Bearer token-1/);
 
   await client.updatePlan('file9', '3A English.json', payload);
-  assert.equal(calls[3].method, 'PATCH');
-  assert.equal(calls[3].body.indexOf('"parents"'), -1);
-  assert.match(calls[3].url, /\/files\/file9/);
+  assert.equal(calls[4].method, 'PATCH');
+  assert.equal(calls[4].body.indexOf('"parents"'), -1);
+  assert.match(calls[4].url, /\/files\/file9/);
+});
+
+test('public client id is set, with no secret, and only an empty id is refused', function () {
+  var cfg = fs.readFileSync(path.join(__dirname, 'drive-config.js'), 'utf8');
+  assert.match(cfg, /clientId:\s*"322774470382-v8tevo6q55satejpvhqcd24l4ujmdruv\.apps\.googleusercontent\.com"/);
+  assert.equal(cfg.indexOf('client_secret'), -1);
+  assert.equal(cfg.indexOf('clientSecret'), -1);
+  var html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  assert.match(html, /function currentClientId\(\) \{\s*return String\(\(window\.SKHHCSS_STUDIO_DRIVE \|\| \{\}\)\.clientId \|\| ''\)\.trim\(\);\s*\}/);
+  assert.match(html, /function configured\(\) \{\s*return !!\(currentClientId\(\) && SD\);\s*\}/);
+  assert.equal(html.split("showToast('Google sign-in is not set up.'").length - 1, 2);
+  assert.match(html, /if \(!configured\(\)\) \{\s*showToast\('Google sign-in is not set up\.', '⚠️'\);\s*return;\s*\}/);
 });
 
 test('Studio chrome keeps local Save / Load and adds the Drive chips after them', function () {
@@ -214,5 +232,5 @@ test('Studio chrome keeps local Save / Load and adds the Drive chips after them'
   assert.match(html, /src="studio-drive\.js"/);
   assert.match(html, /accounts\.google\.com\/gsi\/client/);
   assert.equal(SD.DRIVE_SCOPE, 'https://www.googleapis.com/auth/drive');
-  assert.equal(SD.FOLDER_NAME, 'Studio plans');
+  assert.equal(SD.FOLDER_NAME, 'Class Activity Studio');
 });

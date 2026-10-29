@@ -48,14 +48,14 @@ No Cloudflare Worker. The page talks to Drive from the browser with Google Ident
 
 1. In the school’s Google Workspace, open Google Cloud Console and create a project (or use one the school already owns).
 2. Enable **Google Drive API**.
-3. OAuth consent screen: **Internal** (same Workspace as the teachers). App name: `Class Activity Studio`. The scope the page requests is `https://www.googleapis.com/auth/drive`. Google will describe that as access to all Drive files. Internal apps can use this restricted scope without a public security review. The page itself only lists a folder named `Studio plans`, then reads and writes `.json` plans inside the folder the teacher picked. `drive.file` is the narrower scope, and it cannot show colleagues’ files in a shared folder, so it does not fit Save → Open across teachers.
+3. OAuth consent screen: **Internal** (same Workspace as the teachers). App name: `Class Activity Studio`. The scope the page requests is `https://www.googleapis.com/auth/drive`. Google will describe that as access to all Drive files. Internal apps can use this restricted scope without a public security review. The page itself only lists a folder named exactly `Class Activity Studio`, then reads and writes `.json` plans inside the folder the teacher picked. `drive.file` is the narrower scope, and it cannot show colleagues’ files in a shared folder, so it does not fit Save → Open across teachers.
 4. Create an OAuth client ID of type **Web application**.
    - Authorised JavaScript origins: `https://skhhcss-eng.github.io`
    - No client secret. Do not put a secret in this repository.
    - Optional, for a local check: `http://localhost:8080` and `http://127.0.0.1:8080`
-5. Paste the client id into `classroom/class-activity-studio/drive-config.js` (`clientId`). The id is public. The origin list is what keeps other websites from using it.
-6. In Drive, create a folder named exactly **Studio plans**. A sensible place is `School → Site → Studio plans`. Share that folder with Eng colleagues as **Editor**.
-7. Each browser remembers the folder id in `localStorage` under `skhhcss_eng_studio_drive_folder_v1`. The first **Save online** or **Open plan** uses the only folder with that name, or asks once if there are several. **Create** makes a new `Studio plans` folder in that teacher’s My Drive — use it only when the shared folder is not there yet. To pick again, remove that localStorage key.
+5. The public client id is in `classroom/class-activity-studio/drive-config.js` (`clientId`). It is not a secret. The origin list is what keeps other websites from using it.
+6. In Drive, the folder name is exactly **Class Activity Studio**, at `School → Site → Class Activity Studio`. Share that folder with Eng colleagues as **Editor**.
+7. Each browser remembers the folder id in `localStorage` under `skhhcss_eng_studio_drive_folder_v1`. The first **Save online** or **Open plan** uses the only folder with that exact name, or asks once if there are several. **Create** makes a new `Class Activity Studio` folder in that teacher’s My Drive — use it only when the shared folder is not there yet. To pick again, remove that localStorage key.
 
 The school network must allow `https://accounts.google.com` and `https://www.googleapis.com`.
 

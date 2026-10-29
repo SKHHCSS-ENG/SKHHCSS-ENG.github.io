@@ -8,7 +8,7 @@
   else root.StudioDrive = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
-  var FOLDER_NAME = 'Studio plans';
+  var FOLDER_NAME = 'Class Activity Studio';
   var FOLDER_MIME = 'application/vnd.google-apps.folder';
   var PLAN_MIME = 'application/json';
   var FOLDER_STORAGE_KEY = 'skhhcss_eng_studio_drive_folder_v1';
