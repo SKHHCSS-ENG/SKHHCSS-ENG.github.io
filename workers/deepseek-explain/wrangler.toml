@@ -1,0 +1,7 @@
+# DeepSeek Explain — workers.dev deploy.
+# The API key is a Worker secret, not a var:
+#   npx wrangler secret put DEEPSEEK_API_KEY
+name = "deepseek-explain"
+main = "src/index.js"
+compatibility_date = "2026-10-29"
+workers_dev = true

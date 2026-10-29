@@ -1,0 +1,94 @@
+/* Explain — text control under a sample. Not a pill (pills stay the tappable chips).
+   Unconfigured: quiet “Explain soon”. Reply sits in the open sheet or under the card. */
+
+.explain-row {
+  margin: 0;
+}
+
+.explain-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-ink);
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.explain-btn:focus {
+  outline: none;
+}
+
+.explain-btn:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+.explain-btn:disabled {
+  min-height: 0;
+  padding: 0 0 2px;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: default;
+}
+
+.explain-btn.is-busy {
+  color: var(--muted);
+  text-decoration: none;
+  cursor: progress;
+}
+
+.explain-panel {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  font-size: .92rem;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--accent-soft);
+  border-radius: 8px;
+  overflow-wrap: break-word;
+}
+
+.explain-panel[hidden] {
+  display: none !important;
+}
+
+.example-sheet .explain-row {
+  margin-top: 4px;
+}
+
+.example-sheet .explain-panel {
+  max-height: 36vh;
+  margin: 6px 0 0;
+  overflow: auto;
+}
+
+.pattern-card .pattern-example + .explain-row {
+  margin-top: -4px;
+}
+
+/* Handwrite on: the control must not take the tap. */
+body.hw-on .pattern-card .explain-row,
+body.hw-on .pattern-card .explain-panel {
+  pointer-events: none;
+}
+
+@media print {
+  .explain-row,
+  .explain-panel {
+    display: none !important;
+  }
+}
