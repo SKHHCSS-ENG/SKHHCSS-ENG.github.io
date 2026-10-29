@@ -1,5 +1,5 @@
 /**
- * Explain — Cohesion sample sheet and Sentence Patterns cards.
+ * Explain — Cohesion and Aspects sample sheet, and Sentence Patterns cards.
  * Worker URL: window.__EXPLAIN_WORKER__ (empty until Nest pastes the workers.dev URL).
  * No API key here.
  */
@@ -154,10 +154,13 @@
     var body = {
       page: payload.page,
       itemLabel: payload.itemLabel,
+      label: payload.label || payload.itemLabel,
       sampleText: payload.sampleText,
+      sample: payload.sample || payload.sampleText,
       locale: document.documentElement.lang || "en-GB",
     };
     if (payload.category) body.category = payload.category;
+    if (payload.set) body.set = payload.set;
     if (payload.highlight) body.highlight = payload.highlight;
     if (payload.gloss) body.gloss = payload.gloss;
 
@@ -203,8 +206,10 @@
     var sheet = document.getElementById("exampleSheet");
     var textEl = document.getElementById("exampleSheetText");
     var inner = sheet && sheet.querySelector(".example-sheet-inner");
-    var cohesion = document.querySelector('details[data-section="cohesion"]');
-    if (!sheet || !textEl || !inner || !cohesion) return;
+    var roots = document.querySelectorAll(
+      'details[data-section="cohesion"], details[data-section="aspects"]'
+    );
+    if (!sheet || !textEl || !inner || !roots.length) return;
 
     var row = document.createElement("div");
     row.className = "explain-row";
@@ -218,8 +223,23 @@
 
     var shownKey = "";
 
+    function expandedChip() {
+      var i;
+      for (i = 0; i < roots.length; i++) {
+        var chip = roots[i].querySelector('.vocab-example[aria-expanded="true"]');
+        if (chip) return chip;
+      }
+      return null;
+    }
+
+    function pageFor(chip) {
+      var section = chip.closest("details[data-section]");
+      if (section && section.getAttribute("data-section") === "aspects") return "Aspects";
+      return "Cohesion";
+    }
+
     function currentPayload() {
-      var chip = cohesion.querySelector('.vocab-example[aria-expanded="true"]');
+      var chip = expandedChip();
       if (!chip) return null;
       var raw = chip.getAttribute("data-example") || "";
       var sampleText = squash(decodeSample(raw));
@@ -230,14 +250,20 @@
         var label = part && part.querySelector(".part-label");
         category = label ? squash(label.textContent) : "";
       }
-      return {
-        page: "Cohesion",
-        itemLabel: squash(chip.textContent),
+      var itemLabel = squash(chip.textContent);
+      var page = pageFor(chip);
+      var payload = {
+        page: page,
+        itemLabel: itemLabel,
+        label: itemLabel,
         category: category,
         sampleText: sampleText,
+        sample: sampleText,
         highlight: highlightsFromHtml(raw),
         gloss: squash(chip.getAttribute("data-zh") || ""),
       };
+      if (page === "Aspects" && category) payload.set = category;
+      return payload;
     }
 
     function sync() {

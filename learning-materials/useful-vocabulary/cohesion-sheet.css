@@ -1,6 +1,6 @@
-/* Cohesion samples — fixed sheet above the Tools dock.
+/* Cohesion and Aspects samples — fixed sheet above the Tools dock.
    Out of flow: opening it must not move chips or the handwrite canvas.
-   Pill frames stay only on Cohesion chips (the words students can press).
+   Pill frames stay on tappable chips only (Cohesion and Aspects).
    Other banks keep the same box (border width + padding) with no visible frame,
    so saved ink on those sections does not shift. */
 
@@ -9,7 +9,8 @@ body.vocab-hub .vocab-chips li {
   border-color: transparent;
 }
 
-body.vocab-hub [data-section="cohesion"] .vocab-chips li {
+body.vocab-hub [data-section="cohesion"] .vocab-chips li,
+body.vocab-hub [data-section="aspects"] .vocab-chips li {
   background: var(--accent-soft);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -18,23 +19,27 @@ body.vocab-hub [data-section="cohesion"] .vocab-chips li {
   touch-action: manipulation;
 }
 
-body.vocab-hub [data-section="cohesion"] .vocab-chips li.is-selected {
+body.vocab-hub [data-section="cohesion"] .vocab-chips li.is-selected,
+body.vocab-hub [data-section="aspects"] .vocab-chips li.is-selected {
   background: #d4f0f8;
   border-color: var(--accent-deep);
 }
 
 /* Handwrite on: chips must not take the tap — drawing passes through. */
-body.hw-on [data-section="cohesion"] .vocab-chips li {
+body.hw-on [data-section="cohesion"] .vocab-chips li,
+body.hw-on [data-section="aspects"] .vocab-chips li {
   pointer-events: none;
   cursor: auto;
 }
 
 /* Span, not button: a real button adds a pixel of line box and shifts saved ink. */
-body.vocab-hub [data-section="cohesion"] .vocab-example:focus {
+body.vocab-hub [data-section="cohesion"] .vocab-example:focus,
+body.vocab-hub [data-section="aspects"] .vocab-example:focus {
   outline: none;
 }
 
-body.vocab-hub [data-section="cohesion"] .vocab-example:focus-visible {
+body.vocab-hub [data-section="cohesion"] .vocab-example:focus-visible,
+body.vocab-hub [data-section="aspects"] .vocab-example:focus-visible {
   outline: 2px solid var(--navy);
   outline-offset: 2px;
 }
