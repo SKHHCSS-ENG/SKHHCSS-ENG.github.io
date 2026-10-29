@@ -46,37 +46,31 @@
   sheet.hidden = true;
   sheet.setAttribute("role", "dialog");
   sheet.setAttribute("aria-modal", "true");
-  sheet.setAttribute("aria-labelledby", "askTitle");
+  sheet.setAttribute("aria-label", "Ask");
 
-  var bar = document.createElement("div");
-  bar.className = "ask-bar";
-  var title = document.createElement("h2");
-  title.className = "ask-title";
-  title.id = "askTitle";
-  title.textContent = "Ask";
+  var top = document.createElement("div");
+  top.className = "ask-top";
+  var findName = document.createElement("label");
+  findName.className = "ask-find-name";
+  findName.htmlFor = "askFind";
+  findName.textContent = "Find";
   var closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.className = "ask-close";
-  closeBtn.textContent = "Close";
-  bar.appendChild(title);
-  bar.appendChild(closeBtn);
+  closeBtn.textContent = "\u00d7";
+  closeBtn.setAttribute("aria-label", "Close");
+  top.appendChild(findName);
+  top.appendChild(closeBtn);
 
-  var findLabel = document.createElement("label");
-  findLabel.className = "ask-label";
-  findLabel.appendChild(document.createTextNode("Find"));
   var findInput = document.createElement("input");
   findInput.type = "search";
+  findInput.id = "askFind";
   findInput.className = "ask-find";
   findInput.placeholder = "Format or topic";
   findInput.setAttribute("aria-label", "Find a page");
   findInput.autocomplete = "off";
   findInput.spellcheck = false;
   findInput.enterKeyHint = "search";
-  findLabel.appendChild(findInput);
-
-  var hint = document.createElement("p");
-  hint.className = "ask-hint";
-  hint.textContent = "Try a format or topic";
 
   var hitsBox = document.createElement("ul");
   hitsBox.className = "ask-hits";
@@ -110,9 +104,8 @@
   chat.appendChild(log);
   chat.appendChild(form);
 
-  sheet.appendChild(bar);
-  sheet.appendChild(findLabel);
-  sheet.appendChild(hint);
+  sheet.appendChild(top);
+  sheet.appendChild(findInput);
   sheet.appendChild(hitsBox);
   sheet.appendChild(chat);
 
@@ -162,12 +155,7 @@
     var hits = window.SiteFind && window.SiteFind.search ? window.SiteFind.search(q, 3) : [];
     currentHits = hits;
     hitsBox.textContent = "";
-    if (!hits.length) {
-      hint.hidden = false;
-      hint.textContent = "Try a format or topic";
-    } else {
-      hint.hidden = true;
-    }
+    hitsBox.hidden = !hits.length;
     var i;
     for (i = 0; i < hits.length; i++) {
       var link = document.createElement("a");
@@ -393,8 +381,8 @@
 
   function floaterSize() {
     return {
-      w: floater.offsetWidth || 56,
-      h: floater.offsetHeight || 56
+      w: floater.offsetWidth || 44,
+      h: floater.offsetHeight || 44
     };
   }
 
