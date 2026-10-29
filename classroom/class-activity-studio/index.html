@@ -3938,9 +3938,39 @@
         });
       }
 
-      // Names, seat numbers, team identity, membership, and desk positions.
-      // Scores are stored so a deleted student or team can come back with the
-      // points they had; live scores are not rewritten for people who stayed.
+      // Desk identity saved with Save. Load rebuilds a deleted seat from this
+      // and puts every listed desk back to the score stored here.
+      function snapshotDefaultStudents(students) {
+        return (students || []).map(function (st) {
+          return {
+            id: st.id,
+            classNo: String(st.classNo == null ? '' : st.classNo),
+            name: String(st.name == null ? '' : st.name),
+            groupId: st.groupId || '',
+            x: st.x,
+            y: st.y,
+            score: Number(st.score) || 0
+          };
+        });
+      }
+
+      function studentFromDefaultSnapshot(saved) {
+        return {
+          id: saved.id,
+          classNo: String(saved.classNo == null ? '' : saved.classNo),
+          name: String(saved.name == null ? '' : saved.name),
+          groupId: saved.groupId || '',
+          score: Number(saved.score) || 0,
+          x: saved.x,
+          y: saved.y
+        };
+      }
+
+      // Names, seat numbers, team identity, membership, desk positions, and scores.
+      // A later +1 stays put when undo compares two snapshots that stored the
+      // same score. Undo of Load compares the board from before Load with the
+      // saved scores, so those points go back. A deleted student or team comes
+      // back with the score stored on the snapshot they return from.
       function snapshotBoardEdit(cls) {
         return {
           kind: 'board',
@@ -4064,6 +4094,11 @@
           if ((a.groupId || '') !== (b.groupId || '')) st.groupId = b.groupId || '';
           if (a.x !== b.x) st.x = b.x;
           if (a.y !== b.y) st.y = b.y;
+          if (Object.prototype.hasOwnProperty.call(a, 'score') && Object.prototype.hasOwnProperty.call(b, 'score')) {
+            var scoreA = Number(a.score) || 0;
+            var scoreB = Number(b.score) || 0;
+            if (scoreA !== scoreB) st.score = scoreB;
+          }
         });
         (toSnap.students || []).forEach(function (b, idx) {
           if (fromStudents[b.id]) return;
@@ -4149,7 +4184,17 @@
           cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
           reseeds = true;
         }
-        // Keep roster in sync: drop removed ids; add missing students at their current xy
+        // A saved default keeps desks that were deleted after Save. Factory
+        // seating still tracks the live roster.
+        if (custom) {
+          preserveCustomDefaultRoster(cls);
+          if (!Array.isArray(cls.defaultStudentSnapshot)) {
+            cls.defaultStudentSnapshot = migrateDefaultStudentSnapshot(cls);
+            reseeds = true;
+          }
+          return reseeds;
+        }
+        // Keep the factory roster in sync: drop removed ids; add missing students at their current xy.
         const byId = {};
         cls.defaultPositions.forEach(function (p) { byId[p.id] = p; });
         const next = [];
@@ -4165,16 +4210,77 @@
         return reseeds;
       }
 
-      // Drop leavers from the saved membership list; newcomers keep the team they have now until Save.
+      // Older saves stored positions and teams only. Build a desk snapshot from
+      // the students still on the board so Load does not invent missing seats.
+      function migrateDefaultStudentSnapshot(cls) {
+        var posById = {};
+        (cls.defaultPositions || []).forEach(function (p) {
+          if (p && p.id && !posById[p.id]) posById[p.id] = p;
+        });
+        var groupById = {};
+        var gsnap = cls.defaultGroupSnapshot;
+        if (gsnap && Array.isArray(gsnap.assignments)) {
+          gsnap.assignments.forEach(function (a) {
+            if (a && a.id && !Object.prototype.hasOwnProperty.call(groupById, a.id)) {
+              groupById[a.id] = a.groupId || '';
+            }
+          });
+        }
+        return (cls.students || []).map(function (st) {
+          var pos = posById[st.id];
+          var hasGroup = Object.prototype.hasOwnProperty.call(groupById, st.id);
+          return {
+            id: st.id,
+            classNo: String(st.classNo == null ? '' : st.classNo),
+            name: String(st.name == null ? '' : st.name),
+            groupId: hasGroup ? (groupById[st.id] || '') : (st.groupId || ''),
+            x: pos ? pos.x : st.x,
+            y: pos ? pos.y : st.y,
+            score: Number(st.score) || 0
+          };
+        });
+      }
+
+      // Keep every saved desk. A student added after Save gets a slot; a
+      // student deleted after Save stays in the snapshot until the next Save.
+      function preserveCustomDefaultRoster(cls) {
+        var seen = {};
+        var next = [];
+        (cls.defaultPositions || []).forEach(function (p) {
+          if (!p || !p.id || seen[p.id]) return;
+          seen[p.id] = true;
+          next.push({ id: p.id, x: p.x, y: p.y });
+        });
+        (cls.students || []).forEach(function (st) {
+          if (!st || !st.id || seen[st.id]) return;
+          seen[st.id] = true;
+          next.push({ id: st.id, x: st.x, y: st.y });
+        });
+        cls.defaultPositions = next;
+        syncDefaultGroupAssignments(cls);
+      }
+
+      // Factory defaults drop leavers. A teacher-saved default does not.
+      // Newcomers keep the team they have now until the next Save.
       function syncDefaultGroupAssignments(cls) {
         var snap = cls && cls.defaultGroupSnapshot;
         if (!snap || !Array.isArray(snap.assignments)) return;
         var byId = {};
         snap.assignments.forEach(function (a) {
-          if (a && a.id) byId[a.id] = a.groupId || '';
+          if (a && a.id && !Object.prototype.hasOwnProperty.call(byId, a.id)) byId[a.id] = a.groupId || '';
         });
         var next = [];
+        var seen = {};
+        if (cls.customDefaultSaved) {
+          snap.assignments.forEach(function (a) {
+            if (!a || !a.id || seen[a.id]) return;
+            seen[a.id] = true;
+            next.push({ id: a.id, groupId: a.groupId || '' });
+          });
+        }
         (cls.students || []).forEach(function (st) {
+          if (!st || !st.id || seen[st.id]) return;
+          seen[st.id] = true;
           if (Object.prototype.hasOwnProperty.call(byId, st.id)) {
             next.push({ id: st.id, groupId: byId[st.id] });
           } else {
@@ -4245,6 +4351,7 @@
           if (String(sa.classNo) !== String(sb.classNo)) return false;
           if ((sa.groupId || '') !== (sb.groupId || '')) return false;
           if (sa.x !== sb.x || sa.y !== sb.y) return false;
+          if ((Number(sa.score) || 0) !== (Number(sb.score) || 0)) return false;
         }
         if ((a.layoutStyle || '') !== (b.layoutStyle || '')) return false;
         if (a.gridRows !== b.gridRows || a.gridCols !== b.gridCols) return false;
@@ -4363,16 +4470,66 @@
         showToast('Redid: ' + entry.label, '↪️');
       }
 
-      // Save the current class’s desks and teams as its default. Does not touch scores or layout undo history.
+      // Save the current class’s desks and teams as its default, including each
+      // desk score. Does not change scores on the board or layout undo history.
       function setCurrentLayoutAsDefault() {
         const cls = getCurrentClass();
         if (!cls) return;
-        cls.defaultPositions = snapshotLayoutPositions(cls);
+        cls.defaultStudentSnapshot = snapshotDefaultStudents(cls.students);
+        cls.defaultPositions = cls.defaultStudentSnapshot.map(function (st) {
+          return { id: st.id, x: st.x, y: st.y };
+        });
         cls.defaultGroupSnapshot = snapshotGroupDefaults(cls.groups, cls.students);
         cls.customDefaultSaved = true;
         cls.layoutPitchVersion = LAYOUT_PITCH_VERSION;
         saveState();
         showToast('Layout saved. Scores stay as they are.', '📌');
+      }
+
+      // Put deleted desks back in saved order and set every saved desk's score
+      // to the Save Default value. Students added after Save stay, with the
+      // score they have now. Returns true when a saved score list was applied.
+      function restoreDefaultStudents(cls) {
+        if (!cls || !cls.customDefaultSaved) return false;
+        var snap = cls.defaultStudentSnapshot;
+        if (!Array.isArray(snap) || !snap.length) return false;
+        var liveById = indexById(cls.students);
+        var list = (cls.students || []).slice();
+        var seen = {};
+        snap.forEach(function (saved, idx) {
+          if (!saved || !saved.id || seen[saved.id]) return;
+          seen[saved.id] = true;
+          var live = liveById[saved.id];
+          if (live) {
+            if (Object.prototype.hasOwnProperty.call(saved, 'score')) {
+              live.score = Number(saved.score) || 0;
+            }
+            return;
+          }
+          var created = studentFromDefaultSnapshot(saved);
+          list.splice(Math.min(idx, list.length), 0, created);
+          liveById[created.id] = created;
+        });
+        cls.students = list;
+        return true;
+      }
+
+      function defaultLoadPositions(cls) {
+        var list = [];
+        var seen = {};
+        (cls.defaultPositions || []).forEach(function (p) {
+          if (!p || !p.id || seen[p.id]) return;
+          seen[p.id] = true;
+          list.push({ id: p.id, x: p.x, y: p.y });
+        });
+        if (cls.customDefaultSaved && Array.isArray(cls.defaultStudentSnapshot)) {
+          cls.defaultStudentSnapshot.forEach(function (st) {
+            if (!st || !st.id || seen[st.id]) return;
+            seen[st.id] = true;
+            list.push({ id: st.id, x: st.x, y: st.y });
+          });
+        }
+        return list;
       }
 
       // Restore saved team names, icons, colours, order, and membership. Live scores stay on matching group ids.
@@ -4411,13 +4568,18 @@
 
       function resetLayoutToDefaultGrid() {
         const cls = getCurrentClass();
-        if (!cls || cls.students.length === 0) return;
+        if (!cls) return;
         ensureClassDefaultPositions(cls);
+        var savedRoster = cls.customDefaultSaved && Array.isArray(cls.defaultStudentSnapshot) && cls.defaultStudentSnapshot.length > 0;
+        if ((!cls.students || cls.students.length === 0) && !savedRoster) return;
         const before = snapshotBoardEdit(cls);
-        applyLayoutPositions(cls, cls.defaultPositions);
-        // Exact preset snap-back — scores untouched; no spatial repack
+        const scoresRestored = restoreDefaultStudents(cls);
+        const positions = defaultLoadPositions(cls);
+        applyLayoutPositions(cls, positions);
+        // Exact preset snap-back. Saved desks keep their saved xy. Desk scores
+        // come from the Save Default snapshot when this class has one.
         const locked = {};
-        (cls.defaultPositions || []).forEach(function (p) { locked[p.id] = true; });
+        positions.forEach(function (p) { locked[p.id] = true; });
         ensureNoOverlapsProtecting(cls.students, locked);
         const groupingRestored = applyDefaultGrouping(cls);
         pushLayoutHistory(before, snapshotBoardEdit(cls), 'Load');
@@ -4431,10 +4593,11 @@
         if (groupModal && !groupModal.classList.contains('hidden')) {
           renderGroupModalContents();
         }
+        var scoreNote = scoresRestored ? 'Scores restored.' : 'Scores kept.';
         showToast(
           groupingRestored
-            ? 'Layout restored. Scores kept.'
-            : 'Seating restored. Scores kept.',
+            ? ('Layout restored. ' + scoreNote)
+            : ('Seating restored. ' + scoreNote),
           '🔃'
         );
       }
