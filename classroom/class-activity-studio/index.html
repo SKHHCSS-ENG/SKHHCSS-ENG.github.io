@@ -7566,11 +7566,7 @@
             return;
           }
           if (!hasToken()) {
-            if (!gsiReady()) {
-              showSignIn('Save online');
-              return;
-            }
-            startSignIn(function () { showSaveForm(); });
+            showSignIn('Save online');
             return;
           }
           showSaveForm();

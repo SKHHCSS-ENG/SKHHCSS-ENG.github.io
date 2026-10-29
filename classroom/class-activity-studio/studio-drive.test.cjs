@@ -214,6 +214,9 @@ test('public client id is set, with no secret, and only an empty id is refused',
   assert.match(html, /function configured\(\) \{\s*return !!\(currentClientId\(\) && SD\);\s*\}/);
   assert.equal(html.split("showToast('Google sign-in is not set up.'").length - 1, 2);
   assert.match(html, /if \(!configured\(\)\) \{\s*showToast\('Google sign-in is not set up\.', '⚠️'\);\s*return;\s*\}/);
+  var saveHandler = html.slice(html.indexOf("getElementById('btnSaveOnline')"), html.indexOf("getElementById('btnOpenPlan')"));
+  assert.match(saveHandler, /if \(!hasToken\(\)\) \{\s*showSignIn\('Save online'\);\s*return;\s*\}/);
+  assert.equal(saveHandler.indexOf('startSignIn'), -1);
 });
 
 test('Studio chrome keeps local Save / Load and adds the Drive chips after them', function () {
