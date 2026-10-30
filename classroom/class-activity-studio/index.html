@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Class Activity Studio · English · SKH Holy Carpenter Secondary School</title>
+  <title>HCS Live Class · English · SKH Holy Carpenter Secondary School</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1581,9 +1581,14 @@
     @media (min-width: 640px) {
       #podiumModal .podium-medal { font-size: 0.875rem; }
     }
-    /* Mast: Back stays on the left. Class Activity Studio is the centred
-       title. The SKHHCSS badge sits beside that title and is not part of
-       the centred string. */
+    /* Mast: Back stays on the left. The centred mark is Muse's Bright
+       HCS Live Class lock. The #123a4d plate is left off the asset so the
+       cyan→yellow→coral mesh sits on this header gradient. The image is
+       cropped to the ink. On the stacked mast its height is the old h1
+       line box (clamp 16px / 5.6vw / 24px × 1.1). On the single-row mast
+       it uses the 44px Back row that already sets #studioMast, so the
+       bar does not grow. Measured before: 52px at 1280, 60.78px at 860,
+       58.41px at 390, 54.09px at 320. */
     .studio-mast {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -1613,9 +1618,8 @@
       min-width: 0;
       max-width: 100%;
     }
-    /* Shrink-wraps to the title so the badge can hang off its left
-       without pulling the title off centre. Sits above the Back link's
-       44px tap padding, which hangs into this row on small screens. */
+    /* Shrink-wraps to the mark so it stays centred. Sits above the Back
+       link's 44px tap padding, which hangs into this row on small screens. */
     .studio-title {
       position: relative;
       z-index: 2;
@@ -1623,37 +1627,20 @@
       align-items: center;
       max-width: 100%;
     }
-    .studio-school {
-      position: absolute;
-      right: calc(100% + var(--studio-space));
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: var(--studio-type-label);
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      line-height: 16px;
-      padding: 0 var(--studio-space);
-      border-radius: 999px;
-      background: rgba(251, 191, 36, 0.92);
-      color: #020617;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
-      white-space: nowrap;
-    }
     .studio-brand h1 {
       margin: 0;
-      font-family: var(--font-display);
-      font-weight: 700;
-      letter-spacing: -0.015em;
-      line-height: 1.1;
-      color: #fff;
-      white-space: nowrap;
-      /* 5.6vw keeps the badge inside the mast padding at ~390px.
-         The cap is the 24px chrome title, on the phone and the desk. */
-      font-size: clamp(16px, 5.6vw, var(--studio-type-title));
+      line-height: 0;
+      font-size: 0;
     }
-    @media (min-width: 640px) {
-      .studio-brand h1 { font-size: var(--studio-type-title); }
+    .studio-mark img {
+      display: block;
+      width: auto;
+      height: calc(clamp(16px, 5.6vw, var(--studio-type-title)) * 1.1);
+    }
+    @media (min-width: 861px) {
+      .studio-mark img {
+        height: 44px;
+      }
     }
     @media (max-width: 860px) {
       .studio-mast {
@@ -2243,8 +2230,9 @@
       <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap">← Back to Classroom</a>
       <div class="studio-brand">
         <div class="studio-title">
-          <span class="studio-school">SKHHCSS</span>
-          <h1>Class Activity Studio</h1>
+          <h1 class="studio-mark">
+            <img src="assets/hcs-live-class-bright.svg?v=20261030c" alt="HCS Live Class" width="274" height="86">
+          </h1>
         </div>
       </div>
     </div>
