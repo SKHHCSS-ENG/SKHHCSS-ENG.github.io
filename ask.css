@@ -1,12 +1,13 @@
 /* Ask — draggable circle, bottom-left until the reader moves it.
-   .api-mesh is the shared API wash for this circle and the Explain pill.
-   Pill geometry stays in learning-materials/explain.css.
+   .api-mesh is the shared API wash for this circle, Explain, and SEND.
+   The circle paints the wash on itself. Explain and SEND paint the same
+   wash on ::before (Explain’s pill box stays in learning-materials/explain.css).
    Blue → violet → magenta → orange → yellow, one 10s loop.
-   Ink is soft off-white #f4f0e8. Warm stops are deep enough that this ink
-   stays about 4.7:1 or better on every sRGB blend (lightest stop #7c6906).
-   The wash does not use Competition purple #6b2a80.
-   Send is the shared Explain API pill: coral #b4594a → lilac #866993,
-   not the circle mesh. Tools dock CSS is untouched.
+   ASK, EXPLAIN, and SEND share the site stack, weight 800, and 0.04em
+   tracking. Ink is soft off-white #f4f0e8. Warm stops are deep enough that
+   this ink stays about 4.7:1 or better on every sRGB blend (lightest stop
+   #7c6906). The wash does not use Competition purple #6b2a80.
+   Tools dock CSS is untouched.
    ask.js clamps the circle, stores the last spot, and snaps clear of the
    dock, an open Cohesion sheet, and Explain pills. */
 
@@ -29,7 +30,8 @@
 }
 
 .ask-floater.api-mesh,
-.explain-btn.api-mesh:not(:disabled)::before {
+.explain-btn.api-mesh:not(:disabled)::before,
+.ask-send.api-mesh::before {
   background-color: #1458d6;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
@@ -38,16 +40,23 @@
   animation: api-mesh-wash 10s ease-in-out infinite;
 }
 
-.explain-btn.api-mesh:not(:disabled) {
+/* One caps family: site stack, weight 800, .8rem, 0.04em, soft off-white. */
+.ask-floater.api-mesh,
+.ask-send.api-mesh,
+.explain-btn.explain-api-pill.api-mesh:not(:disabled) {
   color: var(--api-mesh-ink, #f4f0e8);
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+  font-size: .8rem;
   font-weight: 800;
   letter-spacing: 0.04em;
+  line-height: 1;
   text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ask-floater.api-mesh,
-  .explain-btn.api-mesh:not(:disabled)::before {
+  .explain-btn.api-mesh:not(:disabled)::before,
+  .ask-send.api-mesh::before {
     animation: none !important;
     background-size: 100% 100%;
     background-position: 0% 50%;
@@ -70,9 +79,8 @@
   border-radius: 999px;
   color: var(--api-mesh-ink, #f4f0e8);
   font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
-  /* Same 0.85rem ASK as the 56px circle. At 44px it still clears the rim
-     by about 8px each side, so the label does not need a smaller size. */
-  font-size: .85rem;
+  /* Same .8rem as SEND and EXPLAIN. At 44px the label still clears the rim. */
+  font-size: .8rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.04em;
@@ -123,11 +131,13 @@
   left: 12px;
   right: auto;
   width: min(360px, calc(100vw - 84px));
-  /* One shell for Find and Ask AI. 19.5rem fits the tab row, the field,
-     and three Find hits (paths may wrap). Ask replies scroll in that same
-     body. placeSheet may set a smaller max-height above the dock. */
-  height: min(19.5rem, 70dvh);
-  max-height: min(70dvh, 520px);
+  /* height: auto — empty Find and empty Ask shrink to the tab row + field.
+     max-height is the shared shell: hits and replies scroll inside it and
+     the sheet never grows past it. When Find and Ask AI both have content,
+     ask.js holds one min-height (the taller body, capped here) so switching
+     tabs does not jump. placeSheet may set a smaller max-height above the dock. */
+  height: auto;
+  max-height: min(19.5rem, 70dvh);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -141,6 +151,22 @@
   box-shadow: 0 8px 28px rgba(18, 58, 77, 0.18);
   font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
   box-sizing: border-box;
+}
+
+/* An empty body is still in the sheet. Pull it out of the flex flow so
+   empty Find and empty Ask share one outer height (no extra gap). */
+.ask-sheet:not(.is-filled) .ask-hits,
+.ask-sheet:not(.is-filled) .ask-chat {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
 }
 
 .ask-scrim[hidden],
@@ -367,14 +393,11 @@
   min-width: 0;
 }
 
-/* Explain API pill fill (#b4594a → #866993). Sample controls also wear
-   .api-mesh, which paints the circle wash on ::before instead. */
-.explain-api-pill:not(.api-mesh) {
-  --api-pill-ink: #ffffff;
-  --api-pill-fill: linear-gradient(90deg, #b4594a 0%, #866993 100%);
-}
-
-.ask-send.explain-api-pill {
+/* SEND wears the live mesh on ::before, same wash as Explain and the circle.
+   The button face stays transparent so the static coral→lilac fill cannot cover it. */
+.ask-send.api-mesh {
+  position: relative;
+  isolation: isolate;
   flex: 0 0 auto;
   min-width: 72px;
   min-height: 44px;
@@ -382,16 +405,22 @@
   padding: 0 14px;
   border: 0;
   border-radius: 999px;
-  color: var(--api-pill-ink, #ffffff);
-  font: 800 .8rem/1 inherit;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background-color: #b4594a;
-  background-image: var(--api-pill-fill);
+  background: transparent;
+  font-size: .8rem;
+  line-height: 1;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.ask-send.api-mesh::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .ask-send:disabled,

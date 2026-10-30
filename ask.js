@@ -99,7 +99,7 @@
   box.enterKeyHint = "search";
   var sendBtn = document.createElement("button");
   sendBtn.type = "submit";
-  sendBtn.className = "ask-send explain-api-pill";
+  sendBtn.className = "ask-send api-mesh";
   sendBtn.textContent = "SEND";
   form.appendChild(box);
   form.appendChild(sendBtn);
@@ -191,6 +191,7 @@
       item.appendChild(link);
       hitsBox.appendChild(item);
     }
+    syncShell();
   }
 
   function knownPaths() {
@@ -232,6 +233,7 @@
       rest = rest.slice(at + found.length);
     }
     log.appendChild(p);
+    syncShell();
     log.scrollTop = log.scrollHeight;
   }
 
@@ -240,6 +242,7 @@
     p.className = "ask-mine";
     p.textContent = text;
     log.appendChild(p);
+    syncShell();
   }
 
   function unlockComposer() {
@@ -267,6 +270,7 @@
     box.value = "";
     box.disabled = false;
     sendBtn.disabled = false;
+    syncShell();
   }
 
   function paintMode() {
@@ -302,11 +306,80 @@
     sendBtn.disabled = capped || busy;
     box.placeholder = capped ? "Find or Explain" : "Short question";
     hitsBox.hidden = true;
+    syncShell();
+  }
+
+  var shellMin = 0;
+  var placing = false;
+
+  function panelContentPx(el) {
+    var wasHidden = el.hidden;
+    var prev = el.style.cssText;
+    el.hidden = false;
+    el.style.cssText = "position:absolute;visibility:hidden;display:flex;flex-direction:column;height:auto;max-height:none;min-height:0;flex:none;overflow:visible;width:" + Math.max(0, sheet.clientWidth - 16) + "px;pointer-events:none;";
+    var h = el.scrollHeight;
+    el.style.cssText = prev;
+    el.hidden = wasHidden;
+    return h;
+  }
+
+  function chromePx() {
+    var cs = getComputedStyle(sheet);
+    var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    var border = (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+    var gap = parseFloat(cs.rowGap || cs.gap) || 0;
+    var topEl = sheet.querySelector(".ask-top");
+    var formEl = sheet.querySelector(".ask-form");
+    return topEl.getBoundingClientRect().height + formEl.getBoundingClientRect().height + pad + border + gap * 2;
+  }
+
+  function shellCapPx() {
+    var cap = sheetDesignMaxPx();
+    var inlineMax = parseFloat(sheet.style.maxHeight);
+    if (isFinite(inlineMax) && inlineMax > 0) cap = Math.min(cap, inlineMax);
+    return cap;
+  }
+
+  function applyShellMin() {
+    var cap = shellCapPx();
+    var findLive = currentHits.length > 0;
+    var askLive = log.children.length > 0;
+    var shared = 0;
+    if (findLive && askLive) {
+      shared = chromePx() + Math.max(panelContentPx(hitsBox), panelContentPx(chat));
+    }
+    var hold = Math.max(shared, shellMin || 0);
+    if (!hold) {
+      sheet.style.minHeight = "";
+      return;
+    }
+    sheet.style.minHeight = Math.min(cap, Math.ceil(hold)) + "px";
+  }
+
+  function syncShell() {
+    var filled = mode === "find" ? currentHits.length > 0 : log.children.length > 0;
+    sheet.classList.toggle("is-filled", filled);
+    if (!filled) shellMin = 0;
+    if (!sheetOpen() || placing) {
+      applyShellMin();
+      return;
+    }
+    placing = true;
+    placeSheet();
+    placing = false;
   }
 
   function setMode(next) {
     if (next !== "find" && next !== "ask") return;
     var changed = mode !== next;
+    if (changed && sheetOpen()) {
+      var srcFilled = mode === "find" ? currentHits.length > 0 : log.children.length > 0;
+      var destFilled = next === "ask" && log.children.length > 0;
+      shellMin = srcFilled && destFilled ? Math.round(sheet.getBoundingClientRect().height) : 0;
+    } else if (changed) {
+      shellMin = 0;
+    }
+    if (changed && mode === "find") currentHits = [];
     mode = next;
     if (changed) box.value = "";
     paintMode();
@@ -605,6 +678,22 @@
     return { left: start.left, top: start.top, ok: false };
   }
 
+  function sheetDesignMaxPx() {
+    var prev = sheet.style.maxHeight;
+    sheet.style.maxHeight = "";
+    var px = parseFloat(getComputedStyle(sheet).maxHeight);
+    sheet.style.maxHeight = prev;
+    if (!isFinite(px) || px <= 0) px = 19.5 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+    return px;
+  }
+
+  function applySheetMax(bottomPx) {
+    var room = window.innerHeight - bottomPx - 12;
+    var cap = sheetDesignMaxPx();
+    if (room < cap - 1) sheet.style.maxHeight = Math.max(160, room) + "px";
+    else sheet.style.maxHeight = "";
+  }
+
   function placeSheet() {
     if (!sheetOpen()) return;
     var pad = insets();
@@ -614,13 +703,15 @@
     var dockClear = dockRect && dockRect.width >= 2 && dockRect.height >= 2 && dockRect.top < window.innerHeight && dockRect.bottom > 0;
     if (dockClear) bottomPx = Math.max(bottomPx, Math.ceil(window.innerHeight - dockRect.top + 10));
     sheet.style.bottom = bottomPx + "px";
-    sheet.style.maxHeight = dockClear ? Math.max(160, window.innerHeight - bottomPx - 12) + "px" : "";
+    applySheetMax(bottomPx);
+    applyShellMin();
     var sheetRect = sheet.getBoundingClientRect();
     dockRect = dock ? dock.getBoundingClientRect() : null;
     if (dockRect && rectsOverlap(sheetRect, dockRect)) {
       bottomPx = Math.max(bottomPx, Math.ceil(window.innerHeight - dockRect.top + 10));
       sheet.style.bottom = bottomPx + "px";
-      sheet.style.maxHeight = Math.max(160, window.innerHeight - bottomPx - 12) + "px";
+      applySheetMax(bottomPx);
+      applyShellMin();
       sheetRect = sheet.getBoundingClientRect();
     }
     var circle = floater.getBoundingClientRect();
@@ -631,7 +722,8 @@
       if (lift > bottomPx) {
         bottomPx = lift;
         sheet.style.bottom = bottomPx + "px";
-        sheet.style.maxHeight = Math.max(160, window.innerHeight - bottomPx - 12) + "px";
+        applySheetMax(bottomPx);
+        applyShellMin();
       }
     }
   }

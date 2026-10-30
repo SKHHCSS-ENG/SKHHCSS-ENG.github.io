@@ -40,7 +40,8 @@
   isolation: isolate;
   justify-content: center;
   padding: 0 9px;
-  color: #f4f0e8;
+  color: var(--api-mesh-ink, #f4f0e8);
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
   font-size: .8rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -97,7 +98,7 @@
 }
 
 .explain-btn.explain-api-pill.is-busy:not(:disabled) {
-  color: #f4f0e8;
+  color: var(--api-mesh-ink, #f4f0e8);
 }
 
 .explain-panel {
