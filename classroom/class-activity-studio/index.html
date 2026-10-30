@@ -1760,9 +1760,9 @@
     }
     /* Lesson chrome on the header bar, same chip as Podium and Sound:
        white/15 fill, white/25 stroke, 12px radius, 12px type then 14px
-       from 640px. Full opens browser fullscreen. ▲ hides the title
-       banner; ▼ is the same chip, so the bar does not move. The chips
-       sit in the Export group so they stay with Tools on a wrapped row. */
+       from 640px. Full opens browser fullscreen. ▲ hides the whole
+       coloured header (title and the class/timer bar). ▼ and Full stay
+       on a thin strip of that same bar. */
     .studio-lesson-btn {
       box-sizing: border-box;
       display: inline-flex;
@@ -1838,13 +1838,17 @@
       background: #f8fafc;
       color: #123a4d;
     }
-    /* Author display:grid would beat the hidden attribute. */
-    #studioMast[hidden] {
+    /* One chip row. The class, timer, Export, and Tools slots leave;
+       Full and ▼ stay in the Export group, pushed to the right edge. */
+    #studioHeader.is-banner-collapsed #studioMast,
+    #studioHeader.is-banner-collapsed #studioHeaderCluster,
+    #studioHeader.is-banner-collapsed #studioHeaderUtilities > :not(.studio-header-export),
+    #studioHeader.is-banner-collapsed #studioHeaderExportPair {
       display: none;
     }
-    /* The mast no longer supplies the top inset. Keep one chip-row of air. */
     #studioHeader.is-banner-collapsed .studio-header-bar {
-      padding-top: 0.45rem;
+      padding-top: 0.3rem;
+      padding-bottom: 0.3rem;
     }
     #studioToolbar.is-collapsed .studio-band {
       display: none;
@@ -2081,7 +2085,7 @@
     <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
 
       <!-- Center Controls: Class Preset Selector + Mode Switcher -->
-      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div id="studioHeaderCluster" class="flex flex-wrap items-center gap-2 sm:gap-3">
         <!-- Preset Class Selector -->
         <div class="flex items-center bg-white/15 backdrop-blur-sm rounded-xl p-1 border border-white/20">
           <label for="classSelect" class="text-xs font-semibold px-2 text-sky-100 hidden md:inline">Class:</label>
@@ -2107,7 +2111,7 @@
       </div>
 
       <!-- Right Utilities: Timer, Random Picker, Podium, Sound, Export -->
-      <div class="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+      <div id="studioHeaderUtilities" class="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
         <!-- Live Countdown Timer Button -->
         <div class="relative">
           <button id="btnToggleTimerPanel" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Open the countdown timer">
@@ -2185,23 +2189,24 @@
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
-        <!-- Full and the banner ▲/▼ travel with Export and Tools, so a wrapped
-             phone row keeps the lesson chips on the right instead of the left. -->
+        <!-- Full and ▲/▼ stay when the coloured header folds. Export stays with Tools. -->
         <div class="studio-header-export flex items-center gap-1.5 shrink-0">
           <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
             <span id="fullscreenLabel">Full</span>
           </button>
-          <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast" aria-label="Collapse header">
+          <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast studioHeaderCluster studioHeaderUtilities" aria-label="Collapse header">
             <span id="headerBannerMark" aria-hidden="true">▲</span>
           </button>
-          <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span class="hidden sm:inline">Export CSV</span>
-          </button>
-          <button type="button" id="btnToggleStudioBands" class="edit-switch is-on" aria-expanded="true" aria-pressed="true" aria-controls="studioToolbarRow" aria-label="Tools On">
-            <span class="edit-switch-name">Tools</span>
-            <span class="edit-switch-value" aria-hidden="true">ON</span>
-          </button>
+          <div id="studioHeaderExportPair" class="flex items-center gap-1.5 shrink-0">
+            <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span class="hidden sm:inline">Export CSV</span>
+            </button>
+            <button type="button" id="btnToggleStudioBands" class="edit-switch is-on" aria-expanded="true" aria-pressed="true" aria-controls="studioToolbarRow" aria-label="Tools On">
+              <span class="edit-switch-name">Tools</span>
+              <span class="edit-switch-value" aria-hidden="true">ON</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3370,7 +3375,7 @@
         classPulseOpen: true, // Live Class Pulse and Live Leaderboard share one Show/Hide.
         leaderboardOpen: true, // Kept equal to classPulseOpen. Hide tucks both.
         studioBandsOpen: true, // One Show/Hide for Register, Seating, History, and Scores.
-        headerBannerOpen: true, // Title banner (Back, SKHHCSS, Class Activity Studio). ▼ restores it.
+        headerBannerOpen: true, // Coloured header (title and the class/timer bar). A thin strip keeps ▼ and Full.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
@@ -5095,15 +5100,14 @@
 
       function applyHeaderBanner() {
         const open = state.headerBannerOpen !== false;
-        const mast = document.getElementById('studioMast');
         const header = document.getElementById('studioHeader');
         const btn = document.getElementById('btnToggleHeaderBanner');
         const mark = document.getElementById('headerBannerMark');
-        if (mast) {
-          if (open) mast.removeAttribute('hidden');
-          else mast.setAttribute('hidden', '');
-        }
         if (header) header.classList.toggle('is-banner-collapsed', !open);
+        if (!open) {
+          const pop = document.getElementById('timerPopover');
+          if (pop) pop.classList.add('hidden');
+        }
         if (btn) {
           btn.setAttribute('aria-expanded', open ? 'true' : 'false');
           btn.setAttribute('aria-label', open ? 'Collapse header' : 'Show header');
