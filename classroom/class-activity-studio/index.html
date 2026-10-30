@@ -646,10 +646,12 @@
     }
     /* Front-of-room label only. No smartboard graphic and no teacher's desk.
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
-       seating-board slate and the mast teal — not the amber Random Picker. */
+       seating-board slate and the mast teal — not the amber Random Picker.
+       It sits in the desk stage, on the centre of the column room. JS sets
+       left to that centre. Header, panels, and the floor width are not inputs. */
     .front-of-room {
       position: absolute;
-      left: 50%;
+      left: 0;
       z-index: 4;
       pointer-events: none;
       transform: translateX(-50%);
@@ -2369,10 +2371,8 @@
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
           <!-- Scaled Inner Stage -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
-            
-            <!-- Front-of-room strip. Sits just beyond the desk row that faces the front. -->
+            <!-- Column-room midline. Width comes from the column count, not the floor. -->
             <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
-
             <!-- Desks Layer -->
             <div id="desksContainer" class="absolute inset-0"></div>
           </div>
@@ -4901,6 +4901,7 @@
         const stage = document.getElementById('classroomStage');
         if (stage) stage.style.transform = 'scale(' + state.zoom + ')';
         syncZoomReadout();
+        placeFrontOfRoom();
       }
 
       function commitZoomReadout() {
@@ -5159,8 +5160,13 @@
         const side = document.getElementById('studioSideCol');
         const floorCol = document.getElementById('studioFloorCol');
         const btn = document.getElementById('btnToggleSidePanels');
+        const floor = document.getElementById('classroomViewport');
+        // Captured before the floor widens or narrows. A later layout clamp
+        // would drop a sideways pan and slide the column room on screen.
+        if (floor) floorPanHold = floor.scrollLeft;
         if (side) side.classList.toggle('is-tucked', !open);
         if (floorCol) floorCol.classList.toggle('is-wide', !open);
+        syncStageToWindow();
         if (btn) {
           const mark = btn.querySelector('.side-panels-mark');
           if (mark) mark.textContent = open ? '▶' : '◀';
@@ -5487,10 +5493,18 @@
         };
       }
 
+      // Scroll offset saved across a leaderboard hide/show. Null unless that
+      // toggle is in progress. The column-room centre is not derived from this.
+      var floorPanHold = null;
+
       // The dotted floor fills the card. When the window is wider or taller
       // than the desks, the canvas grows with it (no fixed board, no empty
       // margin). When the desks are larger than the window, the canvas keeps
       // their pixel size and the floor scrolls inside the card.
+      // A sideways pan is part of that width. Hiding the leaderboard makes
+      // the floor wider; if the stage then only grows to the new floor, the
+      // browser clamps scrollLeft and the column room jumps. Keep enough
+      // stage width that the same pan still fits, and put that pan back.
       function syncStageToWindow() {
         const floor = document.getElementById('classroomViewport');
         const stage = document.getElementById('classroomStage');
@@ -5498,8 +5512,24 @@
         const content = getContentStageBounds(getCurrentClass());
         const viewW = Math.max(1, floor.clientWidth);
         const viewH = Math.max(1, floor.clientHeight);
-        stage.style.width = Math.ceil(Math.max(content.width, viewW)) + 'px';
-        stage.style.height = Math.ceil(Math.max(content.height, viewH)) + 'px';
+        const pan = floorPanHold != null ? floorPanHold : floor.scrollLeft;
+        // The vertical scrollbar gutter sits in offsetWidth but not clientWidth.
+        // Max scrollLeft is scrollWidth - offsetWidth, so the kept pan needs
+        // that gutter or the browser clamps it and the room slides.
+        const gutter = Math.max(0, floor.offsetWidth - viewW);
+        const width = Math.ceil(Math.max(content.width, pan + viewW + gutter));
+        const height = Math.ceil(Math.max(content.height, viewH));
+        stage.style.width = width + 'px';
+        stage.style.height = height + 'px';
+        if (floorPanHold != null && floor.scrollLeft !== pan) floor.scrollLeft = pan;
+      }
+
+      function finishFloorPanHold() {
+        if (floorPanHold == null) return;
+        const floor = document.getElementById('classroomViewport');
+        const pan = floorPanHold;
+        floorPanHold = null;
+        if (floor && floor.scrollLeft !== pan) floor.scrollLeft = pan;
       }
 
       // Desk cards and the spotlight name share this fit.
@@ -5614,6 +5644,84 @@
         });
       }
 
+      // Column count on the class. Chrome (header, panels, floor size) is not an input.
+      function seatingColumnCount(cls) {
+        const n = cls && cls.students ? cls.students.length : 0;
+        const fallback = n > 30 ? 7 : 6;
+        const cols = parseInt(cls && cls.gridCols, 10);
+        const used = (isFinite(cols) && cols >= 1) ? cols : fallback;
+        return Math.max(1, Math.min(12, used));
+      }
+
+      // Horizontal slot of column c. Pairs and 4-desk pods share the left–right pitch.
+      // Exam rows use the even column step. This does not read the window.
+      function columnSlotOffset(col, layoutType) {
+        const c = Math.max(0, col);
+        if (layoutType === 'pairs' || layoutType === 'pods4') {
+          const podCol = Math.floor(c / 2);
+          const inPod = c % 2;
+          return podCol * (2 * DESK_W + POD_INNER_GAP_X + POD_AISLE_GAP_X) + inPod * (DESK_W + POD_INNER_GAP_X);
+        }
+        return c * (DESK_W + EXAM_COL_GAP_X);
+      }
+
+      // The seating room is as wide as the column span. Six columns always
+      // make the same width. Opening the header or the leaderboard does not.
+      // The centre matches the layout origin those columns are drawn from.
+      function columnRoomBox(cls) {
+        const cols = seatingColumnCount(cls);
+        const style = (cls && cls.layoutStyle) || 'rows';
+        if (style === 'groupClusters' && cls && cls.students && cls.students.length) {
+          const positions = computeLayoutPositions(cls.students.length, 'groupClusters', !!cls.frontAtTop, cls.students, cls.groups || [], cols, cls.gridRows);
+          let minX = Infinity;
+          let maxX = -Infinity;
+          positions.forEach(function (p) {
+            if (!p || !isFinite(p.x)) return;
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+          });
+          if (isFinite(minX) && isFinite(maxX)) {
+            const width = maxX - minX + DESK_W;
+            return { cols: cols, width: width, center: minX + width / 2 };
+          }
+        }
+        const width = columnSlotOffset(cols - 1, style) + DESK_W;
+        const effStageW = Math.max(STAGE_WIDTH, width + 64);
+        const origin = Math.max(28, Math.round((effStageW - width) / 2));
+        return { cols: cols, width: width, center: origin + width / 2 };
+      }
+
+      // FRONT OF ROOM is inside the scaled stage, on the column-room midline.
+      // Pan and zoom move the view; the room centre stays this column geometry.
+      // The strip still sits just past the desk row that faces the front.
+      function placeFrontOfRoom(cls) {
+        const label = document.getElementById('frontOfRoom');
+        const room = cls || getCurrentClass();
+        if (!label || !room) return;
+        const box = columnRoomBox(room);
+        label.style.left = box.center + 'px';
+        label.style.right = 'auto';
+        let top;
+        if (room.frontAtTop) {
+          let minTop = Infinity;
+          (room.students || []).forEach(function (st) {
+            const y = Number(st.y);
+            if (isFinite(y) && y < minTop) minTop = y;
+          });
+          if (!isFinite(minTop)) minTop = FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP;
+          top = Math.max(0, minTop - FRONT_ROW_GAP - FRONT_LABEL_H);
+        } else {
+          let maxBottom = 0;
+          (room.students || []).forEach(function (st) {
+            const bottom = (Number(st.y) || 0) + DESK_H;
+            if (bottom > maxBottom) maxBottom = bottom;
+          });
+          top = maxBottom + FRONT_ROW_GAP;
+        }
+        label.style.top = top + 'px';
+        label.style.bottom = 'auto';
+      }
+
       // Render Freeform Classroom Floor Plan & Desks
       function renderClassroomCanvas(smoothTransition) {
         const cls = getCurrentClass();
@@ -5635,32 +5743,10 @@
         // Size the canvas to the window, keeping every desk at its pixel size.
         syncStageToWindow();
 
-        // Apply Zoom
+        // Apply Zoom. FRONT OF ROOM stays on the column-room midline.
         stage.style.transform = 'scale(' + state.zoom + ')';
         syncZoomReadout();
-
-        // FRONT OF ROOM sits a compact gap beyond the desk row that faces the front.
-        // Anchored to that row (not the far canvas edge) so a flip does not leave
-        // the old smartboard aisle between the strip and the first desks.
-        if (cls.frontAtTop) {
-          let minTop = Infinity;
-          (cls.students || []).forEach(function (st) {
-            const y = Number(st.y);
-            if (isFinite(y) && y < minTop) minTop = y;
-          });
-          if (!isFinite(minTop)) minTop = FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP;
-          const labelTop = Math.max(0, minTop - FRONT_ROW_GAP - FRONT_LABEL_H);
-          frontLabel.style.top = labelTop + 'px';
-          frontLabel.style.bottom = 'auto';
-        } else {
-          let maxBottom = 0;
-          (cls.students || []).forEach(function (st) {
-            const bottom = (Number(st.y) || 0) + DESK_H;
-            if (bottom > maxBottom) maxBottom = bottom;
-          });
-          frontLabel.style.top = (maxBottom + FRONT_ROW_GAP) + 'px';
-          frontLabel.style.bottom = 'auto';
-        }
+        placeFrontOfRoom(cls);
 
         nameEditLock = true;
         container.innerHTML = cls.students.map(function (st) {
@@ -7291,10 +7377,14 @@
       }
 
       function refreshZoomChipFrame() {
-        if (zoomChipDrag) return;
+        if (zoomChipDrag) {
+          finishFloorPanHold();
+          return;
+        }
         syncZoomSlot();
         fitFloorAboveZoomGutter();
         if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
+        finishFloorPanHold();
       }
 
       function currentZoomChipOffset(chip) {
