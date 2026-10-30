@@ -99,8 +99,8 @@
   box.enterKeyHint = "search";
   var sendBtn = document.createElement("button");
   sendBtn.type = "submit";
-  sendBtn.className = "ask-send";
-  sendBtn.textContent = "Send";
+  sendBtn.className = "ask-send explain-api-pill";
+  sendBtn.textContent = "SEND";
   form.appendChild(box);
   form.appendChild(sendBtn);
 
