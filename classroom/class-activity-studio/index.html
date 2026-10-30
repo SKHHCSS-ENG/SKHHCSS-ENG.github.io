@@ -5160,8 +5160,13 @@
         const side = document.getElementById('studioSideCol');
         const floorCol = document.getElementById('studioFloorCol');
         const btn = document.getElementById('btnToggleSidePanels');
+        const floor = document.getElementById('classroomViewport');
+        // Captured before the floor widens or narrows. A later layout clamp
+        // would drop a sideways pan and slide the column room on screen.
+        if (floor) floorPanHold = floor.scrollLeft;
         if (side) side.classList.toggle('is-tucked', !open);
         if (floorCol) floorCol.classList.toggle('is-wide', !open);
+        syncStageToWindow();
         if (btn) {
           const mark = btn.querySelector('.side-panels-mark');
           if (mark) mark.textContent = open ? '▶' : '◀';
@@ -5488,10 +5493,18 @@
         };
       }
 
+      // Scroll offset saved across a leaderboard hide/show. Null unless that
+      // toggle is in progress. The column-room centre is not derived from this.
+      var floorPanHold = null;
+
       // The dotted floor fills the card. When the window is wider or taller
       // than the desks, the canvas grows with it (no fixed board, no empty
       // margin). When the desks are larger than the window, the canvas keeps
       // their pixel size and the floor scrolls inside the card.
+      // A sideways pan is part of that width. Hiding the leaderboard makes
+      // the floor wider; if the stage then only grows to the new floor, the
+      // browser clamps scrollLeft and the column room jumps. Keep enough
+      // stage width that the same pan still fits, and put that pan back.
       function syncStageToWindow() {
         const floor = document.getElementById('classroomViewport');
         const stage = document.getElementById('classroomStage');
@@ -5499,8 +5512,24 @@
         const content = getContentStageBounds(getCurrentClass());
         const viewW = Math.max(1, floor.clientWidth);
         const viewH = Math.max(1, floor.clientHeight);
-        stage.style.width = Math.ceil(Math.max(content.width, viewW)) + 'px';
-        stage.style.height = Math.ceil(Math.max(content.height, viewH)) + 'px';
+        const pan = floorPanHold != null ? floorPanHold : floor.scrollLeft;
+        // The vertical scrollbar gutter sits in offsetWidth but not clientWidth.
+        // Max scrollLeft is scrollWidth - offsetWidth, so the kept pan needs
+        // that gutter or the browser clamps it and the room slides.
+        const gutter = Math.max(0, floor.offsetWidth - viewW);
+        const width = Math.ceil(Math.max(content.width, pan + viewW + gutter));
+        const height = Math.ceil(Math.max(content.height, viewH));
+        stage.style.width = width + 'px';
+        stage.style.height = height + 'px';
+        if (floorPanHold != null && floor.scrollLeft !== pan) floor.scrollLeft = pan;
+      }
+
+      function finishFloorPanHold() {
+        if (floorPanHold == null) return;
+        const floor = document.getElementById('classroomViewport');
+        const pan = floorPanHold;
+        floorPanHold = null;
+        if (floor && floor.scrollLeft !== pan) floor.scrollLeft = pan;
       }
 
       // Desk cards and the spotlight name share this fit.
@@ -7348,10 +7377,14 @@
       }
 
       function refreshZoomChipFrame() {
-        if (zoomChipDrag) return;
+        if (zoomChipDrag) {
+          finishFloorPanHold();
+          return;
+        }
         syncZoomSlot();
         fitFloorAboveZoomGutter();
         if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
+        finishFloorPanHold();
       }
 
       function currentZoomChipOffset(chip) {
