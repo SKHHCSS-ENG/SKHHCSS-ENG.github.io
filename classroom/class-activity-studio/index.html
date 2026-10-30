@@ -1758,6 +1758,94 @@
       outline: 2px solid #fff;
       outline-offset: 2px;
     }
+    /* Lesson chrome on the header bar, same chip as Podium and Sound:
+       white/15 fill, white/25 stroke, 12px radius, 12px type then 14px
+       from 640px. Full opens browser fullscreen. ▲ hides the title
+       banner; ▼ is the same chip, so the bar does not move. The chips
+       sit in the Export group so they stay with Tools on a wrapped row. */
+    .studio-lesson-btn {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      gap: 6px;
+      height: auto;
+      min-height: 30px;
+      margin: 0;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      box-shadow: none;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 16px;
+      white-space: nowrap;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    @media (min-width: 640px) {
+      .studio-lesson-btn {
+        min-height: 34px;
+        font-size: 14px;
+        line-height: 20px;
+      }
+    }
+    .studio-lesson-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+    .studio-lesson-btn:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    .studio-lesson-btn[hidden] {
+      display: none;
+    }
+    /* Full and Exit are both four letters. One width so the bar does not jump. */
+    #btnStudioFullscreen {
+      min-width: 4.25rem;
+    }
+    /* ▲ and ▼ share one square so the right edge stays put. */
+    #btnToggleHeaderBanner {
+      width: 34px;
+      min-width: 34px;
+      padding-left: 0;
+      padding-right: 0;
+      font-size: 15px;
+      line-height: 1;
+    }
+    @media (min-width: 640px) {
+      #btnStudioFullscreen { min-width: 4.5rem; }
+      #btnToggleHeaderBanner {
+        width: 38px;
+        min-width: 38px;
+        font-size: 16px;
+      }
+    }
+    /* In fullscreen, or with the banner tucked, the chip turns solid
+       white so Full → Exit and ▲ → ▼ read at a glance. */
+    #btnStudioFullscreen[aria-pressed="true"],
+    #btnToggleHeaderBanner[aria-expanded="false"] {
+      background: #fff;
+      color: #123a4d;
+      border-color: #fff;
+    }
+    #btnStudioFullscreen[aria-pressed="true"]:hover,
+    #btnToggleHeaderBanner[aria-expanded="false"]:hover {
+      background: #f8fafc;
+      color: #123a4d;
+    }
+    /* Author display:grid would beat the hidden attribute. */
+    #studioMast[hidden] {
+      display: none;
+    }
+    /* The mast no longer supplies the top inset. Keep one chip-row of air. */
+    #studioHeader.is-banner-collapsed .studio-header-bar {
+      padding-top: 0.45rem;
+    }
     #studioToolbar.is-collapsed .studio-band {
       display: none;
     }
@@ -1980,8 +2068,8 @@
 <body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
 
   <!-- TOP NAVIGATION & ACTIVITY BAR -->
-  <header class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
-    <div class="studio-mast">
+  <header id="studioHeader" class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
+    <div id="studioMast" class="studio-mast">
       <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap">← Back to Classroom</a>
       <div class="studio-brand">
         <div class="studio-title">
@@ -2097,8 +2185,15 @@
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
-        <!-- Export CSV stays with Show/Hide so the pair sits at the header’s right. -->
+        <!-- Full and the banner ▲/▼ travel with Export and Tools, so a wrapped
+             phone row keeps the lesson chips on the right instead of the left. -->
         <div class="studio-header-export flex items-center gap-1.5 shrink-0">
+          <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
+            <span id="fullscreenLabel">Full</span>
+          </button>
+          <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast" aria-label="Collapse header">
+            <span id="headerBannerMark" aria-hidden="true">▲</span>
+          </button>
           <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span class="hidden sm:inline">Export CSV</span>
@@ -3275,6 +3370,7 @@
         classPulseOpen: true, // Live Class Pulse and Live Leaderboard share one Show/Hide.
         leaderboardOpen: true, // Kept equal to classPulseOpen. Hide tucks both.
         studioBandsOpen: true, // One Show/Hide for Register, Seating, History, and Scores.
+        headerBannerOpen: true, // Title banner (Back, SKHHCSS, Class Activity Studio). ▼ restores it.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
@@ -3354,6 +3450,7 @@
                 state.leaderboardOpen = false;
               }
               state.studioBandsOpen = parsed.studioBandsOpen !== false;
+              state.headerBannerOpen = parsed.headerBannerOpen !== false;
               state.snapToGrid = parsed.snapToGrid !== undefined ? parsed.snapToGrid : true;
               state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
               // Missing flag stays on. Explicit false is teach mode (no rename, delete, drag, or layout tools).
@@ -3390,6 +3487,7 @@
             classPulseOpen: state.classPulseOpen !== false,
             leaderboardOpen: state.leaderboardOpen !== false,
             studioBandsOpen: state.studioBandsOpen !== false,
+            headerBannerOpen: state.headerBannerOpen !== false,
             snapToGrid: state.snapToGrid,
             soundEnabled: state.soundEnabled,
             editMode: state.editMode !== false,
@@ -4939,6 +5037,80 @@
       // RENDER FUNCTIONS: HEADER, GROUP DOCK, DESKS CANVAS, LEADERBOARD
       // ===================================================================
 
+      function studioFullscreenSupported() {
+        const el = document.documentElement;
+        const request = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (!request) return false;
+        const enabled = document.fullscreenEnabled != null
+          ? document.fullscreenEnabled
+          : document.webkitFullscreenEnabled;
+        return enabled !== false;
+      }
+
+      function studioIsFullscreen() {
+        return !!(document.fullscreenElement || document.webkitFullscreenElement);
+      }
+
+      function requestStudioFullscreen() {
+        const el = document.documentElement;
+        const request = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (!request) return Promise.reject(new Error('unsupported'));
+        try {
+          const result = request.call(el);
+          if (result && typeof result.then === 'function') return result;
+          return Promise.resolve();
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
+
+      function exitStudioFullscreen() {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (!exit) return Promise.reject(new Error('unsupported'));
+        try {
+          const result = exit.call(document);
+          if (result && typeof result.then === 'function') return result;
+          return Promise.resolve();
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
+
+      // Fullscreen is a gesture, not a saved flag. Esc and the browser UI
+      // also leave it; the chip follows the document, not a stored boolean.
+      function syncStudioFullscreen() {
+        const btn = document.getElementById('btnStudioFullscreen');
+        const label = document.getElementById('fullscreenLabel');
+        if (!btn) return;
+        if (!studioFullscreenSupported()) {
+          btn.setAttribute('hidden', '');
+          return;
+        }
+        btn.removeAttribute('hidden');
+        const on = studioIsFullscreen();
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.setAttribute('aria-label', on ? 'Exit fullscreen' : 'Fullscreen');
+        if (label) label.textContent = on ? 'Exit' : 'Full';
+      }
+
+      function applyHeaderBanner() {
+        const open = state.headerBannerOpen !== false;
+        const mast = document.getElementById('studioMast');
+        const header = document.getElementById('studioHeader');
+        const btn = document.getElementById('btnToggleHeaderBanner');
+        const mark = document.getElementById('headerBannerMark');
+        if (mast) {
+          if (open) mast.removeAttribute('hidden');
+          else mast.setAttribute('hidden', '');
+        }
+        if (header) header.classList.toggle('is-banner-collapsed', !open);
+        if (btn) {
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          btn.setAttribute('aria-label', open ? 'Collapse header' : 'Show header');
+        }
+        if (mark) mark.textContent = open ? '▲' : '▼';
+      }
+
       function applyStudioBands() {
         const open = state.studioBandsOpen !== false;
         const bar = document.getElementById('studioToolbar');
@@ -4977,6 +5149,7 @@
 
       function renderAll() {
         applyStudioBands();
+        applyHeaderBanner();
         applySidePanels();
         renderHeaderControls();
         renderGroupBrushBar();
@@ -5100,6 +5273,7 @@
           soundBtn.removeAttribute('title');
           soundBtn.setAttribute('aria-label', state.soundEnabled ? 'Sound' : 'Muted');
         }
+        syncStudioFullscreen();
 
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
@@ -7628,6 +7802,30 @@
             scheduleFloorFit();
           });
         }
+        const btnHeaderBanner = document.getElementById('btnToggleHeaderBanner');
+        if (btnHeaderBanner) {
+          btnHeaderBanner.addEventListener('click', function () {
+            state.headerBannerOpen = state.headerBannerOpen === false;
+            saveState();
+            applyHeaderBanner();
+            scheduleFloorFit();
+          });
+        }
+        const btnFullscreen = document.getElementById('btnStudioFullscreen');
+        if (btnFullscreen) {
+          btnFullscreen.addEventListener('click', function () {
+            const pending = studioIsFullscreen() ? exitStudioFullscreen() : requestStudioFullscreen();
+            pending.catch(function () {
+              showToast('Fullscreen is not available in this browser.', '⛶');
+            });
+          });
+        }
+        function onStudioFullscreenChange() {
+          syncStudioFullscreen();
+          scheduleFloorFit();
+        }
+        document.addEventListener('fullscreenchange', onStudioFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', onStudioFullscreenChange);
         const btnSidePanels = document.getElementById('btnToggleSidePanels');
         if (btnSidePanels) {
           btnSidePanels.addEventListener('click', function () {
