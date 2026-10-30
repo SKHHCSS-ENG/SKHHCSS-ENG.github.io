@@ -28,6 +28,18 @@
       /* Podium shell stays max-w-4xl. Names and 1st/2nd/3rd only. */
       --podium-name-size: 1.5rem;
       --podium-rank-size: 2rem;
+      /* Studio chrome only. 8 / 16 / 24. Labels and toolbar chips are 12px.
+         Header controls and board titles are 14px. The mast title is 24px.
+         Header chips share one 32px height. Toolbar chips stay compact. */
+      --studio-space: 8px;
+      --studio-space-2: 16px;
+      --studio-space-3: 24px;
+      --studio-inset: 16px;
+      --studio-type-label: 12px;
+      --studio-type-control: 14px;
+      --studio-type-title: 24px;
+      --studio-header-chip: 32px;
+      --studio-chip-h: 24px;
     }
     body {
       font-family: var(--font-sans);
@@ -321,7 +333,7 @@
       border-bottom: 1px solid #e2e8f0;
       border-top-left-radius: 1rem;
       border-top-right-radius: 1rem;
-      padding: 0.4rem 0.75rem 0.45rem;
+      padding: var(--studio-space) var(--studio-space-2);
       overflow-x: hidden;
     }
     /* :not(.hidden) so this does not beat Tailwind .hidden in Individual Work.
@@ -343,7 +355,13 @@
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      min-height: 26px;
+      box-sizing: border-box;
+      min-height: var(--studio-chip-h);
+    }
+    .group-score-dock-bar h2,
+    .panel-title-bar h2 {
+      font-size: var(--studio-type-control);
+      line-height: 1.15;
     }
     .group-score-dock-bar h2 {
       grid-column: 1 / -1;
@@ -430,8 +448,9 @@
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
-      min-height: 36px;
-      padding: 0.45rem 0.75rem;
+      box-sizing: border-box;
+      min-height: 40px;
+      padding: var(--studio-space) var(--studio-space-2);
     }
     .panel-title-bar h2 {
       margin: 0;
@@ -491,22 +510,14 @@
       outline: 2px solid #123a4d;
       outline-offset: 2px;
     }
+    /* Page inset is 16px at every width, so the tab reservation is the
+       same step on the phone and the desk. */
     #studioSideCol {
-      padding-right: calc(var(--side-panels-tab-w) - 12px);
-    }
-    @media (min-width: 640px) {
-      #studioSideCol {
-        padding-right: calc(var(--side-panels-tab-w) - 20px);
-      }
+      padding-right: calc(var(--side-panels-tab-w) - var(--studio-inset));
     }
     @media (max-width: 1023px) {
       #studioFloorCol {
-        padding-right: calc(var(--side-panels-tab-w) - 12px);
-      }
-    }
-    @media (min-width: 640px) and (max-width: 1023px) {
-      #studioFloorCol {
-        padding-right: calc(var(--side-panels-tab-w) - 20px);
+        padding-right: calc(var(--side-panels-tab-w) - var(--studio-inset));
       }
     }
     #studioSideCol.is-tucked {
@@ -517,7 +528,7 @@
     }
     @media (min-width: 1024px) {
       #studioFloorCol.is-wide {
-        padding-right: calc(var(--side-panels-tab-w) - 20px);
+        padding-right: calc(var(--side-panels-tab-w) - var(--studio-inset));
       }
     }
     #pulseCard {
@@ -527,7 +538,7 @@
       color: #fff;
     }
     #pulseBody {
-      padding: 0 0.85rem 0.85rem;
+      padding: 0 var(--studio-space-2) var(--studio-space-2);
     }
     #leaderboardCard.is-open {
       flex: 1 1 auto;
@@ -1247,9 +1258,9 @@
     /* Edit + ON/OFF. Compact pill on the Register band only.
        The header Tools chip does not use this frame. */
     .studio-band #btnToggleEditName.edit-switch {
-      gap: 5px;
-      padding-left: 8px;
-      padding-right: 3px;
+      gap: var(--studio-space);
+      padding-left: var(--studio-space);
+      padding-right: 0;
       border-radius: 999px;
       font-weight: 700;
     }
@@ -1261,12 +1272,12 @@
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-      min-width: 30px;
+      min-width: 32px;
       height: 16px;
-      padding: 0 5px;
+      padding: 0 var(--studio-space);
       border-radius: 999px;
-      font-size: 9px;
-      font-weight: 800;
+      font-size: var(--studio-type-label);
+      font-weight: 700;
       letter-spacing: 0.04em;
       line-height: 1;
     }
@@ -1577,13 +1588,13 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
-      column-gap: 0.75rem;
+      column-gap: var(--studio-space-2);
       max-width: 1600px;
       margin: 0 auto;
-      padding: 0.5rem 0.75rem 0.15rem;
+      padding: var(--studio-space) var(--studio-inset) 0;
     }
     @media (min-width: 640px) {
-      .studio-mast { padding: 0.55rem 1.25rem 0.1rem; }
+      .studio-mast { padding: var(--studio-space) var(--studio-inset) 0; }
     }
     .studio-back {
       display: inline-flex;
@@ -1614,15 +1625,15 @@
     }
     .studio-school {
       position: absolute;
-      right: calc(100% + 0.5rem);
+      right: calc(100% + var(--studio-space));
       top: 50%;
       transform: translateY(-50%);
-      font-size: 11px;
-      font-weight: 800;
+      font-size: var(--studio-type-label);
+      font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      line-height: 1;
-      padding: 0.22rem 0.5rem;
+      line-height: 16px;
+      padding: 0 var(--studio-space);
       border-radius: 999px;
       background: rgba(251, 191, 36, 0.92);
       color: #020617;
@@ -1638,11 +1649,11 @@
       color: #fff;
       white-space: nowrap;
       /* 5.6vw keeps the badge inside the mast padding at ~390px.
-         The cap is the same 1.5rem phone size as before. */
-      font-size: clamp(1.25rem, 5.6vw, 1.5rem);
+         The cap is the 24px chrome title, on the phone and the desk. */
+      font-size: clamp(16px, 5.6vw, var(--studio-type-title));
     }
     @media (min-width: 640px) {
-      .studio-brand h1 { font-size: 1.8rem; }
+      .studio-brand h1 { font-size: var(--studio-type-title); }
     }
     @media (max-width: 860px) {
       .studio-mast {
@@ -1650,6 +1661,7 @@
         flex-direction: column;
         align-items: stretch;
         row-gap: 0.15rem;
+        padding-bottom: var(--studio-space);
       }
       .studio-back {
         align-self: flex-start;
@@ -1665,33 +1677,30 @@
       }
       .studio-brand { align-self: center; width: 100%; }
     }
-    /* Toolbar band names. Same size and weight as the old “Quick Layout:”
-       label, kept in Title Case so they stay glanceable section headers. */
+    /* Toolbar band names. 12px / 700, the same step as the chips.
+       Title Case, no colon, so they stay glanceable section headers. */
     .studio-band-label {
       flex-shrink: 0;
-      margin-right: 0.125rem;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.05em;
+      margin-right: 0;
+      font-size: var(--studio-type-label);
+      font-weight: 700;
+      letter-spacing: 0.04em;
       line-height: 1;
       color: #123a4d;
       white-space: nowrap;
     }
     .studio-band {
       min-width: 0;
-      /* One compact height for every chip in Register, Seating, History,
-         and Scores. 26px is a text-xs line (16px) plus py-1 (8px) plus a
-         1px border — the Assign Groups / ＋ Desk size, not the 44px targets. */
-      --studio-chip-h: 26px;
-      /* Quiet frame. One light stroke, same 8px radius as the chips
+      /* Quiet frame. Chip height is --studio-chip-h (24px): 12px type,
+         not the 44px targets. One light stroke, same 8px radius as the chips
          (rounded-lg). The label stays inside, Title Case, no colon. */
       border: 1px solid rgba(42, 143, 173, 0.4);
-      border-radius: 0.5rem;
-      padding: 2px 5px;
+      border-radius: 8px;
+      padding: 0 var(--studio-space);
     }
     @media (min-width: 640px) {
       .studio-band {
-        padding: 3px 7px;
+        padding: 0 var(--studio-space);
       }
     }
     /* Tools sits in the header, immediately after Export CSV.
@@ -1710,17 +1719,17 @@
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
-      gap: 6px;
-      height: auto;
-      min-height: 30px;
+      gap: var(--studio-space);
+      height: var(--studio-header-chip);
+      min-height: var(--studio-header-chip);
       margin: 0;
-      padding: 6px 12px;
+      padding: 0 var(--studio-space);
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.15);
       color: #fff;
       box-shadow: none;
-      font-size: 12px;
+      font-size: var(--studio-type-label);
       font-weight: 700;
       line-height: 16px;
       white-space: nowrap;
@@ -1729,9 +1738,8 @@
       #btnToggleStudioBands.edit-switch,
       #btnToggleStudioBands.edit-switch.is-on,
       #btnToggleStudioBands.edit-switch.is-off {
-        min-height: 34px;
-        font-size: 14px;
-        line-height: 20px;
+        font-size: var(--studio-type-control);
+        line-height: 16px;
       }
     }
     #btnToggleStudioBands.edit-switch:hover,
@@ -1772,17 +1780,17 @@
       align-items: center;
       justify-content: center;
       flex: 0 0 auto;
-      gap: 6px;
-      height: auto;
-      min-height: 30px;
+      gap: var(--studio-space);
+      height: var(--studio-header-chip);
+      min-height: var(--studio-header-chip);
       margin: 0;
-      padding: 6px 12px;
+      padding: 0 var(--studio-space);
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.15);
       color: #fff;
       box-shadow: none;
-      font-size: 12px;
+      font-size: var(--studio-type-label);
       font-weight: 700;
       line-height: 16px;
       white-space: nowrap;
@@ -1791,9 +1799,8 @@
     }
     @media (min-width: 640px) {
       .studio-lesson-btn {
-        min-height: 34px;
-        font-size: 14px;
-        line-height: 20px;
+        font-size: var(--studio-type-control);
+        line-height: 16px;
       }
     }
     .studio-lesson-btn:hover {
@@ -1810,13 +1817,13 @@
     /* Enter and exit icons share one square with ▲/▼, so the bar does not jump. */
     #btnStudioFullscreen,
     #btnToggleHeaderBanner {
-      width: 34px;
-      min-width: 34px;
+      width: var(--studio-header-chip);
+      min-width: var(--studio-header-chip);
       padding-left: 0;
       padding-right: 0;
     }
     #btnToggleHeaderBanner {
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1;
     }
     .studio-fs-icon {
@@ -1831,10 +1838,9 @@
     @media (min-width: 640px) {
       #btnStudioFullscreen,
       #btnToggleHeaderBanner {
-        width: 38px;
-        min-width: 38px;
+        width: var(--studio-header-chip);
+        min-width: var(--studio-header-chip);
       }
-      #btnToggleHeaderBanner { font-size: 16px; }
     }
     /* In fullscreen, or with the header tucked, the chip turns solid
        white so the exit icon and ▼ read at a glance. */
@@ -1858,8 +1864,7 @@
       display: none;
     }
     #studioHeader.is-banner-collapsed .studio-header-bar {
-      padding-top: 0.3rem;
-      padding-bottom: 0.3rem;
+      padding: 0 var(--studio-inset);
     }
     #studioToolbar.is-collapsed .studio-band {
       display: none;
@@ -1874,13 +1879,13 @@
       box-sizing: border-box;
       height: var(--studio-chip-h);
       min-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
+      padding: 0 var(--studio-space);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       line-height: 1;
-      font-size: 12px;
+      font-size: var(--studio-type-label);
+      font-weight: 600;
     }
     /* Icon-only Undo, Redo, and Reset Scores stay square at that same height. */
     #btnUndoLayout,
@@ -1890,15 +1895,15 @@
       min-width: var(--studio-chip-h);
       padding-left: 0;
       padding-right: 0;
-      font-size: 15px;
+      font-size: 16px;
     }
     /* Snap is one fixed border box. Front keeps its own longer-label floor.
-       Padding, height, and radius stay the seating-chip values (px-3, 26px, rounded-lg). */
+       Padding and height stay the seating-chip values (8px, 24px, rounded-lg). */
     #btnToggleSnapGrid {
-      /* Snap: OFF with the ruler, gap-1, and px-3 measures 102.7px
-         (ruler 15px in this face). 108px is that full border box, slightly
-         above, so a wider color-emoji ruler still fits inside the chip.
-         width and max-width keep ON on the same box. */
+      /* Snap: OFF with the ruler, gap, and 8px padding. 108px is the full
+         border box measured for the 12px semibold face, slightly above the
+         text, so a wider color-emoji ruler still fits. width and max-width
+         keep ON on the same box. */
       flex: 0 0 108px;
       width: 108px;
       min-width: 108px;
@@ -1906,8 +1911,8 @@
     }
     #btnFlipRoom {
       /* "Front: Bottom" measures 9.93ch. 9.95ch is the same small step above it.
-         1.5rem is the shared px-3. */
-      min-width: calc(9.95ch + 1.5rem);
+         16px is the shared 8px padding on both sides. */
+      min-width: calc(9.95ch + 16px);
     }
     .studio-grid-setup {
       box-sizing: border-box;
@@ -1926,16 +1931,17 @@
     }
     .studio-grid-setup input {
       box-sizing: border-box;
-      height: 18px;
+      height: 16px;
       min-height: 0;
       padding-top: 0;
       padding-bottom: 0;
     }
     #btnApplyCustomGrid {
-      height: 18px;
+      height: 16px;
       min-height: 0;
       padding-top: 0;
       padding-bottom: 0;
+      margin-left: 0;
     }
     /* Edit Off is teach mode: seating layout tools stay in place but do not fire.
        The band label stays full strength so the row still reads Register · Seating · History · Scores. */
@@ -2077,6 +2083,155 @@
       font-size: 14px;
       font-weight: 700;
       color: #123a4d;
+    }
+    /* Column rhythm. These beat the Tailwind spacing utilities on the
+       header, toolbar, and board frame. Behaviour and labels stay put. */
+    #studioHeader .studio-header-bar {
+      padding: 0 var(--studio-inset) var(--studio-space);
+      column-gap: var(--studio-space-2);
+      row-gap: var(--studio-space);
+    }
+    #studioHeaderCluster {
+      column-gap: var(--studio-space);
+      row-gap: var(--studio-space);
+    }
+    @media (min-width: 640px) {
+      #studioHeaderCluster {
+        column-gap: var(--studio-space-2);
+      }
+    }
+    #studioHeaderUtilities,
+    #studioHeader .studio-header-export,
+    #studioHeaderExportPair {
+      column-gap: var(--studio-space);
+      row-gap: var(--studio-space);
+    }
+    #studioHeaderCluster > div {
+      padding: 0;
+    }
+    #studioHeaderCluster > div:first-child {
+      gap: var(--studio-space);
+    }
+    #studioHeaderCluster label[for="classSelect"] {
+      padding: 0 var(--studio-space);
+      font-size: var(--studio-type-control);
+      font-weight: 700;
+      line-height: 1;
+    }
+    #classSelect,
+    #btnOpenClassModal,
+    #btnModeIndividual,
+    #btnModeGroup,
+    #btnToggleTimerPanel,
+    #btnOpenPickerModal,
+    #btnOpenPodiumModal,
+    #btnToggleSound,
+    #btnExportCsv {
+      box-sizing: border-box;
+      height: var(--studio-header-chip);
+      min-height: var(--studio-header-chip);
+      padding: 0 var(--studio-space);
+      font-size: var(--studio-type-label);
+      font-weight: 700;
+      line-height: 1;
+    }
+    #classSelect {
+      padding-right: var(--studio-header-chip);
+    }
+    #btnOpenClassModal {
+      margin-left: 0;
+    }
+    @media (min-width: 640px) {
+      #classSelect,
+      #btnOpenClassModal,
+      #btnModeIndividual,
+      #btnModeGroup,
+      #btnToggleTimerPanel,
+      #btnOpenPickerModal,
+      #btnOpenPodiumModal,
+      #btnToggleSound,
+      #btnExportCsv {
+        font-size: var(--studio-type-control);
+      }
+    }
+    #studioToolbarRow {
+      padding: var(--studio-space) var(--studio-inset);
+      column-gap: var(--studio-space-2);
+      row-gap: var(--studio-space);
+    }
+    #studioToolbar .studio-band,
+    #studioSeatingBand .studio-grid-setup {
+      gap: var(--studio-space);
+    }
+    #groupBrushBar {
+      padding: var(--studio-space) var(--studio-inset);
+    }
+    #groupBrushBar > .max-w-\[1600px\],
+    #groupBrushChips {
+      gap: var(--studio-space);
+    }
+    #groupBrushBar .font-extrabold {
+      font-size: var(--studio-type-label);
+      font-weight: 700;
+    }
+    #groupBrushBar button,
+    .brush-chip-btn {
+      box-sizing: border-box;
+      height: var(--studio-chip-h);
+      min-height: var(--studio-chip-h);
+      padding: 0 var(--studio-space);
+      font-size: var(--studio-type-label);
+      font-weight: 700;
+      line-height: 1;
+    }
+    #studioWorkspace {
+      padding: var(--studio-space) var(--studio-inset) 0;
+      gap: var(--studio-space-2);
+    }
+    #studioSideCol {
+      gap: var(--studio-space-2);
+    }
+    #btnToggleTeamScoreboard {
+      box-sizing: border-box;
+      height: var(--studio-chip-h);
+      min-height: var(--studio-chip-h);
+      padding: 0 var(--studio-space);
+      font-size: var(--studio-type-label);
+      font-weight: 700;
+      line-height: 1;
+    }
+    #tabLbStudents,
+    #tabLbGroups,
+    #tabLbFeed {
+      box-sizing: border-box;
+      height: var(--studio-header-chip);
+      min-height: var(--studio-header-chip);
+      padding: 0 var(--studio-space);
+      font-size: var(--studio-type-label);
+      font-weight: 700;
+      line-height: 1;
+    }
+    #leaderboardPanel > .border-b,
+    #lbSearchWrapper,
+    #leaderboardBody {
+      padding: var(--studio-space) var(--studio-space-2);
+    }
+    #lbSearchInput {
+      box-sizing: border-box;
+      height: var(--studio-header-chip);
+      min-height: var(--studio-header-chip);
+      padding: 0 var(--studio-space-2);
+      font-size: var(--studio-type-label);
+    }
+    #leaderboardSortHint,
+    #pulseBody .grid > div > div:first-child {
+      font-size: var(--studio-type-label);
+      line-height: 16px;
+      font-weight: 600;
+    }
+    #statTotalPoints {
+      font-size: var(--studio-type-title);
+      line-height: 1.15;
     }
   </style>
 </head>
