@@ -275,7 +275,7 @@
     findTab.setAttribute("aria-selected", finding ? "true" : "false");
     askTab.setAttribute("aria-selected", finding ? "false" : "true");
     findTab.tabIndex = finding ? 0 : -1;
-    askTab.tabIndex = finding ? 0 : -1;
+    askTab.tabIndex = finding ? -1 : 0;
     sheet.setAttribute("data-ask-mode", mode);
     chat.hidden = finding;
     if (finding) {
