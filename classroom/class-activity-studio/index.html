@@ -1760,9 +1760,10 @@
     }
     /* Lesson chrome on the header bar, same chip as Podium and Sound:
        white/15 fill, white/25 stroke, 12px radius, 12px type then 14px
-       from 640px. Full opens browser fullscreen. ▲ hides the whole
-       coloured header (title and the class/timer bar). ▼ and Full stay
-       on a thin strip of that same bar. */
+       from 640px. The fullscreen chip uses the enter and exit corner
+       icons (same 16px, 2.3 stroke as Export). ▲ hides the whole
+       coloured header (title and the class/timer bar). ▼ and that icon
+       stay on a thin strip of the same bar. */
     .studio-lesson-btn {
       box-sizing: border-box;
       display: inline-flex;
@@ -1804,29 +1805,37 @@
     .studio-lesson-btn[hidden] {
       display: none;
     }
-    /* Full and Exit are both four letters. One width so the bar does not jump. */
-    #btnStudioFullscreen {
-      min-width: 4.25rem;
-    }
-    /* ▲ and ▼ share one square so the right edge stays put. */
+    /* Enter and exit icons share one square with ▲/▼, so the bar does not jump. */
+    #btnStudioFullscreen,
     #btnToggleHeaderBanner {
       width: 34px;
       min-width: 34px;
       padding-left: 0;
       padding-right: 0;
+    }
+    #btnToggleHeaderBanner {
       font-size: 15px;
       line-height: 1;
     }
+    .studio-fs-icon {
+      width: 16px;
+      height: 16px;
+      display: block;
+      flex: 0 0 auto;
+    }
+    .studio-fs-icon[hidden] {
+      display: none;
+    }
     @media (min-width: 640px) {
-      #btnStudioFullscreen { min-width: 4.5rem; }
+      #btnStudioFullscreen,
       #btnToggleHeaderBanner {
         width: 38px;
         min-width: 38px;
-        font-size: 16px;
       }
+      #btnToggleHeaderBanner { font-size: 16px; }
     }
-    /* In fullscreen, or with the banner tucked, the chip turns solid
-       white so Full → Exit and ▲ → ▼ read at a glance. */
+    /* In fullscreen, or with the header tucked, the chip turns solid
+       white so the exit icon and ▼ read at a glance. */
     #btnStudioFullscreen[aria-pressed="true"],
     #btnToggleHeaderBanner[aria-expanded="false"] {
       background: #fff;
@@ -1839,7 +1848,7 @@
       color: #123a4d;
     }
     /* One chip row. The class, timer, Export, and Tools slots leave;
-       Full and ▼ stay in the Export group, pushed to the right edge. */
+       the fullscreen icon and ▼ stay in the Export group, on the right. */
     #studioHeader.is-banner-collapsed #studioMast,
     #studioHeader.is-banner-collapsed #studioHeaderCluster,
     #studioHeader.is-banner-collapsed #studioHeaderUtilities > :not(.studio-header-export),
@@ -2189,14 +2198,9 @@
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
-        <!-- Full and ▲/▼ stay when the coloured header folds. Export stays with Tools. -->
+        <!-- Export stays with Tools. The fullscreen icon and ▲/▼ are last,
+             so they keep the same right-edge spot when the header folds. -->
         <div class="studio-header-export flex items-center gap-1.5 shrink-0">
-          <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
-            <span id="fullscreenLabel">Full</span>
-          </button>
-          <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast studioHeaderCluster studioHeaderUtilities" aria-label="Collapse header">
-            <span id="headerBannerMark" aria-hidden="true">▲</span>
-          </button>
           <div id="studioHeaderExportPair" class="flex items-center gap-1.5 shrink-0">
             <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -2207,6 +2211,13 @@
               <span class="edit-switch-value" aria-hidden="true">ON</span>
             </button>
           </div>
+          <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
+            <svg id="fullscreenEnterIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            <svg id="fullscreenExitIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+          </button>
+          <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast studioHeaderCluster studioHeaderUtilities" aria-label="Collapse header">
+            <span id="headerBannerMark" aria-hidden="true">▲</span>
+          </button>
         </div>
       </div>
     </div>
@@ -3375,7 +3386,7 @@
         classPulseOpen: true, // Live Class Pulse and Live Leaderboard share one Show/Hide.
         leaderboardOpen: true, // Kept equal to classPulseOpen. Hide tucks both.
         studioBandsOpen: true, // One Show/Hide for Register, Seating, History, and Scores.
-        headerBannerOpen: true, // Coloured header (title and the class/timer bar). A thin strip keeps ▼ and Full.
+        headerBannerOpen: true, // Coloured header (title and the class/timer bar). A thin strip keeps ▼ and the fullscreen icon.
         snapToGrid: true,
         zoom: 1,
         soundEnabled: true,
@@ -5085,7 +5096,8 @@
       // also leave it; the chip follows the document, not a stored boolean.
       function syncStudioFullscreen() {
         const btn = document.getElementById('btnStudioFullscreen');
-        const label = document.getElementById('fullscreenLabel');
+        const enterIcon = document.getElementById('fullscreenEnterIcon');
+        const exitIcon = document.getElementById('fullscreenExitIcon');
         if (!btn) return;
         if (!studioFullscreenSupported()) {
           btn.setAttribute('hidden', '');
@@ -5095,7 +5107,14 @@
         const on = studioIsFullscreen();
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         btn.setAttribute('aria-label', on ? 'Exit fullscreen' : 'Fullscreen');
-        if (label) label.textContent = on ? 'Exit' : 'Full';
+        if (enterIcon) {
+          if (on) enterIcon.setAttribute('hidden', '');
+          else enterIcon.removeAttribute('hidden');
+        }
+        if (exitIcon) {
+          if (on) exitIcon.removeAttribute('hidden');
+          else exitIcon.setAttribute('hidden', '');
+        }
       }
 
       function applyHeaderBanner() {
