@@ -646,7 +646,21 @@
     }
     /* Front-of-room label only. No smartboard graphic and no teacher's desk.
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
-       seating-board slate and the mast teal — not the amber Random Picker. */
+       seating-board slate and the mast teal — not the amber Random Picker.
+       The pin matches the visible floor, not the desk canvas. It sticks
+       when the floor pans sideways, so a wider grid, a zoom scale, or the
+       leaderboard opening cannot slide the pill off the viewport midline.
+       Height is zero so it does not push the desks down. */
+    .front-of-room-pin {
+      position: sticky;
+      left: 0;
+      width: 100%;
+      height: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      pointer-events: none;
+    }
     .front-of-room {
       position: absolute;
       left: 50%;
@@ -2367,12 +2381,12 @@
         </section>
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
+          <!-- Midline of the visible floor. Not a child of the scaled stage. -->
+          <div class="front-of-room-pin">
+            <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
+          </div>
           <!-- Scaled Inner Stage -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
-            
-            <!-- Front-of-room strip. Sits just beyond the desk row that faces the front. -->
-            <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
-
             <!-- Desks Layer -->
             <div id="desksContainer" class="absolute inset-0"></div>
           </div>
@@ -4901,6 +4915,7 @@
         const stage = document.getElementById('classroomStage');
         if (stage) stage.style.transform = 'scale(' + state.zoom + ')';
         syncZoomReadout();
+        placeFrontOfRoom();
       }
 
       function commitZoomReadout() {
@@ -5614,6 +5629,81 @@
         });
       }
 
+      // Live desk scale, including a zoom transition that has not finished.
+      // Falls back to the committed zoom.
+      function readStageScale() {
+        const stage = document.getElementById('classroomStage');
+        const fallback = state.zoom || 1;
+        if (!stage) return fallback;
+        const tr = window.getComputedStyle(stage).transform;
+        if (!tr || tr === 'none') return fallback;
+        const match = /^matrix\(([^,]+)/.exec(tr);
+        if (!match) return fallback;
+        const scale = parseFloat(match[1]);
+        if (!isFinite(scale) || scale <= 0) return fallback;
+        return scale;
+      }
+
+      // Vertical spot for FRONT OF ROOM, in floor pixels. The pill is not
+      // inside the scaled stage, so the gap zooms with the desks while the
+      // 32px frame stays the same size. Horizontal centre is CSS on the pin.
+      function placeFrontOfRoom(cls) {
+        const label = document.getElementById('frontOfRoom');
+        const room = cls || getCurrentClass();
+        if (!label || !room) return;
+        const scale = readStageScale();
+        let top;
+        if (room.frontAtTop) {
+          let minTop = Infinity;
+          (room.students || []).forEach(function (st) {
+            const y = Number(st.y);
+            if (isFinite(y) && y < minTop) minTop = y;
+          });
+          if (!isFinite(minTop)) minTop = FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP;
+          top = (minTop - FRONT_ROW_GAP) * scale - FRONT_LABEL_H;
+        } else {
+          let maxBottom = 0;
+          (room.students || []).forEach(function (st) {
+            const bottom = (Number(st.y) || 0) + DESK_H;
+            if (bottom > maxBottom) maxBottom = bottom;
+          });
+          top = (maxBottom + FRONT_ROW_GAP) * scale;
+        }
+        label.style.top = top + 'px';
+        label.style.bottom = 'auto';
+      }
+
+      // The desk scale eases for 150ms. Follow it so the strip stays on the
+      // facing row instead of jumping to the finished zoom.
+      var frontPinFrame = 0;
+      var frontPinUntil = 0;
+      function followFrontOfRoomZoom() {
+        frontPinUntil = performance.now() + 240;
+        if (frontPinFrame) return;
+        function tick(now) {
+          placeFrontOfRoom();
+          if (now < frontPinUntil) frontPinFrame = requestAnimationFrame(tick);
+          else frontPinFrame = 0;
+        }
+        frontPinFrame = requestAnimationFrame(tick);
+      }
+
+      var frontPinBound = false;
+      function bindFrontOfRoomPin() {
+        if (frontPinBound) return;
+        const stage = document.getElementById('classroomStage');
+        if (!stage) return;
+        frontPinBound = true;
+        stage.addEventListener('transitionrun', function (e) {
+          if (e.propertyName !== 'transform') return;
+          followFrontOfRoomZoom();
+        });
+        stage.addEventListener('transitionend', function (e) {
+          if (e.propertyName !== 'transform') return;
+          placeFrontOfRoom();
+        });
+      }
+
       // Render Freeform Classroom Floor Plan & Desks
       function renderClassroomCanvas(smoothTransition) {
         const cls = getCurrentClass();
@@ -5635,32 +5725,11 @@
         // Size the canvas to the window, keeping every desk at its pixel size.
         syncStageToWindow();
 
-        // Apply Zoom
+        // Apply Zoom. FRONT OF ROOM's midline is the pin, not this stage.
+        // Its top still tracks the desk row that faces the front.
         stage.style.transform = 'scale(' + state.zoom + ')';
         syncZoomReadout();
-
-        // FRONT OF ROOM sits a compact gap beyond the desk row that faces the front.
-        // Anchored to that row (not the far canvas edge) so a flip does not leave
-        // the old smartboard aisle between the strip and the first desks.
-        if (cls.frontAtTop) {
-          let minTop = Infinity;
-          (cls.students || []).forEach(function (st) {
-            const y = Number(st.y);
-            if (isFinite(y) && y < minTop) minTop = y;
-          });
-          if (!isFinite(minTop)) minTop = FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP;
-          const labelTop = Math.max(0, minTop - FRONT_ROW_GAP - FRONT_LABEL_H);
-          frontLabel.style.top = labelTop + 'px';
-          frontLabel.style.bottom = 'auto';
-        } else {
-          let maxBottom = 0;
-          (cls.students || []).forEach(function (st) {
-            const bottom = (Number(st.y) || 0) + DESK_H;
-            if (bottom > maxBottom) maxBottom = bottom;
-          });
-          frontLabel.style.top = (maxBottom + FRONT_ROW_GAP) + 'px';
-          frontLabel.style.bottom = 'auto';
-        }
+        placeFrontOfRoom(cls);
 
         nameEditLock = true;
         container.innerHTML = cls.students.map(function (st) {
@@ -8596,6 +8665,7 @@
         loadState();
         state.classes.forEach(function (c) { ensureNoOverlaps(c.students); });
         initCanvasDragAndClickEvents();
+        bindFrontOfRoomPin();
         bindAllEvents();
         renderTimerUI();
         renderAll();
