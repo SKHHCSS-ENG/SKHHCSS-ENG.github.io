@@ -1591,11 +1591,11 @@
        Muse's fs44 lock; the asset and the 44px desk mark height stay.
        The #123a4d plate stays off the asset so the mesh sits on this
        gradient. On the stacked mast the mark height is still the old h1
-       line box (clamp 16px / 5.6vw / 24px × 1.1). Padding is the previous
-       pad plus 4px on the top and 4px on the bottom: desk 12px / 4px,
-       stacked 12px / 12px. The 44px row plus that pad is the desk height.
-       Remeasured: #studioMast 60px at 1280 and 1920 (was 52), 66.41px at
-       390 (was 58.41). Mark stays 44px on the desk row and 24.02px at 390.
+       line box (clamp 16px / 5.6vw / 24px × 1.1). Padding is another 4px
+       on the top and 4px on the bottom from the 60px mast: desk 16px / 8px,
+       stacked 16px / 16px. The 44px row plus that pad is the desk height.
+       Remeasured: #studioMast 68px at 1280 and 1920 (was 60), 74.41px at
+       390 (was 66.41). Mark stays 44px on the desk row and 24.02px at 390.
        Back target stays 44×44. The gap after that target is 8px. */
     .studio-mast {
       display: flex;
@@ -1604,10 +1604,10 @@
       column-gap: var(--studio-space);
       max-width: 1600px;
       margin: 0 auto;
-      padding: calc(var(--studio-space) + 4px) var(--studio-inset) 4px;
+      padding: calc(var(--studio-space) + 8px) var(--studio-inset) 8px;
     }
     @media (min-width: 640px) {
-      .studio-mast { padding: calc(var(--studio-space) + 4px) var(--studio-inset) 4px; }
+      .studio-mast { padding: calc(var(--studio-space) + 8px) var(--studio-inset) 8px; }
     }
     .studio-back {
       display: inline-flex;
@@ -1657,7 +1657,7 @@
         flex-direction: column;
         align-items: stretch;
         row-gap: 0.15rem;
-        padding-bottom: calc(var(--studio-space) + 4px);
+        padding-bottom: calc(var(--studio-space) + 8px);
       }
       .studio-back {
         align-self: flex-start;
