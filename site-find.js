@@ -457,6 +457,62 @@
     return a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
   }
 
+  // Find / Ask jump links are origin-absolute. GitHub Pages serves the site at
+  // /. The school LMS serves the same files at /english/. site-find.js (and
+  // ask.js) always sit at that site root, so the script URL is the base.
+  function baseFromScriptSrc(src) {
+    var raw = String(src || "").replace(/^\s+|\s+$/g, "");
+    if (!raw) return "";
+    var path = raw.split("#")[0].split("?")[0];
+    try {
+      path = new URL(raw, "https://example.invalid/").pathname;
+    } catch (e) {
+      var scheme = path.indexOf("://");
+      if (scheme !== -1) {
+        var slash = path.indexOf("/", scheme + 3);
+        path = slash === -1 ? "/" : path.slice(slash);
+      }
+    }
+    path = path.replace(/\/(?:site-find|ask)\.js$/i, "");
+    if (!path || path === "/") return "";
+    return path.replace(/\/+$/, "");
+  }
+
+  function baseFromPathname(pathname) {
+    var path = String(pathname || "");
+    if (path === "/english" || path.indexOf("/english/") === 0) return "/english";
+    return "";
+  }
+
+  var SITE_BASE = "";
+  try {
+    if (typeof document !== "undefined" && document && document.currentScript && document.currentScript.src) {
+      SITE_BASE = baseFromScriptSrc(document.currentScript.src);
+    } else if (typeof location !== "undefined" && location && typeof location.pathname === "string") {
+      SITE_BASE = baseFromPathname(location.pathname);
+    }
+  } catch (e) {
+    SITE_BASE = "";
+  }
+
+  function hrefFor(path, base) {
+    var root = base == null ? SITE_BASE : String(base);
+    root = root.replace(/\/+$/, "");
+    if (root === "/") root = "";
+
+    var raw = path == null ? "" : String(path);
+    var hash = "";
+    var hashAt = raw.indexOf("#");
+    if (hashAt !== -1) {
+      hash = raw.slice(hashAt);
+      raw = raw.slice(0, hashAt);
+    }
+    if (!raw || raw === "/") return (root ? root + "/" : "/") + hash;
+    if (raw.charAt(0) !== "/") raw = "/" + raw;
+    if (root && (raw === root || raw.indexOf(root + "/") === 0)) return raw + hash;
+    return root + raw + hash;
+  }
+
   return {
     entries: ENTRIES,
     norm: norm,
@@ -464,6 +520,10 @@
     search: search,
     extraHaystack: extraHaystack,
     hubCardPath: hubCardPath,
-    rectsOverlap: rectsOverlap
+    rectsOverlap: rectsOverlap,
+    baseFromScriptSrc: baseFromScriptSrc,
+    baseFromPathname: baseFromPathname,
+    siteBase: function () { return SITE_BASE; },
+    hrefFor: hrefFor
   };
 });

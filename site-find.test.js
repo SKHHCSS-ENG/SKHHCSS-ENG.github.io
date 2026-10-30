@@ -1,9 +1,26 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import fs from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 const require = createRequire(import.meta.url);
 const SiteFind = require("./site-find.js");
+const siteFindSource = fs.readFileSync(new URL("./site-find.js", import.meta.url), "utf8");
+
+function loadSiteFind(document, location) {
+  const sandbox = {
+    document: document,
+    location: location,
+    module: { exports: {} },
+    URL: URL,
+    console
+  };
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(siteFindSource, sandbox, { filename: "site-find.js" });
+  return sandbox.module.exports;
+}
 
 test("alias index is Tess’s 32 entries and paths are unique", () => {
   assert.equal(SiteFind.entries.length, 32);
@@ -67,6 +84,89 @@ test("hub cards reuse this index and do not grow a second list", () => {
   assert.match(festival, /朗誦節/);
 
   assert.equal(SiteFind.extraHaystack("https://example.com/"), "");
+});
+
+test("Find and Ask jump links stay at the origin root on GitHub Pages", () => {
+  assert.equal(SiteFind.siteBase(), "");
+  assert.equal(SiteFind.baseFromScriptSrc("https://skhhcss-eng.github.io/site-find.js?v=20261030a"), "");
+  assert.equal(SiteFind.baseFromScriptSrc("https://skhhcss-eng.github.io/ask.js"), "");
+  assert.equal(SiteFind.baseFromPathname("/"), "");
+  assert.equal(SiteFind.baseFromPathname("/learning-materials/useful-vocabulary/"), "");
+
+  assert.equal(SiteFind.hrefFor("/"), "/");
+  assert.equal(SiteFind.hrefFor("/", ""), "/");
+  assert.equal(
+    SiteFind.hrefFor("learning-materials/paper-2-exam-skills/letter-to-the-editor/", ""),
+    "/learning-materials/paper-2-exam-skills/letter-to-the-editor/"
+  );
+  assert.equal(
+    SiteFind.hrefFor("learning-materials/useful-vocabulary/#coh-h", ""),
+    "/learning-materials/useful-vocabulary/#coh-h"
+  );
+});
+
+test("Find and Ask jump links prefix /english/ on the school LMS", () => {
+  assert.equal(
+    SiteFind.baseFromScriptSrc("https://learning.hcs.edu.hk/english/site-find.js?v=20261030a"),
+    "/english"
+  );
+  assert.equal(
+    SiteFind.baseFromScriptSrc("https://learning.hcs.edu.hk/english/ask.js?v=20261030a"),
+    "/english"
+  );
+  assert.equal(SiteFind.baseFromPathname("/english"), "/english");
+  assert.equal(SiteFind.baseFromPathname("/english/"), "/english");
+  assert.equal(
+    SiteFind.baseFromPathname("/english/learning-materials/useful-vocabulary/"),
+    "/english"
+  );
+  assert.equal(SiteFind.baseFromPathname("/learning-materials/"), "");
+
+  const base = "/english";
+  assert.equal(SiteFind.hrefFor("/", base), "/english/");
+  assert.equal(SiteFind.hrefFor("", base), "/english/");
+  assert.equal(
+    SiteFind.hrefFor("learning-materials/paper-2-exam-skills/letter-to-the-editor/", base),
+    "/english/learning-materials/paper-2-exam-skills/letter-to-the-editor/"
+  );
+  assert.equal(
+    SiteFind.hrefFor("learning-materials/useful-vocabulary/#coh-h", base),
+    "/english/learning-materials/useful-vocabulary/#coh-h"
+  );
+  assert.equal(SiteFind.hrefFor("/english/whats-new/", base), "/english/whats-new/");
+  assert.equal(SiteFind.hrefFor("whats-new/", "/english/"), "/english/whats-new/");
+});
+
+test("script URL sets the base used by Find and Ask jumps", () => {
+  const pages = loadSiteFind(
+    { currentScript: { src: "https://skhhcss-eng.github.io/site-find.js?v=20261030a" } },
+    { pathname: "/english/learning-materials/" }
+  );
+  assert.equal(pages.siteBase(), "");
+  assert.equal(
+    pages.hrefFor("learning-materials/paper-2-exam-skills/letter-to-the-editor/"),
+    "/learning-materials/paper-2-exam-skills/letter-to-the-editor/"
+  );
+  assert.equal(pages.hrefFor("/"), "/");
+
+  const lms = loadSiteFind(
+    { currentScript: { src: "https://learning.hcs.edu.hk/english/site-find.js?v=20261030a" } },
+    { pathname: "/" }
+  );
+  assert.equal(lms.siteBase(), "/english");
+  assert.equal(lms.hrefFor("/"), "/english/");
+  assert.equal(
+    lms.hrefFor("learning-materials/useful-vocabulary/#coh-h"),
+    "/english/learning-materials/useful-vocabulary/#coh-h"
+  );
+
+  const fromPage = loadSiteFind(null, { pathname: "/english/learning-materials/grammar/" });
+  assert.equal(fromPage.siteBase(), "/english");
+  assert.equal(fromPage.hrefFor("speech-festival/u41/"), "/english/speech-festival/u41/");
+
+  const rootPage = loadSiteFind(null, { pathname: "/learning-materials/" });
+  assert.equal(rootPage.siteBase(), "");
+  assert.equal(rootPage.hrefFor("whats-new/"), "/whats-new/");
 });
 
 test("rectsOverlap is a soft-fail check for the Ask circle and the dock", () => {

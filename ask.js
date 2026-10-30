@@ -146,6 +146,7 @@
   }
 
   function hrefFor(path) {
+    if (window.SiteFind && window.SiteFind.hrefFor) return window.SiteFind.hrefFor(path);
     if (!path || path === "/") return "/";
     if (path.charAt(0) === "/") return path;
     return "/" + path;
