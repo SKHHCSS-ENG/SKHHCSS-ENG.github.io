@@ -1581,18 +1581,22 @@
     @media (min-width: 640px) {
       #podiumModal .podium-medal { font-size: 0.875rem; }
     }
-    /* Mast: Back stays on the left. The centred mark is Muse's Bright
-       HCS Live Class lock. The #123a4d plate is left off the asset so the
+    /* Mast: Back stays on the left, and the Bright mark sits beside it.
+       Howard circled that left zone (by Back, left of Individual Work),
+       not the empty centre and not the timer. The wordmark is Muse's
+       fs44 lock: two-line HCS / Live Class lines up with the pill top
+       and the lower dots. The #123a4d plate stays off the asset so the
        cyan→yellow→coral mesh sits on this header gradient. The image is
        cropped to the ink. On the stacked mast its height is the old h1
        line box (clamp 16px / 5.6vw / 24px × 1.1). On the single-row mast
        it uses the 44px Back row that already sets #studioMast, so the
-       bar does not grow. Measured before: 52px at 1280, 60.78px at 860,
-       58.41px at 390, 54.09px at 320. */
+       bar does not grow. Remeasured after the left move, same as the
+       centred mark: 52px at 1280 and 861, 60.78px at 860, 58.41px at
+       390, 54.09px at 320. */
     .studio-mast {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      display: flex;
       align-items: center;
+      justify-content: flex-start;
       column-gap: var(--studio-space-2);
       max-width: 1600px;
       margin: 0 auto;
@@ -1606,20 +1610,19 @@
       align-items: center;
       box-sizing: border-box;
       min-height: 44px;
-      grid-column: 1;
-      justify-self: start;
+      flex: 0 0 auto;
       align-self: center;
     }
     .studio-brand {
-      grid-column: 2;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      flex: 0 0 auto;
       min-width: 0;
       max-width: 100%;
     }
-    /* Shrink-wraps to the mark so it stays centred. Sits above the Back
-       link's 44px tap padding, which hangs into this row on small screens. */
+    /* Shrink-wraps to the mark. Sits above the Back link's 44px tap
+       padding, which hangs into this row on small screens. */
     .studio-title {
       position: relative;
       z-index: 2;
@@ -1656,13 +1659,14 @@
         z-index: 1;
         /* text-xs line is 16px. The rest of the 44px target hangs into
            the mast padding and the row beneath, then negative margins
-           cancel that so the centred brand does not move. */
+           cancel that so the brand stays on the left without growing
+           the bar. */
         padding-top: 8px;
         padding-bottom: 20px;
         margin-top: -8px;
         margin-bottom: -20px;
       }
-      .studio-brand { align-self: center; width: 100%; }
+      .studio-brand { align-self: flex-start; width: auto; }
     }
     /* Toolbar band names. 12px / 700, the same step as the chips.
        Title Case, no colon, so they stay glanceable section headers. */
@@ -2231,7 +2235,7 @@
       <div class="studio-brand">
         <div class="studio-title">
           <h1 class="studio-mark">
-            <img src="assets/hcs-live-class-bright.svg?v=20261030c" alt="HCS Live Class" width="274" height="86">
+            <img src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
           </h1>
         </div>
       </div>
