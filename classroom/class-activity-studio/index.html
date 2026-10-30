@@ -647,23 +647,11 @@
     /* Front-of-room label only. No smartboard graphic and no teacher's desk.
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
        seating-board slate and the mast teal — not the amber Random Picker.
-       The pin matches the visible floor, not the desk canvas. It sticks
-       when the floor pans sideways, so a wider grid, a zoom scale, or the
-       leaderboard opening cannot slide the pill off the viewport midline.
-       Height is zero so it does not push the desks down. */
-    .front-of-room-pin {
-      position: sticky;
-      left: 0;
-      width: 100%;
-      height: 0;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      pointer-events: none;
-    }
+       It sits in the desk stage, on the centre of the column room. JS sets
+       left to that centre. Header, panels, and the floor width are not inputs. */
     .front-of-room {
       position: absolute;
-      left: 50%;
+      left: 0;
       z-index: 4;
       pointer-events: none;
       transform: translateX(-50%);
@@ -2381,12 +2369,10 @@
         </section>
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
-          <!-- Midline of the visible floor. Not a child of the scaled stage. -->
-          <div class="front-of-room-pin">
-            <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
-          </div>
           <!-- Scaled Inner Stage -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
+            <!-- Column-room midline. Width comes from the column count, not the floor. -->
+            <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
             <!-- Desks Layer -->
             <div id="desksContainer" class="absolute inset-0"></div>
           </div>
@@ -5629,29 +5615,63 @@
         });
       }
 
-      // Live desk scale, including a zoom transition that has not finished.
-      // Falls back to the committed zoom.
-      function readStageScale() {
-        const stage = document.getElementById('classroomStage');
-        const fallback = state.zoom || 1;
-        if (!stage) return fallback;
-        const tr = window.getComputedStyle(stage).transform;
-        if (!tr || tr === 'none') return fallback;
-        const match = /^matrix\(([^,]+)/.exec(tr);
-        if (!match) return fallback;
-        const scale = parseFloat(match[1]);
-        if (!isFinite(scale) || scale <= 0) return fallback;
-        return scale;
+      // Column count on the class. Chrome (header, panels, floor size) is not an input.
+      function seatingColumnCount(cls) {
+        const n = cls && cls.students ? cls.students.length : 0;
+        const fallback = n > 30 ? 7 : 6;
+        const cols = parseInt(cls && cls.gridCols, 10);
+        const used = (isFinite(cols) && cols >= 1) ? cols : fallback;
+        return Math.max(1, Math.min(12, used));
       }
 
-      // Vertical spot for FRONT OF ROOM, in floor pixels. The pill is not
-      // inside the scaled stage, so the gap zooms with the desks while the
-      // 32px frame stays the same size. Horizontal centre is CSS on the pin.
+      // Horizontal slot of column c. Pairs and 4-desk pods share the left–right pitch.
+      // Exam rows use the even column step. This does not read the window.
+      function columnSlotOffset(col, layoutType) {
+        const c = Math.max(0, col);
+        if (layoutType === 'pairs' || layoutType === 'pods4') {
+          const podCol = Math.floor(c / 2);
+          const inPod = c % 2;
+          return podCol * (2 * DESK_W + POD_INNER_GAP_X + POD_AISLE_GAP_X) + inPod * (DESK_W + POD_INNER_GAP_X);
+        }
+        return c * (DESK_W + EXAM_COL_GAP_X);
+      }
+
+      // The seating room is as wide as the column span. Six columns always
+      // make the same width. Opening the header or the leaderboard does not.
+      // The centre matches the layout origin those columns are drawn from.
+      function columnRoomBox(cls) {
+        const cols = seatingColumnCount(cls);
+        const style = (cls && cls.layoutStyle) || 'rows';
+        if (style === 'groupClusters' && cls && cls.students && cls.students.length) {
+          const positions = computeLayoutPositions(cls.students.length, 'groupClusters', !!cls.frontAtTop, cls.students, cls.groups || [], cols, cls.gridRows);
+          let minX = Infinity;
+          let maxX = -Infinity;
+          positions.forEach(function (p) {
+            if (!p || !isFinite(p.x)) return;
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+          });
+          if (isFinite(minX) && isFinite(maxX)) {
+            const width = maxX - minX + DESK_W;
+            return { cols: cols, width: width, center: minX + width / 2 };
+          }
+        }
+        const width = columnSlotOffset(cols - 1, style) + DESK_W;
+        const effStageW = Math.max(STAGE_WIDTH, width + 64);
+        const origin = Math.max(28, Math.round((effStageW - width) / 2));
+        return { cols: cols, width: width, center: origin + width / 2 };
+      }
+
+      // FRONT OF ROOM is inside the scaled stage, on the column-room midline.
+      // Pan and zoom move the view; the room centre stays this column geometry.
+      // The strip still sits just past the desk row that faces the front.
       function placeFrontOfRoom(cls) {
         const label = document.getElementById('frontOfRoom');
         const room = cls || getCurrentClass();
         if (!label || !room) return;
-        const scale = readStageScale();
+        const box = columnRoomBox(room);
+        label.style.left = box.center + 'px';
+        label.style.right = 'auto';
         let top;
         if (room.frontAtTop) {
           let minTop = Infinity;
@@ -5660,48 +5680,17 @@
             if (isFinite(y) && y < minTop) minTop = y;
           });
           if (!isFinite(minTop)) minTop = FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP;
-          top = (minTop - FRONT_ROW_GAP) * scale - FRONT_LABEL_H;
+          top = Math.max(0, minTop - FRONT_ROW_GAP - FRONT_LABEL_H);
         } else {
           let maxBottom = 0;
           (room.students || []).forEach(function (st) {
             const bottom = (Number(st.y) || 0) + DESK_H;
             if (bottom > maxBottom) maxBottom = bottom;
           });
-          top = (maxBottom + FRONT_ROW_GAP) * scale;
+          top = maxBottom + FRONT_ROW_GAP;
         }
         label.style.top = top + 'px';
         label.style.bottom = 'auto';
-      }
-
-      // The desk scale eases for 150ms. Follow it so the strip stays on the
-      // facing row instead of jumping to the finished zoom.
-      var frontPinFrame = 0;
-      var frontPinUntil = 0;
-      function followFrontOfRoomZoom() {
-        frontPinUntil = performance.now() + 240;
-        if (frontPinFrame) return;
-        function tick(now) {
-          placeFrontOfRoom();
-          if (now < frontPinUntil) frontPinFrame = requestAnimationFrame(tick);
-          else frontPinFrame = 0;
-        }
-        frontPinFrame = requestAnimationFrame(tick);
-      }
-
-      var frontPinBound = false;
-      function bindFrontOfRoomPin() {
-        if (frontPinBound) return;
-        const stage = document.getElementById('classroomStage');
-        if (!stage) return;
-        frontPinBound = true;
-        stage.addEventListener('transitionrun', function (e) {
-          if (e.propertyName !== 'transform') return;
-          followFrontOfRoomZoom();
-        });
-        stage.addEventListener('transitionend', function (e) {
-          if (e.propertyName !== 'transform') return;
-          placeFrontOfRoom();
-        });
       }
 
       // Render Freeform Classroom Floor Plan & Desks
@@ -5725,8 +5714,7 @@
         // Size the canvas to the window, keeping every desk at its pixel size.
         syncStageToWindow();
 
-        // Apply Zoom. FRONT OF ROOM's midline is the pin, not this stage.
-        // Its top still tracks the desk row that faces the front.
+        // Apply Zoom. FRONT OF ROOM stays on the column-room midline.
         stage.style.transform = 'scale(' + state.zoom + ')';
         syncZoomReadout();
         placeFrontOfRoom(cls);
@@ -8665,7 +8653,6 @@
         loadState();
         state.classes.forEach(function (c) { ensureNoOverlaps(c.students); });
         initCanvasDragAndClickEvents();
-        bindFrontOfRoomPin();
         bindAllEvents();
         renderTimerUI();
         renderAll();
