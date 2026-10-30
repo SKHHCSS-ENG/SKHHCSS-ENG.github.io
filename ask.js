@@ -2,8 +2,9 @@
  * Ask — circle bottom-left. Drag moves it (touch or mouse) and the last
  * spot is kept in localStorage for this browser. A tap opens the sheet;
  * a tap again, Close, or a press outside collapses it. A drag does not toggle.
- * Find first (site-find.js), then a short Ask AI chat. Three assistant
- * replies per open; closing the sheet resets the count.
+ * One shared box. The sheet opens in Find (site-find.js). Ask AI is the
+ * other mode. Send runs Find in Find mode and posts one chat turn in Ask AI
+ * mode. Three assistant replies per open; closing the sheet resets the count.
  * No daily cap. Worker: window.__EXPLAIN_WORKER__ (page "Ask"), else the
  * deployed deepseek-explain host. No API key here.
  * Does not restyle the Tools dock. On drop, and whenever the dock, an open
@@ -48,64 +49,80 @@
   sheet.setAttribute("aria-modal", "true");
   sheet.setAttribute("aria-label", "Ask");
 
+  var mode = "find";
+
   var top = document.createElement("div");
   top.className = "ask-top";
-  var findName = document.createElement("label");
-  findName.className = "ask-find-name";
-  findName.htmlFor = "askFind";
-  findName.textContent = "Find";
+  var modeBar = document.createElement("div");
+  modeBar.className = "ask-mode";
+  modeBar.setAttribute("role", "tablist");
+  modeBar.setAttribute("aria-label", "Find or Ask AI");
+  var findTab = document.createElement("button");
+  findTab.type = "button";
+  findTab.className = "ask-mode-btn is-on";
+  findTab.id = "askModeFind";
+  findTab.textContent = "Find";
+  findTab.setAttribute("role", "tab");
+  findTab.setAttribute("aria-selected", "true");
+  findTab.setAttribute("aria-controls", "askFindPanel");
+  findTab.tabIndex = 0;
+  var askTab = document.createElement("button");
+  askTab.type = "button";
+  askTab.className = "ask-mode-btn is-ask";
+  askTab.id = "askModeAsk";
+  askTab.textContent = "Ask AI";
+  askTab.setAttribute("role", "tab");
+  askTab.setAttribute("aria-selected", "false");
+  askTab.setAttribute("aria-controls", "askChatPanel");
+  askTab.tabIndex = -1;
+  modeBar.appendChild(findTab);
+  modeBar.appendChild(askTab);
   var closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.className = "ask-close";
   closeBtn.textContent = "\u00d7";
   closeBtn.setAttribute("aria-label", "Close");
-  top.appendChild(findName);
+  top.appendChild(modeBar);
   top.appendChild(closeBtn);
 
-  var findInput = document.createElement("input");
-  findInput.type = "search";
-  findInput.id = "askFind";
-  findInput.className = "ask-find";
-  findInput.placeholder = "Format or topic";
-  findInput.setAttribute("aria-label", "Find a page");
-  findInput.autocomplete = "off";
-  findInput.spellcheck = false;
-  findInput.enterKeyHint = "search";
-
-  var hitsBox = document.createElement("ul");
-  hitsBox.className = "ask-hits";
-
-  var chat = document.createElement("div");
-  chat.className = "ask-chat";
-  var kicker = document.createElement("p");
-  kicker.className = "ask-kicker";
-  kicker.textContent = "Ask AI";
-  var log = document.createElement("div");
-  log.className = "ask-log";
-  log.setAttribute("aria-live", "polite");
   var form = document.createElement("form");
   form.className = "ask-form";
   form.setAttribute("action", "");
-  var chatInput = document.createElement("input");
-  chatInput.type = "text";
-  chatInput.className = "ask-q";
-  chatInput.maxLength = 400;
-  chatInput.placeholder = "Short question";
-  chatInput.setAttribute("aria-label", "Ask AI");
-  chatInput.autocomplete = "off";
-  chatInput.enterKeyHint = "send";
+  var box = document.createElement("input");
+  box.type = "search";
+  box.id = "askBox";
+  box.className = "ask-box";
+  box.placeholder = "Format or topic";
+  box.setAttribute("aria-label", "Find a page");
+  box.autocomplete = "off";
+  box.spellcheck = false;
+  box.enterKeyHint = "search";
   var sendBtn = document.createElement("button");
   sendBtn.type = "submit";
   sendBtn.className = "ask-send";
   sendBtn.textContent = "Send";
-  form.appendChild(chatInput);
+  form.appendChild(box);
   form.appendChild(sendBtn);
-  chat.appendChild(kicker);
+
+  var hitsBox = document.createElement("ul");
+  hitsBox.className = "ask-hits";
+  hitsBox.id = "askFindPanel";
+  hitsBox.setAttribute("role", "tabpanel");
+  hitsBox.setAttribute("aria-labelledby", "askModeFind");
+
+  var chat = document.createElement("div");
+  chat.className = "ask-chat";
+  chat.id = "askChatPanel";
+  chat.hidden = true;
+  chat.setAttribute("role", "tabpanel");
+  chat.setAttribute("aria-labelledby", "askModeAsk");
+  var log = document.createElement("div");
+  log.className = "ask-log";
+  log.setAttribute("aria-live", "polite");
   chat.appendChild(log);
-  chat.appendChild(form);
 
   sheet.appendChild(top);
-  sheet.appendChild(findInput);
+  sheet.appendChild(form);
   sheet.appendChild(hitsBox);
   sheet.appendChild(chat);
 
@@ -151,11 +168,11 @@
   }
 
   function renderFind() {
-    var q = findInput.value;
+    var q = box.value;
     var hits = window.SiteFind && window.SiteFind.search ? window.SiteFind.search(q, 3) : [];
     currentHits = hits;
     hitsBox.textContent = "";
-    hitsBox.hidden = !hits.length;
+    hitsBox.hidden = mode !== "find" || !hits.length;
     var i;
     for (i = 0; i < hits.length; i++) {
       var link = document.createElement("a");
@@ -225,15 +242,17 @@
   }
 
   function unlockComposer() {
-    if (turns >= TURNS) return;
-    chatInput.disabled = false;
+    if (turns >= TURNS || inflight || mode !== "ask") return;
+    box.disabled = false;
     sendBtn.disabled = false;
+    box.placeholder = "Short question";
   }
 
   function lockChat() {
-    chatInput.disabled = true;
+    if (mode !== "ask") return;
+    box.disabled = true;
     sendBtn.disabled = true;
-    chatInput.placeholder = "Find or Explain";
+    box.placeholder = "Find or Explain";
   }
 
   function resetChat() {
@@ -244,10 +263,52 @@
     }
     turns = 0;
     log.textContent = "";
-    chatInput.value = "";
-    chatInput.placeholder = "Short question";
-    chatInput.disabled = false;
+    box.value = "";
+    box.disabled = false;
     sendBtn.disabled = false;
+  }
+
+  function paintMode() {
+    var finding = mode === "find";
+    findTab.classList.toggle("is-on", finding);
+    askTab.classList.toggle("is-on", !finding);
+    findTab.setAttribute("aria-selected", finding ? "true" : "false");
+    askTab.setAttribute("aria-selected", finding ? "false" : "true");
+    findTab.tabIndex = finding ? 0 : -1;
+    askTab.tabIndex = finding ? 0 : -1;
+    sheet.setAttribute("data-ask-mode", mode);
+    chat.hidden = finding;
+    if (finding) {
+      if (box.type !== "search") box.type = "search";
+      box.placeholder = "Format or topic";
+      box.setAttribute("aria-label", "Find a page");
+      box.enterKeyHint = "search";
+      box.spellcheck = false;
+      box.removeAttribute("maxlength");
+      box.disabled = false;
+      sendBtn.disabled = false;
+      renderFind();
+      return;
+    }
+    if (box.type !== "text") box.type = "text";
+    box.maxLength = 400;
+    box.setAttribute("aria-label", "Ask AI");
+    box.enterKeyHint = "send";
+    box.spellcheck = true;
+    var capped = turns >= TURNS;
+    var busy = !!inflight;
+    box.disabled = capped || busy;
+    sendBtn.disabled = capped || busy;
+    box.placeholder = capped ? "Find or Explain" : "Short question";
+    hitsBox.hidden = true;
+  }
+
+  function setMode(next) {
+    if (next !== "find" && next !== "ask") return;
+    var changed = mode !== next;
+    mode = next;
+    if (changed) box.value = "";
+    paintMode();
   }
 
   function sheetOpen() {
@@ -257,13 +318,12 @@
   function openSheet() {
     if (floater.getAttribute("data-ask-overlap") === "1") return;
     resetChat();
-    findInput.value = "";
-    renderFind();
+    setMode("find");
     sheet.hidden = false;
     scrim.hidden = false;
     floater.setAttribute("aria-expanded", "true");
     place();
-    if (sheetOpen()) findInput.focus();
+    if (sheetOpen()) box.focus();
   }
 
   function closeSheet() {
@@ -285,11 +345,11 @@
     if (!text || turns >= TURNS || inflight) return;
     var turn = turns + 1;
     renderMine(text);
-    chatInput.value = "";
+    box.value = "";
     var ticket = ++seq;
     var controller = new AbortController();
     inflight = controller;
-    chatInput.disabled = true;
+    box.disabled = true;
     sendBtn.disabled = true;
     var pending = document.createElement("p");
     pending.className = "ask-reply";
@@ -546,22 +606,32 @@
 
   function placeSheet() {
     if (!sheetOpen()) return;
+    var pad = insets();
+    var bottomPx = 12 + pad.bottom;
     var dock = document.querySelector(".bottom-dock");
     var dockRect = dock ? dock.getBoundingClientRect() : null;
-    if (dockRect && dockRect.width >= 2 && dockRect.height >= 2 && dockRect.top < window.innerHeight && dockRect.bottom > 0) {
-      var bottomPx = Math.max(12, Math.ceil(window.innerHeight - dockRect.top + 10));
-      sheet.style.bottom = bottomPx + "px";
-      sheet.style.maxHeight = Math.max(160, window.innerHeight - bottomPx - 12) + "px";
-    } else {
-      sheet.style.bottom = "calc(12px + env(safe-area-inset-bottom, 0px))";
-      sheet.style.maxHeight = "";
-    }
+    var dockClear = dockRect && dockRect.width >= 2 && dockRect.height >= 2 && dockRect.top < window.innerHeight && dockRect.bottom > 0;
+    if (dockClear) bottomPx = Math.max(bottomPx, Math.ceil(window.innerHeight - dockRect.top + 10));
+    sheet.style.bottom = bottomPx + "px";
+    sheet.style.maxHeight = dockClear ? Math.max(160, window.innerHeight - bottomPx - 12) + "px" : "";
     var sheetRect = sheet.getBoundingClientRect();
     dockRect = dock ? dock.getBoundingClientRect() : null;
     if (dockRect && rectsOverlap(sheetRect, dockRect)) {
-      var again = Math.ceil(window.innerHeight - dockRect.top + 10);
-      sheet.style.bottom = again + "px";
-      sheet.style.maxHeight = Math.max(160, window.innerHeight - again - 12) + "px";
+      bottomPx = Math.max(bottomPx, Math.ceil(window.innerHeight - dockRect.top + 10));
+      sheet.style.bottom = bottomPx + "px";
+      sheet.style.maxHeight = Math.max(160, window.innerHeight - bottomPx - 12) + "px";
+      sheetRect = sheet.getBoundingClientRect();
+    }
+    var circle = floater.getBoundingClientRect();
+    // The circle stays where it is. Lift only the sheet so the shared box
+    // is not hidden under the circle.
+    if (circle.width >= 2 && circle.height >= 2 && rectsOverlap(sheetRect, circle)) {
+      var lift = Math.ceil(window.innerHeight - circle.top + 8);
+      if (lift > bottomPx) {
+        bottomPx = lift;
+        sheet.style.bottom = bottomPx + "px";
+        sheet.style.maxHeight = Math.max(160, window.innerHeight - bottomPx - 12) + "px";
+      }
     }
   }
 
@@ -663,11 +733,27 @@
 
   scrim.addEventListener("click", closeSheet);
   closeBtn.addEventListener("click", closeSheet);
-  findInput.addEventListener("input", renderFind);
-  findInput.addEventListener("search", renderFind);
+  findTab.addEventListener("click", function () { setMode("find"); });
+  askTab.addEventListener("click", function () { setMode("ask"); });
+  modeBar.addEventListener("keydown", function (e) {
+    var next = "";
+    if (e.key === "ArrowRight" || e.key === "End") next = "ask";
+    else if (e.key === "ArrowLeft" || e.key === "Home") next = "find";
+    else return;
+    e.preventDefault();
+    setMode(next);
+    (next === "find" ? findTab : askTab).focus();
+  });
+  box.addEventListener("input", function () {
+    if (mode === "find") renderFind();
+  });
+  box.addEventListener("search", function () {
+    if (mode === "find") renderFind();
+  });
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    sendMessage(chatInput.value);
+    if (mode === "find") renderFind();
+    else sendMessage(box.value);
   });
   document.addEventListener("keydown", function (e) {
     if (sheetOpen() && e.key === "Escape") {
@@ -706,6 +792,6 @@
     }
   }
 
-  renderFind();
+  paintMode();
   place();
 })();
