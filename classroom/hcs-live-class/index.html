@@ -654,9 +654,33 @@
       color: #0f172a;
     }
     /* Front-row score buttons can scroll clear of the floating pill
-       and of the horizontal scrollbar. This margin is inside the floor. */
+       and of the horizontal scrollbar. The pad is inside the floor, on
+       the scale host (the stage is positioned inside that host). */
+    #classroomScaleHost {
+      position: relative;
+      width: 1080px;
+      height: calc(720px + 76px);
+    }
     #classroomStage {
-      margin-bottom: 76px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      margin-bottom: 0;
+      transform-origin: 0 0;
+    }
+    #classroomStage.is-direct-move {
+      transition: none !important;
+    }
+    /* Edit Off floor pan. Grab until the drag crosses the move threshold. */
+    #classroomViewport.is-floor-pannable {
+      cursor: grab;
+    }
+    #classroomViewport.is-floor-pannable .desk-card {
+      cursor: grab;
+    }
+    #classroomViewport.is-floor-panning,
+    #classroomViewport.is-floor-panning .desk-card {
+      cursor: grabbing;
     }
     /* Front-of-room label only. No smartboard graphic and no teacher's desk.
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
@@ -2690,12 +2714,15 @@
         </section>
         <!-- Scrollable Freeform Viewport. Zoom floats on this canvas; no floor bar. -->
         <div id="classroomViewport" class="classroom-floor snap-active w-full relative select-none">
-          <!-- Scaled Inner Stage -->
+          <!-- Sized to the scaled stage so zoom and floor pan have scroll room. -->
+          <div id="classroomScaleHost">
+          <!-- Scaled Inner Stage. FRONT OF ROOM stays inside so pan and zoom move it. -->
           <div id="classroomStage" class="relative w-[1080px] h-[720px] origin-top-left transition-transform duration-150">
             <!-- Column-room midline. Width comes from the column count, not the floor. -->
             <div id="frontOfRoom" class="front-of-room">FRONT OF ROOM</div>
             <!-- Desks Layer -->
             <div id="desksContainer" class="absolute inset-0"></div>
+          </div>
           </div>
         </div>
         <!-- Zero height. The pill floats on the floor; this does not reserve a bar. -->
@@ -5220,7 +5247,13 @@
 
       function applyZoomTransform() {
         const stage = document.getElementById('classroomStage');
-        if (stage) stage.style.transform = 'scale(' + state.zoom + ')';
+        if (stage) {
+          stage.style.transformOrigin = '0 0';
+          const x = Math.round(floorShiftX) || 0;
+          const y = Math.round(floorShiftY) || 0;
+          stage.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + state.zoom + ')';
+        }
+        syncScaleHost();
         syncZoomReadout();
         placeFrontOfRoom();
       }
@@ -5248,6 +5281,8 @@
         const stageW = stage.offsetWidth || STAGE_WIDTH;
         const fit = Math.min(1, floor.clientWidth / Math.max(1, stageW));
         state.zoom = clampZoom(fit);
+        floorShiftX = 0;
+        floorShiftY = 0;
       }
 
       function undoLastScoreAction() {
@@ -5625,6 +5660,7 @@
         }
         syncStudioFullscreen();
 
+        syncFloorPanCursor();
         const btnEditName = document.getElementById('btnToggleEditName');
         if (btnEditName) {
           const editing = state.editMode !== false;
@@ -5817,6 +5853,17 @@
       // Scroll offset saved across a leaderboard hide/show. Null unless that
       // toggle is in progress. The column-room centre is not derived from this.
       var floorPanHold = null;
+      // Edit Off pan that scroll cannot express (board nudged down or right
+      // from the origin). Session only. FRONT OF ROOM is inside the stage,
+      // so this shift moves the pill with the desks.
+      var floorShiftX = 0;
+      var floorShiftY = 0;
+      // Pixels under the scaled stage so front-row score buttons can scroll
+      // clear of the floating Zoom pill. Replaces the old stage margin.
+      var floorScrollExtra = 76;
+      var floorPanDrag = null;
+      var floorPanSuppressClick = false;
+      var FLOOR_PAN_THRESHOLD = 8;
 
       // The dotted floor fills the card. When the window is wider or taller
       // than the desks, the canvas grows with it (no fixed board, no empty
@@ -5833,7 +5880,15 @@
         const content = getContentStageBounds(getCurrentClass());
         const viewW = Math.max(1, floor.clientWidth);
         const viewH = Math.max(1, floor.clientHeight);
-        const pan = floorPanHold != null ? floorPanHold : floor.scrollLeft;
+        const held = floorPanHold != null ? floorPanHold : floor.scrollLeft;
+        // scrollLeft is host pixels. Stage width is unscaled. At zoom 1 with
+        // no shift, pan is the same scrollLeft the leaderboard toggle keeps.
+        const zoom = state.zoom || 1;
+        let pan = held;
+        if (zoom !== 1 || floorShiftX) {
+          pan = (held - floorShiftX) / zoom;
+        }
+        if (!isFinite(pan) || pan < 0) pan = 0;
         // The vertical scrollbar gutter sits in offsetWidth but not clientWidth.
         // Max scrollLeft is scrollWidth - offsetWidth, so the kept pan needs
         // that gutter or the browser clamps it and the room slides.
@@ -5842,7 +5897,187 @@
         const height = Math.ceil(Math.max(content.height, viewH));
         stage.style.width = width + 'px';
         stage.style.height = height + 'px';
-        if (floorPanHold != null && floor.scrollLeft !== pan) floor.scrollLeft = pan;
+        syncScaleHost();
+        if (floorPanHold != null && floor.scrollLeft !== held) floor.scrollLeft = held;
+      }
+
+      // The stage is scaled from its top-left and does not grow the scrollport.
+      // The host's layout box is the scaled size plus any origin shift, so
+      // wheel zoom and Edit Off pan can scroll. FRONT stays inside the stage.
+      function syncScaleHost() {
+        const stage = document.getElementById('classroomStage');
+        const host = document.getElementById('classroomScaleHost');
+        if (!stage || !host) return;
+        const zoom = state.zoom || 1;
+        const sw = stage.offsetWidth || 0;
+        const sh = stage.offsetHeight || 0;
+        let w = sw * zoom + (floorShiftX || 0);
+        let h = sh * zoom + (floorShiftY || 0) + (floorScrollExtra || 0);
+        if (w < 1) w = 1080;
+        if (h < 1) h = 796;
+        host.style.width = Math.ceil(w) + 'px';
+        host.style.height = Math.ceil(h) + 'px';
+      }
+
+      function syncFloorPanCursor() {
+        const floor = document.getElementById('classroomViewport');
+        if (!floor) return;
+        const on = !boardEditsAllowed() && !state.brushMode;
+        floor.classList.toggle('is-floor-pannable', on);
+        if (!on) floor.classList.remove('is-floor-panning');
+      }
+
+      function floorViewportPoint(floor, clientX, clientY) {
+        const rect = floor.getBoundingClientRect();
+        return {
+          vx: clientX - rect.left - floor.clientLeft,
+          vy: clientY - rect.top - floor.clientTop
+        };
+      }
+
+      // Keep the stage point under the pointer fixed. Same clamp as − / +.
+      function zoomFloorToward(clientX, clientY, nextZoom) {
+        const floor = document.getElementById('classroomViewport');
+        const stage = document.getElementById('classroomStage');
+        if (!floor || !stage) return;
+        const oldZoom = state.zoom || 1;
+        const newZoom = clampZoom(nextZoom);
+        if (newZoom === oldZoom) return;
+        const p = floorViewportPoint(floor, clientX, clientY);
+        const contentX = floor.scrollLeft + p.vx;
+        const contentY = floor.scrollTop + p.vy;
+        const sx = (contentX - floorShiftX) / oldZoom;
+        const sy = (contentY - floorShiftY) / oldZoom;
+        state.zoom = newZoom;
+        const originX = p.vx - sx * newZoom;
+        const originY = p.vy - sy * newZoom;
+        floorShiftX = originX >= 0 ? originX : 0;
+        floorShiftY = originY >= 0 ? originY : 0;
+        stage.classList.add('is-direct-move');
+        applyZoomTransform();
+        syncZoomSlot();
+        let scrollLeft = floorShiftX + sx * newZoom - p.vx;
+        let scrollTop = floorShiftY + sy * newZoom - p.vy;
+        if (scrollLeft < 0) scrollLeft = 0;
+        if (scrollTop < 0) scrollTop = 0;
+        floor.scrollLeft = scrollLeft;
+        floor.scrollTop = scrollTop;
+        requestAnimationFrame(function () {
+          if (!floorPanDrag) stage.classList.remove('is-direct-move');
+        });
+      }
+
+      function wheelZoomDelta(e) {
+        let dy = e.deltaY;
+        if (e.deltaMode === 1) dy *= 16;
+        else if (e.deltaMode === 2) {
+          const floor = document.getElementById('classroomViewport');
+          dy *= floor && floor.clientHeight ? floor.clientHeight : 400;
+        }
+        if (e.ctrlKey) dy *= 10;
+        return -dy / 1000;
+      }
+
+      // Content follows the pointer. Positive origin is shift (scroll is 0).
+      // Negative origin is scroll (shift is 0). A small gap is allowed so a
+      // zoomed-out board can sit under the pointer; it cannot leave the view.
+      function applyFloorOrigin(originX, originY) {
+        const floor = document.getElementById('classroomViewport');
+        if (!floor) return;
+        const maxShiftX = Math.max(0, floor.clientWidth - 48);
+        const maxShiftY = Math.max(0, floor.clientHeight - 48);
+        if (originX >= 0) {
+          floorShiftX = Math.min(maxShiftX, originX);
+          floor.scrollLeft = 0;
+        } else {
+          floorShiftX = 0;
+          floor.scrollLeft = -originX;
+        }
+        if (originY >= 0) {
+          floorShiftY = Math.min(maxShiftY, originY);
+          floor.scrollTop = 0;
+        } else {
+          floorShiftY = 0;
+          floor.scrollTop = -originY;
+        }
+        applyZoomTransform();
+        if (originX >= 0) floor.scrollLeft = 0;
+        else floor.scrollLeft = -originX;
+        if (originY >= 0) floor.scrollTop = 0;
+        else floor.scrollTop = -originY;
+      }
+
+      function finishFloorPan(e) {
+        if (!floorPanDrag) return;
+        if (e && e.pointerId !== floorPanDrag.pointerId) return;
+        const moved = floorPanDrag.moved;
+        floorPanDrag = null;
+        const floor = document.getElementById('classroomViewport');
+        if (floor) floor.classList.remove('is-floor-panning');
+        const stage = document.getElementById('classroomStage');
+        if (stage) stage.classList.remove('is-direct-move');
+        if (!moved) return;
+        floorPanSuppressClick = true;
+        setTimeout(function () { floorPanSuppressClick = false; }, 0);
+      }
+
+      // Wheel zooms the floor toward the pointer. Edit Off left-drag pans.
+      // Touch is ignored so phone scroll and seat taps stay as they are.
+      // Edit On seat drag is a separate handler and is not changed here.
+      function initFloorWheelAndPan() {
+        const floor = document.getElementById('classroomViewport');
+        if (!floor) return;
+        floor.addEventListener('wheel', function (e) {
+          if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return;
+          e.preventDefault();
+          const delta = wheelZoomDelta(e);
+          if (!delta) return;
+          zoomFloorToward(e.clientX, e.clientY, (state.zoom || 1) + delta);
+        }, { passive: false });
+
+        floor.addEventListener('pointerdown', function (e) {
+          if (boardEditsAllowed() || state.brushMode) return;
+          if (e.pointerType && e.pointerType !== 'mouse') return;
+          if (e.button != null && e.button !== 0) return;
+          if (e.target.closest && e.target.closest('input, textarea, select, #zoomChip')) return;
+          floorPanDrag = {
+            pointerId: e.pointerId,
+            startX: e.clientX,
+            startY: e.clientY,
+            originX: floorShiftX - floor.scrollLeft,
+            originY: floorShiftY - floor.scrollTop,
+            moved: false
+          };
+        });
+
+        function onFloorPointerMove(e) {
+          if (!floorPanDrag || e.pointerId !== floorPanDrag.pointerId) return;
+          const dx = e.clientX - floorPanDrag.startX;
+          const dy = e.clientY - floorPanDrag.startY;
+          if (!floorPanDrag.moved) {
+            if (Math.hypot(dx, dy) < FLOOR_PAN_THRESHOLD) return;
+            floorPanDrag.moved = true;
+            floor.classList.add('is-floor-panning');
+            const stage = document.getElementById('classroomStage');
+            if (stage) stage.classList.add('is-direct-move');
+            try { floor.setPointerCapture(e.pointerId); } catch (err) {}
+          }
+          e.preventDefault();
+          applyFloorOrigin(floorPanDrag.originX + dx, floorPanDrag.originY + dy);
+        }
+
+        floor.addEventListener('pointermove', onFloorPointerMove);
+        document.addEventListener('pointermove', onFloorPointerMove);
+        floor.addEventListener('pointerup', finishFloorPan);
+        floor.addEventListener('pointercancel', finishFloorPan);
+        document.addEventListener('pointerup', finishFloorPan);
+        document.addEventListener('pointercancel', finishFloorPan);
+        floor.addEventListener('click', function (e) {
+          if (!floorPanSuppressClick) return;
+          floorPanSuppressClick = false;
+          e.preventDefault();
+          e.stopPropagation();
+        }, true);
       }
 
       function finishFloorPanHold() {
@@ -6076,10 +6311,9 @@
         // Size the canvas to the window, keeping every desk at its pixel size.
         syncStageToWindow();
 
-        // Apply Zoom. FRONT OF ROOM stays on the column-room midline.
-        stage.style.transform = 'scale(' + state.zoom + ')';
-        syncZoomReadout();
-        placeFrontOfRoom(cls);
+        // Apply Zoom. FRONT OF ROOM stays on the column-room midline
+        // and moves with pan because it is painted on this stage.
+        applyZoomTransform();
 
         nameEditLock = true;
         container.innerHTML = cls.students.map(function (st) {
@@ -6216,6 +6450,16 @@
             const grp = getGroupById(cls, st.groupId);
             const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
             const pct = st.score > 0 ? Math.min(100, Math.round((st.score / maxScore) * 100)) : 0;
+            // Individual: name and points only. Group keeps the group line
+            // under the name (chip or Unassigned, plus the score bar).
+            const groupLine = state.activityMode === 'individual'
+              ? ''
+              : '<div class="flex items-center gap-2 mt-1 min-w-0">' +
+                  (grp ? '<span class="group-name-chip text-[10px] font-bold px-1.5 py-0.2 rounded ' + pal.badgeBg + ' ' + pal.text + '"><span class="group-name-label">' + escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) + '</span></span>' : '<span class="text-[10px] text-slate-400">Unassigned</span>') +
+                  '<div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden max-w-[70px]">' +
+                    '<div class="h-full bg-indigo-500 rounded-full" style="width:' + pct + '%"></div>' +
+                  '</div>' +
+                '</div>';
 
             return '<div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-indigo-200 transition flex items-center justify-between gap-2">' +
               '<div class="flex items-center gap-2.5 min-w-0 flex-1">' +
@@ -6225,12 +6469,7 @@
                     (formatClassNoMark(st.classNo) ? '<span class="text-[11px] font-mono font-bold text-slate-400">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
                     '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
                   '</div>' +
-                  '<div class="flex items-center gap-2 mt-1 min-w-0">' +
-                    (grp ? '<span class="group-name-chip text-[10px] font-bold px-1.5 py-0.2 rounded ' + pal.badgeBg + ' ' + pal.text + '"><span class="group-name-label">' + escapeHtml(grp.icon) + ' ' + escapeHtml(grp.name) + '</span></span>' : '<span class="text-[10px] text-slate-400">Unassigned</span>') +
-                    '<div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden max-w-[70px]">' +
-                      '<div class="h-full bg-indigo-500 rounded-full" style="width:' + pct + '%"></div>' +
-                    '</div>' +
-                  '</div>' +
+                  groupLine +
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1">' +
@@ -7484,7 +7723,7 @@
         const stage = document.getElementById('classroomStage');
         if (!chip || !slot) return;
         // No reserved gutter. The pill floats on the floor.
-        // The stage margin lets the front-row score buttons scroll clear of it.
+        // Extra host height lets the front-row score buttons scroll clear of it.
         slot.style.height = '0px';
         if (!stage) return;
         const floor = document.getElementById('classroomViewport');
@@ -7495,8 +7734,9 @@
         const content = getContentStageBounds(getCurrentClass());
         const zoom = state.zoom || 1;
         const roomBelow = floor ? (floor.clientHeight - content.bottom * zoom) : 0;
-        if (roomBelow >= pad) stage.style.marginBottom = '0px';
-        else stage.style.marginBottom = Math.ceil(pad - Math.max(0, roomBelow)) + 'px';
+        floorScrollExtra = roomBelow >= pad ? 0 : Math.ceil(pad - Math.max(0, roomBelow));
+        stage.style.marginBottom = '0px';
+        syncScaleHost();
       }
 
       // Open Team Scoreboard: as tall as the team cards, capped so the floor
@@ -8394,6 +8634,11 @@
             if (dragContext.deskEl) dragContext.deskEl.classList.remove('dragging');
             dragContext = null;
           }
+          if (floorPanDrag) {
+            floorPanDrag = null;
+            const floorNow = document.getElementById('classroomViewport');
+            if (floorNow) floorNow.classList.remove('is-floor-panning');
+          }
           saveState();
           renderHeaderControls();
           renderGroupScoreDock();
@@ -9113,6 +9358,7 @@
         loadState();
         state.classes.forEach(function (c) { ensureNoOverlaps(c.students); });
         initCanvasDragAndClickEvents();
+        initFloorWheelAndPan();
         bindAllEvents();
         renderTimerUI();
         renderAll();
