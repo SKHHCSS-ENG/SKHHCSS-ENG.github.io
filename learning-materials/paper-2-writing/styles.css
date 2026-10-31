@@ -1011,6 +1011,21 @@ body.vocab-hub.zh-on .vocab-chips-pairs .gloss,
 body.vocab-hub.zh-on .vocab-chips-pairs .gloss::after {
   white-space: nowrap;
 }
+/* Phone 譯: .part ul's 1.15rem indent plus full-size glosses makes the widest
+   triples (~352px) wider than the chip lane. Reclaim the indent and ease the
+   chip so those triples fit at 360–390px. A chip that still cannot fit wraps
+   only at " / " (gloss nowrap above). Tone and Topic lists are unchanged. */
+@media (max-width: 390px) {
+  body.vocab-hub.zh-on .vocab-chips-pairs {
+    padding-left: 0;
+  }
+  body.vocab-hub.zh-on .vocab-chips-pairs li {
+    flex-shrink: 0;
+    font-size: .7rem;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
 
 /* Sentence patterns 譯: Chinese after-text may wrap at ~390px (mirror vocab-hub) */
 body.sentence-patterns.zh-on .gloss::after {
