@@ -1705,10 +1705,8 @@
        The outer chip matches Podium and Sound: white/15 fill, white/25
        border, rounded-xl, text-xs then text-sm from 640px. Amber and
        muted live only on the inner ON/OFF capsule. Collapsing the bands
-       does not move this slot. */
-    .studio-header-export {
-      margin-left: auto;
-    }
+       does not move this slot. Export stays in the utility row; it does
+       not push itself to the right edge when that row wraps. */
     #btnToggleStudioBands.edit-switch,
     #btnToggleStudioBands.edit-switch.is-on,
     #btnToggleStudioBands.edit-switch.is-off {
@@ -1853,12 +1851,11 @@
       background: #f8fafc;
       color: #123a4d;
     }
-    /* One chip row. The class, timer, Export, and Tools slots leave;
-       the fullscreen icon and ▼ stay in the Export group, on the right. */
+    /* One chip row. The class row and Timer through Tools leave.
+       Fullscreen and ▼ stay in the pin, top-right of the bar. */
     #studioHeader.is-banner-collapsed #studioMast,
     #studioHeader.is-banner-collapsed #studioHeaderCluster,
-    #studioHeader.is-banner-collapsed #studioHeaderUtilities > :not(.studio-header-export),
-    #studioHeader.is-banner-collapsed #studioHeaderExportPair {
+    #studioHeader.is-banner-collapsed #studioHeaderUtilities {
       display: none;
     }
     #studioHeader.is-banner-collapsed .studio-header-bar {
@@ -2084,14 +2081,48 @@
     }
     /* Column rhythm. These beat the Tailwind spacing utilities on the
        header, toolbar, and board frame. Behaviour and labels stay put. */
+    /* Two tracks. The main track wraps: class and mode stay on the first
+       line, and when Timer through Tools no longer fit beside them they
+       drop to a second line, left-aligned. Fullscreen and the collapse
+       arrow are the second track, so they stay top-right at every width.
+       The 8px column-gap is the same step that sat between Tools and
+       Fullscreen. Wide screens still read as one row: the class cluster's
+       right auto margin pushes the utility chips against the pin. */
     #studioHeader .studio-header-bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      justify-content: start;
       padding: 0 var(--studio-inset) var(--studio-space);
+      column-gap: var(--studio-space);
+      row-gap: var(--studio-space);
+    }
+    .studio-header-main {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      min-width: 0;
       column-gap: var(--studio-space-2);
       row-gap: var(--studio-space);
     }
+    .studio-header-pin {
+      display: flex;
+      align-items: center;
+      align-self: start;
+      column-gap: var(--studio-space);
+    }
     #studioHeaderCluster {
+      flex: 0 0 auto;
+      max-width: 100%;
+      margin-right: auto;
       column-gap: var(--studio-space);
       row-gap: var(--studio-space);
+    }
+    #studioHeaderUtilities {
+      flex: 0 0 auto;
+      max-width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
     }
     @media (min-width: 640px) {
       #studioHeaderCluster {
@@ -2104,8 +2135,15 @@
       column-gap: var(--studio-space);
       row-gap: var(--studio-space);
     }
+    /* The pin owns the top-right corner, so these groups stay inside the
+       main column. On a phone the class chip is wider than that column;
+       wrap Classes under the select instead of sliding it under Fullscreen. */
     #studioHeaderCluster > div {
       padding: 0;
+      max-width: 100%;
+      min-width: 0;
+      flex-wrap: wrap;
+      row-gap: var(--studio-space);
     }
     #studioHeaderCluster > div:first-child {
       gap: var(--studio-space);
@@ -2247,7 +2285,8 @@
         </div>
       </div>
     </div>
-    <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5">
+    <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1">
+      <div class="studio-header-main">
 
       <!-- Center Controls: Class Preset Selector + Mode Switcher -->
       <div id="studioHeaderCluster" class="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -2275,8 +2314,8 @@
         </div>
       </div>
 
-      <!-- Right Utilities: Timer, Random Picker, Podium, Sound, Export -->
-      <div id="studioHeaderUtilities" class="ml-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+      <!-- Timer through Tools. Left-aligned when this group wraps under the class row. -->
+      <div id="studioHeaderUtilities" class="flex flex-wrap items-center justify-start gap-1.5 sm:gap-2">
         <!-- Live Countdown Timer Button -->
         <div class="relative">
           <button id="btnToggleTimerPanel" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Open the countdown timer">
@@ -2354,8 +2393,7 @@
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
-        <!-- Export stays with Tools. The fullscreen icon and ▲/▼ are last,
-             so they keep the same right-edge spot when the header folds. -->
+        <!-- Export stays with Tools on the utility row. -->
         <div class="studio-header-export flex items-center gap-1.5 shrink-0">
           <div id="studioHeaderExportPair" class="flex items-center gap-1.5 shrink-0">
             <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
@@ -2367,14 +2405,18 @@
               <span class="edit-switch-value" aria-hidden="true">ON</span>
             </button>
           </div>
-          <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
-            <svg id="fullscreenEnterIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-            <svg id="fullscreenExitIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
-          </button>
-          <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast studioHeaderCluster studioHeaderUtilities" aria-label="Collapse header">
-            <span id="headerBannerMark" aria-hidden="true">▲</span>
-          </button>
         </div>
+      </div>
+      </div>
+      <!-- Fullscreen and collapse stay top-right when the utility chips wrap. -->
+      <div class="studio-header-pin">
+        <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
+          <svg id="fullscreenEnterIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+          <svg id="fullscreenExitIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+        </button>
+        <button type="button" id="btnToggleHeaderBanner" class="studio-lesson-btn" aria-expanded="true" aria-controls="studioMast studioHeaderCluster studioHeaderUtilities" aria-label="Collapse header">
+          <span id="headerBannerMark" aria-hidden="true">▲</span>
+        </button>
       </div>
     </div>
   </header>
