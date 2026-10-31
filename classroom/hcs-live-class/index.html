@@ -1670,9 +1670,21 @@
     @media (min-width: 640px) {
       #podiumModal .podium-medal { font-size: 0.875rem; }
     }
-    /* Individual hides the groups card. Group keeps both. Visibility only. */
+    /* Individual hides the groups card and centres the student pillars
+       in the modal. The card keeps one column of the gap-6 pair so the
+       bars stay the same width. Group keeps the two-column row. */
     #podiumModal.is-individual #podiumGroupsSection {
       display: none;
+    }
+    @media (min-width: 768px) {
+      #podiumModal.is-individual #podiumBody {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+      }
+      #podiumModal.is-individual #podiumStudentsSection {
+        width: calc((100% - 1.5rem) / 2);
+        justify-self: center;
+      }
     }
     /* Mast: arrow-only Back on the left, Bright mark beside it (left of
        Individual Work, not the centre and not the timer). The words live
@@ -3040,9 +3052,9 @@
       </div>
 
       <!-- Body -->
-      <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div id="podiumBody" class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Top 3 Students Podium -->
-        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
+        <div id="podiumStudentsSection" class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
           <h3 class="font-display text-center text-base font-bold text-amber-300 mb-4">🌟 Top Individual Students</h3>
           <div id="podiumStudentsContainer" class="flex-1 flex items-end justify-center gap-3 min-h-[220px] pt-6"></div>
         </div>
