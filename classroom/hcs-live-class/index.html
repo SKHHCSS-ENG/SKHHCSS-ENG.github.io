@@ -662,12 +662,15 @@
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
        seating-board slate and the mast teal — not the amber Random Picker.
        It sits in the desk stage, on the centre of the column room. JS sets
-       left to that centre. Header, panels, and the floor width are not inputs. */
+       left to that centre. Header, panels, and the floor width are not inputs.
+       The pill is painted on that floor. Pan and zoom move it with the desks.
+       The Zoom chip may cover it; the pill is not parked or hidden. */
     .front-of-room {
       position: absolute;
       left: 0;
       z-index: 4;
       pointer-events: none;
+      transform: translateX(-50%);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -688,10 +691,6 @@
       text-transform: uppercase;
       white-space: nowrap;
       box-shadow: 0 1px 2px rgba(18, 58, 77, 0.16);
-      /* --front-park-y is 0 on the column-room line. While the resting
-         band meets the Zoom chip, JS sets a downward shift so the words
-         sit in the strip under the chip. The chip is not moved. */
-      transform: translateX(-50%) translateY(var(--front-park-y, 0px));
     }
     #pickerResultSub:empty {
       display: none;
@@ -5957,9 +5956,9 @@
         return { cols: cols, width: width, center: origin + width / 2 };
       }
 
-      // FRONT OF ROOM is inside the scaled stage, on the column-room midline.
-      // Pan and zoom move the view; the room centre stays this column geometry.
-      // The strip still sits just past the desk row that faces the front.
+      // FRONT OF ROOM is painted on the floor, on the column-room midline.
+      // Column count sets that line. The window does not. Pan and zoom move
+      // the pill with the desks. The Zoom chip may cover it.
       function placeFrontOfRoom(cls) {
         const label = document.getElementById('frontOfRoom');
         const room = cls || getCurrentClass();
@@ -5986,80 +5985,6 @@
         }
         label.style.top = top + 'px';
         label.style.bottom = 'auto';
-        syncFrontUnderZoom();
-      }
-
-      // FRONT pans inside the floor. Zoom floats on top of that floor.
-      // When the resting band meets the chip, drop the pill so the words
-      // sit under the chip, toward the bottom of the floor. The chip is
-      // not nudged, and the mast does not grow. A clear pan restores the
-      // column-room line. The park is measured from that line, so the
-      // nudge cannot clear the hit test and bounce back.
-      function stageScaleNow() {
-        const stage = document.getElementById('classroomStage');
-        const fallback = state.zoom || 1;
-        if (!stage) return fallback;
-        const t = window.getComputedStyle(stage).transform;
-        if (!t || t === 'none') return fallback;
-        const m = t.match(/matrix\(([^)]+)\)/);
-        if (!m) return fallback;
-        const scale = parseFloat(m[1].split(',')[0]);
-        return (isFinite(scale) && scale > 0) ? scale : fallback;
-      }
-
-      var frontParkFrames = 0;
-
-      function syncFrontUnderZoom() {
-        const label = document.getElementById('frontOfRoom');
-        const chip = document.getElementById('zoomChip');
-        const floor = document.getElementById('classroomViewport');
-        if (!label || !chip) return;
-        // Resting band, before this frame's park.
-        label.style.setProperty('--front-park-y', '0px');
-        const a = label.getBoundingClientRect();
-        const b = chip.getBoundingClientRect();
-        const pad = 1;
-        const hit = a.width > 1 && a.height > 1 && b.width > 1 && b.height > 1 &&
-          a.left < b.right + pad && a.right > b.left - pad &&
-          a.top < b.bottom + pad && a.bottom > b.top - pad;
-        let shiftScreen = 0;
-        if (hit) {
-          const range = document.createRange();
-          range.selectNodeContents(label);
-          const glyphs = range.getBoundingClientRect();
-          const glyphTop = glyphs.height > 1 ? glyphs.top : a.top;
-          const glyphBottom = glyphs.height > 1 ? glyphs.bottom : a.bottom;
-          const gap = 4;
-          // Whole pill just under the chip, toward the bottom of the floor.
-          shiftScreen = (b.bottom + gap) - a.top;
-          if (floor && shiftScreen > 0) {
-            const visibleBottom = floor.getBoundingClientRect().top + floor.clientHeight;
-            const overflow = (glyphBottom + shiftScreen) - visibleBottom;
-            if (overflow > 0.75) shiftScreen -= overflow;
-          }
-          // The words stay clear of the chip even when the pill's top
-          // has to tuck under it to remain on the floor.
-          const minShift = (b.bottom + 1) - glyphTop;
-          if (shiftScreen < minShift) shiftScreen = minShift;
-          if (shiftScreen < 0.5) shiftScreen = 0;
-        }
-        if (shiftScreen <= 0) {
-          label.classList.remove('is-under-zoom');
-          label.style.removeProperty('--front-park-y');
-        } else {
-          const scale = stageScaleNow();
-          label.style.setProperty('--front-park-y', (shiftScreen / scale).toFixed(2) + 'px');
-          label.classList.add('is-under-zoom');
-        }
-        // Fit animates the stage scale. Recheck until the matrix settles
-        // so a pan that already overlaps is parked on the finished frame.
-        const scale = stageScaleNow();
-        if (Math.abs(scale - (state.zoom || 1)) > 0.015 && frontParkFrames < 20) {
-          frontParkFrames += 1;
-          requestAnimationFrame(syncFrontUnderZoom);
-        } else {
-          frontParkFrames = 0;
-        }
       }
 
       // Render Freeform Classroom Floor Plan & Desks
@@ -7433,7 +7358,6 @@
         chip.style.top = Math.round(pos.top) + 'px';
         chip.style.bottom = 'auto';
         chip.style.right = 'auto';
-        syncFrontUnderZoom();
         return pos;
       }
 
@@ -7801,7 +7725,6 @@
         fitFloorAboveZoomGutter();
         if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
         finishFloorPanHold();
-        syncFrontUnderZoom();
       }
 
       function currentZoomChipOffset(chip) {
@@ -8483,10 +8406,6 @@
             e.preventDefault();
           }, { passive: false });
           initZoomChipDrag(zoomChip);
-        }
-        const classroomViewport = document.getElementById('classroomViewport');
-        if (classroomViewport) {
-          classroomViewport.addEventListener('scroll', syncFrontUnderZoom, { passive: true });
         }
 
         // Manual Group Brush Bar
