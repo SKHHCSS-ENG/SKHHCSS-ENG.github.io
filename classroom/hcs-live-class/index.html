@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("skhhcss_eng_hcs_live_class_skin_v1") === "minimalist") {
+          document.documentElement.setAttribute("data-skin", "minimalist");
+        }
+      } catch (err) {}
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HCS Live Class · English · SKH Holy Carpenter Secondary School</title>
@@ -2425,6 +2434,593 @@
       font-size: var(--studio-type-title);
       line-height: 1.15;
     }
+    /* Skin. Default is the live chrome above: no attribute, no overrides.
+       Minimalist only recolours, drops heavy shadow, and swaps the mast mark.
+       Spacing, type size, and the framework stay put. */
+    .studio-mark img.studio-mark-day { display: none; }
+    html[data-skin="minimalist"] .studio-mark img.studio-mark-default { display: none; }
+    html[data-skin="minimalist"] .studio-mark img.studio-mark-day { display: block; }
+    .skin-choice {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      cursor: pointer;
+    }
+    .skin-choice:hover { background: #e2e8f0; }
+    .skin-choice:focus-visible {
+      outline: 2px solid #123a4d;
+      outline-offset: 2px;
+    }
+    html:not([data-skin="minimalist"]) #btnSkinDefault,
+    html:not([data-skin="minimalist"]) #btnSkinDefault:hover {
+      background: #4f46e5;
+      color: #fff;
+    }
+    html[data-skin="minimalist"] {
+      --skin-bg: #fff;
+      --skin-line: #e2e8f0;
+      --skin-text: #0f172a;
+      --skin-muted: #64748b;
+      --skin-accent: #2a8fad;
+    }
+    html[data-skin="minimalist"] body {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #studioHeader {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 -1px 0 var(--skin-line);
+    }
+    html[data-skin="minimalist"] #studioHeader button,
+    html[data-skin="minimalist"] #studioHeader a,
+    html[data-skin="minimalist"] #studioHeader label,
+    html[data-skin="minimalist"] #studioHeader select {
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #headerTimerDisplay,
+    html[data-skin="minimalist"] #studioHeader .text-sky-100 {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #studioHeader [class*="bg-white/"],
+    html[data-skin="minimalist"] #studioHeader [class*="bg-slate-900/"] {
+      background-color: var(--skin-bg);
+      border-color: var(--skin-line);
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+    html[data-skin="minimalist"] #studioHeader button,
+    html[data-skin="minimalist"] #classSelect,
+    html[data-skin="minimalist"] .studio-lesson-btn,
+    html[data-skin="minimalist"] .studio-lesson-btn:hover,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch.is-on,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch.is-off,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch:hover,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch.is-on:hover,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch.is-off:hover,
+    html[data-skin="minimalist"] #btnStudioFullscreen,
+    html[data-skin="minimalist"] #btnToggleHeaderBanner,
+    html[data-skin="minimalist"] #btnStudioFullscreen:hover,
+    html[data-skin="minimalist"] #btnToggleHeaderBanner:hover,
+    html[data-skin="minimalist"] #btnStudioFullscreen[aria-pressed="true"],
+    html[data-skin="minimalist"] #btnToggleHeaderBanner[aria-expanded="false"],
+    html[data-skin="minimalist"] #btnStudioFullscreen[aria-pressed="true"]:hover,
+    html[data-skin="minimalist"] #btnToggleHeaderBanner[aria-expanded="false"]:hover {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #studioHeader #btnOpenPickerModal,
+    html[data-skin="minimalist"] #studioHeader #btnExportCsv,
+    html[data-skin="minimalist"] #studioHeader #btnOpenClassModal,
+    html[data-skin="minimalist"] #studioHeader #btnOpenPickerModal:hover,
+    html[data-skin="minimalist"] #studioHeader #btnExportCsv:hover,
+    html[data-skin="minimalist"] #studioHeader #btnOpenClassModal:hover {
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #btnModeIndividual.shadow-sm,
+    html[data-skin="minimalist"] #btnModeGroup.shadow-sm,
+    html[data-skin="minimalist"] #btnModeIndividual.shadow-sm:hover,
+    html[data-skin="minimalist"] #btnModeGroup.shadow-sm:hover {
+      background-color: var(--skin-accent);
+      color: #fff;
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch.is-on .edit-switch-value {
+      background: var(--skin-accent);
+      color: #fff;
+      border-color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch.is-off .edit-switch-value {
+      background: var(--skin-bg);
+      color: var(--skin-muted);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] .studio-lesson-btn:focus-visible,
+    html[data-skin="minimalist"] #btnToggleStudioBands.edit-switch:focus-visible,
+    html[data-skin="minimalist"] .skin-choice:focus-visible {
+      outline-color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #studioToolbar {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .studio-band {
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] .studio-band-label {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #studioToolbarRow button,
+    html[data-skin="minimalist"] #studioToolbarRow button:hover {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #btnToggleEditName.edit-switch.is-on,
+    html[data-skin="minimalist"] #btnToggleEditName.edit-switch.is-on:hover,
+    html[data-skin="minimalist"] #btnToggleGroupBrush.shadow-sm,
+    html[data-skin="minimalist"] #btnToggleGroupBrush.shadow-sm:hover {
+      background: var(--skin-accent);
+      color: #fff;
+      border-color: var(--skin-accent);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #btnToggleEditName.edit-switch.is-on .edit-switch-value {
+      background: #fff;
+      color: var(--skin-accent);
+      border-color: #fff;
+    }
+    html[data-skin="minimalist"] #btnToggleEditName.edit-switch.is-off,
+    html[data-skin="minimalist"] #btnToggleEditName.edit-switch.is-off:hover {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #btnToggleEditName.edit-switch.is-off .edit-switch-value {
+      background: var(--skin-bg);
+      color: var(--skin-muted);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #studioToolbarRow #btnSkinMinimalist,
+    html[data-skin="minimalist"] #studioToolbarRow #btnSkinMinimalist:hover,
+    html[data-skin="minimalist"] #studioToolbarRow .layout-preset-btn.shadow-xs,
+    html[data-skin="minimalist"] #studioToolbarRow .layout-preset-btn.ring-2,
+    html[data-skin="minimalist"] #studioToolbarRow .layout-preset-btn.shadow-xs:hover,
+    html[data-skin="minimalist"] #studioToolbarRow .layout-preset-btn.ring-2:hover,
+    html[data-skin="minimalist"] #studioToolbarRow #btnAllPlusOne,
+    html[data-skin="minimalist"] #studioToolbarRow #btnAllPlusOne:hover,
+    html[data-skin="minimalist"] #studioToolbarRow #btnApplyCustomGrid,
+    html[data-skin="minimalist"] #studioToolbarRow #btnApplyCustomGrid:hover {
+      background-color: var(--skin-bg);
+      color: var(--skin-accent);
+      border-color: var(--skin-accent);
+      box-shadow: inset 0 0 0 1px var(--skin-accent);
+    }
+    html[data-skin="minimalist"] .studio-grid-setup {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .studio-grid-setup span,
+    html[data-skin="minimalist"] .studio-grid-setup label {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #quickRowsInput,
+    html[data-skin="minimalist"] #quickColsInput,
+    html[data-skin="minimalist"] #studioHeader #classSelect {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #quickRowsInput:focus,
+    html[data-skin="minimalist"] #quickColsInput:focus,
+    html[data-skin="minimalist"] #zoomReadout:focus,
+    html[data-skin="minimalist"] #lbSearchInput:focus {
+      border-color: var(--skin-accent);
+      box-shadow: none;
+      outline: none;
+    }
+    html[data-skin="minimalist"] #groupBrushBar {
+      background: var(--skin-bg);
+      background-image: none;
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #groupBrushBar .text-fuchsia-800,
+    html[data-skin="minimalist"] #groupBrushBar .text-slate-600 {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #btnClusterAfterBrush,
+    html[data-skin="minimalist"] #btnCloseBrushBar,
+    html[data-skin="minimalist"] #btnClusterAfterBrush:hover,
+    html[data-skin="minimalist"] #btnCloseBrushBar:hover,
+    html[data-skin="minimalist"] #btnToggleTeamScoreboard,
+    html[data-skin="minimalist"] #btnToggleTeamScoreboard:hover {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #btnClusterAfterBrush,
+    html[data-skin="minimalist"] #btnClusterAfterBrush:hover,
+    html[data-skin="minimalist"] #btnToggleTeamScoreboard,
+    html[data-skin="minimalist"] #btnToggleTeamScoreboard:hover {
+      color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] .classroom-floor {
+      background-color: var(--skin-bg);
+      background-image: radial-gradient(var(--skin-line) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    html[data-skin="minimalist"] .classroom-floor.snap-active {
+      background-image:
+        linear-gradient(to right, var(--skin-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--skin-line) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    html[data-skin="minimalist"] #studioFloorSection,
+    html[data-skin="minimalist"] #leaderboardCard,
+    html[data-skin="minimalist"] #pulseCard {
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #pulseCard {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #pulseCard [class*="bg-white/"] {
+      background-color: var(--skin-bg);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #pulseCard .text-indigo-100 {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #pulseCard .text-white,
+    html[data-skin="minimalist"] #pulseCard .text-amber-300,
+    html[data-skin="minimalist"] #pulseCard .text-emerald-300,
+    html[data-skin="minimalist"] #statTopStudent,
+    html[data-skin="minimalist"] #statTopGroup {
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #pulseCard #statTotalPoints {
+      color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] .front-of-room {
+      background: var(--skin-bg);
+      border-color: var(--skin-accent);
+      color: var(--skin-text);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .desk-card,
+    html[data-skin="minimalist"] .desk-card:hover,
+    html[data-skin="minimalist"] .desk-card.dragging {
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .brush-mode-active .desk-card:hover {
+      transform: none;
+    }
+    html[data-skin="minimalist"] .desk-card.spotlight-active {
+      background: color-mix(in srgb, var(--skin-accent) 12%, #fff);
+      box-shadow: inset 0 0 0 1px var(--skin-accent);
+      transform: none;
+    }
+    html[data-skin="minimalist"] .desk-card.pulse-plus,
+    html[data-skin="minimalist"] .desk-card.pulse-minus,
+    html[data-skin="minimalist"] .podium-pillar {
+      animation: none;
+    }
+    html[data-skin="minimalist"] .desk-card .bg-slate-700 {
+      background-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] .desk-score-value {
+      background: transparent;
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] .board-delete-btn span,
+    html[data-skin="minimalist"] .board-delete-btn:hover span,
+    html[data-skin="minimalist"] .board-delete-btn:focus-visible span {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      color: var(--skin-muted);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .desk-card .desk-name-btn,
+    html[data-skin="minimalist"] .desk-card .desk-classno-btn,
+    html[data-skin="minimalist"] .desk-card .desk-name-input,
+    html[data-skin="minimalist"] .desk-card .desk-classno-input,
+    html[data-skin="minimalist"] .desk-card .desk-name-btn:hover,
+    html[data-skin="minimalist"] .desk-card .desk-name-btn:focus-visible,
+    html[data-skin="minimalist"] .desk-card .desk-classno-btn:hover,
+    html[data-skin="minimalist"] .desk-card .desk-classno-btn:focus-visible {
+      background: var(--skin-bg);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .dock-group-input:focus {
+      border-color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] .desk-action-btn,
+    html[data-skin="minimalist"] .desk-action-btn:hover,
+    html[data-skin="minimalist"] .score-step[data-lb-st-minus],
+    html[data-skin="minimalist"] .score-step[data-lb-st-minus]:hover,
+    html[data-skin="minimalist"] .score-step[data-lb-st-plus],
+    html[data-skin="minimalist"] .score-step[data-lb-st-plus]:hover,
+    html[data-skin="minimalist"] .score-step[data-grp-minus],
+    html[data-skin="minimalist"] .score-step[data-grp-minus]:hover {
+      background-color: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .desk-action-btn[data-desk-plus],
+    html[data-skin="minimalist"] .desk-action-btn[data-desk-plus]:hover,
+    html[data-skin="minimalist"] .desk-action-btn[data-desk-team-plus],
+    html[data-skin="minimalist"] .desk-action-btn[data-desk-team-plus]:hover,
+    html[data-skin="minimalist"] .score-step[data-lb-st-plus],
+    html[data-skin="minimalist"] .score-step[data-lb-st-plus]:hover {
+      color: var(--skin-accent);
+      border-color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] .score-float {
+      text-shadow: none;
+    }
+    html[data-skin="minimalist"] .score-float.text-emerald-600 { color: var(--skin-accent); }
+    html[data-skin="minimalist"] .score-float.text-rose-600 { color: var(--skin-text); }
+    html[data-skin="minimalist"] .zoom-chip,
+    html[data-skin="minimalist"] .zoom-chip.is-dragging {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #zoomReadout {
+      border-color: var(--skin-line);
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] .zoom-chip-handle,
+    html[data-skin="minimalist"] .zoom-chip-label,
+    html[data-skin="minimalist"] .zoom-chip-btn,
+    html[data-skin="minimalist"] .zoom-chip-fit {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #btnToggleSidePanels.side-panels-tab,
+    html[data-skin="minimalist"] .side-panels-tab:hover,
+    html[data-skin="minimalist"] .side-panels-tab:focus-visible {
+      background: var(--skin-bg);
+      color: var(--skin-muted);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] .panel-title-bar,
+    html[data-skin="minimalist"] #leaderboardPanel .bg-slate-50\/70,
+    html[data-skin="minimalist"] #leaderboardPanel .bg-slate-200\/75 {
+      background-color: var(--skin-bg);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #leaderboardCard h2,
+    html[data-skin="minimalist"] #leaderboardBody .text-slate-800 {
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #leaderboardSortHint {
+      color: var(--skin-muted);
+      background: var(--skin-bg);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #tabLbStudents.shadow-sm,
+    html[data-skin="minimalist"] #tabLbGroups.shadow-sm,
+    html[data-skin="minimalist"] #tabLbFeed.shadow-sm {
+      background: var(--skin-bg);
+      color: var(--skin-accent);
+      box-shadow: inset 0 0 0 1px var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #lbSearchInput {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #leaderboardBody > .border-slate-100,
+    html[data-skin="minimalist"] #leaderboardBody > .border-slate-100:hover {
+      background-color: var(--skin-bg);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #leaderboardBody .text-emerald-700,
+    html[data-skin="minimalist"] #leaderboardBody .text-rose-600,
+    html[data-skin="minimalist"] .lb-rank {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] .lb-rank.is-podium { color: var(--skin-text); }
+    html[data-skin="minimalist"] #timerCardBox,
+    html[data-skin="minimalist"] #pickerStageBox {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #timerBigDisplay,
+    html[data-skin="minimalist"] #pickerResultTitle,
+    html[data-skin="minimalist"] #timerCardBox .text-amber-300,
+    html[data-skin="minimalist"] #pickerStageBox .text-white,
+    html[data-skin="minimalist"] #pickerBadge {
+      color: var(--skin-text);
+      background-color: transparent;
+    }
+    html[data-skin="minimalist"] #timerStatusText,
+    html[data-skin="minimalist"] #pickerResultSub,
+    html[data-skin="minimalist"] #pickerCurrentScorePill {
+      color: var(--skin-muted);
+      background: transparent;
+    }
+    html[data-skin="minimalist"] #timerProgressBar { background-color: var(--skin-accent); }
+    html[data-skin="minimalist"] #timerPopover button,
+    html[data-skin="minimalist"] #timerPopover button:hover {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #timerPopover #btnTimerStartPause,
+    html[data-skin="minimalist"] #timerPopover #btnTimerStartPause:hover,
+    html[data-skin="minimalist"] #pickerModal #btnTriggerRandomPick,
+    html[data-skin="minimalist"] #pickerModal #btnTriggerRandomPick:hover,
+    html[data-skin="minimalist"] #btnPickerPlusOne,
+    html[data-skin="minimalist"] #btnPickerPlusOne:hover,
+    html[data-skin="minimalist"] #classModal .bg-indigo-600,
+    html[data-skin="minimalist"] #groupModal .bg-indigo-600,
+    html[data-skin="minimalist"] #classModal .bg-indigo-600:hover,
+    html[data-skin="minimalist"] #groupModal .bg-indigo-600:hover,
+    html[data-skin="minimalist"] #btnDonePodiumModal,
+    html[data-skin="minimalist"] #btnDonePodiumModal:hover {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-accent);
+      box-shadow: inset 0 0 0 1px var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #btnPickerMinusOne,
+    html[data-skin="minimalist"] #btnPickerMinusOne:hover,
+    html[data-skin="minimalist"] #btnConfirmResetAllScores,
+    html[data-skin="minimalist"] #btnConfirmResetAllScores:hover,
+    html[data-skin="minimalist"] #btnConfirmResetGroupScoresOnly,
+    html[data-skin="minimalist"] #btnConfirmResetGroupScoresOnly:hover,
+    html[data-skin="minimalist"] #btnConfirmClearGroups,
+    html[data-skin="minimalist"] #btnConfirmClearGroups:hover,
+    html[data-skin="minimalist"] #btnCancelResetModal,
+    html[data-skin="minimalist"] #btnCancelClearGroups,
+    html[data-skin="minimalist"] #btnCancelResetModal:hover,
+    html[data-skin="minimalist"] #btnCancelClearGroups:hover {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #classModal .bg-gradient-to-r,
+    html[data-skin="minimalist"] #groupModal .bg-gradient-to-r,
+    html[data-skin="minimalist"] #pickerModal .bg-gradient-to-r {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 -1px 0 var(--skin-line);
+    }
+    html[data-skin="minimalist"] #classModal .bg-gradient-to-r button,
+    html[data-skin="minimalist"] #groupModal .bg-gradient-to-r button,
+    html[data-skin="minimalist"] #pickerModal .bg-gradient-to-r button {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #pickerModal #btnPickerTypeStudent.shadow-sm,
+    html[data-skin="minimalist"] #pickerModal #btnPickerTypeGroup.shadow-sm {
+      color: var(--skin-accent);
+      background: var(--skin-bg);
+      box-shadow: inset 0 0 0 1px var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #pickerModal .text-indigo-600,
+    html[data-skin="minimalist"] #classModal .text-indigo-700,
+    html[data-skin="minimalist"] #classModal .text-indigo-900 {
+      color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #classModal .bg-indigo-50\/70,
+    html[data-skin="minimalist"] #presetClassList .border-indigo-500 {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #presetClassList .border-indigo-500 {
+      border-color: var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #podiumModal > .bg-gradient-to-b {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #podiumModal .text-amber-300,
+    html[data-skin="minimalist"] #podiumModal .text-emerald-300,
+    html[data-skin="minimalist"] #podiumModal .podium-name,
+    html[data-skin="minimalist"] #podiumModal .podium-rank {
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #podiumSubTitle,
+    html[data-skin="minimalist"] #podiumModal .text-indigo-200,
+    html[data-skin="minimalist"] #podiumModal .podium-score {
+      color: var(--skin-muted);
+    }
+    html[data-skin="minimalist"] #podiumModal [class*="border-white"] {
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #podiumModal .bg-white\/5,
+    html[data-skin="minimalist"] #podiumModal .bg-black\/30,
+    html[data-skin="minimalist"] #podiumModal .bg-white\/10,
+    html[data-skin="minimalist"] #podiumModal .podium-pillar {
+      background-color: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #podiumModal .podium-pillar {
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #podiumModal .podium-pillar.text-slate-950 {
+      box-shadow: inset 0 0 0 1px var(--skin-accent);
+    }
+    html[data-skin="minimalist"] #planSheet .plan-panel {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #planSheet .plan-bar {
+      background: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 -1px 0 var(--skin-line);
+    }
+    html[data-skin="minimalist"] #planSheet .plan-close,
+    html[data-skin="minimalist"] #planSheet .plan-row-title,
+    html[data-skin="minimalist"] #planSheet .plan-confirm,
+    html[data-skin="minimalist"] #planNameInput {
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #planSheet .plan-row-sub { color: var(--skin-muted); }
+    html[data-skin="minimalist"] #planSheet .plan-action,
+    html[data-skin="minimalist"] #planSheet .plan-action:hover {
+      background: var(--skin-bg);
+      color: var(--skin-accent);
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #resetModal .bg-rose-100 {
+      background: var(--skin-bg);
+      color: var(--skin-muted);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] #classModal .shadow-2xl,
+    html[data-skin="minimalist"] #groupModal .shadow-2xl,
+    html[data-skin="minimalist"] #pickerModal .shadow-2xl,
+    html[data-skin="minimalist"] #resetModal .shadow-2xl,
+    html[data-skin="minimalist"] #clearGroupsModal .shadow-2xl,
+    html[data-skin="minimalist"] #timerPopover {
+      box-shadow: none;
+      border-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #toastContainer > div {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: inset 0 0 0 1px var(--skin-line);
+    }
+    html[data-skin="minimalist"] .site-version-footer,
+    html[data-skin="minimalist"] .site-version-line {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      color: var(--skin-muted);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
@@ -2436,7 +3032,8 @@
       <div class="studio-brand">
         <div class="studio-title">
           <h1 class="studio-mark">
-            <img src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
+            <img class="studio-mark-default" src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
+            <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101a" alt="HCS Live Class" width="420" height="120">
           </h1>
         </div>
       </div>
@@ -2678,6 +3275,12 @@
         <button id="btnOpenResetModal" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-base font-bold transition" title="Reset all scores to 0" aria-label="Reset scores">
           <span aria-hidden="true">🔄</span>
         </button>
+      </div>
+
+      <div class="studio-band studio-skin-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2" role="group" aria-label="Skin">
+        <span class="studio-band-label">Skin</span>
+        <button type="button" id="btnSkinDefault" class="skin-choice" aria-pressed="true">Default</button>
+        <button type="button" id="btnSkinMinimalist" class="skin-choice" aria-pressed="false">Minimalist</button>
       </div>
     </div>
 
@@ -9420,6 +10023,34 @@
         }
         window.addEventListener('resize', scheduleNameFit);
       });
+    })();
+  </script>
+  <script>
+    (function () {
+      var KEY = "skhhcss_eng_hcs_live_class_skin_v1";
+      function skinNow() {
+        return document.documentElement.getAttribute("data-skin") === "minimalist" ? "minimalist" : "default";
+      }
+      function syncPressed() {
+        var skin = skinNow();
+        var defBtn = document.getElementById("btnSkinDefault");
+        var minBtn = document.getElementById("btnSkinMinimalist");
+        if (defBtn) defBtn.setAttribute("aria-pressed", skin === "default" ? "true" : "false");
+        if (minBtn) minBtn.setAttribute("aria-pressed", skin === "minimalist" ? "true" : "false");
+      }
+      function applySkin(skin) {
+        if (skin === "minimalist") document.documentElement.setAttribute("data-skin", "minimalist");
+        else document.documentElement.removeAttribute("data-skin");
+        try {
+          localStorage.setItem(KEY, skin === "minimalist" ? "minimalist" : "default");
+        } catch (err) {}
+        syncPressed();
+      }
+      var defBtn = document.getElementById("btnSkinDefault");
+      var minBtn = document.getElementById("btnSkinMinimalist");
+      if (defBtn) defBtn.addEventListener("click", function () { applySkin("default"); });
+      if (minBtn) minBtn.addEventListener("click", function () { applySkin("minimalist"); });
+      syncPressed();
     })();
   </script>
 <script src="../../site-version.js?v=sv"></script>
