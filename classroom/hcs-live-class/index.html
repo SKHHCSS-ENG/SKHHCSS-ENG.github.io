@@ -679,7 +679,7 @@
       border: 3px solid #2a8fad;
       border-radius: 999px;
       color: #123a4d;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 800;
       letter-spacing: 0.16em;
       line-height: 1;
@@ -867,6 +867,22 @@
     .desk-name-btn:focus-visible .desk-name-label.is-name-clamp::after,
     .desk-name-btn.is-editable .desk-name-label.is-name-clamp::after {
       background: #fffbeb;
+    }
+    /* Phone stays six desks across. The fit that sizes a name up to the
+       card edge shaves the last letter once Fit scales the floor to 35%.
+       One step under the 18px face, then an ellipsis. The button title
+       still has the full name. */
+    @media (max-width: 390px) {
+      .desk-name-btn,
+      .desk-name-static {
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+        font-size: 16px;
+      }
+      .desk-name-label.is-name-ellipsis {
+        text-overflow: ellipsis;
+      }
     }
     /* Group names share the student-name fit: one line, then smaller, then
        two lines. Ellipsis only after a 12px two-line name still overflows.
@@ -2558,7 +2574,7 @@
         <!-- Team scoreboard sits above the desks. It does not cover the cards. -->
         <section id="groupScoreDock" class="group-score-dock is-collapsed hidden">
           <div class="group-score-dock-bar">
-            <h2 class="font-display font-bold text-slate-800 text-sm">Team Scoreboard</h2>
+            <h2 class="font-display font-bold text-slate-800 text-sm">Group Scoreboard</h2>
             <button type="button" id="btnToggleTeamScoreboard" class="px-3 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition" aria-expanded="false" aria-controls="groupDockCards">Show</button>
           </div>
           <div id="groupDockCards"></div>
@@ -2612,7 +2628,7 @@
               <div id="statTopStudent" class="font-display text-xs font-bold text-white truncate mt-1">—</div>
             </div>
             <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/15">
-              <div class="text-[11px] text-indigo-100">Leading Team</div>
+              <div class="text-[11px] text-indigo-100">Leading Group</div>
               <div id="statTopGroup" class="group-name-label font-display text-xs font-bold text-emerald-300 mt-1">—</div>
             </div>
           </div>
@@ -2920,7 +2936,7 @@
           <span class="text-2xl">🏆</span>
           <div>
             <h2 class="font-display text-xl font-bold text-amber-300">SKHHCSS Classroom Champions Podium</h2>
-            <p id="podiumSubTitle" class="text-xs text-indigo-200">Live Standings — Individual &amp; Team Leaders</p>
+            <p id="podiumSubTitle" class="text-xs text-indigo-200">Live Standings — Individual &amp; Group Leaders</p>
           </div>
         </div>
         <button id="btnClosePodiumModal" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center font-bold" aria-label="Close">✕</button>
@@ -2936,7 +2952,7 @@
 
         <!-- Top 3 Teams Podium -->
         <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
-          <h3 class="font-display text-center text-base font-bold text-emerald-300 mb-4">🛡️ Top Classroom Teams</h3>
+          <h3 class="font-display text-center text-base font-bold text-emerald-300 mb-4">🛡️ Top Classroom Groups</h3>
           <div id="podiumGroupsContainer" class="flex-1 flex items-end justify-center gap-3 min-h-[220px] pt-6"></div>
         </div>
       </div>
@@ -4204,11 +4220,11 @@
             '<input type="text" enterkeyhint="done" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="48" ' +
             'class="dock-group-input" data-dock-group-input="' + escapeHtml(grp.id) + '" ' +
             'data-original-group-name="' + escapeHtml(grp.name) + '" ' +
-            'value="' + escapeHtml(grp.name) + '" aria-label="Team name" />' +
+            'value="' + escapeHtml(grp.name) + '" aria-label="Group name" />' +
             '</span>';
         }
         return '<button type="button" class="dock-group-btn is-editable" data-dock-group-rename="' + escapeHtml(grp.id) + '" style="' + fitStyle + '" ' +
-          'title="Rename ' + escapeHtml(grp.name) + '" aria-label="Rename team ' + escapeHtml(grp.name) + '">' +
+          'title="Rename ' + escapeHtml(grp.name) + '" aria-label="Rename group ' + escapeHtml(grp.name) + '">' +
           '<span class="text-base leading-none shrink-0" aria-hidden="true">' + escapeHtml(grp.icon) + '</span>' +
           nameHtml +
           '</button>';
@@ -5599,7 +5615,7 @@
         if (toggle) {
           toggle.textContent = open ? 'Hide' : 'Show';
           toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-          toggle.setAttribute('aria-label', open ? 'Hide Team Scoreboard' : 'Show Team Scoreboard');
+          toggle.setAttribute('aria-label', open ? 'Hide Group Scoreboard' : 'Show Group Scoreboard');
         }
 
         if (!group) {
@@ -5631,12 +5647,12 @@
                 '<span class="group-score-value shrink-0 font-display font-extrabold bg-white border ' + pal.border + ' ' + pal.text + ' shadow-2xs">' +
                   (grp.score > 0 ? '+' + grp.score : grp.score) +
                 '</span>' +
-                (editing ? renderEditDeleteButton('data-dock-delete-group', grp.id, 'Delete Team') : '') +
+                (editing ? renderEditDeleteButton('data-dock-delete-group', grp.id, 'Delete group') : '') +
               '</span>' +
             '</div>' +
             '<div class="grid grid-cols-2 gap-1.5 mt-1">' +
-              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-sm transition shadow-2xs" aria-label="Minus one" title="Take 1 from this team and each member">−</button>' +
-              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Give +1 to this team and each member">+</button>' +
+              '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-display font-bold text-sm transition shadow-2xs" aria-label="Minus one" title="Take 1 from this group and each member">−</button>' +
+              '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="team-score-step py-1 rounded-xl ' + pal.headerBg + ' hover:opacity-95 text-white font-display font-bold text-sm transition shadow-xs" aria-label="Plus one" title="Give +1 to this group and each member">+</button>' +
             '</div>' +
           '</div>';
         }).join('') + '</div></div>';
@@ -5748,7 +5764,7 @@
 
       function fitDisplayedName(el, floorPx) {
         if (!el || el.clientWidth < 8) return;
-        el.classList.remove('is-name-wrap', 'is-name-clamp');
+        el.classList.remove('is-name-wrap', 'is-name-clamp', 'is-name-ellipsis');
         el.style.fontSize = '';
         el.style.minHeight = '';
         var maxPx = parseFloat(window.getComputedStyle(el).fontSize);
@@ -5798,7 +5814,19 @@
       function fitDeskNames(root) {
         var scope = root && root.querySelectorAll ? root : document;
         var nodes = scope.querySelectorAll('.desk-name-label');
-        for (var i = 0; i < nodes.length; i++) fitDisplayedName(nodes[i], NAME_FIT_FLOOR_PX);
+        var phone = window.matchMedia('(max-width: 390px)').matches;
+        for (var i = 0; i < nodes.length; i++) {
+          if (!phone) {
+            fitDisplayedName(nodes[i], NAME_FIT_FLOOR_PX);
+            continue;
+          }
+          var label = nodes[i];
+          label.classList.remove('is-name-wrap', 'is-name-clamp', 'is-name-ellipsis');
+          label.style.fontSize = '';
+          label.style.minHeight = '';
+          if (label.clientWidth < 8) continue;
+          if (nameTextOverflows(label)) label.classList.add('is-name-ellipsis');
+        }
       }
 
       function fitGroupNames(root) {
@@ -5988,7 +6016,7 @@
               '<div class="desk-score-actions' + (state.activityMode === 'group' && grp ? ' is-grouped' : '') + '">' +
                 '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one">−</button>' +
                 (state.activityMode === 'group' && grp
-                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="desk-action-btn px-1.5 rounded-full bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 font-display font-bold leading-none transition flex items-center justify-center text-[10px] whitespace-nowrap" title="Give +1 to this team and each member" aria-label="Group plus one">Group+1</button>'
+                  ? '<button type="button" data-desk-team-plus="' + escapeHtml(grp.id) + '" class="desk-action-btn px-1.5 rounded-full bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 font-display font-bold leading-none transition flex items-center justify-center text-[10px] whitespace-nowrap" title="Give +1 to this group and each member" aria-label="Group plus one">Group+1</button>'
                   : '') +
                 '<button type="button" data-desk-plus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold leading-none transition shadow-2xs flex items-center justify-center" aria-label="Plus one">+</button>' +
               '</div>' +
@@ -6130,9 +6158,9 @@
                 '</div>' +
               '</div>' +
               '<div class="flex items-center gap-1.5 shrink-0">' +
-                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Take 1 from this team and each member">−</button>' +
+                '<button type="button" data-grp-minus="' + escapeHtml(grp.id) + '" class="score-step bg-white hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200 font-bold flex items-center justify-center transition" aria-label="Minus one" title="Take 1 from this group and each member">−</button>' +
                 '<span class="px-2 py-0.5 rounded-lg bg-white font-display font-extrabold text-sm ' + pal.text + ' border ' + pal.border + '">' + grp.score + '</span>' +
-                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="score-step ' + pal.headerBg + ' hover:opacity-90 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Give +1 to this team and each member">+</button>' +
+                '<button type="button" data-grp-plus="' + escapeHtml(grp.id) + '" class="score-step ' + pal.headerBg + ' hover:opacity-90 text-white font-bold flex items-center justify-center transition" aria-label="Plus one" title="Give +1 to this group and each member">+</button>' +
               '</div>' +
             '</div>';
           }).join('');
@@ -6721,15 +6749,15 @@
 
             return '<div class="p-2.5 rounded-xl border-2 ' + pal.border + ' ' + pal.bg + ' flex flex-col gap-2">' +
               '<div class="flex items-center gap-1.5">' +
-                '<input type="text" data-edit-grp-icon="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.icon) + '" aria-label="Team Emoji" class="w-10 px-1.5 py-1 text-center text-sm bg-white border border-slate-200 rounded-lg" />' +
-                '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Team Name"' +
+                '<input type="text" data-edit-grp-icon="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.icon) + '" aria-label="Group emoji" class="w-10 px-1.5 py-1 text-center text-sm bg-white border border-slate-200 rounded-lg" />' +
+                '<input type="text" data-edit-grp-name="' + escapeHtml(grp.id) + '" value="' + escapeHtml(grp.name) + '" aria-label="Group name"' +
                   (boardEditsAllowed() ? '' : ' readonly aria-readonly="true"') +
                   ' class="flex-1 min-w-0 px-2.5 py-1 text-xs font-bold border border-slate-200 rounded-lg ' +
                   (boardEditsAllowed() ? 'is-editable' : 'bg-slate-100 text-slate-500 cursor-default') + '" />' +
-                '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" aria-label="Delete team">✕</button>' +
+                '<button type="button" data-delete-grp="' + escapeHtml(grp.id) + '" class="p-1 text-slate-400 hover:text-rose-600 text-xs font-bold" aria-label="Delete group">✕</button>' +
               '</div>' +
               '<div class="flex items-center justify-between text-[11px]">' +
-                '<select data-edit-grp-color="' + escapeHtml(grp.id) + '" aria-label="Team Color" class="bg-white border border-slate-200 rounded-lg px-2 py-0.5 font-semibold text-slate-700">' +
+                '<select data-edit-grp-color="' + escapeHtml(grp.id) + '" aria-label="Group colour" class="bg-white border border-slate-200 rounded-lg px-2 py-0.5 font-semibold text-slate-700">' +
                   colorOptions +
                 '</select>' +
                 '<span class="font-bold ' + pal.text + '">' + count + ' students • Score: ' + grp.score + '</span>' +
@@ -6751,7 +6779,7 @@
                 '<span class="text-xs font-mono font-bold text-slate-400 w-8" data-assign-st-no="' + escapeHtml(st.id) + '">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' +
                 '<span class="text-xs font-bold text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
               '</div>' +
-              '<select data-assign-student-grp="' + escapeHtml(st.id) + '" aria-label="Assign Team for ' + escapeHtml(st.name) + '" class="px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:ring-2 focus:ring-violet-400">' +
+              '<select data-assign-student-grp="' + escapeHtml(st.id) + '" aria-label="Assign group for ' + escapeHtml(st.name) + '" class="px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:ring-2 focus:ring-violet-400">' +
                 groupOptions +
               '</select>' +
             '</div>';
@@ -6856,7 +6884,7 @@
             return;
           }
           bar.classList.remove('hidden');
-          pill.textContent = 'Team Score: ' + grp.score;
+          pill.textContent = 'Group Score: ' + grp.score;
         }
       }
 
@@ -7016,7 +7044,7 @@
             return '<div class="flex-1 flex flex-col items-center text-center">' +
               '<div class="text-lg mb-0.5">' + escapeHtml(grp.icon) + '</div>' +
               '<div class="group-name-label podium-name text-white">' + escapeHtml(grp.name) + '</div>' +
-              '<div class="text-[11px] font-mono text-emerald-300 mb-2">' + grp.score + ' team pts</div>' +
+              '<div class="text-[11px] font-mono text-emerald-300 mb-2">' + grp.score + ' group pts</div>' +
               '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-center p-2.5 shadow-lg">' +
                 podiumPlaceHtml(idx) +
               '</div>' +
@@ -8091,7 +8119,7 @@
           state.teamScoreboardOpen = true;
           saveState();
           renderAll();
-          showToast('Switched to Group Work Mode. Tap a name to rename. Team points also add to each member.', '🛡️');
+          showToast('Switched to Group Work Mode. Tap a name to rename. Group points also add to each member.', '🛡️');
         });
         const btnTeamScoreboard = document.getElementById('btnToggleTeamScoreboard');
         if (btnTeamScoreboard) {
