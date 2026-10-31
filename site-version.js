@@ -6,11 +6,15 @@
  *
  * Nest, on each ship:
  * 1. Finish the content commit. That commit is the one Howard should revert to.
- * 2. Set `sha` to its 7-character id (`git rev-parse --short=7 HEAD`).
- * 3. Set `date` to that commit's Asia/Hong_Kong calendar day, English short month,
- *    no leading zero: `22 Oct 2026`
+ * 2. Set `sha` in this file to its 7-character id (`git rev-parse --short=7 HEAD`).
+ * 3. Set `date` in this file to that commit's Asia/Hong_Kong calendar day, English
+ *    short month, no leading zero: `22 Oct 2026`
  *    (`TZ=Asia/Hong_Kong date '+%-d %b %Y'` in an English locale).
- * 4. Bump every `site-version.js?v=` to that same sha so phones drop the old file.
+ * 4. Stop there for the stamp. Set `sha` and `date` in this file only (plus
+ *    What's New when that note is folded into the feature tip). Do not rewrite
+ *    every page's `site-version.js?v=`. Pages keep `?v=sv`. Phones may need one
+ *    refresh after a stamp if the old JS was cached hard. That is an acceptable
+ *    tradeoff.
  * 5. What's New end-of-day: under the newest date only, keep one line
  *    `<p class="release-version" data-site-version-echo>Site version: <span data-site-version-label>…</span></p>`
  *    and put the same `sha · date` text in the span. Move the line forward
