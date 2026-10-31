@@ -997,6 +997,10 @@ body.vocab-hub.tools-page.dock-open {
 body.vocab-hub.zh-on .gloss::after {
   white-space: normal;
 }
+/* Format Tags and other vocab tables: keep each gloss and its 譯 on one line */
+body.vocab-hub.zh-on .vocab-table .gloss::after {
+  white-space: nowrap;
+}
 
 /* Sentence patterns 譯: Chinese after-text may wrap at ~390px (mirror vocab-hub) */
 body.sentence-patterns.zh-on .gloss::after {
