@@ -156,10 +156,14 @@ test('Drive client lists the folder, creates, and overwrites without a new paren
       return { ok: true, status: 200, text: async function () { return JSON.stringify({ id: 'file1', name: '3A English.json' }); } };
     }
     if (init && init.method === 'POST' && url.indexOf('/upload/') === -1) {
-      return { ok: true, status: 200, text: async function () { return JSON.stringify({ id: 'createdFolder', name: 'Class Activity Studio' }); } };
+      return { ok: true, status: 200, text: async function () { return JSON.stringify({ id: 'createdFolder', name: 'HCS Live Class' }); } };
     }
-    if (url.indexOf('mimeType') !== -1 && (url.indexOf('Class+Activity+Studio') !== -1 || url.indexOf('Class%20Activity%20Studio') !== -1)) {
-      return { ok: true, status: 200, text: async function () { return JSON.stringify({ files: [{ id: 'folder1', name: 'Class Activity Studio', owners: [{ displayName: 'Howard' }] }] }); } };
+    var query = decodeURIComponent(url).replace(/\+/g, ' ');
+    if (url.indexOf('mimeType') !== -1 && query.indexOf("name = 'HCS Live Class'") !== -1 && query.indexOf("name = 'Class Activity Studio'") !== -1) {
+      return { ok: true, status: 200, text: async function () { return JSON.stringify({ files: [
+        { id: 'legacyFolder', name: 'Class Activity Studio', owners: [{ displayName: 'Howard' }] },
+        { id: 'liveFolder', name: 'HCS Live Class', owners: [{ displayName: 'Ada Wong' }] }
+      ] }); } };
     }
     if (url.indexOf('in+parents') !== -1 || url.indexOf('in%20parents') !== -1 || url.indexOf("in parents") !== -1) {
       return { ok: true, status: 200, text: async function () { return JSON.stringify({ files: [{ id: 'file9', name: '3A English.json', modifiedTime: '2026-10-29T06:05:00.000Z', lastModifyingUser: { displayName: 'Ada Wong' } }] }); } };
@@ -178,13 +182,20 @@ test('Drive client lists the folder, creates, and overwrites without a new paren
   }
 
   var folders = await client.listFolders();
-  assert.equal(folders[0].id, 'folder1');
-  assert.equal(SD.folderWho(folders[0]), 'Howard');
+  assert.equal(folders.length, 2);
+  assert.equal(folders[0].id, 'liveFolder');
+  assert.equal(folders[0].name, 'HCS Live Class');
+  assert.equal(SD.folderWho(folders[0]), 'Ada Wong');
+  assert.equal(folders[1].id, 'legacyFolder');
+  assert.equal(folders[1].name, 'Class Activity Studio');
   assert.match(calls[0].url, /supportsAllDrives=true/);
+  assert.match(decoded(calls[0].url), /name = 'HCS Live Class'/);
   assert.match(decoded(calls[0].url), /name = 'Class Activity Studio'/);
+  assert.match(decoded(calls[0].url), /\(name = 'HCS Live Class' or name = 'Class Activity Studio'\)/);
   var created = await client.createFolder();
-  assert.equal(created.name, 'Class Activity Studio');
-  assert.match(calls[1].body, /"name":"Class Activity Studio"/);
+  assert.equal(created.name, 'HCS Live Class');
+  assert.match(calls[1].body, /"name":"HCS Live Class"/);
+  assert.equal(calls[1].body.indexOf('Class Activity Studio'), -1);
 
   var plans = await client.listPlans('folder1');
   assert.equal(plans[0].id, 'file9');
@@ -235,5 +246,41 @@ test('Studio chrome keeps local Save / Load and adds the Drive chips after them'
   assert.match(html, /src="studio-drive\.js"/);
   assert.match(html, /accounts\.google\.com\/gsi\/client/);
   assert.equal(SD.DRIVE_SCOPE, 'https://www.googleapis.com/auth/drive');
-  assert.equal(SD.FOLDER_NAME, 'Class Activity Studio');
+  assert.equal(SD.FOLDER_NAME, 'HCS Live Class');
+  assert.equal(SD.FOLDER_NAME_LEGACY, 'Class Activity Studio');
+  assert.equal(SD.FOLDER_STORAGE_KEY, 'skhhcss_eng_studio_drive_folder_v1');
+  assert.equal(SD.PLAN_KIND, 'skhhcss-studio-plan');
+  assert.equal(
+    SD.folderSearchQuery(),
+    "(name = 'HCS Live Class' or name = 'Class Activity Studio') and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+  );
+  assert.match(html, /STORAGE_KEY = 'skhhcss_eng_classroom_v4'/);
+  assert.match(html, /src="assets\/hcs-live-class-bright\.svg/);
+  assert.match(html, /src="\.\.\/\.\.\/site-version\.js/);
+  var hub = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
+  assert.match(hub, /href="hcs-live-class\/"/);
+  assert.equal(hub.indexOf('class-activity-studio'), -1);
+  var redirect = fs.readFileSync(path.join(__dirname, '../class-activity-studio/index.html'), 'utf8');
+  assert.match(redirect, /location\.replace\(\(at === -1 \? "\/classroom" : path\.slice\(0, at\)\) \+ "\/hcs-live-class\/" \+ location\.search \+ location\.hash\)/);
+  assert.match(redirect, /http-equiv="refresh" content="0; url=\.\.\/hcs-live-class\/"/);
+  assert.match(redirect, /href="\.\.\/hcs-live-class\/"/);
+  assert.equal(redirect.indexOf('<style'), -1);
+  var vm = require('node:vm');
+  var script = redirect.slice(redirect.indexOf('<script>') + '<script>'.length, redirect.indexOf('</script>'));
+  function landed(pathname, search, hash) {
+    var next = '';
+    vm.runInNewContext(script, {
+      location: {
+        pathname: pathname,
+        search: search || '',
+        hash: hash || '',
+        replace: function (url) { next = url; }
+      }
+    });
+    return next;
+  }
+  assert.equal(landed('/classroom/class-activity-studio/', '', ''), '/classroom/hcs-live-class/');
+  assert.equal(landed('/classroom/class-activity-studio', '?a=1', '#room'), '/classroom/hcs-live-class/?a=1#room');
+  assert.equal(landed('/english/classroom/class-activity-studio/', '', ''), '/english/classroom/hcs-live-class/');
+  assert.equal(landed('/english/classroom/class-activity-studio/index.html', '', '#x'), '/english/classroom/hcs-live-class/#x');
 });
