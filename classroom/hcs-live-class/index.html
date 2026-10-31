@@ -668,7 +668,6 @@
       left: 0;
       z-index: 4;
       pointer-events: none;
-      transform: translateX(-50%);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -689,12 +688,10 @@
       text-transform: uppercase;
       white-space: nowrap;
       box-shadow: 0 1px 2px rgba(18, 58, 77, 0.16);
-    }
-    /* The pill pans with the floor. When that pan slides it under the
-       floating Zoom chip, hide it. Raising it would cover Zoom, and a
-       taller mast is not available. Back and the mast pad stay put. */
-    .front-of-room.is-under-zoom {
-      visibility: hidden;
+      /* --front-park-y is 0 on the column-room line. While the resting
+         band meets the Zoom chip, JS sets a downward shift so the words
+         sit in the strip under the chip. The chip is not moved. */
+      transform: translateX(-50%) translateY(var(--front-park-y, 0px));
     }
     #pickerResultSub:empty {
       display: none;
@@ -5993,20 +5990,76 @@
       }
 
       // FRONT pans inside the floor. Zoom floats on top of that floor.
-      // When the pill's box meets the chip, hide the pill. It comes back
-      // as soon as the pan moves it clear. The chip is not nudged, and
-      // the mast does not grow.
+      // When the resting band meets the chip, drop the pill so the words
+      // sit under the chip, toward the bottom of the floor. The chip is
+      // not nudged, and the mast does not grow. A clear pan restores the
+      // column-room line. The park is measured from that line, so the
+      // nudge cannot clear the hit test and bounce back.
+      function stageScaleNow() {
+        const stage = document.getElementById('classroomStage');
+        const fallback = state.zoom || 1;
+        if (!stage) return fallback;
+        const t = window.getComputedStyle(stage).transform;
+        if (!t || t === 'none') return fallback;
+        const m = t.match(/matrix\(([^)]+)\)/);
+        if (!m) return fallback;
+        const scale = parseFloat(m[1].split(',')[0]);
+        return (isFinite(scale) && scale > 0) ? scale : fallback;
+      }
+
+      var frontParkFrames = 0;
+
       function syncFrontUnderZoom() {
         const label = document.getElementById('frontOfRoom');
         const chip = document.getElementById('zoomChip');
+        const floor = document.getElementById('classroomViewport');
         if (!label || !chip) return;
+        // Resting band, before this frame's park.
+        label.style.setProperty('--front-park-y', '0px');
         const a = label.getBoundingClientRect();
         const b = chip.getBoundingClientRect();
         const pad = 1;
         const hit = a.width > 1 && a.height > 1 && b.width > 1 && b.height > 1 &&
           a.left < b.right + pad && a.right > b.left - pad &&
           a.top < b.bottom + pad && a.bottom > b.top - pad;
-        label.classList.toggle('is-under-zoom', hit);
+        let shiftScreen = 0;
+        if (hit) {
+          const range = document.createRange();
+          range.selectNodeContents(label);
+          const glyphs = range.getBoundingClientRect();
+          const glyphTop = glyphs.height > 1 ? glyphs.top : a.top;
+          const glyphBottom = glyphs.height > 1 ? glyphs.bottom : a.bottom;
+          const gap = 4;
+          // Whole pill just under the chip, toward the bottom of the floor.
+          shiftScreen = (b.bottom + gap) - a.top;
+          if (floor && shiftScreen > 0) {
+            const visibleBottom = floor.getBoundingClientRect().top + floor.clientHeight;
+            const overflow = (glyphBottom + shiftScreen) - visibleBottom;
+            if (overflow > 0.75) shiftScreen -= overflow;
+          }
+          // The words stay clear of the chip even when the pill's top
+          // has to tuck under it to remain on the floor.
+          const minShift = (b.bottom + 1) - glyphTop;
+          if (shiftScreen < minShift) shiftScreen = minShift;
+          if (shiftScreen < 0.5) shiftScreen = 0;
+        }
+        if (shiftScreen <= 0) {
+          label.classList.remove('is-under-zoom');
+          label.style.removeProperty('--front-park-y');
+        } else {
+          const scale = stageScaleNow();
+          label.style.setProperty('--front-park-y', (shiftScreen / scale).toFixed(2) + 'px');
+          label.classList.add('is-under-zoom');
+        }
+        // Fit animates the stage scale. Recheck until the matrix settles
+        // so a pan that already overlaps is parked on the finished frame.
+        const scale = stageScaleNow();
+        if (Math.abs(scale - (state.zoom || 1)) > 0.015 && frontParkFrames < 20) {
+          frontParkFrames += 1;
+          requestAnimationFrame(syncFrontUnderZoom);
+        } else {
+          frontParkFrames = 0;
+        }
       }
 
       // Render Freeform Classroom Floor Plan & Desks
