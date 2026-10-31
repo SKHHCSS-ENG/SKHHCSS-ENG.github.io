@@ -1571,12 +1571,30 @@
       from { transform: scaleY(0.1); opacity: 0.3; }
       to { transform: scaleY(1); opacity: 1; }
     }
+    /* One pillar chrome for Individual and Group. The stack sits at the
+       top of the bar (medal, then 1st/2nd/3rd), centred across the pillar.
+       There is no justify-between path and no Group-only justify-center
+       path — those put the medal ~10px from the top on one side and
+       mid-bar on the other. Bar heights stay the Group lock (h-36 / h-28 /
+       h-24) and the row still bottom-aligns, so matching places share a
+       baseline and a medal band. A class number, when present, is pinned
+       to the foot and is not a flex slot. */
     .podium-pillar {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      box-sizing: border-box;
+      width: 100%;
       transform-origin: bottom;
       animation: growUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
     /* Window size is unchanged. Student and team names, and the place
-       words 1st / 2nd / 3rd, grow. Medals stay at the old label size. */
+       words 1st / 2nd / 3rd, grow. Medals stay at the old label size.
+       Names are Inter 700 at --podium-name-size on both podiums. They are
+       not .group-name-label, so the desk fitter does not shrink a group
+       name away from the student name. */
     /* Three place columns share the row. min-width:0 stops a single
        unbroken name from stretching its column past the pillar. The
        clamp stays 3 lines. The modal shell (max-w-4xl) is unchanged. */
@@ -1594,30 +1612,64 @@
       max-width: 100%;
       min-width: 0;
       margin-bottom: 0.125rem;
+      font-family: var(--font-sans);
       font-weight: 700;
       font-size: var(--podium-name-size);
       line-height: 1.15;
+      color: #fff;
       text-align: center;
       white-space: normal;
       overflow-wrap: anywhere;
       word-break: break-word;
     }
-    #podiumModal .podium-place {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.28rem;
+    /* X pts and X group pts. Tint is the only difference. */
+    #podiumModal .podium-score {
       max-width: 100%;
+      margin-bottom: 0.5rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1.25;
+      text-align: center;
+    }
+    #podiumModal .podium-score.is-individual { color: #fcd34d; }
+    #podiumModal .podium-score.is-group { color: #6ee7b7; }
+    #podiumModal .podium-place {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.125rem;
+      width: 100%;
+      max-width: 100%;
+      text-align: center;
     }
     #podiumModal .podium-medal {
+      display: block;
       font-size: 0.75rem;
       line-height: 1;
+      text-align: center;
     }
     #podiumModal .podium-rank {
+      display: block;
       font-family: var(--font-display);
       font-weight: 800;
       font-size: var(--podium-rank-size);
       line-height: 1;
+      text-align: center;
+    }
+    #podiumModal .podium-classno {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0.4rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 10px;
+      font-weight: 400;
+      line-height: 1;
+      text-align: center;
+      opacity: 0.8;
+      pointer-events: none;
     }
     @media (min-width: 640px) {
       #podiumModal .podium-medal { font-size: 0.875rem; }
@@ -7076,34 +7128,40 @@
         const stHeights = ['h-28', 'h-36', 'h-24'];
         const placeMedals = ['🥈', '🥇', '🥉'];
         const placeLabels = ['2nd', '1st', '3rd'];
+        const stGradients = [
+          'from-slate-400 to-slate-600',
+          'from-amber-300 via-amber-400 to-orange-500 text-slate-950',
+          'from-amber-600 to-amber-800'
+        ];
         function podiumPlaceHtml(idx) {
           return '<span class="podium-place">' +
             '<span class="podium-medal" aria-hidden="true">' + placeMedals[idx] + '</span>' +
             '<span class="podium-rank">' + placeLabels[idx] + '</span>' +
           '</span>';
         }
-        const stGradients = [
-          'from-slate-400 to-slate-600',
-          'from-amber-300 via-amber-400 to-orange-500 text-slate-950',
-          'from-amber-600 to-amber-800'
-        ];
+        /* Same bar for both podiums. Heights are the Group lock. The
+           stack is painted by .podium-pillar; do not add a justify-* split. */
+        function podiumPillarHtml(idx, classNoMark) {
+          return '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' p-2.5 shadow-lg">' +
+            podiumPlaceHtml(idx) +
+            (classNoMark ? '<span class="podium-classno">' + escapeHtml(classNoMark) + '</span>' : '') +
+          '</div>';
+        }
 
         const stContainer = document.getElementById('podiumStudentsContainer');
         if (stContainer) {
           stContainer.innerHTML = top3St.map(function (st, idx) {
             if (!st) return '<div class="flex-1"></div>';
             return '<div class="flex-1 flex flex-col items-center text-center">' +
-              '<div class="podium-name text-white">' + escapeHtml(st.name) + '</div>' +
-              '<div class="text-[11px] font-mono text-amber-300 mb-2">' + st.score + ' pts</div>' +
-              '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-between p-2.5 shadow-lg">' +
-                podiumPlaceHtml(idx) +
-                (formatClassNoMark(st.classNo) ? '<span class="text-[10px] opacity-80 font-mono">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
-              '</div>' +
+              '<div class="podium-name">' + escapeHtml(st.name) + '</div>' +
+              '<div class="podium-score is-individual">' + st.score + ' pts</div>' +
+              podiumPillarHtml(idx, formatClassNoMark(st.classNo)) +
             '</div>';
           }).join('');
         }
 
-        // Top 3 Groups
+        // Top 3 Groups. Names use .podium-name only — not .group-name-label —
+        // so fitGroupNames cannot shrink them away from the student names.
         const sortedGrp = cls.groups.slice().sort(function (a, b) {
           return (b.score || 0) - (a.score || 0);
         });
@@ -7114,17 +7172,14 @@
             if (!grp) return '<div class="flex-1"></div>';
             return '<div class="flex-1 flex flex-col items-center text-center">' +
               '<div class="text-lg mb-0.5">' + escapeHtml(grp.icon) + '</div>' +
-              '<div class="group-name-label podium-name text-white">' + escapeHtml(grp.name) + '</div>' +
-              '<div class="text-[11px] font-mono text-emerald-300 mb-2">' + grp.score + ' group pts</div>' +
-              '<div class="podium-pillar w-full rounded-t-2xl bg-gradient-to-b ' + stGradients[idx] + ' ' + stHeights[idx] + ' flex flex-col items-center justify-center p-2.5 shadow-lg">' +
-                podiumPlaceHtml(idx) +
-              '</div>' +
+              '<div class="podium-name">' + escapeHtml(grp.name) + '</div>' +
+              '<div class="podium-score is-group">' + grp.score + ' group pts</div>' +
+              podiumPillarHtml(idx) +
             '</div>';
           }).join('');
         }
 
         document.getElementById('podiumModal').classList.remove('hidden');
-        fitGroupNames(document.getElementById('podiumModal'));
       }
 
       // ===================================================================
