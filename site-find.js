@@ -193,17 +193,6 @@
       ]
     },
     {
-      "title": "Spelling Watchlist",
-      "path": "learning-materials/useful-vocabulary/#spell-h",
-      "aliases": [
-        "spelling",
-        "spelling watchlist",
-        "拼寫",
-        "串法",
-        "易錯拼寫"
-      ]
-    },
-    {
       "title": "Topic Banks (Jobs · HK Places)",
       "path": "learning-materials/useful-vocabulary/#topics-h",
       "aliases": [
@@ -213,6 +202,17 @@
         "職業",
         "香港地方",
         "jobs hk places"
+      ]
+    },
+    {
+      "title": "Spelling Watchlist",
+      "path": "learning-materials/useful-vocabulary/#spell-h",
+      "aliases": [
+        "spelling",
+        "spelling watchlist",
+        "拼寫",
+        "串法",
+        "易錯拼寫"
       ]
     },
     {

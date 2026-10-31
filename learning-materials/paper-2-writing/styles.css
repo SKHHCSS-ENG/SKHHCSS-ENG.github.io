@@ -997,6 +997,15 @@ body.vocab-hub.tools-page.dock-open {
 body.vocab-hub.zh-on .gloss::after {
   white-space: normal;
 }
+/* Format Tags and other vocab tables: keep EN and its 譯 on the same line */
+body.vocab-hub.zh-on .vocab-table .gloss,
+body.vocab-hub.zh-on .vocab-table .gloss::after {
+  white-space: nowrap;
+}
+/* Formality phrases are full sentences — wrap the English, keep each 譯 intact */
+body.vocab-hub.zh-on .vocab-table.vocab-table-pairs .gloss {
+  white-space: normal;
+}
 
 /* Sentence patterns 譯: Chinese after-text may wrap at ~390px (mirror vocab-hub) */
 body.sentence-patterns.zh-on .gloss::after {
