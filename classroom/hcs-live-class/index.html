@@ -662,7 +662,9 @@
        All-caps source text stays "FRONT OF ROOM". The pill frame uses the
        seating-board slate and the mast teal — not the amber Random Picker.
        It sits in the desk stage, on the centre of the column room. JS sets
-       left to that centre. Header, panels, and the floor width are not inputs. */
+       left to that centre. Header, panels, and the floor width are not inputs.
+       The pill is painted on that floor. Pan and zoom move it with the desks.
+       The Zoom chip may cover it; the pill is not parked or hidden. */
     .front-of-room {
       position: absolute;
       left: 0;
@@ -689,12 +691,6 @@
       text-transform: uppercase;
       white-space: nowrap;
       box-shadow: 0 1px 2px rgba(18, 58, 77, 0.16);
-    }
-    /* The pill pans with the floor. When that pan slides it under the
-       floating Zoom chip, hide it. Raising it would cover Zoom, and a
-       taller mast is not available. Back and the mast pad stay put. */
-    .front-of-room.is-under-zoom {
-      visibility: hidden;
     }
     #pickerResultSub:empty {
       display: none;
@@ -6012,9 +6008,9 @@
         return { cols: cols, width: width, center: origin + width / 2 };
       }
 
-      // FRONT OF ROOM is inside the scaled stage, on the column-room midline.
-      // Pan and zoom move the view; the room centre stays this column geometry.
-      // The strip still sits just past the desk row that faces the front.
+      // FRONT OF ROOM is painted on the floor, on the column-room midline.
+      // Column count sets that line. The window does not. Pan and zoom move
+      // the pill with the desks. The Zoom chip may cover it.
       function placeFrontOfRoom(cls) {
         const label = document.getElementById('frontOfRoom');
         const room = cls || getCurrentClass();
@@ -6041,24 +6037,6 @@
         }
         label.style.top = top + 'px';
         label.style.bottom = 'auto';
-        syncFrontUnderZoom();
-      }
-
-      // FRONT pans inside the floor. Zoom floats on top of that floor.
-      // When the pill's box meets the chip, hide the pill. It comes back
-      // as soon as the pan moves it clear. The chip is not nudged, and
-      // the mast does not grow.
-      function syncFrontUnderZoom() {
-        const label = document.getElementById('frontOfRoom');
-        const chip = document.getElementById('zoomChip');
-        if (!label || !chip) return;
-        const a = label.getBoundingClientRect();
-        const b = chip.getBoundingClientRect();
-        const pad = 1;
-        const hit = a.width > 1 && a.height > 1 && b.width > 1 && b.height > 1 &&
-          a.left < b.right + pad && a.right > b.left - pad &&
-          a.top < b.bottom + pad && a.bottom > b.top - pad;
-        label.classList.toggle('is-under-zoom', hit);
       }
 
       // Render Freeform Classroom Floor Plan & Desks
@@ -7435,7 +7413,6 @@
         chip.style.top = Math.round(pos.top) + 'px';
         chip.style.bottom = 'auto';
         chip.style.right = 'auto';
-        syncFrontUnderZoom();
         return pos;
       }
 
@@ -7803,7 +7780,6 @@
         fitFloorAboveZoomGutter();
         if (hasSavedZoomChip()) placeZoomChip(state.zoomChipLeft, state.zoomChipTop);
         finishFloorPanHold();
-        syncFrontUnderZoom();
       }
 
       function currentZoomChipOffset(chip) {
@@ -8485,10 +8461,6 @@
             e.preventDefault();
           }, { passive: false });
           initZoomChipDrag(zoomChip);
-        }
-        const classroomViewport = document.getElementById('classroomViewport');
-        if (classroomViewport) {
-          classroomViewport.addEventListener('scroll', syncFrontUnderZoom, { passive: true });
         }
 
         // Manual Group Brush Bar
