@@ -1670,6 +1670,22 @@
     @media (min-width: 640px) {
       #podiumModal .podium-medal { font-size: 0.875rem; }
     }
+    /* Individual hides the groups card and centres the student pillars
+       in the modal. The card keeps one column of the gap-6 pair so the
+       bars stay the same width. Group keeps the two-column row. */
+    #podiumModal.is-individual #podiumGroupsSection {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      #podiumModal.is-individual #podiumBody {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+      }
+      #podiumModal.is-individual #podiumStudentsSection {
+        width: calc((100% - 1.5rem) / 2);
+        justify-self: center;
+      }
+    }
     /* Mast: arrow-only Back on the left, Bright mark beside it (left of
        Individual Work, not the centre and not the timer). The words live
        in the link's aria-label ("Back to Classroom"). The control is a
@@ -3028,23 +3044,23 @@
         <div class="flex items-center gap-2.5">
           <span class="text-2xl">🏆</span>
           <div>
-            <h2 class="font-display text-xl font-bold text-amber-300">SKHHCSS Classroom Champions Podium</h2>
-            <p id="podiumSubTitle" class="text-xs text-indigo-200">Live Standings — Individual &amp; Group Leaders</p>
+            <h2 class="font-display text-xl font-bold text-amber-300">HCS Live Class Podium</h2>
+            <p id="podiumSubTitle" class="text-xs text-indigo-200">Live Standings</p>
           </div>
         </div>
         <button id="btnClosePodiumModal" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center font-bold" aria-label="Close">✕</button>
       </div>
 
       <!-- Body -->
-      <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div id="podiumBody" class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Top 3 Students Podium -->
-        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
+        <div id="podiumStudentsSection" class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
           <h3 class="font-display text-center text-base font-bold text-amber-300 mb-4">🌟 Top Individual Students</h3>
           <div id="podiumStudentsContainer" class="flex-1 flex items-end justify-center gap-3 min-h-[220px] pt-6"></div>
         </div>
 
         <!-- Top 3 Teams Podium -->
-        <div class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
+        <div id="podiumGroupsSection" class="bg-white/5 rounded-2xl p-4 border border-white/10 flex flex-col">
           <h3 class="font-display text-center text-base font-bold text-emerald-300 mb-4">🛡️ Top Classroom Groups</h3>
           <div id="podiumGroupsContainer" class="flex-1 flex items-end justify-center gap-3 min-h-[220px] pt-6"></div>
         </div>
@@ -7090,13 +7106,12 @@
       // MODAL 4: LIVE PODIUM CELEBRATION
       // ===================================================================
 
-      function openPodiumModal() {
-        const cls = getCurrentClass();
-        if (!cls) return;
-        playSubtleSound('fanfare');
+      function renderPodiumStandings(cls) {
+        const modal = document.getElementById('podiumModal');
+        if (modal) modal.classList.toggle('is-individual', state.activityMode === 'individual');
 
         const subTitle = document.getElementById('podiumSubTitle');
-        if (subTitle) subTitle.textContent = cls.name + ' — Live Champions Standings';
+        if (subTitle) subTitle.textContent = 'Live Standings';
 
         // Top 3 Students
         const sortedSt = cls.students.slice().sort(function (a, b) {
@@ -7157,7 +7172,22 @@
           }).join('');
         }
 
+      }
+
+      function openPodiumModal() {
+        const cls = getCurrentClass();
+        if (!cls) return;
+        playSubtleSound('fanfare');
+        renderPodiumStandings(cls);
         document.getElementById('podiumModal').classList.remove('hidden');
+      }
+
+      function refreshPodiumIfOpen() {
+        const modal = document.getElementById('podiumModal');
+        if (!modal || modal.classList.contains('hidden')) return;
+        const cls = getCurrentClass();
+        if (!cls) return;
+        renderPodiumStandings(cls);
       }
 
       // ===================================================================
@@ -8281,6 +8311,7 @@
           state.activityMode = 'individual';
           saveState();
           renderAll();
+          refreshPodiumIfOpen();
           showToast('Switched to Individual Mode. Tap a name to rename.', '👤');
         });
         document.getElementById('btnModeGroup').addEventListener('click', function () {
@@ -8290,6 +8321,7 @@
           state.teamScoreboardOpen = true;
           saveState();
           renderAll();
+          refreshPodiumIfOpen();
           showToast('Switched to Group Mode. Tap a name to rename. Group points also add to each member.', '🛡️');
         });
         const btnTeamScoreboard = document.getElementById('btnToggleTeamScoreboard');
