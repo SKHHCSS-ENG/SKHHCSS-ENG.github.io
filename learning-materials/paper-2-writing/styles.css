@@ -1006,6 +1006,11 @@ body.vocab-hub.zh-on .vocab-table .gloss::after {
 body.vocab-hub.zh-on .vocab-table.vocab-table-pairs .gloss {
   white-space: normal;
 }
+/* Spelling pairs: keep each EN + 譯 together; the chip may wrap at " / " */
+body.vocab-hub.zh-on .vocab-chips-pairs .gloss,
+body.vocab-hub.zh-on .vocab-chips-pairs .gloss::after {
+  white-space: nowrap;
+}
 
 /* Sentence patterns 譯: Chinese after-text may wrap at ~390px (mirror vocab-hub) */
 body.sentence-patterns.zh-on .gloss::after {
