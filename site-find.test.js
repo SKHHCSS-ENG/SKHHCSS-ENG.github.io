@@ -169,6 +169,26 @@ test("script URL sets the base used by Find and Ask jumps", () => {
   assert.equal(rootPage.hrefFor("whats-new/"), "/whats-new/");
 });
 
+test("Spelling Watchlist aliases jump to the new part names", () => {
+  for (const query of [
+    "spelling",
+    "confusing pairs",
+    "british vs american",
+    "true misspellings",
+    "confusable",
+    "british forms",
+    "true misspellings (correct forms)"
+  ]) {
+    const hit = SiteFind.search(query);
+    assert.equal(hit[0].title, "Spelling Watchlist", query);
+    assert.equal(hit[0].path, "learning-materials/useful-vocabulary/#spell-h");
+  }
+  const hub = SiteFind.extraHaystack("useful-vocabulary/");
+  assert.match(hub, /confusing pairs/i);
+  assert.match(hub, /british vs american/i);
+  assert.match(hub, /true misspellings/i);
+});
+
 test("rectsOverlap is a soft-fail check for the Ask circle and the dock", () => {
   const circle = { left: 12, top: 700, right: 68, bottom: 756, width: 56, height: 56 };
   const chip = { left: 334, top: 740, right: 378, bottom: 784, width: 44, height: 44 };

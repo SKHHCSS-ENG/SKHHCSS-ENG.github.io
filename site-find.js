@@ -229,7 +229,14 @@
         "spelling watchlist",
         "拼寫",
         "串法",
-        "易錯拼寫"
+        "易錯拼寫",
+        "confusing pairs",
+        "british vs american",
+        "true misspellings",
+        "confusable",
+        "confusable pairs",
+        "british forms",
+        "true misspellings (correct forms)"
       ]
     },
     {
