@@ -1,6 +1,13 @@
 /**
- * Class Activity Studio — shared seating plans in one Google Drive folder.
+ * HCS Live Class — shared seating plans in one Google Drive folder.
  * Browser calls Drive API v3 with the teacher’s own token (no Worker, no secret).
+ *
+ * Drive folder dual-lookup: search accepts either name. Create always uses
+ * FOLDER_NAME ('HCS Live Class'). FOLDER_NAME_LEGACY ('Class Activity Studio')
+ * is still found so Save online works on the day Howard renames the shared
+ * folder, and afterwards if a copy of the old name remains. When both names
+ * exist, HCS Live Class is listed first. FOLDER_STORAGE_KEY and PLAN_KIND stay
+ * forever so a remembered folder id and existing plan files keep working.
  */
 (function (root, factory) {
   var api = factory();
@@ -8,7 +15,8 @@
   else root.StudioDrive = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
-  var FOLDER_NAME = 'Class Activity Studio';
+  var FOLDER_NAME = 'HCS Live Class';
+  var FOLDER_NAME_LEGACY = 'Class Activity Studio';
   var FOLDER_MIME = 'application/vnd.google-apps.folder';
   var PLAN_MIME = 'application/json';
   var FOLDER_STORAGE_KEY = 'skhhcss_eng_studio_drive_folder_v1';
@@ -39,6 +47,24 @@
 
   function driveQuote(value) {
     return "'" + String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+  }
+
+  // Parentheses are required: Drive's `and` binds tighter than `or`.
+  function folderSearchQuery() {
+    var eitherName = '(name = ' + driveQuote(FOLDER_NAME) +
+      ' or name = ' + driveQuote(FOLDER_NAME_LEGACY) + ')';
+    return eitherName + " and mimeType = '" + FOLDER_MIME + "' and trashed = false";
+  }
+
+  function orderFolders(files) {
+    var preferred = [];
+    var rest = [];
+    var list = files || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].name === FOLDER_NAME) preferred.push(list[i]);
+      else rest.push(list[i]);
+    }
+    return preferred.concat(rest);
   }
 
   function isDriveId(id) {
@@ -264,9 +290,7 @@
 
     return {
       listFolders: function () {
-        var q = 'name = ' + driveQuote(FOLDER_NAME) +
-          " and mimeType = '" + FOLDER_MIME + "' and trashed = false";
-        return listAll(q);
+        return listAll(folderSearchQuery()).then(orderFolders);
       },
       createFolder: function () {
         var params = new URLSearchParams();
@@ -323,6 +347,8 @@
   return {
     DRIVE_SCOPE: DRIVE_SCOPE,
     FOLDER_NAME: FOLDER_NAME,
+    FOLDER_NAME_LEGACY: FOLDER_NAME_LEGACY,
+    folderSearchQuery: folderSearchQuery,
     FOLDER_MIME: FOLDER_MIME,
     PLAN_MIME: PLAN_MIME,
     FOLDER_STORAGE_KEY: FOLDER_STORAGE_KEY,
