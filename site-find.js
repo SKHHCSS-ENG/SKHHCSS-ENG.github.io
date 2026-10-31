@@ -193,7 +193,7 @@
       ]
     },
     {
-      "title": "Topic Banks (Jobs · HK Places)",
+      "title": "Topic Banks",
       "path": "learning-materials/useful-vocabulary/#topics-h",
       "aliases": [
         "jobs",
@@ -201,7 +201,24 @@
         "topic banks",
         "職業",
         "香港地方",
-        "jobs hk places"
+        "jobs hk places",
+        "environment",
+        "health & lifestyle",
+        "technology",
+        "education",
+        "social issues",
+        "crime & law",
+        "media",
+        "culture & leisure",
+        "travel & tourism",
+        "work & economy",
+        "family & relationships",
+        "poverty & inequality",
+        "climate & energy",
+        "consumerism",
+        "civic duty",
+        "volunteering",
+        "mental wellbeing"
       ]
     },
     {
