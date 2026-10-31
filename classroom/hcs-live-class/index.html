@@ -2321,11 +2321,11 @@
         <div class="flex items-center bg-slate-900/30 p-1 rounded-xl border border-white/15" role="group" aria-label="Activity Mode">
           <button id="btnModeIndividual" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all bg-white text-[#0c5a70] shadow-sm">
             <span>👤</span>
-            <span>Individual Work</span>
+            <span>Individual</span>
           </button>
           <button id="btnModeGroup" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all text-white/90 hover:text-white">
             <span>🛡️</span>
-            <span>Group Work</span>
+            <span>Group</span>
           </button>
         </div>
       </div>
@@ -5978,7 +5978,11 @@
           const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
           const borderClass = pal ? ('border-2 ' + pal.border) : 'border-2 border-slate-200';
           const topStripClass = pal ? pal.headerBg : 'bg-slate-700';
-          const groupBadgeHtml = renderDeskGroupLabel(st, cls);
+          // Individual hides the group-name row. The border and top strip stay,
+          // so the group colour is still a quiet hint. Group keeps the name
+          // (and the Edit On team menu that lives on that row).
+          const showDeskGroupName = state.activityMode === 'group';
+          const groupBadgeHtml = showDeskGroupName ? renderDeskGroupLabel(st, cls) : '';
 
           const scoreVal = Number(st.score) || 0;
           const scoreBadgeClass = scoreVal > 0
@@ -6008,10 +6012,12 @@
               '</div>' +
               '<!-- Row 2: Student Name (tap to rename, including Empty) -->' +
               renderDeskNameControl(st) +
-              '<!-- Row 3: Group name. Edit On turns this chip into the team menu. -->' +
-              '<div class="desk-team-row flex items-center justify-center mb-0.5 gap-1">' +
-                groupBadgeHtml +
-              '</div>' +
+              (showDeskGroupName
+                ? '<!-- Row 3: Group name. Edit On turns this chip into the team menu. -->' +
+                  '<div class="desk-team-row flex items-center justify-center mb-0.5 gap-1">' +
+                    groupBadgeHtml +
+                  '</div>'
+                : '') +
               '<!-- Row 4: Compact − / + ; Group+1 sits with them so the name can use the full card. -->' +
               '<div class="desk-score-actions' + (state.activityMode === 'group' && grp ? ' is-grouped' : '') + '">' +
                 '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one">−</button>' +
@@ -7159,7 +7165,7 @@
 
         const rows = [
           ['SKHHCSS English Department - Classroom Activity Score Report'],
-          ['Class Name', cls.name, 'Activity Mode', state.activityMode === 'group' ? 'Group Work' : 'Individual Work', 'Exported At', nowStr],
+          ['Class Name', cls.name, 'Activity Mode', state.activityMode === 'group' ? 'Group' : 'Individual', 'Exported At', nowStr],
           [],
           ['Rank', 'Class No.', 'Student Name', 'Assigned Team', 'Individual Score', 'Team Score']
         ];
@@ -8110,7 +8116,7 @@
           state.activityMode = 'individual';
           saveState();
           renderAll();
-          showToast('Switched to Individual Work Mode. Tap a name to rename.', '👤');
+          showToast('Switched to Individual Mode. Tap a name to rename.', '👤');
         });
         document.getElementById('btnModeGroup').addEventListener('click', function () {
           state.activityMode = 'group';
@@ -8119,7 +8125,7 @@
           state.teamScoreboardOpen = true;
           saveState();
           renderAll();
-          showToast('Switched to Group Work Mode. Tap a name to rename. Group points also add to each member.', '🛡️');
+          showToast('Switched to Group Mode. Tap a name to rename. Group points also add to each member.', '🛡️');
         });
         const btnTeamScoreboard = document.getElementById('btnToggleTeamScoreboard');
         if (btnTeamScoreboard) {
