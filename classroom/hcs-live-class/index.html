@@ -1380,6 +1380,12 @@
     .desk-team-row {
       min-width: 0;
     }
+    /* Individual omits the group name. This empty band is the one-line
+       chip (min-height 20px). The row's mb-0.5 stays on the element so
+       −/+ sits where it does in Group, and the card does not grow past that. */
+    .desk-team-spacer {
+      min-height: 20px;
+    }
     .desk-team-static,
     .desk-team-face {
       box-sizing: border-box;
@@ -1603,16 +1609,17 @@
        44×44 tap. On the single row the arrow sits on the trailing edge
        of that square so the mark can come up beside it without covering
        the target. Column-gap is one studio step (8px), down from 16px —
-       that is the gap after Back, not a margin pull. The wordmark is
-       Muse's fs44 lock; the asset and the 44px desk mark height stay.
-       The #123a4d plate stays off the asset so the mesh sits on this
-       gradient. On the stacked mast the mark height is still the old h1
-       line box (clamp 16px / 5.6vw / 24px × 1.1). Padding is another 4px
-       on the top and 4px on the bottom from the 60px mast: desk 16px / 8px,
-       stacked 16px / 16px. The 44px row plus that pad is the desk height.
-       Remeasured: #studioMast 68px at 1280 and 1920 (was 60), 74.41px at
-       390 (was 66.41). Mark stays 44px on the desk row and 24.02px at 390.
-       Back target stays 44×44. The gap after that target is 8px. */
+       that is the gap after Back, not a margin pull. The wordmark was
+       Muse's fs44 lock. Howard asked for more air, so the desk mark is
+       36px. The SVG asset stays. Below 861px the old clamp
+       (16px / 5.6vw / 24px × 1.1) is scaled by 36/44, which is ×0.9.
+       Padding is another 4px on the top and 4px on the bottom from the
+       60px mast: desk 16px / 8px, stacked 16px / 16px. The 44px Back row
+       plus that pad is still the desk height, so the shorter mark sits
+       in the same bar. Back target stays 44×44. The gap after that
+       target is 8px. Remeasured: #studioMast stays 68px at 1280 and
+       1920, mark 36px. At 390 the mark is 19.66px and the mast is 70px
+       (was 74.41px with the 24px mark). */
     .studio-mast {
       display: flex;
       align-items: center;
@@ -1660,11 +1667,12 @@
     .studio-mark img {
       display: block;
       width: auto;
-      height: calc(clamp(16px, 5.6vw, var(--studio-type-title)) * 1.1);
+      /* Same stacked-mast clamp, scaled with the desk mark (44px → 36px). */
+      height: calc(clamp(16px, 5.6vw, var(--studio-type-title)) * 1.1 * 36 / 44);
     }
     @media (min-width: 861px) {
       .studio-mark img {
-        height: 44px;
+        height: 36px;
       }
     }
     @media (max-width: 860px) {
@@ -2313,7 +2321,7 @@
           </select>
           <button id="btnOpenClassModal" type="button" class="ml-1.5 px-2.5 py-1.5 rounded-lg bg-[#0c5a70]/50 hover:bg-[#0c5a70]/80 text-xs font-semibold text-white flex items-center gap-1 transition" title="Edit class lists and student names">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            <span>Classes</span>
+            <span>Class</span>
           </button>
         </div>
 
@@ -5978,9 +5986,10 @@
           const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
           const borderClass = pal ? ('border-2 ' + pal.border) : 'border-2 border-slate-200';
           const topStripClass = pal ? pal.headerBg : 'bg-slate-700';
-          // Individual hides the group-name row. The border and top strip stay,
-          // so the group colour is still a quiet hint. Group keeps the name
-          // (and the Edit On team menu that lives on that row).
+          // Individual hides the group name, Group+1, and the team menu.
+          // An empty band keeps the old row's height so −/+ is not tight
+          // under the name. The border and top strip stay. Group keeps
+          // the name (and the Edit On team menu that lives on that row).
           const showDeskGroupName = state.activityMode === 'group';
           const groupBadgeHtml = showDeskGroupName ? renderDeskGroupLabel(st, cls) : '';
 
@@ -6017,7 +6026,8 @@
                   '<div class="desk-team-row flex items-center justify-center mb-0.5 gap-1">' +
                     groupBadgeHtml +
                   '</div>'
-                : '') +
+                : '<!-- Row 3: Individual spacer. Same band, no group text. -->' +
+                  '<div class="desk-team-row desk-team-spacer mb-0.5" aria-hidden="true"></div>') +
               '<!-- Row 4: Compact − / + ; Group+1 sits with them so the name can use the full card. -->' +
               '<div class="desk-score-actions' + (state.activityMode === 'group' && grp ? ' is-grouped' : '') + '">' +
                 '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one">−</button>' +
