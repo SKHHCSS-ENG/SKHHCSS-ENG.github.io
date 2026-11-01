@@ -1826,7 +1826,7 @@
       .studio-brand { align-self: flex-start; width: auto; }
     }
     /* Toolbar band names. 12px / 700, the same step as the chips.
-       Title Case, no colon, so they stay glanceable section headers. */
+       All caps, no colon. Weight and tracking stay put so the heads do not shout. */
     .studio-band-label {
       flex-shrink: 0;
       margin-right: 0;
@@ -1841,7 +1841,7 @@
       min-width: 0;
       /* Quiet frame. Chip height is --studio-chip-h (24px): 12px type,
          not the 44px targets. One light stroke, same 8px radius as the chips
-         (rounded-lg). The label stays inside, Title Case, no colon. */
+         (rounded-lg). The label stays inside, all caps, no colon. */
       border: 1px solid rgba(42, 143, 173, 0.4);
       border-radius: 8px;
       padding: 0 var(--studio-space);
@@ -2106,7 +2106,7 @@
       margin-left: 0;
     }
     /* Edit Off is teach mode: seating layout tools stay in place but do not fire.
-       The band label stays full strength so the row still reads Register · History · Seating · Scores. */
+       The band label stays full strength so the row still reads REGISTER · HISTORY · SEATING · SCORES. */
     #studioSeatingBand.is-teach-frozen .studio-grid-setup,
     #studioSeatingBand.is-teach-frozen .layout-preset-btn,
     #studioSeatingBand.is-teach-frozen #btnToggleSnapGrid,
@@ -3957,13 +3957,13 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: Register · History · Seating · Scores · Skin (left to right). Wrap stays on. -->
+  <!-- SECONDARY TOOLBAR: REGISTER · HISTORY · SEATING · SCORES · SKIN (left to right). Wrap stays on. -->
   <section id="studioToolbar" class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div id="studioToolbarRow" class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
       <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Tidy, Manage Groups, Assign, Clear. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">Register</span>
+        <span class="studio-band-label">REGISTER</span>
         <!-- Edit: ON edits names, seat #, team names, delete, desk drag, and layout tools. OFF is teach mode. -->
         <button id="btnToggleEditName" type="button" class="edit-switch is-on" aria-label="Edit On" aria-pressed="true">
           <span class="edit-switch-name">Edit</span>
@@ -3997,7 +3997,7 @@
 
       <!-- History sits after Register so a typical desktop row can hold both before Seating. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">History</span>
+        <span class="studio-band-label">HISTORY</span>
         <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Undo">
           <span aria-hidden="true">↩️</span>
         </button>
@@ -4020,7 +4020,7 @@
 
       <!-- Seating: grid, presets, Snap, Front. Edit Off freezes these with desk drag. -->
       <div id="studioSeatingBand" class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">Seating</span>
+        <span class="studio-band-label">SEATING</span>
         <!-- Custom Rows x Columns Grid Quick Setup -->
         <div class="studio-grid-setup inline-flex items-center gap-1 bg-indigo-50/90 border border-indigo-200 rounded-xl px-2 shadow-2xs">
           <span class="text-xs font-semibold text-indigo-800">Grid:</span>
@@ -4047,9 +4047,9 @@
         </button>
       </div>
 
-      <!-- Scores follows Seating. The visible label stays Scores. -->
+      <!-- Scores follows Seating. The visible label is SCORES. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">Scores</span>
+        <span class="studio-band-label">SCORES</span>
         <button id="btnAllPlusOne" type="button" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
           All +1
         </button>
@@ -4059,7 +4059,7 @@
       </div>
 
       <div class="studio-band studio-skin-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2" role="group" aria-label="Skin">
-        <span class="studio-band-label">Skin</span>
+        <span class="studio-band-label">SKIN</span>
         <button type="button" id="btnSkinDefault" class="skin-choice" aria-pressed="true">Default</button>
         <button type="button" id="btnSkinMinimalist" class="skin-choice" aria-pressed="false">Minimalist</button>
         <button type="button" id="btnSkinSpark" class="skin-choice" aria-pressed="false">Spark</button>
