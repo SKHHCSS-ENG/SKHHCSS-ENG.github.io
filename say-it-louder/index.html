@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Say It Louder · English · SKH Holy Carpenter Secondary School</title>
+<meta name="description" content="Say It Louder — coach Leo with precise English and find his school bag on the MTR. All Levels starter.">
+<link rel="stylesheet" href="../ask.css?v=20261030b">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../learning-materials/">← Back to Learning Materials</a>
+
+    <header class="hero">
+      <div class="hero-accent" aria-hidden="true"></div>
+      <div class="brand">
+        <img src="https://www.hcs.edu.hk/template/app/img/logo.png" width="276" height="58" alt="SKH Holy Carpenter Secondary School logo">
+      </div>
+      <div class="hero-body">
+        <p class="kicker">All Levels · starter</p>
+        <h1>Say It Louder</h1>
+        <p class="tagline">Say it clearer</p>
+      </div>
+    </header>
+
+    <p id="frameLine" class="frame">Help Leo find his bag before the doors close.</p>
+
+    <div class="layout">
+      <section class="stage" aria-label="Carriage">
+        <div class="status-row">
+          <h2 id="missionTitle" class="mission-title">Mission 1: The Lost Bag</h2>
+          <p id="doorsHud" class="pill">Doors 1:30</p>
+          <p id="clarityHud" class="pill pill-clarity">Clarity 0 / 3</p>
+        </div>
+        <ol class="step-pips" aria-label="Progress">
+          <li data-step="zone">Place</li>
+          <li data-step="bag">Bag</li>
+          <li data-step="tag">Name tag</li>
+        </ol>
+        <div id="scene"></div>
+        <div class="dialogue" aria-live="polite">
+          <p id="speakerTag" class="speaker-tag">Leo · panicked</p>
+          <p id="aiDialogue" class="dialogue-line"></p>
+        </div>
+        <p id="banner" class="banner" hidden></p>
+      </section>
+
+      <aside class="side">
+        <section class="card">
+          <h2>Seat note</h2>
+          <p class="card-lead">Leo remembers this. Say it in a clear sentence.</p>
+          <ol id="manualList" class="manual"></ol>
+        </section>
+
+        <section class="card">
+          <h2>Your turn</h2>
+          <div id="missionField" class="mission-field">
+            <label for="missionSelect">Mission</label>
+            <select id="missionSelect"></select>
+          </div>
+          <button id="micBtn" type="button" aria-pressed="false">Speak</button>
+          <p id="micNote" class="mic-note" hidden>The microphone needs Chrome or Edge. Type your instruction instead.</p>
+          <form id="textForm" class="text-row">
+            <label class="visually-hidden" for="textCmd">Type an instruction</label>
+            <input id="textCmd" type="text" placeholder="Or type an instruction…" autocomplete="off" enterkeyhint="send">
+            <button id="sendBtn" type="submit">Send</button>
+          </form>
+          <p class="heard"><span class="heard-label">Heard</span> <span id="heardText">…</span></p>
+        </section>
+
+        <section class="card">
+          <h2>Teacher tip</h2>
+          <p id="teacherTip" aria-live="polite"></p>
+        </section>
+
+        <button id="resetBtn" type="button" class="btn-reset">Try again</button>
+      </aside>
+    </div>
+
+    <footer>
+      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      Materials for school use
+    </footer>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+  <script src="../site-find.js?v=20261030a"></script>
+  <script src="../ask.js?v=20261030b"></script>
+  <script src="../site-version.js?v=sv"></script>
+</body>
+</html>

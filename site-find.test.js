@@ -22,14 +22,19 @@ function loadSiteFind(document, location) {
   return sandbox.module.exports;
 }
 
-test("alias index is Tess’s 32 entries and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 32);
+test("alias index is Tess’s list plus Say It Louder, and paths are unique", () => {
+  assert.equal(SiteFind.entries.length, 33);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 32);
+  assert.equal(new Set(paths).size, 33);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
-  assert.equal(SiteFind.entries[31].title, "What's New");
-  assert.equal(SiteFind.entries[31].path, "whats-new/");
+  assert.equal(SiteFind.entries[31].title, "Say It Louder");
+  assert.equal(SiteFind.entries[31].path, "say-it-louder/");
+  assert.equal(SiteFind.entries[32].title, "What's New");
+  assert.equal(SiteFind.entries[32].path, "whats-new/");
+  const louder = SiteFind.search("lost bag");
+  assert.equal(louder[0].title, "Say It Louder");
+  assert.equal(louder[0].path, "say-it-louder/");
 });
 
 test("Find uses the hub brain: norm, exact, prefix, substring, cap 3", () => {
