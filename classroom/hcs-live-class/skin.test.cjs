@@ -215,11 +215,15 @@ test('Tidy, Assign, Clear, Group, and Snap chrome stay on the Default master', f
   assert.match(html, /id="btnQuickAddGroup"[\s\S]*id="btnTidyLayout"[\s\S]*id="btnOpenGroupModal"/);
   assert.match(html, /id="btnTidyLayout"[^>]*title="Snap desks to this layout — doesn’t move who sits where\."/);
   assert.match(html, /id="btnTidyLayout"[^>]*class="[^"]*px-2\.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-300 text-xs font-bold inline-flex items-center gap-1/);
+  assert.match(html, /id="btnTidyLayout"[^>]*>\s*<span>Tidy<\/span>\s*<\/button>/);
+  assert.doesNotMatch(html, /id="btnTidyLayout"[\s\S]{0,220}📐/);
+  assert.match(html, /id="btnOpenGroupModal"[^>]*>\s*<span>Manage Groups<\/span>\s*<\/button>/);
+  assert.doesNotMatch(html, /id="btnOpenGroupModal"[\s\S]{0,220}🛡️/);
   assert.match(html, /#btnTidyLayout \{\s*background-color: #e0f2fe;\s*color: #0369a1;\s*border: 1px solid #7dd3fc;/);
   assert.match(html, /aria-label="Assign Groups">\s*<span id="groupBrushBtnLabel">Assign<\/span>/);
   assert.doesNotMatch(html, /id="btnToggleGroupBrush"[\s\S]{0,400}🎨/);
   assert.match(html, /id="btnClearGroups"[^>]*aria-label="Clear Groups">\s*Clear\s*<\/button>/);
-  assert.match(html, /aria-label="Cluster by Group">Group<\/button>/);
+  assert.match(html, /aria-label="Cluster by Groups">Groups<\/button>/);
   assert.doesNotMatch(html, /id="btnToggleSnapGrid"[\s\S]{0,280}📏/);
   assert.doesNotMatch(html, /data-layout="groupClusters"[\s\S]{0,280}🧲/);
   assert.match(html, /id="studioToolbarRow"[^>]*flex flex-wrap/);
