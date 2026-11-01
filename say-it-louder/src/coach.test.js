@@ -206,7 +206,7 @@ test("soft-oops stills swap on the wrong-path beats", () => {
     assert.equal(fs.existsSync(new URL("../assets/" + name, import.meta.url)), true, name);
   });
   assert.match(scene, /PUT_BACK_MS/);
-  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101d/);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101l/);
 });
 
 test("hub card does not tag a device", () => {
