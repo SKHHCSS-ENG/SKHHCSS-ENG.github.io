@@ -223,6 +223,8 @@ test('Tidy, Assign, Clear, Group, and Snap chrome stay on the Default master', f
   assert.doesNotMatch(html, /id="btnToggleSnapGrid"[\s\S]{0,280}📏/);
   assert.doesNotMatch(html, /data-layout="groupClusters"[\s\S]{0,280}🧲/);
   assert.match(html, /id="studioToolbarRow"[^>]*flex flex-wrap/);
+  assert.match(html, /studio-band-label">Register<\/span>[\s\S]*studio-band-label">History<\/span>[\s\S]*studio-band-label">Seating<\/span>[\s\S]*studio-band-label">Scores<\/span>[\s\S]*studio-band-label">Skin<\/span>/);
+  assert.doesNotMatch(html, /studioToolbarRow[^>]*>[\s\S]*flex-nowrap/);
   assert.match(html, /id="applyGridModal"/);
   assert.match(html, /id="applyGridTitle"[^>]*>Apply a fresh grid\?<\/h3>/);
   assert.match(html, /This wipes the current desk positions and builds a fresh /);

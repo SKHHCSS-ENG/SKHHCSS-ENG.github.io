@@ -2106,7 +2106,7 @@
       margin-left: 0;
     }
     /* Edit Off is teach mode: seating layout tools stay in place but do not fire.
-       The band label stays full strength so the row still reads Register · Seating · History · Scores. */
+       The band label stays full strength so the row still reads Register · History · Seating · Scores. */
     #studioSeatingBand.is-teach-frozen .studio-grid-setup,
     #studioSeatingBand.is-teach-frozen .layout-preset-btn,
     #studioSeatingBand.is-teach-frozen #btnToggleSnapGrid,
@@ -3957,7 +3957,7 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: Register · Seating · History · Scores (left to right). -->
+  <!-- SECONDARY TOOLBAR: Register · History · Seating · Scores · Skin (left to right). Wrap stays on. -->
   <section id="studioToolbar" class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div id="studioToolbarRow" class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
@@ -3997,6 +3997,29 @@
         </button>
       </div>
 
+      <!-- History sits after Register so a typical desktop row can hold both before Seating. -->
+      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="studio-band-label">History</span>
+        <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Undo">
+          <span aria-hidden="true">↩️</span>
+        </button>
+        <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Redo">
+          <span aria-hidden="true">↪️</span>
+        </button>
+        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save current desk layout">
+          Save
+        </button>
+        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Load saved desk layout">
+          Load
+        </button>
+        <button id="btnSaveOnline" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition">
+          Save online
+        </button>
+        <button id="btnOpenPlan" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition">
+          Open plan
+        </button>
+      </div>
+
       <!-- Seating: grid, presets, Snap, Front. Edit Off freezes these with desk drag. -->
       <div id="studioSeatingBand" class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Seating</span>
@@ -4026,30 +4049,7 @@
         </button>
       </div>
 
-      <!-- History sits in the same left-to-right flow as the other bands. -->
-      <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
-        <span class="studio-band-label">History</span>
-        <button id="btnUndoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Undo">
-          <span aria-hidden="true">↩️</span>
-        </button>
-        <button id="btnRedoLayout" type="button" class="studio-icon-chip px-0 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-base font-bold transition disabled:opacity-40 disabled:pointer-events-none" disabled aria-label="Redo">
-          <span aria-hidden="true">↪️</span>
-        </button>
-        <button id="btnSetDefaultLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Save current desk layout">
-          Save
-        </button>
-        <button id="btnResetLayout" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition" title="Load saved desk layout">
-          Load
-        </button>
-        <button id="btnSaveOnline" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition">
-          Save online
-        </button>
-        <button id="btnOpenPlan" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition">
-          Open plan
-        </button>
-      </div>
-
-      <!-- Scores follows History in the same left-to-right flow. -->
+      <!-- Scores follows Seating. The visible label stays Scores. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Scores</span>
         <button id="btnAllPlusOne" type="button" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold whitespace-nowrap transition shadow-sm" title="Give +1 to every student in the class">
