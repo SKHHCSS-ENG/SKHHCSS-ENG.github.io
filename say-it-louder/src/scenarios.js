@@ -219,7 +219,7 @@ const lostBag = {
       spoken_reply: "The far end? That's a big grey bag. My stop is the other way — near the door.",
       mood: "CONFUSED",
       hardware_action: "NONE",
-      teacher_tip: "At the far end is the big grey bag. Leo's is under the seat near the door."
+      teacher_tip: "The big grey bag is on the seat. Leo's is under the seat near the door."
     },
     empty: {
       spoken_reply: "I didn't hear an instruction. Tell me where to look.",

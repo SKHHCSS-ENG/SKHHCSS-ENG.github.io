@@ -324,6 +324,7 @@ test("teacher tips speak to the student", () => {
   assert.equal(pack.lines.redNone.teacher_tip, "Name a colour that is there: black, navy, or grey.");
   assert.equal(pack.lines.zoneAgain.teacher_tip, "Next: small navy, under the seat, between the black sports bag and the yellow lunchbox.");
   assert.equal(pack.lines.seatLeft.teacher_tip, "On the left is the wrong bag. Look under the seats near the door.");
+  assert.equal(pack.lines.farEnd.teacher_tip, "The big grey bag is on the seat. Leo's is under the seat near the door.");
   assert.equal(pack.lines.fallback.teacher_tip, "Try one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox.");
 });
 
