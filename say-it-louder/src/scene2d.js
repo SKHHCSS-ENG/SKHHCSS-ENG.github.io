@@ -83,7 +83,17 @@ var PLATE_FILE = {
   "m2-09": "say-it-louder-M2-09-leo-confused.jpg",
   "m2-10": "say-it-louder-M2-10-leo-relieved-library.jpg",
   "m2-f01": "say-it-louder-M2-F01-canteen-enter.jpg",
-  "m2-f02": "say-it-louder-M2-F02-bells-gone-gate.jpg"
+  "m2-f02": "say-it-louder-M2-F02-bells-gone-gate.jpg",
+  "s3-01": "say-it-louder-S3-01-fair-entrance-wide.jpg",
+  "s3-02": "say-it-louder-S3-02-leo-confused-entrance.jpg",
+  "s3-03": "say-it-louder-S3-03-sports-booth.jpg",
+  "s3-04": "say-it-louder-S3-04-art-music-booth.jpg",
+  "s3-05": "say-it-louder-S3-05-pe-store-foil.jpg",
+  "s3-06": "say-it-louder-S3-06-snack-stall-foil.jpg",
+  "s3-07": "say-it-louder-S3-07-photography-booth.jpg",
+  "s3-08": "say-it-louder-S3-08-drama-booth.jpg",
+  "s3-09": "say-it-louder-S3-09-signup-sheet-leo.jpg",
+  "s3-10": "say-it-louder-S3-10-leo-relieved-win.jpg"
 };
 
 var PUT_BACK_MS = 1500;
@@ -172,7 +182,53 @@ function mapCue(action, state) {
   return null;
 }
 
+export function fairPlate(action, state, mood, outcome) {
+  if (outcome === "win") return "s3-10";
+  if (outcome === "miss") return "s3-01";
+  if (action === "FOIL_PE_STORE") return "s3-05";
+  if (action === "FOIL_SNACK_STALL") return "s3-06";
+  if (action === "SHOW_SIGNUP_SHEET" || (state && state.SIGNUP === "SHOWN")) return "s3-09";
+  var node = (state && state.NODE) || "ENTRANCE";
+  var branched = action === "BRANCH_SPORTS" || action === "BRANCH_ARTS" || action === "BRANCH_SERVICE";
+  var atEntrance = node === "ENTRANCE" && (!action || action === "NONE" || branched);
+  if (action === "HOVER_CONFUSED" || (mood === "CONFUSED" && !atEntrance)) return "s3-02";
+  if (action === "JOIN_CLUB_PHOTO" || action === "ARRIVE_PHOTO_BOOTH" || node === "PHOTO") return "s3-07";
+  if (action === "JOIN_CLUB_DRAMA" || action === "ARRIVE_DRAMA_BOOTH" || node === "DRAMA") return "s3-08";
+  if (
+    action === "JOIN_CLUB_MUSIC" ||
+    action === "ARRIVE_MUSIC_BOOTH" ||
+    action === "ARRIVE_ART_BOOTH" ||
+    node === "MUSIC" ||
+    node === "ART"
+  ) return "s3-04";
+  if (action === "JOIN_CLUB_SPORTS" || action === "ARRIVE_SPORTS_BOOTH" || node === "SPORTS") return "s3-03";
+  return "s3-01";
+}
+
+function fairCue(action, state) {
+  if (action === "HOVER_CONFUSED") {
+    return { kind: "wait", text: "Wait — name the area, the booth, or the club." };
+  }
+  if (action === "FOIL_PE_STORE") {
+    return { kind: "wait", text: "That's the PE store. Step back and name a club." };
+  }
+  if (action === "FOIL_SNACK_STALL") {
+    return { kind: "wait", text: "That's the snack stall. Name a club booth." };
+  }
+  if (action === "STEP_BACK") {
+    return { kind: "wait", text: "Step back and say the booth more clearly." };
+  }
+  if (state && state.SIGNUP === "SHOWN") {
+    return { kind: "hold", text: "Club chosen." };
+  }
+  if (state && state.JOINED === "YES") {
+    return { kind: "hold", text: "Joined — confirm the name on the signup sheet." };
+  }
+  return null;
+}
+
 export function sceneCue(action, state) {
+  if (state && Object.prototype.hasOwnProperty.call(state, "AREA")) return fairCue(action, state);
   if (state && Object.prototype.hasOwnProperty.call(state, "GATE")) return mapCue(action, state);
   if (action === "HOVER_CONFUSED") {
     return { kind: "wait", text: "Wait — say the colour and the size." };
@@ -398,13 +454,195 @@ var MAP_ACTION_COPY = {
   NONE: ""
 };
 
+var FAIR_ACTION_COPY = {
+  BRANCH_SPORTS: "Leo turns towards the sports area.",
+  BRANCH_ARTS: "Leo turns towards the arts area.",
+  BRANCH_SERVICE: "Leo turns towards the service area.",
+  ARRIVE_SPORTS_BOOTH: "Leo stops at the sports booth.",
+  ARRIVE_ART_BOOTH: "Leo stops at the art booth.",
+  ARRIVE_MUSIC_BOOTH: "Leo stops at the music booth.",
+  ARRIVE_PHOTO_BOOTH: "Leo stops at the photography booth.",
+  ARRIVE_DRAMA_BOOTH: "Leo stops at the drama booth.",
+  ARRIVE_SERVICE_BOOTH: "Leo stops at the service booth.",
+  FOIL_PE_STORE: "Leo steps into the PE store, then back.",
+  FOIL_SNACK_STALL: "Leo stops at the snack stall, then back.",
+  STEP_BACK: "Leo steps back from the wrong stall.",
+  JOIN_CLUB_SPORTS: "Leo asks to join the sports club.",
+  JOIN_CLUB_DRAMA: "Leo asks to join the drama club.",
+  JOIN_CLUB_PHOTO: "Leo asks to join the photography club.",
+  JOIN_CLUB_MUSIC: "Leo asks to join the music club.",
+  JOIN_CLUB_SERVICE: "Leo asks to join the service club.",
+  SHOW_SIGNUP_SHEET: "Leo writes his name on the signup sheet.",
+  HOVER_CONFUSED: "Leo waits, unsure which club you mean.",
+  NONE: ""
+};
+
+function mountClubFair(root, scenario, live) {
+  var fair = el("div", "campus fair");
+  fair.setAttribute("data-ask-clear", "");
+  fair.setAttribute("role", "img");
+  fair.setAttribute("aria-label", "School club fair. Colourful booths for sports, arts, and service. The PE store and the snack stall are not club booths.");
+  var showPlate = mountPlate(fair);
+
+  fair.appendChild(el("div", "campus-grass"));
+  fair.appendChild(el("div", "campus-path campus-path-ns"));
+  fair.appendChild(el("div", "campus-path campus-path-ew"));
+
+  var pins = {};
+  (scenario.landmarks || []).forEach(function (mark) {
+    var pin = el("div", "pin pin-" + mark.id.toLowerCase());
+    pin.dataset.pin = mark.id;
+    pin.appendChild(el("span", "pin-label", mark.label));
+    if (mark.place) pin.appendChild(el("span", "pin-place", mark.place));
+    pins[mark.id] = pin;
+    fair.appendChild(pin);
+  });
+
+  var leo = el("div", "leo");
+  leo.setAttribute("data-ask-clear", "");
+  leo.appendChild(el("span", "leo-name", "Leo"));
+  var figure = el("span", "leo-figure");
+  figure.setAttribute("aria-hidden", "true");
+  var head = el("span", "leo-head");
+  head.appendChild(el("span", "leo-hair"));
+  head.appendChild(el("span", "leo-eyes"));
+  head.appendChild(el("span", "leo-mouth"));
+  head.appendChild(el("span", "leo-sweat"));
+  figure.appendChild(head);
+  var torso = el("span", "leo-body");
+  torso.appendChild(el("span", "leo-tie"));
+  figure.appendChild(torso);
+  var legs = el("span", "leo-legs");
+  legs.appendChild(el("span", "leo-leg"));
+  legs.appendChild(el("span", "leo-leg"));
+  figure.appendChild(legs);
+  leo.appendChild(figure);
+  var mood = el("span", "leo-mood", "Confused");
+  leo.appendChild(mood);
+  fair.appendChild(leo);
+
+  var cue = el("p", "scene-cue");
+  cue.hidden = true;
+  cue.setAttribute("data-ask-clear", "");
+  cue.setAttribute("role", "status");
+
+  var chan = el("p", "ms-chan", "Ms Chan is by the fair entrance. The fair clock starts when you speak.");
+  chan.setAttribute("data-ask-clear", "");
+
+  root.appendChild(cue);
+  root.appendChild(fair);
+  root.appendChild(chan);
+  root.appendChild(live);
+
+  var plateAction = "";
+  var plateState = scenario.initialState || null;
+  var plateMood = "CONFUSED";
+  var plateOutcome = "";
+
+  function syncPlate() {
+    showPlate(fairPlate(plateAction, plateState, plateMood, plateOutcome));
+  }
+
+  function showCue(next) {
+    if (!next) {
+      cue.hidden = true;
+      cue.textContent = "";
+      cue.className = "scene-cue";
+      return;
+    }
+    cue.hidden = false;
+    cue.className = "scene-cue is-" + next.kind;
+    cue.textContent = next.text;
+  }
+
+  function markHere(state) {
+    var node = (state && state.NODE) || "ENTRANCE";
+    var branch = (state && state.BRANCH) || "NONE";
+    Object.keys(pins).forEach(function (id) {
+      pins[id].classList.remove("is-here");
+    });
+    var id = node === "ENTRANCE" ? "" : node;
+    if (!id && branch === "SPORTS") id = "SPORTS";
+    if (!id && branch === "ARTS") id = "ARTS";
+    if (!id && branch === "SERVICE") id = "SERVICE";
+    if (id && pins[id]) pins[id].classList.add("is-here");
+  }
+
+  function setMood(next) {
+    var label = {
+      PANICKED: "Panicked",
+      CONFUSED: "Confused",
+      RELIEVED: "Relieved",
+      HOPEFUL: "Hopeful"
+    }[next] || "Confused";
+    fair.dataset.mood = next || "CONFUSED";
+    mood.textContent = label;
+    plateMood = next || "CONFUSED";
+    syncPlate();
+  }
+
+  function apply(action, state) {
+    fair.classList.remove("is-hover", "is-foil");
+    plateAction = action || "";
+    plateState = state || plateState;
+    markHere(state);
+    if (action === "HOVER_CONFUSED") fair.classList.add("is-hover");
+    if (action === "FOIL_PE_STORE" || action === "FOIL_SNACK_STALL" || action === "STEP_BACK") {
+      fair.classList.add("is-foil");
+    }
+    if (FAIR_ACTION_COPY[action]) live.textContent = FAIR_ACTION_COPY[action];
+    showCue(fairCue(action, state));
+    syncPlate();
+  }
+
+  function setDoors(seconds, running) {
+    if (!running) {
+      chan.textContent = "Ms Chan is by the fair entrance. The fair clock starts when you speak.";
+      return;
+    }
+    if (seconds <= 0) {
+      chan.textContent = "Ms Chan: Fair's closing.";
+      return;
+    }
+    chan.textContent = "Ms Chan: Fair closing in " + seconds + " seconds.";
+  }
+
+  function setOutcome(kind) {
+    fair.classList.remove("is-win", "is-missed");
+    plateOutcome = kind || "";
+    if (kind === "win") {
+      fair.classList.add("is-win");
+      chan.textContent = "Ms Chan: Joined up. Lovely clear choice.";
+      showCue({ kind: "hold", text: "Club chosen." });
+      syncPlate();
+      return;
+    }
+    if (kind === "miss") {
+      fair.classList.add("is-missed");
+      chan.textContent = "Ms Chan: Fair's closing — back to the entrance.";
+      showCue(null);
+      syncPlate();
+      return;
+    }
+    showCue(null);
+    syncPlate();
+  }
+
+  setMood("CONFUSED");
+  markHere(scenario.initialState);
+  syncPlate();
+  return { apply: apply, setMood: setMood, setDoors: setDoors, setOutcome: setOutcome };
+}
+
 export function mountScene(root, scenario) {
   root.replaceChildren();
   root.classList.add("scene");
   root.classList.toggle("scene-map", !!(scenario && scenario.sceneId === "school-map"));
+  root.classList.toggle("scene-fair", !!(scenario && scenario.sceneId === "club-fair"));
   var live = el("p", "scene-live");
   live.setAttribute("aria-live", "polite");
 
+  if (scenario && scenario.sceneId === "club-fair") return mountClubFair(root, scenario, live);
   if (scenario && scenario.sceneId === "school-map") return mountSchoolMap(root, scenario, live);
 
   if (!scenario || scenario.sceneId !== "mtr-carriage") {

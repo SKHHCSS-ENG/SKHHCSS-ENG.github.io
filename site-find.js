@@ -389,7 +389,10 @@
         "school map",
         "school map walk",
         "map walk",
-        "mission 2"
+        "mission 2",
+        "mission 3",
+        "club fair",
+        "club fair choices"
       ]
     },
     {

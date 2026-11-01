@@ -2,6 +2,7 @@
  * Say It Louder — scenario packs (data only).
  * Mission 1: The Lost Bag. Soft comedy on the MTR after a school trip.
  * Mission 2: School Map Walk. Soft peer-help directions on a campus map.
+ * Mission 3: Club Fair Choices. Soft peer-help at the after-lunch club fair.
  * main.js and the mock coach read these fields.
  */
 
@@ -493,9 +494,280 @@ const schoolMap = {
   }
 };
 
+const clubFair = {
+  id: "mission_3_club_fair_choices",
+  title: "Mission 3: Club Fair Choices",
+  band: "All Levels starter",
+  aiName: "Leo",
+  sceneId: "club-fair",
+  frame: "Help Leo choose a club before the fair closes.",
+  timerLabel: "Fair",
+  stageLabel: "Club fair",
+  noteTitle: "Fair note",
+  noteLead: "Leo is at the club fair. Say the next choice in a clear sentence.",
+  doorsSeconds: 90,
+  maxStrikes: 3,
+  winPlateHoldMs: 1500,
+  resetOnMiss: true,
+  timeoutMood: "CONFUSED",
+  timeoutLine: "Fair's closing — try again from the entrance.",
+  resetSpoken: "Fair's closing. I'm back at the entrance. Sports, arts, or service — which way?",
+  resetMood: "CONFUSED",
+  strikeOutSuffix: " That's three. Fair's closing — try again from the entrance.",
+  badActionTip: "The coach reply was not a known action. Try the fair note again.",
+  allowedActions: [
+    "BRANCH_SPORTS",
+    "BRANCH_ARTS",
+    "BRANCH_SERVICE",
+    "ARRIVE_SPORTS_BOOTH",
+    "ARRIVE_ART_BOOTH",
+    "ARRIVE_MUSIC_BOOTH",
+    "ARRIVE_PHOTO_BOOTH",
+    "ARRIVE_DRAMA_BOOTH",
+    "ARRIVE_SERVICE_BOOTH",
+    "FOIL_PE_STORE",
+    "FOIL_SNACK_STALL",
+    "HOVER_CONFUSED",
+    "NONE",
+    "STEP_BACK",
+    "SHOW_SIGNUP_SHEET",
+    "JOIN_CLUB_SPORTS",
+    "JOIN_CLUB_DRAMA",
+    "JOIN_CLUB_PHOTO",
+    "JOIN_CLUB_MUSIC",
+    "JOIN_CLUB_SERVICE"
+  ],
+  clarityStrikeActions: ["HOVER_CONFUSED", "FOIL_PE_STORE", "FOIL_SNACK_STALL", "STEP_BACK"],
+  moods: ["CONFUSED", "HOPEFUL", "RELIEVED", "PANICKED"],
+  winWhen: {
+    SIGNUP: "SHOWN"
+  },
+  steps: [
+    { id: "area", label: "Area", key: "AREA", value: "CHOSEN" },
+    { id: "booth", label: "Booth", key: "BOOTH", value: "AT" },
+    { id: "join", label: "Join", key: "JOINED", value: "YES" },
+    { id: "sheet", label: "Signup", key: "SIGNUP", value: "SHOWN" }
+  ],
+  endCopy: {
+    winTitle: "Joined up!",
+    winDetail: "Club chosen!",
+    missTitle: "Fair's closing — try again from the entrance",
+    missDetail: "Reset and choose with Leo again. Clear beats loud."
+  },
+  intro: {
+    spoken_reply: "The fair closes soon and there are so many booths. Sports, arts, or service — which area first?",
+    mood: "CONFUSED",
+    teacher_tip: "Start with an area. Try: How about the sports area first?"
+  },
+  manualSteps: [
+    "How about the sports area first?",
+    "Let's go to the sports booth.",
+    "Don't go in the PE store — that's kit, not a club.",
+    "Why don't we try the drama booth?",
+    "I'd like to join the drama club because I enjoy acting.",
+    "Write your name on the signup sheet."
+  ],
+  chunks: [
+    "How about the sports area first?",
+    "Let's go to the sports booth.",
+    "Why don't we try the photography booth?",
+    "I'd like to join the drama club because I enjoy acting.",
+    "Could I try photography?",
+    "Write your name on the signup sheet."
+  ],
+  landmarks: [
+    { id: "SPORTS", label: "Sports", place: "Area" },
+    { id: "ARTS", label: "Arts", place: "Area" },
+    { id: "SERVICE", label: "Service", place: "Area" },
+    { id: "ART", label: "Art", place: "Booth" },
+    { id: "MUSIC", label: "Music", place: "Booth" },
+    { id: "PHOTO", label: "Photography", place: "Side booth" },
+    { id: "DRAMA", label: "Drama", place: "Side booth" }
+  ],
+  initialState: {
+    NODE: "ENTRANCE",
+    LAST_NODE: "ENTRANCE",
+    BRANCH: "NONE",
+    AREA: "NONE",
+    BOOTH: "NONE",
+    CLUB: "NONE",
+    JOINED: "NO",
+    SIGNUP: "HIDDEN",
+    PE_STORE: "AHEAD",
+    SNACK: "AHEAD"
+  },
+  trapRules: [
+    "If the student says only “that one”, “go there”, or “I like it”, use HOVER_CONFUSED and ask for an area, a booth, or a reason.",
+    "If they name the PE store or the snack stall, use FOIL_PE_STORE or FOIL_SNACK_STALL. That is a soft wrong stop, not a win.",
+    "If they say they will join without a club name and a because-reason, or without a clear Could I try…?, do not use a JOIN_CLUB token.",
+    "Win only when a club is joined and the signup sheet is confirmed. One clear utterance that joins and confirms the sheet may win in a single turn.",
+    "A miss is “Fair's closing — try again from the entrance”. This is an after-lunch club fair, not a chase."
+  ].join(" "),
+  lines: {
+    branchSports: {
+      spoken_reply: "Sports area first? Okay — I can see banners and balls that way!",
+      mood: "HOPEFUL",
+      hardware_action: "BRANCH_SPORTS",
+      teacher_tip: "Nice clear choice. Next, say which booth to stop at — for example, the sports booth."
+    },
+    branchArts: {
+      spoken_reply: "Arts area — paints, music, and more. Which booth should I stop at?",
+      mood: "HOPEFUL",
+      hardware_action: "BRANCH_ARTS",
+      teacher_tip: "Clear area. Next, name a booth: the art booth or the music booth."
+    },
+    branchService: {
+      spoken_reply: "Service area — helpers with signup sheets. Which booth should I walk to?",
+      mood: "HOPEFUL",
+      hardware_action: "BRANCH_SERVICE",
+      teacher_tip: "Clear area. Next, say the service booth, or name another club booth."
+    },
+    arriveSports: {
+      spoken_reply: "Sports booth — helpers with rackets and a signup sheet. What should I say?",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_SPORTS_BOOTH",
+      teacher_tip: "Good booth stop. When you join, add because plus a short reason."
+    },
+    arriveArt: {
+      spoken_reply: "Art booth — paints and posters everywhere. There's a music table beside it too!",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_ART_BOOTH",
+      teacher_tip: "Clear booth name. You can suggest music, photography, or drama next with How about…"
+    },
+    arriveMusic: {
+      spoken_reply: "Music booth — a stand and a case on the table. Should I stay here?",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_MUSIC_BOOTH",
+      teacher_tip: "Clear booth name. Lock it later with I'd like to join music because… plus a reason."
+    },
+    arrivePhoto: {
+      spoken_reply: "Photography booth — cameras on the table. The helper is waiting. Should I join?",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_PHOTO_BOOTH",
+      teacher_tip: "Great suggestion. Lock it with I'd like to join photography because… plus your reason."
+    },
+    arriveDrama: {
+      spoken_reply: "Drama booth — masks on the table. The helper is smiling. Should I join?",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_DRAMA_BOOTH",
+      teacher_tip: "Clear booth. Next: I'd like to join drama because… plus a short reason."
+    },
+    arriveService: {
+      spoken_reply: "Service booth — a quiet table and a signup sheet. What should I tell the helper?",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_SERVICE_BOOTH",
+      teacher_tip: "Good stop. Join with I'd like to join service because… and a short reason."
+    },
+    foilPe: {
+      spoken_reply: "Wait — this is the PE store. Balls and kit, not club signup sheets! I'm backing out.",
+      mood: "PANICKED",
+      hardware_action: "FOIL_PE_STORE",
+      teacher_tip: "That was the PE store. Try the sports booth, or How about the drama side-booth?"
+    },
+    foilSnack: {
+      spoken_reply: "Snack stall — tasty, but no signup sheet! Where's the photography or drama booth?",
+      mood: "PANICKED",
+      hardware_action: "FOIL_SNACK_STALL",
+      teacher_tip: "Funny stop, wrong place. Name a club booth — photography or drama — and add a reason later."
+    },
+    hoverEntrance: {
+      spoken_reply: "Which way? Sports, arts, or service? Say it clearer!",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Name the area — sports, arts, or service — instead of that one or go there."
+    },
+    hoverBooth: {
+      spoken_reply: "Which booth? Say sports, art, music, photography, drama, or service.",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Name the booth. Try: Why don't we try the photography booth?"
+    },
+    hoverJoin: {
+      spoken_reply: "Join… which club, and why? Say it clearer!",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Try I'd like to join … because … — name the club and give one short reason."
+    },
+    joinSports: {
+      spoken_reply: "I'd like to join sports because I like running — I'll say that to the helper!",
+      mood: "HOPEFUL",
+      hardware_action: "JOIN_CLUB_SPORTS",
+      teacher_tip: "Clear join — the club name plus because and a reason. Next, confirm your name on the signup sheet."
+    },
+    joinDrama: {
+      spoken_reply: "I'd like to join drama because I enjoy acting — okay, I'm saying that to the helper!",
+      mood: "HOPEFUL",
+      hardware_action: "JOIN_CLUB_DRAMA",
+      teacher_tip: "Clear join — the club name plus because and a reason. Next, confirm your name on the signup sheet."
+    },
+    joinPhoto: {
+      spoken_reply: "I'd like to join photography because I enjoy taking photos — saying it now!",
+      mood: "HOPEFUL",
+      hardware_action: "JOIN_CLUB_PHOTO",
+      teacher_tip: "Clear join — the club name plus because and a reason. Next, confirm your name on the signup sheet."
+    },
+    joinMusic: {
+      spoken_reply: "I'd like to join music because I like singing — the helper can hear me!",
+      mood: "HOPEFUL",
+      hardware_action: "JOIN_CLUB_MUSIC",
+      teacher_tip: "Clear join — the club name plus because and a reason. Next, confirm your name on the signup sheet."
+    },
+    joinService: {
+      spoken_reply: "I'd like to join service because I like helping people — I'll tell the helper!",
+      mood: "HOPEFUL",
+      hardware_action: "JOIN_CLUB_SERVICE",
+      teacher_tip: "Clear join — the club name plus because and a reason. Next, confirm your name on the signup sheet."
+    },
+    earlyJoin: {
+      spoken_reply: "I can say that at a booth. Which booth should I stop at first?",
+      mood: "HOPEFUL",
+      hardware_action: "NONE",
+      teacher_tip: "Stop at the booth first. Try: Let's go to the sports booth."
+    },
+    signup: {
+      spoken_reply: "Name down — I'm in the club! You're a legend. The fair can close now!",
+      mood: "RELIEVED",
+      hardware_action: "SHOW_SIGNUP_SHEET",
+      teacher_tip: "Clear suggestions and a because-reason did it — not volume. Well done."
+    },
+    signupEarly: {
+      spoken_reply: "A signup sheet needs a club first. Which club, and why?",
+      mood: "CONFUSED",
+      hardware_action: "NONE",
+      teacher_tip: "Join first. Try: I'd like to join the drama club because I enjoy acting."
+    },
+    stepBack: {
+      spoken_reply: "Stepping back. Which club booth is next?",
+      mood: "CONFUSED",
+      hardware_action: "STEP_BACK",
+      teacher_tip: "Name a club booth — sports, drama, photography, music, or service."
+    },
+    empty: {
+      spoken_reply: "I didn't hear a choice. Tell me sports, arts, or service.",
+      mood: "CONFUSED",
+      hardware_action: "NONE",
+      teacher_tip: "Use a suggestion. Try: How about the sports area first?"
+    },
+    alreadyWon: {
+      spoken_reply: "We're signed up. Joined up — thank you!",
+      mood: "RELIEVED",
+      hardware_action: "NONE",
+      teacher_tip: "Clear suggestions and a because-reason did it — not volume. Well done."
+    },
+    fallback: {
+      spoken_reply: "Say it clearer for me? I need an area, a booth, or a club and a reason.",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Try one clear line: How about the sports area first?"
+    }
+  }
+};
+
 export const SCENARIOS = {
   level_1_lost_bag: lostBag,
   mission_1_lost_bag: lostBag,
   mission_2_school_map_walk: schoolMap,
-  level_2_map_walk: schoolMap
+  level_2_map_walk: schoolMap,
+  mission_3_club_fair_choices: clubFair,
+  level_3_club_fair: clubFair
 };

@@ -1244,7 +1244,9 @@ footer {
 .has-plate[data-plate="m1-f02"] .leo-mood,
 .has-plate[data-plate="m1-f03"] .leo-mood,
 .has-plate[data-plate="m2-f01"] .pin,
-.has-plate[data-plate="m2-f02"] .pin {
+.has-plate[data-plate="m2-f02"] .pin,
+.has-plate[data-plate="s3-05"] .pin,
+.has-plate[data-plate="s3-06"] .pin {
   display: none !important;
 }
 
@@ -1315,6 +1317,39 @@ footer {
 .campus.has-plate[data-plate="m2-06"] .pin-hall { left: 50%; top: 52%; }
 .campus.has-plate[data-plate="m2-07"] .pin-library { left: 50%; top: 78%; }
 
+/* Club fair chips sit on the booth, clear of Leo's face. Service reuses the entrance still. */
+.campus.has-plate[data-plate="s3-01"] .pin-sports,
+.campus.has-plate[data-plate="s3-01"] .pin-arts,
+.campus.has-plate[data-plate="s3-01"] .pin-service,
+.campus.has-plate[data-plate="s3-03"] .pin-sports,
+.campus.has-plate[data-plate="s3-04"] .pin-art,
+.campus.has-plate[data-plate="s3-04"] .pin-music,
+.campus.has-plate[data-plate="s3-07"] .pin-photo,
+.campus.has-plate[data-plate="s3-08"] .pin-drama {
+  display: block;
+}
+
+.campus.has-plate[data-plate="s3-01"] .pin-sports { left: 16%; top: 48%; }
+.campus.has-plate[data-plate="s3-01"] .pin-arts { left: 84%; top: 38%; }
+.campus.has-plate[data-plate="s3-01"] .pin-service { left: 84%; top: 68%; }
+.campus.has-plate[data-plate="s3-03"] .pin-sports { left: 22%; top: 76%; }
+.campus.has-plate[data-plate="s3-04"] .pin-art { left: 18%; top: 74%; }
+.campus.has-plate[data-plate="s3-04"] .pin-music { left: 82%; top: 70%; }
+.campus.has-plate[data-plate="s3-07"] .pin-photo { left: 20%; top: 64%; }
+.campus.has-plate[data-plate="s3-08"] .pin-drama { left: 24%; top: 62%; }
+
+.fair .pin-sports { left: 22%; top: 30%; }
+.fair .pin-arts { left: 50%; top: 16%; }
+.fair .pin-service { left: 78%; top: 30%; }
+.fair .pin-art { left: 24%; top: 52%; }
+.fair .pin-music { left: 76%; top: 52%; }
+.fair .pin-photo { left: 24%; top: 72%; }
+.fair .pin-drama { left: 76%; top: 72%; }
+
+.campus.is-foil {
+  box-shadow: inset 0 0 0 3px #fecdd3;
+}
+
 .carriage > .ms-chan {
   position: relative;
   z-index: 3;
@@ -1357,4 +1392,21 @@ footer {
     line-height: 1.15;
     padding: 0 4px;
   }
+  .campus.has-plate[data-plate="s3-01"] .pin-sports,
+  .campus.has-plate[data-plate="s3-01"] .pin-arts,
+  .campus.has-plate[data-plate="s3-01"] .pin-service,
+  .campus.has-plate[data-plate="s3-03"] .pin-sports,
+  .campus.has-plate[data-plate="s3-04"] .pin-art,
+  .campus.has-plate[data-plate="s3-04"] .pin-music,
+  .campus.has-plate[data-plate="s3-07"] .pin-photo,
+  .campus.has-plate[data-plate="s3-08"] .pin-drama {
+    width: 4.7rem;
+    margin-left: -2.35rem;
+    padding: 3px;
+  }
+  .campus.has-plate[data-plate="s3-01"] .pin-sports { left: 18%; top: 56%; }
+  .campus.has-plate[data-plate="s3-01"] .pin-arts { left: 78%; top: 34%; }
+  .campus.has-plate[data-plate="s3-01"] .pin-service { left: 78%; top: 66%; }
+  .campus.has-plate[data-plate="s3-04"] .pin-art { left: 16%; top: 72%; }
+  .campus.has-plate[data-plate="s3-04"] .pin-music { left: 80%; top: 68%; }
 }
