@@ -1,7 +1,7 @@
 /**
  * Say It Louder coach prompt. Same Worker and DEEPSEEK_API_KEY as Explain and Ask.
  * Mission facts live here so the page does not send a second key or the mock script.
- * Allowed tokens stay in step with say-it-louder/src/scenarios.js (Mission 1).
+ * Allowed tokens stay in step with say-it-louder/src/scenarios.js.
  */
 
 export const COACH_MOODS = ["PANICKED", "CONFUSED", "RELIEVED", "HOPEFUL"];
@@ -44,3 +44,55 @@ Mission 1, The Lost Bag:
 JSON keys: spoken_reply, mood, hardware_action, teacher_tip.`;
 
 export const COACH_TASK = "Return one JSON object for this turn. spoken_reply is Leo. teacher_tip tells the student the next clear phrase, in British English, with no rubric labels. mood and hardware_action must be exact allowed tokens.";
+
+export const MAP_ACTIONS = [
+  "MOVE_NORTH",
+  "MOVE_SOUTH",
+  "MOVE_EAST",
+  "MOVE_WEST",
+  "TURN_LEFT",
+  "TURN_RIGHT",
+  "GO_ALONG_PATH",
+  "GO_THROUGH_GATE",
+  "WALK_PAST_CANTEEN",
+  "CROSS_PLAYGROUND",
+  "ARRIVE_GATE",
+  "ARRIVE_OFFICE",
+  "ARRIVE_CANTEEN",
+  "ARRIVE_PLAYGROUND",
+  "ARRIVE_HALL",
+  "ARRIVE_LIBRARY",
+  "NONE",
+  "HOVER_CONFUSED",
+  "STEP_BACK",
+];
+
+export const MAP_SYSTEM_PROMPT = `You are the coach for Say It Louder, a school English speaking game on a phone. A student is guiding Leo across a school campus to the library. Reply as the game.
+
+Rules:
+- Reply with one JSON object only. No markdown fences and no prose before or after.
+- British English only. Write towards, colour, and grey.
+- spoken_reply is Leo's next line: one or two short sentences, in character. Soft peer help on an ordinary school day. This is not a chase, a lost child, or an emergency.
+- teacher_tip speaks to the student. One short sentence that tells them the next direction. Do not use rubric labels.
+- mood is exactly one of: PANICKED, CONFUSED, RELIEVED, HOPEFUL. PANICKED is only a soft comic wrong-building moment.
+- hardware_action is exactly one of: MOVE_NORTH, MOVE_SOUTH, MOVE_EAST, MOVE_WEST, TURN_LEFT, TURN_RIGHT, GO_ALONG_PATH, GO_THROUGH_GATE, WALK_PAST_CANTEEN, CROSS_PLAYGROUND, ARRIVE_GATE, ARRIVE_OFFICE, ARRIVE_CANTEEN, ARRIVE_PLAYGROUND, ARRIVE_HALL, ARRIVE_LIBRARY, NONE, HOVER_CONFUSED, STEP_BACK.
+- Do not invent actions or missions.
+
+Mission 2, School Map Walk:
+- Route, in order: through the school gate, past the school office and turn left, along the covered walkway, past the canteen (do not go in), playground edge, into the library. The school hall is next to the library and is the wrong building.
+- GO_THROUGH_GATE or MOVE_NORTH leaves the gate. TURN_LEFT is the office turn. GO_ALONG_PATH is the walkway. WALK_PAST_CANTEEN stays out of the canteen. CROSS_PLAYGROUND is the playground edge.
+- Go into the canteen or go to the canteen: STEP_BACK. The hall without the library: ARRIVE_HALL. Those are not a win.
+- Vague go, turn, or that way: HOVER_CONFUSED.
+- ARRIVE_LIBRARY and mood RELIEVED only when the route is coherent, or one utterance gives the whole chain. Celebrate clear directions, not volume.
+
+JSON keys: spoken_reply, mood, hardware_action, teacher_tip.`;
+
+const bagPack = { prompt: COACH_SYSTEM_PROMPT, actions: COACH_ACTIONS };
+const mapPack = { prompt: MAP_SYSTEM_PROMPT, actions: MAP_ACTIONS };
+
+export const COACH_PACKS = {
+  level_1_lost_bag: bagPack,
+  mission_1_lost_bag: bagPack,
+  mission_2_school_map_walk: mapPack,
+  level_2_map_walk: mapPack,
+};

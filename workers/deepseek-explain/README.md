@@ -108,7 +108,7 @@ Same URL, same secret, same origin allowlist (`https://skhhcss-eng.github.io`, `
 }
 ```
 
-`transcript` is required. `scenarioId` must be `level_1_lost_bag` or `mission_1_lost_bag` (the lost-bag mission). `state` is optional. The browser keeps the API key off the page. It reads `window.__EXPLAIN_WORKER__` when that page sets one, otherwise `https://deepseek-explain.skhhcss-eng.workers.dev`.
+`transcript` is required. `scenarioId` is `level_1_lost_bag` or `mission_1_lost_bag` for the lost bag, and `mission_2_school_map_walk` or `level_2_map_walk` for the school map walk. `state` is optional. The browser keeps the API key off the page. It reads `window.__EXPLAIN_WORKER__` when that page sets one, otherwise `https://deepseek-explain.skhhcss-eng.workers.dev`.
 
 Success is the carriage contract (British English). `scene_action` from the model is returned as `hardware_action`.
 
@@ -121,7 +121,7 @@ Success is the carriage contract (British English). `scene_action` from the mode
 }
 ```
 
-`mood` is `PANICKED`, `CONFUSED`, `RELIEVED`, or `HOPEFUL`. `hardware_action` is one of the lost-bag actions (`NONE`, `HOVER_CONFUSED`, `BAG_BLACK_SPORTS`, `BAG_NAVY_SMALL`, `BAG_GREY_BIG`, `LUNCHBOX_YELLOW`, `SHOW_NAME_TAG`, `SEAT_NEAR_DOOR`, `SEAT_LEFT`, `SEAT_MIDDLE`). A rubric tip (`Prompt:`, `Stretch:`, `Win:`, soft fail) or an unknown action is a 502, and the page uses its mock coach so the carriage still moves.
+`mood` is `PANICKED`, `CONFUSED`, `RELIEVED`, or `HOPEFUL`. Lost-bag `hardware_action` values are `NONE`, `HOVER_CONFUSED`, `BAG_BLACK_SPORTS`, `BAG_NAVY_SMALL`, `BAG_GREY_BIG`, `LUNCHBOX_YELLOW`, `SHOW_NAME_TAG`, `SEAT_NEAR_DOOR`, `SEAT_LEFT`, `SEAT_MIDDLE`. The map walk uses move, turn, and arrive tokens, including `GO_THROUGH_GATE`, `WALK_PAST_CANTEEN`, `ARRIVE_LIBRARY`, `HOVER_CONFUSED`, and `STEP_BACK`. A rubric tip (`Prompt:`, `Stretch:`, `Win:`, soft fail) or an unknown action is a 502, and the page uses its mock coach so the scene still moves.
 
 Say It Louder shares the Explain rate limit (about 10 requests per minute per IP).
 

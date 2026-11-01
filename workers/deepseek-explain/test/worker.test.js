@@ -434,3 +434,38 @@ test("GitHub Pages and the school LMS share one allowlist", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("Say It Louder coach accepts the school map walk", async () => {
+  const originalFetch = globalThis.fetch;
+  let lastInit = null;
+  globalThis.fetch = async function (url, init) {
+    lastInit = { url: String(url), init: init };
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "{\"spoken_reply\":\"Library doors — I'm in!\",\"mood\":\"RELIEVED\",\"hardware_action\":\"ARRIVE_LIBRARY\",\"teacher_tip\":\"Clear directions did it.\"}" } }],
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const ok = await handleRequest(post({
+      page: "Say It Louder",
+      scenarioId: "level_2_map_walk",
+      state: "LIBRARY=AHEAD",
+      transcript: "Go into the library.",
+    }, "203.0.113.94"), { DEEPSEEK_API_KEY: KEY });
+    const body = await ok.json();
+    assert.equal(ok.status, 200);
+    assert.equal(body.hardware_action, "ARRIVE_LIBRARY");
+    assert.equal(body.mood, "RELIEVED");
+    const sent = JSON.parse(lastInit.init.body);
+    assert.match(sent.messages[0].content, /ARRIVE_LIBRARY/);
+    assert.match(sent.messages[0].content, /School Map Walk/);
+    assert.equal(sent.messages[0].content === COACH_SYSTEM_PROMPT, false);
+
+    const bagToken = coachReplyFromModel(
+      "{\"spoken_reply\":\"No.\",\"mood\":\"CONFUSED\",\"hardware_action\":\"BAG_NAVY_SMALL\",\"teacher_tip\":\"That is the wrong mission.\"}",
+      ["ARRIVE_LIBRARY", "NONE", "HOVER_CONFUSED"]
+    );
+    assert.equal(bagToken, null);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

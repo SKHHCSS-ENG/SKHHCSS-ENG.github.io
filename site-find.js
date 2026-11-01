@@ -385,7 +385,11 @@
         "lost bag",
         "the lost bag",
         "mtr bag",
-        "voice coach"
+        "voice coach",
+        "school map",
+        "school map walk",
+        "map walk",
+        "mission 2"
       ]
     },
     {

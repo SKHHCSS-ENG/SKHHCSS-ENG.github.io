@@ -4,7 +4,8 @@
  * Live pages post to the same DeepSeek Worker as Ask and Explain
  * (page "Say It Louder"). The key stays on that Worker. USE_MOCK is off.
  * Node tests have no document, so they stay on the mock. If the Worker
- * misses, the page falls back to mockCoach and the carriage still moves.
+ * misses, the page falls back to mockCoach and the scene still moves.
+ * Do not put a DeepSeek key in this file or on the student page.
  */
 export const USE_MOCK = false;
 
@@ -19,6 +20,8 @@ export function normaliseUtterance(raw) {
     .trim()
     .replace(/\bgray\b/g, "grey")
     .replace(/\bcolor\b/g, "colour")
+    .replace(/\btoward\b/g, "towards")
+    .replace(/\bstraightly\b/g, "straight")
     .replace(/\blunch box\b/g, "lunchbox")
     .replace(/\bnametag\b/g, "name tag")
     .replace(/\s+/g, " ")
@@ -168,11 +171,251 @@ function placeAction(text) {
   return "NONE";
 }
 
+function mapFlags(state) {
+  var src = state || {};
+  return {
+    gate: src.GATE === "THROUGH",
+    office: src.OFFICE === "PAST",
+    officeAt: src.OFFICE === "AT" || src.OFFICE === "PAST",
+    walkway: src.WALKWAY === "ALONG",
+    canteen: src.CANTEEN === "PAST",
+    play: src.PLAYGROUND === "CROSSED",
+    library: src.LIBRARY === "ARRIVED"
+  };
+}
+
+function saysLeft(text) {
+  if (!has(text, "left")) return false;
+  if (has(text, "right") && !has(text, "not right") && !has(text, "dont")) return false;
+  return true;
+}
+
+function saysRightOnly(text) {
+  return has(text, "right") && !saysLeft(text);
+}
+
+function hasLandmark(text) {
+  return has(text, "gate") || has(text, "office") || has(text, "walkway") || has(text, "path") ||
+    has(text, "canteen") || has(text, "playground") || has(text, "hall") || has(text, "library");
+}
+
+function isVagueDirection(text) {
+  var exact = {
+    go: 1,
+    turn: 1,
+    "that way": 1,
+    "this way": 1,
+    "go there": 1,
+    "go that way": 1,
+    "walk": 1,
+    "walk there": 1,
+    "over there": 1,
+    "that direction": 1,
+    "go on": 1,
+    move: 1,
+    yes: 1,
+    no: 1,
+    ok: 1,
+    okay: 1
+  };
+  if (exact[text]) return true;
+  if (hasLandmark(text) || saysLeft(text) || saysRightOnly(text)) return false;
+  if (has(text, "north") || has(text, "south") || has(text, "east") || has(text, "west")) return false;
+  if (has(text, "through") || has(text, "along") || has(text, "past") || has(text, "across") || has(text, "straight")) return false;
+  if (has(text, "that way") || has(text, "this way")) return true;
+  var words = text.split(" ");
+  if (words.length <= 3 && (has(text, "go") || has(text, "turn") || has(text, "walk"))) return true;
+  return false;
+}
+
+function throughGate(text) {
+  if (!has(text, "gate")) return false;
+  return has(text, "through") || has(text, "enter") || has(text, "straight") || has(text, "inside");
+}
+
+function atGateOnly(text) {
+  if (!has(text, "gate")) return false;
+  return !throughGate(text);
+}
+
+function pastOffice(text) {
+  if (!has(text, "office")) return false;
+  return has(text, "past") || has(text, "pass") || has(text, "by");
+}
+
+function alongPath(text) {
+  if (has(text, "along") || has(text, "walkway") || has(text, "covered")) return true;
+  if (has(text, "path") || has(text, "corridor")) {
+    return has(text, "go") || has(text, "walk") || has(text, "down") || has(text, "along");
+  }
+  return false;
+}
+
+function canteenEnter(text) {
+  if (!has(text, "canteen")) return false;
+  if (has(text, "past") || has(text, "pass")) return false;
+  if (has(text, "along") || has(text, "walkway") || has(text, "towards")) return false;
+  if ((has(text, "dont") || has(text, "do not")) && (has(text, "in") || has(text, "inside") || has(text, "into"))) return false;
+  return has(text, "into") || has(text, "enter") || has(text, "inside") || has(text, "go in") ||
+    has(text, "go to") || has(text, "to the canteen") || has(text, "in the canteen") || has(text, "stop");
+}
+
+function pastCanteen(text) {
+  if (!has(text, "canteen")) return false;
+  if (canteenEnter(text)) return false;
+  return has(text, "past") || has(text, "pass");
+}
+
+function besideCanteen(text) {
+  if (!has(text, "canteen") || pastCanteen(text) || canteenEnter(text)) return false;
+  return has(text, "beside") || has(text, "next to");
+}
+
+function hallFoil(text) {
+  if (!has(text, "hall")) return false;
+  if (has(text, "not the hall") || has(text, "not the school hall")) return false;
+  if (has(text, "library")) {
+    if (has(text, "into the hall") || has(text, "enter the hall") || has(text, "go into the hall")) {
+      return !has(text, "not") && !has(text, "dont");
+    }
+    return false;
+  }
+  return true;
+}
+
+function wantsLibrary(text) {
+  if (!has(text, "library") || hallFoil(text)) return false;
+  if (playgroundMove(text)) return false;
+  return has(text, "into") || has(text, "enter") || has(text, "go to") || has(text, "to the library") ||
+    has(text, "stop") || has(text, "wait") || has(text, "arrive");
+}
+
+function playgroundMove(text) {
+  return has(text, "playground");
+}
+
+function fullRoute(text) {
+  var gate = has(text, "through") && has(text, "gate");
+  var office = has(text, "office") && (has(text, "past") || has(text, "pass") || saysLeft(text));
+  var path = has(text, "along") || has(text, "walkway");
+  var canteen = has(text, "canteen") && (has(text, "past") || has(text, "pass")) && !canteenEnter(text);
+  var play = has(text, "playground");
+  var library = has(text, "library") && !hallFoil(text);
+  return gate && office && path && canteen && play && library;
+}
+
+function compassAction(text) {
+  var north = has(text, "north");
+  var south = has(text, "south");
+  var east = has(text, "east");
+  var west = has(text, "west");
+  var count = (north ? 1 : 0) + (south ? 1 : 0) + (east ? 1 : 0) + (west ? 1 : 0);
+  if (count !== 1) return "";
+  if (hasLandmark(text) && !has(text, "straight")) return "";
+  if (north) return "MOVE_NORTH";
+  if (south) return "MOVE_SOUTH";
+  if (east) return "MOVE_EAST";
+  return "MOVE_WEST";
+}
+
+function straightOn(text) {
+  return has(text, "straight") || has(text, "north");
+}
+
+/**
+ * Mission 2 mock. One hardware_action per turn. Win only on ARRIVE_LIBRARY.
+ */
+export function mockMapCoach({ scenario, currentState, transcript }) {
+  var lines = scenario.lines;
+  var text = normaliseUtterance(transcript);
+  var flags = mapFlags(currentState || scenario.initialState);
+
+  if (!text) return cloneLine(lines.empty);
+  if (flags.library) return cloneLine(lines.alreadyWon);
+  if (isVagueDirection(text)) {
+    return cloneLine(has(text, "turn") ? lines.vagueTurn : lines.vagueGo);
+  }
+  if (fullRoute(text)) return cloneLine(lines.win);
+  if (canteenEnter(text)) return cloneLine(lines.canteenFoil);
+  if (hallFoil(text)) return cloneLine(lines.hallFoil);
+
+  if (!flags.gate) {
+    if (throughGate(text)) return cloneLine(lines.beat1);
+    if (atGateOnly(text)) return cloneLine(lines.needThrough);
+    if (straightOn(text) && !has(text, "library")) return cloneLine(lines.beat1North);
+    var opening = compassAction(text);
+    if (opening === "MOVE_NORTH") return cloneLine(lines.beat1North);
+    if (opening) return cloneLine(lines.compass, opening);
+    if (saysLeft(text) && !has(text, "office")) return cloneLine(lines.turnLeftOnly);
+    if (wantsLibrary(text) || playgroundMove(text) || pastCanteen(text) || alongPath(text) || pastOffice(text)) {
+      return cloneLine(lines.earlyStep);
+    }
+    return cloneLine(lines.fallback);
+  }
+
+  if (!flags.office) {
+    if (pastOffice(text) && saysLeft(text)) return cloneLine(lines.officeTurn);
+    if (pastOffice(text) && saysRightOnly(text)) return cloneLine(lines.turnRight);
+    if (pastOffice(text)) return cloneLine(lines.officePast);
+    if (saysLeft(text)) return cloneLine(lines.turnLeftOnly);
+    if (saysRightOnly(text)) return cloneLine(lines.turnRight);
+    if (alongPath(text) || pastCanteen(text) || playgroundMove(text) || wantsLibrary(text)) {
+      return cloneLine(lines.earlyStep);
+    }
+    if (throughGate(text)) return cloneLine(lines.beat1);
+    var officeCompass = compassAction(text);
+    if (officeCompass) return cloneLine(lines.compass, officeCompass);
+    return cloneLine(lines.fallback);
+  }
+
+  if (!flags.walkway) {
+    if (alongPath(text)) return cloneLine(lines.along);
+    if (pastCanteen(text) || playgroundMove(text) || wantsLibrary(text)) return cloneLine(lines.earlyStep);
+    if (saysLeft(text)) return cloneLine(lines.turnLeftOnly);
+    var pathCompass = compassAction(text);
+    if (pathCompass) return cloneLine(lines.compass, pathCompass);
+    return cloneLine(lines.fallback);
+  }
+
+  if (!flags.canteen) {
+    if (pastCanteen(text)) return cloneLine(lines.canteenPast);
+    if (besideCanteen(text)) return cloneLine(lines.besideCanteen);
+    if ((has(text, "dont") || has(text, "do not")) && has(text, "canteen")) return cloneLine(lines.besideCanteen);
+    if (playgroundMove(text) || wantsLibrary(text)) return cloneLine(lines.earlyStep);
+    if (alongPath(text)) return cloneLine(lines.along);
+    var canteenCompass = compassAction(text);
+    if (canteenCompass) return cloneLine(lines.compass, canteenCompass);
+    return cloneLine(lines.fallback);
+  }
+
+  if (!flags.play) {
+    if (playgroundMove(text)) return cloneLine(lines.playground);
+    if (wantsLibrary(text)) return cloneLine(lines.earlyLibrary);
+    var yardCompass = compassAction(text);
+    if (yardCompass) return cloneLine(lines.compass, yardCompass);
+    return cloneLine(lines.fallback);
+  }
+
+  if (wantsLibrary(text)) return cloneLine(lines.win);
+  if (has(text, "library")) return cloneLine(lines.libraryNeedVerb);
+  if (playgroundMove(text)) return cloneLine(lines.playground);
+  var endCompass = compassAction(text);
+  if (endCompass) return cloneLine(lines.compass, endCompass);
+  return cloneLine(lines.fallback);
+}
+
 /**
  * Deterministic coach. Same JSON shape the Worker will return later:
  * { spoken_reply, mood, hardware_action, teacher_tip }
  */
 export function mockCoach({ scenario, currentState, transcript }) {
+  if (scenario && scenario.sceneId === "school-map") {
+    return mockMapCoach({ scenario: scenario, currentState: currentState, transcript: transcript });
+  }
+  return mockBagCoach({ scenario: scenario, currentState: currentState, transcript: transcript });
+}
+
+function mockBagCoach({ scenario, currentState, transcript }) {
   var lines = scenario.lines;
   var text = normaliseUtterance(transcript);
   var state = currentState || scenario.initialState;

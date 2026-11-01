@@ -18,8 +18,98 @@ export function freshState(scenario) {
   return next;
 }
 
+function rotateFacing(facing, action) {
+  var order = ["NORTH", "EAST", "SOUTH", "WEST"];
+  var index = order.indexOf(facing || "NORTH");
+  if (index < 0) index = 0;
+  var delta = action === "TURN_RIGHT" ? 1 : -1;
+  return order[(index + delta + 4) % 4];
+}
+
+function parkNode(next, node) {
+  next.NODE = node;
+  if (node !== "CANTEEN" && node !== "HALL") next.LAST_NODE = node;
+}
+
+function applyMapAction(next, action) {
+  if (action === "GO_THROUGH_GATE") {
+    next.GATE = "THROUGH";
+    next.FACING = "NORTH";
+    parkNode(next, "GATE_IN");
+  }
+  if (action === "ARRIVE_GATE") {
+    next.FACING = "NORTH";
+    parkNode(next, "GATE");
+  }
+  if (action === "MOVE_NORTH") {
+    next.FACING = "NORTH";
+    if (next.GATE !== "THROUGH") {
+      next.GATE = "THROUGH";
+      parkNode(next, "GATE_IN");
+    }
+  }
+  if (action === "MOVE_SOUTH") next.FACING = "SOUTH";
+  if (action === "MOVE_EAST") next.FACING = "EAST";
+  if (action === "MOVE_WEST") next.FACING = "WEST";
+  if (action === "TURN_LEFT" || action === "TURN_RIGHT") {
+    if (action === "TURN_LEFT" && next.GATE === "THROUGH" && next.OFFICE !== "PAST") {
+      next.OFFICE = "PAST";
+      next.FACING = "WEST";
+      parkNode(next, "CORNER");
+    } else {
+      next.FACING = rotateFacing(next.FACING, action);
+    }
+  }
+  if (action === "ARRIVE_OFFICE") {
+    next.FACING = "NORTH";
+    if (next.OFFICE !== "PAST") next.OFFICE = "AT";
+    parkNode(next, "OFFICE");
+  }
+  if (action === "GO_ALONG_PATH") {
+    next.WALKWAY = "ALONG";
+    next.FACING = "NORTH";
+    parkNode(next, "WALKWAY");
+  }
+  if (action === "WALK_PAST_CANTEEN") {
+    next.CANTEEN = "PAST";
+    next.FACING = "NORTH";
+    parkNode(next, "CANTEEN_PATH");
+  }
+  if (action === "CROSS_PLAYGROUND" || action === "ARRIVE_PLAYGROUND") {
+    next.PLAYGROUND = "CROSSED";
+    next.FACING = "NORTH";
+    parkNode(next, "PLAYGROUND");
+  }
+  if (action === "ARRIVE_LIBRARY") {
+    next.LIBRARY = "ARRIVED";
+    next.FACING = "NORTH";
+    parkNode(next, "LIBRARY");
+  }
+  if (action === "ARRIVE_CANTEEN") {
+    if (next.CANTEEN !== "PAST") next.CANTEEN = "FOIL";
+    next.FACING = "WEST";
+    next.NODE = "CANTEEN";
+  }
+  if (action === "ARRIVE_HALL") {
+    next.HALL = "FOIL";
+    next.FACING = "EAST";
+    next.NODE = "HALL";
+  }
+  if (action === "STEP_BACK") {
+    if (next.NODE === "CANTEEN" || next.NODE === "HALL") {
+      next.NODE = next.LAST_NODE || "GATE";
+    }
+    if (next.CANTEEN === "FOIL") next.CANTEEN = "AHEAD";
+    if (next.HALL === "FOIL") next.HALL = "AHEAD";
+  }
+  return next;
+}
+
 export function applyHardwareAction(state, action) {
   var next = freshFrom(state);
+  if (next && Object.prototype.hasOwnProperty.call(next, "GATE")) {
+    return applyMapAction(next, action);
+  }
   if (action === "SEAT_NEAR_DOOR") next.SEAT_NEAR_DOOR = "LOOKING";
   if (action === "SEAT_LEFT") next.SEAT_LEFT = "LOOKING";
   if (action === "SEAT_MIDDLE") next.SEAT_MIDDLE = "LOOKING";
@@ -57,6 +147,15 @@ export function clarityLabel(strikes, maxStrikes) {
   return remaining + " clear chances";
 }
 
+export function packForId(id) {
+  if (!id || !SCENARIOS[id]) return null;
+  var packs = listScenarios();
+  for (var i = 0; i < packs.length; i++) {
+    if (packs[i] === SCENARIOS[id] || packs[i].id === id) return packs[i];
+  }
+  return null;
+}
+
 export function listScenarios() {
   var seen = {};
   var out = [];
@@ -73,9 +172,23 @@ function $(id) {
   return document.getElementById(id);
 }
 
+function missionFromLocation() {
+  if (typeof window === "undefined" || !window.location) return "";
+  var id = "";
+  try {
+    id = new URLSearchParams(window.location.search).get("mission") || "";
+  } catch (err) {
+    id = "";
+  }
+  if (!id && window.location.hash) {
+    id = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+  }
+  return id;
+}
+
 function boot() {
   var packs = listScenarios();
-  var scenario = packs[0];
+  var scenario = packForId(missionFromLocation()) || packs[0];
   var state = freshState(scenario);
   var strikes = 0;
   var doorsLeft = scenario.doorsSeconds;
@@ -94,9 +207,9 @@ function boot() {
     select.appendChild(opt);
   });
   if (packs.length < 2) $("missionField").hidden = true;
+  select.value = scenario.id;
 
-  $("missionTitle").textContent = scenario.title;
-  $("frameLine").textContent = scenario.frame;
+  applyChrome(scenario);
   renderManual(scenario);
   renderDialogue(scenario.intro);
   scene.setMood(scenario.intro.mood);
@@ -175,6 +288,32 @@ function boot() {
     btn.textContent = on ? "Listening…" : "Speak";
   }
 
+  function applyChrome(pack) {
+    $("missionTitle").textContent = pack.title;
+    $("frameLine").textContent = pack.frame;
+    var noteTitle = $("noteTitle");
+    var noteLead = $("noteLead");
+    if (noteTitle) noteTitle.textContent = pack.noteTitle || "Seat note";
+    if (noteLead) noteLead.textContent = pack.noteLead || "Leo remembers this. Say it in a clear sentence.";
+    var stage = $("stage");
+    if (stage) stage.setAttribute("aria-label", pack.stageLabel || "Carriage");
+    renderSteps(pack);
+  }
+
+  function renderSteps(pack) {
+    var list = $("stepPips");
+    if (!list) return;
+    var steps = pack.steps || [];
+    if (!steps.length) return;
+    list.replaceChildren();
+    steps.forEach(function (step) {
+      var item = document.createElement("li");
+      item.dataset.step = step.id;
+      item.textContent = step.label;
+      list.appendChild(item);
+    });
+  }
+
   function renderManual(pack) {
     var list = $("manualList");
     list.replaceChildren();
@@ -194,7 +333,7 @@ function boot() {
   function updateHud() {
     var m = String(Math.floor(doorsLeft / 60));
     var s = String(doorsLeft % 60).padStart(2, "0");
-    $("doorsHud").textContent = "Doors " + m + ":" + s;
+    $("doorsHud").textContent = (scenario.timerLabel || "Doors") + " " + m + ":" + s;
     var clarity = $("clarityHud");
     var remaining = scenario.maxStrikes - strikes;
     if (remaining < 0) remaining = 0;
@@ -202,9 +341,9 @@ function boot() {
     clarity.classList.toggle("is-low", remaining > 0 && remaining < scenario.maxStrikes);
     clarity.classList.toggle("is-out", remaining === 0);
     clarity.setAttribute("aria-label", remaining + " of " + scenario.maxStrikes + " clear chances remaining");
-    setStep("zone", state.SEAT_NEAR_DOOR === "LOOKING");
-    setStep("bag", state.BAG_NAVY_SMALL === "HELD");
-    setStep("tag", state.NAME_TAG === "SHOWN");
+    (scenario.steps || []).forEach(function (step) {
+      setStep(step.id, state[step.key] === step.value);
+    });
   }
 
   function setStep(name, done) {
@@ -225,9 +364,10 @@ function boot() {
       if (doorsLeft <= 0 && !ended) {
         stopDoors();
         if (!isWin(scenario, state)) {
-          $("aiDialogue").textContent = "The doors closed. We missed this stop — try again next carriage.";
-          $("speakerTag").textContent = scenario.aiName + " · panicked";
-          scene.setMood("PANICKED");
+          var timeoutMood = scenario.timeoutMood || "PANICKED";
+          $("aiDialogue").textContent = scenario.timeoutLine || "The doors closed. We missed this stop — try again next carriage.";
+          $("speakerTag").textContent = scenario.aiName + " · " + (MOOD_LABEL[timeoutMood] || "panicked");
+          scene.setMood(timeoutMood);
           finish("miss");
         }
       }
@@ -257,6 +397,11 @@ function boot() {
       banner.textContent = scenario.endCopy.missTitle;
       banner.className = "banner is-miss";
       scene.setOutcome("miss");
+      if (scenario.resetOnMiss) {
+        state = freshState(scenario);
+        scene.apply("NONE", state);
+        updateHud();
+      }
     }
     if (kind === "miss") {
       $("micBtn").disabled = true;
@@ -284,11 +429,11 @@ function boot() {
     }
     if (ticket !== turnTicket) return;
     if (!result || scenario.allowedActions.indexOf(result.hardware_action) === -1) {
-      $("teacherTip").textContent = "The coach reply was not a known action. Try the seat note again.";
+      $("teacherTip").textContent = scenario.badActionTip || "The coach reply was not a known action. Try the seat note again.";
       return;
     }
     state = applyHardwareAction(state, result.hardware_action);
-    if (scenario.clarityStrikeActions.indexOf(result.hardware_action) !== -1) {
+    if (scenario.clarityStrikeActions.indexOf(result.hardware_action) !== -1 && !isWin(scenario, state)) {
       strikes += 1;
     }
     renderDialogue(result);
@@ -296,7 +441,7 @@ function boot() {
     scene.apply(result.hardware_action, state);
     var tip = result.teacher_tip;
     if (strikes >= scenario.maxStrikes && !isWin(scenario, state)) {
-      tip = tip + " That's three. Missed the stop — try again next carriage.";
+      tip = tip + (scenario.strikeOutSuffix || " That's three. Missed the stop — try again next carriage.");
     }
     $("teacherTip").textContent = tip;
     updateHud();
@@ -319,8 +464,7 @@ function boot() {
     doorsLeft = scenario.doorsSeconds;
     ended = "";
     scene = mountScene($("scene"), scenario);
-    $("missionTitle").textContent = scenario.title;
-    $("frameLine").textContent = scenario.frame;
+    applyChrome(scenario);
     renderManual(scenario);
     renderDialogue(scenario.intro);
     $("teacherTip").textContent = scenario.intro.teacher_tip;
