@@ -195,6 +195,18 @@ h1 {
 
 .scene { margin-top: 4px; }
 
+.scene-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  background: #102a38;
+}
+
 .carriage {
   position: relative;
   border-radius: 12px;
@@ -1122,4 +1134,94 @@ footer {
 @media (max-width: 380px) {
   .prop-place { display: none; }
   .seat-row { gap: 4px; }
+}
+
+.has-plate .carriage-wall,
+.has-plate .carriage-floor {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+.has-plate .window,
+.has-plate .doors,
+.has-plate .door-leaf {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.has-plate .carriage-floor::after,
+.has-plate .campus-grass,
+.has-plate .campus-path,
+.has-plate .leo-head,
+.has-plate .leo-body,
+.has-plate .leo-legs,
+.has-plate .seat-pad,
+.has-plate .prop-strap,
+.has-plate .prop-mark {
+  opacity: 0;
+}
+
+.has-plate .prop-body {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.has-plate .name-tag { opacity: 0; }
+.has-plate.is-tag .name-tag { opacity: 1; }
+
+.has-plate .prop-label,
+.has-plate .prop-place,
+.has-plate .zone-name,
+.has-plate .door-caption {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 6px;
+}
+
+.carriage > .ms-chan {
+  position: relative;
+  z-index: 3;
+}
+
+.campus .leo,
+.scene-cue {
+  z-index: 4;
+}
+
+.pin { z-index: 5; }
+
+.campus[data-plate="m2-08"] .leo,
+.campus[data-plate="m2-09"] .leo,
+.campus[data-plate="m2-10"] .leo {
+  visibility: hidden;
+}
+
+@media (max-width: 390px) {
+  .scene-plate {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .carriage.has-plate,
+  .campus.has-plate {
+    background: #102a38;
+  }
+
+  .carriage.has-plate .carriage-floor {
+    min-height: 168px;
+    padding-bottom: 64px;
+  }
+
+  .campus.has-plate {
+    min-height: 420px;
+  }
+
+  .has-plate .prop-label,
+  .has-plate .zone-name,
+  .pin-label,
+  .pin-place {
+    font-size: .62rem;
+  }
 }
