@@ -4,8 +4,11 @@
   <script>
     (function () {
       try {
-        if (localStorage.getItem("skhhcss_eng_hcs_live_class_skin_v1") === "minimalist") {
+        var savedSkin = localStorage.getItem("skhhcss_eng_hcs_live_class_skin_v1");
+        if (savedSkin === "minimalist") {
           document.documentElement.setAttribute("data-skin", "minimalist");
+        } else if (savedSkin === "spark") {
+          document.documentElement.setAttribute("data-skin", "spark");
         }
       } catch (err) {}
     })();
@@ -2436,7 +2439,8 @@
     }
     /* Skin. Default is the live chrome above: no attribute, no overrides.
        Minimalist only recolours, drops heavy shadow, and swaps the mast mark.
-       Spacing, type size, and the framework stay put. */
+       Spark adds a +pts burst, top-3 rims, and On fire, and only under
+       html[data-skin="spark"]. Spacing, type size, and the framework stay put. */
     .studio-mark img.studio-mark-day { display: none; }
     html[data-skin="minimalist"] .studio-mark img.studio-mark-default { display: none; }
     html[data-skin="minimalist"] .studio-mark img.studio-mark-day { display: block; }
@@ -2452,8 +2456,8 @@
       outline: 2px solid #123a4d;
       outline-offset: 2px;
     }
-    html:not([data-skin="minimalist"]) #btnSkinDefault,
-    html:not([data-skin="minimalist"]) #btnSkinDefault:hover {
+    html:not([data-skin]) #btnSkinDefault,
+    html:not([data-skin]) #btnSkinDefault:hover {
       background: #4f46e5;
       color: #fff;
     }
@@ -3021,6 +3025,201 @@
       border-color: var(--skin-line);
       color: var(--skin-muted);
     }
+    /* Spark. Same desk size as Default. Bright mast stays (Day is Minimalist-only).
+       Nodes below are hidden until html[data-skin="spark"], so Default and
+       Minimalist do not paint the burst, the tier rims, or On fire. */
+    .spark-tier-badge,
+    .spark-fire,
+    .spark-fire-mini,
+    .score-burst { display: none; }
+    html[data-skin="spark"] .studio-mark img.studio-mark-default {
+      display: block;
+    }
+    html[data-skin="spark"] .studio-mark img.studio-mark-day {
+      display: none;
+    }
+    html[data-skin="spark"] #btnSkinSpark,
+    html[data-skin="spark"] #btnSkinSpark:hover {
+      background: linear-gradient(90deg, #22d3ee, #facc15, #fb7185);
+      color: #0f172a;
+      border-color: transparent;
+    }
+    html[data-skin="spark"] .desk-team-row {
+      position: relative;
+    }
+    html[data-skin="spark"] .desk-card.spark-tier-1,
+    html[data-skin="spark"] .desk-card.spark-tier-2,
+    html[data-skin="spark"] .desk-card.spark-tier-3 {
+      z-index: 12;
+    }
+    html[data-skin="spark"] .desk-card.spark-tier-1 {
+      border-color: #facc15;
+      box-shadow:
+        0 0 0 2px rgba(250, 204, 21, 0.35),
+        0 10px 22px -4px rgba(234, 179, 8, 0.35),
+        0 4px 8px -2px rgba(15, 23, 42, 0.06);
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 55%);
+    }
+    html[data-skin="spark"] .desk-card.spark-tier-2 {
+      border-color: #cbd5e1;
+      box-shadow:
+        0 0 0 2px rgba(148, 163, 184, 0.35),
+        0 8px 18px -4px rgba(100, 116, 139, 0.28);
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 55%);
+    }
+    html[data-skin="spark"] .desk-card.spark-tier-3 {
+      border-color: #fdba74;
+      box-shadow:
+        0 0 0 2px rgba(217, 119, 6, 0.28),
+        0 8px 16px -4px rgba(217, 119, 6, 0.22);
+      background: linear-gradient(180deg, #fff7ed 0%, #ffffff 55%);
+    }
+    html[data-skin="spark"] .spark-tier-badge {
+      display: inline-block;
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      z-index: 7;
+      pointer-events: none;
+      font-family: var(--font-display);
+      font-size: .65rem;
+      font-weight: 700;
+      line-height: 1.2;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: #0f172a;
+      letter-spacing: .02em;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+    }
+    html[data-skin="spark"] .spark-tier-1 .spark-tier-badge {
+      background: linear-gradient(135deg, #fde047, #f59e0b);
+    }
+    html[data-skin="spark"] .spark-tier-2 .spark-tier-badge {
+      background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+      color: #1e293b;
+    }
+    html[data-skin="spark"] .spark-tier-3 .spark-tier-badge {
+      background: linear-gradient(135deg, #fdba74, #d97706);
+      color: #fff;
+    }
+    /* Pinned in the name-card band (absolute) so the 148px desk does not grow. */
+    html[data-skin="spark"] .spark-fire.is-on {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 4;
+      margin: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      font-family: var(--font-display);
+      font-size: .68rem;
+      font-weight: 700;
+      line-height: 1;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #fff;
+      background: linear-gradient(90deg, #f97316, #fb7185);
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25), 0 0 14px rgba(251, 113, 133, 0.45);
+      animation: emberPulse 1.4s ease-in-out infinite;
+    }
+    html[data-skin="spark"] .spark-fire.is-on::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #fde68a;
+      box-shadow: 0 0 8px #fbbf24;
+    }
+    @keyframes emberPulse {
+      0%, 100% { filter: brightness(1); transform: scale(1); }
+      50% { filter: brightness(1.08); transform: scale(1.03); }
+    }
+    html[data-skin="spark"] .score-burst {
+      display: block;
+      position: absolute;
+      left: 50%;
+      /* Mock stage puts the burst 10px above the desk, then it rises. */
+      top: -10px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+      z-index: 80;
+      color: #06b6d4;
+      text-shadow:
+        0 0 10px rgba(34, 211, 238, 0.95),
+        0 0 22px rgba(250, 204, 21, 0.55),
+        0 2px 0 rgba(255, 255, 255, 0.9);
+      animation: sparkBurst 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    html[data-skin="spark"] .score-burst::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 42px;
+      height: 42px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.45) 0%, rgba(250, 204, 21, 0.2) 45%, transparent 70%);
+      animation: sparkRing 1.35s ease-out forwards;
+      z-index: -1;
+    }
+    @keyframes sparkBurst {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.7); }
+      18%  { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.22); }
+      70%  { opacity: 1; transform: translateX(-50%) translateY(-28px) scale(1.05); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-42px) scale(0.92); }
+    }
+    @keyframes sparkRing {
+      0%   { opacity: .9; transform: translate(-50%, -50%) scale(0.4); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+    }
+    html[data-skin="spark"] #leaderboardBody > .spark-tier-1 {
+      background: linear-gradient(90deg, #fffbeb, #fff);
+      box-shadow: inset 3px 0 0 #eab308;
+    }
+    html[data-skin="spark"] #leaderboardBody > .spark-tier-1 .lb-rank {
+      background: #fde047;
+      color: #713f12;
+      border-radius: 8px;
+    }
+    html[data-skin="spark"] #leaderboardBody > .spark-tier-2 {
+      background: linear-gradient(90deg, #f8fafc, #fff);
+      box-shadow: inset 3px 0 0 #94a3b8;
+    }
+    html[data-skin="spark"] #leaderboardBody > .spark-tier-2 .lb-rank {
+      background: #e2e8f0;
+      color: #334155;
+      border-radius: 8px;
+    }
+    html[data-skin="spark"] #leaderboardBody > .spark-tier-3 {
+      background: linear-gradient(90deg, #fff7ed, #fff);
+      box-shadow: inset 3px 0 0 #d97706;
+    }
+    html[data-skin="spark"] #leaderboardBody > .spark-tier-3 .lb-rank {
+      background: #fdba74;
+      color: #7c2d12;
+      border-radius: 8px;
+    }
+    html[data-skin="spark"] .spark-fire-mini {
+      display: inline-flex;
+      align-items: center;
+      flex: none;
+      font-family: var(--font-display);
+      font-size: .62rem;
+      font-weight: 700;
+      line-height: 1.2;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f97316, #fb7185);
+      color: #fff;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-100 text-slate-800">
@@ -3033,7 +3232,7 @@
         <div class="studio-title">
           <h1 class="studio-mark">
             <img class="studio-mark-default" src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
-            <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101a" alt="HCS Live Class" width="420" height="120">
+            <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101b" alt="HCS Live Class" width="380" height="86">
           </h1>
         </div>
       </div>
@@ -3281,6 +3480,7 @@
         <span class="studio-band-label">Skin</span>
         <button type="button" id="btnSkinDefault" class="skin-choice" aria-pressed="true">Default</button>
         <button type="button" id="btnSkinMinimalist" class="skin-choice" aria-pressed="false">Minimalist</button>
+        <button type="button" id="btnSkinSpark" class="skin-choice" aria-pressed="false">Spark</button>
       </div>
     </div>
 
@@ -3769,6 +3969,7 @@
   <!-- ===================================================================== -->
   <script src="drive-config.js"></script>
   <script src="studio-drive.js"></script>
+  <script src="spark-fire.js"></script>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script>
     (function () {
@@ -5034,6 +5235,8 @@
         if (!st) return;
 
         st.score = (Number(st.score) || 0) + delta;
+        var sparkAt = delta > 0 ? Date.now() : 0;
+        if (sparkAt && window.SparkFire) window.SparkFire.note(st, delta, sparkAt);
 
         // Record history for Undo & Activity Feed
         state.historyStack.unshift({
@@ -5044,7 +5247,8 @@
           label: (classNoText(st.classNo) ? (classNoText(st.classNo) + ' ' + st.name) : st.name),
           delta: delta,
           note: sourceLabel || 'Individual score',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          sparkAt: sparkAt
         });
         if (state.historyStack.length > 40) state.historyStack.pop();
         clearRedoStack();
@@ -5054,6 +5258,7 @@
         updateSingleDeskScoreDOM(st.id, st.score, delta);
         renderLeaderboardAndStats();
         updatePickerScoreReadout();
+        refreshSparkChrome();
       }
 
       function adjustGroupScore(groupId, delta) {
@@ -5065,11 +5270,13 @@
         grp.score = (Number(grp.score) || 0) + delta;
 
         // Crucial requirement: Group points ALSO add to each member's individual score!
+        var sparkAt = delta > 0 ? Date.now() : 0;
         const memberIds = [];
         cls.students.forEach(function (st) {
           if (st.groupId === grp.id) {
             st.score = (Number(st.score) || 0) + delta;
             memberIds.push(st.id);
+            if (sparkAt && window.SparkFire) window.SparkFire.note(st, delta, sparkAt);
           }
         });
 
@@ -5082,7 +5289,8 @@
           label: grp.icon + ' ' + grp.name,
           delta: delta,
           note: 'Group point (also ' + (delta > 0 ? '+' : '') + delta + ' to ' + memberIds.length + ' members)',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          sparkAt: sparkAt
         });
         if (state.historyStack.length > 40) state.historyStack.pop();
         clearRedoStack();
@@ -5101,16 +5309,19 @@
         renderGroupScoreDock();
         renderLeaderboardAndStats();
         updatePickerScoreReadout();
+        refreshSparkChrome();
       }
 
       function adjustWholeClassScore(delta) {
         const cls = getCurrentClass();
         if (!cls || cls.students.length === 0) return;
 
+        var sparkAt = delta > 0 ? Date.now() : 0;
         const memberIds = [];
         cls.students.forEach(function (st) {
           st.score = (Number(st.score) || 0) + delta;
           memberIds.push(st.id);
+          if (sparkAt && window.SparkFire) window.SparkFire.note(st, delta, sparkAt);
         });
 
         state.historyStack.unshift({
@@ -5121,7 +5332,8 @@
           label: 'Whole Class (' + cls.name + ')',
           delta: delta,
           note: 'Class-wide bonus',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          sparkAt: sparkAt
         });
         if (state.historyStack.length > 40) state.historyStack.pop();
         clearRedoStack();
@@ -5133,6 +5345,7 @@
           updateSingleDeskScoreDOM(st.id, st.score, delta, false);
         });
         renderLeaderboardAndStats();
+        refreshSparkChrome();
         showToast('Awarded ' + (delta > 0 ? '+1' : '-1') + ' to all ' + cls.students.length + ' students!', '🎉');
       }
 
@@ -5305,7 +5518,8 @@
             groupId: st.groupId || '',
             score: Number(st.score) || 0,
             x: st.x,
-            y: st.y
+            y: st.y,
+            sparkPts: Array.isArray(st.sparkPts) ? st.sparkPts : []
           };
         });
         nextStudents.forEach(function (st) {
@@ -5320,7 +5534,10 @@
           if (Object.prototype.hasOwnProperty.call(a, 'score') && Object.prototype.hasOwnProperty.call(b, 'score')) {
             var scoreA = Number(a.score) || 0;
             var scoreB = Number(b.score) || 0;
-            if (scoreA !== scoreB) st.score = scoreB;
+            if (scoreA !== scoreB) {
+              st.score = scoreB;
+              st.sparkPts = [];
+            }
           }
         });
         (toSnap.students || []).forEach(function (b, idx) {
@@ -5895,6 +6112,14 @@
         floorShiftY = 0;
       }
 
+      function undoSparkAdd(st, delta, at) {
+        if (st && delta > 0 && at && window.SparkFire) window.SparkFire.undo(st, delta, at);
+      }
+
+      function redoSparkAdd(st, delta, at) {
+        if (st && delta > 0 && at && window.SparkFire) window.SparkFire.note(st, delta, at);
+      }
+
       function undoLastScoreAction() {
         const cls = getCurrentClass();
         if (!cls || state.historyStack.length === 0) return;
@@ -5910,6 +6135,7 @@
           const st = cls.students.find(function (s) { return s.id === last.studentId; });
           if (st) {
             st.score -= last.delta;
+            undoSparkAdd(st, last.delta, last.sparkAt);
             updateSingleDeskScoreDOM(st.id, st.score, 0);
           }
         } else if (last.type === 'group') {
@@ -5919,6 +6145,7 @@
             const st = cls.students.find(function (s) { return s.id === mId; });
             if (st) {
               st.score -= last.delta;
+              undoSparkAdd(st, last.delta, last.sparkAt);
               updateSingleDeskScoreDOM(st.id, st.score, 0);
             }
           });
@@ -5928,6 +6155,7 @@
             const st = cls.students.find(function (s) { return s.id === mId; });
             if (st) {
               st.score -= last.delta;
+              undoSparkAdd(st, last.delta, last.sparkAt);
               updateSingleDeskScoreDOM(st.id, st.score, 0);
             }
           });
@@ -5938,6 +6166,7 @@
 
         saveState();
         renderLeaderboardAndStats();
+        refreshSparkChrome();
         showToast('Undid: ' + last.label + ' (' + (last.delta > 0 ? '+' : '') + last.delta + ')', '↩️');
       }
 
@@ -5955,6 +6184,7 @@
           const st = cls.students.find(function (s) { return s.id === next.studentId; });
           if (st) {
             st.score = (Number(st.score) || 0) + next.delta;
+            redoSparkAdd(st, next.delta, next.sparkAt);
             updateSingleDeskScoreDOM(st.id, st.score, next.delta);
           }
         } else if (next.type === 'group') {
@@ -5964,6 +6194,7 @@
             const st = cls.students.find(function (s) { return s.id === mId; });
             if (st) {
               st.score = (Number(st.score) || 0) + next.delta;
+              redoSparkAdd(st, next.delta, next.sparkAt);
               updateSingleDeskScoreDOM(st.id, st.score, next.delta, true);
             }
           });
@@ -5973,6 +6204,7 @@
             const st = cls.students.find(function (s) { return s.id === mId; });
             if (st) {
               st.score = (Number(st.score) || 0) + next.delta;
+              redoSparkAdd(st, next.delta, next.sparkAt);
               updateSingleDeskScoreDOM(st.id, st.score, next.delta, false);
             }
           });
@@ -5983,6 +6215,7 @@
 
         saveState();
         renderLeaderboardAndStats();
+        refreshSparkChrome();
         showToast('Redid: ' + next.label + ' (' + (next.delta > 0 ? '+' : '') + next.delta + ')', '↪️');
       }
 
@@ -6003,17 +6236,92 @@
           void deskEl.offsetWidth; // Force reflow
           deskEl.classList.add(delta > 0 ? 'pulse-plus' : 'pulse-minus');
 
-          // Spawn floating score badge
+          // Spawn floating score badge. Spark replaces a plus with the burst.
+          var sparkBurst = delta > 0 && document.documentElement.getAttribute('data-skin') === 'spark';
           const floatEl = document.createElement('div');
-          floatEl.className = 'score-float ' + (delta > 0 ? 'text-emerald-600' : 'text-rose-600');
-          floatEl.style.left = isTeamSync ? '32px' : '54px';
-          floatEl.style.top = '-8px';
+          if (sparkBurst) {
+            floatEl.className = 'score-burst';
+          } else {
+            floatEl.className = 'score-float ' + (delta > 0 ? 'text-emerald-600' : 'text-rose-600');
+            floatEl.style.left = isTeamSync ? '32px' : '54px';
+            floatEl.style.top = '-8px';
+          }
           floatEl.textContent = (delta > 0 ? '+' + delta : String(delta)) + (isTeamSync ? ' 🛡️' : ' ★');
           deskEl.appendChild(floatEl);
           setTimeout(function () {
             if (floatEl.parentNode) floatEl.parentNode.removeChild(floatEl);
-          }, 950);
+          }, sparkBurst ? 1350 : 950);
         }
+      }
+
+      var sparkFireTimer = 0;
+
+      function syncSparkSeats() {
+        var cls = getCurrentClass();
+        if (!cls || !window.SparkFire) return;
+        var now = Date.now();
+        var tiers = window.SparkFire.individualTiers(cls.students);
+        var desks = document.querySelectorAll('.desk-card[data-student-id]');
+        desks.forEach(function (desk) {
+          var id = desk.getAttribute('data-student-id');
+          var st = cls.students.find(function (s) { return s.id === id; });
+          if (!st) return;
+          var tier = tiers[id] || 0;
+          desk.classList.remove('spark-tier-1', 'spark-tier-2', 'spark-tier-3');
+          if (tier) desk.classList.add('spark-tier-' + tier);
+          var badge = desk.querySelector('.spark-tier-badge');
+          if (tier) {
+            if (!badge) {
+              badge = document.createElement('span');
+              badge.className = 'spark-tier-badge';
+              desk.insertBefore(badge, desk.firstChild);
+            }
+            badge.textContent = formatRankOrdinal(tier);
+          } else if (badge && badge.parentNode) {
+            badge.parentNode.removeChild(badge);
+          }
+          var fire = window.SparkFire.onFire(st, now);
+          var row = desk.querySelector('.desk-team-row');
+          var fireEl = desk.querySelector('.spark-fire');
+          if (fire) {
+            if (!fireEl && row) {
+              fireEl = document.createElement('span');
+              fireEl.className = 'spark-fire is-on';
+              fireEl.title = '3+ pts in the last ~3 min';
+              fireEl.textContent = 'On fire';
+              row.appendChild(fireEl);
+            }
+          } else if (fireEl && fireEl.parentNode) {
+            fireEl.parentNode.removeChild(fireEl);
+          }
+          if (row && row.classList.contains('desk-team-spacer')) {
+            var sparkOn = document.documentElement.getAttribute('data-skin') === 'spark';
+            if (sparkOn && fire) row.removeAttribute('aria-hidden');
+            else row.setAttribute('aria-hidden', 'true');
+          }
+        });
+      }
+
+      function scheduleSparkFireTick() {
+        if (sparkFireTimer) clearTimeout(sparkFireTimer);
+        sparkFireTimer = 0;
+        var cls = getCurrentClass();
+        if (!cls || !window.SparkFire) return;
+        var now = Date.now();
+        var at = window.SparkFire.nextChangeAt(cls.students, now);
+        if (at == null) return;
+        var delay = Math.min(2147483647, Math.max(50, at - now + 40));
+        sparkFireTimer = setTimeout(function () {
+          sparkFireTimer = 0;
+          syncSparkSeats();
+          if (state.leaderboardTab === 'students') renderLeaderboardAndStats();
+          scheduleSparkFireTick();
+        }, delay);
+      }
+
+      function refreshSparkChrome() {
+        syncSparkSeats();
+        scheduleSparkFireTick();
       }
 
       // ===================================================================
@@ -6152,6 +6460,7 @@
         renderClassroomCanvas();
         renderLeaderboardAndStats();
         scheduleFloorFit();
+        refreshSparkChrome();
       }
 
       // True when the live desks are still the arrangement that preset would draw.
@@ -6949,6 +7258,8 @@
         // and moves with pan because it is painted on this stage.
         applyZoomTransform();
 
+        const sparkTiers = window.SparkFire ? window.SparkFire.individualTiers(cls.students) : {};
+        const sparkNow = Date.now();
         nameEditLock = true;
         container.innerHTML = cls.students.map(function (st) {
           const grp = getGroupById(cls, st.groupId);
@@ -6973,10 +7284,16 @@
 
           const isSpotlight = state.lastPickedTarget && state.lastPickedTarget.type === 'student' && state.lastPickedTarget.id === st.id;
           const editing = boardEditsAllowed();
+          const tier = sparkTiers[st.id] || 0;
+          const onFire = !!(window.SparkFire && window.SparkFire.onFire(st, sparkNow));
+          const fireHtml = onFire
+            ? '<span class="spark-fire is-on" title="3+ pts in the last ~3 min">On fire</span>'
+            : '';
 
-          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + '" ' +
+          return '<div class="desk-card ' + borderClass + ' ' + cursorClass + (tier ? (' spark-tier-' + tier) : '') + (smoothTransition ? ' smooth-move' : '') + (isSpotlight ? ' spotlight-active' : '') + '" ' +
             'data-student-id="' + escapeHtml(st.id) + '" ' +
             'style="left:' + Math.round(st.x) + 'px; top:' + Math.round(st.y) + 'px;">' +
+            (tier ? '<span class="spark-tier-badge">' + formatRankOrdinal(tier) + '</span>' : '') +
             '<!-- Top Color Accent Bar -->' +
             '<div class="h-1 w-full rounded-t-[12px] ' + topStripClass + '"></div>' +
             '<div class="px-1.5 pt-0.5 pb-1">' +
@@ -6994,9 +7311,10 @@
                 ? '<!-- Row 3: Group name. Edit On turns this chip into the team menu. -->' +
                   '<div class="desk-team-row flex items-center justify-center mb-0.5 gap-1">' +
                     groupBadgeHtml +
+                    fireHtml +
                   '</div>'
                 : '<!-- Row 3: Individual spacer. Same band, no group text. -->' +
-                  '<div class="desk-team-row desk-team-spacer mb-0.5" aria-hidden="true"></div>') +
+                  '<div class="desk-team-row desk-team-spacer mb-0.5" aria-hidden="true">' + fireHtml + '</div>') +
               '<!-- Row 4: Compact − / + ; Group+1 sits with them so the name can use the full card. -->' +
               '<div class="desk-score-actions' + (state.activityMode === 'group' && grp ? ' is-grouped' : '') + '">' +
                 '<button type="button" data-desk-minus="' + escapeHtml(st.id) + '" class="desk-action-btn px-1 rounded-full bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 border border-rose-200/80 font-display font-bold leading-none transition flex items-center justify-center" aria-label="Minus one">−</button>' +
@@ -7020,10 +7338,14 @@
 
         // 1. Update Top Summary Pulse Stats
         const totalPts = cls.students.reduce(function (acc, s) { return acc + (Number(s.score) || 0); }, 0);
-        const sortedStudents = cls.students.slice().sort(function (a, b) {
-          if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
-          return String(a.classNo).localeCompare(String(b.classNo));
-        });
+        const sortedStudents = window.SparkFire
+          ? window.SparkFire.sortedIndividuals(cls.students)
+          : cls.students.slice().sort(function (a, b) {
+              if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
+              return String(a.classNo).localeCompare(String(b.classNo));
+            });
+        const sparkTiers = window.SparkFire ? window.SparkFire.individualTiers(cls.students) : {};
+        const sparkNow = Date.now();
         const sortedGroups = cls.groups.slice().sort(function (a, b) {
           return (b.score || 0) - (a.score || 0);
         });
@@ -7081,6 +7403,8 @@
             const rank = sortedStudents.findIndex(function (s) { return s.id === st.id; }) + 1;
             const place = formatRankOrdinal(rank);
             const podium = rank <= 3 && st.score > 0;
+            const tier = sparkTiers[st.id] || 0;
+            const onFire = !!(window.SparkFire && window.SparkFire.onFire(st, sparkNow));
             const grp = getGroupById(cls, st.groupId);
             const pal = grp ? (TEAM_PALETTES[grp.color] || TEAM_PALETTES.blue) : null;
             const pct = st.score > 0 ? Math.min(100, Math.round((st.score / maxScore) * 100)) : 0;
@@ -7095,13 +7419,14 @@
                   '</div>' +
                 '</div>';
 
-            return '<div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-indigo-200 transition flex items-center justify-between gap-2">' +
+            return '<div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-white hover:border-indigo-200 transition flex items-center justify-between gap-2' + (tier ? (' spark-tier-' + tier) : '') + '">' +
               '<div class="flex items-center gap-2.5 min-w-0 flex-1">' +
                 '<span class="lb-rank' + (podium ? ' is-podium' : '') + '">' + place + '</span>' +
                 '<div class="min-w-0 flex-1">' +
                   '<div class="flex items-center gap-1.5">' +
                     (formatClassNoMark(st.classNo) ? '<span class="text-[11px] font-mono font-bold text-slate-400">' + escapeHtml(formatClassNoMark(st.classNo)) + '</span>' : '') +
                     '<span class="font-bold text-xs text-slate-800 truncate">' + escapeHtml(st.name) + '</span>' +
+                    (onFire ? '<span class="spark-fire-mini" title="3+ pts in the last ~3 min">On fire</span>' : '') +
                   '</div>' +
                   groupLine +
                 '</div>' +
@@ -9978,7 +10303,11 @@
         document.getElementById('btnConfirmResetAllScores').addEventListener('click', function () {
           const cls = getCurrentClass();
           if (cls) {
-            cls.students.forEach(function (s) { s.score = 0; });
+            cls.students.forEach(function (s) {
+              s.score = 0;
+              if (window.SparkFire) window.SparkFire.clear(s);
+              else s.sparkPts = [];
+            });
             cls.groups.forEach(function (g) { g.score = 0; });
             state.historyStack = state.historyStack.filter(function (h) { return h.classId !== cls.id; });
             state.redoStack = state.redoStack.filter(function (h) { return h.classId !== cls.id; });
@@ -10029,27 +10358,37 @@
     (function () {
       var KEY = "skhhcss_eng_hcs_live_class_skin_v1";
       function skinNow() {
-        return document.documentElement.getAttribute("data-skin") === "minimalist" ? "minimalist" : "default";
+        var skin = document.documentElement.getAttribute("data-skin");
+        if (skin === "minimalist" || skin === "spark") return skin;
+        return "default";
       }
       function syncPressed() {
         var skin = skinNow();
         var defBtn = document.getElementById("btnSkinDefault");
         var minBtn = document.getElementById("btnSkinMinimalist");
+        var sparkBtn = document.getElementById("btnSkinSpark");
         if (defBtn) defBtn.setAttribute("aria-pressed", skin === "default" ? "true" : "false");
         if (minBtn) minBtn.setAttribute("aria-pressed", skin === "minimalist" ? "true" : "false");
+        if (sparkBtn) sparkBtn.setAttribute("aria-pressed", skin === "spark" ? "true" : "false");
       }
       function applySkin(skin) {
         if (skin === "minimalist") document.documentElement.setAttribute("data-skin", "minimalist");
-        else document.documentElement.removeAttribute("data-skin");
+        else if (skin === "spark") document.documentElement.setAttribute("data-skin", "spark");
+        else {
+          document.documentElement.removeAttribute("data-skin");
+          skin = "default";
+        }
         try {
-          localStorage.setItem(KEY, skin === "minimalist" ? "minimalist" : "default");
+          localStorage.setItem(KEY, skin === "minimalist" || skin === "spark" ? skin : "default");
         } catch (err) {}
         syncPressed();
       }
       var defBtn = document.getElementById("btnSkinDefault");
       var minBtn = document.getElementById("btnSkinMinimalist");
+      var sparkBtn = document.getElementById("btnSkinSpark");
       if (defBtn) defBtn.addEventListener("click", function () { applySkin("default"); });
       if (minBtn) minBtn.addEventListener("click", function () { applySkin("minimalist"); });
+      if (sparkBtn) sparkBtn.addEventListener("click", function () { applySkin("spark"); });
       syncPressed();
     })();
   </script>
