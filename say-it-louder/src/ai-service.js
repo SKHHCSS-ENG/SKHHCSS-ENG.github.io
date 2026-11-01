@@ -616,6 +616,8 @@ export function normaliseCoachReply(data, scenario) {
     : data.scene_action;
   var action = exactToken(named, scenario.allowedActions);
   var mood = exactToken(data.mood, scenario.moods);
+  if (action === "HOVER_CONFUSED") mood = "CONFUSED";
+  if (mood && /which (one|bag)/i.test(spoken) && /under the seat|few bags/i.test(spoken)) mood = "CONFUSED";
   if (!spoken || !tip || !mood || !action || rubricVoice(tip)) return null;
   return {
     spoken_reply: spoken,

@@ -75,7 +75,18 @@ test("beat 3 picks the small navy bag only when size, colour, under, and between
 
   const short = coach("Pick the small navy bag under the seat.");
   assert.equal(short.hardware_action, "NONE");
-  assert.match(short.spoken_reply, /Between what and what/i);
+  assert.equal(short.mood, "CONFUSED");
+  assert.match(short.spoken_reply, /few bags under the seat/i);
+  assert.match(short.spoken_reply, /navy/i);
+  assert.match(short.spoken_reply, /black sports bag/i);
+  assert.match(short.spoken_reply, /yellow lunchbox/i);
+
+  const which = coach("under the seat");
+  assert.equal(which.mood, "CONFUSED");
+  assert.match(which.spoken_reply, /few bags under the seat/i);
+  assert.equal(pack.lines.zoneAgain.mood, "CONFUSED");
+  assert.equal(pack.lines.zoneAgain.hardware_action, "HOVER_CONFUSED");
+  assert.match(pack.lines.zoneAgain.spoken_reply, /few bags under the seat/i);
 
   const navyOnly = coach("the navy bag");
   assert.equal(navyOnly.hardware_action, "NONE");
@@ -195,7 +206,7 @@ test("soft-oops stills swap on the wrong-path beats", () => {
     assert.equal(fs.existsSync(new URL("../assets/" + name, import.meta.url)), true, name);
   });
   assert.match(scene, /PUT_BACK_MS/);
-  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101d/);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101l/);
 });
 
 test("hub card does not tag a device", () => {
@@ -274,6 +285,17 @@ test("phone Ask chip stays off Leo, Ms Chan, and the dialogue", () => {
   assert.match(css, /\.is-hold-navy \.prop-navy/);
   assert.match(css, /\.is-hover \.leo/);
   assert.match(css, /\.leo-name/);
+  assert.match(css, /\.has-plate \.prop-body[\s\S]{0,400}display:\s*none/);
+  assert.match(css, /\.has-plate \.campus-path/);
+  assert.match(css, /\.has-plate \.leo-head/);
+  assert.match(css, /data-plate="m1-02"\] \.prop-navy/);
+  assert.match(css, /data-plate="m2-07"\] \.pin-library/);
+  assert.match(css, /\.has-plate \.leo-name/);
+  assert.match(css, /is-wrong-grey \.prop/);
+  assert.match(css, /data-plate="m1-f02"\] \.prop/);
+  assert.match(css, /data-plate="m1-f02"\] \.zone-name/);
+  assert.match(css, /data-plate="m2-f01"\] \.pin/);
+  assert.match(css, /is-wrong-grey \.seat-row/);
   assert.match(css, /\.scene-cue\.is-wait/);
   assert.match(css, /\.scene-cue\.is-hold/);
 });
@@ -302,6 +324,7 @@ test("teacher tips speak to the student", () => {
   assert.equal(pack.lines.redNone.teacher_tip, "Name a colour that is there: black, navy, or grey.");
   assert.equal(pack.lines.zoneAgain.teacher_tip, "Next: small navy, under the seat, between the black sports bag and the yellow lunchbox.");
   assert.equal(pack.lines.seatLeft.teacher_tip, "On the left is the wrong bag. Look under the seats near the door.");
+  assert.equal(pack.lines.farEnd.teacher_tip, "The big grey bag is on the seat. Leo's is under the seat near the door.");
   assert.equal(pack.lines.fallback.teacher_tip, "Try one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox.");
 });
 
@@ -356,6 +379,12 @@ test("live reply keeps the contract and a miss falls back to the mock", async ()
     hardware_action: "HOVER_CONFUSED",
     teacher_tip: "Prompt: navy vs black."
   }, pack), null);
+  assert.equal(normaliseCoachReply({
+    spoken_reply: "Under the seat, that's a start! But in which one? There are a few bags down there.",
+    mood: "HOPEFUL",
+    hardware_action: "HOVER_CONFUSED",
+    teacher_tip: "Say which bag is under the seat."
+  }, pack).mood, "CONFUSED");
   assert.equal(coachWorkerUrl("https://user:secret@evil.example"), "https://deepseek-explain.skhhcss-eng.workers.dev");
   assert.equal(coachWorkerUrl("https://evil.example/hook?key=sk-test"), "https://deepseek-explain.skhhcss-eng.workers.dev");
   const lmsPage = "https://learning.hcs.edu.hk/english/say-it-louder/";
