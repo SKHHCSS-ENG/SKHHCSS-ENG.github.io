@@ -167,6 +167,8 @@ test('Spark On fire is one continuous burn, and the mast mesh loops without a cu
   assert.match(html, /class="spark-flame-wave"/);
   assert.match(html, /M0,36 C14,36 12,14 24,18/);
   assert.match(html, /html\[data-skin="spark"\] \.spark-burn-sheet \{/);
+  assert.match(html, /html\[data-skin="spark"\] \.spark-tier-badge \{[\s\S]*?top: -12px;\s*left: -10px;/);
+  assert.doesNotMatch(html, /html\[data-skin="spark"\] \.spark-tier-badge \{[\s\S]*?right: -10px;/);
   assert.match(html, /html\[data-skin="spark"\] #studioHeader::before \{[\s\S]*?background-size: 200% 100%;[\s\S]*?animation: sparkMeshSlide 3\.6s linear infinite;/);
   assert.match(html, /html\[data-skin="spark"\] #studioHeader::after \{[\s\S]*?background-size: 200% 100%;[\s\S]*?animation: sparkMeshSlide 5\.4s linear infinite reverse;/);
   assert.match(html, /@keyframes sparkMeshSlide \{\s*0% \{ background-position: 0% 0; \}\s*100% \{ background-position: 100% 0; \}\s*\}/);
