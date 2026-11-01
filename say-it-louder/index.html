@@ -6,7 +6,7 @@
 <title>Say It Louder · English · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="Say It Louder — coach Leo with precise English and find his school bag on the MTR. All Levels starter.">
 <link rel="stylesheet" href="../ask.css?v=20261030b">
-<link rel="stylesheet" href="styles.css?v=20261101a">
+<link rel="stylesheet" href="styles.css?v=20261101b">
 </head>
 <body>
   <div class="wrap">
@@ -59,12 +59,12 @@
             <label for="missionSelect">Mission</label>
             <select id="missionSelect"></select>
           </div>
-          <button id="micBtn" type="button" aria-pressed="false">Speak</button>
+          <button id="micBtn" type="button" class="ask-send api-mesh" aria-pressed="false">Speak</button>
           <p id="micNote" class="mic-note" hidden>The microphone needs Chrome or Edge. Type your instruction instead.</p>
           <form id="textForm" class="text-row">
             <label class="visually-hidden" for="textCmd">Type an instruction</label>
             <input id="textCmd" type="text" placeholder="Or type an instruction…" autocomplete="off" enterkeyhint="send">
-            <button id="sendBtn" type="submit">Send</button>
+            <button id="sendBtn" type="submit" class="ask-send api-mesh">Send</button>
           </form>
           <p class="heard"><span class="heard-label">Heard</span> <span id="heardText">…</span></p>
         </section>
@@ -83,7 +83,7 @@
       Materials for school use
     </footer>
   </div>
-  <script type="module" src="./src/main.js?v=20261101a"></script>
+  <script type="module" src="./src/main.js?v=20261101b"></script>
   <script src="../site-find.js?v=20261030a"></script>
   <script src="../ask.js?v=20261101a"></script>
   <script src="../site-version.js?v=sv"></script>

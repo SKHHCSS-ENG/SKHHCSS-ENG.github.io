@@ -83,6 +83,7 @@ function boot() {
   var doorsTimer = null;
   var ended = "";
   var listening = false;
+  var turnTicket = 0;
   var scene = mountScene($("scene"), scenario);
 
   var select = $("missionSelect");
@@ -266,6 +267,7 @@ function boot() {
 
   async function takeTurn(transcript) {
     if (ended === "miss") return;
+    var ticket = ++turnTicket;
     $("heardText").textContent = transcript;
     startDoors();
     var result;
@@ -276,9 +278,11 @@ function boot() {
         transcript: transcript
       });
     } catch (err) {
+      if (ticket !== turnTicket) return;
       $("aiDialogue").textContent = "The coach is not connected. Type your line again in a moment.";
       return;
     }
+    if (ticket !== turnTicket) return;
     if (!result || scenario.allowedActions.indexOf(result.hardware_action) === -1) {
       $("teacherTip").textContent = "The coach reply was not a known action. Try the seat note again.";
       return;
@@ -304,6 +308,7 @@ function boot() {
   }
 
   function resetMission() {
+    turnTicket += 1;
     stopDoors();
     if (recognition && listening) {
       try { recognition.stop(); } catch (err) { /* already stopped */ }

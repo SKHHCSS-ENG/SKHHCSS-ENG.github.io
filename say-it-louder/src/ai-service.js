@@ -1,10 +1,14 @@
 /**
  * Speech helpers and the coach call.
  *
- * USE_MOCK stays true until a Worker proxy exists. Flip it then.
- * Do not put a DeepSeek key in this file or on the student page.
+ * Live pages post to the same DeepSeek Worker as Ask and Explain
+ * (page "Say It Louder"). The key stays on that Worker. USE_MOCK is off.
+ * Node tests have no document, so they stay on the mock. If the Worker
+ * misses, the page falls back to mockCoach and the carriage still moves.
  */
-export const USE_MOCK = true;
+export const USE_MOCK = false;
+
+var LIVE_WORKER = "https://deepseek-explain.skhhcss-eng.workers.dev";
 
 export function normaliseUtterance(raw) {
   return String(raw || "")
@@ -225,13 +229,137 @@ export function mockCoach({ scenario, currentState, transcript }) {
   return cloneLine(lines.fallback);
 }
 
-export async function queryCoach(input) {
-  if (USE_MOCK) return mockCoach(input);
-  return liveCoach(input);
+export function safeWorkerUrl(raw, base) {
+  if (raw == null) return "";
+  var text = String(raw).trim();
+  if (!text) return "";
+  try {
+    var url = base ? new URL(text, base) : new URL(text);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+    if (url.username || url.password) return "";
+    if (url.search || url.hash) return "";
+    return url.origin + url.pathname.replace(/\/+$/, "");
+  } catch (err) {
+    return "";
+  }
 }
 
-async function liveCoach() {
-  throw new Error("Live coach is not connected. Keep USE_MOCK true until the Worker proxy is ready.");
+/**
+ * Absolute Worker host. A relative setting is rejected so a page under
+ * /english/ on the LMS cannot retarget the call at the school origin.
+ * An absolute https URL is used as given, with no /english/ prefix.
+ */
+export function coachWorkerUrl(raw, pageUrl) {
+  var value = raw;
+  if (value == null && typeof window !== "undefined") value = window.__EXPLAIN_WORKER__;
+  var text = value == null ? "" : String(value).trim();
+  if (text && text.indexOf("://") === -1) return LIVE_WORKER;
+  var base = pageUrl;
+  if (base == null && typeof location !== "undefined" && location.href) base = location.href;
+  return safeWorkerUrl(text, base) || LIVE_WORKER;
+}
+
+export function stateLine(state) {
+  var keys = Object.keys(state || {}).sort();
+  var parts = [];
+  for (var i = 0; i < keys.length; i++) {
+    var key = String(keys[i]).toUpperCase().replace(/[^A-Z0-9_]/g, "").slice(0, 32);
+    var value = String(state[keys[i]] == null ? "" : state[keys[i]]).toUpperCase().replace(/[^A-Z_]/g, "").slice(0, 24);
+    if (!key || !value) continue;
+    parts.push(key + "=" + value);
+  }
+  return parts.join("; ").slice(0, 500);
+}
+
+function clipLine(value, max) {
+  var text = String(value == null ? "" : value).replace(/\s+/g, " ").trim();
+  if (!text) return "";
+  if (text.length <= max) return text;
+  return text.slice(0, max).trim();
+}
+
+function rubricVoice(tip) {
+  return /\b(prompt|stretch)\s*:|soft fail|\bwin\s*:|excellent precision/i.test(tip);
+}
+
+function exactToken(value, allowed) {
+  var text = String(value == null ? "" : value).trim();
+  if (!text || !allowed) return "";
+  for (var i = 0; i < allowed.length; i++) {
+    if (allowed[i] === text || allowed[i].toLowerCase() === text.toLowerCase()) return allowed[i];
+  }
+  return "";
+}
+
+/**
+ * Accept the Worker shape, including scene_action as an alias.
+ * The carriage still reads hardware_action.
+ */
+export function normaliseCoachReply(data, scenario) {
+  if (!data || typeof data !== "object" || !scenario) return null;
+  var spoken = clipLine(data.spoken_reply, 280);
+  var tip = clipLine(data.teacher_tip, 240);
+  var named = typeof data.hardware_action === "string" && data.hardware_action.trim()
+    ? data.hardware_action
+    : data.scene_action;
+  var action = exactToken(named, scenario.allowedActions);
+  var mood = exactToken(data.mood, scenario.moods);
+  if (!spoken || !tip || !mood || !action || rubricVoice(tip)) return null;
+  return {
+    spoken_reply: spoken,
+    mood: mood,
+    hardware_action: action,
+    teacher_tip: tip
+  };
+}
+
+export async function queryCoach(input, options) {
+  var opts = options || {};
+  var onPage = opts.live === true || (opts.live !== false && typeof document !== "undefined");
+  if (USE_MOCK || !onPage) return mockCoach(input);
+  try {
+    var live = await liveCoach(input, opts.fetchImpl);
+    if (live) return live;
+  } catch (err) {
+    /* Worker missed. The mock keeps the carriage moving. */
+  }
+  return mockCoach(input);
+}
+
+async function liveCoach(input, fetchImpl) {
+  var scenario = input && input.scenario;
+  if (!scenario) throw new Error("coach_scenario");
+  var transcript = String((input && input.transcript) || "").replace(/\s+/g, " ").trim();
+  if (!transcript) return mockCoach(input);
+  var doFetch = fetchImpl || fetch;
+  var controller = new AbortController();
+  var timer = setTimeout(function () { controller.abort(); }, 20000);
+  try {
+    var res = await doFetch(coachWorkerUrl(), {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        page: "Say It Louder",
+        scenarioId: scenario.id,
+        state: stateLine(input.currentState),
+        transcript: transcript.slice(0, 400)
+      }),
+      signal: controller.signal
+    });
+    var data = null;
+    try {
+      data = await res.json();
+    } catch (err) {
+      data = null;
+    }
+    if (!res || !res.ok || !data) throw new Error("coach_http");
+    var live = normaliseCoachReply(data, scenario);
+    if (!live) throw new Error("coach_shape");
+    return live;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export function speechInputAvailable() {

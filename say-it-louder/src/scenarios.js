@@ -84,43 +84,43 @@ const lostBag = {
       spoken_reply: "Okay… near the door? I'm looking. There are three bags here!",
       mood: "PANICKED",
       hardware_action: "SEAT_NEAR_DOOR",
-      teacher_tip: "Nice start. Next, add a colour or size so Leo knows which bag."
+      teacher_tip: "Nice start. Add a colour or size so Leo knows which bag."
     },
     beat2: {
       spoken_reply: "Which bag? The black one or the navy one? Say it clearer!",
       mood: "CONFUSED",
       hardware_action: "HOVER_CONFUSED",
-      teacher_tip: "Prompt: navy vs black. Ask for colour + size together."
+      teacher_tip: "Try navy or black — say colour and size together."
     },
     beat3: {
       spoken_reply: "Small navy bag… under the seat… between the black bag and the yellow lunchbox. Got it!",
       mood: "HOPEFUL",
       hardware_action: "BAG_NAVY_SMALL",
-      teacher_tip: "Excellent precision: size + colour + between X and Y."
+      teacher_tip: "Great — size, colour, and between. Next check the name tag."
     },
     beat4: {
       spoken_reply: "Name tag says Leo — that's mine! Thank you!",
       mood: "RELIEVED",
       hardware_action: "SHOW_NAME_TAG",
-      teacher_tip: "Stretch: 'Check the name tag on the front of the bag.'"
+      teacher_tip: "Try: Check the name tag on the front of the bag."
     },
     beat5Black: {
       spoken_reply: "Wait — this has someone else's PE kit! I'm putting it back. Which bag is mine?",
       mood: "PANICKED",
       hardware_action: "BAG_BLACK_SPORTS",
-      teacher_tip: "Wrong bag = soft fail. Push small + navy + under the seat."
+      teacher_tip: "That was the black sports bag. Try the small navy one under the seat."
     },
     beat5Grey: {
       spoken_reply: "This big grey one isn't mine — it's full of someone else's books. I'm putting it back.",
       mood: "PANICKED",
       hardware_action: "BAG_GREY_BIG",
-      teacher_tip: "Wrong bag = soft fail. Leo needs the small navy one, under the seat, between the black sports bag and the yellow lunchbox."
+      teacher_tip: "That was the big grey bag. Leo needs the small navy one under the seat, between the black sports bag and the yellow lunchbox."
     },
     beat6: {
       spoken_reply: "Small navy bag secured. I'm getting off — you're a legend!",
       mood: "RELIEVED",
       hardware_action: "BAG_NAVY_SMALL",
-      teacher_tip: "Win: celebrate clear speech, not volume."
+      teacher_tip: "Clear speech found it — not volume. Well done."
     },
     beat6Early: {
       spoken_reply: "Small and navy — good. I still need the place. Under the seat, between which things? Then check the name tag.",
@@ -144,19 +144,19 @@ const lostBag = {
       spoken_reply: "I can check a name tag — but which bag? Tell me the colour, the size, and the place first.",
       mood: "CONFUSED",
       hardware_action: "HOVER_CONFUSED",
-      teacher_tip: "Find the bag before the tag. Small navy, under the seat, between the black sports bag and the yellow lunchbox."
+      teacher_tip: "Find the bag first. Small navy, under the seat, between the black sports bag and the yellow lunchbox."
     },
     needBetween: {
       spoken_reply: "Under the seat… but two things are by that seat. Between what and what?",
       mood: "CONFUSED",
       hardware_action: "NONE",
-      teacher_tip: "Between is the trap. Say: between the black sports bag and the yellow lunchbox."
+      teacher_tip: "Say: between the black sports bag and the yellow lunchbox."
     },
     needUnder: {
       spoken_reply: "Between the black bag and the yellow lunchbox — on the seat or under it?",
       mood: "CONFUSED",
       hardware_action: "NONE",
-      teacher_tip: "Add the preposition under. The small navy bag is under the seat, not on it."
+      teacher_tip: "Add under — the small navy bag is under the seat, not on it."
     },
     underNotOn: {
       spoken_reply: "On the seat? I see the black sports bag and a lunchbox up there. Is mine under the seat?",
@@ -168,25 +168,25 @@ const lostBag = {
       spoken_reply: "Beside the black bag could be the lunchbox. Do you mean between the black bag and the yellow lunchbox?",
       mood: "CONFUSED",
       hardware_action: "HOVER_CONFUSED",
-      teacher_tip: "Between A and B names both sides. Beside only names one neighbour."
+      teacher_tip: "Between names both sides. Beside only names one neighbour."
     },
     navyNeedSize: {
       spoken_reply: "The navy one — is it the small bag under the seat, or are you looking at something bigger?",
       mood: "HOPEFUL",
       hardware_action: "NONE",
-      teacher_tip: "Colour is a start. Add size and place: the small navy bag under the seat."
+      teacher_tip: "Add size and place: the small navy bag under the seat."
     },
     blueNotNavy: {
       spoken_reply: "Blue? I need the exact colour. Do you mean navy?",
       mood: "CONFUSED",
       hardware_action: "HOVER_CONFUSED",
-      teacher_tip: "Navy is a dark blue. Say navy, not just blue. The lunchbox is yellow."
+      teacher_tip: "Say navy, not just blue. The lunchbox is yellow."
     },
     redNone: {
       spoken_reply: "Red? I can't see a red bag. The ones here are black, navy, and grey.",
       mood: "CONFUSED",
       hardware_action: "HOVER_CONFUSED",
-      teacher_tip: "Name a colour that is actually there: black, navy, or grey."
+      teacher_tip: "Name a colour that is there: black, navy, or grey."
     },
     lunchbox: {
       spoken_reply: "This is the yellow lunchbox — there's an apple in it, not my books! I'm putting it back.",
@@ -198,13 +198,13 @@ const lostBag = {
       spoken_reply: "I'm already at the seats near the door. Which bag — colour and size?",
       mood: "HOPEFUL",
       hardware_action: "SEAT_NEAR_DOOR",
-      teacher_tip: "The place is done. Next: small navy, under the seat, between the black sports bag and the yellow lunchbox."
+      teacher_tip: "Next: small navy, under the seat, between the black sports bag and the yellow lunchbox."
     },
     seatLeft: {
       spoken_reply: "On the left there's a black sports bag. Mine should be nearer the door, under the seat.",
       mood: "CONFUSED",
       hardware_action: "SEAT_LEFT",
-      teacher_tip: "On the left is the wrong bag. Send Leo under the seats near the door."
+      teacher_tip: "On the left is the wrong bag. Look under the seats near the door."
     },
     farEnd: {
       spoken_reply: "The far end? That's a big grey bag. My stop is the other way — near the door.",
@@ -222,13 +222,13 @@ const lostBag = {
       spoken_reply: "We've got it — the name tag says Leo. I can get off at the next stop.",
       mood: "RELIEVED",
       hardware_action: "NONE",
-      teacher_tip: "Win: celebrate clear speech, not volume."
+      teacher_tip: "Clear speech found it — not volume. Well done."
     },
     fallback: {
       spoken_reply: "Say it clearer for me? I need a colour, a size, and a place.",
       mood: "CONFUSED",
       hardware_action: "HOVER_CONFUSED",
-      teacher_tip: "Build one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox."
+      teacher_tip: "Try one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox."
     }
   }
 };
