@@ -306,6 +306,7 @@ test("Say It Louder is a page on the same worker and returns the coach contract"
   assert.match(COACH_SYSTEM_PROMPT, /hardware_action/);
   assert.equal(COACH_SYSTEM_PROMPT.includes("Prompt:"), false);
   assert.equal(COACH_SYSTEM_PROMPT.includes("sk-"), false);
+  assert.equal(/\bon a phone\b|\bAndroid\b|\biOS\b|\bdesktop\b/i.test(COACH_SYSTEM_PROMPT), false);
 
   const fenced = coachReplyFromModel("```json\n{\"spoken_reply\":\"Near the door.\",\"mood\":\"PANICKED\",\"scene_action\":\"SEAT_NEAR_DOOR\",\"teacher_tip\":\"Add a colour.\"}\n```");
   assert.deepEqual(fenced, {
@@ -459,6 +460,7 @@ test("Say It Louder coach accepts the school map walk", async () => {
     assert.match(sent.messages[0].content, /ARRIVE_LIBRARY/);
     assert.match(sent.messages[0].content, /School Map Walk/);
     assert.equal(sent.messages[0].content === COACH_SYSTEM_PROMPT, false);
+    assert.equal(/\bon a phone\b|\bAndroid\b|\biOS\b|\bdesktop\b/i.test(sent.messages[0].content), false);
 
     const bagToken = coachReplyFromModel(
       "{\"spoken_reply\":\"No.\",\"mood\":\"CONFUSED\",\"hardware_action\":\"BAG_NAVY_SMALL\",\"teacher_tip\":\"That is the wrong mission.\"}",

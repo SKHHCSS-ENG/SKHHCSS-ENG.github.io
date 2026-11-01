@@ -151,6 +151,18 @@ test("beside is not between, and a landmark phrase is not a wrong-bag grab", () 
   assert.equal(pack.clarityStrikeActions.includes(landmark.hardware_action), false);
 });
 
+test("hub card does not tag a device", () => {
+  const hub = fs.readFileSync(new URL("../../learning-materials/index.html", import.meta.url), "utf8");
+  const start = hub.indexOf('href="../say-it-louder/"');
+  assert.equal(start > 0, true);
+  const card = hub.slice(start, hub.indexOf("</a>", start));
+  assert.match(card, /Say It Louder/);
+  assert.match(card, /badge-activity/);
+  assert.equal(/badge-phone|>Phone<|>Desktop<|>Android<|>iOS</i.test(card), false);
+  const page = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.equal(/badge-phone|>Phone</i.test(page), false);
+});
+
 test("student page has no API key and no Three.js", () => {
   const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
