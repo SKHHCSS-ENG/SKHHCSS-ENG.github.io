@@ -1274,7 +1274,7 @@ footer {
   margin: 0;
   padding: 0;
   width: max-content;
-  max-width: 34%;
+  max-width: 30%;
   text-align: left;
   z-index: 3;
   transform: translateX(-50%);
@@ -1293,11 +1293,11 @@ footer {
 
 .has-plate[data-plate="m1-02"] .prop-place { margin-top: 2px; }
 
-/* M1-02: grey on the bench, navy under the seat between black and yellow. */
-.has-plate[data-plate="m1-02"] .prop-grey { left: 24%; top: 36%; }
-.has-plate[data-plate="m1-02"] .prop-black { left: 20%; top: 78%; }
-.has-plate[data-plate="m1-02"] .prop-navy { left: 48%; top: 72%; }
-.has-plate[data-plate="m1-02"] .prop-lunch { left: 66%; top: 78%; }
+/* M1-02: grey on the seat; navy, black, and yellow tucked under the cushion. */
+.has-plate[data-plate="m1-02"] .prop-grey { left: 24%; top: 38%; }
+.has-plate[data-plate="m1-02"] .prop-black { left: 18%; top: 78%; }
+.has-plate[data-plate="m1-02"] .prop-navy { left: 46%; top: 74%; }
+.has-plate[data-plate="m1-02"] .prop-lunch { left: 72%; top: 78%; }
 
 .campus.has-plate[data-plate="m2-02"] .pin-office,
 .campus.has-plate[data-plate="m2-03"] .pin-walkway,
@@ -1328,11 +1328,11 @@ footer {
 .pin { z-index: 5; }
 
 @media (max-width: 420px) {
-  .has-plate[data-plate="m1-02"] .prop { max-width: 46%; }
-  .has-plate[data-plate="m1-02"] .prop-grey { left: 22%; top: 28%; }
-  .has-plate[data-plate="m1-02"] .prop-black { left: 18%; top: 82%; }
-  .has-plate[data-plate="m1-02"] .prop-navy { left: 48%; top: 74%; }
-  .has-plate[data-plate="m1-02"] .prop-lunch { left: 72%; top: 78%; }
+  .has-plate[data-plate="m1-02"] .prop { max-width: 36%; }
+  .has-plate[data-plate="m1-02"] .prop-grey { left: 24%; top: 36%; }
+  .has-plate[data-plate="m1-02"] .prop-black { left: 16%; top: 80%; }
+  .has-plate[data-plate="m1-02"] .prop-navy { left: 44%; top: 72%; }
+  .has-plate[data-plate="m1-02"] .prop-lunch { left: 74%; top: 80%; }
   .has-plate[data-plate="m1-02"] .prop-label,
   .has-plate[data-plate="m1-02"] .prop-place,
   .campus.has-plate .pin-label,
