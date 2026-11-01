@@ -167,10 +167,39 @@ test('Spark On fire is one continuous burn, and the mast mesh loops without a cu
   assert.match(html, /class="spark-flame-wave"/);
   assert.match(html, /M0,36 C14,36 12,14 24,18/);
   assert.match(html, /html\[data-skin="spark"\] \.spark-burn-sheet \{/);
-  assert.match(html, /html\[data-skin="spark"\] #studioHeader::before \{[\s\S]*?width: 200%;[\s\S]*?animation: sparkMeshSlide 3\.6s linear infinite;/);
-  assert.match(html, /html\[data-skin="spark"\] #studioHeader::after \{[\s\S]*?width: 200%;[\s\S]*?animation: sparkMeshSlide 5\.4s linear infinite reverse;/);
-  assert.match(html, /@keyframes sparkMeshSlide \{\s*0% \{ transform: translateX\(0\); \}\s*100% \{ transform: translateX\(-50%\); \}\s*\}/);
+  assert.match(html, /html\[data-skin="spark"\] #studioHeader::before \{[\s\S]*?background-size: 200% 100%;[\s\S]*?animation: sparkMeshSlide 3\.6s linear infinite;/);
+  assert.match(html, /html\[data-skin="spark"\] #studioHeader::after \{[\s\S]*?background-size: 200% 100%;[\s\S]*?animation: sparkMeshSlide 5\.4s linear infinite reverse;/);
+  assert.match(html, /@keyframes sparkMeshSlide \{\s*0% \{ background-position: 0% 0; \}\s*100% \{ background-position: 100% 0; \}\s*\}/);
   assert.match(html, /querySelector\('\.spark-burn-sheet'\)/);
+  assert.doesNotMatch(html, /rgba\(255, 179, 0, 0\.22\) 50%,\s*rgba\(255, 45, 149, 0\.18\) 50%/);
+  var meshCss = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
+  var meshRules = {};
+  walkCssRules(meshCss, function (selector, body, isKeyframes) {
+    if (isKeyframes) return;
+    if (selector === 'html[data-skin="spark"] #studioHeader::before' || selector === 'html[data-skin="spark"] #studioHeader::after') {
+      meshRules[selector] = body;
+    }
+  });
+  ['html[data-skin="spark"] #studioHeader::before', 'html[data-skin="spark"] #studioHeader::after'].forEach(function (selector) {
+    var stops = (meshRules[selector].match(/rgba?\([^)]+\)\s+[\d.]+%/g) || []).map(function (token) {
+      var parts = token.match(/^(rgba?\([^)]+\))\s+([\d.]+)%$/);
+      return { color: parts[1].replace(/\s+/g, ''), pos: Number(parts[2]) };
+    });
+    assert.ok(stops.length >= 3, selector);
+    function colorsAt(pos) {
+      return stops.filter(function (stop) { return stop.pos === pos; }).map(function (stop) { return stop.color; });
+    }
+    var edge = colorsAt(0);
+    assert.deepEqual(edge, colorsAt(50));
+    assert.deepEqual(edge, colorsAt(100));
+    assert.equal(edge.length, 1);
+    stops.forEach(function (stop) {
+      if (stop.pos > 50) return;
+      var twin = colorsAt(stop.pos + 50);
+      if (stop.pos === 0) assert.deepEqual(twin, edge);
+      else assert.deepEqual(twin, [stop.color]);
+    });
+  });
   var css = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
   walkCssRules(css, function (selector, body, isKeyframes) {
     if (isKeyframes) return;
