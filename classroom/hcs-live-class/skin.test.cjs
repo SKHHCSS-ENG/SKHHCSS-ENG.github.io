@@ -158,3 +158,24 @@ test('Default and Minimalist never inherit Spark fire, burst, or tiers', functio
   assert.match(html, /family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800/);
   assert.equal((html.match(/fonts\.googleapis\.com/g) || []).length, 2);
 });
+
+test('Spark On fire is one continuous burn, and the mast mesh loops without a cut', function () {
+  assert.doesNotMatch(html, /spark-flame f1|class="spark-flame"|sparkBarShine|sparkFlameFlicker|spark-ember/);
+  assert.match(html, /class="spark-burn-sheet"/);
+  assert.match(html, /class="spark-burn-halo"/);
+  assert.match(html, /class="spark-flame-wave w2"/);
+  assert.match(html, /class="spark-flame-wave"/);
+  assert.match(html, /M0,36 C14,36 12,14 24,18/);
+  assert.match(html, /html\[data-skin="spark"\] \.spark-burn-sheet \{/);
+  assert.match(html, /html\[data-skin="spark"\] #studioHeader::before \{[\s\S]*?width: 200%;[\s\S]*?animation: sparkMeshSlide 3\.6s linear infinite;/);
+  assert.match(html, /html\[data-skin="spark"\] #studioHeader::after \{[\s\S]*?width: 200%;[\s\S]*?animation: sparkMeshSlide 5\.4s linear infinite reverse;/);
+  assert.match(html, /@keyframes sparkMeshSlide \{\s*0% \{ transform: translateX\(0\); \}\s*100% \{ transform: translateX\(-50%\); \}\s*\}/);
+  assert.match(html, /querySelector\('\.spark-burn-sheet'\)/);
+  var css = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
+  walkCssRules(css, function (selector, body, isKeyframes) {
+    if (isKeyframes) return;
+    if (!/spark-burn|sparkMeshSlide|sparkBurnFlicker|sparkBurnCore/.test(selector + body)) return;
+    assert.match(selector, /html\[data-skin="spark"\]/);
+    assert.equal(selector.indexOf('html[data-skin="minimalist"]'), -1);
+  });
+});
