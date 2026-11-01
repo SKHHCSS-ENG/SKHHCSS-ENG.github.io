@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { ASK_SYSTEM_PROMPT, ASK_TASK, SYSTEM_PROMPT, buildAskUserMessage, buildUserMessage, handleRequest } from "../src/index.js";
+import { ASK_SYSTEM_PROMPT, ASK_TASK, COACH_SYSTEM_PROMPT, COACH_TASK, LIVE_ORIGINS, SYSTEM_PROMPT, buildAskUserMessage, buildCoachUserMessage, buildUserMessage, coachReplyFromModel, handleRequest } from "../src/index.js";
 
 const TESS_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
 
@@ -69,6 +69,7 @@ test("source has no key and no canned soft-sample replies", () => {
   const src = [
     readFileSync(new URL("../src/index.js", import.meta.url), "utf8"),
     readFileSync(new URL("../src/askPrompt.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../src/coachPrompt.js", import.meta.url), "utf8"),
   ].join("\n");
   assert.equal(src.includes("PLACEHOLDER_SYSTEM_PROMPT"), false);
   assert.equal(src.includes(KEY), false);
@@ -287,6 +288,148 @@ test("Ask is a page mode on the same worker and does not replace Explain", async
     const bare = await handleRequest(post(askBody, "203.0.113.64"), {});
     assert.equal(bare.status, 503);
     assert.equal((await bare.json()).error, "Ask is not available yet.");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Say It Louder is a page on the same worker and returns the coach contract", async () => {
+  const message = buildCoachUserMessage({
+    scenarioId: "level_1_lost_bag",
+    state: "BAG_NAVY_SMALL=UNDER_SEAT; NAME_TAG=HIDDEN",
+    transcript: "Look under the seats near the door.",
+  });
+  assert.match(message, /^Scenario: level_1_lost_bag\nState: BAG_NAVY_SMALL=UNDER_SEAT/);
+  assert.match(message, /Student: Look under the seats near the door\./);
+  assert.match(message, new RegExp(COACH_TASK.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(COACH_SYSTEM_PROMPT, /British English/);
+  assert.match(COACH_SYSTEM_PROMPT, /hardware_action/);
+  assert.equal(COACH_SYSTEM_PROMPT.includes("Prompt:"), false);
+  assert.equal(COACH_SYSTEM_PROMPT.includes("sk-"), false);
+
+  const fenced = coachReplyFromModel("```json\n{\"spoken_reply\":\"Near the door.\",\"mood\":\"PANICKED\",\"scene_action\":\"SEAT_NEAR_DOOR\",\"teacher_tip\":\"Add a colour.\"}\n```");
+  assert.deepEqual(fenced, {
+    spoken_reply: "Near the door.",
+    mood: "PANICKED",
+    hardware_action: "SEAT_NEAR_DOOR",
+    teacher_tip: "Add a colour.",
+  });
+  assert.equal(coachReplyFromModel("{\"spoken_reply\":\"No.\",\"mood\":\"CONFUSED\",\"hardware_action\":\"HOVER_CONFUSED\",\"teacher_tip\":\"Prompt: navy vs black.\"}"), null);
+  assert.equal(coachReplyFromModel("{\"spoken_reply\":\"No.\",\"mood\":\"ANGRY\",\"hardware_action\":\"NONE\",\"teacher_tip\":\"Try again.\"}"), null);
+
+  const originalFetch = globalThis.fetch;
+  let calls = 0;
+  let lastInit = null;
+  globalThis.fetch = async function (url, init) {
+    calls += 1;
+    lastInit = { url: String(url), init: init };
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "{\"spoken_reply\":\"Near the door? I'm looking.\",\"mood\":\"PANICKED\",\"scene_action\":\"SEAT_NEAR_DOOR\",\"teacher_tip\":\"Nice start. Add a colour or size so Leo knows which bag.\"}" } }],
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const coachBody = {
+      page: "Say It Louder",
+      scenarioId: "level_1_lost_bag",
+      state: "BAG_NAVY_SMALL=UNDER_SEAT",
+      transcript: "Look under the seats near the door.",
+    };
+    const missing = await handleRequest(post({ page: "Say It Louder", transcript: "  " }, "203.0.113.70"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(missing.status, 400);
+    assert.equal((await missing.json()).error, "Say a short instruction.");
+    assert.equal(calls, 0);
+
+    const other = await handleRequest(post({
+      page: "Say It Louder",
+      scenarioId: "level_2_new",
+      transcript: "Look near the door.",
+    }, "203.0.113.71"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(other.status, 400);
+    assert.equal((await other.json()).error, "This coach only covers the lost bag.");
+    assert.equal(calls, 0);
+
+    const ok = await handleRequest(post(coachBody, "203.0.113.72"), { DEEPSEEK_API_KEY: KEY });
+    const okJson = await ok.json();
+    assert.equal(ok.status, 200);
+    assert.deepEqual(Object.keys(okJson).sort(), ["hardware_action", "mood", "spoken_reply", "teacher_tip"]);
+    assert.equal(okJson.hardware_action, "SEAT_NEAR_DOOR");
+    assert.equal(okJson.scene_action, undefined);
+    assert.equal(okJson.explanation, undefined);
+    assert.equal(okJson.reply, undefined);
+    assert.equal(calls, 1);
+    const sent = JSON.parse(lastInit.init.body);
+    assert.equal(sent.messages[0].content, COACH_SYSTEM_PROMPT);
+    assert.equal(sent.max_tokens, 420);
+    assert.match(sent.messages[1].content, /^Scenario: level_1_lost_bag\n/);
+    assert.equal(sent.messages[0].content === SYSTEM_PROMPT, false);
+    assert.equal(sent.messages[0].content === ASK_SYSTEM_PROMPT, false);
+    assert.equal(lastInit.init.headers.Authorization, "Bearer " + KEY);
+    assert.equal(JSON.stringify(okJson).includes(KEY), false);
+
+    globalThis.fetch = async function () {
+      return new Response(JSON.stringify({
+        choices: [{ message: { content: "{\"spoken_reply\":\"Nope.\",\"mood\":\"CONFUSED\",\"hardware_action\":\"NOT_A_PROP\",\"teacher_tip\":\"Try again.\"}" } }],
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    };
+    const bad = await handleRequest(post(coachBody, "203.0.113.73"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(bad.status, 502);
+    assert.equal((await bad.json()).error, "Say It Louder is unavailable just now.");
+
+    const bare = await handleRequest(post(coachBody, "203.0.113.74"), {});
+    assert.equal(bare.status, 503);
+    assert.equal((await bare.json()).error, "Say It Louder is not available yet.");
+
+    const explain = await handleRequest(post(cohesionBody, "203.0.113.75"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(explain.status, 200);
+    assert.equal(typeof (await explain.json()).explanation, "string");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("GitHub Pages and the school LMS share one allowlist", async () => {
+  assert.deepEqual(LIVE_ORIGINS, [
+    "https://skhhcss-eng.github.io",
+    "https://learning.hcs.edu.hk",
+  ]);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async function () {
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "{\"spoken_reply\":\"Near the door.\",\"mood\":\"PANICKED\",\"hardware_action\":\"SEAT_NEAR_DOOR\",\"teacher_tip\":\"Add a colour.\"}" } }],
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  const lms = "https://learning.hcs.edu.hk";
+  const coachBody = {
+    page: "Say It Louder",
+    scenarioId: "level_1_lost_bag",
+    transcript: "Look under the seats near the door.",
+  };
+  try {
+    const preflight = await handleRequest(new Request("https://deepseek-explain.example.workers.dev/", {
+      method: "OPTIONS",
+      headers: {
+        Origin: lms,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type",
+      },
+    }), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(preflight.status, 204);
+    assert.equal(preflight.headers.get("Access-Control-Allow-Origin"), lms);
+
+    const ok = await handleRequest(post(coachBody, "203.0.113.90", lms), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(ok.status, 200);
+    assert.equal(ok.headers.get("Access-Control-Allow-Origin"), lms);
+    assert.equal((await ok.json()).hardware_action, "SEAT_NEAR_DOOR");
+
+    const pages = await handleRequest(post(cohesionBody, "203.0.113.91", "https://skhhcss-eng.github.io"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(pages.status, 200);
+    assert.equal(pages.headers.get("Access-Control-Allow-Origin"), "https://skhhcss-eng.github.io");
+
+    const lookalike = await handleRequest(post(coachBody, "203.0.113.92", "https://learning.hcs.edu.hk.evil.example"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(lookalike.status, 403);
+
+    const withPath = await handleRequest(post(coachBody, "203.0.113.93", "https://learning.hcs.edu.hk/english/"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(withPath.status, 403);
   } finally {
     globalThis.fetch = originalFetch;
   }

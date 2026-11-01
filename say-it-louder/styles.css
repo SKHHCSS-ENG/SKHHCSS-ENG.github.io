@@ -809,19 +809,22 @@ select, .text-row input {
 
 #micBtn, #sendBtn, .btn-reset {
   min-height: 44px;
-  border-radius: 10px;
   border: 0;
   font-weight: 800;
   cursor: pointer;
 }
 
-#micBtn {
+/* Speak and Send use the Ask / Explain mesh (ask-send api-mesh). No second wash. */
+#micBtn.ask-send.api-mesh {
   width: 100%;
-  background: var(--accent-deep);
-  color: #fff;
+  background: transparent;
+  color: var(--api-mesh-ink, #f4f0e8);
 }
 
-#micBtn.is-listening { background: var(--ok); }
+#micBtn.ask-send.api-mesh.is-listening {
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
 #micBtn:disabled, #sendBtn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -837,10 +840,9 @@ select, .text-row input {
 
 .text-row input { margin-top: 0; flex: 1; }
 
-#sendBtn {
-  background: var(--navy);
-  color: #fff;
-  padding: 0 14px;
+#sendBtn.ask-send.api-mesh {
+  background: transparent;
+  color: var(--api-mesh-ink, #f4f0e8);
 }
 
 .heard { margin-top: 8px; }
@@ -848,6 +850,7 @@ select, .text-row input {
 
 .btn-reset {
   width: 100%;
+  border-radius: 10px;
   background: #fff;
   color: var(--accent-ink);
   border: 1px solid var(--border);

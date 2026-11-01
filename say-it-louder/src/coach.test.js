@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-import { USE_MOCK, mockCoach, queryCoach } from "./ai-service.js";
+import { USE_MOCK, coachWorkerUrl, mockCoach, normaliseCoachReply, queryCoach } from "./ai-service.js";
 import { SCENARIOS } from "./scenarios.js";
 import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios } from "./main.js";
 import { sceneCue } from "./scene2d.js";
@@ -22,8 +22,8 @@ function keys(result) {
   return Object.keys(result).sort();
 }
 
-test("mock flag is on and both scenario keys share the lost-bag pack", () => {
-  assert.equal(USE_MOCK, true);
+test("live coach is on and both scenario keys share the lost-bag pack", () => {
+  assert.equal(USE_MOCK, false);
   assert.equal(SCENARIOS.mission_1_lost_bag, pack);
   assert.equal(pack.id, "level_1_lost_bag");
   assert.equal(listScenarios().length, 1);
@@ -143,7 +143,7 @@ test("beat 6 celebration plays only after the bag and the name tag", () => {
 test("beside is not between, and a landmark phrase is not a wrong-bag grab", () => {
   const beside = coach("It's beside the black bag.");
   assert.equal(beside.hardware_action, "HOVER_CONFUSED");
-  assert.match(beside.teacher_tip, /Between A and B/i);
+  assert.match(beside.teacher_tip, /Between names both sides/i);
 
   const landmark = coach("under the seat between the black bag and the yellow lunchbox");
   assert.equal(landmark.hardware_action, "NONE");
@@ -159,7 +159,13 @@ test("student page has no API key and no Three.js", () => {
   assert.match(html, /type="module"/);
   assert.equal(/apiKey|api-key|deepseek/i.test(html + css), false);
   assert.equal(/three\.js|THREE\./.test(html + css + ai), false);
-  assert.match(ai, /export const USE_MOCK = true/);
+  assert.match(ai, /export const USE_MOCK = false/);
+  assert.match(ai, /https:\/\/deepseek-explain\.skhhcss-eng\.workers\.dev/);
+  assert.match(ai, /page: "Say It Louder"/);
+  assert.equal(/DEEPSEEK_API_KEY|api[_-]?key\b|Bearer\s|sk-[A-Za-z0-9]{8,}/i.test(html + css + ai), false);
+  assert.match(html, /id="micBtn"[^>]*class="ask-send api-mesh"/);
+  assert.match(html, /id="sendBtn"[^>]*class="ask-send api-mesh"/);
+  assert.equal(css.includes("#1458d6"), false);
 });
 
 test("clarity pill counts chances still left", () => {
@@ -208,6 +214,96 @@ test("phone Ask chip stays off Leo, Ms Chan, and the dialogue", () => {
   assert.match(css, /\.leo-name/);
   assert.match(css, /\.scene-cue\.is-wait/);
   assert.match(css, /\.scene-cue\.is-hold/);
+});
+
+test("teacher tips speak to the student", () => {
+  const tips = Object.keys(pack.lines).map((key) => pack.lines[key].teacher_tip);
+  tips.push(pack.intro.teacher_tip);
+  const banned = /Prompt:|Stretch:|soft fail|Win:|Excellent precision|Between is the trap|preposition under|Send Leo/;
+  for (const tip of tips) assert.equal(banned.test(tip), false, tip);
+  assert.equal(pack.intro.teacher_tip, "Start with a place. Try: Look under the seats near the door.");
+  assert.equal(pack.lines.beat1.teacher_tip, "Nice start. Add a colour or size so Leo knows which bag.");
+  assert.equal(pack.lines.beat2.teacher_tip, "Try navy or black — say colour and size together.");
+  assert.equal(pack.lines.beat3.teacher_tip, "Great — size, colour, and between. Next check the name tag.");
+  assert.equal(pack.lines.beat4.teacher_tip, "Try: Check the name tag on the front of the bag.");
+  assert.equal(pack.lines.beat5Black.teacher_tip, "That was the black sports bag. Try the small navy one under the seat.");
+  assert.equal(pack.lines.beat5Grey.teacher_tip, "That was the big grey bag. Leo needs the small navy one under the seat, between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.beat6.teacher_tip, "Clear speech found it — not volume. Well done.");
+  assert.equal(pack.lines.alreadyWon.teacher_tip, pack.lines.beat6.teacher_tip);
+  assert.equal(pack.lines.beat6Early.teacher_tip, "Add the place: under the seat, between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.nameTagEarly.teacher_tip, "Find the bag first. Small navy, under the seat, between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.needBetween.teacher_tip, "Say: between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.needUnder.teacher_tip, "Add under — the small navy bag is under the seat, not on it.");
+  assert.equal(pack.lines.besideNotBetween.teacher_tip, "Between names both sides. Beside only names one neighbour.");
+  assert.equal(pack.lines.navyNeedSize.teacher_tip, "Add size and place: the small navy bag under the seat.");
+  assert.equal(pack.lines.blueNotNavy.teacher_tip, "Say navy, not just blue. The lunchbox is yellow.");
+  assert.equal(pack.lines.redNone.teacher_tip, "Name a colour that is there: black, navy, or grey.");
+  assert.equal(pack.lines.zoneAgain.teacher_tip, "Next: small navy, under the seat, between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.seatLeft.teacher_tip, "On the left is the wrong bag. Look under the seats near the door.");
+  assert.equal(pack.lines.fallback.teacher_tip, "Try one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox.");
+});
+
+test("live reply keeps the contract and a miss falls back to the mock", async () => {
+  const input = {
+    scenario: pack,
+    currentState: freshState(pack),
+    transcript: "Look under the seats near the door."
+  };
+  let sentUrl = "";
+  let sentBody = null;
+  const live = await queryCoach(input, {
+    live: true,
+    fetchImpl: async function (url, init) {
+      sentUrl = String(url);
+      sentBody = JSON.parse(init.body);
+      return {
+        ok: true,
+        json: async function () {
+          return {
+            spoken_reply: "Near the door, then.",
+            mood: "panicked",
+            scene_action: "SEAT_NEAR_DOOR",
+            teacher_tip: "Nice start. Add a colour or size so Leo knows which bag."
+          };
+        }
+      };
+    }
+  });
+  assert.equal(live.hardware_action, "SEAT_NEAR_DOOR");
+  assert.equal(live.mood, "PANICKED");
+  assert.equal(live.scene_action, undefined);
+  assert.deepEqual(keys(live), ["hardware_action", "mood", "spoken_reply", "teacher_tip"]);
+  assert.equal(sentUrl, "https://deepseek-explain.skhhcss-eng.workers.dev");
+  assert.equal(sentBody.page, "Say It Louder");
+  assert.equal(sentBody.scenarioId, "level_1_lost_bag");
+  assert.match(sentBody.state, /BAG_NAVY_SMALL=UNDER_SEAT/);
+  assert.equal(sentBody.transcript, input.transcript);
+  assert.equal(JSON.stringify(sentBody).includes("sk-"), false);
+
+  const missed = await queryCoach(input, {
+    live: true,
+    fetchImpl: async function () {
+      throw new Error("down");
+    }
+  });
+  assert.deepEqual(missed, mockCoach(input));
+
+  assert.equal(normaliseCoachReply({
+    spoken_reply: "Which bag?",
+    mood: "CONFUSED",
+    hardware_action: "HOVER_CONFUSED",
+    teacher_tip: "Prompt: navy vs black."
+  }, pack), null);
+  assert.equal(coachWorkerUrl("https://user:secret@evil.example"), "https://deepseek-explain.skhhcss-eng.workers.dev");
+  assert.equal(coachWorkerUrl("https://evil.example/hook?key=sk-test"), "https://deepseek-explain.skhhcss-eng.workers.dev");
+  const lmsPage = "https://learning.hcs.edu.hk/english/say-it-louder/";
+  assert.equal(coachWorkerUrl(undefined, lmsPage), "https://deepseek-explain.skhhcss-eng.workers.dev");
+  assert.equal(
+    coachWorkerUrl("https://deepseek-explain.skhhcss-eng.workers.dev/", lmsPage),
+    "https://deepseek-explain.skhhcss-eng.workers.dev"
+  );
+  assert.equal(coachWorkerUrl("/english/api", lmsPage), "https://deepseek-explain.skhhcss-eng.workers.dev");
+  assert.equal(coachWorkerUrl("deepseek-explain.skhhcss-eng.workers.dev", lmsPage), "https://deepseek-explain.skhhcss-eng.workers.dev");
 });
 
 test("lost-bag copy stays school-safe", () => {

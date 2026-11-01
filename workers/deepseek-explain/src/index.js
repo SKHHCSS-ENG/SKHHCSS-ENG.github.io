@@ -2,6 +2,7 @@
  * DeepSeek proxy for the Eng subject site.
  * Explain pages: Cohesion, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
+ * Say It Louder: page "Say It Louder" (the carriage coach). Same secret.
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.
  * Do not hardcode it, and do not log it.
  *
@@ -10,8 +11,9 @@
  */
 
 import { ASK_SYSTEM_PROMPT, ASK_TASK } from "./askPrompt.js";
+import { COACH_ACTIONS, COACH_MOODS, COACH_SYSTEM_PROMPT, COACH_TASK } from "./coachPrompt.js";
 
-export { ASK_SYSTEM_PROMPT, ASK_TASK };
+export { ASK_SYSTEM_PROMPT, ASK_TASK, COACH_ACTIONS, COACH_MOODS, COACH_SYSTEM_PROMPT, COACH_TASK };
 
 /** Tess 2026-10-29. Do not paraphrase. */
 export const SYSTEM_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
@@ -28,7 +30,11 @@ Rules:
 
 export const ALLOWED_PAGES = ["Cohesion", "Sentence Patterns"];
 
-const LIVE_ORIGIN = "https://skhhcss-eng.github.io";
+/** Browser origins that may call this Worker. Paths are not part of Origin. */
+export const LIVE_ORIGINS = [
+  "https://skhhcss-eng.github.io",
+  "https://learning.hcs.edu.hk",
+];
 const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 const MODEL = "deepseek-chat";
 const MAX_BODY_BYTES = 4096;
@@ -48,6 +54,9 @@ const LIMITS = {
   message: 400,
   pagePath: 200,
   findHits: 500,
+  transcript: 400,
+  scenarioId: 40,
+  state: 500,
 };
 
 export function buildAskUserMessage(fields) {
@@ -80,7 +89,7 @@ export function buildUserMessage(fields) {
 
 function originAllowed(origin) {
   if (!origin || typeof origin !== "string") return false;
-  if (origin === LIVE_ORIGIN) return true;
+  if (LIVE_ORIGINS.indexOf(origin) !== -1) return true;
   let url;
   try {
     url = new URL(origin);
@@ -157,6 +166,7 @@ function readFields(data) {
   const page = asLimitedString(data.page, LIMITS.page);
   if (!page.ok) return { error: "field" };
   if (page.value === "Ask") return readAskFields(data);
+  if (page.value === "Say It Louder") return readCoachFields(data);
   const label = asLimitedString(
     data.itemLabel != null ? data.itemLabel : data.label,
     LIMITS.label
@@ -246,6 +256,97 @@ function readAskFields(data) {
       findHits: findHits.value,
       message: message.value,
     },
+  };
+}
+
+const COACH_SCENARIOS = ["level_1_lost_bag", "mission_1_lost_bag"];
+
+export function buildCoachUserMessage(fields) {
+  return [
+    "Scenario: " + fields.scenarioId,
+    "State: " + (fields.state || ""),
+    "Student: " + fields.transcript,
+    "Task: " + COACH_TASK,
+  ].join("\n");
+}
+
+function readCoachFields(data) {
+  const transcript = asLimitedString(
+    data.transcript != null ? data.transcript : data.message,
+    LIMITS.transcript
+  );
+  const scenarioId = asLimitedString(
+    data.scenarioId == null || data.scenarioId === "" ? "level_1_lost_bag" : data.scenarioId,
+    LIMITS.scenarioId
+  );
+  const state = asLimitedString(data.state == null ? "" : data.state, LIMITS.state);
+  const checked = [transcript, scenarioId, state];
+  for (let i = 0; i < checked.length; i++) {
+    if (!checked[i].ok) return { mode: "coach", error: "field" };
+  }
+  if (!transcript.value) return { mode: "coach", error: "required" };
+  if (COACH_SCENARIOS.indexOf(scenarioId.value) === -1) return { mode: "coach", error: "scenario" };
+  return {
+    mode: "coach",
+    fields: {
+      scenarioId: scenarioId.value,
+      state: state.value,
+      transcript: transcript.value,
+    },
+  };
+}
+
+function exactToken(value, allowed) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.replace(/\s+/g, " ").trim();
+  if (!trimmed) return "";
+  for (let i = 0; i < allowed.length; i++) {
+    if (allowed[i] === trimmed || allowed[i].toLowerCase() === trimmed.toLowerCase()) {
+      return allowed[i];
+    }
+  }
+  return "";
+}
+
+function clipText(value, max) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.replace(/\s+/g, " ").trim();
+  if (!trimmed) return "";
+  if (trimmed.length <= max) return trimmed;
+  return trimmed.slice(0, max).trim();
+}
+
+function rubricVoice(tip) {
+  return /\b(prompt|stretch)\s*:|soft fail|\bwin\s*:|excellent precision/i.test(tip);
+}
+
+export function coachReplyFromModel(text) {
+  let raw = String(text || "").trim();
+  raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start === -1 || end <= start) return null;
+  let data;
+  try {
+    data = JSON.parse(raw.slice(start, end + 1));
+  } catch (e) {
+    return null;
+  }
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  const spoken = clipText(data.spoken_reply, 280);
+  const tip = clipText(data.teacher_tip, 240);
+  const named = typeof data.hardware_action === "string" && data.hardware_action.trim()
+    ? data.hardware_action
+    : data.scene_action;
+  const mood = exactToken(data.mood, COACH_MOODS);
+  const action = exactToken(named, COACH_ACTIONS);
+  if (!spoken || !tip || !mood || !action) return null;
+  if (rubricVoice(tip)) return null;
+  return {
+    spoken_reply: spoken,
+    mood: mood,
+    hardware_action: action,
+    teacher_tip: tip,
   };
 }
 
@@ -393,6 +494,33 @@ export async function handleRequest(request, env) {
       return jsonResponse(asked.status, { error: asked.error }, origin);
     }
     return jsonResponse(200, { reply: asked.explanation }, origin);
+  }
+  if (parsed.mode === "coach") {
+    if (parsed.error === "required") {
+      return jsonResponse(400, { error: "Say a short instruction." }, origin);
+    }
+    if (parsed.error === "field") {
+      return jsonResponse(400, { error: "One of the fields is too long." }, origin);
+    }
+    if (parsed.error === "scenario") {
+      return jsonResponse(400, { error: "This coach only covers the lost bag." }, origin);
+    }
+    const coached = await callDeepSeek(env, buildCoachUserMessage(parsed.fields), {
+      system: COACH_SYSTEM_PROMPT,
+      maxTokens: 420,
+      maxChars: 1200,
+      unavailable: "Say It Louder is unavailable just now.",
+      unconfigured: "Say It Louder is not available yet.",
+    });
+    if (!coached.ok) {
+      return jsonResponse(coached.status, { error: coached.error }, origin);
+    }
+    const coach = coachReplyFromModel(coached.explanation);
+    if (!coach) {
+      console.error("coach_bad_json");
+      return jsonResponse(502, { error: "Say It Louder is unavailable just now." }, origin);
+    }
+    return jsonResponse(200, coach, origin);
   }
   if (parsed.error === "required") {
     return jsonResponse(400, { error: "Page, item and sample are required." }, origin);
