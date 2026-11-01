@@ -258,6 +258,8 @@ const schoolMap = {
   resetOnMiss: true,
   timeoutMood: "CONFUSED",
   timeoutLine: "Bell's gone — try the walk again from the gate.",
+  resetSpoken: "Bell's gone. I'm back at the school gate. Which way is the library?",
+  resetMood: "CONFUSED",
   strikeOutSuffix: " That's three. Bell's gone — try again from the gate.",
   badActionTip: "The coach reply was not a known action. Try the route note again.",
   allowedActions: [
@@ -289,7 +291,7 @@ const schoolMap = {
   steps: [
     { id: "gate", label: "Gate", key: "GATE", value: "THROUGH" },
     { id: "office", label: "Office", key: "OFFICE", value: "PAST" },
-    { id: "path", label: "Path", key: "WALKWAY", value: "ALONG" },
+    { id: "path", label: "Walkway", key: "WALKWAY", value: "ALONG" },
     { id: "canteen", label: "Canteen", key: "CANTEEN", value: "PAST" },
     { id: "ground", label: "Playground", key: "PLAYGROUND", value: "CROSSED" },
     { id: "library", label: "Library", key: "LIBRARY", value: "ARRIVED" }
@@ -411,8 +413,8 @@ const schoolMap = {
       teacher_tip: "Great use of go along. Next, tell Leo what to do when he reaches the canteen."
     },
     canteenFoil: {
-      spoken_reply: "Wait — this smells like lunch, not books! I'm backing out. Where should I go?",
-      mood: "PANICKED",
+      spoken_reply: "This smells like lunch, not books. I'm stepping back. Where should I go?",
+      mood: "CONFUSED",
       hardware_action: "STEP_BACK",
       teacher_tip: "That was the canteen. Try walk past the canteen, then head for the playground."
     },
@@ -485,7 +487,7 @@ const schoolMap = {
     fallback: {
       spoken_reply: "Say it clearer for me? I need a direction and a landmark.",
       mood: "CONFUSED",
-      hardware_action: "NONE",
+      hardware_action: "HOVER_CONFUSED",
       teacher_tip: "Add a landmark and a direction word, such as turn left, go along, or walk past."
     }
   }

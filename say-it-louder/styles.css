@@ -829,7 +829,8 @@ select, .text-row input {
 }
 
 #micBtn.ask-send.api-mesh.is-listening {
-  box-shadow: inset 0 0 0 3px #ffffff;
+  box-shadow: 0 0 0 3px rgba(244, 240, 232, 0.92);
+  animation: say-clearer-pulse 1.4s ease-in-out infinite;
 }
 
 #micBtn:disabled, #sendBtn:disabled {
@@ -963,13 +964,20 @@ footer {
   color: var(--ok);
 }
 
-.pin-gate { left: 22%; top: 82%; }
-.pin-office { left: 78%; top: 62%; }
-.pin-walkway { left: 78%; top: 46%; width: 6.4rem; margin-left: -3.2rem; }
-.pin-canteen { left: 18%; top: 34%; background: #fff7ed; border-color: #c2410c; }
-.pin-playground { left: 22%; top: 20%; width: 6.6rem; margin-left: -3.3rem; background: #ecfccb; }
-.pin-hall { left: 78%; top: 8%; background: #f8fafc; }
-.pin-library { left: 24%; top: 6%; background: #e0f2fe; border-color: var(--accent-deep); }
+.pin-gate { left: 50%; top: 82%; }
+.pin-office { left: 78%; top: 56%; }
+.pin-walkway { left: 78%; top: 40%; width: 6.4rem; margin-left: -3.2rem; }
+.pin-canteen { left: 18%; top: 32%; background: #fff7ed; }
+.pin-playground { left: 22%; top: 18%; width: 6.6rem; margin-left: -3.3rem; background: #ecfccb; }
+.pin-hall { left: 78%; top: 4%; background: #f8fafc; }
+.pin-library { left: 50%; top: 4%; background: #e0f2fe; border-color: var(--accent-deep); }
+
+.pin-canteen.is-here,
+.pin-canteen.is-beside {
+  border-color: #c2410c;
+  outline: 3px solid #c2410c;
+  outline-offset: 2px;
+}
 
 .pin.is-here {
   outline: 3px solid var(--accent-deep);
@@ -1060,7 +1068,11 @@ footer {
 }
 
 @keyframes dip-hall {
-  45% { left: 78%; top: 14%; }
+  45% { left: 78%; top: 16%; }
+}
+
+@keyframes say-clearer-pulse {
+  50% { box-shadow: 0 0 0 7px rgba(91, 186, 213, 0.4); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1077,9 +1089,16 @@ footer {
   .campus.is-hover .leo-figure,
   .campus.is-walking .leo-leg,
   .campus.is-foil-canteen .leo,
-  .campus.is-foil-hall .leo {
+  .campus.is-foil-hall .leo,
+  #micBtn.ask-send.api-mesh.is-listening {
     animation: none;
     transition: none;
+  }
+}
+
+@media (max-width: 859px) {
+  #noteCard {
+    padding-bottom: calc(44px + 18px);
   }
 }
 

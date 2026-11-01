@@ -11,7 +11,7 @@ export const USE_MOCK = false;
 
 var LIVE_WORKER = "https://deepseek-explain.skhhcss-eng.workers.dev";
 
-export function normaliseUtterance(raw) {
+function baseNormalise(raw) {
   return String(raw || "")
     .toLowerCase()
     .replace(/['’]/g, "")
@@ -26,6 +26,42 @@ export function normaliseUtterance(raw) {
     .replace(/\bnametag\b/g, "name tag")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/**
+ * Accent / STT near-hits become the target word.
+ * Do not rewrite a real "and the" inside "between A and the B".
+ * Do not turn "maybe" into navy when a wrong colour is already named.
+ */
+export function forgivePronunciation(text) {
+  var out = String(text || "");
+  out = out.replace(/\blie berry\b/g, "library");
+  out = out.replace(/\bliberry\b/g, "library");
+  out = out.replace(/\blibary\b/g, "library");
+  out = out.replace(/\bbe twin\b/g, "between");
+  out = out.replace(/\bbeetween\b/g, "between");
+  out = out.replace(/\bbetwen\b/g, "between");
+  out = out.replace(/\bbe to\b/g, "between");
+  out = out.replace(/\bonda\b/g, "under");
+  out = out.replace(/\banda\b/g, "under");
+  out = out.replace(/\band the seats\b/g, "under the seats");
+  out = out.replace(/\band the seat\b/g, "under the seat");
+  out = out.replace(/\bneighbours\b/g, "navy");
+  out = out.replace(/\bneighbour\b/g, "navy");
+  out = out.replace(/\bnavi\b/g, "navy");
+  out = out.replace(/\bplay ground\b/g, "playground");
+  out = out.replace(/\bwalk way\b/g, "walkway");
+  out = out.replace(/\bcan teen\b/g, "canteen");
+  out = out.replace(/\bgait\b/g, "gate");
+  out = out.replace(/\bpassed\b/g, "past");
+  if (!/\b(black|grey|red|yellow|blue)\b/.test(out)) {
+    out = out.replace(/\bmaybe\b/g, "navy");
+  }
+  return out.replace(/\s+/g, " ").trim();
+}
+
+export function normaliseUtterance(raw) {
+  return forgivePronunciation(baseNormalise(raw));
 }
 
 function has(text, phrase) {
@@ -408,11 +444,44 @@ export function mockMapCoach({ scenario, currentState, transcript }) {
  * Deterministic coach. Same JSON shape the Worker will return later:
  * { spoken_reply, mood, hardware_action, teacher_tip }
  */
-export function mockCoach({ scenario, currentState, transcript }) {
-  if (scenario && scenario.sceneId === "school-map") {
-    return mockMapCoach({ scenario: scenario, currentState: currentState, transcript: transcript });
-  }
-  return mockBagCoach({ scenario: scenario, currentState: currentState, transcript: transcript });
+var WRONG_STRIKE = {
+  STEP_BACK: 1,
+  ARRIVE_CANTEEN: 1,
+  ARRIVE_HALL: 1,
+  BAG_BLACK_SPORTS: 1,
+  BAG_GREY_BIG: 1,
+  LUNCHBOX_YELLOW: 1
+};
+
+function softenNearHit(input, result) {
+  var scenario = (input && input.scenario) || {};
+  var base = baseNormalise(input && input.transcript);
+  var text = forgivePronunciation(base);
+  if (!result || text === base) return result;
+  if (WRONG_STRIKE[result.hardware_action]) return result;
+  var strikes = scenario.clarityStrikeActions || [];
+  if (strikes.indexOf(result.hardware_action) === -1) return result;
+  var state = input.currentState || {};
+  if (state.LAST_UTTERANCE === text) return result;
+  var map = scenario.sceneId === "school-map";
+  return {
+    spoken_reply: map
+      ? "I almost heard that. Say the direction once more, with the place."
+      : "I almost heard that. Say the colour, the size, and the place once more.",
+    mood: "CONFUSED",
+    hardware_action: "NONE",
+    teacher_tip: map
+      ? "Nearly there. Add left or right, or name the building."
+      : "Nearly there. Add the missing colour, size, or place."
+  };
+}
+
+export function mockCoach(input) {
+  var scenario = input && input.scenario;
+  var result = scenario && scenario.sceneId === "school-map"
+    ? mockMapCoach(input)
+    : mockBagCoach(input);
+  return softenNearHit(input, result);
 }
 
 function mockBagCoach({ scenario, currentState, transcript }) {
@@ -610,21 +679,38 @@ export function speechInputAvailable() {
   return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 }
 
+export function heardText(event) {
+  var finalText = "";
+  var interim = "";
+  var results = event && event.results;
+  if (!results) return { finalText: "", interim: "" };
+  for (var i = 0; i < results.length; i++) {
+    var piece = "";
+    try {
+      piece = results[i][0].transcript || "";
+    } catch (err) {
+      piece = "";
+    }
+    if (results[i].isFinal) finalText += piece + " ";
+    else interim += piece;
+  }
+  return {
+    finalText: finalText.replace(/\s+/g, " ").trim(),
+    interim: interim.replace(/\s+/g, " ").trim()
+  };
+}
+
 export function createRecognizer(handlers) {
   if (!speechInputAvailable()) return null;
   var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   var recognition = new SpeechRec();
   recognition.lang = (handlers && handlers.lang) || "en-GB";
-  recognition.interimResults = false;
+  recognition.continuous = true;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
-    var said = "";
-    try {
-      said = event.results[0][0].transcript;
-    } catch (err) {
-      said = "";
-    }
-    if (handlers && handlers.onResult) handlers.onResult(said);
+    var heard = heardText(event);
+    if (handlers && handlers.onHeard) handlers.onHeard(heard);
   };
   recognition.onerror = function (event) {
     if (handlers && handlers.onError) handlers.onError((event && event.error) || "error");

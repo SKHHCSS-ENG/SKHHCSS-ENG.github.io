@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-import { USE_MOCK, coachWorkerUrl, mockCoach, normaliseCoachReply, queryCoach } from "./ai-service.js";
+import { USE_MOCK, coachWorkerUrl, forgivePronunciation, heardText, mockCoach, normaliseCoachReply, normaliseUtterance, queryCoach } from "./ai-service.js";
 import { SCENARIOS } from "./scenarios.js";
 import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios, packForId } from "./main.js";
 import { MAP_SPOTS, sceneCue } from "./scene2d.js";
@@ -166,6 +166,8 @@ test("student page has no API key and no Three.js", () => {
   assert.equal(/DEEPSEEK_API_KEY|api[_-]?key\b|Bearer\s|sk-[A-Za-z0-9]{8,}/i.test(html + css + ai), false);
   assert.match(html, /id="micBtn"[^>]*class="ask-send api-mesh"/);
   assert.match(html, /id="sendBtn"[^>]*class="ask-send api-mesh"/);
+  assert.match(css, /#micBtn\.ask-send\.api-mesh/);
+  assert.match(css, /say-clearer-pulse/);
   assert.equal(css.includes("#1458d6"), false);
 });
 
@@ -403,7 +405,7 @@ test("vague directions hover, and canteen or hall do not win", () => {
   state = applyHardwareAction(state, "GO_ALONG_PATH");
   const canteen = mapCoach("Go into the canteen.", state);
   assert.equal(canteen.hardware_action, "STEP_BACK");
-  assert.equal(canteen.mood, "PANICKED");
+  assert.equal(canteen.mood, "CONFUSED");
   assert.match(canteen.spoken_reply, /lunch/i);
   const afterCanteen = applyHardwareAction(state, canteen.hardware_action);
   assert.equal(isWin(mapPack, afterCanteen), false);
@@ -450,6 +452,102 @@ test("map tokens move Leo from the gate towards the library", () => {
   assert.equal(sceneCue("HOVER_CONFUSED", start).text.includes("landmark"), true);
   assert.equal(sceneCue("ARRIVE_LIBRARY", applyHardwareAction(start, "ARRIVE_LIBRARY")).kind, "hold");
   assert.equal(sceneCue("HOVER_CONFUSED", freshState(pack)).text.includes("colour"), true);
+});
+
+test("mission 1 tips are student-facing", () => {
+  const tips = Object.keys(pack.lines).map((key) => pack.lines[key].teacher_tip);
+  tips.push(pack.intro.teacher_tip);
+  const banned = /Prompt:|Stretch:|soft fail|Win:|Excellent precision|Between is the trap|preposition under|Send Leo|Wrong bag =/;
+  for (const tip of tips) assert.equal(banned.test(tip), false, tip);
+  assert.equal(pack.lines.beat2.teacher_tip, "Try navy or black — say colour and size together.");
+  assert.equal(pack.lines.beat3.teacher_tip, "Great — size, colour, and between. Next check the name tag.");
+  assert.equal(pack.lines.beat4.teacher_tip, "Try: Check the name tag on the front of the bag.");
+  assert.equal(pack.lines.beat5Black.teacher_tip, "That was the black sports bag. Try the small navy one under the seat.");
+  assert.equal(pack.lines.beat5Grey.teacher_tip, "That was the big grey bag. Leo needs the small navy one under the seat, between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.beat6.teacher_tip, "Clear speech found it — not volume. Well done.");
+  assert.equal(pack.lines.alreadyWon.teacher_tip, pack.lines.beat6.teacher_tip);
+  assert.equal(pack.lines.needBetween.teacher_tip, "Say: between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.fallback.teacher_tip, "Try one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox.");
+  const mapTips = Object.keys(mapPack.lines).map((key) => mapPack.lines[key].teacher_tip);
+  for (const tip of mapTips) assert.equal(/Prompt:|Stretch:/.test(tip), false, tip);
+});
+
+test("near-hit pronunciation maps to the target word and does not save a wrong bag", () => {
+  assert.equal(forgivePronunciation("lie berry"), "library");
+  assert.equal(forgivePronunciation("be twin"), "between");
+  assert.equal(forgivePronunciation("be to"), "between");
+  assert.equal(forgivePronunciation("onda"), "under");
+  assert.equal(forgivePronunciation("and the seat"), "under the seat");
+  assert.equal(forgivePronunciation("neighbour"), "navy");
+  assert.equal(
+    normaliseUtterance("between the black bag and the yellow lunchbox"),
+    "between the black bag and the yellow lunchbox"
+  );
+
+  const door = coach("Look and the seats near the door.");
+  assert.equal(door.hardware_action, "SEAT_NEAR_DOOR");
+
+  const navy = coach("The maybe bag.");
+  assert.equal(navy.hardware_action, "NONE");
+  assert.match(navy.spoken_reply, /small/i);
+
+  const black = coach("The black bag.");
+  assert.equal(black.hardware_action, "BAG_BLACK_SPORTS");
+
+  const kept = coach("Maybe the black bag.");
+  assert.equal(kept.hardware_action, "BAG_BLACK_SPORTS");
+
+  const full = coach("The small neighbour bag onda the seat be twin the black bag and the yellow lunchbox.");
+  assert.equal(full.hardware_action, "BAG_NAVY_SMALL");
+
+  let walked = freshState(mapPack);
+  walked = applyHardwareAction(walked, "GO_THROUGH_GATE");
+  walked = applyHardwareAction(walked, "TURN_LEFT");
+  walked = applyHardwareAction(walked, "GO_ALONG_PATH");
+  walked = applyHardwareAction(walked, "WALK_PAST_CANTEEN");
+  walked = applyHardwareAction(walked, "CROSS_PLAYGROUND");
+  const lib = mapCoach("Go to the lie berry.", walked);
+  assert.equal(lib.hardware_action, "ARRIVE_LIBRARY");
+
+  const first = mapCoach("navi");
+  assert.equal(first.hardware_action, "NONE");
+  assert.match(first.teacher_tip, /Nearly there/i);
+  const again = mapCoach("navi", Object.assign(freshState(mapPack), { LAST_UTTERANCE: "navy" }));
+  assert.equal(again.hardware_action, "HOVER_CONFUSED");
+  assert.equal(mapCoach("go").hardware_action, "HOVER_CONFUSED");
+});
+
+test("speak fills the box and does not auto-send a final transcript", () => {
+  const main = fs.readFileSync(new URL("./main.js", import.meta.url), "utf8");
+  const ai = fs.readFileSync(new URL("./ai-service.js", import.meta.url), "utf8");
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(ai, /continuous = true/);
+  assert.match(ai, /interimResults = true/);
+  assert.match(main, /onHeard/);
+  assert.equal(/onResult:\s*function[\s\S]{0,80}takeTurn/.test(main), false);
+  assert.match(main, /Say it clearer/);
+  assert.match(css, /#micBtn\.ask-send\.api-mesh\.is-listening/);
+  assert.match(css, /\.pin-gate \{ left: 50%/);
+  assert.match(css, /\.pin-library \{ left: 50%/);
+  assert.match(css, /\.pin-hall \{ left: 78%/);
+  assert.equal(/pin-goal/.test(fs.readFileSync(new URL("./scene2d.js", import.meta.url), "utf8")), false);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /id="noteCard"[^>]*data-ask-clear/);
+  const heard = heardText({
+    results: [
+      [{ transcript: "go through " }],
+      [{ transcript: "the gate" }]
+    ]
+  });
+  heardText({ results: [] });
+  const finals = heardText({
+    results: [
+      Object.assign([{ transcript: "walk past the canteen" }], { isFinal: true }),
+      [{ transcript: " please" }]
+    ]
+  });
+  assert.equal(finals.finalText, "walk past the canteen");
+  assert.equal(finals.interim, "please");
+  assert.equal(heard.interim.length > 0, true);
 });
 
 test("lost-bag copy stays school-safe", () => {

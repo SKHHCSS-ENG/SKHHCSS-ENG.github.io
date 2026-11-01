@@ -17,16 +17,16 @@ var ACTION_COPY = {
 };
 
 export var MAP_SPOTS = {
-  GATE: { x: 50, y: 88 },
-  GATE_IN: { x: 50, y: 76 },
-  OFFICE: { x: 50, y: 64 },
-  CORNER: { x: 42, y: 56 },
-  WALKWAY: { x: 50, y: 48 },
-  CANTEEN_PATH: { x: 50, y: 36 },
-  CANTEEN: { x: 18, y: 36 },
-  PLAYGROUND: { x: 50, y: 24 },
-  HALL: { x: 78, y: 12 },
-  LIBRARY: { x: 50, y: 14 }
+  GATE: { x: 50, y: 78 },
+  GATE_IN: { x: 50, y: 68 },
+  OFFICE: { x: 50, y: 58 },
+  CORNER: { x: 50, y: 50 },
+  WALKWAY: { x: 50, y: 42 },
+  CANTEEN_PATH: { x: 50, y: 34 },
+  CANTEEN: { x: 18, y: 34 },
+  PLAYGROUND: { x: 50, y: 26 },
+  HALL: { x: 78, y: 16 },
+  LIBRARY: { x: 50, y: 30 }
 };
 
 var MAP_PIN = {
@@ -124,7 +124,6 @@ function mountSchoolMap(root, scenario, live) {
     pin.dataset.pin = mark.id;
     pin.appendChild(el("span", "pin-label", mark.label));
     if (mark.place) pin.appendChild(el("span", "pin-place", mark.place));
-    if (mark.id === "LIBRARY") pin.appendChild(el("span", "pin-goal", "Goal"));
     pins[mark.id] = pin;
     campus.appendChild(pin);
   });

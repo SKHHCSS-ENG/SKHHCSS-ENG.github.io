@@ -1,5 +1,5 @@
 import { SCENARIOS } from "./scenarios.js";
-import { queryCoach, createRecognizer, speakText, speechInputAvailable } from "./ai-service.js";
+import { queryCoach, createRecognizer, speakText, speechInputAvailable, normaliseUtterance } from "./ai-service.js";
 import { mountScene } from "./scene2d.js";
 
 var MOOD_LABEL = {
@@ -217,20 +217,36 @@ function boot() {
   updateHud();
   scene.setDoors(doorsLeft, false);
 
+  var wantListen = false;
+  var micDraft = "";
+  var micLock = false;
+
   var recognition = createRecognizer({
     lang: "en-GB",
-    onResult: function (text) {
-      setListening(false);
-      takeTurn(text);
+    onHeard: function (heard) {
+      if (!wantListen || micLock) return;
+      var text = ((heard.finalText || "") + " " + (heard.interim || "")).replace(/\s+/g, " ").trim();
+      micDraft = text;
+      $("textCmd").value = text;
     },
     onError: function (code) {
-      setListening(false);
       if (code === "not-allowed" || code === "service-not-allowed") {
+        wantListen = false;
+        setListening(false);
         showMicNote("The microphone is blocked. Type your instruction instead.");
       }
     },
     onEnd: function () {
-      setListening(false);
+      if (!wantListen) {
+        setListening(false);
+        return;
+      }
+      try {
+        recognition.start();
+      } catch (err) {
+        wantListen = false;
+        setListening(false);
+      }
     }
   });
 
@@ -239,28 +255,51 @@ function boot() {
     showMicNote("The microphone needs Chrome or Edge. Type your instruction instead.");
   }
 
+  $("textCmd").addEventListener("input", function () {
+    if (!wantListen) return;
+    if ($("textCmd").value !== micDraft) micLock = true;
+  });
+
+  function stopMic() {
+    wantListen = false;
+    if (recognition) {
+      try { recognition.stop(); } catch (err) { /* already stopped */ }
+    }
+    setListening(false);
+  }
+
+  function submitBox() {
+    var value = $("textCmd").value.trim();
+    $("textCmd").value = "";
+    micDraft = "";
+    micLock = false;
+    if (!value || ended === "miss") return;
+    takeTurn(value);
+  }
+
   $("micBtn").addEventListener("click", function () {
     if (!recognition || ended) return;
-    if (listening) {
-      recognition.stop();
-      setListening(false);
+    if (listening || wantListen) {
+      stopMic();
+      submitBox();
       return;
     }
+    micLock = $("textCmd").value.trim().length > 0;
+    micDraft = micLock ? "" : $("textCmd").value;
+    wantListen = true;
+    setListening(true);
     try {
-      setListening(true);
       recognition.start();
     } catch (err) {
+      wantListen = false;
       setListening(false);
     }
   });
 
   $("textForm").addEventListener("submit", function (event) {
     event.preventDefault();
-    var input = $("textCmd");
-    var value = input.value.trim();
-    if (!value) return;
-    input.value = "";
-    takeTurn(value);
+    if (listening || wantListen) stopMic();
+    submitBox();
   });
 
   $("resetBtn").addEventListener("click", function () {
@@ -285,7 +324,7 @@ function boot() {
     var btn = $("micBtn");
     btn.classList.toggle("is-listening", on);
     btn.setAttribute("aria-pressed", on ? "true" : "false");
-    btn.textContent = on ? "Listening…" : "Speak";
+    btn.textContent = on ? "Say it clearer" : "Speak";
   }
 
   function applyChrome(pack) {
@@ -383,6 +422,7 @@ function boot() {
   function finish(kind) {
     ended = kind;
     stopDoors();
+    wantListen = false;
     if (recognition && listening) {
       try { recognition.stop(); } catch (err) { /* already stopped */ }
       setListening(false);
@@ -400,6 +440,13 @@ function boot() {
       if (scenario.resetOnMiss) {
         state = freshState(scenario);
         scene.apply("NONE", state);
+        var resetMood = scenario.resetMood || (scenario.intro && scenario.intro.mood) || "CONFUSED";
+        $("aiDialogue").textContent = scenario.resetSpoken || (scenario.intro && scenario.intro.spoken_reply) || "";
+        $("speakerTag").textContent = scenario.aiName + " · " + (MOOD_LABEL[resetMood] || "confused");
+        scene.setMood(resetMood);
+        if (scenario.intro && scenario.intro.teacher_tip) {
+          $("teacherTip").textContent = scenario.intro.teacher_tip;
+        }
         updateHud();
       }
     }
@@ -433,6 +480,7 @@ function boot() {
       return;
     }
     state = applyHardwareAction(state, result.hardware_action);
+    state.LAST_UTTERANCE = normaliseUtterance(transcript);
     if (scenario.clarityStrikeActions.indexOf(result.hardware_action) !== -1 && !isWin(scenario, state)) {
       strikes += 1;
     }
@@ -455,6 +503,7 @@ function boot() {
   function resetMission() {
     turnTicket += 1;
     stopDoors();
+    wantListen = false;
     if (recognition && listening) {
       try { recognition.stop(); } catch (err) { /* already stopped */ }
     }
