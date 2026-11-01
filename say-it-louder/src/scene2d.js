@@ -62,6 +62,92 @@ var WALK_ACTIONS = {
   STEP_BACK: 1
 };
 
+var PLATE_FILE = {
+  "m1-01": "say-it-louder-M1-01-carriage-wide.jpg",
+  "m1-02": "say-it-louder-M1-02-seats-props.jpg",
+  "m1-03": "say-it-louder-M1-03-leo-confused.jpg",
+  "m1-04": "say-it-louder-M1-04-leo-navy-bag.jpg",
+  "m1-05": "say-it-louder-M1-05-name-tag.jpg",
+  "m1-06": "say-it-louder-M1-06-leo-relieved.jpg",
+  "m2-01": "say-it-louder-M2-01-school-gate.jpg",
+  "m2-02": "say-it-louder-M2-02-school-office.jpg",
+  "m2-03": "say-it-louder-M2-03-covered-walkway.jpg",
+  "m2-04": "say-it-louder-M2-04-canteen.jpg",
+  "m2-05": "say-it-louder-M2-05-playground.jpg",
+  "m2-06": "say-it-louder-M2-06-school-hall.jpg",
+  "m2-07": "say-it-louder-M2-07-library.jpg",
+  "m2-08": "say-it-louder-M2-08-leo-side-walk.jpg",
+  "m2-09": "say-it-louder-M2-09-leo-confused.jpg",
+  "m2-10": "say-it-louder-M2-10-leo-relieved-library.jpg"
+};
+
+var NODE_PLATE = {
+  GATE: "m2-01",
+  GATE_IN: "m2-01",
+  OFFICE: "m2-02",
+  CORNER: "m2-02",
+  WALKWAY: "m2-03",
+  CANTEEN_PATH: "m2-04",
+  CANTEEN: "m2-04",
+  PLAYGROUND: "m2-05",
+  HALL: "m2-06",
+  LIBRARY: "m2-07"
+};
+
+function plateSrc(id) {
+  return new URL("../assets/" + PLATE_FILE[id], import.meta.url).href;
+}
+
+export function carriagePlate(action, state, mood, outcome) {
+  if (outcome === "win") return "m1-06";
+  if (state && state.NAME_TAG === "SHOWN") return "m1-05";
+  if (state && state.BAG_NAVY_SMALL === "HELD") return "m1-04";
+  if (action === "HOVER_CONFUSED" || mood === "CONFUSED") return "m1-03";
+  if (
+    action === "BAG_BLACK_SPORTS" ||
+    action === "BAG_GREY_BIG" ||
+    action === "LUNCHBOX_YELLOW" ||
+    (state && (state.SEAT_NEAR_DOOR === "LOOKING" || state.SEAT_LEFT === "LOOKING" || state.SEAT_MIDDLE === "LOOKING"))
+  ) {
+    return "m1-02";
+  }
+  return "m1-01";
+}
+
+export function campusPlate(action, state, mood, outcome, walking) {
+  if (outcome === "win") return "m2-10";
+  var node = (state && state.NODE) || "GATE";
+  var hall = action === "ARRIVE_HALL" || node === "HALL";
+  var canteenFoil = action === "STEP_BACK" || action === "ARRIVE_CANTEEN" || node === "CANTEEN";
+  if (hall) return "m2-06";
+  if (canteenFoil) return "m2-04";
+  if (walking) return "m2-08";
+  var atGateStart = node === "GATE" && (action === "NONE" || !action);
+  if (action === "HOVER_CONFUSED" || (mood === "CONFUSED" && !atGateStart)) return "m2-09";
+  return NODE_PLATE[node] || "m2-01";
+}
+
+function mountPlate(host) {
+  var img = el("img", "scene-plate");
+  img.alt = "";
+  img.setAttribute("aria-hidden", "true");
+  img.decoding = "async";
+  host.insertBefore(img, host.firstChild);
+  var current = "";
+  img.addEventListener("load", function () {
+    if (img.getAttribute("src")) host.classList.add("has-plate");
+  });
+  img.addEventListener("error", function () {
+    host.classList.remove("has-plate");
+  });
+  return function show(id) {
+    if (!PLATE_FILE[id] || id === current) return;
+    current = id;
+    host.dataset.plate = id;
+    img.src = plateSrc(id);
+  };
+}
+
 function mapCue(action, state) {
   if (action === "HOVER_CONFUSED") {
     return { kind: "wait", text: "Wait — say left, right, or a landmark." };
@@ -113,6 +199,7 @@ function mountSchoolMap(root, scenario, live) {
   campus.setAttribute("data-ask-clear", "");
   campus.setAttribute("role", "img");
   campus.setAttribute("aria-label", "School campus map. The gate is at the bottom. The path goes past the office, along the covered walkway, past the canteen, and beside the playground to the library. The school hall is next to the library.");
+  var showPlate = mountPlate(campus);
 
   campus.appendChild(el("div", "campus-grass"));
   campus.appendChild(el("div", "campus-path campus-path-ns"));
@@ -165,6 +252,15 @@ function mountSchoolMap(root, scenario, live) {
   root.appendChild(live);
 
   var walkTimer = null;
+  var plateAction = "";
+  var plateState = scenario.initialState || null;
+  var plateMood = "CONFUSED";
+  var plateOutcome = "";
+  var plateWalking = false;
+
+  function syncPlate() {
+    showPlate(campusPlate(plateAction, plateState, plateMood, plateOutcome, plateWalking));
+  }
 
   function showCue(next) {
     if (!next) {
@@ -205,23 +301,32 @@ function mountSchoolMap(root, scenario, live) {
     }[next] || "Confused";
     campus.dataset.mood = next || "CONFUSED";
     mood.textContent = label;
+    plateMood = next || "CONFUSED";
+    syncPlate();
   }
 
   function apply(action, state) {
     campus.classList.remove("is-hover", "is-foil-canteen", "is-foil-hall", "is-walking");
     placeLeo(state);
+    plateAction = action || "";
+    plateState = state || plateState;
     if (action === "HOVER_CONFUSED") campus.classList.add("is-hover");
     if (action === "STEP_BACK" || action === "ARRIVE_CANTEEN") campus.classList.add("is-foil-canteen");
     if (action === "ARRIVE_HALL") campus.classList.add("is-foil-hall");
     if (walkTimer) clearTimeout(walkTimer);
+    plateWalking = false;
     if (WALK_ACTIONS[action]) {
+      plateWalking = true;
       campus.classList.add("is-walking");
       walkTimer = setTimeout(function () {
+        plateWalking = false;
         campus.classList.remove("is-walking");
+        syncPlate();
       }, 800);
     }
     if (MAP_ACTION_COPY[action]) live.textContent = MAP_ACTION_COPY[action];
     showCue(mapCue(action, state));
+    syncPlate();
   }
 
   function setDoors(seconds, running) {
@@ -238,23 +343,28 @@ function mountSchoolMap(root, scenario, live) {
 
   function setOutcome(kind) {
     campus.classList.remove("is-win", "is-missed");
+    plateOutcome = kind || "";
     if (kind === "win") {
       campus.classList.add("is-win");
       chan.textContent = "Ms Chan: Library reached. Lovely clear directions.";
       showCue({ kind: "hold", text: "Library reached." });
+      syncPlate();
       return;
     }
     if (kind === "miss") {
       campus.classList.add("is-missed");
       chan.textContent = "Ms Chan: Bell's gone — back to the gate.";
       showCue(null);
+      syncPlate();
       return;
     }
     showCue(null);
+    syncPlate();
   }
 
   setMood("CONFUSED");
   placeLeo(scenario.initialState);
+  syncPlate();
   return { apply: apply, setMood: setMood, setDoors: setDoors, setOutcome: setOutcome };
 }
 
@@ -310,6 +420,7 @@ export function mountScene(root, scenario) {
   carriage.setAttribute("data-ask-clear", "");
   carriage.setAttribute("role", "img");
   carriage.setAttribute("aria-label", "MTR carriage with four items near the door seats: a black sports bag, a small navy bag under the seat, a yellow lunchbox, and a big grey bag at the far end.");
+  var showPlate = mountPlate(carriage);
 
   var wall = el("div", "carriage-wall");
   wall.appendChild(el("div", "window"));
@@ -378,6 +489,15 @@ export function mountScene(root, scenario) {
   root.appendChild(carriage);
   root.appendChild(live);
 
+  var plateAction = "";
+  var plateState = scenario.initialState || null;
+  var plateMood = "PANICKED";
+  var plateOutcome = "";
+
+  function syncPlate() {
+    showPlate(carriagePlate(plateAction, plateState, plateMood, plateOutcome));
+  }
+
   function showCue(next) {
     if (!next) {
       cue.hidden = true;
@@ -399,6 +519,8 @@ export function mountScene(root, scenario) {
     }[next] || "Panicked";
     carriage.dataset.mood = next || "PANICKED";
     mood.textContent = label;
+    plateMood = next || "PANICKED";
+    syncPlate();
   }
 
   function apply(action, state) {
@@ -413,6 +535,8 @@ export function mountScene(root, scenario) {
       "is-left",
       "is-middle"
     );
+    plateAction = action || "";
+    plateState = state || plateState;
     if (state && state.SEAT_NEAR_DOOR === "LOOKING") carriage.classList.add("is-zone");
     if (state && state.SEAT_LEFT === "LOOKING") carriage.classList.add("is-left");
     if (state && state.SEAT_MIDDLE === "LOOKING") carriage.classList.add("is-middle");
@@ -424,6 +548,7 @@ export function mountScene(root, scenario) {
     if (action === "LUNCHBOX_YELLOW") carriage.classList.add("is-wrong-lunch");
     if (ACTION_COPY[action]) live.textContent = ACTION_COPY[action];
     showCue(sceneCue(action, state));
+    syncPlate();
   }
 
   function setDoors(seconds, running) {
@@ -440,6 +565,7 @@ export function mountScene(root, scenario) {
 
   function setOutcome(kind) {
     carriage.classList.remove("is-win", "is-missed");
+    plateOutcome = kind || "";
     showCue(null);
     if (kind === "win") {
       carriage.classList.add("is-win");
@@ -449,8 +575,10 @@ export function mountScene(root, scenario) {
       carriage.classList.add("is-missed");
       chan.textContent = "Ms Chan: Missed the stop — try again next carriage.";
     }
+    syncPlate();
   }
 
   setMood("PANICKED");
+  syncPlate();
   return { apply: apply, setMood: setMood, setDoors: setDoors, setOutcome: setOutcome };
 }
