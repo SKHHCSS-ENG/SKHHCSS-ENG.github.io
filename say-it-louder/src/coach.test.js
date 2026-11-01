@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-import { USE_MOCK, coachWorkerUrl, mockCoach, normaliseCoachReply, queryCoach } from "./ai-service.js";
+import { USE_MOCK, coachWorkerUrl, forgivePronunciation, heardText, mockCoach, normaliseCoachReply, normaliseUtterance, queryCoach } from "./ai-service.js";
 import { SCENARIOS } from "./scenarios.js";
-import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios } from "./main.js";
-import { sceneCue } from "./scene2d.js";
+import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios, packForId } from "./main.js";
+import { MAP_SPOTS, sceneCue } from "./scene2d.js";
 
 const pack = SCENARIOS.level_1_lost_bag;
 const FULL = "The small navy bag under the seat between the black bag and the yellow lunchbox.";
@@ -26,8 +26,9 @@ test("live coach is on and both scenario keys share the lost-bag pack", () => {
   assert.equal(USE_MOCK, false);
   assert.equal(SCENARIOS.mission_1_lost_bag, pack);
   assert.equal(pack.id, "level_1_lost_bag");
-  assert.equal(listScenarios().length, 1);
+  assert.equal(listScenarios().length, 2);
   assert.equal(listScenarios()[0].title, "Mission 1: The Lost Bag");
+  assert.equal(listScenarios()[0].id, "level_1_lost_bag");
 });
 
 test("coach JSON is the four-field contract", async () => {
@@ -165,6 +166,8 @@ test("student page has no API key and no Three.js", () => {
   assert.equal(/DEEPSEEK_API_KEY|api[_-]?key\b|Bearer\s|sk-[A-Za-z0-9]{8,}/i.test(html + css + ai), false);
   assert.match(html, /id="micBtn"[^>]*class="ask-send api-mesh"/);
   assert.match(html, /id="sendBtn"[^>]*class="ask-send api-mesh"/);
+  assert.match(css, /#micBtn\.ask-send\.api-mesh/);
+  assert.match(css, /say-clearer-pulse/);
   assert.equal(css.includes("#1458d6"), false);
 });
 
@@ -304,6 +307,247 @@ test("live reply keeps the contract and a miss falls back to the mock", async ()
   );
   assert.equal(coachWorkerUrl("/english/api", lmsPage), "https://deepseek-explain.skhhcss-eng.workers.dev");
   assert.equal(coachWorkerUrl("deepseek-explain.skhhcss-eng.workers.dev", lmsPage), "https://deepseek-explain.skhhcss-eng.workers.dev");
+});
+
+const mapPack = SCENARIOS.mission_2_school_map_walk;
+const MAP_ROUTE = [
+  "Go through the school gate and walk straight on.",
+  "Walk past the school office and turn left.",
+  "Go along the covered walkway towards the canteen.",
+  "Walk past the canteen. Don't go inside.",
+  "Walk next to the playground until you see the library.",
+  "Go into the library."
+];
+
+function mapCoach(transcript, state) {
+  return mockCoach({
+    scenario: mapPack,
+    currentState: state || freshState(mapPack),
+    transcript: transcript
+  });
+}
+
+test("mission 2 is selectable beside mission 1 and keeps the four-field JSON", async () => {
+  assert.equal(mapPack, SCENARIOS.level_2_map_walk);
+  assert.equal(mapPack.id, "mission_2_school_map_walk");
+  assert.equal(mapPack.sceneId, "school-map");
+  assert.equal(packForId("level_2_map_walk").id, "mission_2_school_map_walk");
+  assert.equal(packForId("mission_1_lost_bag").id, "level_1_lost_bag");
+  assert.equal(listScenarios()[1].title, "Mission 2: School Map Walk");
+
+  const result = await queryCoach({
+    scenario: mapPack,
+    currentState: freshState(mapPack),
+    transcript: MAP_ROUTE[0]
+  });
+  assert.deepEqual(keys(result), ["hardware_action", "mood", "spoken_reply", "teacher_tip"]);
+  assert.equal(result.hardware_action, "GO_THROUGH_GATE");
+  assert.ok(mapPack.allowedActions.includes(result.hardware_action));
+  assert.match(mapPack.frame, /library/i);
+  assert.match(mapPack.endCopy.winTitle, /Made it!/);
+  assert.match(mapPack.endCopy.winDetail, /Library reached/);
+  assert.match(mapPack.endCopy.missTitle, /Bell's gone/);
+  assert.match(mapPack.endCopy.missTitle, /gate/);
+});
+
+test("mission 2 tips stay student-facing", () => {
+  const bits = [mapPack.intro.teacher_tip];
+  Object.keys(mapPack.lines).forEach(function (key) {
+    bits.push(mapPack.lines[key].teacher_tip);
+    bits.push(mapPack.lines[key].spoken_reply);
+  });
+  const text = bits.join("\n");
+  assert.equal(/prompt\s*:/i.test(text), false);
+  assert.equal(/stretch\s*:/i.test(text), false);
+  assert.equal(/\b(chase|lockdown|stranger)\b/i.test(text), false);
+});
+
+test("mission 2 walks gate to library and wins only on ARRIVE_LIBRARY", () => {
+  let state = freshState(mapPack);
+  const expected = [
+    "GO_THROUGH_GATE",
+    "TURN_LEFT",
+    "GO_ALONG_PATH",
+    "WALK_PAST_CANTEEN",
+    "CROSS_PLAYGROUND",
+    "ARRIVE_LIBRARY"
+  ];
+  for (let i = 0; i < MAP_ROUTE.length; i++) {
+    const result = mapCoach(MAP_ROUTE[i], state);
+    assert.equal(result.hardware_action, expected[i], MAP_ROUTE[i]);
+    assert.ok(mapPack.allowedActions.includes(result.hardware_action));
+    state = applyHardwareAction(state, result.hardware_action);
+    if (i < MAP_ROUTE.length - 1) assert.equal(isWin(mapPack, state), false);
+  }
+  assert.equal(state.LIBRARY, "ARRIVED");
+  assert.equal(state.GATE, "THROUGH");
+  assert.equal(state.OFFICE, "PAST");
+  assert.equal(state.WALKWAY, "ALONG");
+  assert.equal(state.CANTEEN, "PAST");
+  assert.equal(state.PLAYGROUND, "CROSSED");
+  assert.equal(isWin(mapPack, state), true);
+  assert.equal(mapCoach(MAP_ROUTE[5], state).mood, "RELIEVED");
+  const won = mapCoach("Go into the library.", applyHardwareAction(freshState(mapPack), "ARRIVE_LIBRARY"));
+  assert.equal(won.hardware_action, "NONE");
+  assert.equal(won.mood, "RELIEVED");
+});
+
+test("vague directions hover, and canteen or hall do not win", () => {
+  for (const line of ["go", "turn", "that way", "Go there."]) {
+    const result = mapCoach(line);
+    assert.equal(result.hardware_action, "HOVER_CONFUSED", line);
+    assert.equal(mapPack.clarityStrikeActions.includes(result.hardware_action), true, line);
+  }
+
+  let state = freshState(mapPack);
+  state = applyHardwareAction(state, "GO_THROUGH_GATE");
+  state = applyHardwareAction(state, "TURN_LEFT");
+  state = applyHardwareAction(state, "GO_ALONG_PATH");
+  const canteen = mapCoach("Go into the canteen.", state);
+  assert.equal(canteen.hardware_action, "STEP_BACK");
+  assert.equal(canteen.mood, "CONFUSED");
+  assert.match(canteen.spoken_reply, /lunch/i);
+  const afterCanteen = applyHardwareAction(state, canteen.hardware_action);
+  assert.equal(isWin(mapPack, afterCanteen), false);
+  assert.equal(afterCanteen.CANTEEN, "AHEAD");
+  assert.equal(mapPack.clarityStrikeActions.includes("ARRIVE_CANTEEN"), true);
+
+  state = applyHardwareAction(state, "WALK_PAST_CANTEEN");
+  state = applyHardwareAction(state, "CROSS_PLAYGROUND");
+  const hall = mapCoach("Go to the school hall.", state);
+  assert.equal(hall.hardware_action, "ARRIVE_HALL");
+  assert.equal(isWin(mapPack, applyHardwareAction(state, hall.hardware_action)), false);
+  assert.match(hall.teacher_tip, /library/i);
+
+  const early = mapCoach("Go into the library.");
+  assert.notEqual(early.hardware_action, "ARRIVE_LIBRARY");
+  assert.equal(isWin(mapPack, applyHardwareAction(freshState(mapPack), early.hardware_action)), false);
+});
+
+test("one clear multi-step utterance can reach the library", () => {
+  const line = "Go through the school gate, walk past the office and turn left, go along the covered walkway, walk past the canteen, walk next to the playground, and go into the library.";
+  const result = mapCoach(line);
+  assert.equal(result.hardware_action, "ARRIVE_LIBRARY");
+  assert.equal(result.mood, "RELIEVED");
+  assert.equal(isWin(mapPack, applyHardwareAction(freshState(mapPack), result.hardware_action)), true);
+});
+
+test("map tokens move Leo from the gate towards the library", () => {
+  const start = freshState(mapPack);
+  const through = applyHardwareAction(start, "MOVE_NORTH");
+  assert.equal(through.GATE, "THROUGH");
+  assert.equal(through.FACING, "NORTH");
+  assert.equal(through.NODE, "GATE_IN");
+  const left = applyHardwareAction(through, "TURN_LEFT");
+  assert.equal(left.OFFICE, "PAST");
+  assert.equal(left.FACING, "WEST");
+  const west = applyHardwareAction(left, "MOVE_WEST");
+  assert.equal(west.FACING, "WEST");
+  assert.equal(west.LIBRARY, "AHEAD");
+  const hall = applyHardwareAction(west, "ARRIVE_HALL");
+  assert.equal(hall.NODE, "HALL");
+  const back = applyHardwareAction(hall, "STEP_BACK");
+  assert.equal(back.NODE, "CORNER");
+  assert.ok(MAP_SPOTS.LIBRARY.y < MAP_SPOTS.GATE.y);
+  assert.equal(sceneCue("HOVER_CONFUSED", start).text.includes("landmark"), true);
+  assert.equal(sceneCue("ARRIVE_LIBRARY", applyHardwareAction(start, "ARRIVE_LIBRARY")).kind, "hold");
+  assert.equal(sceneCue("HOVER_CONFUSED", freshState(pack)).text.includes("colour"), true);
+});
+
+test("mission 1 tips are student-facing", () => {
+  const tips = Object.keys(pack.lines).map((key) => pack.lines[key].teacher_tip);
+  tips.push(pack.intro.teacher_tip);
+  const banned = /Prompt:|Stretch:|soft fail|Win:|Excellent precision|Between is the trap|preposition under|Send Leo|Wrong bag =/;
+  for (const tip of tips) assert.equal(banned.test(tip), false, tip);
+  assert.equal(pack.lines.beat2.teacher_tip, "Try navy or black — say colour and size together.");
+  assert.equal(pack.lines.beat3.teacher_tip, "Great — size, colour, and between. Next check the name tag.");
+  assert.equal(pack.lines.beat4.teacher_tip, "Try: Check the name tag on the front of the bag.");
+  assert.equal(pack.lines.beat5Black.teacher_tip, "That was the black sports bag. Try the small navy one under the seat.");
+  assert.equal(pack.lines.beat5Grey.teacher_tip, "That was the big grey bag. Leo needs the small navy one under the seat, between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.beat6.teacher_tip, "Clear speech found it — not volume. Well done.");
+  assert.equal(pack.lines.alreadyWon.teacher_tip, pack.lines.beat6.teacher_tip);
+  assert.equal(pack.lines.needBetween.teacher_tip, "Say: between the black sports bag and the yellow lunchbox.");
+  assert.equal(pack.lines.fallback.teacher_tip, "Try one sentence: the small navy bag under the seat, between the black sports bag and the yellow lunchbox.");
+  const mapTips = Object.keys(mapPack.lines).map((key) => mapPack.lines[key].teacher_tip);
+  for (const tip of mapTips) assert.equal(/Prompt:|Stretch:/.test(tip), false, tip);
+});
+
+test("near-hit pronunciation maps to the target word and does not save a wrong bag", () => {
+  assert.equal(forgivePronunciation("lie berry"), "library");
+  assert.equal(forgivePronunciation("be twin"), "between");
+  assert.equal(forgivePronunciation("be to"), "between");
+  assert.equal(forgivePronunciation("onda"), "under");
+  assert.equal(forgivePronunciation("and the seat"), "under the seat");
+  assert.equal(forgivePronunciation("neighbour"), "navy");
+  assert.equal(
+    normaliseUtterance("between the black bag and the yellow lunchbox"),
+    "between the black bag and the yellow lunchbox"
+  );
+
+  const door = coach("Look and the seats near the door.");
+  assert.equal(door.hardware_action, "SEAT_NEAR_DOOR");
+
+  const navy = coach("The maybe bag.");
+  assert.equal(navy.hardware_action, "NONE");
+  assert.match(navy.spoken_reply, /small/i);
+
+  const black = coach("The black bag.");
+  assert.equal(black.hardware_action, "BAG_BLACK_SPORTS");
+
+  const kept = coach("Maybe the black bag.");
+  assert.equal(kept.hardware_action, "BAG_BLACK_SPORTS");
+
+  const full = coach("The small neighbour bag onda the seat be twin the black bag and the yellow lunchbox.");
+  assert.equal(full.hardware_action, "BAG_NAVY_SMALL");
+
+  let walked = freshState(mapPack);
+  walked = applyHardwareAction(walked, "GO_THROUGH_GATE");
+  walked = applyHardwareAction(walked, "TURN_LEFT");
+  walked = applyHardwareAction(walked, "GO_ALONG_PATH");
+  walked = applyHardwareAction(walked, "WALK_PAST_CANTEEN");
+  walked = applyHardwareAction(walked, "CROSS_PLAYGROUND");
+  const lib = mapCoach("Go to the lie berry.", walked);
+  assert.equal(lib.hardware_action, "ARRIVE_LIBRARY");
+
+  const first = mapCoach("navi");
+  assert.equal(first.hardware_action, "NONE");
+  assert.match(first.teacher_tip, /Nearly there/i);
+  const again = mapCoach("navi", Object.assign(freshState(mapPack), { LAST_UTTERANCE: "navy" }));
+  assert.equal(again.hardware_action, "HOVER_CONFUSED");
+  assert.equal(mapCoach("go").hardware_action, "HOVER_CONFUSED");
+});
+
+test("speak fills the box and does not auto-send a final transcript", () => {
+  const main = fs.readFileSync(new URL("./main.js", import.meta.url), "utf8");
+  const ai = fs.readFileSync(new URL("./ai-service.js", import.meta.url), "utf8");
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(ai, /continuous = true/);
+  assert.match(ai, /interimResults = true/);
+  assert.match(main, /onHeard/);
+  assert.equal(/onResult:\s*function[\s\S]{0,80}takeTurn/.test(main), false);
+  assert.match(main, /Say it clearer/);
+  assert.match(css, /#micBtn\.ask-send\.api-mesh\.is-listening/);
+  assert.match(css, /\.pin-gate \{ left: 50%/);
+  assert.match(css, /\.pin-library \{ left: 50%/);
+  assert.match(css, /\.pin-hall \{ left: 78%/);
+  assert.equal(/pin-goal/.test(fs.readFileSync(new URL("./scene2d.js", import.meta.url), "utf8")), false);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /id="noteCard"[^>]*data-ask-clear/);
+  const heard = heardText({
+    results: [
+      [{ transcript: "go through " }],
+      [{ transcript: "the gate" }]
+    ]
+  });
+  heardText({ results: [] });
+  const finals = heardText({
+    results: [
+      Object.assign([{ transcript: "walk past the canteen" }], { isFinal: true }),
+      [{ transcript: " please" }]
+    ]
+  });
+  assert.equal(finals.finalText, "walk past the canteen");
+  assert.equal(finals.interim, "please");
+  assert.equal(heard.interim.length > 0, true);
 });
 
 test("lost-bag copy stays school-safe", () => {

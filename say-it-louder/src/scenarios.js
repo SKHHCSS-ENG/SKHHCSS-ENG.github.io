@@ -1,8 +1,8 @@
 /**
  * Say It Louder — scenario packs (data only).
  * Mission 1: The Lost Bag. Soft comedy on the MTR after a school trip.
- * Add another mission by dropping a new object in SCENARIOS. main.js and the
- * mock coach read these fields; they do not hard-code a second mission.
+ * Mission 2: School Map Walk. Soft peer-help directions on a campus map.
+ * main.js and the mock coach read these fields.
  */
 
 const lostBag = {
@@ -12,6 +12,10 @@ const lostBag = {
   aiName: "Leo",
   sceneId: "mtr-carriage",
   frame: "Help Leo find his bag before the doors close.",
+  timerLabel: "Doors",
+  stageLabel: "Carriage",
+  noteTitle: "Seat note",
+  noteLead: "Leo remembers this. Say it in a clear sentence.",
   doorsSeconds: 90,
   maxStrikes: 3,
   allowedActions: [
@@ -32,6 +36,11 @@ const lostBag = {
     BAG_NAVY_SMALL: "HELD",
     NAME_TAG: "SHOWN"
   },
+  steps: [
+    { id: "zone", label: "Place", key: "SEAT_NEAR_DOOR", value: "LOOKING" },
+    { id: "bag", label: "Bag", key: "BAG_NAVY_SMALL", value: "HELD" },
+    { id: "tag", label: "Name tag", key: "NAME_TAG", value: "SHOWN" }
+  ],
   endCopy: {
     winTitle: "Bag found!",
     winDetail: "You said it clearer.",
@@ -233,7 +242,260 @@ const lostBag = {
   }
 };
 
+const schoolMap = {
+  id: "mission_2_school_map_walk",
+  title: "Mission 2: School Map Walk",
+  band: "All Levels starter",
+  aiName: "Leo",
+  sceneId: "school-map",
+  frame: "Help Leo walk to the library before the next lesson.",
+  timerLabel: "Bell",
+  stageLabel: "School map",
+  noteTitle: "Route note",
+  noteLead: "Leo has the map. Say the next direction in a clear sentence.",
+  doorsSeconds: 90,
+  maxStrikes: 3,
+  resetOnMiss: true,
+  timeoutMood: "CONFUSED",
+  timeoutLine: "Bell's gone — try the walk again from the gate.",
+  resetSpoken: "Bell's gone. I'm back at the school gate. Which way is the library?",
+  resetMood: "CONFUSED",
+  strikeOutSuffix: " That's three. Bell's gone — try again from the gate.",
+  badActionTip: "The coach reply was not a known action. Try the route note again.",
+  allowedActions: [
+    "MOVE_NORTH",
+    "MOVE_SOUTH",
+    "MOVE_EAST",
+    "MOVE_WEST",
+    "TURN_LEFT",
+    "TURN_RIGHT",
+    "GO_ALONG_PATH",
+    "GO_THROUGH_GATE",
+    "WALK_PAST_CANTEEN",
+    "CROSS_PLAYGROUND",
+    "ARRIVE_GATE",
+    "ARRIVE_OFFICE",
+    "ARRIVE_CANTEEN",
+    "ARRIVE_PLAYGROUND",
+    "ARRIVE_HALL",
+    "ARRIVE_LIBRARY",
+    "NONE",
+    "HOVER_CONFUSED",
+    "STEP_BACK"
+  ],
+  clarityStrikeActions: ["HOVER_CONFUSED", "STEP_BACK", "ARRIVE_CANTEEN", "ARRIVE_HALL"],
+  moods: ["CONFUSED", "HOPEFUL", "RELIEVED", "PANICKED"],
+  winWhen: {
+    LIBRARY: "ARRIVED"
+  },
+  steps: [
+    { id: "gate", label: "Gate", key: "GATE", value: "THROUGH" },
+    { id: "office", label: "Office", key: "OFFICE", value: "PAST" },
+    { id: "path", label: "Walkway", key: "WALKWAY", value: "ALONG" },
+    { id: "canteen", label: "Canteen", key: "CANTEEN", value: "PAST" },
+    { id: "ground", label: "Playground", key: "PLAYGROUND", value: "CROSSED" },
+    { id: "library", label: "Library", key: "LIBRARY", value: "ARRIVED" }
+  ],
+  endCopy: {
+    winTitle: "Made it!",
+    winDetail: "Library reached.",
+    missTitle: "Bell's gone — try again from the gate",
+    missDetail: "Reset and walk with Leo again. Clear beats loud."
+  },
+  intro: {
+    spoken_reply: "I'm at the school gate with the map, and the next lesson is coming. Which way is the library?",
+    mood: "CONFUSED",
+    teacher_tip: "Start at the gate. Try: Go through the school gate and walk straight on."
+  },
+  manualSteps: [
+    "Go through the school gate and walk straight on.",
+    "Walk past the school office and turn left.",
+    "Go along the covered walkway towards the canteen.",
+    "Walk past the canteen. Don't go inside.",
+    "Walk next to the playground until you see the library.",
+    "Go into the library."
+  ],
+  chunks: [
+    "Go through the school gate and walk straight on.",
+    "Walk past the school office and turn left.",
+    "Go along the covered walkway towards the canteen.",
+    "Walk past the canteen. Don't go inside.",
+    "Walk next to the playground until you see the library.",
+    "Go into the library."
+  ],
+  landmarks: [
+    { id: "GATE", label: "School Gate", place: "Start" },
+    { id: "OFFICE", label: "School Office", place: "Walk past" },
+    { id: "WALKWAY", label: "Covered walkway", place: "Go along" },
+    { id: "CANTEEN", label: "Canteen", place: "Walk past" },
+    { id: "PLAYGROUND", label: "Playground", place: "Cross the edge" },
+    { id: "HALL", label: "School Hall", place: "Next to the library" },
+    { id: "LIBRARY", label: "Library", place: "Goal" }
+  ],
+  initialState: {
+    NODE: "GATE",
+    LAST_NODE: "GATE",
+    FACING: "NORTH",
+    GATE: "AT",
+    OFFICE: "AHEAD",
+    WALKWAY: "AHEAD",
+    CANTEEN: "AHEAD",
+    PLAYGROUND: "AHEAD",
+    HALL: "AHEAD",
+    LIBRARY: "AHEAD"
+  },
+  trapRules: [
+    "If the student says only “go”, “that way”, or “turn”, use HOVER_CONFUSED and ask for left, right, or a landmark.",
+    "If they say go into the canteen or go to the canteen when the route needs walk past, use STEP_BACK. That is a soft wrong building, not a win.",
+    "If they name the hall without the library, use ARRIVE_HALL and ask for the library next to the hall.",
+    "Win only on ARRIVE_LIBRARY after the gate, past the office, along the walkway, past the canteen, and the playground. One clear utterance that gives that whole chain may win in a single turn.",
+    "A miss is “Bell's gone — try again from the gate”. This is a campus errand, not a chase."
+  ].join(" "),
+  lines: {
+    beat1: {
+      spoken_reply: "Okay… through the gate… walking straight. I can see the office ahead!",
+      mood: "HOPEFUL",
+      hardware_action: "GO_THROUGH_GATE",
+      teacher_tip: "Nice start. Next, say which way to turn when you reach the office."
+    },
+    beat1North: {
+      spoken_reply: "Straight on, towards the office. I'm coming through the gate.",
+      mood: "HOPEFUL",
+      hardware_action: "MOVE_NORTH",
+      teacher_tip: "Straight on works. Next, say walk past the school office and turn left."
+    },
+    needThrough: {
+      spoken_reply: "I'm at the gate, but I haven't gone through. Say go through the school gate.",
+      mood: "CONFUSED",
+      hardware_action: "NONE",
+      teacher_tip: "Go through the school gate, not just go to the gate."
+    },
+    vagueTurn: {
+      spoken_reply: "Turn… which way? Left or right? Say it clearer!",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Add left or right after turn — for example, turn left at the office."
+    },
+    vagueGo: {
+      spoken_reply: "Go… which way? Name a landmark, or say left or right.",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Go on its own is too vague. Try: Go through the school gate and walk straight on."
+    },
+    officePast: {
+      spoken_reply: "Walking past the school office. Do I turn left or right here?",
+      mood: "HOPEFUL",
+      hardware_action: "ARRIVE_OFFICE",
+      teacher_tip: "You named the office. Add the turn: turn left."
+    },
+    officeTurn: {
+      spoken_reply: "Past the office and left. I can see a covered walkway.",
+      mood: "HOPEFUL",
+      hardware_action: "TURN_LEFT",
+      teacher_tip: "Clear turn. Next, say go along the covered walkway."
+    },
+    turnLeftOnly: {
+      spoken_reply: "Turning left. Say it again with the office if that is the landmark.",
+      mood: "HOPEFUL",
+      hardware_action: "TURN_LEFT",
+      teacher_tip: "Add the landmark: walk past the school office and turn left."
+    },
+    turnRight: {
+      spoken_reply: "Right? That faces away from the walkway. Do you mean turn left at the office?",
+      mood: "CONFUSED",
+      hardware_action: "TURN_RIGHT",
+      teacher_tip: "At the office the path is left. Say: Walk past the school office and turn left."
+    },
+    along: {
+      spoken_reply: "Along the walkway… I can smell the canteen already!",
+      mood: "HOPEFUL",
+      hardware_action: "GO_ALONG_PATH",
+      teacher_tip: "Great use of go along. Next, tell Leo what to do when he reaches the canteen."
+    },
+    canteenFoil: {
+      spoken_reply: "This smells like lunch, not books. I'm stepping back. Where should I go?",
+      mood: "CONFUSED",
+      hardware_action: "STEP_BACK",
+      teacher_tip: "That was the canteen. Try walk past the canteen, then head for the playground."
+    },
+    canteenPast: {
+      spoken_reply: "Walking past the canteen. I won't go in. The playground is ahead.",
+      mood: "HOPEFUL",
+      hardware_action: "WALK_PAST_CANTEEN",
+      teacher_tip: "Walk past is the right choice. Next, walk next to the playground or cross the edge."
+    },
+    besideCanteen: {
+      spoken_reply: "Beside the canteen might mean I step in. Do you mean walk past it?",
+      mood: "CONFUSED",
+      hardware_action: "NONE",
+      teacher_tip: "Say walk past the canteen. Beside can sound like go in."
+    },
+    playground: {
+      spoken_reply: "Next to the playground… oh! I can see the library sign!",
+      mood: "HOPEFUL",
+      hardware_action: "CROSS_PLAYGROUND",
+      teacher_tip: "Clear place language. Finish with go into the library or stop at the library."
+    },
+    hallFoil: {
+      spoken_reply: "This is the hall — big stage, no books. Which building is the library?",
+      mood: "CONFUSED",
+      hardware_action: "ARRIVE_HALL",
+      teacher_tip: "Name the building: the library next to the hall, not the hall itself."
+    },
+    win: {
+      spoken_reply: "Library doors — I'm in! You're a legend. Book time!",
+      mood: "RELIEVED",
+      hardware_action: "ARRIVE_LIBRARY",
+      teacher_tip: "Clear directions did it — turn, go along, past, and next to. Volume was never the point."
+    },
+    earlyLibrary: {
+      spoken_reply: "The library is the goal, but I'm not there yet. Where do I go next?",
+      mood: "CONFUSED",
+      hardware_action: "NONE",
+      teacher_tip: "Keep the order: gate, past the office, along the walkway, past the canteen, then the playground."
+    },
+    libraryNeedVerb: {
+      spoken_reply: "I can see the library. Do I go in, or stop at the door?",
+      mood: "HOPEFUL",
+      hardware_action: "NONE",
+      teacher_tip: "Finish the direction: go into the library, or stop at the library."
+    },
+    earlyStep: {
+      spoken_reply: "I can do that in a minute. Tell me the next bit from where I'm standing.",
+      mood: "HOPEFUL",
+      hardware_action: "NONE",
+      teacher_tip: "One clear step at a time. Say the direction for the place Leo can see now."
+    },
+    compass: {
+      spoken_reply: "I can face that way. Add a landmark so I know when to stop.",
+      mood: "HOPEFUL",
+      hardware_action: "MOVE_NORTH",
+      teacher_tip: "A compass word turns Leo. Pair it with a place, such as the office or the walkway."
+    },
+    empty: {
+      spoken_reply: "I didn't hear a direction. Tell me which way to walk.",
+      mood: "CONFUSED",
+      hardware_action: "NONE",
+      teacher_tip: "Use a direction. Try: Go through the school gate and walk straight on."
+    },
+    alreadyWon: {
+      spoken_reply: "We're at the library. Made it — thank you!",
+      mood: "RELIEVED",
+      hardware_action: "NONE",
+      teacher_tip: "Clear directions did it — turn, go along, past, and next to. Volume was never the point."
+    },
+    fallback: {
+      spoken_reply: "Say it clearer for me? I need a direction and a landmark.",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
+      teacher_tip: "Add a landmark and a direction word, such as turn left, go along, or walk past."
+    }
+  }
+};
+
 export const SCENARIOS = {
   level_1_lost_bag: lostBag,
-  mission_1_lost_bag: lostBag
+  mission_1_lost_bag: lostBag,
+  mission_2_school_map_walk: schoolMap,
+  level_2_map_walk: schoolMap
 };

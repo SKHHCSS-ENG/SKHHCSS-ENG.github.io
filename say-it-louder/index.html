@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Say It Louder · English · SKH Holy Carpenter Secondary School</title>
-<meta name="description" content="Say It Louder — coach Leo with precise English and find his school bag on the MTR. All Levels starter.">
+<meta name="description" content="Say It Louder — coach Leo with precise English. Mission 1 finds his school bag on the MTR. Mission 2 walks him from the school gate to the library. All Levels starter.">
 <link rel="stylesheet" href="../ask.css?v=20261030b">
 <link rel="stylesheet" href="styles.css?v=20261101b">
 </head>
@@ -27,13 +27,13 @@
     <p id="frameLine" class="frame">Help Leo find his bag before the doors close.</p>
 
     <div class="layout">
-      <section class="stage" aria-label="Carriage">
+      <section class="stage" id="stage" aria-label="Carriage">
         <div class="status-row">
           <h2 id="missionTitle" class="mission-title">Mission 1: The Lost Bag</h2>
           <p id="doorsHud" class="pill" data-ask-clear>Doors 1:30</p>
           <p id="clarityHud" class="pill pill-clarity" data-ask-clear aria-label="3 of 3 clear chances remaining">3 clear chances</p>
         </div>
-        <ol class="step-pips" aria-label="Progress">
+        <ol id="stepPips" class="step-pips" aria-label="Progress">
           <li data-step="zone">Place</li>
           <li data-step="bag">Bag</li>
           <li data-step="tag">Name tag</li>
@@ -47,9 +47,9 @@
       </section>
 
       <aside class="side">
-        <section class="card">
-          <h2>Seat note</h2>
-          <p class="card-lead">Leo remembers this. Say it in a clear sentence.</p>
+        <section class="card" id="noteCard" data-ask-clear>
+          <h2 id="noteTitle">Seat note</h2>
+          <p id="noteLead" class="card-lead">Leo remembers this. Say it in a clear sentence.</p>
           <ol id="manualList" class="manual"></ol>
         </section>
 

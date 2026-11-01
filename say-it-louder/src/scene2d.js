@@ -16,7 +16,70 @@ var ACTION_COPY = {
   NONE: ""
 };
 
+export var MAP_SPOTS = {
+  GATE: { x: 50, y: 78 },
+  GATE_IN: { x: 50, y: 68 },
+  OFFICE: { x: 50, y: 58 },
+  CORNER: { x: 50, y: 50 },
+  WALKWAY: { x: 50, y: 42 },
+  CANTEEN_PATH: { x: 50, y: 34 },
+  CANTEEN: { x: 18, y: 34 },
+  PLAYGROUND: { x: 50, y: 26 },
+  HALL: { x: 78, y: 16 },
+  LIBRARY: { x: 50, y: 30 }
+};
+
+var MAP_PIN = {
+  GATE: "GATE",
+  GATE_IN: "GATE",
+  OFFICE: "OFFICE",
+  CORNER: "OFFICE",
+  WALKWAY: "WALKWAY",
+  CANTEEN_PATH: "CANTEEN",
+  CANTEEN: "CANTEEN",
+  PLAYGROUND: "PLAYGROUND",
+  HALL: "HALL",
+  LIBRARY: "LIBRARY"
+};
+
+var WALK_ACTIONS = {
+  MOVE_NORTH: 1,
+  MOVE_SOUTH: 1,
+  MOVE_EAST: 1,
+  MOVE_WEST: 1,
+  TURN_LEFT: 1,
+  TURN_RIGHT: 1,
+  GO_ALONG_PATH: 1,
+  GO_THROUGH_GATE: 1,
+  WALK_PAST_CANTEEN: 1,
+  CROSS_PLAYGROUND: 1,
+  ARRIVE_GATE: 1,
+  ARRIVE_OFFICE: 1,
+  ARRIVE_CANTEEN: 1,
+  ARRIVE_PLAYGROUND: 1,
+  ARRIVE_HALL: 1,
+  ARRIVE_LIBRARY: 1,
+  STEP_BACK: 1
+};
+
+function mapCue(action, state) {
+  if (action === "HOVER_CONFUSED") {
+    return { kind: "wait", text: "Wait — say left, right, or a landmark." };
+  }
+  if (action === "STEP_BACK" || action === "ARRIVE_CANTEEN") {
+    return { kind: "wait", text: "Wrong building — step back and say it clearer." };
+  }
+  if (action === "ARRIVE_HALL" || (state && state.NODE === "HALL")) {
+    return { kind: "wait", text: "That's the hall. The library is next to it." };
+  }
+  if (state && state.LIBRARY === "ARRIVED") {
+    return { kind: "hold", text: "Library reached." };
+  }
+  return null;
+}
+
 export function sceneCue(action, state) {
+  if (state && Object.prototype.hasOwnProperty.call(state, "GATE")) return mapCue(action, state);
   if (action === "HOVER_CONFUSED") {
     return { kind: "wait", text: "Wait — say the colour and the size." };
   }
@@ -45,11 +108,186 @@ function propNode(prop, className) {
   return wrap;
 }
 
+function mountSchoolMap(root, scenario, live) {
+  var campus = el("div", "campus");
+  campus.setAttribute("data-ask-clear", "");
+  campus.setAttribute("role", "img");
+  campus.setAttribute("aria-label", "School campus map. The gate is at the bottom. The path goes past the office, along the covered walkway, past the canteen, and beside the playground to the library. The school hall is next to the library.");
+
+  campus.appendChild(el("div", "campus-grass"));
+  campus.appendChild(el("div", "campus-path campus-path-ns"));
+  campus.appendChild(el("div", "campus-path campus-path-ew"));
+
+  var pins = {};
+  (scenario.landmarks || []).forEach(function (mark) {
+    var pin = el("div", "pin pin-" + mark.id.toLowerCase());
+    pin.dataset.pin = mark.id;
+    pin.appendChild(el("span", "pin-label", mark.label));
+    if (mark.place) pin.appendChild(el("span", "pin-place", mark.place));
+    pins[mark.id] = pin;
+    campus.appendChild(pin);
+  });
+
+  var leo = el("div", "leo");
+  leo.setAttribute("data-ask-clear", "");
+  leo.appendChild(el("span", "leo-name", "Leo"));
+  var figure = el("span", "leo-figure");
+  figure.setAttribute("aria-hidden", "true");
+  var head = el("span", "leo-head");
+  head.appendChild(el("span", "leo-hair"));
+  head.appendChild(el("span", "leo-eyes"));
+  head.appendChild(el("span", "leo-mouth"));
+  head.appendChild(el("span", "leo-sweat"));
+  figure.appendChild(head);
+  var torso = el("span", "leo-body");
+  torso.appendChild(el("span", "leo-tie"));
+  figure.appendChild(torso);
+  var legs = el("span", "leo-legs");
+  legs.appendChild(el("span", "leo-leg"));
+  legs.appendChild(el("span", "leo-leg"));
+  figure.appendChild(legs);
+  leo.appendChild(figure);
+  var mood = el("span", "leo-mood", "Confused");
+  leo.appendChild(mood);
+  campus.appendChild(leo);
+
+  var cue = el("p", "scene-cue");
+  cue.hidden = true;
+  cue.setAttribute("data-ask-clear", "");
+  cue.setAttribute("role", "status");
+
+  var chan = el("p", "ms-chan", "Ms Chan is by the gate. The bell starts when you speak.");
+  chan.setAttribute("data-ask-clear", "");
+
+  root.appendChild(cue);
+  root.appendChild(campus);
+  root.appendChild(chan);
+  root.appendChild(live);
+
+  var walkTimer = null;
+
+  function showCue(next) {
+    if (!next) {
+      cue.hidden = true;
+      cue.textContent = "";
+      cue.className = "scene-cue";
+      return;
+    }
+    cue.hidden = false;
+    cue.className = "scene-cue is-" + next.kind;
+    cue.textContent = next.text;
+  }
+
+  function placeLeo(state) {
+    var node = (state && state.NODE) || "GATE";
+    var spot = MAP_SPOTS[node] || MAP_SPOTS.GATE;
+    leo.style.left = spot.x + "%";
+    leo.style.top = spot.y + "%";
+    var facing = ((state && state.FACING) || "NORTH").toLowerCase();
+    campus.classList.remove("facing-north", "facing-east", "facing-south", "facing-west");
+    campus.classList.add("facing-" + facing);
+    Object.keys(pins).forEach(function (id) {
+      pins[id].classList.remove("is-here", "is-beside");
+    });
+    var pinId = MAP_PIN[node];
+    if (pinId && pins[pinId]) {
+      if (node === "CANTEEN_PATH") pins[pinId].classList.add("is-beside");
+      else pins[pinId].classList.add("is-here");
+    }
+  }
+
+  function setMood(next) {
+    var label = {
+      PANICKED: "Panicked",
+      CONFUSED: "Confused",
+      RELIEVED: "Relieved",
+      HOPEFUL: "Hopeful"
+    }[next] || "Confused";
+    campus.dataset.mood = next || "CONFUSED";
+    mood.textContent = label;
+  }
+
+  function apply(action, state) {
+    campus.classList.remove("is-hover", "is-foil-canteen", "is-foil-hall", "is-walking");
+    placeLeo(state);
+    if (action === "HOVER_CONFUSED") campus.classList.add("is-hover");
+    if (action === "STEP_BACK" || action === "ARRIVE_CANTEEN") campus.classList.add("is-foil-canteen");
+    if (action === "ARRIVE_HALL") campus.classList.add("is-foil-hall");
+    if (walkTimer) clearTimeout(walkTimer);
+    if (WALK_ACTIONS[action]) {
+      campus.classList.add("is-walking");
+      walkTimer = setTimeout(function () {
+        campus.classList.remove("is-walking");
+      }, 800);
+    }
+    if (MAP_ACTION_COPY[action]) live.textContent = MAP_ACTION_COPY[action];
+    showCue(mapCue(action, state));
+  }
+
+  function setDoors(seconds, running) {
+    if (!running) {
+      chan.textContent = "Ms Chan is by the gate. The bell starts when you speak.";
+      return;
+    }
+    if (seconds <= 0) {
+      chan.textContent = "Ms Chan: Bell's gone.";
+      return;
+    }
+    chan.textContent = "Ms Chan: Bell in " + seconds + " seconds.";
+  }
+
+  function setOutcome(kind) {
+    campus.classList.remove("is-win", "is-missed");
+    if (kind === "win") {
+      campus.classList.add("is-win");
+      chan.textContent = "Ms Chan: Library reached. Lovely clear directions.";
+      showCue({ kind: "hold", text: "Library reached." });
+      return;
+    }
+    if (kind === "miss") {
+      campus.classList.add("is-missed");
+      chan.textContent = "Ms Chan: Bell's gone — back to the gate.";
+      showCue(null);
+      return;
+    }
+    showCue(null);
+  }
+
+  setMood("CONFUSED");
+  placeLeo(scenario.initialState);
+  return { apply: apply, setMood: setMood, setDoors: setDoors, setOutcome: setOutcome };
+}
+
+var MAP_ACTION_COPY = {
+  MOVE_NORTH: "Leo walks north.",
+  MOVE_SOUTH: "Leo walks south.",
+  MOVE_EAST: "Leo walks east.",
+  MOVE_WEST: "Leo walks west.",
+  TURN_LEFT: "Leo turns left.",
+  TURN_RIGHT: "Leo turns right.",
+  GO_THROUGH_GATE: "Leo goes through the school gate.",
+  GO_ALONG_PATH: "Leo goes along the covered walkway.",
+  WALK_PAST_CANTEEN: "Leo walks past the canteen.",
+  CROSS_PLAYGROUND: "Leo crosses the playground edge.",
+  ARRIVE_GATE: "Leo is at the school gate.",
+  ARRIVE_OFFICE: "Leo is by the school office.",
+  ARRIVE_CANTEEN: "Leo steps into the canteen, then back.",
+  ARRIVE_PLAYGROUND: "Leo is at the playground edge.",
+  ARRIVE_HALL: "Leo is at the school hall.",
+  ARRIVE_LIBRARY: "Leo arrives at the library.",
+  STEP_BACK: "Leo steps back from the wrong building.",
+  HOVER_CONFUSED: "Leo waits, unsure which way you mean.",
+  NONE: ""
+};
+
 export function mountScene(root, scenario) {
   root.replaceChildren();
   root.classList.add("scene");
+  root.classList.toggle("scene-map", !!(scenario && scenario.sceneId === "school-map"));
   var live = el("p", "scene-live");
   live.setAttribute("aria-live", "polite");
+
+  if (scenario && scenario.sceneId === "school-map") return mountSchoolMap(root, scenario, live);
 
   if (!scenario || scenario.sceneId !== "mtr-carriage") {
     var plain = el("p", "scene-fallback", scenario ? scenario.title : "Scene");

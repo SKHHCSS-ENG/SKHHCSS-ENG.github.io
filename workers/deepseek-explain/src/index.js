@@ -11,7 +11,7 @@
  */
 
 import { ASK_SYSTEM_PROMPT, ASK_TASK } from "./askPrompt.js";
-import { COACH_ACTIONS, COACH_MOODS, COACH_SYSTEM_PROMPT, COACH_TASK } from "./coachPrompt.js";
+import { COACH_ACTIONS, COACH_MOODS, COACH_PACKS, COACH_SYSTEM_PROMPT, COACH_TASK } from "./coachPrompt.js";
 
 export { ASK_SYSTEM_PROMPT, ASK_TASK, COACH_ACTIONS, COACH_MOODS, COACH_SYSTEM_PROMPT, COACH_TASK };
 
@@ -259,7 +259,7 @@ function readAskFields(data) {
   };
 }
 
-const COACH_SCENARIOS = ["level_1_lost_bag", "mission_1_lost_bag"];
+const COACH_SCENARIOS = Object.keys(COACH_PACKS);
 
 export function buildCoachUserMessage(fields) {
   return [
@@ -320,7 +320,7 @@ function rubricVoice(tip) {
   return /\b(prompt|stretch)\s*:|soft fail|\bwin\s*:|excellent precision/i.test(tip);
 }
 
-export function coachReplyFromModel(text) {
+export function coachReplyFromModel(text, actions) {
   let raw = String(text || "").trim();
   raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
   const start = raw.indexOf("{");
@@ -339,7 +339,7 @@ export function coachReplyFromModel(text) {
     ? data.hardware_action
     : data.scene_action;
   const mood = exactToken(data.mood, COACH_MOODS);
-  const action = exactToken(named, COACH_ACTIONS);
+  const action = exactToken(named, actions || COACH_ACTIONS);
   if (!spoken || !tip || !mood || !action) return null;
   if (rubricVoice(tip)) return null;
   return {
@@ -505,8 +505,9 @@ export async function handleRequest(request, env) {
     if (parsed.error === "scenario") {
       return jsonResponse(400, { error: "This coach only covers the lost bag." }, origin);
     }
+    const pack = COACH_PACKS[parsed.fields.scenarioId];
     const coached = await callDeepSeek(env, buildCoachUserMessage(parsed.fields), {
-      system: COACH_SYSTEM_PROMPT,
+      system: pack.prompt,
       maxTokens: 420,
       maxChars: 1200,
       unavailable: "Say It Louder is unavailable just now.",
@@ -515,7 +516,7 @@ export async function handleRequest(request, env) {
     if (!coached.ok) {
       return jsonResponse(coached.status, { error: coached.error }, origin);
     }
-    const coach = coachReplyFromModel(coached.explanation);
+    const coach = coachReplyFromModel(coached.explanation, pack.actions);
     if (!coach) {
       console.error("coach_bad_json");
       return jsonResponse(502, { error: "Say It Louder is unavailable just now." }, origin);
