@@ -2045,14 +2045,31 @@
     /* Snap is one fixed border box. Front keeps its own longer-label floor.
        Padding and height stay the seating-chip values (8px, 24px, rounded-lg). */
     #btnToggleSnapGrid {
-      /* Snap: OFF with the ruler, gap, and 8px padding. 108px is the full
-         border box measured for the 12px semibold face, slightly above the
-         text, so a wider color-emoji ruler still fits. width and max-width
+      /* Snap: OFF is the longer text-only label (no ruler). 76px is that
+         12px semibold face plus 8px padding each side. width and max-width
          keep ON on the same box. */
-      flex: 0 0 108px;
-      width: 108px;
-      min-width: 108px;
-      max-width: 108px;
+      flex: 0 0 76px;
+      width: 76px;
+      min-width: 76px;
+      max-width: 76px;
+    }
+    /* Tidy is a Default-skin sky chip. Minimalist and Spark restyle every
+       toolbar button with their own rules, which outrank this id, so the
+       sky fills stay on Default only. */
+    #btnTidyLayout {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #7dd3fc;
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.18);
+    }
+    #btnTidyLayout:hover {
+      background-color: #bae6fd;
+      color: #0369a1;
+      border-color: #7dd3fc;
+    }
+    #btnTidyLayout:disabled {
+      opacity: 0.4;
+      box-shadow: none;
     }
     #btnFlipRoom {
       /* "Front: Bottom" measures 9.93ch. 9.95ch is the same small step above it.
@@ -2900,7 +2917,11 @@
     html[data-skin="minimalist"] #btnCancelResetModal,
     html[data-skin="minimalist"] #btnCancelClearGroups,
     html[data-skin="minimalist"] #btnCancelResetModal:hover,
-    html[data-skin="minimalist"] #btnCancelClearGroups:hover {
+    html[data-skin="minimalist"] #btnCancelClearGroups:hover,
+    html[data-skin="minimalist"] #btnCancelApplyGrid,
+    html[data-skin="minimalist"] #btnConfirmApplyGrid,
+    html[data-skin="minimalist"] #btnCancelApplyGrid:hover,
+    html[data-skin="minimalist"] #btnConfirmApplyGrid:hover {
       background: var(--skin-bg);
       color: var(--skin-text);
       box-shadow: inset 0 0 0 1px var(--skin-line);
@@ -3009,6 +3030,7 @@
     html[data-skin="minimalist"] #pickerModal .shadow-2xl,
     html[data-skin="minimalist"] #resetModal .shadow-2xl,
     html[data-skin="minimalist"] #clearGroupsModal .shadow-2xl,
+    html[data-skin="minimalist"] #applyGridModal .shadow-2xl,
     html[data-skin="minimalist"] #timerPopover {
       box-shadow: none;
       border-color: var(--skin-line);
@@ -3939,7 +3961,7 @@
   <section id="studioToolbar" class="bg-white border-b border-slate-200 shadow-sm z-30">
     <div id="studioToolbarRow" class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
-      <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Manage Groups, Assign Groups. -->
+      <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Tidy, Manage Groups, Assign, Clear. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">Register</span>
         <!-- Edit: ON edits names, seat #, team names, delete, desk drag, and layout tools. OFF is teach mode. -->
@@ -3956,18 +3978,22 @@
           <span>＋ Group</span>
         </button>
 
+        <button id="btnTidyLayout" type="button" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-300 text-xs font-bold inline-flex items-center gap-1 transition" title="Snap desks to this layout — doesn’t move who sits where.">
+          <span aria-hidden="true">📐</span>
+          <span>Tidy</span>
+        </button>
+
         <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition">
           <span aria-hidden="true">🛡️</span>
           <span>Manage Groups</span>
         </button>
 
-        <!-- Paint: pick a group colour, then tap desks. Label stays Assign Groups. -->
-        <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Tap a group colour, then tap desks">
-          <span aria-hidden="true">🎨</span>
-          <span id="groupBrushBtnLabel">Assign Groups</span>
+        <!-- Paint: pick a group colour, then tap desks. Visible label is Assign. -->
+        <button id="btnToggleGroupBrush" type="button" class="px-3 py-1 rounded-lg bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 text-xs font-bold flex items-center gap-1.5 transition" title="Assign groups — pick a colour, then tap desks" aria-label="Assign Groups">
+          <span id="groupBrushBtnLabel">Assign</span>
         </button>
-        <button id="btnClearGroups" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold whitespace-nowrap transition" title="Clear every student’s group assignment. Groups and scores stay.">
-          Clear Groups
+        <button id="btnClearGroups" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold whitespace-nowrap transition" title="Clear every student’s group assignment. Groups and scores stay." aria-label="Clear Groups">
+          Clear
         </button>
       </div>
 
@@ -3990,13 +4016,9 @@
         <button type="button" data-layout="rows" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space the grid into separate exam desks" aria-label="Exam Rows">Exam</button>
         <button type="button" data-layout="pairs" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns, with a wider aisle between pairs" aria-label="Paired Desks">Pairs</button>
         <button type="button" data-layout="pods4" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group desks into 2×2 pods, with a wider aisle between pods" aria-label="4-Desk Pods">4-Desk</button>
-        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition flex items-center gap-1" title="Gather each group into a cluster, with a wider aisle between clusters" aria-label="Cluster by Group">
-          <span aria-hidden="true">🧲</span>
-          <span>By Group</span>
-        </button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition" title="Gather each group into a cluster, with a wider aisle between clusters" aria-label="Cluster by Group">Group</button>
 
-        <button id="btnToggleSnapGrid" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Snap desks to a grid when dragging">
-          <span aria-hidden="true">📏</span>
+        <button id="btnToggleSnapGrid" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center justify-center transition whitespace-nowrap" title="Snap desks to a grid when dragging">
           <span id="snapGridText">Snap: ON</span>
         </button>
         <button id="btnFlipRoom" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center gap-1 transition whitespace-nowrap" title="Move the front of the room to the top or the bottom">
@@ -4323,7 +4345,7 @@
 
           <div class="bg-violet-50 rounded-2xl p-3.5 border border-violet-100 mt-auto">
             <div class="text-xs font-bold text-violet-950 mb-1">💡 Fast Canvas Grouping Tip</div>
-            <p class="text-[11px] text-violet-800 mb-2">You can also click <strong>Assign Groups</strong> on the main toolbar, pick a group colour, and tap desks on the classroom map.</p>
+            <p class="text-[11px] text-violet-800 mb-2">You can also click <strong>Assign</strong> on the main toolbar, pick a group colour, and tap desks on the classroom map.</p>
             <button id="btnSwitchToBrushFromModal" type="button" class="w-full py-1.5 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs transition">
               🎨 Switch to Canvas Group Brush
             </button>
@@ -4497,6 +4519,18 @@
         <button id="btnCancelResetModal" type="button" class="w-full py-2 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition">
           Cancel
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply builds a fresh Rows × Cols rectangle. Confirm before the wipe. -->
+  <div id="applyGridModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6" role="dialog" aria-modal="true" aria-labelledby="applyGridTitle" aria-describedby="applyGridDetail">
+      <h3 id="applyGridTitle" class="font-display text-lg font-bold text-slate-800">Apply a fresh grid?</h3>
+      <p id="applyGridDetail" class="text-sm text-slate-500 mt-2">This wipes the current desk positions and builds a fresh rectangle from Rows and Cols. Names, groups, and scores stay.</p>
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 mt-5">
+        <button id="btnCancelApplyGrid" type="button" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition">Cancel</button>
+        <button id="btnConfirmApplyGrid" type="button" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition">Apply</button>
       </div>
     </div>
   </div>
@@ -5255,11 +5289,12 @@
         else el.removeAttribute('aria-disabled');
       }
 
-      // Grey Snap, Front, presets, and the grid while Edit is off. History stays live.
+      // Grey Tidy, Snap, Front, presets, and the grid while Edit is off. History stays live.
       function syncLayoutToolGate() {
         var frozen = !boardEditsAllowed();
         var seating = document.getElementById('studioSeatingBand');
         if (seating) seating.classList.toggle('is-teach-frozen', frozen);
+        setControlFrozen(document.getElementById('btnTidyLayout'), frozen);
         setControlFrozen(document.getElementById('btnApplyCustomGrid'), frozen);
         setControlFrozen(document.getElementById('btnToggleSnapGrid'), frozen);
         setControlFrozen(document.getElementById('btnFlipRoom'), frozen);
@@ -7152,7 +7187,7 @@
         document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
           const lt = btn.getAttribute('data-layout');
           if (lt === 'groupClusters') {
-            btn.className = 'layout-preset-btn px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ' +
+            btn.className = 'layout-preset-btn px-3 py-1 rounded-lg text-xs font-bold transition ' +
               (activeStyle === 'groupClusters'
                 ? 'bg-violet-600 text-white shadow-xs ring-2 ring-violet-300'
                 : 'bg-violet-100 hover:bg-violet-200 text-violet-800');
@@ -8106,6 +8141,65 @@
 
       let dragContext = null;
 
+      // How much of a desk the drop covers. A light brush is not a swap.
+      function deskOverlapArea(ax, ay, bx, by) {
+        var left = Math.max(ax, bx);
+        var right = Math.min(ax + DESK_W, bx + DESK_W);
+        var top = Math.max(ay, by);
+        var bottom = Math.min(ay + DESK_H, by + DESK_H);
+        if (right <= left || bottom <= top) return 0;
+        return (right - left) * (bottom - top);
+      }
+
+      // Dropping onto another seat exchanges the two slot positions exactly.
+      // The student stays on their own desk. Only x/y swap, so both land flush.
+      function findSeatSwapTarget(cls, student, x, y) {
+        var best = null;
+        var bestArea = 0;
+        var minArea = DESK_W * DESK_H * 0.2;
+        var cx = x + DESK_W / 2;
+        var cy = y + DESK_H / 2;
+        (cls.students || []).forEach(function (other) {
+          if (!other || other.id === student.id) return;
+          var area = deskOverlapArea(x, y, other.x, other.y);
+          var centerInside = cx >= other.x && cx <= other.x + DESK_W && cy >= other.y && cy <= other.y + DESK_H;
+          if (centerInside) area = Math.max(area, minArea);
+          if (area > bestArea) {
+            bestArea = area;
+            best = other;
+          }
+        });
+        if (!best || bestArea < minArea) return null;
+        return best;
+      }
+
+      function placeDeskElement(student) {
+        var container = document.getElementById('desksContainer');
+        if (!container || !student) return;
+        var cards = container.querySelectorAll('.desk-card');
+        for (var i = 0; i < cards.length; i++) {
+          if (cards[i].getAttribute('data-student-id') !== student.id) continue;
+          cards[i].style.left = Math.round(student.x) + 'px';
+          cards[i].style.top = Math.round(student.y) + 'px';
+          return;
+        }
+      }
+
+      function settleDeskSwap(cls, drag) {
+        var student = drag.student;
+        var target = findSeatSwapTarget(cls, student, student.x, student.y);
+        if (!target) return null;
+        var sourceX = drag.origX;
+        var sourceY = drag.origY;
+        student.x = target.x;
+        student.y = target.y;
+        target.x = sourceX;
+        target.y = sourceY;
+        placeDeskElement(student);
+        placeDeskElement(target);
+        return target;
+      }
+
       function initCanvasDragAndClickEvents() {
         const container = document.getElementById('desksContainer');
         if (!container) return;
@@ -8379,14 +8473,25 @@
 
         function finishDrag(e) {
           if (!dragContext || e.pointerId !== dragContext.pointerId) return;
-          dragContext.deskEl.classList.remove('dragging');
+          var drag = dragContext;
+          drag.deskEl.classList.remove('dragging');
           try {
-            dragContext.deskEl.releasePointerCapture(e.pointerId);
+            drag.deskEl.releasePointerCapture(e.pointerId);
           } catch (err) {}
-          if (dragContext.hasMoved) {
+          if (drag.hasMoved) {
             const cls = getCurrentClass();
-            if (cls && dragContext.student && dragContext.beforeBoard) {
-              pushLayoutHistory(dragContext.beforeBoard, snapshotBoardEdit(cls), 'Move ' + (formatStudentLabel(dragContext.student.classNo, dragContext.student.name) || 'desk'));
+            var swappedWith = null;
+            if (cls && drag.student && e.type === 'pointerup') {
+              swappedWith = settleDeskSwap(cls, drag);
+            }
+            if (cls && drag.student && drag.beforeBoard) {
+              var mine = formatStudentLabel(drag.student.classNo, drag.student.name) || 'desk';
+              var label = 'Move ' + mine;
+              if (swappedWith) {
+                var theirs = formatStudentLabel(swappedWith.classNo, swappedWith.name) || 'desk';
+                label = 'Swap ' + mine + ' with ' + theirs;
+              }
+              pushLayoutHistory(drag.beforeBoard, snapshotBoardEdit(cls), label);
             }
             saveState();
             renderHeaderControls();
@@ -8409,6 +8514,162 @@
         if (rInput) rInput.value = String(reqRows);
         if (cInput) cInput.value = String(reqCols);
         return { rows: reqRows, cols: reqCols };
+      }
+
+      // Column/row anchor: the position in the cluster that the desks already share.
+      function axisClusterAnchor(items) {
+        var best = items[0];
+        var bestSum = Infinity;
+        var bestCount = -1;
+        for (var i = 0; i < items.length; i++) {
+          var candidate = items[i];
+          var sum = 0;
+          var count = 0;
+          for (var j = 0; j < items.length; j++) {
+            var dist = Math.abs(items[j] - candidate);
+            sum += dist;
+            if (dist < 0.5) count += 1;
+          }
+          if (sum < bestSum - 0.001 || (Math.abs(sum - bestSum) <= 0.001 && count > bestCount)) {
+            best = candidate;
+            bestSum = sum;
+            bestCount = count;
+          }
+        }
+        return best;
+      }
+
+      // Cluster nearby X or Y values without joining real columns or rows.
+      // maxSpan stays under half the tightest pitch, so pairs and singles stay.
+      function layoutAxisAnchors(values, maxSpan) {
+        var clusters = [];
+        values.forEach(function (v) {
+          if (typeof v !== 'number' || !isFinite(v)) return;
+          clusters.push([v]);
+        });
+        if (!clusters.length) return [];
+        function canMerge(a, b) {
+          var min = Infinity;
+          var max = -Infinity;
+          a.concat(b).forEach(function (v) {
+            if (v < min) min = v;
+            if (v > max) max = v;
+          });
+          if (max - min > maxSpan) return false;
+          return Math.abs(axisClusterAnchor(a) - axisClusterAnchor(b)) <= maxSpan;
+        }
+        var guard = clusters.length * clusters.length + 2;
+        while (clusters.length > 1 && guard > 0) {
+          guard -= 1;
+          var bestI = -1;
+          var bestJ = -1;
+          var bestDist = Infinity;
+          for (var i = 0; i < clusters.length; i++) {
+            for (var j = i + 1; j < clusters.length; j++) {
+              if (!canMerge(clusters[i], clusters[j])) continue;
+              var dist = Math.abs(axisClusterAnchor(clusters[i]) - axisClusterAnchor(clusters[j]));
+              if (dist < bestDist - 0.001) {
+                bestDist = dist;
+                bestI = i;
+                bestJ = j;
+              }
+            }
+          }
+          if (bestI < 0) break;
+          clusters[bestI] = clusters[bestI].concat(clusters[bestJ]);
+          clusters.splice(bestJ, 1);
+        }
+        return clusters.map(axisClusterAnchor).sort(function (a, b) { return a - b; });
+      }
+
+      function nearestLayoutAnchor(value, anchors) {
+        var best = anchors[0];
+        var bestDist = Math.abs(value - best);
+        for (var i = 1; i < anchors.length; i++) {
+          var dist = Math.abs(value - anchors[i]);
+          if (dist < bestDist) {
+            best = anchors[i];
+            bestDist = dist;
+          }
+        }
+        return best;
+      }
+
+      // Snap each desk onto the current layout's own column X and row Y.
+      // Does not rebuild Exam Rows, does not reflow who sits where.
+      function tidyCurrentLayout() {
+        var cls = getCurrentClass();
+        if (!cls || !boardEditsAllowed()) return;
+        var students = cls.students || [];
+        if (!students.length) {
+          showToast('No desks to tidy', '📐');
+          return;
+        }
+        var before = snapshotBoardEdit(cls);
+        var colSpan = (DESK_W + POD_INNER_GAP_X) / 2 - 1;
+        var rowSpan = (DESK_H + ROW_GAP_Y) / 2 - 1;
+        var colAnchors = layoutAxisAnchors(students.map(function (st) { return Number(st.x) || 0; }), colSpan);
+        var rowAnchors = layoutAxisAnchors(students.map(function (st) { return Number(st.y) || 0; }), rowSpan);
+        var plans = students.map(function (st) {
+          var x = nearestLayoutAnchor(Number(st.x) || 0, colAnchors);
+          var y = nearestLayoutAnchor(Number(st.y) || 0, rowAnchors);
+          return {
+            st: st,
+            x: x,
+            y: y,
+            dist: Math.abs(x - (Number(st.x) || 0)) + Math.abs(y - (Number(st.y) || 0))
+          };
+        });
+        plans.sort(function (a, b) { return a.dist - b.dist; });
+        var taken = {};
+        plans.forEach(function (plan) {
+          var key = plan.x + '|' + plan.y;
+          if (taken[key]) {
+            plan.x = Number(plan.st.x) || 0;
+            plan.y = Number(plan.st.y) || 0;
+            key = plan.x + '|' + plan.y;
+          }
+          taken[key] = true;
+        });
+        var moved = 0;
+        plans.forEach(function (plan) {
+          if (plan.st.x === plan.x && plan.st.y === plan.y) return;
+          plan.st.x = plan.x;
+          plan.st.y = plan.y;
+          moved += 1;
+        });
+        if (!moved) {
+          showToast('Desks already sit on this layout', '📐');
+          return;
+        }
+        pushLayoutHistory(before, snapshotBoardEdit(cls), 'Tidy layout');
+        saveState();
+        renderHeaderControls();
+        renderClassroomCanvas(true);
+        showToast('Snapped desks to this layout', '📐');
+      }
+
+      function closeApplyGridModal() {
+        var modal = document.getElementById('applyGridModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      function requestApplyCustomGrid() {
+        var cls = getCurrentClass();
+        if (!cls || !boardEditsAllowed()) return;
+        var rInput = document.getElementById('quickRowsInput');
+        var cInput = document.getElementById('quickColsInput');
+        var rows = Math.max(1, Math.min(15, parseInt(rInput && rInput.value, 10) || (cls.gridRows || 4)));
+        var cols = Math.max(1, Math.min(12, parseInt(cInput && cInput.value, 10) || (cls.gridCols || 6)));
+        var detail = document.getElementById('applyGridDetail');
+        if (detail) {
+          detail.textContent = 'This wipes the current desk positions and builds a fresh ' + rows + ' × ' + cols + ' rectangle. Names, groups, and scores stay.';
+        }
+        var modal = document.getElementById('applyGridModal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        var cancelBtn = document.getElementById('btnCancelApplyGrid');
+        if (cancelBtn) cancelBtn.focus();
       }
 
       // Apply a quick layout template ('rows', 'pairs', 'pods4', 'groupClusters') onto the user's customized Rows x Cols grid
@@ -10228,19 +10489,34 @@
         // Export CSV
         document.getElementById('btnExportCsv').addEventListener('click', exportClassScoresToCsv);
 
-        // Custom Rows x Columns Quick Setup Binding
-        document.getElementById('btnApplyCustomGrid').addEventListener('click', applyCustomRowsColsGrid);
+        // Custom Rows x Columns Quick Setup Binding. Apply confirms before the wipe.
+        document.getElementById('btnApplyCustomGrid').addEventListener('click', requestApplyCustomGrid);
+        document.getElementById('btnCancelApplyGrid').addEventListener('click', closeApplyGridModal);
+        document.getElementById('btnConfirmApplyGrid').addEventListener('click', function () {
+          closeApplyGridModal();
+          applyCustomRowsColsGrid();
+        });
+        document.getElementById('applyGridModal').addEventListener('click', function (e) {
+          if (e.target.id === 'applyGridModal') closeApplyGridModal();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key !== 'Escape') return;
+          var modal = document.getElementById('applyGridModal');
+          if (!modal || modal.classList.contains('hidden')) return;
+          closeApplyGridModal();
+        });
         ['quickRowsInput', 'quickColsInput'].forEach(function (inputId) {
           const el = document.getElementById(inputId);
           if (el) {
             el.addEventListener('keydown', function (e) {
               if (e.key === 'Enter') {
                 e.preventDefault();
-                applyCustomRowsColsGrid();
+                requestApplyCustomGrid();
               }
             });
           }
         });
+        document.getElementById('btnTidyLayout').addEventListener('click', tidyCurrentLayout);
 
         // Layout Preset Buttons
         document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
