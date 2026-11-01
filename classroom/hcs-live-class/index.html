@@ -3979,12 +3979,10 @@
         </button>
 
         <button id="btnTidyLayout" type="button" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-300 text-xs font-bold inline-flex items-center gap-1 transition" title="Snap desks to this layout — doesn’t move who sits where.">
-          <span aria-hidden="true">📐</span>
           <span>Tidy</span>
         </button>
 
         <button id="btnOpenGroupModal" type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition">
-          <span aria-hidden="true">🛡️</span>
           <span>Manage Groups</span>
         </button>
 
@@ -4039,7 +4037,7 @@
         <button type="button" data-layout="rows" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space the grid into separate exam desks" aria-label="Exam Rows">Exam</button>
         <button type="button" data-layout="pairs" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns, with a wider aisle between pairs" aria-label="Paired Desks">Pairs</button>
         <button type="button" data-layout="pods4" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group desks into 2×2 pods, with a wider aisle between pods" aria-label="4-Desk Pods">4-Desk</button>
-        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition" title="Gather each group into a cluster, with a wider aisle between clusters" aria-label="Cluster by Group">Group</button>
+        <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition" title="Gather each group into a cluster, with a wider aisle between clusters" aria-label="Cluster by Groups">Groups</button>
 
         <button id="btnToggleSnapGrid" type="button" class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold inline-flex items-center justify-center transition whitespace-nowrap" title="Snap desks to a grid when dragging">
           <span id="snapGridText">Snap: ON</span>
@@ -4833,6 +4831,88 @@
         // Front at the top: leave a compact strip for FRONT OF ROOM, then the first desk row.
         // Front at the bottom: a small back-of-room margin. The strip sits just past the front row.
         return frontAtTop ? (FRONT_EDGE + FRONT_LABEL_H + FRONT_ROW_GAP) : 28;
+      }
+
+      // Where ＋ Desk should land: on the back row if it still has a gap,
+      // otherwise one row further from FRONT OF ROOM. Back is the top of the
+      // board when the front pill is at the bottom, and the bottom when the
+      // pill is at the top. shift moves every existing desk toward the front
+      // so a new back row is not placed above y=0.
+      function planBackRowDesk(students, frontAtTop) {
+        var stepY = DESK_H + ROW_GAP_Y;
+        var stepX = DESK_W + EXAM_COL_GAP_X;
+        var edge = frontRowTopOffset(false);
+        var band = stepY * 0.45;
+        var list = [];
+        (students || []).forEach(function (st) {
+          var x = Number(st && st.x);
+          var y = Number(st && st.y);
+          if (!isFinite(x) || !isFinite(y)) return;
+          list.push({ x: x, y: y });
+        });
+        if (!list.length) {
+          return {
+            x: 28,
+            y: frontAtTop ? frontRowTopOffset(true) : edge,
+            shift: 0
+          };
+        }
+        list.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
+        var rows = [];
+        list.forEach(function (desk) {
+          var row = rows.length ? rows[rows.length - 1] : null;
+          if (!row || Math.abs(desk.y - row.anchor) > band) {
+            rows.push({ anchor: desk.y, desks: [desk] });
+          } else {
+            row.desks.push(desk);
+            var sum = 0;
+            row.desks.forEach(function (d) { sum += d.y; });
+            row.anchor = sum / row.desks.length;
+          }
+        });
+        var back = frontAtTop ? rows[rows.length - 1] : rows[0];
+        var widest = 0;
+        rows.forEach(function (row) {
+          if (row.desks.length > widest) widest = row.desks.length;
+        });
+        var backY = frontAtTop ? -Infinity : Infinity;
+        var minX = Infinity;
+        var maxX = -Infinity;
+        back.desks.forEach(function (d) {
+          if (d.x < minX) minX = d.x;
+          if (d.x > maxX) maxX = d.x;
+          if (frontAtTop) {
+            if (d.y > backY) backY = d.y;
+          } else if (d.y < backY) backY = d.y;
+        });
+        var pitch = stepX;
+        if (back.desks.length >= 2) {
+          var xs = back.desks.map(function (d) { return d.x; }).sort(function (a, b) { return a - b; });
+          var gaps = [];
+          for (var i = 1; i < xs.length; i++) {
+            var gap = xs[i] - xs[i - 1];
+            if (gap >= DESK_W * 0.5) gaps.push(gap);
+          }
+          if (gaps.length) {
+            gaps.sort(function (a, b) { return a - b; });
+            pitch = gaps[Math.floor((gaps.length - 1) / 2)];
+          }
+        }
+        var x = minX;
+        var y = backY;
+        var shift = 0;
+        if (back.desks.length < widest) {
+          x = maxX + pitch;
+        } else {
+          y = frontAtTop ? (backY + stepY) : (backY - stepY);
+        }
+        // Front at the bottom: the back is y=0. Open the board instead of
+        // parking the new seat above it.
+        if (!frontAtTop && y < edge) {
+          shift = edge - y;
+          y = edge;
+        }
+        return { x: Math.round(x), y: Math.round(y), shift: shift };
       }
 
       function computeLayoutPositions(count, layoutType, frontAtTop, students, groups, customCols, customRows) {
@@ -7388,8 +7468,14 @@
             if (deskBottom > bottom) bottom = deskBottom;
           });
           if (cls.frontAtTop) {
-            if (bottom + 16 > maxY) maxY = bottom + 16;
+            // Back of the room is the bottom edge. One more row, plus the
+            // same 8px front-edge inset, so a desk can sit behind the last
+            // row without ending on the stage border.
+            const backFloor = bottom + DESK_H + ROW_GAP_Y + FRONT_EDGE;
+            if (backFloor > maxY) maxY = backFloor;
           } else {
+            // Front pill sits under the last row. Back room is opened above
+            // the top row by planBackRowDesk, not by growing this bottom edge.
             bottom += FRONT_ROW_GAP + FRONT_LABEL_H;
             if (bottom + 12 > maxY) maxY = bottom + 12;
           }
@@ -10625,10 +10711,36 @@
           renderGroupBrushBar();
         });
 
-        // Quick Add Student Desk on Canvas
+        // Quick Add Student Desk on Canvas. One seat on the back edge,
+        // opposite the FRONT OF ROOM pill. A full back row starts the next
+        // row behind it; if that row would sit above the board, the class
+        // shifts toward the front so the new seat stays on the floor.
+        function revealBackDesk(studentId, frontAtTop) {
+          var floor = document.getElementById('classroomViewport');
+          var stage = document.getElementById('classroomStage');
+          if (!floor || !stage || !studentId) return;
+          var card = stage.querySelector('.desk-card[data-student-id="' + studentId + '"]');
+          if (!card) return;
+          var zoom = state.zoom || 1;
+          var top = card.offsetTop * zoom + (floorShiftY || 0);
+          var bottom = top + card.offsetHeight * zoom;
+          var viewTop = floor.scrollTop;
+          var viewBottom = viewTop + floor.clientHeight;
+          if (top >= viewTop + 4 && bottom <= viewBottom - 4) return;
+          if (!frontAtTop) floor.scrollTop = Math.max(0, Math.round(top - 12));
+          else floor.scrollTop = Math.max(0, Math.round(bottom - floor.clientHeight + 12));
+        }
+
         document.getElementById('btnQuickAddStudent').addEventListener('click', function () {
           const cls = getCurrentClass();
           if (!cls) return;
+          const before = snapshotBoardEdit(cls);
+          const plan = planBackRowDesk(cls.students, !!cls.frontAtTop);
+          if (plan.shift) {
+            cls.students.forEach(function (st) {
+              st.y = (Number(st.y) || 0) + plan.shift;
+            });
+          }
           const nextNum = cls.students.length + 1;
           const newSt = {
             id: 'st_' + Date.now(),
@@ -10636,13 +10748,17 @@
             name: 'Student ' + String(nextNum).padStart(2, '0'),
             groupId: cls.groups[0] ? cls.groups[0].id : '',
             score: 0,
-            x: 28 + ((nextNum - 1) % 6) * (DESK_W + EXAM_COL_GAP_X),
-            y: frontRowTopOffset(cls.frontAtTop) + Math.floor((nextNum - 1) / 6) * (DESK_H + ROW_GAP_Y)
+            x: plan.x,
+            y: plan.y
           };
           cls.students.push(newSt);
           rememberStudentDefaultPosition(cls, newSt);
+          pushLayoutHistory(before, snapshotBoardEdit(cls), 'Add desk');
           saveState();
           renderAll();
+          requestAnimationFrame(function () {
+            revealBackDesk(newSt.id, !!cls.frontAtTop);
+          });
           showToast('Added a desk' + (boardEditsAllowed() ? ' — drag it anywhere!' : ''), '🪑');
         });
 
