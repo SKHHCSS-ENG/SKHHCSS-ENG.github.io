@@ -507,6 +507,7 @@ const clubFair = {
   noteLead: "Leo is at the club fair. Say the next choice in a clear sentence.",
   doorsSeconds: 90,
   maxStrikes: 3,
+  winPlateHoldMs: 1500,
   resetOnMiss: true,
   timeoutMood: "CONFUSED",
   timeoutLine: "Fair's closing — try again from the entrance.",

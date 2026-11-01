@@ -206,7 +206,7 @@ test("soft-oops stills swap on the wrong-path beats", () => {
     assert.equal(fs.existsSync(new URL("../assets/" + name, import.meta.url)), true, name);
   });
   assert.match(scene, /PUT_BACK_MS/);
-  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101m/);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101n/);
 });
 
 test("hub card does not tag a device", () => {
@@ -720,7 +720,15 @@ test("mission 3 walks entrance, branch, booth, foil, join, signup, and win", () 
   assert.equal(isWin(fairPack, state), true);
   assert.equal(fairCoach(FAIR_WALK[5], state).mood, "RELIEVED");
   assert.equal(fairCoach(FAIR_WALK[5], state).hardware_action, "NONE");
+  assert.equal(fairPlate("SHOW_SIGNUP_SHEET", state, "RELIEVED", ""), "s3-09");
   assert.equal(fairPlate("SHOW_SIGNUP_SHEET", state, "RELIEVED", "win"), "s3-10");
+  assert.equal(fairPack.winPlateHoldMs, 1500);
+  assert.equal(pack.winPlateHoldMs, undefined);
+  assert.equal(mapPack.winPlateHoldMs, undefined);
+  const shell = fs.readFileSync(new URL("./main.js", import.meta.url), "utf8");
+  assert.match(shell, /winPlateHoldMs/);
+  assert.match(shell, /function holdWin/);
+  assert.equal(/if \(isWin\(scenario, state\)\) \{\s*if \(ended !== "win"\) finish\("win"\)/.test(shell), false);
 });
 
 test("vague fair lines hover, foils do not win, and a join needs a club plus a reason", () => {

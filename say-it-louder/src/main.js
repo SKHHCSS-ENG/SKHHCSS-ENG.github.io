@@ -290,6 +290,7 @@ function boot() {
   var wantListen = false;
   var micDraft = "";
   var micLock = false;
+  var winHoldTimer = null;
 
   var recognition = createRecognizer({
     lang: "en-GB",
@@ -564,14 +565,43 @@ function boot() {
     $("teacherTip").textContent = tip;
     updateHud();
     if (isWin(scenario, state)) {
-      if (ended !== "win") finish("win");
+      if (ended !== "win") {
+        if (scenario.winPlateHoldMs) holdWin(ticket);
+        else finish("win");
+      }
     } else if (strikes >= scenario.maxStrikes) {
       finish("miss");
     }
   }
 
+  function clearWinHold() {
+    if (winHoldTimer) clearTimeout(winHoldTimer);
+    winHoldTimer = null;
+  }
+
+  function holdWin(ticket) {
+    clearWinHold();
+    wantListen = false;
+    if (recognition && listening) {
+      try { recognition.stop(); } catch (err) { /* already stopped */ }
+      setListening(false);
+    }
+    $("micBtn").disabled = true;
+    $("textCmd").disabled = true;
+    $("sendBtn").disabled = true;
+    winHoldTimer = setTimeout(function () {
+      winHoldTimer = null;
+      if (ticket !== turnTicket || ended) return;
+      $("micBtn").disabled = !speechInputAvailable();
+      $("textCmd").disabled = false;
+      $("sendBtn").disabled = false;
+      finish("win");
+    }, scenario.winPlateHoldMs);
+  }
+
   function resetMission() {
     turnTicket += 1;
+    clearWinHold();
     stopDoors();
     wantListen = false;
     if (recognition && listening) {
