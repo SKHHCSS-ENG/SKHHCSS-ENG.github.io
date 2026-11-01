@@ -5,7 +5,7 @@ import test from "node:test";
 import { USE_MOCK, coachWorkerUrl, forgivePronunciation, heardText, mockCoach, normaliseCoachReply, normaliseUtterance, queryCoach } from "./ai-service.js";
 import { SCENARIOS } from "./scenarios.js";
 import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios, packForId } from "./main.js";
-import { MAP_SPOTS, campusPlate, carriagePlate, sceneCue } from "./scene2d.js";
+import { MAP_SPOTS, campusPlate, carriagePlate, fairPlate, sceneCue } from "./scene2d.js";
 
 const pack = SCENARIOS.level_1_lost_bag;
 const FULL = "The small navy bag under the seat between the black bag and the yellow lunchbox.";
@@ -26,7 +26,7 @@ test("live coach is on and both scenario keys share the lost-bag pack", () => {
   assert.equal(USE_MOCK, false);
   assert.equal(SCENARIOS.mission_1_lost_bag, pack);
   assert.equal(pack.id, "level_1_lost_bag");
-  assert.equal(listScenarios().length, 2);
+  assert.equal(listScenarios().length, 3);
   assert.equal(listScenarios()[0].title, "Mission 1: The Lost Bag");
   assert.equal(listScenarios()[0].id, "level_1_lost_bag");
 });
@@ -206,7 +206,7 @@ test("soft-oops stills swap on the wrong-path beats", () => {
     assert.equal(fs.existsSync(new URL("../assets/" + name, import.meta.url)), true, name);
   });
   assert.match(scene, /PUT_BACK_MS/);
-  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101l/);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101m/);
 });
 
 test("hub card does not tag a device", () => {
@@ -636,6 +636,190 @@ test("speak fills the box and does not auto-send a final transcript", () => {
   assert.equal(finals.finalText, "walk past the canteen");
   assert.equal(finals.interim, "please");
   assert.equal(heard.interim.length > 0, true);
+});
+
+const fairPack = SCENARIOS.mission_3_club_fair_choices;
+const FAIR_WALK = [
+  "How about the sports area first?",
+  "Let's go to the sports booth.",
+  "Go to the PE store.",
+  "Why don't we try the drama booth?",
+  "I'd like to join the drama club because I enjoy acting.",
+  "Write your name on the signup sheet."
+];
+
+function fairCoach(transcript, state) {
+  return mockCoach({
+    scenario: fairPack,
+    currentState: state || freshState(fairPack),
+    transcript: transcript
+  });
+}
+
+test("mission 3 is selectable beside mission 1 and 2 and keeps the four-field JSON", async () => {
+  assert.equal(fairPack, SCENARIOS.level_3_club_fair);
+  assert.equal(fairPack.id, "mission_3_club_fair_choices");
+  assert.equal(fairPack.sceneId, "club-fair");
+  assert.equal(packForId("level_3_club_fair").id, "mission_3_club_fair_choices");
+  assert.equal(listScenarios()[2].title, "Mission 3: Club Fair Choices");
+  assert.equal(listScenarios()[0].id, "level_1_lost_bag");
+  assert.equal(listScenarios()[1].id, "mission_2_school_map_walk");
+
+  const result = await queryCoach({
+    scenario: fairPack,
+    currentState: freshState(fairPack),
+    transcript: FAIR_WALK[0]
+  });
+  assert.deepEqual(keys(result), ["hardware_action", "mood", "spoken_reply", "teacher_tip"]);
+  assert.equal(result.hardware_action, "BRANCH_SPORTS");
+  assert.ok(fairPack.allowedActions.includes(result.hardware_action));
+  assert.match(fairPack.frame, /club/i);
+  assert.match(fairPack.endCopy.winTitle, /Joined up!/);
+  assert.match(fairPack.endCopy.winDetail, /Club chosen!/);
+  assert.match(fairPack.endCopy.missTitle, /Fair's closing/);
+  assert.match(fairPack.endCopy.missTitle, /entrance/);
+});
+
+test("mission 3 tips stay student-facing", () => {
+  const bits = [fairPack.intro.teacher_tip];
+  Object.keys(fairPack.lines).forEach(function (key) {
+    bits.push(fairPack.lines[key].teacher_tip);
+    bits.push(fairPack.lines[key].spoken_reply);
+  });
+  const text = bits.join("\n");
+  assert.equal(/prompt\s*:/i.test(text), false);
+  assert.equal(/stretch\s*:/i.test(text), false);
+  assert.equal(/\b(chase|lockdown|stranger|romance)\b/i.test(text), false);
+  assert.equal(/Prompt:|Stretch:|soft fail|Win:/.test(text), false);
+});
+
+test("mission 3 walks entrance, branch, booth, foil, join, signup, and win", () => {
+  let state = freshState(fairPack);
+  const expected = [
+    "BRANCH_SPORTS",
+    "ARRIVE_SPORTS_BOOTH",
+    "FOIL_PE_STORE",
+    "ARRIVE_DRAMA_BOOTH",
+    "JOIN_CLUB_DRAMA",
+    "SHOW_SIGNUP_SHEET"
+  ];
+  const plates = ["s3-01", "s3-03", "s3-05", "s3-08", "s3-08", "s3-09"];
+  for (let i = 0; i < FAIR_WALK.length; i++) {
+    const result = fairCoach(FAIR_WALK[i], state);
+    assert.equal(result.hardware_action, expected[i], FAIR_WALK[i]);
+    assert.ok(fairPack.allowedActions.includes(result.hardware_action));
+    state = applyHardwareAction(state, result.hardware_action);
+    assert.equal(fairPlate(result.hardware_action, state, result.mood, ""), plates[i], FAIR_WALK[i]);
+    if (i < FAIR_WALK.length - 1) assert.equal(isWin(fairPack, state), false, FAIR_WALK[i]);
+  }
+  assert.equal(state.AREA, "CHOSEN");
+  assert.equal(state.BOOTH, "AT");
+  assert.equal(state.JOINED, "YES");
+  assert.equal(state.CLUB, "DRAMA");
+  assert.equal(state.SIGNUP, "SHOWN");
+  assert.equal(isWin(fairPack, state), true);
+  assert.equal(fairCoach(FAIR_WALK[5], state).mood, "RELIEVED");
+  assert.equal(fairCoach(FAIR_WALK[5], state).hardware_action, "NONE");
+  assert.equal(fairPlate("SHOW_SIGNUP_SHEET", state, "RELIEVED", "win"), "s3-10");
+});
+
+test("vague fair lines hover, foils do not win, and a join needs a club plus a reason", () => {
+  for (const line of ["that one", "Go there.", "I like it."]) {
+    const result = fairCoach(line);
+    assert.equal(result.hardware_action, "HOVER_CONFUSED", line);
+    assert.equal(fairPack.clarityStrikeActions.includes(result.hardware_action), true, line);
+    assert.equal(isWin(fairPack, applyHardwareAction(freshState(fairPack), result.hardware_action)), false);
+  }
+
+  let state = freshState(fairPack);
+  state = applyHardwareAction(state, "BRANCH_ARTS");
+  state = applyHardwareAction(state, "ARRIVE_ART_BOOTH");
+  const snack = fairCoach("Let's go to that snack stall.", state);
+  assert.equal(snack.hardware_action, "FOIL_SNACK_STALL");
+  assert.equal(snack.mood, "PANICKED");
+  assert.match(snack.spoken_reply, /signup sheet/i);
+  const afterSnack = applyHardwareAction(state, snack.hardware_action);
+  assert.equal(isWin(fairPack, afterSnack), false);
+  assert.equal(afterSnack.NODE, "ART");
+  assert.equal(fairPlate("FOIL_SNACK_STALL", afterSnack, "PANICKED", ""), "s3-06");
+
+  const bare = fairCoach("I'd like to join the drama club.", state);
+  assert.equal(bare.hardware_action, "HOVER_CONFUSED");
+  assert.notEqual(bare.hardware_action, "JOIN_CLUB_DRAMA");
+
+  const early = fairCoach("I'd like to join the drama club because I enjoy acting.");
+  assert.equal(early.hardware_action, "NONE");
+  assert.equal(isWin(fairPack, applyHardwareAction(freshState(fairPack), early.hardware_action)), false);
+
+  const sheet = fairCoach("Write your name on the signup sheet.", state);
+  assert.equal(sheet.hardware_action, "NONE");
+  assert.equal(isWin(fairPack, applyHardwareAction(state, sheet.hardware_action)), false);
+});
+
+test("mission 3 reuses stills for service and for sports or music joins", () => {
+  const entrance = freshState(fairPack);
+  assert.equal(fairPlate("NONE", entrance, "CONFUSED", ""), "s3-01");
+  assert.equal(fairPlate("HOVER_CONFUSED", entrance, "CONFUSED", ""), "s3-02");
+  assert.equal(fairPlate("BRANCH_SERVICE", applyHardwareAction(entrance, "BRANCH_SERVICE"), "HOPEFUL", ""), "s3-01");
+  const service = applyHardwareAction(freshState(fairPack), "ARRIVE_SERVICE_BOOTH");
+  assert.equal(fairPlate("ARRIVE_SERVICE_BOOTH", service, "HOPEFUL", ""), "s3-01");
+  const joinedService = applyHardwareAction(service, "JOIN_CLUB_SERVICE");
+  assert.equal(joinedService.CLUB, "SERVICE");
+  assert.equal(fairPlate("JOIN_CLUB_SERVICE", joinedService, "HOPEFUL", ""), "s3-01");
+
+  const sports = applyHardwareAction(freshState(fairPack), "ARRIVE_SPORTS_BOOTH");
+  const joinSports = fairCoach("I'd like to join the sports club because I like running.", sports);
+  assert.equal(joinSports.hardware_action, "JOIN_CLUB_SPORTS");
+  assert.equal(fairPlate("JOIN_CLUB_SPORTS", applyHardwareAction(sports, "JOIN_CLUB_SPORTS"), "HOPEFUL", ""), "s3-03");
+
+  const music = applyHardwareAction(freshState(fairPack), "ARRIVE_MUSIC_BOOTH");
+  assert.equal(fairPlate("ARRIVE_MUSIC_BOOTH", music, "HOPEFUL", ""), "s3-04");
+  assert.equal(fairPlate("ARRIVE_ART_BOOTH", applyHardwareAction(freshState(fairPack), "ARRIVE_ART_BOOTH"), "HOPEFUL", ""), "s3-04");
+  const joinMusic = fairCoach("I'd like to join the music club because I like singing.", music);
+  assert.equal(joinMusic.hardware_action, "JOIN_CLUB_MUSIC");
+  assert.equal(fairPlate("JOIN_CLUB_MUSIC", applyHardwareAction(music, "JOIN_CLUB_MUSIC"), "HOPEFUL", ""), "s3-04");
+
+  const photo = applyHardwareAction(freshState(fairPack), "ARRIVE_PHOTO_BOOTH");
+  assert.equal(fairCoach("Could I try photography?", photo).hardware_action, "JOIN_CLUB_PHOTO");
+  assert.equal(fairPlate("ARRIVE_PHOTO_BOOTH", photo, "HOPEFUL", ""), "s3-07");
+  assert.equal(fairPlate("JOIN_CLUB_PHOTO", applyHardwareAction(photo, "JOIN_CLUB_PHOTO"), "HOPEFUL", ""), "s3-07");
+  assert.equal(fairPlate("NONE", entrance, "CONFUSED", "miss"), "s3-01");
+
+  const scene = fs.readFileSync(new URL("./scene2d.js", import.meta.url), "utf8");
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  const plates = [
+    "say-it-louder-S3-01-fair-entrance-wide.jpg",
+    "say-it-louder-S3-02-leo-confused-entrance.jpg",
+    "say-it-louder-S3-03-sports-booth.jpg",
+    "say-it-louder-S3-04-art-music-booth.jpg",
+    "say-it-louder-S3-05-pe-store-foil.jpg",
+    "say-it-louder-S3-06-snack-stall-foil.jpg",
+    "say-it-louder-S3-07-photography-booth.jpg",
+    "say-it-louder-S3-08-drama-booth.jpg",
+    "say-it-louder-S3-09-signup-sheet-leo.jpg",
+    "say-it-louder-S3-10-leo-relieved-win.jpg"
+  ];
+  plates.forEach(function (name) {
+    assert.match(scene, new RegExp(name.replace(".", "\\.")));
+    assert.equal(fs.existsSync(new URL("../assets/" + name, import.meta.url)), true, name);
+  });
+  assert.match(css, /data-plate="s3-01"\] \.pin-sports/);
+  assert.match(css, /data-plate="s3-03"\] \.pin-sports/);
+  assert.match(css, /data-plate="s3-04"\] \.pin-music/);
+  assert.match(css, /data-plate="s3-05"\] \.pin/);
+  assert.match(css, /data-plate="s3-06"\] \.pin/);
+  assert.match(css, /max-width: 420px[\s\S]*data-plate="s3-01"/);
+  assert.match(css, /\.has-plate \.prop-body[\s\S]{0,400}display:\s*none/);
+  const hub = fs.readFileSync(new URL("../../learning-materials/index.html", import.meta.url), "utf8");
+  assert.match(hub, /Mission 3 — Club Fair Choices/);
+});
+
+test("one clear join-and-signup utterance can choose the club", () => {
+  const line = "I'd like to join the drama club because I enjoy acting. Write your name on the signup sheet.";
+  const result = fairCoach(line);
+  assert.equal(result.hardware_action, "SHOW_SIGNUP_SHEET");
+  assert.equal(result.mood, "RELIEVED");
+  assert.equal(isWin(fairPack, applyHardwareAction(freshState(fairPack), result.hardware_action)), true);
 });
 
 test("lost-bag copy stays school-safe", () => {

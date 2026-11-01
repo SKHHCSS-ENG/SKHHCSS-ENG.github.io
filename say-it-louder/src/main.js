@@ -105,8 +105,78 @@ function applyMapAction(next, action) {
   return next;
 }
 
+function chooseFairArea(next, branch) {
+  next.AREA = "CHOSEN";
+  next.BRANCH = branch;
+  if (next.BOOTH !== "AT") {
+    next.NODE = "ENTRANCE";
+    next.LAST_NODE = "ENTRANCE";
+  }
+}
+
+function arriveFairBooth(next, node, branch) {
+  if (next.AREA !== "CHOSEN") {
+    next.AREA = "CHOSEN";
+    next.BRANCH = branch;
+  }
+  next.BOOTH = "AT";
+  next.NODE = node;
+  next.LAST_NODE = node;
+}
+
+function joinFairClub(next, club, node, branch) {
+  if (next.AREA !== "CHOSEN") next.BRANCH = branch;
+  next.AREA = "CHOSEN";
+  next.BOOTH = "AT";
+  next.JOINED = "YES";
+  next.CLUB = club;
+  next.NODE = node;
+  next.LAST_NODE = node;
+}
+
+function applyFairAction(next, action) {
+  if (action === "BRANCH_SPORTS") chooseFairArea(next, "SPORTS");
+  if (action === "BRANCH_ARTS") chooseFairArea(next, "ARTS");
+  if (action === "BRANCH_SERVICE") chooseFairArea(next, "SERVICE");
+  if (action === "ARRIVE_SPORTS_BOOTH") arriveFairBooth(next, "SPORTS", "SPORTS");
+  if (action === "ARRIVE_ART_BOOTH") arriveFairBooth(next, "ART", "ARTS");
+  if (action === "ARRIVE_MUSIC_BOOTH") arriveFairBooth(next, "MUSIC", "ARTS");
+  if (action === "ARRIVE_PHOTO_BOOTH") arriveFairBooth(next, "PHOTO", "ARTS");
+  if (action === "ARRIVE_DRAMA_BOOTH") arriveFairBooth(next, "DRAMA", "ARTS");
+  if (action === "ARRIVE_SERVICE_BOOTH") arriveFairBooth(next, "SERVICE", "SERVICE");
+  if (action === "FOIL_PE_STORE") {
+    next.PE_STORE = "FOIL";
+    next.NODE = next.LAST_NODE || "ENTRANCE";
+  }
+  if (action === "FOIL_SNACK_STALL") {
+    next.SNACK = "FOIL";
+    next.NODE = next.LAST_NODE || "ENTRANCE";
+  }
+  if (action === "STEP_BACK") {
+    next.NODE = next.LAST_NODE || "ENTRANCE";
+    if (next.PE_STORE === "FOIL") next.PE_STORE = "AHEAD";
+    if (next.SNACK === "FOIL") next.SNACK = "AHEAD";
+  }
+  if (action === "JOIN_CLUB_SPORTS") joinFairClub(next, "SPORTS", "SPORTS", "SPORTS");
+  if (action === "JOIN_CLUB_DRAMA") joinFairClub(next, "DRAMA", "DRAMA", "ARTS");
+  if (action === "JOIN_CLUB_PHOTO") joinFairClub(next, "PHOTO", "PHOTO", "ARTS");
+  if (action === "JOIN_CLUB_MUSIC") joinFairClub(next, "MUSIC", "MUSIC", "ARTS");
+  if (action === "JOIN_CLUB_SERVICE") joinFairClub(next, "SERVICE", "SERVICE", "SERVICE");
+  if (action === "SHOW_SIGNUP_SHEET") {
+    next.SIGNUP = "SHOWN";
+    next.JOINED = "YES";
+    next.AREA = "CHOSEN";
+    next.BOOTH = "AT";
+    if (!next.CLUB || next.CLUB === "NONE") next.CLUB = "CHOSEN";
+  }
+  return next;
+}
+
 export function applyHardwareAction(state, action) {
   var next = freshFrom(state);
+  if (next && Object.prototype.hasOwnProperty.call(next, "AREA")) {
+    return applyFairAction(next, action);
+  }
   if (next && Object.prototype.hasOwnProperty.call(next, "GATE")) {
     return applyMapAction(next, action);
   }

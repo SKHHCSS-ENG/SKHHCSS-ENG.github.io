@@ -54,6 +54,16 @@ export function forgivePronunciation(text) {
   out = out.replace(/\bcan teen\b/g, "canteen");
   out = out.replace(/\bgait\b/g, "gate");
   out = out.replace(/\bpassed\b/g, "past");
+  out = out.replace(/\bbecuase\b/g, "because");
+  out = out.replace(/\bbecasue\b/g, "because");
+  out = out.replace(/\bcuz\b/g, "because");
+  out = out.replace(/\bcoz\b/g, "because");
+  out = out.replace(/\bfotography\b/g, "photography");
+  out = out.replace(/\bphotografy\b/g, "photography");
+  out = out.replace(/\bphoto graphy\b/g, "photography");
+  out = out.replace(/\bdram a\b/g, "drama");
+  out = out.replace(/\bsign up\b/g, "signup");
+  out = out.replace(/\bp e store\b/g, "pe store");
   if (!/\b(black|grey|red|yellow|blue)\b/.test(out)) {
     out = out.replace(/\bmaybe\b/g, "navy");
   }
@@ -440,6 +450,202 @@ export function mockMapCoach({ scenario, currentState, transcript }) {
   return cloneLine(lines.fallback);
 }
 
+function fairFlags(state) {
+  var src = state || {};
+  return {
+    booth: src.BOOTH === "AT",
+    joined: src.JOINED === "YES",
+    signup: src.SIGNUP === "SHOWN"
+  };
+}
+
+function fairClubIn(text) {
+  if (has(text, "photography") || has(text, "photo")) return "PHOTO";
+  if (has(text, "drama") || has(text, "theatre") || has(text, "theater")) return "DRAMA";
+  if (has(text, "music") || has(text, "singing") || has(text, "choir")) return "MUSIC";
+  if (has(text, "service") || has(text, "volunteer")) return "SERVICE";
+  if (has(text, "sport") || has(text, "running") || has(text, "basketball") || has(text, "football") || has(text, "badminton")) return "SPORTS";
+  return "";
+}
+
+function fairBecause(text) {
+  var at = text.indexOf("because");
+  if (at < 0) return false;
+  var skip = { a: 1, an: 1, the: 1, of: 1, to: 1, it: 1, is: 1, yes: 1 };
+  var words = text.slice(at + "because".length).trim().split(" ");
+  var kept = [];
+  for (var i = 0; i < words.length; i++) {
+    if (words[i] && !skip[words[i]]) kept.push(words[i]);
+  }
+  return kept.length >= 1 && kept.join(" ").length >= 4;
+}
+
+function namedFairClub(text) {
+  var at = text.indexOf("because");
+  return fairClubIn(at >= 0 ? text.slice(0, at) : text);
+}
+
+function politeTry(text) {
+  return has(text, "could i try") || has(text, "could we try") || has(text, "can i try") || has(text, "may i try");
+}
+
+function fairJoinClub(text) {
+  if (politeTry(text) && !has(text, "booth") && !has(text, "first") && !has(text, "then")) {
+    var tried = namedFairClub(text);
+    if (tried) return tried;
+  }
+  var club = namedFairClub(text);
+  if (!club || !has(text, "join") || !fairBecause(text)) return "";
+  return club;
+}
+
+function fairJoinNeedsReason(text) {
+  if (fairJoinClub(text) || politeTry(text) || !has(text, "join")) return false;
+  return !!namedFairClub(text) && !fairBecause(text);
+}
+
+function fairPeStore(text) {
+  if (has(text, "not the pe") || has(text, "not pe") || (has(text, "dont") && has(text, "pe"))) return false;
+  if (has(text, "pe store") || has(text, "sports store") || has(text, "kit room") || has(text, "equipment room")) return true;
+  return has(text, "store") && (has(text, "pe") || has(text, "kit") || has(text, "equipment"));
+}
+
+function fairSnack(text) {
+  if (has(text, "not the snack") || has(text, "not snack") || (has(text, "dont") && has(text, "snack"))) return false;
+  if (has(text, "snack")) return true;
+  return has(text, "food stall") || (has(text, "stall") && (has(text, "food") || has(text, "eat")));
+}
+
+function fairSportsBooth(text) {
+  if (fairPeStore(text)) return false;
+  return has(text, "sport") && has(text, "booth") && !has(text, "area");
+}
+
+function fairArtBooth(text) {
+  if (has(text, "music")) return false;
+  if (has(text, "art booth")) return true;
+  return has(text, "art") && !has(text, "arts") && (has(text, "how about") || has(text, "lets") || has(text, "try"));
+}
+
+function fairMusicBooth(text) {
+  return has(text, "music") && (has(text, "booth") || has(text, "table"));
+}
+
+function fairPhotoBooth(text) {
+  return has(text, "photography") || (has(text, "photo") && has(text, "booth"));
+}
+
+function fairDramaBooth(text) {
+  if (has(text, "how about drama") || has(text, "try drama") || has(text, "try the drama")) return true;
+  return has(text, "drama") && (has(text, "booth") || has(text, "side"));
+}
+
+function fairServiceBooth(text) {
+  return has(text, "service") && has(text, "booth");
+}
+
+function fairSportsArea(text) {
+  if (fairSportsBooth(text) || fairPeStore(text) || has(text, "join")) return false;
+  return has(text, "sport") && !has(text, "booth");
+}
+
+function fairArtsArea(text) {
+  if (fairArtBooth(text) || fairMusicBooth(text) || fairPhotoBooth(text) || fairDramaBooth(text) || has(text, "join")) return false;
+  return has(text, "arts") || has(text, "art area") || has(text, "art booths");
+}
+
+function fairServiceArea(text) {
+  if (fairServiceBooth(text) || has(text, "join")) return false;
+  return has(text, "service");
+}
+
+function fairSignup(text) {
+  if (has(text, "signup") || has(text, "write your name") || has(text, "write leo") || has(text, "confirm your name")) return true;
+  return has(text, "name") && (has(text, "sheet") || has(text, "signup"));
+}
+
+function fairVague(text) {
+  var exact = {
+    "that one": 1,
+    "this one": 1,
+    "go there": 1,
+    "i like it": 1,
+    "that way": 1,
+    "over there": 1,
+    "this way": 1,
+    "go": 1,
+    "yes": 1,
+    "no": 1,
+    "ok": 1,
+    "okay": 1,
+    "that booth": 1,
+    "the booth": 1,
+    "the one": 1,
+    "it": 1,
+    "join": 1,
+    "ill join": 1,
+    "i will join": 1,
+    "i like this": 1,
+    "i like this club": 1,
+    "that club": 1,
+    "the club": 1
+  };
+  if (exact[text]) return true;
+  if (fairPeStore(text) || fairSnack(text) || fairBecause(text)) return false;
+  if (fairClubIn(text) || has(text, "sport") || has(text, "art") || has(text, "music") || has(text, "service") || has(text, "booth")) return false;
+  if (has(text, "that one") || has(text, "go there")) return true;
+  var words = text.split(" ").filter(Boolean);
+  return words.length <= 4 && (has(text, "go") || has(text, "there") || has(text, "that"));
+}
+
+var FAIR_JOIN_LINE = {
+  SPORTS: "joinSports",
+  DRAMA: "joinDrama",
+  PHOTO: "joinPhoto",
+  MUSIC: "joinMusic",
+  SERVICE: "joinService"
+};
+
+/**
+ * Mission 3 mock. One hardware_action per turn.
+ * Win only after a join is locked and SHOW_SIGNUP_SHEET confirms the sheet.
+ */
+export function mockFairCoach({ scenario, currentState, transcript }) {
+  var lines = scenario.lines;
+  var text = normaliseUtterance(transcript).replace(/\bid like to\b/g, "i would like to");
+  var flags = fairFlags(currentState || scenario.initialState);
+  if (!text) return cloneLine(lines.empty);
+  if (flags.signup) return cloneLine(lines.alreadyWon);
+  if (fairPeStore(text)) return cloneLine(lines.foilPe);
+  if (fairSnack(text)) return cloneLine(lines.foilSnack);
+  if (has(text, "step back")) return cloneLine(lines.stepBack);
+
+  var club = fairJoinClub(text);
+  if (fairSignup(text) && (club || flags.joined)) return cloneLine(lines.signup);
+  if (fairSignup(text)) return cloneLine(lines.signupEarly);
+  if (club) {
+    if (!flags.booth && !has(text, "booth")) return cloneLine(lines.earlyJoin);
+    return cloneLine(lines[FAIR_JOIN_LINE[club]]);
+  }
+  if (fairJoinNeedsReason(text)) return cloneLine(lines.hoverJoin);
+  if (fairVague(text)) {
+    if (flags.joined) return cloneLine(lines.hoverJoin);
+    if (flags.booth) return cloneLine(lines.hoverBooth);
+    return cloneLine(lines.hoverEntrance);
+  }
+  if (fairPhotoBooth(text)) return cloneLine(lines.arrivePhoto);
+  if (fairDramaBooth(text)) return cloneLine(lines.arriveDrama);
+  if (fairMusicBooth(text)) return cloneLine(lines.arriveMusic);
+  if (fairArtBooth(text)) return cloneLine(lines.arriveArt);
+  if (fairSportsBooth(text)) return cloneLine(lines.arriveSports);
+  if (fairServiceBooth(text)) return cloneLine(lines.arriveService);
+  if (fairSportsArea(text)) return cloneLine(lines.branchSports);
+  if (fairArtsArea(text)) return cloneLine(lines.branchArts);
+  if (fairServiceArea(text)) return cloneLine(lines.branchService);
+  if (has(text, "join")) return cloneLine(lines.hoverJoin);
+  return cloneLine(lines.fallback);
+}
+
 /**
  * Deterministic coach. Same JSON shape the Worker will return later:
  * { spoken_reply, mood, hardware_action, teacher_tip }
@@ -450,8 +656,29 @@ var WRONG_STRIKE = {
   ARRIVE_HALL: 1,
   BAG_BLACK_SPORTS: 1,
   BAG_GREY_BIG: 1,
-  LUNCHBOX_YELLOW: 1
+  LUNCHBOX_YELLOW: 1,
+  FOIL_PE_STORE: 1,
+  FOIL_SNACK_STALL: 1
 };
+
+function nearHitCopy(scenario) {
+  if (scenario.sceneId === "school-map") {
+    return {
+      spoken_reply: "I almost heard that. Say the direction once more, with the place.",
+      teacher_tip: "Nearly there. Add left or right, or name the building."
+    };
+  }
+  if (scenario.sceneId === "club-fair") {
+    return {
+      spoken_reply: "I almost heard that. Say the area or the club once more.",
+      teacher_tip: "Nearly there. Name sports, arts, or service, or a club booth."
+    };
+  }
+  return {
+    spoken_reply: "I almost heard that. Say the colour, the size, and the place once more.",
+    teacher_tip: "Nearly there. Add the missing colour, size, or place."
+  };
+}
 
 function softenNearHit(input, result) {
   var scenario = (input && input.scenario) || {};
@@ -463,24 +690,23 @@ function softenNearHit(input, result) {
   if (strikes.indexOf(result.hardware_action) === -1) return result;
   var state = input.currentState || {};
   if (state.LAST_UTTERANCE === text) return result;
-  var map = scenario.sceneId === "school-map";
+  var copy = nearHitCopy(scenario);
   return {
-    spoken_reply: map
-      ? "I almost heard that. Say the direction once more, with the place."
-      : "I almost heard that. Say the colour, the size, and the place once more.",
+    spoken_reply: copy.spoken_reply,
     mood: "CONFUSED",
     hardware_action: "NONE",
-    teacher_tip: map
-      ? "Nearly there. Add left or right, or name the building."
-      : "Nearly there. Add the missing colour, size, or place."
+    teacher_tip: copy.teacher_tip
   };
 }
 
 export function mockCoach(input) {
   var scenario = input && input.scenario;
-  var result = scenario && scenario.sceneId === "school-map"
+  var scene = scenario && scenario.sceneId;
+  var result = scene === "school-map"
     ? mockMapCoach(input)
-    : mockBagCoach(input);
+    : scene === "club-fair"
+      ? mockFairCoach(input)
+      : mockBagCoach(input);
   return softenNearHit(input, result);
 }
 
