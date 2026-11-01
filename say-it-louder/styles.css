@@ -1136,49 +1136,184 @@ footer {
   .seat-row { gap: 4px; }
 }
 
-.has-plate .carriage-wall,
-.has-plate .carriage-floor {
+/* Anime still fills a 16:9 frame. Ms Chan stays under the carriage picture. */
+.carriage.has-plate,
+.campus.has-plate {
+  min-height: 0;
+  background: #102a38;
+}
+
+.carriage.has-plate {
+  display: grid;
+}
+
+.carriage.has-plate .scene-plate {
+  position: relative;
+  inset: auto;
+  grid-area: 1 / 1;
+  z-index: 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.campus.has-plate {
+  aspect-ratio: 16 / 9;
+}
+
+.carriage.has-plate .carriage-wall {
+  display: none !important;
+}
+
+.carriage.has-plate .carriage-floor {
+  grid-area: 1 / 1;
   position: relative;
   z-index: 2;
+  display: block;
+  min-height: 0;
+  height: 100%;
+  padding: 0;
   background: transparent;
+  pointer-events: none;
 }
 
+.carriage.has-plate .ms-chan {
+  grid-row: 2;
+}
+
+/* Strip leftover 2D mesh. Teaching chips are separate text nodes. */
 .has-plate .window,
 .has-plate .doors,
-.has-plate .door-leaf {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-
+.has-plate .door-leaf,
 .has-plate .carriage-floor::after,
 .has-plate .campus-grass,
 .has-plate .campus-path,
+.has-plate .leo-figure,
 .has-plate .leo-head,
+.has-plate .leo-hair,
+.has-plate .leo-eyes,
+.has-plate .leo-mouth,
+.has-plate .leo-sweat,
 .has-plate .leo-body,
+.has-plate .leo-tie,
 .has-plate .leo-legs,
+.has-plate .leo-leg,
 .has-plate .seat-pad,
+.has-plate .prop-body,
 .has-plate .prop-strap,
-.has-plate .prop-mark {
-  opacity: 0;
+.has-plate .prop-mark,
+.has-plate .name-tag {
+  display: none !important;
 }
 
-.has-plate .prop-body {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
+.has-plate .seat-row,
+.has-plate .seat,
+.has-plate .far-col,
+.has-plate .door-col,
+.carriage.has-plate.is-zone .seat-row,
+.carriage.has-plate.is-middle .seat,
+.carriage.has-plate.is-wrong-grey .seat-row,
+.carriage.has-plate.is-wrong-black .seat-row,
+.carriage.has-plate.is-wrong-lunch .seat-row {
+  position: static;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-.has-plate .name-tag { opacity: 0; }
-.has-plate.is-tag .name-tag { opacity: 1; }
+/* Fail stills are character plates. No zone bar and no chips across Leo. */
+.carriage.has-plate.is-wrong-grey .prop,
+.carriage.has-plate.is-wrong-black .prop,
+.carriage.has-plate.is-wrong-grey .zone-name,
+.carriage.has-plate.is-wrong-black .zone-name,
+.carriage.has-plate.is-wrong-grey .door-caption,
+.carriage.has-plate.is-wrong-black .door-caption,
+.carriage.has-plate.is-wrong-grey .leo-name,
+.carriage.has-plate.is-wrong-black .leo-name,
+.carriage.has-plate.is-wrong-grey .leo-mood,
+.carriage.has-plate.is-wrong-black .leo-mood,
+.has-plate[data-plate="m1-f01"] .prop,
+.has-plate[data-plate="m1-f02"] .prop,
+.has-plate[data-plate="m1-f03"] .prop,
+.has-plate[data-plate="m1-f01"] .zone-name,
+.has-plate[data-plate="m1-f02"] .zone-name,
+.has-plate[data-plate="m1-f03"] .zone-name,
+.has-plate[data-plate="m1-f01"] .leo-name,
+.has-plate[data-plate="m1-f02"] .leo-name,
+.has-plate[data-plate="m1-f03"] .leo-name,
+.has-plate[data-plate="m1-f01"] .leo-mood,
+.has-plate[data-plate="m1-f02"] .leo-mood,
+.has-plate[data-plate="m1-f03"] .leo-mood,
+.has-plate[data-plate="m2-f01"] .pin,
+.has-plate[data-plate="m2-f02"] .pin {
+  display: none !important;
+}
 
-.has-plate .prop-label,
-.has-plate .prop-place,
+.has-plate .prop,
 .has-plate .zone-name,
-.has-plate .door-caption {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 6px;
+.has-plate .door-caption,
+.has-plate .leo-name,
+.has-plate .leo-mood,
+.has-plate .pin,
+.has-plate .leo {
+  animation: none !important;
 }
+
+/* Wide and mood plates keep the still clear. Chips return on teaching beats. */
+.has-plate .prop,
+.has-plate .zone-name,
+.has-plate .door-caption,
+.has-plate .leo-name,
+.has-plate .leo-mood,
+.has-plate .pin {
+  display: none;
+}
+
+.has-plate[data-plate="m1-02"] .prop {
+  display: block;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  width: max-content;
+  max-width: 34%;
+  text-align: left;
+  z-index: 3;
+  transform: translateX(-50%);
+}
+
+.has-plate[data-plate="m1-02"] .prop-label,
+.has-plate[data-plate="m1-02"] .prop-place {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 rgba(18, 58, 77, 0.16);
+}
+
+.has-plate[data-plate="m1-02"] .prop-place { margin-top: 2px; }
+
+/* M1-02: grey on the bench, navy under the seat between black and yellow. */
+.has-plate[data-plate="m1-02"] .prop-grey { left: 24%; top: 36%; }
+.has-plate[data-plate="m1-02"] .prop-black { left: 20%; top: 78%; }
+.has-plate[data-plate="m1-02"] .prop-navy { left: 48%; top: 60%; }
+.has-plate[data-plate="m1-02"] .prop-lunch { left: 64%; top: 76%; }
+
+.campus.has-plate[data-plate="m2-02"] .pin-office,
+.campus.has-plate[data-plate="m2-03"] .pin-walkway,
+.campus.has-plate[data-plate="m2-04"] .pin-canteen,
+.campus.has-plate[data-plate="m2-05"] .pin-playground,
+.campus.has-plate[data-plate="m2-06"] .pin-hall,
+.campus.has-plate[data-plate="m2-07"] .pin-library {
+  display: block;
+}
+
+.campus.has-plate[data-plate="m2-02"] .pin-office { left: 42%; top: 34%; }
+.campus.has-plate[data-plate="m2-03"] .pin-walkway { left: 42%; top: 64%; }
+.campus.has-plate[data-plate="m2-04"] .pin-canteen { left: 72%; top: 16%; }
+.campus.has-plate[data-plate="m2-05"] .pin-playground { left: 68%; top: 54%; }
+.campus.has-plate[data-plate="m2-06"] .pin-hall { left: 50%; top: 52%; }
+.campus.has-plate[data-plate="m2-07"] .pin-library { left: 50%; top: 78%; }
 
 .carriage > .ms-chan {
   position: relative;
@@ -1192,36 +1327,18 @@ footer {
 
 .pin { z-index: 5; }
 
-.campus[data-plate="m2-08"] .leo,
-.campus[data-plate="m2-09"] .leo,
-.campus[data-plate="m2-10"] .leo {
-  visibility: hidden;
-}
-
-@media (max-width: 390px) {
-  .scene-plate {
-    object-fit: cover;
-    object-position: center;
-  }
-
-  .carriage.has-plate,
-  .campus.has-plate {
-    background: #102a38;
-  }
-
-  .carriage.has-plate .carriage-floor {
-    min-height: 168px;
-    padding-bottom: 64px;
-  }
-
-  .campus.has-plate {
-    min-height: 420px;
-  }
-
-  .has-plate .prop-label,
-  .has-plate .zone-name,
-  .pin-label,
-  .pin-place {
-    font-size: .62rem;
+@media (max-width: 420px) {
+  .has-plate[data-plate="m1-02"] .prop { max-width: 46%; }
+  .has-plate[data-plate="m1-02"] .prop-grey { left: 22%; top: 28%; }
+  .has-plate[data-plate="m1-02"] .prop-black { left: 18%; top: 82%; }
+  .has-plate[data-plate="m1-02"] .prop-navy { left: 46%; top: 50%; }
+  .has-plate[data-plate="m1-02"] .prop-lunch { left: 70%; top: 74%; }
+  .has-plate[data-plate="m1-02"] .prop-label,
+  .has-plate[data-plate="m1-02"] .prop-place,
+  .campus.has-plate .pin-label,
+  .campus.has-plate .pin-place {
+    font-size: .58rem;
+    line-height: 1.15;
+    padding: 0 4px;
   }
 }

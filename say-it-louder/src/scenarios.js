@@ -83,7 +83,7 @@ const lostBag = {
   trapRules: [
     "If the student says only “the bag” or “that one”, use HOVER_CONFUSED and ask for colour and size.",
     "If they say “the black bag” or “the big bag” without the small navy bag under the seat, do not treat it as a win. Use the wrong-bag line and a clarity strike.",
-    "If they say “under the seat” without “between” the black sports bag and the yellow lunchbox, ask which things it is between.",
+    "If they say “under the seat” without “between” the black sports bag and the yellow lunchbox, use HOVER_CONFUSED, mood CONFUSED, and say there are a few bags under the seat: a small navy bag, a black sports bag, and a yellow lunchbox.",
     "Navy is not the same as blue. The lunchbox is yellow.",
     "Win only when BAG_NAVY_SMALL is chosen (small navy, under the seat, between the black sports bag and the yellow lunchbox) and the name tag is confirmed. One clear utterance that does both may win in a single turn.",
     "A miss is “Missed the stop”. This is a school-trip mix-up, not a chase."
@@ -156,9 +156,9 @@ const lostBag = {
       teacher_tip: "Find the bag first. Small navy, under the seat, between the black sports bag and the yellow lunchbox."
     },
     needBetween: {
-      spoken_reply: "Under the seat… but two things are by that seat. Between what and what?",
+      spoken_reply: "Under the seat, that's a start! But which one? There are a few bags under the seat — a small navy bag, a black sports bag, and a yellow lunchbox.",
       mood: "CONFUSED",
-      hardware_action: "NONE",
+      hardware_action: "HOVER_CONFUSED",
       teacher_tip: "Say: between the black sports bag and the yellow lunchbox."
     },
     needUnder: {
@@ -204,9 +204,9 @@ const lostBag = {
       teacher_tip: "The yellow lunchbox is only a landmark. The bag is the small navy one between that lunchbox and the black sports bag."
     },
     zoneAgain: {
-      spoken_reply: "I'm already at the seats near the door. Which bag — colour and size?",
-      mood: "HOPEFUL",
-      hardware_action: "SEAT_NEAR_DOOR",
+      spoken_reply: "I'm already looking under the seat. Which bag? There are a few bags under the seat — a small navy bag, a black sports bag, and a yellow lunchbox.",
+      mood: "CONFUSED",
+      hardware_action: "HOVER_CONFUSED",
       teacher_tip: "Next: small navy, under the seat, between the black sports bag and the yellow lunchbox."
     },
     seatLeft: {
