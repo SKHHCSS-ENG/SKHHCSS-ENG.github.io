@@ -328,6 +328,10 @@
       /* The vertical bar keeps its own lane, so it does not cover the
          right-hand score buttons. */
       scrollbar-gutter: stable;
+      /* Pinch and one-finger pan belong to this canvas. The browser must
+         not scroll or zoom the page from a touch that starts here.
+         Toolbar, chips, and bands sit outside this element. */
+      touch-action: none;
     }
     /* The scoreboard sits above the desk canvas, in the card column.
        It must not paint over desk numbers or names. Collapsed it is one
@@ -7415,6 +7419,10 @@
       var floorPanDrag = null;
       var floorPanSuppressClick = false;
       var FLOOR_PAN_THRESHOLD = 8;
+      // Active touches on the floor canvas, keyed by pointer id. Pinch uses
+      // the first two. Cleared when the fingers lift or Edit is toggled.
+      var floorTouchPoints = {};
+      var floorPinch = null;
 
       // The dotted floor fills the card. When the window is wider or taller
       // than the desks, the canvas grows with it (no fixed board, no empty
@@ -7514,8 +7522,136 @@
         floor.scrollLeft = scrollLeft;
         floor.scrollTop = scrollTop;
         requestAnimationFrame(function () {
-          if (!floorPanDrag) stage.classList.remove('is-direct-move');
+          if (!floorPanDrag && !floorPinch) stage.classList.remove('is-direct-move');
         });
+      }
+
+      // Distance ratio into zoomFloorToward, which clamps at 35%–200%.
+      // Not a second transform. A zero span keeps the zoom where it is.
+      function floorPinchNextZoom(startZoom, startDist, dist) {
+        if (!(startDist > 0) || !(dist > 0)) return startZoom;
+        return startZoom * (dist / startDist);
+      }
+
+      function floorPointerKey(id) {
+        return String(id);
+      }
+
+      function floorTouchIds() {
+        return Object.keys(floorTouchPoints);
+      }
+
+      function floorTouchCount() {
+        return floorTouchIds().length;
+      }
+
+      function floorTouchSpan(idA, idB) {
+        var a = floorTouchPoints[idA];
+        var b = floorTouchPoints[idB];
+        if (!a || !b) return null;
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        var dist = Math.hypot(dx, dy);
+        if (!(dist > 0)) return null;
+        return { dist: dist, midX: (a.x + b.x) / 2, midY: (a.y + b.y) / 2 };
+      }
+
+      function armFloorPan(e) {
+        var floor = document.getElementById('classroomViewport');
+        if (!floor) return;
+        floorPanDrag = {
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          originX: floorShiftX - floor.scrollLeft,
+          originY: floorShiftY - floor.scrollTop,
+          moved: false
+        };
+      }
+
+      function disarmFloorPan() {
+        if (!floorPanDrag) return;
+        floorPanDrag = null;
+        var floor = document.getElementById('classroomViewport');
+        if (floor) floor.classList.remove('is-floor-panning');
+      }
+
+      // Pinch takes the fingers. Put a half-moved seat back so the zoom
+      // does not also leave a desk where the first finger was.
+      function abortSeatDragForPinch() {
+        if (!dragContext) return;
+        var drag = dragContext;
+        dragContext = null;
+        if (!drag.deskEl) return;
+        drag.deskEl.classList.remove('dragging');
+        if (drag.student) {
+          drag.student.x = drag.origX;
+          drag.student.y = drag.origY;
+          drag.deskEl.style.left = Math.round(drag.origX) + 'px';
+          drag.deskEl.style.top = Math.round(drag.origY) + 'px';
+        }
+        try { drag.deskEl.releasePointerCapture(drag.pointerId); } catch (err) {}
+      }
+
+      function beginFloorPinch() {
+        disarmFloorPan();
+        var ids = floorTouchIds();
+        if (ids.length < 2) return;
+        var span = floorTouchSpan(ids[0], ids[1]);
+        if (!span) return;
+        floorPinch = {
+          idA: ids[0],
+          idB: ids[1],
+          startDist: span.dist,
+          startZoom: state.zoom || 1,
+          ready: span.dist >= FLOOR_PAN_THRESHOLD
+        };
+        var stage = document.getElementById('classroomStage');
+        if (stage) stage.classList.add('is-direct-move');
+      }
+
+      function applyFloorPinch() {
+        if (!floorPinch) return;
+        var span = floorTouchSpan(floorPinch.idA, floorPinch.idB);
+        if (!span) return;
+        if (!floorPinch.ready) {
+          if (span.dist < FLOOR_PAN_THRESHOLD) return;
+          floorPinch.startDist = span.dist;
+          floorPinch.startZoom = state.zoom || 1;
+          floorPinch.ready = true;
+          return;
+        }
+        zoomFloorToward(
+          span.midX,
+          span.midY,
+          floorPinchNextZoom(floorPinch.startZoom, floorPinch.startDist, span.dist)
+        );
+      }
+
+      function endFloorPinch() {
+        if (!floorPinch) return;
+        floorPinch = null;
+        var stage = document.getElementById('classroomStage');
+        if (stage && !floorPanDrag) stage.classList.remove('is-direct-move');
+        floorPanSuppressClick = true;
+        setTimeout(function () { floorPanSuppressClick = false; }, 0);
+      }
+
+      function rememberFloorTouch(e) {
+        if (!e || e.pointerType !== 'touch') return;
+        var key = floorPointerKey(e.pointerId);
+        if (!Object.prototype.hasOwnProperty.call(floorTouchPoints, key)) return;
+        floorTouchPoints[key] = { x: e.clientX, y: e.clientY };
+      }
+
+      function releaseFloorTouch(e) {
+        if (!e || e.pointerType !== 'touch') return;
+        var key = floorPointerKey(e.pointerId);
+        if (!Object.prototype.hasOwnProperty.call(floorTouchPoints, key)) return;
+        delete floorTouchPoints[key];
+        if (floorPinch && (key === floorPinch.idA || key === floorPinch.idB || floorTouchCount() < 2)) {
+          endFloorPinch();
+        }
       }
 
       function wheelZoomDelta(e) {
@@ -7566,19 +7702,26 @@
         const floor = document.getElementById('classroomViewport');
         if (floor) floor.classList.remove('is-floor-panning');
         const stage = document.getElementById('classroomStage');
-        if (stage) stage.classList.remove('is-direct-move');
+        if (stage && !floorPinch) stage.classList.remove('is-direct-move');
         if (!moved) return;
         floorPanSuppressClick = true;
         setTimeout(function () { floorPanSuppressClick = false; }, 0);
       }
 
       // Wheel zooms the floor toward the pointer. Edit Off left-drag pans.
-      // Touch is ignored so phone scroll and seat taps stay as they are.
-      // Edit On seat drag is a separate handler and is not changed here.
+      // On a phone or tablet the same canvas takes a two-finger pinch (Edit
+      // on or off) and, when Edit is off, a one-finger drag after 8px.
+      // Edit On one-finger stays with the seat handler. The toolbar is outside.
       function initFloorWheelAndPan() {
         const floor = document.getElementById('classroomViewport');
         if (!floor) return;
         floor.addEventListener('wheel', function (e) {
+          // A touch pinch already owns the zoom. Swallow the extra wheel
+          // some browsers emit for the same gesture so it is not applied twice.
+          if (floorPinch) {
+            e.preventDefault();
+            return;
+          }
           if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return;
           e.preventDefault();
           const delta = wheelZoomDelta(e);
@@ -7586,22 +7729,41 @@
           zoomFloorToward(e.clientX, e.clientY, (state.zoom || 1) + delta);
         }, { passive: false });
 
+        // Second finger arrives before the seat handler sees it, so a pinch
+        // does not keep dragging the desk the first finger landed on.
         floor.addEventListener('pointerdown', function (e) {
-          if (boardEditsAllowed() || state.brushMode) return;
+          if (e.pointerType !== 'touch') return;
+          if (floorTouchCount() < 1) return;
+          abortSeatDragForPinch();
+        }, true);
+
+        floor.addEventListener('pointerdown', function (e) {
+          var onField = e.target.closest && e.target.closest('input, textarea, select, #zoomChip');
+          if (e.pointerType === 'touch') {
+            floorTouchPoints[floorPointerKey(e.pointerId)] = { x: e.clientX, y: e.clientY };
+            if (floorTouchCount() >= 2) {
+              beginFloorPinch();
+              e.preventDefault();
+              return;
+            }
+            if (onField || boardEditsAllowed() || state.brushMode) return;
+            armFloorPan(e);
+            return;
+          }
           if (e.pointerType && e.pointerType !== 'mouse') return;
+          if (boardEditsAllowed() || state.brushMode) return;
           if (e.button != null && e.button !== 0) return;
-          if (e.target.closest && e.target.closest('input, textarea, select, #zoomChip')) return;
-          floorPanDrag = {
-            pointerId: e.pointerId,
-            startX: e.clientX,
-            startY: e.clientY,
-            originX: floorShiftX - floor.scrollLeft,
-            originY: floorShiftY - floor.scrollTop,
-            moved: false
-          };
+          if (onField) return;
+          armFloorPan(e);
         });
 
         function onFloorPointerMove(e) {
+          rememberFloorTouch(e);
+          if (floorPinch && e.pointerType === 'touch') {
+            e.preventDefault();
+            applyFloorPinch();
+            return;
+          }
           if (!floorPanDrag || e.pointerId !== floorPanDrag.pointerId) return;
           const dx = e.clientX - floorPanDrag.startX;
           const dy = e.clientY - floorPanDrag.startY;
@@ -7617,12 +7779,29 @@
           applyFloorOrigin(floorPanDrag.originX + dx, floorPanDrag.originY + dy);
         }
 
+        function onFloorPointerEnd(e) {
+          releaseFloorTouch(e);
+          finishFloorPan(e);
+        }
+
         floor.addEventListener('pointermove', onFloorPointerMove);
         document.addEventListener('pointermove', onFloorPointerMove);
-        floor.addEventListener('pointerup', finishFloorPan);
-        floor.addEventListener('pointercancel', finishFloorPan);
-        document.addEventListener('pointerup', finishFloorPan);
-        document.addEventListener('pointercancel', finishFloorPan);
+        floor.addEventListener('pointerup', onFloorPointerEnd);
+        floor.addEventListener('pointercancel', onFloorPointerEnd);
+        document.addEventListener('pointerup', onFloorPointerEnd);
+        document.addEventListener('pointercancel', onFloorPointerEnd);
+        floor.addEventListener('touchmove', function (e) {
+          if (e.touches && e.touches.length >= 2) {
+            e.preventDefault();
+            return;
+          }
+          if (floorPanDrag && floorPanDrag.moved) e.preventDefault();
+        }, { passive: false });
+        function blockFloorBrowserZoom(e) {
+          e.preventDefault();
+        }
+        floor.addEventListener('gesturestart', blockFloorBrowserZoom, { passive: false });
+        floor.addEventListener('gesturechange', blockFloorBrowserZoom, { passive: false });
         floor.addEventListener('click', function (e) {
           if (!floorPanSuppressClick) return;
           floorPanSuppressClick = false;
@@ -8423,6 +8602,8 @@
             return;
           }
           if (!boardEditsAllowed()) return;
+          // One finger still drags the seat. A second finger is the floor pinch.
+          if (e.pointerType === 'touch' && (floorPinch || floorTouchCount() >= 1)) return;
 
           e.preventDefault();
           try { deskEl.setPointerCapture(e.pointerId); } catch (err) {}
@@ -10464,10 +10645,14 @@
             if (dragContext.deskEl) dragContext.deskEl.classList.remove('dragging');
             dragContext = null;
           }
-          if (floorPanDrag) {
+          if (floorPanDrag || floorPinch || floorTouchCount()) {
             floorPanDrag = null;
+            floorPinch = null;
+            floorTouchPoints = {};
             const floorNow = document.getElementById('classroomViewport');
             if (floorNow) floorNow.classList.remove('is-floor-panning');
+            const stageNow = document.getElementById('classroomStage');
+            if (stageNow) stageNow.classList.remove('is-direct-move');
           }
           saveState();
           renderHeaderControls();
