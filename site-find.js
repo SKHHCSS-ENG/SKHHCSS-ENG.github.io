@@ -1,6 +1,6 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
- * Tess 2026-10-29 (32 entries). Matching uses the hub brain:
+ * Tess 2026-10-29, plus Say It Louder (33 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -374,6 +374,18 @@
         "u66",
         "late home",
         "s3 boys late home"
+      ]
+    },
+    {
+      "title": "Say It Louder",
+      "path": "say-it-louder/",
+      "aliases": [
+        "say it louder",
+        "say it clearer",
+        "lost bag",
+        "the lost bag",
+        "mtr bag",
+        "voice coach"
       ]
     },
     {
