@@ -117,6 +117,7 @@ function walkCssRules(css, fn) {
 test('Default and Minimalist never inherit Spark fire, burst, or tiers', function () {
   var css = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
   var sawBurst = false;
+  var sawBurstShown = false;
   var sawTier = false;
   var sawFire = false;
   var sawHide = false;
@@ -133,18 +134,23 @@ test('Default and Minimalist never inherit Spark fire, burst, or tiers', functio
     if (selector.indexOf('html[data-skin="spark"]') !== -1) {
       assert.equal(selector.indexOf('html[data-skin="minimalist"]'), -1);
       if (/score-burst/.test(selector)) sawBurst = true;
+      if (selector.replace(/\s+/g, ' ').trim() === 'html[data-skin="spark"] .score-burst' && /display:\s*block/.test(body)) {
+        sawBurstShown = true;
+      }
       if (/spark-tier-1/.test(selector)) sawTier = true;
       if (/spark-fire/.test(selector)) sawFire = true;
       return;
     }
     sawHide = true;
-    assert.doesNotMatch(selector, /minimalist|score-burst|sparkBurst|sparkRing|emberPulse/);
+    assert.doesNotMatch(selector, /minimalist|sparkBurst|sparkRing|emberPulse/);
     assert.match(selector, /\.spark-tier-badge/);
     assert.match(selector, /\.spark-fire/);
     assert.match(selector, /\.spark-fire-mini/);
+    assert.match(selector, /\.score-burst/);
     assert.equal(body.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ''), 'display:none;');
   });
   assert.equal(sawBurst, true);
+  assert.equal(sawBurstShown, true);
   assert.equal(sawTier, true);
   assert.equal(sawFire, true);
   assert.equal(sawHide, true);

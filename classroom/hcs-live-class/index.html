@@ -3030,9 +3030,8 @@
        Minimalist do not paint the burst, the tier rims, or On fire. */
     .spark-tier-badge,
     .spark-fire,
-    .spark-fire-mini {
-      display: none;
-    }
+    .spark-fire-mini,
+    .score-burst { display: none; }
     html[data-skin="spark"] .studio-mark img.studio-mark-default {
       display: block;
     }
@@ -3139,6 +3138,7 @@
       50% { filter: brightness(1.08); transform: scale(1.03); }
     }
     html[data-skin="spark"] .score-burst {
+      display: block;
       position: absolute;
       left: 50%;
       /* Mock stage puts the burst 10px above the desk, then it rises. */
