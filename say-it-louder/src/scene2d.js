@@ -427,7 +427,7 @@ export function mountScene(root, scenario) {
   var carriage = el("div", "carriage");
   carriage.setAttribute("data-ask-clear", "");
   carriage.setAttribute("role", "img");
-  carriage.setAttribute("aria-label", "MTR carriage with four items near the door seats: a black sports bag, a small navy bag under the seat, a yellow lunchbox, and a big grey bag at the far end.");
+  carriage.setAttribute("aria-label", "MTR carriage with four items near the door seats: a black sports bag, a small navy bag under the seat, a yellow lunchbox, and a big grey bag on the seat.");
   var showPlate = mountPlate(carriage);
 
   var wall = el("div", "carriage-wall");
@@ -443,7 +443,7 @@ export function mountScene(root, scenario) {
   var floor = el("div", "carriage-floor");
   var far = el("div", "far-col");
   far.appendChild(el("p", "zone-name", "Far end"));
-  far.appendChild(propNode(props.BAG_GREY_BIG || { id: "BAG_GREY_BIG", label: "Big grey bag", place: "At the far end" }, "prop-grey"));
+  far.appendChild(propNode(props.BAG_GREY_BIG || { id: "BAG_GREY_BIG", label: "Big grey bag", place: "On the seat" }, "prop-grey"));
   floor.appendChild(far);
 
   var doorCol = el("div", "door-col");

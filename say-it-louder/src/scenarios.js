@@ -68,7 +68,7 @@ const lostBag = {
     { id: "BAG_BLACK_SPORTS", label: "Black sports bag", place: "Beside the seat" },
     { id: "BAG_NAVY_SMALL", label: "Small navy bag", place: "Under the seat" },
     { id: "LUNCHBOX_YELLOW", label: "Yellow lunchbox", place: "Next to the seat" },
-    { id: "BAG_GREY_BIG", label: "Big grey bag", place: "At the far end" }
+    { id: "BAG_GREY_BIG", label: "Big grey bag", place: "On the seat" }
   ],
   initialState: {
     BAG_BLACK_SPORTS: "ON_SEAT",
