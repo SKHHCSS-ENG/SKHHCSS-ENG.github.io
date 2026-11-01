@@ -16,6 +16,16 @@ var ACTION_COPY = {
   NONE: ""
 };
 
+export function sceneCue(action, state) {
+  if (action === "HOVER_CONFUSED") {
+    return { kind: "wait", text: "Wait — say the colour and the size." };
+  }
+  if (state && state.BAG_NAVY_SMALL === "HELD" && state.NAME_TAG !== "SHOWN") {
+    return { kind: "hold", text: "Holding the small navy bag." };
+  }
+  return null;
+}
+
 function el(tag, className, text) {
   var node = document.createElement(tag);
   if (className) node.className = className;
@@ -26,7 +36,10 @@ function el(tag, className, text) {
 function propNode(prop, className) {
   var wrap = el("div", "prop " + className);
   wrap.dataset.prop = prop.id;
-  wrap.appendChild(el("span", "prop-body", ""));
+  var body = el("span", "prop-body");
+  body.appendChild(el("span", "prop-strap"));
+  body.appendChild(el("span", "prop-mark"));
+  wrap.appendChild(body);
   wrap.appendChild(el("span", "prop-label", prop.label));
   wrap.appendChild(el("span", "prop-place", prop.place));
   return wrap;
@@ -56,6 +69,7 @@ export function mountScene(root, scenario) {
   });
 
   var carriage = el("div", "carriage");
+  carriage.setAttribute("data-ask-clear", "");
   carriage.setAttribute("role", "img");
   carriage.setAttribute("aria-label", "MTR carriage with four items near the door seats: a black sports bag, a small navy bag under the seat, a yellow lunchbox, and a big grey bag at the far end.");
 
@@ -86,7 +100,7 @@ export function mountScene(root, scenario) {
   var navy = propNode(props.BAG_NAVY_SMALL || { id: "BAG_NAVY_SMALL", label: "Small navy bag", place: "Under the seat" }, "prop-navy");
   var tag = el("span", "name-tag");
   tag.appendChild(el("span", "tag-face", "Leo"));
-  navy.appendChild(tag);
+  navy.querySelector(".prop-body").appendChild(tag);
   seat.appendChild(navy);
   row.appendChild(seat);
 
@@ -95,18 +109,48 @@ export function mountScene(root, scenario) {
   floor.appendChild(doorCol);
 
   var leo = el("div", "leo");
-  leo.appendChild(el("span", "leo-head"));
-  leo.appendChild(el("span", "leo-body"));
+  leo.setAttribute("data-ask-clear", "");
+  leo.appendChild(el("span", "leo-name", "Leo"));
+  var head = el("span", "leo-head");
+  head.setAttribute("aria-hidden", "true");
+  head.appendChild(el("span", "leo-hair"));
+  head.appendChild(el("span", "leo-eyes"));
+  head.appendChild(el("span", "leo-mouth"));
+  head.appendChild(el("span", "leo-sweat"));
+  leo.appendChild(head);
+  var torso = el("span", "leo-body");
+  torso.setAttribute("aria-hidden", "true");
+  torso.appendChild(el("span", "leo-tie"));
+  leo.appendChild(torso);
   var mood = el("span", "leo-mood", "Panicked");
   leo.appendChild(mood);
   floor.appendChild(leo);
   carriage.appendChild(floor);
 
+  var cue = el("p", "scene-cue");
+  cue.hidden = true;
+  cue.setAttribute("data-ask-clear", "");
+  cue.setAttribute("role", "status");
+
   var chan = el("p", "ms-chan", "Ms Chan is on the platform. The doors start when you speak.");
+  chan.setAttribute("data-ask-clear", "");
   carriage.appendChild(chan);
 
+  root.appendChild(cue);
   root.appendChild(carriage);
   root.appendChild(live);
+
+  function showCue(next) {
+    if (!next) {
+      cue.hidden = true;
+      cue.textContent = "";
+      cue.className = "scene-cue";
+      return;
+    }
+    cue.hidden = false;
+    cue.className = "scene-cue is-" + next.kind;
+    cue.textContent = next.text;
+  }
 
   function setMood(next) {
     var label = {
@@ -141,6 +185,7 @@ export function mountScene(root, scenario) {
     if (action === "BAG_GREY_BIG") carriage.classList.add("is-wrong-grey");
     if (action === "LUNCHBOX_YELLOW") carriage.classList.add("is-wrong-lunch");
     if (ACTION_COPY[action]) live.textContent = ACTION_COPY[action];
+    showCue(sceneCue(action, state));
   }
 
   function setDoors(seconds, running) {
@@ -157,6 +202,7 @@ export function mountScene(root, scenario) {
 
   function setOutcome(kind) {
     carriage.classList.remove("is-win", "is-missed");
+    showCue(null);
     if (kind === "win") {
       carriage.classList.add("is-win");
       chan.textContent = "Ms Chan: Bag found. Lovely clear English.";

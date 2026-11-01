@@ -4,7 +4,8 @@ import test from "node:test";
 
 import { USE_MOCK, mockCoach, queryCoach } from "./ai-service.js";
 import { SCENARIOS } from "./scenarios.js";
-import { applyHardwareAction, freshState, isWin, listScenarios } from "./main.js";
+import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios } from "./main.js";
+import { sceneCue } from "./scene2d.js";
 
 const pack = SCENARIOS.level_1_lost_bag;
 const FULL = "The small navy bag under the seat between the black bag and the yellow lunchbox.";
@@ -159,6 +160,54 @@ test("student page has no API key and no Three.js", () => {
   assert.equal(/apiKey|api-key|deepseek/i.test(html + css), false);
   assert.equal(/three\.js|THREE\./.test(html + css + ai), false);
   assert.match(ai, /export const USE_MOCK = true/);
+});
+
+test("clarity pill counts chances still left", () => {
+  assert.equal(clarityLabel(0, 3), "3 clear chances");
+  assert.equal(clarityLabel(1, 3), "2 clear chances");
+  assert.equal(clarityLabel(2, 3), "1 clear chance");
+  assert.equal(clarityLabel(3, 3), "No clear chances");
+  assert.equal(clarityLabel(9, 3), "No clear chances");
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /id="clarityHud"[^>]*>3 clear chances</);
+  assert.equal(/Clarity 0/.test(html), false);
+});
+
+test("wait and hold cues name the moment", () => {
+  assert.deepEqual(sceneCue("HOVER_CONFUSED", freshState(pack)), {
+    kind: "wait",
+    text: "Wait — say the colour and the size."
+  });
+  const held = applyHardwareAction(freshState(pack), "BAG_NAVY_SMALL");
+  assert.equal(sceneCue("HOVER_CONFUSED", held).kind, "wait");
+  assert.equal(sceneCue("BAG_NAVY_SMALL", held).kind, "hold");
+  assert.match(sceneCue("BAG_NAVY_SMALL", held).text, /small navy bag/);
+  const won = applyHardwareAction(held, "SHOW_NAME_TAG");
+  assert.equal(sceneCue("SHOW_NAME_TAG", won), null);
+  assert.equal(sceneCue("SEAT_NEAR_DOOR", freshState(pack)), null);
+});
+
+test("phone Ask chip stays off Leo, Ms Chan, and the dialogue", () => {
+  const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const scene = fs.readFileSync(new URL("./scene2d.js", import.meta.url), "utf8");
+  const ask = fs.readFileSync(new URL("../../ask.js", import.meta.url), "utf8");
+  const css = fs.readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+  assert.match(html, /data-ask-park/);
+  assert.match(html, /class="dialogue"[^>]*data-ask-clear/);
+  const marks = scene.match(/setAttribute\("data-ask-clear"/g) || [];
+  assert.equal(marks.length >= 4, true);
+  assert.match(ask, /\[data-ask-clear\]/);
+  assert.match(ask, /data-ask-park/);
+  assert.match(ask, /innerWidth < 860/);
+  assert.match(css, /\.prop-black \.prop-strap/);
+  assert.match(css, /\.prop-grey \.prop-body/);
+  assert.match(css, /\.prop-lunch \.prop-strap/);
+  assert.match(css, /\.prop-navy \.prop-mark/);
+  assert.match(css, /\.is-hold-navy \.prop-navy/);
+  assert.match(css, /\.is-hover \.leo/);
+  assert.match(css, /\.leo-name/);
+  assert.match(css, /\.scene-cue\.is-wait/);
+  assert.match(css, /\.scene-cue\.is-hold/);
 });
 
 test("lost-bag copy stays school-safe", () => {

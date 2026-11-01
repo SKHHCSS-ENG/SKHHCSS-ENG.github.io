@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en-GB" data-ask-park>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Say It Louder · English · SKH Holy Carpenter Secondary School</title>
 <meta name="description" content="Say It Louder — coach Leo with precise English and find his school bag on the MTR. All Levels starter.">
 <link rel="stylesheet" href="../ask.css?v=20261030b">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20261101a">
 </head>
 <body>
   <div class="wrap">
@@ -30,8 +30,8 @@
       <section class="stage" aria-label="Carriage">
         <div class="status-row">
           <h2 id="missionTitle" class="mission-title">Mission 1: The Lost Bag</h2>
-          <p id="doorsHud" class="pill">Doors 1:30</p>
-          <p id="clarityHud" class="pill pill-clarity">Clarity 0 / 3</p>
+          <p id="doorsHud" class="pill" data-ask-clear>Doors 1:30</p>
+          <p id="clarityHud" class="pill pill-clarity" data-ask-clear aria-label="3 of 3 clear chances remaining">3 clear chances</p>
         </div>
         <ol class="step-pips" aria-label="Progress">
           <li data-step="zone">Place</li>
@@ -39,7 +39,7 @@
           <li data-step="tag">Name tag</li>
         </ol>
         <div id="scene"></div>
-        <div class="dialogue" aria-live="polite">
+        <div class="dialogue" data-ask-clear="" aria-live="polite">
           <p id="speakerTag" class="speaker-tag">Leo · panicked</p>
           <p id="aiDialogue" class="dialogue-line"></p>
         </div>
@@ -83,9 +83,9 @@
       Materials for school use
     </footer>
   </div>
-  <script type="module" src="./src/main.js"></script>
+  <script type="module" src="./src/main.js?v=20261101a"></script>
   <script src="../site-find.js?v=20261030a"></script>
-  <script src="../ask.js?v=20261030b"></script>
+  <script src="../ask.js?v=20261101a"></script>
   <script src="../site-version.js?v=sv"></script>
 </body>
 </html>
