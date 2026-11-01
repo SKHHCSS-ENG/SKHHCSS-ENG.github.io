@@ -210,3 +210,38 @@ test('Spark On fire is one continuous burn, and the mast mesh loops without a cu
     assert.equal(selector.indexOf('html[data-skin="minimalist"]'), -1);
   });
 });
+
+test('Tidy, Assign, Clear, Group, and Snap chrome stay on the Default master', function () {
+  assert.match(html, /id="btnQuickAddGroup"[\s\S]*id="btnTidyLayout"[\s\S]*id="btnOpenGroupModal"/);
+  assert.match(html, /id="btnTidyLayout"[^>]*title="Snap desks to this layout — doesn’t move who sits where\."/);
+  assert.match(html, /id="btnTidyLayout"[^>]*class="[^"]*px-2\.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-300 text-xs font-bold inline-flex items-center gap-1/);
+  assert.match(html, /#btnTidyLayout \{\s*background-color: #e0f2fe;\s*color: #0369a1;\s*border: 1px solid #7dd3fc;/);
+  assert.match(html, /aria-label="Assign Groups">\s*<span id="groupBrushBtnLabel">Assign<\/span>/);
+  assert.doesNotMatch(html, /id="btnToggleGroupBrush"[\s\S]{0,400}🎨/);
+  assert.match(html, /id="btnClearGroups"[^>]*aria-label="Clear Groups">\s*Clear\s*<\/button>/);
+  assert.match(html, /aria-label="Cluster by Group">Group<\/button>/);
+  assert.doesNotMatch(html, /id="btnToggleSnapGrid"[\s\S]{0,280}📏/);
+  assert.doesNotMatch(html, /data-layout="groupClusters"[\s\S]{0,280}🧲/);
+  assert.match(html, /id="studioToolbarRow"[^>]*flex flex-wrap/);
+  assert.match(html, /studio-band-label">Register<\/span>[\s\S]*studio-band-label">History<\/span>[\s\S]*studio-band-label">Seating<\/span>[\s\S]*studio-band-label">Scores<\/span>[\s\S]*studio-band-label">Skin<\/span>/);
+  assert.doesNotMatch(html, /studioToolbarRow[^>]*>[\s\S]*flex-nowrap/);
+  assert.match(html, /id="applyGridModal"/);
+  assert.match(html, /id="applyGridTitle"[^>]*>Apply a fresh grid\?<\/h3>/);
+  assert.match(html, /This wipes the current desk positions and builds a fresh /);
+  assert.match(html, /addEventListener\('click', requestApplyCustomGrid\)/);
+  assert.match(html, /addEventListener\('click', tidyCurrentLayout\)/);
+  var css = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
+  walkCssRules(css, function (selector, body, isKeyframes) {
+    if (isKeyframes) return;
+    if (!/btnTidyLayout|applyGridModal|btnConfirmApplyGrid|btnCancelApplyGrid/.test(selector)) return;
+    assert.equal(selector.indexOf('html[data-skin="spark"]'), -1, selector);
+    if (/btnTidyLayout/.test(selector)) {
+      assert.equal(selector.indexOf('html[data-skin="minimalist"]'), -1, selector);
+    }
+  });
+  assert.match(html, /html\[data-skin="minimalist"\] #btnCancelApplyGrid/);
+  assert.match(html, /html\[data-skin="minimalist"\] #btnConfirmApplyGrid/);
+  assert.match(html, /html\[data-skin="minimalist"\] #applyGridModal \.shadow-2xl/);
+  assert.match(html, /html\[data-skin="minimalist"\] #studioToolbarRow button/);
+  assert.match(html, /html\[data-skin="spark"\] #studioToolbarRow button/);
+});
