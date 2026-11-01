@@ -1328,24 +1328,28 @@ footer {
 .pin { z-index: 5; }
 
 @media (max-width: 420px) {
-  .has-plate[data-plate="m1-02"] .prop-grey { left: 24%; top: 36%; }
+  .has-plate[data-plate="m1-02"] .prop-grey { left: 24%; top: 34%; }
   .has-plate[data-plate="m1-02"] .prop-black,
   .has-plate[data-plate="m1-02"] .prop-navy,
   .has-plate[data-plate="m1-02"] .prop-lunch {
     transform: none;
-    max-width: 32%;
+    box-sizing: border-box;
+    top: 68%;
   }
-  .has-plate[data-plate="m1-02"] .prop-black { left: 2%; top: 78%; }
-  .has-plate[data-plate="m1-02"] .prop-navy { left: 36%; top: 80%; }
-  .has-plate[data-plate="m1-02"] .prop-lunch { left: 66%; top: 76%; }
+  .has-plate[data-plate="m1-02"] .prop-black { left: 1%; width: 30%; max-width: 30%; }
+  .has-plate[data-plate="m1-02"] .prop-navy { left: 34%; width: 29%; max-width: 29%; }
+  .has-plate[data-plate="m1-02"] .prop-lunch { left: 66%; width: 33%; max-width: 33%; }
   .has-plate[data-plate="m1-02"] .prop-label,
   .has-plate[data-plate="m1-02"] .prop-place {
-    width: auto;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
     max-width: 100%;
     white-space: normal;
-    font-size: .58rem;
-    line-height: 1.15;
-    padding: 0 4px;
+    overflow-wrap: break-word;
+    font-size: .5rem;
+    line-height: 1.1;
+    padding: 0 3px;
   }
   .campus.has-plate .pin-label,
   .campus.has-plate .pin-place {
