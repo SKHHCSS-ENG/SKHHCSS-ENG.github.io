@@ -5,7 +5,7 @@ import test from "node:test";
 import { USE_MOCK, coachWorkerUrl, forgivePronunciation, heardText, mockCoach, normaliseCoachReply, normaliseUtterance, queryCoach } from "./ai-service.js";
 import { SCENARIOS } from "./scenarios.js";
 import { applyHardwareAction, clarityLabel, freshState, isWin, listScenarios, packForId } from "./main.js";
-import { MAP_SPOTS, sceneCue } from "./scene2d.js";
+import { MAP_SPOTS, campusPlate, carriagePlate, sceneCue } from "./scene2d.js";
 
 const pack = SCENARIOS.level_1_lost_bag;
 const FULL = "The small navy bag under the seat between the black bag and the yellow lunchbox.";
@@ -149,6 +149,53 @@ test("beside is not between, and a landmark phrase is not a wrong-bag grab", () 
   const landmark = coach("under the seat between the black bag and the yellow lunchbox");
   assert.equal(landmark.hardware_action, "NONE");
   assert.equal(pack.clarityStrikeActions.includes(landmark.hardware_action), false);
+});
+
+test("soft-oops stills swap on the wrong-path beats", () => {
+  const bag = freshState(pack);
+  assert.equal(carriagePlate("NONE", bag, "PANICKED", ""), "m1-01");
+  assert.equal(carriagePlate("SEAT_NEAR_DOOR", freshState(pack), "PANICKED", ""), "m1-01");
+  const looking = applyHardwareAction(bag, "SEAT_NEAR_DOOR");
+  assert.equal(carriagePlate("SEAT_NEAR_DOOR", looking, "PANICKED", ""), "m1-02");
+  assert.equal(carriagePlate("LUNCHBOX_YELLOW", looking, "PANICKED", ""), "m1-02");
+  assert.equal(carriagePlate("HOVER_CONFUSED", bag, "CONFUSED", ""), "m1-03");
+  assert.equal(carriagePlate("BAG_BLACK_SPORTS", looking, "CONFUSED", ""), "m1-f01");
+  assert.equal(carriagePlate("BAG_BLACK_SPORTS", looking, "PANICKED", "", true), "m1-f03");
+  assert.equal(carriagePlate("BAG_GREY_BIG", looking, "PANICKED", ""), "m1-f02");
+  assert.equal(carriagePlate("BAG_GREY_BIG", looking, "PANICKED", "", true), "m1-f03");
+  const held = applyHardwareAction(looking, "BAG_NAVY_SMALL");
+  assert.equal(carriagePlate("BAG_NAVY_SMALL", held, "HOPEFUL", ""), "m1-04");
+  assert.equal(carriagePlate("BAG_GREY_BIG", held, "PANICKED", ""), "m1-f02");
+  const tagged = applyHardwareAction(held, "SHOW_NAME_TAG");
+  assert.equal(carriagePlate("SHOW_NAME_TAG", tagged, "RELIEVED", "win"), "m1-06");
+
+  const gate = freshState(mapPack);
+  const canteen = Object.assign(freshState(mapPack), { NODE: "CANTEEN", CANTEEN: "FOIL" });
+  assert.equal(campusPlate("ARRIVE_CANTEEN", canteen, "CONFUSED", "", true), "m2-f01");
+  assert.equal(campusPlate("STEP_BACK", Object.assign(freshState(mapPack), { NODE: "WALKWAY" }), "CONFUSED", ""), "m2-f01");
+  const past = Object.assign(freshState(mapPack), { NODE: "CANTEEN_PATH", CANTEEN: "PAST" });
+  assert.equal(campusPlate("WALK_PAST_CANTEEN", past, "HOPEFUL", "", true), "m2-08");
+  assert.equal(campusPlate("NONE", past, "HOPEFUL", ""), "m2-04");
+  assert.equal(campusPlate("ARRIVE_HALL", Object.assign(freshState(mapPack), { NODE: "HALL" }), "CONFUSED", ""), "m2-06");
+  assert.equal(campusPlate("HOVER_CONFUSED", Object.assign(freshState(mapPack), { NODE: "WALKWAY" }), "CONFUSED", ""), "m2-09");
+  assert.equal(campusPlate("NONE", gate, "CONFUSED", ""), "m2-01");
+  assert.equal(campusPlate("NONE", gate, "CONFUSED", "miss"), "m2-f02");
+  assert.equal(campusPlate("ARRIVE_LIBRARY", Object.assign(freshState(mapPack), { NODE: "LIBRARY" }), "RELIEVED", "win"), "m2-10");
+
+  const scene = fs.readFileSync(new URL("./scene2d.js", import.meta.url), "utf8");
+  const plates = [
+    "say-it-louder-M1-F01-wrong-black-bag.jpg",
+    "say-it-louder-M1-F02-wrong-grey-bag.jpg",
+    "say-it-louder-M1-F03-put-bag-back.jpg",
+    "say-it-louder-M2-F01-canteen-enter.jpg",
+    "say-it-louder-M2-F02-bells-gone-gate.jpg"
+  ];
+  plates.forEach(function (name) {
+    assert.match(scene, new RegExp(name.replace(".", "\\.")));
+    assert.equal(fs.existsSync(new URL("../assets/" + name, import.meta.url)), true, name);
+  });
+  assert.match(scene, /PUT_BACK_MS/);
+  assert.match(fs.readFileSync(new URL("../index.html", import.meta.url), "utf8"), /main\.js\?v=20261101d/);
 });
 
 test("hub card does not tag a device", () => {

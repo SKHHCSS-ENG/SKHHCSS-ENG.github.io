@@ -69,6 +69,9 @@ var PLATE_FILE = {
   "m1-04": "say-it-louder-M1-04-leo-navy-bag.jpg",
   "m1-05": "say-it-louder-M1-05-name-tag.jpg",
   "m1-06": "say-it-louder-M1-06-leo-relieved.jpg",
+  "m1-f01": "say-it-louder-M1-F01-wrong-black-bag.jpg",
+  "m1-f02": "say-it-louder-M1-F02-wrong-grey-bag.jpg",
+  "m1-f03": "say-it-louder-M1-F03-put-bag-back.jpg",
   "m2-01": "say-it-louder-M2-01-school-gate.jpg",
   "m2-02": "say-it-louder-M2-02-school-office.jpg",
   "m2-03": "say-it-louder-M2-03-covered-walkway.jpg",
@@ -78,8 +81,12 @@ var PLATE_FILE = {
   "m2-07": "say-it-louder-M2-07-library.jpg",
   "m2-08": "say-it-louder-M2-08-leo-side-walk.jpg",
   "m2-09": "say-it-louder-M2-09-leo-confused.jpg",
-  "m2-10": "say-it-louder-M2-10-leo-relieved-library.jpg"
+  "m2-10": "say-it-louder-M2-10-leo-relieved-library.jpg",
+  "m2-f01": "say-it-louder-M2-F01-canteen-enter.jpg",
+  "m2-f02": "say-it-louder-M2-F02-bells-gone-gate.jpg"
 };
+
+var PUT_BACK_MS = 1500;
 
 var NODE_PLATE = {
   GATE: "m2-01",
@@ -98,14 +105,14 @@ function plateSrc(id) {
   return new URL("../assets/" + PLATE_FILE[id], import.meta.url).href;
 }
 
-export function carriagePlate(action, state, mood, outcome) {
+export function carriagePlate(action, state, mood, outcome, returning) {
   if (outcome === "win") return "m1-06";
+  if (action === "BAG_BLACK_SPORTS") return returning ? "m1-f03" : "m1-f01";
+  if (action === "BAG_GREY_BIG") return returning ? "m1-f03" : "m1-f02";
   if (state && state.NAME_TAG === "SHOWN") return "m1-05";
   if (state && state.BAG_NAVY_SMALL === "HELD") return "m1-04";
   if (action === "HOVER_CONFUSED" || mood === "CONFUSED") return "m1-03";
   if (
-    action === "BAG_BLACK_SPORTS" ||
-    action === "BAG_GREY_BIG" ||
     action === "LUNCHBOX_YELLOW" ||
     (state && (state.SEAT_NEAR_DOOR === "LOOKING" || state.SEAT_LEFT === "LOOKING" || state.SEAT_MIDDLE === "LOOKING"))
   ) {
@@ -116,11 +123,12 @@ export function carriagePlate(action, state, mood, outcome) {
 
 export function campusPlate(action, state, mood, outcome, walking) {
   if (outcome === "win") return "m2-10";
+  if (outcome === "miss") return "m2-f02";
   var node = (state && state.NODE) || "GATE";
   var hall = action === "ARRIVE_HALL" || node === "HALL";
   var canteenFoil = action === "STEP_BACK" || action === "ARRIVE_CANTEEN" || node === "CANTEEN";
   if (hall) return "m2-06";
-  if (canteenFoil) return "m2-04";
+  if (canteenFoil) return "m2-f01";
   if (walking) return "m2-08";
   var atGateStart = node === "GATE" && (action === "NONE" || !action);
   if (action === "HOVER_CONFUSED" || (mood === "CONFUSED" && !atGateStart)) return "m2-09";
@@ -493,9 +501,11 @@ export function mountScene(root, scenario) {
   var plateState = scenario.initialState || null;
   var plateMood = "PANICKED";
   var plateOutcome = "";
+  var plateReturning = false;
+  var returnTimer = null;
 
   function syncPlate() {
-    showPlate(carriagePlate(plateAction, plateState, plateMood, plateOutcome));
+    showPlate(carriagePlate(plateAction, plateState, plateMood, plateOutcome, plateReturning));
   }
 
   function showCue(next) {
@@ -537,6 +547,14 @@ export function mountScene(root, scenario) {
     );
     plateAction = action || "";
     plateState = state || plateState;
+    if (returnTimer) clearTimeout(returnTimer);
+    plateReturning = false;
+    if (action === "BAG_BLACK_SPORTS" || action === "BAG_GREY_BIG") {
+      returnTimer = setTimeout(function () {
+        plateReturning = true;
+        syncPlate();
+      }, PUT_BACK_MS);
+    }
     if (state && state.SEAT_NEAR_DOOR === "LOOKING") carriage.classList.add("is-zone");
     if (state && state.SEAT_LEFT === "LOOKING") carriage.classList.add("is-left");
     if (state && state.SEAT_MIDDLE === "LOOKING") carriage.classList.add("is-middle");
