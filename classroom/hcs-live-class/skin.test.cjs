@@ -13,7 +13,7 @@ test('default document does not set a skin attribute', function () {
 
 test('Bright mark stays the default mast image', function () {
   assert.match(html, /class="studio-mark-default" src="assets\/hcs-live-class-bright\.svg\?v=20261031a"/);
-  assert.match(html, /class="studio-mark-day" src="assets\/hcs-live-class-day\.svg\?v=20261101a"/);
+  assert.match(html, /class="studio-mark-day" src="assets\/hcs-live-class-day\.svg\?v=20261101b" alt="HCS Live Class" width="380" height="86"/);
 });
 
 test('Skin control is on the toolbar and persists in localStorage', function () {
@@ -41,10 +41,16 @@ test('Minimalist overrides are gated and use the approved tokens', function () {
 });
 
 test('Day logo is the indigo-to-teal mark', function () {
+  assert.match(day, /viewBox="6 16 380 86"/);
+  assert.match(day, /font-size="44"/);
+  assert.match(day, /y="50"/);
+  assert.match(day, /y="100"/);
   assert.match(day, /#818cf8/);
   assert.match(day, /#2a8fad/);
+  assert.match(day, /#334155/);
   assert.match(day, /HCS Live Class/);
   assert.doesNotMatch(day, /#22d3ee/);
+  assert.doesNotMatch(day, /#f8fafc/);
 });
 
 test('Spark keeps Bright and leaves Day on Minimalist', function () {
