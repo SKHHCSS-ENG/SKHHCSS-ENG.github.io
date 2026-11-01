@@ -50,6 +50,13 @@ export function isWin(scenario, state) {
   });
 }
 
+export function clarityLabel(strikes, maxStrikes) {
+  var remaining = maxStrikes - strikes;
+  if (remaining < 1) return "No clear chances";
+  if (remaining === 1) return "1 clear chance";
+  return remaining + " clear chances";
+}
+
 export function listScenarios() {
   var seen = {};
   var out = [];
@@ -187,7 +194,13 @@ function boot() {
     var m = String(Math.floor(doorsLeft / 60));
     var s = String(doorsLeft % 60).padStart(2, "0");
     $("doorsHud").textContent = "Doors " + m + ":" + s;
-    $("clarityHud").textContent = "Clarity " + strikes + " / " + scenario.maxStrikes;
+    var clarity = $("clarityHud");
+    var remaining = scenario.maxStrikes - strikes;
+    if (remaining < 0) remaining = 0;
+    clarity.textContent = clarityLabel(strikes, scenario.maxStrikes);
+    clarity.classList.toggle("is-low", remaining > 0 && remaining < scenario.maxStrikes);
+    clarity.classList.toggle("is-out", remaining === 0);
+    clarity.setAttribute("aria-label", remaining + " of " + scenario.maxStrikes + " clear chances remaining");
     setStep("zone", state.SEAT_NEAR_DOOR === "LOOKING");
     setStep("bag", state.BAG_NAVY_SMALL === "HELD");
     setStep("tag", state.NAME_TAG === "SHOWN");

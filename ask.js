@@ -9,6 +9,11 @@
  * deployed deepseek-explain host. No API key here.
  * Does not restyle the Tools dock. On drop, and whenever the dock, an open
  * Cohesion sheet, or an Explain pill would cover the circle, it snaps clear.
+ * On a narrow screen (under 860px) a [data-ask-clear] zone is the same kind
+ * of obstacle. Say It Louder marks the carriage, Leo, Ms Chan, and the
+ * dialogue. If the circle would cover one, and the page sets data-ask-park
+ * on <html>, it parks in the top-right corner instead. If nowhere is clear,
+ * the circle hides.
  */
 (function () {
   if (document.documentElement.getAttribute("data-ask-init") === "1") return;
@@ -614,6 +619,13 @@
       var pill = visibleRect(pills[i]);
       if (pill) list.push(pill);
     }
+    if (window.innerWidth < 860) {
+      var zones = document.querySelectorAll("[data-ask-clear]");
+      for (i = 0; i < zones.length; i++) {
+        var zone = visibleRect(zones[i]);
+        if (zone) list.push(zone);
+      }
+    }
     return list;
   }
 
@@ -649,9 +661,20 @@
     return false;
   }
 
+  function parkPos() {
+    if (window.innerWidth >= 860) return null;
+    if (!document.documentElement.hasAttribute("data-ask-park")) return null;
+    var b = bounds();
+    return { left: b.maxL, top: b.minT };
+  }
+
   function resolvePos(left, top, obs) {
     var start = clampPos(left, top);
     if (!hits(start.left, start.top, obs)) return { left: start.left, top: start.top, ok: true };
+    var parked = parkPos();
+    if (parked && !hits(parked.left, parked.top, obs)) {
+      return { left: parked.left, top: parked.top, ok: true };
+    }
     var b = bounds();
     var candidates = [];
     var i;
@@ -874,6 +897,28 @@
     if (dock) ro.observe(dock);
     var exampleSheet = document.getElementById("exampleSheet");
     if (exampleSheet) ro.observe(exampleSheet);
+  }
+
+  function observeClearZones() {
+    if (!ro) return;
+    var zones = document.querySelectorAll("[data-ask-clear]");
+    var z;
+    for (z = 0; z < zones.length; z++) ro.observe(zones[z]);
+  }
+
+  observeClearZones();
+  var sceneRoot = document.getElementById("scene");
+  if (sceneRoot && window.MutationObserver) {
+    var zoneWatch = new MutationObserver(function () {
+      observeClearZones();
+      schedulePlace();
+    });
+    zoneWatch.observe(sceneRoot, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "hidden"]
+    });
   }
   if (window.MutationObserver && document.body) {
     var watch = new MutationObserver(schedulePlace);
