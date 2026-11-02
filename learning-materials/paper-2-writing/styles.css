@@ -758,6 +758,39 @@ body.zh-on .gloss::after {
 body.zh-on .gloss-key { display: block; }
 .gloss-key strong { color: var(--warn); }
 
+/* Exam Skills keyword mark — amber, distinct from teal section chips.
+   Locked pair: #b45309 on #fef3c7. Gloss underline stays teal.
+   Put <strong class="kw"> inside .gloss (not around it) so the Chinese
+   gloss::after stays outside the highlight. */
+strong.kw {
+  font-weight: 800;
+  color: #b45309;
+  background: #fef3c7;
+  border-radius: 0.2em;
+  padding: 0 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+a strong.kw,
+a:visited strong.kw {
+  color: #b45309;
+}
+/* Paper 2 marking heads — same teal as section chips, not the amber keyword wash. */
+body.writing-notes strong.exam-key {
+  white-space: nowrap;
+  font-weight: 800;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 0 .2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
 /* Useful vocabulary hub — chips + tables */
 .section-lead {
   margin: 0 0 14px;
