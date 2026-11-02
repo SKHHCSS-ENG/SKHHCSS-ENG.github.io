@@ -777,6 +777,19 @@ a strong.kw,
 a:visited strong.kw {
   color: #b45309;
 }
+/* Paper 2 marking heads — same teal as section chips, not the amber keyword wash. */
+body.writing-notes strong.exam-key {
+  white-space: nowrap;
+  font-weight: 800;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 0 .2em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
 
 /* Useful vocabulary hub — chips + tables */
 .section-lead {
