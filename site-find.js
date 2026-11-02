@@ -1,6 +1,6 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
- * Tess 2026-10-29 (32 entries). Matching uses the hub brain:
+ * Tess 2026-10-29 (26 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -294,18 +294,6 @@
       ]
     },
     {
-      "title": "Paper 1 - Exam Practice",
-      "path": "learning-materials/paper-1-exam-practice/",
-      "aliases": [
-        "paper 1 exam practice",
-        "p1 practice",
-        "reading practice",
-        "閱讀練習",
-        "quest hub",
-        "past papers reading"
-      ]
-    },
-    {
       "title": "Paper 4 - Speaking Expressions",
       "path": "learning-materials/paper-4-speaking-expressions/",
       "aliases": [
@@ -328,52 +316,6 @@
         "初中文法",
         "tenses",
         "時態"
-      ]
-    },
-    {
-      "title": "Speech Festival",
-      "path": "speech-festival/",
-      "aliases": [
-        "speech festival",
-        "hkssf",
-        "朗誦節",
-        "speech fest"
-      ]
-    },
-    {
-      "title": "Speech Festival Solo Verse Speaking",
-      "path": "speech-festival/solo-verse/",
-      "aliases": [
-        "solo verse",
-        "solo verse speaking",
-        "個人詩詞朗誦"
-      ]
-    },
-    {
-      "title": "S3 Girls · Last Day (U41)",
-      "path": "speech-festival/u41/",
-      "aliases": [
-        "u41",
-        "last day",
-        "s3 girls last day"
-      ]
-    },
-    {
-      "title": "S5 Girls · One Moment in Summer (U47)",
-      "path": "speech-festival/u47/",
-      "aliases": [
-        "u47",
-        "one moment in summer",
-        "s5 girls one moment"
-      ]
-    },
-    {
-      "title": "S3 Boys · Late Home (U66)",
-      "path": "speech-festival/u66/",
-      "aliases": [
-        "u66",
-        "late home",
-        "s3 boys late home"
       ]
     },
     {
