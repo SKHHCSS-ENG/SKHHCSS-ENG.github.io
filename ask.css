@@ -237,15 +237,15 @@
 }
 
 .ask-mode-btn.is-on {
-  background: #ffffff;
-  border-color: #d3e8ef;
-  color: #123a4d;
+  background: #2a8fad;
+  border-color: #2a8fad;
+  color: #ffffff;
 }
 
 .ask-mode-btn.is-on.is-ask {
-  border-color: #e4d5ea;
-  background: #fbf8fc;
-  color: #866993;
+  border-color: #866993;
+  background: #866993;
+  color: #ffffff;
 }
 
 .ask-close {
