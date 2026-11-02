@@ -72,6 +72,7 @@ test("source has no key and no canned soft-sample replies", () => {
   const src = [
     readFileSync(new URL("../src/index.js", import.meta.url), "utf8"),
     readFileSync(new URL("../src/askPrompt.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../src/speakNovel.js", import.meta.url), "utf8"),
   ].join("\n");
   assert.equal(src.includes("PLACEHOLDER_SYSTEM_PROMPT"), false);
   assert.equal(src.includes(KEY), false);
