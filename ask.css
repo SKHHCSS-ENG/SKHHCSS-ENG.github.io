@@ -1,7 +1,8 @@
 /* Ask — draggable circle, bottom-left until the reader moves it.
-   .api-mesh is the shared API wash for this circle, Explain, and SEND.
-   The circle paints the wash on itself. Explain and SEND paint the same
-   wash on ::before (Explain’s pill box stays in learning-materials/explain.css).
+   .api-mesh is the shared API wash for this circle, Explain, SEND, and the
+   selected Ask AI chip. The circle and that chip paint the wash on
+   themselves. Explain and SEND paint the same wash on ::before (Explain’s
+   pill box stays in learning-materials/explain.css).
    Blue → violet → magenta → orange → yellow, one 10s loop.
    ASK, EXPLAIN, and SEND share the site stack, weight 800, and 0.04em
    tracking. Ink is soft off-white #f4f0e8. Warm stops are deep enough that
@@ -11,7 +12,8 @@
    ask.js clamps the circle, stores the last spot, and snaps clear of the
    dock, an open Cohesion sheet, and Explain pills. */
 
-.api-mesh {
+.api-mesh,
+.ask-mode-btn.is-on.is-ask {
   --api-mesh-ink: #f4f0e8;
   --api-mesh-image: linear-gradient(
     122deg,
@@ -31,7 +33,8 @@
 
 .ask-floater.api-mesh,
 .explain-btn.api-mesh:not(:disabled)::before,
-.ask-send.api-mesh::before {
+.ask-send.api-mesh::before,
+.ask-mode-btn.is-on.is-ask {
   background-color: #1458d6;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
@@ -56,7 +59,8 @@
 @media (prefers-reduced-motion: reduce) {
   .ask-floater.api-mesh,
   .explain-btn.api-mesh:not(:disabled)::before,
-  .ask-send.api-mesh::before {
+  .ask-send.api-mesh::before,
+  .ask-mode-btn.is-on.is-ask {
     animation: none !important;
     background-size: 100% 100%;
     background-position: 0% 50%;
@@ -237,15 +241,15 @@
 }
 
 .ask-mode-btn.is-on {
-  background: #ffffff;
-  border-color: #d3e8ef;
-  color: #123a4d;
+  background: #2a8fad;
+  border-color: #2a8fad;
+  color: #ffffff;
 }
 
+/* Same wash as ASK / EXPLAIN / SEND. Transparent border lets the mesh fill the rim. */
 .ask-mode-btn.is-on.is-ask {
-  border-color: #e4d5ea;
-  background: #fbf8fc;
-  color: #866993;
+  border-color: transparent;
+  color: var(--api-mesh-ink, #f4f0e8);
 }
 
 .ask-close {
