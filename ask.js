@@ -10,10 +10,9 @@
  * Does not restyle the Tools dock. On drop, and whenever the dock, an open
  * Cohesion sheet, or an Explain pill would cover the circle, it snaps clear.
  * On a narrow screen (under 860px) a [data-ask-clear] zone is the same kind
- * of obstacle. Say It Louder marks the carriage, Leo, Ms Chan, and the
- * dialogue. If the circle would cover one, and the page sets data-ask-park
- * on <html>, it parks in the top-right corner instead. If nowhere is clear,
- * the circle hides.
+ * of obstacle. If the page sets data-ask-park on <html> and the circle
+ * would cover a marked zone, it parks in the top-right corner instead. If
+ * nowhere is clear, the circle hides.
  */
 (function () {
   if (document.documentElement.getAttribute("data-ask-init") === "1") return;
