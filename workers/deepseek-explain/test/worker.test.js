@@ -200,12 +200,13 @@ test("requests: cors, validation, rate limit, and a live API call", async () => 
     }, "203.0.113.26"), {});
     assert.equal(unconfigured.status, 503);
 
-    let limitedStatus = 0;
-    for (let i = 0; i < 11; i++) {
+    const limited = [];
+    for (let i = 0; i < 31; i++) {
       const res = await handleRequest(post(cohesionBody, "203.0.113.50"), { DEEPSEEK_API_KEY: KEY });
-      limitedStatus = res.status;
+      limited.push(res.status);
     }
-    assert.equal(limitedStatus, 429);
+    assert.equal(limited[29] === 429, false);
+    assert.equal(limited[30], 429);
 
     const logText = logs.join("\n");
     assert.equal(logText.includes(KEY), false);
@@ -227,7 +228,7 @@ test("Ask user message follows Tess’s template", () => {
     message,
     [
       "Page context: /learning-materials/useful-vocabulary/",
-      "Turn: 1 / 3",
+      "Turn: 1 / 5",
       "Find hits (optional): Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
       "Cohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
       "Student: 讀者來函在哪",
@@ -235,7 +236,11 @@ test("Ask user message follows Tess’s template", () => {
     ].join("\n")
   );
   assert.match(ASK_SYSTEM_PROMPT, /繁體中文/);
-  assert.match(ASK_SYSTEM_PROMPT, /這次 Ask 已達 3 輪/);
+  assert.match(ASK_SYSTEM_PROMPT, /After the \*\*5th\*\* assistant reply in this open, end with: 這次 Ask 已達 5 輪。請改用上方 Find 找頁面，或到樣本下的 Explain 查看該項目。/);
+  assert.equal(ASK_SYSTEM_PROMPT.includes("已達 3 輪"), false);
+  assert.equal(ASK_SYSTEM_PROMPT.includes("3rd"), false);
+  assert.match(ASK_TASK, /用2至4句/);
+  assert.match(ASK_TASK, /若 Turn 已是 5，結尾加上五輪提示。/);
   assert.match(SYSTEM_PROMPT, /繁體中文/);
   assert.match(SYSTEM_PROMPT, /書面語/);
   assert.equal(SYSTEM_PROMPT.includes("British English"), false);
@@ -266,21 +271,31 @@ test("Ask is a page mode on the same worker and does not replace Explain", async
     assert.equal((await missing.json()).error, "Type a short question.");
     assert.equal(calls, 0);
 
-    const fourth = await handleRequest(post({ page: "Ask", turn: 4, message: "hello" }, "203.0.113.61"), { DEEPSEEK_API_KEY: KEY });
-    assert.equal(fourth.status, 400);
-    assert.equal((await fourth.json()).error, "Ask allows 3 turns in this open.");
+    const sixth = await handleRequest(post({ page: "Ask", turn: 6, message: "hello" }, "203.0.113.61"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(sixth.status, 400);
+    assert.equal((await sixth.json()).error, "Ask allows 5 turns in this open.");
     assert.equal(calls, 0);
+
+    const fifth = await handleRequest(post({ page: "Ask", turn: 5, message: "第五輪" }, "203.0.113.66"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(fifth.status, 200);
+    assert.equal(typeof (await fifth.json()).reply, "string");
+    assert.equal(calls, 1);
+    assert.match(JSON.parse(lastInit.init.body).messages[1].content, /Turn: 5 \/ 5\n/);
+
+    const fifthText = await handleRequest(post({ page: "Ask", turn: "5", message: "第五輪文字" }, "203.0.113.67"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(fifthText.status, 200);
+    assert.equal(calls, 2);
 
     const ok = await handleRequest(post(askBody, "203.0.113.62"), { DEEPSEEK_API_KEY: KEY });
     const okJson = await ok.json();
     assert.equal(ok.status, 200);
     assert.equal(typeof okJson.reply, "string");
     assert.equal(okJson.explanation, undefined);
-    assert.equal(calls, 1);
+    assert.equal(calls, 3);
     const sent = JSON.parse(lastInit.init.body);
     assert.equal(sent.messages[0].content, ASK_SYSTEM_PROMPT);
     assert.equal(sent.max_tokens, 360);
-    assert.match(sent.messages[1].content, /^Page context: site\nTurn: 1 \/ 3\n/);
+    assert.match(sent.messages[1].content, /^Page context: site\nTurn: 1 \/ 5\n/);
     assert.equal(sent.messages[0].content === SYSTEM_PROMPT, false);
 
     const explain = await handleRequest(post(cohesionBody, "203.0.113.63"), { DEEPSEEK_API_KEY: KEY });

@@ -85,7 +85,7 @@ Same URL, same secret, same origin allowlist (`https://skhhcss-eng.github.io`, `
 }
 ```
 
-`turn` is 1, 2, or 3 for this open. `message` is required. `pagePath` defaults to `site`. `findHits` is optional, up to three `title — path` lines. The Ask system prompt is Tess’s 2026-10-29 text (Traditional Chinese 書面語). Soft sample replies are not stored here.
+`turn` is 1, 2, 3, 4, or 5 for this open. `message` is required. `pagePath` defaults to `site`. `findHits` is optional, up to three `title — path` lines. The Ask system prompt is Tess’s 2026-10-29 text (Traditional Chinese 書面語), with the turn-limit line at 5. Soft sample replies are not stored here.
 
 Success:
 
@@ -93,10 +93,10 @@ Success:
 { "reply": "…" }
 ```
 
-A 4th turn is rejected with 400 before any API call. The browser also stops at 3 replies per open. There is no daily cap. Ask shares the Explain rate limit (about 10 requests per minute per IP).
+Turns 1–5 are accepted. A 6th turn is rejected with 400 before any API call. The browser script still stops at 3 replies per open. There is no daily cap. Ask shares the Explain rate limit (30 requests per minute per IP).
 
 Ask and Explain use one allowlist in `src/index.js` (`LIVE_ORIGINS`): `https://skhhcss-eng.github.io`, `https://learning.hcs.edu.hk`, and loopback. There is no Pages preview origin in this repo. `wrangler.toml` does not list origins.
 
 Errors are JSON `{ "error": "…" }` with 400, 403, 405, 413, 415, 429, 502, or 503.
 
-About 10 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`.
+30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`.

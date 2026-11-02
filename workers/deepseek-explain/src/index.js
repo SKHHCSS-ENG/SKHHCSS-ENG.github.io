@@ -40,7 +40,7 @@ const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 const MODEL = "deepseek-chat";
 const MAX_BODY_BYTES = 4096;
 const MAX_EXPLANATION_CHARS = 800;
-const RATE_LIMIT = 10;
+const RATE_LIMIT = 30;
 const RATE_WINDOW_MS = 60 * 1000;
 const UPSTREAM_TIMEOUT_MS = 20000;
 
@@ -60,7 +60,7 @@ const LIMITS = {
 export function buildAskUserMessage(fields) {
   return [
     "Page context: " + (fields.pagePath || "site"),
-    "Turn: " + fields.turn + " / 3",
+    "Turn: " + fields.turn + " / 5",
     "Find hits (optional): " + (fields.findHits || ""),
     "Student: " + fields.message,
     "Task: " + ASK_TASK,
@@ -226,8 +226,8 @@ function asHitText(value, max) {
 
 function readTurn(value) {
   let turn = value;
-  if (typeof turn === "string" && /^[1-3]$/.test(turn.trim())) turn = Number(turn.trim());
-  if (turn !== 1 && turn !== 2 && turn !== 3) return null;
+  if (typeof turn === "string" && /^[1-5]$/.test(turn.trim())) turn = Number(turn.trim());
+  if (turn !== 1 && turn !== 2 && turn !== 3 && turn !== 4 && turn !== 5) return null;
   return turn;
 }
 
@@ -381,7 +381,7 @@ export async function handleRequest(request, env) {
   }
   if (parsed.mode === "ask") {
     if (parsed.error === "turn") {
-      return jsonResponse(400, { error: "Ask allows 3 turns in this open." }, origin);
+      return jsonResponse(400, { error: "Ask allows 5 turns in this open." }, origin);
     }
     if (parsed.error === "required") {
       return jsonResponse(400, { error: "Type a short question." }, origin);
