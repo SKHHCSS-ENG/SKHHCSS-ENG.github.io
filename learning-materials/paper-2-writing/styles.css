@@ -758,6 +758,25 @@ body.zh-on .gloss::after {
 body.zh-on .gloss-key { display: block; }
 .gloss-key strong { color: var(--warn); }
 
+/* Exam Skills keyword mark — same teal pair as .exam-key / .level-stars.
+   One accent plus bold. Put <strong class="kw"> inside .gloss (not around it)
+   so the Chinese gloss::after stays outside the highlight. */
+strong.kw {
+  font-weight: 800;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 0.2em;
+  padding: 0 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+a strong.kw,
+a:visited strong.kw {
+  color: var(--accent-ink);
+}
+
 /* Useful vocabulary hub — chips + tables */
 .section-lead {
   margin: 0 0 14px;
