@@ -23,13 +23,19 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 32);
+  assert.equal(SiteFind.entries.length, 26);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 32);
+  assert.equal(new Set(paths).size, 26);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
-  assert.equal(SiteFind.entries[31].title, "What's New");
-  assert.equal(SiteFind.entries[31].path, "whats-new/");
+  assert.equal(SiteFind.entries[25].title, "What's New");
+  assert.equal(SiteFind.entries[25].path, "whats-new/");
+  assert.equal(paths.includes("learning-materials/paper-1-exam-practice/"), false);
+  assert.equal(paths.includes("speech-festival/"), false);
+  assert.equal(SiteFind.search("paper 1 exam practice").length, 0);
+  assert.equal(SiteFind.search("quest hub").length, 0);
+  assert.equal(SiteFind.search("朗誦節").length, 0);
+  assert.equal(SiteFind.search("u41").length, 0);
   assert.equal(SiteFind.search("say it louder").length, 0);
   assert.equal(SiteFind.search("lost bag").length, 0);
   assert.equal(SiteFind.search("club fair").length, 0);
@@ -56,7 +62,7 @@ test("Find uses the hub brain: norm, exact, prefix, substring, cap 3", () => {
   const speech = SiteFind.search("speech");
   assert.equal(speech[0].title, "Speech");
   assert.equal(speech.length <= 3, true);
-  assert.equal(speech.some((hit) => hit.title === "Speech Festival"), true);
+  assert.equal(speech.some((hit) => hit.title === "Speech Festival"), false);
 
   const sp = SiteFind.search("sp");
   assert.equal(sp[0].title, "Sentence Patterns");
@@ -83,9 +89,10 @@ test("hub cards reuse this index and do not grow a second list", () => {
   assert.match(home, /english home/i);
   assert.equal(home.includes("u41"), false);
 
-  const festival = SiteFind.extraHaystack("../speech-festival/");
-  assert.match(festival, /u41/);
-  assert.match(festival, /朗誦節/);
+  assert.equal(SiteFind.extraHaystack("../speech-festival/"), "");
+  assert.equal(SiteFind.extraHaystack("paper-1-exam-practice/"), "");
+  assert.equal(SiteFind.extraHaystack("https://skhhcss-eng.github.io/speech-festival/"), "");
+  assert.equal(SiteFind.extraHaystack("https://skhhcss-eng.github.io/paper-1-exam-practice/"), "");
 
   assert.equal(SiteFind.extraHaystack("https://example.com/"), "");
 });
@@ -166,7 +173,7 @@ test("script URL sets the base used by Find and Ask jumps", () => {
 
   const fromPage = loadSiteFind(null, { pathname: "/english/learning-materials/grammar/" });
   assert.equal(fromPage.siteBase(), "/english");
-  assert.equal(fromPage.hrefFor("speech-festival/u41/"), "/english/speech-festival/u41/");
+  assert.equal(fromPage.hrefFor("learning-materials/grammar/"), "/english/learning-materials/grammar/");
 
   const rootPage = loadSiteFind(null, { pathname: "/learning-materials/" });
   assert.equal(rootPage.siteBase(), "");
@@ -191,6 +198,49 @@ test("Spelling Watchlist aliases jump to the new part names", () => {
   assert.match(hub, /confusing pairs/i);
   assert.match(hub, /british vs american/i);
   assert.match(hub, /true misspellings/i);
+});
+
+test("Paper 1 practice and Speech Festival hub cards open the project sites", () => {
+  const hub = fs.readFileSync(new URL("./learning-materials/index.html", import.meta.url), "utf8");
+  assert.match(
+    hub,
+    /href="https:\/\/skhhcss-eng\.github\.io\/paper-1-exam-practice\/" target="_blank" rel="noopener noreferrer"/
+  );
+  assert.match(
+    hub,
+    /href="https:\/\/skhhcss-eng\.github\.io\/speech-festival\/" target="_blank" rel="noopener noreferrer"/
+  );
+  assert.equal(hub.includes('href="paper-1-exam-practice/"'), false);
+  assert.equal(hub.includes('href="../speech-festival/"'), false);
+
+  const practice = fs.readFileSync(
+    new URL("./learning-materials/paper-1-exam-practice/index.html", import.meta.url),
+    "utf8"
+  );
+  assert.match(practice, /HKDSE English Paper 1 Quest Hub/);
+  assert.match(
+    practice,
+    /pathname\.indexOf\("\/learning-materials\/paper-1-exam-practice"\)!==-1\)location\.replace\("https:\/\/skhhcss-eng\.github\.io\/paper-1-exam-practice\/"/
+  );
+  const festival = fs.readFileSync(new URL("./speech-festival/index.html", import.meta.url), "utf8");
+  assert.match(festival, /href="solo-verse\/"/);
+  assert.match(festival, /href="u41\/"/);
+
+  const stubs = [
+    ["learning-materials/paper-1-exam-practice/redirect.html", "https://skhhcss-eng.github.io/paper-1-exam-practice/"],
+    ["learning-materials/reading-paper-1/index.html", "https://skhhcss-eng.github.io/paper-1-exam-practice/"],
+    ["speech-festival/redirect.html", "https://skhhcss-eng.github.io/speech-festival/"],
+    ["speech-festival/solo-verse/redirect.html", "https://skhhcss-eng.github.io/speech-festival/solo-verse/"],
+    ["speech-festival/u41/redirect.html", "https://skhhcss-eng.github.io/speech-festival/u41/"],
+    ["speech-festival/u47/redirect.html", "https://skhhcss-eng.github.io/speech-festival/u47/"],
+    ["speech-festival/u66/redirect.html", "https://skhhcss-eng.github.io/speech-festival/u66/"]
+  ];
+  for (const [file, url] of stubs) {
+    const html = fs.readFileSync(new URL("./" + file, import.meta.url), "utf8");
+    assert.match(html, new RegExp("location\\.replace\\(\"" + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.match(html, new RegExp("location\\.search \\+ location\\.hash"));
+    assert.match(html, new RegExp('content="0; url=' + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
+  }
 });
 
 test("rectsOverlap is a soft-fail check for the Ask circle and the dock", () => {

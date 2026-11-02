@@ -7,7 +7,8 @@ Public GitHub Pages site for the English panel.
 - **Classroom:** https://skhhcss-eng.github.io/classroom/
 - **What's New:** https://skhhcss-eng.github.io/whats-new/
 - **HCS Live Class:** https://skhhcss-eng.github.io/classroom/hcs-live-class/
-- **Speech Festival:** https://skhhcss-eng.github.io/speech-festival/
+- **Speech Festival:** https://skhhcss-eng.github.io/speech-festival/ (project site; the Eng folder remains until that host is live)
+- **Paper 1 - Exam Practice:** https://skhhcss-eng.github.io/paper-1-exam-practice/ (project site; the Eng folder remains until that host is live)
 - **Paper 2 - Exam Skills:** https://skhhcss-eng.github.io/learning-materials/paper-2-exam-skills/
 
 ## Contents
@@ -15,16 +16,17 @@ Public GitHub Pages site for the English panel.
 | Path | What |
 |------|------|
 | `/` | English Department home (Learning Materials · Classroom · What's New) |
-| `/learning-materials/` | Student practice hub (Speech Festival, Paper 2 - Writing) |
+| `/learning-materials/` | Student practice hub (DSE papers, junior grammar, useful vocabulary). Speech Festival and Paper 1 - Exam Practice open on their own project sites. |
 | `/classroom/` | Teacher tools hub |
 | `/classroom/hcs-live-class/` | HCS Live Class (live scoreboard / desks / points). `/classroom/class-activity-studio/` redirects here. |
 | `/whats-new/` | Site updates (newest first) |
-| `/speech-festival/` | Speech Festival hub |
+| `/speech-festival/` | Speech Festival source copy (hub card opens the project site). `redirect.html` beside each page points at that host. |
 | `/speech-festival/u41/` | U41 *Last Day* (Clare Bevan) — S3 Girls |
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |
 | `/speech-festival/u66/` | U66 *Late Home* (Gervase Phinn) — S3 Boys |
 | `/learning-materials/paper-1-exam-skills/` | Paper 1 - Exam Skills |
-| `/learning-materials/paper-1-exam-practice/` | Paper 1 - Exam Practice |
+| `/learning-materials/paper-1-exam-practice/` | Paper 1 - Exam Practice source copy (hub card opens the project site). Opening it under `/learning-materials/` redirects to the project site. `redirect.html` is the same soft redirect. |
+| `/learning-materials/reading-paper-1/` | Old Paper 1 practice address; redirects to the project site |
 | `/learning-materials/paper-2-exam-skills/` | Paper 2 - Exam Skills |
 | `/learning-materials/paper-2-writing-formats/` | Paper 2 - Writing Formats |
 | `/learning-materials/paper-4-speaking-expressions/` | Paper 4 - Speaking Expressions |
