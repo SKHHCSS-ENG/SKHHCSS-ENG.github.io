@@ -1,6 +1,6 @@
 # DeepSeek Explain worker
 
-Short explanations for the Cohesion sheet and Sentence Patterns samples, and a short Ask chat (`page: "Ask"`). The browser calls this Worker. The Worker calls DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Explain and Ask share that binding. There is no second key.
+Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), and Say It Louder SpeakNovel (`mode: "speaknovel"`). The browser calls this Worker. The Worker calls DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Explain, Ask, and SpeakNovel share that binding. There is no second key.
 
 Live site origins: `https://skhhcss-eng.github.io` and `https://learning.hcs.edu.hk` (the school LMS; pages live under `/english/`, which is not part of the Origin header).  
 This repo has no GitHub Pages preview origin. The org site is served from `main` on `skhhcss-eng.github.io` only.  
@@ -45,7 +45,7 @@ An empty string keeps the control quiet (`Explain soon`, not tappable). The clie
 
 ## Request
 
-`POST` JSON, `Content-Type: application/json`, body at most 4 KB.
+`POST` JSON, `Content-Type: application/json`. Ask and Explain bodies are at most 4 KB. A SpeakNovel body may be up to 24 KB because the scene includes its branches. A larger Ask or Explain body is still rejected.
 
 ```json
 {
@@ -93,10 +93,57 @@ Success:
 { "reply": "…" }
 ```
 
-Turns 1–5 are accepted. A 6th turn is rejected with 400 before any API call. The browser script also stops at 5 replies per open. There is no daily cap. Ask shares the Explain rate limit (30 requests per minute per IP).
+Turns 1–5 are accepted. A 6th turn is rejected with 400 before any API call. The browser script also stops at 5 replies per open. There is no daily cap. Ask shares the Explain rate limit (30 requests per minute per IP). SpeakNovel does not draw on that allowance.
 
-Ask and Explain use one allowlist in `src/index.js` (`LIVE_ORIGINS`): `https://skhhcss-eng.github.io`, `https://learning.hcs.edu.hk`, and loopback. There is no Pages preview origin in this repo. `wrangler.toml` does not list origins.
+Ask, Explain, and SpeakNovel use one allowlist in `src/index.js` (`LIVE_ORIGINS`): `https://skhhcss-eng.github.io`, `https://learning.hcs.edu.hk`, and loopback. Paths are not part of Origin, so `https://skhhcss-eng.github.io` already covers `/say-it-louder/`. There is no Pages preview origin in this repo. `wrangler.toml` does not list origins.
+
+## SpeakNovel
+
+Same URL, same secret, same origin allowlist. Say It Louder posts from `https://skhhcss-eng.github.io` (the `/say-it-louder/` path is not part of Origin). `mode` must be `speaknovel`. This is not the old Mission coach (`page: "Say It Louder"` is still rejected).
+
+```json
+{
+  "mode": "speaknovel",
+  "episode": "ep1_boba",
+  "nodeKey": "node_start",
+  "transcript": "Allow me to remake your drink right away.",
+  "node": {
+    "speaker": "Angry Customer (Ken)",
+    "defaultLine": "What are you going to do about this?!",
+    "goalHint": "Apologise politely and offer a concrete fix.",
+    "targetGrammar": {
+      "item": "Polite Modals & Offers",
+      "patterns": ["Allow me to ___ right away."],
+      "keywords": ["allow me", "right away"]
+    },
+    "branches": [
+      { "condition": "Polite offer", "targetNode": "node_remake", "label": "Polite offer", "kind": "success" },
+      { "condition": "Vague apology", "targetNode": "node_manager", "label": "Try again", "kind": "retry" }
+    ]
+  }
+}
+```
+
+`episode`, `nodeKey`, `transcript`, `node.speaker`, `node.defaultLine`, `node.targetGrammar`, and at least one `node.branches[].targetNode` are required. Branch ids use letters, digits, `_`, `.`, and `-`.
+
+The worker asks DeepSeek for JSON, then checks the line against the node's keywords. A bare apology or a line that misses the pattern is `used_target_grammar: false`. That result is not sent to a `golden` or `success` branch (or any branch whose id or label contains "golden"). The worker prefers `retry` / `clarification`, then `fail` / `chaos`. `grammar_score` is an integer from 1 to 5, and at most 2 when the grammar was missed. `character_reaction` is one or two in-character sentences. `teacher_tip` is one encouraging British English sentence about the target grammar.
+
+Success:
+
+```json
+{
+  "chosen_target_node": "node_remake",
+  "used_target_grammar": true,
+  "grammar_score": 5,
+  "character_reaction": "Alright… thank you. That helps.",
+  "teacher_tip": "Nice work — practise Allow me to… and name the fix you will make."
+}
+```
+
+SpeakNovel has its own limit of 20 requests per minute per IP, so a game session cannot use up the Ask and Explain allowance. A 429 includes `Retry-After: 60`.
+
+Deploy is unchanged: `npx wrangler secret put DEEPSEEK_API_KEY` if the secret is not already set, then `npx wrangler deploy`. No second secret.
 
 Errors are JSON `{ "error": "…" }` with 400, 403, 405, 413, 415, 429, 502, or 503.
 
-30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`.
+Ask and Explain: 30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`. SpeakNovel: 20 requests per minute per IP, counted separately.

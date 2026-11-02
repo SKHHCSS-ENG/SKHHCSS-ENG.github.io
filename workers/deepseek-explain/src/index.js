@@ -2,6 +2,7 @@
  * DeepSeek proxy for the Eng subject site.
  * Explain pages: Cohesion, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
+ * SpeakNovel: mode "speaknovel" (Say It Louder on its own Pages host).
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.
  * Do not hardcode it, and do not log it.
  *
@@ -10,8 +11,22 @@
  */
 
 import { ASK_SYSTEM_PROMPT, ASK_TASK } from "./askPrompt.js";
+import {
+  SPEAKNOVEL_SYSTEM_PROMPT,
+  SPEAKNOVEL_TASK,
+  buildSpeakNovelUserMessage,
+  isSpeakNovelMode,
+  judgeSpeakNovel,
+  readSpeakNovelFields,
+} from "./speakNovel.js";
 
 export { ASK_SYSTEM_PROMPT, ASK_TASK };
+export {
+  SPEAKNOVEL_SYSTEM_PROMPT,
+  SPEAKNOVEL_TASK,
+  buildSpeakNovelUserMessage,
+  judgeSpeakNovel,
+};
 
 /** Tess 2026-10-29 Howard lock. Explain replies in Traditional Chinese 書面語. Do not paraphrase. */
 export const SYSTEM_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
@@ -38,9 +53,13 @@ export const LIVE_ORIGINS = [
 ];
 const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 const MODEL = "deepseek-chat";
-const MAX_BODY_BYTES = 4096;
+/** Ask and Explain stay on this cap. SpeakNovel nodes carry branches. */
+export const MAX_BODY_BYTES = 4096;
+export const MAX_SPEAKNOVEL_BODY_BYTES = 24576;
 const MAX_EXPLANATION_CHARS = 800;
 const RATE_LIMIT = 30;
+/** Own bucket so a SpeakNovel session cannot use up Ask or Explain. */
+export const SPEAKNOVEL_RATE_LIMIT = 20;
 const RATE_WINDOW_MS = 60 * 1000;
 const UPSTREAM_TIMEOUT_MS = 20000;
 
@@ -100,26 +119,65 @@ function originAllowed(origin) {
   return host === "localhost" || host === "127.0.0.1" || host === "[::1]";
 }
 
+async function readCappedBody(request, maxBytes) {
+  if (!request.body || typeof request.body.getReader !== "function") {
+    let text = "";
+    try {
+      text = await request.text();
+    } catch (e) {
+      return { error: true, text: "" };
+    }
+    return { overflow: new TextEncoder().encode(text).length > maxBytes, text: text };
+  }
+  const reader = request.body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const step = await reader.read();
+      if (step.done) break;
+      total += step.value.byteLength;
+      if (total > maxBytes) {
+        try { await reader.cancel(); } catch (e) { /* already closing */ }
+        return { overflow: true, text: "" };
+      }
+      chunks.push(step.value);
+    }
+  } catch (e) {
+    return { error: true, text: "" };
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (let i = 0; i < chunks.length; i++) {
+    bytes.set(chunks[i], offset);
+    offset += chunks[i].byteLength;
+  }
+  return { overflow: false, text: new TextDecoder().decode(bytes) };
+}
+
 function clientIp(request) {
   const cf = request.headers.get("CF-Connecting-IP");
   if (cf && cf.trim()) return cf.trim().slice(0, 80);
   return "unknown";
 }
 
-function allowRate(ip, now) {
+function allowRate(ip, now, scope) {
+  const speaknovel = scope === "speaknovel";
+  const limit = speaknovel ? SPEAKNOVEL_RATE_LIMIT : RATE_LIMIT;
+  const key = speaknovel ? "speaknovel " + ip : ip;
   const t = now || Date.now();
-  let bucket = buckets.get(ip);
+  let bucket = buckets.get(key);
   if (!bucket || t - bucket.start >= RATE_WINDOW_MS) {
     bucket = { start: t, count: 0 };
-    buckets.set(ip, bucket);
+    buckets.set(key, bucket);
   }
   bucket.count += 1;
   if (buckets.size > 4000) {
-    for (const [key, value] of buckets) {
-      if (t - value.start >= RATE_WINDOW_MS) buckets.delete(key);
+    for (const [bucketKey, value] of buckets) {
+      if (t - value.start >= RATE_WINDOW_MS) buckets.delete(bucketKey);
     }
   }
-  return bucket.count <= RATE_LIMIT;
+  return bucket.count <= limit;
 }
 
 function jsonResponse(status, body, origin, extraHeaders) {
@@ -161,6 +219,7 @@ function asHighlight(value) {
 
 function readFields(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  if (isSpeakNovelMode(data)) return readSpeakNovelFields(data);
   const page = asLimitedString(data.page, LIMITS.page);
   if (!page.ok) return { error: "field" };
   if (page.value === "Ask") return readAskFields(data);
@@ -267,6 +326,17 @@ async function callDeepSeek(env, userMessage, options) {
   if (!key || typeof key !== "string" || !key.trim()) {
     return { ok: false, status: 503, error: unconfigured };
   }
+  const payload = {
+    model: MODEL,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: userMessage },
+    ],
+    temperature: 0.3,
+    max_tokens: maxTokens,
+    stream: false,
+  };
+  if (opts.jsonMode) payload.response_format = { type: "json_object" };
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, UPSTREAM_TIMEOUT_MS);
   let res;
@@ -278,16 +348,7 @@ async function callDeepSeek(env, userMessage, options) {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + key.trim(),
       },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: userMessage },
-        ],
-        temperature: 0.3,
-        max_tokens: maxTokens,
-        stream: false,
-      }),
+      body: JSON.stringify(payload),
     });
   } catch (e) {
     console.error("deepseek_fetch_failed");
@@ -342,14 +403,8 @@ export async function handleRequest(request, env) {
     return jsonResponse(405, { error: "Use POST." }, origin);
   }
 
-  if (!allowRate(clientIp(request))) {
-    return jsonResponse(429, { error: "Too many explanations. Wait a minute and try again." }, origin, {
-      "Retry-After": "60",
-    });
-  }
-
   const declared = request.headers.get("Content-Length");
-  if (declared && Number(declared) > MAX_BODY_BYTES) {
+  if (declared && Number(declared) > MAX_SPEAKNOVEL_BODY_BYTES) {
     return jsonResponse(413, { error: "Request is too large." }, origin);
   }
 
@@ -358,21 +413,35 @@ export async function handleRequest(request, env) {
     return jsonResponse(415, { error: "Send JSON." }, origin);
   }
 
-  let raw;
-  try {
-    raw = await request.text();
-  } catch (e) {
+  const capped = await readCappedBody(request, MAX_SPEAKNOVEL_BODY_BYTES);
+  if (capped.error) {
     return jsonResponse(400, { error: "Request body must be JSON." }, origin);
   }
-  if (new TextEncoder().encode(raw).length > MAX_BODY_BYTES) {
+  if (capped.overflow) {
     return jsonResponse(413, { error: "Request is too large." }, origin);
   }
+  const raw = capped.text;
+  const rawBytes = new TextEncoder().encode(raw).length;
 
   let data;
   try {
     data = JSON.parse(raw);
   } catch (e) {
+    if (rawBytes > MAX_BODY_BYTES) {
+      return jsonResponse(413, { error: "Request is too large." }, origin);
+    }
     return jsonResponse(400, { error: "Request body must be JSON." }, origin);
+  }
+  const speaknovel = isSpeakNovelMode(data);
+  if (!speaknovel && rawBytes > MAX_BODY_BYTES) {
+    return jsonResponse(413, { error: "Request is too large." }, origin);
+  }
+
+  if (!allowRate(clientIp(request), undefined, speaknovel ? "speaknovel" : "study")) {
+    const message = speaknovel
+      ? "Too many SpeakNovel turns. Wait a minute and try again."
+      : "Too many explanations. Wait a minute and try again.";
+    return jsonResponse(429, { error: message }, origin, { "Retry-After": "60" });
   }
 
   const parsed = readFields(data);
@@ -400,6 +469,31 @@ export async function handleRequest(request, env) {
       return jsonResponse(asked.status, { error: asked.error }, origin);
     }
     return jsonResponse(200, { reply: asked.explanation }, origin);
+  }
+  if (parsed.mode === "speaknovel") {
+    if (parsed.error === "required") {
+      return jsonResponse(400, { error: "Episode, scene, line, and branches are required." }, origin);
+    }
+    if (parsed.error === "field") {
+      return jsonResponse(400, { error: "One of the fields is too long." }, origin);
+    }
+    const judged = await callDeepSeek(env, buildSpeakNovelUserMessage(parsed.fields), {
+      system: SPEAKNOVEL_SYSTEM_PROMPT,
+      maxTokens: 500,
+      maxChars: 2400,
+      jsonMode: true,
+      unavailable: "SpeakNovel is unavailable just now.",
+      unconfigured: "SpeakNovel is not available yet.",
+    });
+    if (!judged.ok) {
+      return jsonResponse(judged.status, { error: judged.error }, origin);
+    }
+    const reply = judgeSpeakNovel(judged.explanation, parsed.fields);
+    if (!reply) {
+      console.error("speaknovel_bad_json");
+      return jsonResponse(502, { error: "SpeakNovel is unavailable just now." }, origin);
+    }
+    return jsonResponse(200, reply, origin);
   }
   if (parsed.error === "required") {
     return jsonResponse(400, { error: "Page, item and sample are required." }, origin);
