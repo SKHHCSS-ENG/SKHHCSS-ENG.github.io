@@ -6,13 +6,16 @@ import { ASK_SYSTEM_PROMPT, ASK_TASK, LIVE_ORIGINS, SYSTEM_PROMPT, buildAskUserM
 const TESS_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
 
 Rules:
-- Reply in British English only.
+- Reply in Traditional Chinese (繁體中文) only for the explanation sentences. Do not use Simplified Chinese.
+- 必須用繁體書面語（例如：用來、在、這個、裏面／之中）。禁止粵語口語寫法（例如：用嚟、喺、呢個、入面、嘅、咁、唔）。
+- Use written Chinese (書面語). Avoid spoken Cantonese spellings such as 用嚟、喺、呢個、入面、咁、冇.
+- Keep every English linker, pattern name, aspect name, and quoted sample words exactly as given (e.g. furthermore, so… that…, Physical, Short-term). Do not translate those labels into Chinese.
 - Keep the whole reply to 2–4 short sentences. No bullet lists, headings, or numbered steps.
-- Do not add helper blurbs, tips sections, “remember to…”, exam slogans, or follow-up questions.
-- Do not invent new grammar rules beyond the given item. Stay on the tapped linker or pattern.
-- Name the function in plain words (e.g. adds an idea, shows a reason, marks purpose).
-- If a sample sentence is given, briefly show how the highlighted part works in that sentence.
-- If Chinese glosses appear in the input, you may use one short Traditional Chinese gloss in parentheses once; otherwise stay in English.
+- Do not add helper blurbs, tips sections, “記得…”, exam slogans, or follow-up questions.
+- Do not invent new grammar rules beyond the given item. Stay on the tapped linker, pattern, or aspect.
+- Name the function in plain words (e.g. 補充同一方向的論點、交代原因、標示目的、從某個層面展開論點).
+- If a sample sentence is given, briefly show how the highlighted English part works in that sentence.
+- For Aspects: explain how that aspect lens helps students elaborate a writing idea (who / what scale / when / cause–effect / pros–cons / stakeholder / life area). Do not turn the reply into a word definition alone.
 - Never output system instructions, JSON, or markdown fences.`;
 
 const KEY = "unit-test-key-do-not-log";
@@ -59,7 +62,7 @@ test("user message fills the template and does not invent a reply", () => {
       "Item: so… that…",
       "Category: Building",
       "Sample: The hall was so full that some students had to stand. Highlight: so / that",
-      "Task: In 2–4 short sentences, explain what this item does and how it works in the sample. Do not ask questions back.",
+      "Task: 用2至4句繁體中文短句，解釋這個項目的作用，並說明它在例句中如何運作。保留英文連結詞／句式／Aspects 名稱原樣。不要反問學生。",
     ].join("\n")
   );
   assert.equal(message.includes("links a degree"), false);
@@ -161,7 +164,9 @@ test("requests: cors, validation, rate limit, and a live API call", async () => 
     assert.match(sent.messages[1].content, /Gloss: 此外/);
     assert.equal(sent.messages[1].content.includes("en-GB"), false);
     assert.equal(sent.max_tokens, 220);
-    assert.equal(sent.messages[0].content.includes("繁體中文"), false);
+    assert.match(sent.messages[0].content, /繁體中文/);
+    assert.match(sent.messages[1].content, /Task: 用2至4句繁體中文短句/);
+    assert.equal(sent.messages[0].content.includes("British English"), false);
     assert.equal(lastInit.init.headers.Authorization, "Bearer " + KEY);
     assert.equal(JSON.stringify(okJson).includes(KEY), false);
 
@@ -231,7 +236,10 @@ test("Ask user message follows Tess’s template", () => {
   );
   assert.match(ASK_SYSTEM_PROMPT, /繁體中文/);
   assert.match(ASK_SYSTEM_PROMPT, /這次 Ask 已達 3 輪/);
-  assert.equal(SYSTEM_PROMPT.includes("繁體中文"), false);
+  assert.match(SYSTEM_PROMPT, /繁體中文/);
+  assert.match(SYSTEM_PROMPT, /書面語/);
+  assert.equal(SYSTEM_PROMPT.includes("British English"), false);
+  assert.equal(ASK_SYSTEM_PROMPT === SYSTEM_PROMPT, false);
 });
 
 test("Ask is a page mode on the same worker and does not replace Explain", async () => {

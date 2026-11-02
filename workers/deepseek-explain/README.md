@@ -59,11 +59,11 @@ An empty string keeps the control quiet (`Explain soon`, not tappable). The clie
 }
 ```
 
-`page` must be `Cohesion` or `Sentence Patterns`. `itemLabel` and `sampleText` are required. `label` and `sample` are accepted as aliases. `category`, `highlight` (string or short list), `gloss`, and `locale` are optional. `locale` does not change the language: replies stay British English.
+`page` must be `Cohesion` or `Sentence Patterns`. `itemLabel` and `sampleText` are required. `label` and `sample` are accepted as aliases. `category`, `highlight` (string or short list), `gloss`, and `locale` are optional. `locale` does not switch the reply language. Explain replies are Traditional Chinese 書面語 (Howard lock 2026-10-29). English linker names, pattern names, aspect names, and quoted sample words stay as given.
 
-The user message is built from that body (Tess’s template). `gloss` is added only when the page sent one, so a Chinese gloss in the input can be used once. Soft sample replies in the prompt pack are not stored here. Every accepted request calls `https://api.deepseek.com/chat/completions` (`deepseek-chat`).
+The user message is built from Tess’s template. The Task line asks for 2–4 short Traditional Chinese sentences and tells the model to keep English linker, pattern, and Aspects names. `gloss` is added only when the page sent one. Soft sample replies in the prompt pack are not stored here. Every accepted request calls `https://api.deepseek.com/chat/completions` (`deepseek-chat`).
 
-Explain pages are unchanged: `page` must still be `Cohesion` or `Sentence Patterns`, and the reply is still `{ "explanation": "…" }` in British English.
+Explain stays a separate path: `page` must be `Cohesion` or `Sentence Patterns`, and the reply is `{ "explanation": "…" }` in Traditional Chinese 書面語. The system prompt includes the Aspects rule from the pack; this Worker still rejects an Aspects page.
 
 Success:
 
