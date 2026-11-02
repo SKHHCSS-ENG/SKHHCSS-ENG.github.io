@@ -27,7 +27,7 @@
  * to that sha.
  */
 (function () {
-  var sha = "3ccfb6b";
+  var sha = "190c2a2";
   var date = "2 Nov 2026";
   var label = sha + " \u00b7 " + date;
 
