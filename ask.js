@@ -4,7 +4,7 @@
  * a tap again, Close, or a press outside collapses it. A drag does not toggle.
  * One shared box. The sheet opens in Find (site-find.js). Ask AI is the
  * other mode. Send runs Find in Find mode and posts one chat turn in Ask AI
- * mode. Three assistant replies per open; closing the sheet resets the count.
+ * mode. Five assistant replies per open; closing the sheet resets the count.
  * No daily cap. Worker: window.__EXPLAIN_WORKER__ (page "Ask"), else the
  * deployed deepseek-explain host. No API key here.
  * Does not restyle the Tools dock. On drop, and whenever the dock, an open
@@ -18,8 +18,8 @@
   if (document.documentElement.getAttribute("data-ask-init") === "1") return;
   document.documentElement.setAttribute("data-ask-init", "1");
 
-  var TURNS = 3;
-  var NUDGE = "這次 Ask 已達 3 輪。請改用上方 Find 找頁面，或到樣本下的 Explain 查看該項目。";
+  var TURNS = 5;
+  var NUDGE = "這次 Ask 已達 5 輪。請改用上方 Find 找頁面，或到樣本下的 Explain 查看該項目。";
   var FALLBACK_WORKER = "https://deepseek-explain.skhhcss-eng.workers.dev";
 
   var workerUrl = safeWorkerUrl(window.__EXPLAIN_WORKER__) || FALLBACK_WORKER;
@@ -456,7 +456,7 @@
       if (pending.parentNode) pending.parentNode.removeChild(pending);
       var reply = result.data && typeof result.data.reply === "string" ? result.data.reply.trim() : "";
       if (result.status === 200 && reply) {
-        if (turn === TURNS && reply.indexOf("\u9019\u6b21 Ask \u5df2\u9054 3 \u8f2a") === -1) {
+        if (turn === TURNS && reply.indexOf("\u9019\u6b21 Ask \u5df2\u9054 5 \u8f2a") === -1) {
           reply = reply.replace(/\s+$/, "") + " " + NUDGE;
         }
         renderReply(reply);

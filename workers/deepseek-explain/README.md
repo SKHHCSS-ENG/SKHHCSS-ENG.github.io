@@ -93,7 +93,7 @@ Success:
 { "reply": "…" }
 ```
 
-Turns 1–5 are accepted. A 6th turn is rejected with 400 before any API call. The browser script still stops at 3 replies per open. There is no daily cap. Ask shares the Explain rate limit (30 requests per minute per IP).
+Turns 1–5 are accepted. A 6th turn is rejected with 400 before any API call. The browser script also stops at 5 replies per open. There is no daily cap. Ask shares the Explain rate limit (30 requests per minute per IP).
 
 Ask and Explain use one allowlist in `src/index.js` (`LIVE_ORIGINS`): `https://skhhcss-eng.github.io`, `https://learning.hcs.edu.hk`, and loopback. There is no Pages preview origin in this repo. `wrangler.toml` does not list origins.
 
