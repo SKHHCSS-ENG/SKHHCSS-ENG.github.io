@@ -1,8 +1,10 @@
 /* Ask — draggable circle, bottom-left until the reader moves it.
    .api-mesh is the shared API wash for this circle, Explain, SEND, and the
-   selected Ask AI chip. The circle and that chip paint the wash on
+   selected Ask chip. The circle and that chip paint the wash on
    themselves. Explain and SEND paint the same wash on ::before (Explain’s
    pill box stays in learning-materials/explain.css).
+   Find and Dict, when selected, stay solid #2a8fad with white text.
+   Idle Find, Dict, and Ask share the pale chip.
    Blue → violet → magenta → orange → yellow, one 10s loop.
    ASK, EXPLAIN, and SEND share the site stack, weight 800, and 0.04em
    tracking. Ink is soft off-white #f4f0e8. Warm stops are deep enough that
@@ -137,9 +139,10 @@
   width: min(360px, calc(100vw - 84px));
   /* height: auto — empty Find and empty Ask shrink to the tab row + field.
      max-height is the shared shell: hits and replies scroll inside it and
-     the sheet never grows past it. When Find and Ask AI both have content,
-     ask.js holds one min-height (the taller body, capped here) so switching
-     tabs does not jump. placeSheet may set a smaller max-height above the dock. */
+     the sheet never grows past it. When two of Find, Dict, and Ask have
+     content, ask.js holds one min-height (the taller body, capped here) so
+     switching tabs does not jump. placeSheet may set a smaller max-height
+     above the dock. */
   height: auto;
   max-height: min(19.5rem, 70dvh);
   display: flex;
@@ -250,6 +253,15 @@
 .ask-mode-btn.is-on.is-ask {
   border-color: transparent;
   color: var(--api-mesh-ink, #f4f0e8);
+}
+
+/* Dict is a lookup, same solid family as Find. Not the Ask mesh. */
+.ask-mode-btn.is-on.is-dict {
+  background-color: #2a8fad;
+  background-image: none;
+  border-color: #2a8fad;
+  color: #ffffff;
+  animation: none;
 }
 
 .ask-close {
@@ -384,6 +396,25 @@
   color: #0c5a70;
   font-weight: 700;
   overflow-wrap: anywhere;
+}
+
+.ask-dict p {
+  margin: 0 0 4px;
+}
+
+.ask-dict-head {
+  font-weight: 800;
+  color: #123a4d;
+}
+
+.ask-dict-def,
+.ask-dict-ex,
+.ask-dict-plain {
+  color: #334155;
+}
+
+.ask-dict-plain {
+  white-space: pre-wrap;
 }
 
 .ask-form {
