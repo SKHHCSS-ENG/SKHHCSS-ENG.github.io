@@ -2,8 +2,8 @@
  * Free Dictionary lookup for the Ask sheet Dict chip.
  * Proxies https://api.dictionaryapi.dev (no key) for the English block.
  * index.js may call DeepSeek once afterwards for a single 繁體書面語 gloss.
- * Student reply: British spelling, headword + part of speech, 1–2 short
- * senses, one simple example when the API has one, then one「譯」line.
+ * Student reply: one「譯」line, then British spelling, headword + part of speech,
+ * 1–2 short senses, and one simple example when the API has one.
  * No IPA and no synonym lists. A miss stays "Try another spelling?" with no gloss.
  */
 
@@ -235,8 +235,81 @@ Rules:
 
 const DICT_GLOSS_MAX = 32;
 const CANTONESE_RE = /用嚟|喺|呢個|入面|嘅|咁|唔|冇/;
-/** Unambiguous simplified forms. A hit drops the gloss; the English block still returns. */
-const SIMPLIFIED_RE = /[这个为对会说语国学书长门问时间从发经过还让应当种样现实体东车来们么吗与义论没]/;
+/**
+ * Unambiguous simplified forms. These are rewritten to traditional before the
+ * gloss is kept. A character still in this set after that rewrite drops the line.
+ * 发 maps to 發 (not 髮).
+ */
+const SIMPLIFIED_CHARS = "这个为对会说语国学书长门问时间从发经过还让应当种样现实体东车来们么吗与义论没";
+const SIMPLIFIED_RE = new RegExp("[" + SIMPLIFIED_CHARS + "]");
+const SIMPLIFIED_TO_TRADITIONAL = {
+  这: "這",
+  个: "個",
+  为: "為",
+  对: "對",
+  会: "會",
+  说: "說",
+  语: "語",
+  国: "國",
+  学: "學",
+  书: "書",
+  长: "長",
+  门: "門",
+  问: "問",
+  时: "時",
+  间: "間",
+  从: "從",
+  发: "發",
+  经: "經",
+  过: "過",
+  还: "還",
+  让: "讓",
+  应: "應",
+  当: "當",
+  种: "種",
+  样: "樣",
+  现: "現",
+  实: "實",
+  体: "體",
+  东: "東",
+  车: "車",
+  来: "來",
+  们: "們",
+  么: "麼",
+  吗: "嗎",
+  与: "與",
+  义: "義",
+  论: "論",
+  没: "沒",
+};
+
+function toTraditionalGloss(text) {
+  return String(text || "").replace(new RegExp("[" + SIMPLIFIED_CHARS + "]", "g"), function (ch) {
+    return SIMPLIFIED_TO_TRADITIONAL[ch] || ch;
+  });
+}
+
+/** First clause, so one full stop does not throw away an otherwise good gloss. */
+function firstGlossClause(text) {
+  const parts = String(text || "").split(/[。！？!?]/);
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i].replace(/[。．.\s]+$/g, "").trim();
+    if (part) return part;
+  }
+  return "";
+}
+
+function clipGloss(text) {
+  let gloss = String(text || "").trim();
+  if (gloss.length <= DICT_GLOSS_MAX) return gloss;
+  const cut = gloss.slice(0, DICT_GLOSS_MAX);
+  const marks = ["；", "，", "、", "／", "："];
+  let at = -1;
+  for (let i = 0; i < marks.length; i++) at = Math.max(at, cut.lastIndexOf(marks[i]));
+  if (at < 2) return "";
+  gloss = cut.slice(0, at).replace(/[；，、／：\s]+$/g, "").trim();
+  return gloss.length <= DICT_GLOSS_MAX ? gloss : "";
+}
 
 export function buildDictGlossMessage(shaped) {
   const word = shaped && typeof shaped.word === "string" ? shaped.word : "";
@@ -272,22 +345,25 @@ export function cleanDictGloss(raw) {
     gloss = gloss.replace(/^譯/, "");
   }
   gloss = gloss.replace(/^["“”「『]+/, "").replace(/["“”」』]+$/, "").trim();
-  gloss = gloss.replace(/[。．.]+$/, "").trim();
+  if (!gloss) return "";
+  if (/^[-*•]/.test(gloss) || /^\d+[.)）、]/.test(gloss)) return "";
+  gloss = firstGlossClause(toTraditionalGloss(gloss));
+  gloss = gloss.replace(/[。．.]+$/, "").replace(/[；，、／：\s]+$/g, "").trim();
+  gloss = clipGloss(gloss);
   if (!gloss || gloss.length > DICT_GLOSS_MAX) return "";
   if (CANTONESE_RE.test(gloss) || SIMPLIFIED_RE.test(gloss)) return "";
   if (!/[\u3400-\u9fff]/.test(gloss)) return "";
-  if (/^[-*•]/.test(gloss) || /^\d+[.)）、]/.test(gloss)) return "";
   if (/[。！？!?]/.test(gloss)) return "";
   return gloss;
 }
 
-/** Append `譯` + gloss under the English block. A bad gloss leaves the block unchanged. */
+/** Put `譯` + gloss above the English block. A bad gloss leaves the block unchanged. */
 export function applyDictGloss(shaped, raw) {
   if (!shaped || typeof shaped !== "object" || typeof shaped.reply !== "string") return shaped;
   const gloss = cleanDictGloss(raw);
   if (!gloss) return shaped;
   const next = {
-    reply: shaped.reply.replace(/\s+$/, "") + "\n譯 " + gloss,
+    reply: "譯 " + gloss + "\n" + shaped.reply.replace(/^\s+/, ""),
     word: shaped.word,
     senses: shaped.senses,
     gloss: gloss,

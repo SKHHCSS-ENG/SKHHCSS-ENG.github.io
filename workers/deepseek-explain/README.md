@@ -106,13 +106,13 @@ Same URL and the same origin allowlist. `mode` must be `dict`. There is no stude
 
 On a hit, the Worker calls DeepSeek once, with the same `DEEPSEEK_API_KEY` as Explain, for a single Traditional Chinese 書面語 gloss of the kept sense or senses. The gloss is one short line, not a Chinese dictionary entry. English linker, pattern, and proper names stay as given.
 
-The English block is unchanged: headword and British part of speech, one or two short senses, and one simple example when the API has one. IPA, audio, and synonym lists are left out. The gloss line is appended under that block as `譯` plus the short gloss.
+The student reply starts with that gloss as one line, `譯` plus the short gloss. The English block follows: headword and British part of speech, one or two short senses, and one simple example when the API has one. IPA, audio, and synonym lists are left out.
 
 Success (`200`):
 
 ```json
 {
-  "reply": "however — adverb\nNevertheless; yet, still; in spite of (that).\n\nhowever — conjunction\nIn whatever way or manner.\n\nExample: I did it anyway, however.\n譯 然而；不論以何種方式",
+  "reply": "譯 然而；不論以何種方式\nhowever — adverb\nNevertheless; yet, still; in spite of (that).\n\nhowever — conjunction\nIn whatever way or manner.\n\nExample: I did it anyway, however.",
   "word": "however",
   "senses": [
     { "pos": "adverb", "definition": "Nevertheless; yet, still; in spite of (that)." },
@@ -123,7 +123,7 @@ Success (`200`):
 }
 ```
 
-`gloss` is omitted when DeepSeek is unconfigured, errors, or returns something that is not one short 繁體書面語 line. The English `reply`, `word`, `senses`, and `example` are still returned.
+`gloss` is a string on a hit. The reply starts with `譯` and that gloss, then the English block. A simplified character in the model line is rewritten to traditional (for example 过 becomes 過). A full stop keeps the first clause instead of dropping the line. If that line is still unusable, or DeepSeek errors, the gloss call is tried once more. A missing `DEEPSEEK_API_KEY` is not retried. `gloss` is omitted only when the key is missing or both attempts fail. The English `reply`, `word`, `senses`, and `example` are still returned in that case.
 
 A missing word is `404` with `{ "error": "Try another spelling?" }` and no gloss line. An empty word is `400` (`Type a word.`). A word that is too long or not a short phrase is `400` (`Type one word or a short phrase.`). If the dictionary host is down, the error is `502` (`The dictionary is unavailable just now.`). A gloss failure is not a `502`.
 
