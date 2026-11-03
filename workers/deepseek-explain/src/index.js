@@ -1,10 +1,12 @@
 /**
- * DeepSeek proxy for the Eng subject site.
+ * DeepSeek proxy + neural TTS for the Eng subject site.
  * Explain pages: Cohesion, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
  * SpeakNovel: mode "speaknovel" (Say It Louder on its own Pages host).
+ * Neural TTS: mode "tts" (Azure Speech neural voices + zero-key en-GB MP3 fallback).
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.
- * Do not hardcode it, and do not log it.
+ * Optional voice secrets: AZURE_SPEECH_KEY and AZURE_SPEECH_REGION.
+ * Do not hardcode keys, and do not log them.
  *
  * Prompts: Tess 2026-10-29 (verbatim). Soft samples in the prompt packs
  * are tone reference only — this worker always calls the API.
@@ -60,8 +62,29 @@ const MAX_EXPLANATION_CHARS = 800;
 const RATE_LIMIT = 30;
 /** Own bucket so a SpeakNovel session cannot use up Ask or Explain. */
 export const SPEAKNOVEL_RATE_LIMIT = 20;
+/** Own bucket so Say It Louder voice playback cannot use up Ask, Explain, or SpeakNovel. */
+const TTS_RATE_LIMIT = 30;
 const RATE_WINDOW_MS = 60 * 1000;
 const UPSTREAM_TIMEOUT_MS = 20000;
+
+const ALLOWED_TTS_VOICES = [
+  "en-GB-RyanNeural",
+  "en-GB-SoniaNeural",
+  "en-GB-LibbyNeural",
+  "en-GB-ThomasNeural",
+  "en-HK-YanNeural",
+  "en-HK-SamNeural",
+];
+
+const ALLOWED_TTS_STYLES = [
+  "general",
+  "cheerful",
+  "sad",
+  "angry",
+  "friendly",
+  "excited",
+  "customerservice",
+];
 
 const LIMITS = {
   page: 40,
@@ -74,6 +97,7 @@ const LIMITS = {
   message: 400,
   pagePath: 200,
   findHits: 500,
+  ttsText: 500,
 };
 
 export function buildAskUserMessage(fields) {
@@ -163,8 +187,9 @@ function clientIp(request) {
 
 function allowRate(ip, now, scope) {
   const speaknovel = scope === "speaknovel";
-  const limit = speaknovel ? SPEAKNOVEL_RATE_LIMIT : RATE_LIMIT;
-  const key = speaknovel ? "speaknovel " + ip : ip;
+  const tts = scope === "tts";
+  const limit = tts ? TTS_RATE_LIMIT : (speaknovel ? SPEAKNOVEL_RATE_LIMIT : RATE_LIMIT);
+  const key = tts ? "tts " + ip : (speaknovel ? "speaknovel " + ip : ip);
   const t = now || Date.now();
   let bucket = buckets.get(key);
   if (!bucket || t - bucket.start >= RATE_WINDOW_MS) {
@@ -204,6 +229,131 @@ function asLimitedString(value, max) {
   return { ok: true, value: trimmed };
 }
 
+function escapeXml(unsafe) {
+  return String(unsafe || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+export function buildAzureSsml(fields) {
+  const voice = ALLOWED_TTS_VOICES.indexOf(fields.voice) !== -1 ? fields.voice : "en-GB-RyanNeural";
+  const style = ALLOWED_TTS_STYLES.indexOf(fields.style) !== -1 ? fields.style : "general";
+  const rate = fields.rate || "0%";
+  const pitch = fields.pitch || "0%";
+  const lang = voice.startsWith("en-HK") ? "en-HK" : "en-GB";
+  const escaped = escapeXml(fields.text);
+
+  const inner = `<prosody rate="${escapeXml(rate)}" pitch="${escapeXml(pitch)}">${escaped}</prosody>`;
+  const body = style !== "general"
+    ? `<mstts:express-as style="${escapeXml(style)}">${inner}</mstts:express-as>`
+    : inner;
+
+  return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${lang}"><voice name="${voice}">${body}</voice></speak>`;
+}
+
+function isTtsMode(data) {
+  return !!(
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    data.mode === "tts"
+  );
+}
+
+function readTtsFields(data) {
+  const text = asLimitedString(data.text, LIMITS.ttsText);
+  if (!text.ok) return { mode: "tts", error: "field" };
+  if (!text.value) return { mode: "tts", error: "required" };
+  const voice = typeof data.voice === "string" && ALLOWED_TTS_VOICES.indexOf(data.voice) !== -1
+    ? data.voice
+    : "en-GB-RyanNeural";
+  const style = typeof data.style === "string" && ALLOWED_TTS_STYLES.indexOf(data.style) !== -1
+    ? data.style
+    : "general";
+  const rate = typeof data.rate === "string" && /^[-+]?\d{1,2}%$/.test(data.rate.trim())
+    ? data.rate.trim()
+    : "0%";
+  const pitch = typeof data.pitch === "string" && /^[-+]?\d{1,2}%$/.test(data.pitch.trim())
+    ? data.pitch.trim()
+    : "0%";
+  return {
+    mode: "tts",
+    fields: {
+      text: text.value,
+      voice: voice,
+      style: style,
+      rate: rate,
+      pitch: pitch,
+    },
+  };
+}
+
+function audioResponse(body, origin, engine) {
+  const headers = new Headers();
+  headers.set("Content-Type", "audio/mpeg");
+  headers.set("Cache-Control", "public, max-age=86400");
+  headers.set("X-TTS-Engine", engine);
+  if (origin) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Vary", "Origin");
+    headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Access-Control-Allow-Private-Network", "true");
+  }
+  return new Response(body, { status: 200, headers });
+}
+
+async function handleTtsSynthesis(env, fields, origin) {
+  const azureKey = env && typeof env.AZURE_SPEECH_KEY === "string" ? env.AZURE_SPEECH_KEY.trim() : "";
+  const azureRegion = env && typeof env.AZURE_SPEECH_REGION === "string" && env.AZURE_SPEECH_REGION.trim()
+    ? env.AZURE_SPEECH_REGION.trim()
+    : "eastasia";
+
+  // Tier 1: Microsoft Azure Speech neural TTS. Key and region are optional Worker secrets.
+  if (azureKey) {
+    try {
+      const ssml = buildAzureSsml(fields);
+      const res = await fetch("https://" + azureRegion + ".tts.speech.microsoft.com/cognitiveservices/v1", {
+        method: "POST",
+        headers: {
+          "Ocp-Apim-Subscription-Key": azureKey,
+          "Content-Type": "application/ssml+xml",
+          "X-Microsoft-OutputFormat": "audio-24khz-96kbitrate-mono-mp3",
+          "User-Agent": "SKHHCSS-SayItLouder-Worker",
+        },
+        body: ssml,
+      });
+      if (res.ok && res.body) {
+        return audioResponse(res.body, origin, "azure-neural");
+      }
+    } catch (e) {
+      console.error("azure_tts_failed");
+    }
+  }
+
+  // Tier 2: zero-key en-GB MP3 fallback. en-HK voices use the same free en-GB stream.
+  try {
+    const cleanQ = fields.text.slice(0, 200);
+    const tl = "en-GB";
+    const fallbackUrl = "https://translate.googleapis.com/translate_tts?ie=UTF-8&tl=" + tl + "&client=tw-ob&q=" + encodeURIComponent(cleanQ);
+    const res = await fetch(fallbackUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+      },
+    });
+    if (res.ok && res.body) {
+      return audioResponse(res.body, origin, "cloud-en-gb-free");
+    }
+  } catch (e) {
+    console.error("fallback_tts_failed");
+  }
+
+  return jsonResponse(502, { error: "Voice synthesis is unavailable just now." }, origin);
+}
+
 function asHighlight(value) {
   if (Array.isArray(value)) {
     const parts = [];
@@ -219,6 +369,7 @@ function asHighlight(value) {
 
 function readFields(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  if (isTtsMode(data)) return readTtsFields(data);
   if (isSpeakNovelMode(data)) return readSpeakNovelFields(data);
   const page = asLimitedString(data.page, LIMITS.page);
   if (!page.ok) return { error: "field" };
@@ -433,20 +584,33 @@ export async function handleRequest(request, env) {
     return jsonResponse(400, { error: "Request body must be JSON." }, origin);
   }
   const speaknovel = isSpeakNovelMode(data);
+  const tts = isTtsMode(data);
   if (!speaknovel && rawBytes > MAX_BODY_BYTES) {
     return jsonResponse(413, { error: "Request is too large." }, origin);
   }
 
-  if (!allowRate(clientIp(request), undefined, speaknovel ? "speaknovel" : "study")) {
-    const message = speaknovel
-      ? "Too many SpeakNovel turns. Wait a minute and try again."
-      : "Too many explanations. Wait a minute and try again.";
+  const scope = tts ? "tts" : (speaknovel ? "speaknovel" : "study");
+  if (!allowRate(clientIp(request), undefined, scope)) {
+    const message = tts
+      ? "Too many voice requests. Wait a moment."
+      : (speaknovel
+        ? "Too many SpeakNovel turns. Wait a minute and try again."
+        : "Too many explanations. Wait a minute and try again.");
     return jsonResponse(429, { error: message }, origin, { "Retry-After": "60" });
   }
 
   const parsed = readFields(data);
   if (!parsed) {
     return jsonResponse(400, { error: "Request body must be JSON." }, origin);
+  }
+  if (parsed.mode === "tts") {
+    if (parsed.error === "required") {
+      return jsonResponse(400, { error: "Text is required for TTS." }, origin);
+    }
+    if (parsed.error === "field") {
+      return jsonResponse(400, { error: "TTS text is too long." }, origin);
+    }
+    return handleTtsSynthesis(env, parsed.fields, origin);
   }
   if (parsed.mode === "ask") {
     if (parsed.error === "turn") {
