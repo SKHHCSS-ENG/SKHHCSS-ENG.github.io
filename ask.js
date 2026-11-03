@@ -6,6 +6,8 @@
  * the other modes. Chips read FIND, DICT, ASK. Send runs Find in Find mode,
  * posts mode "dict" in Dict mode, and posts one chat turn in Ask mode.
  * Find, Dict, and Ask have no student turn cap and no “n left” lock.
+ * A Dict hit shows one 譯 gloss line, then the English senses. A miss is
+ * "Try another spelling?" with no gloss line.
  * Closing the sheet clears the open chat. Worker: window.__EXPLAIN_WORKER__
  * (page "Ask"), else the deployed deepseek-explain host. No API key here.
  * Does not restyle the Tools dock. On drop, and whenever the dock, an open
@@ -563,6 +565,15 @@
     }
     var wrap = document.createElement("div");
     wrap.className = "ask-reply ask-dict";
+    var gloss = data && typeof data.gloss === "string" ? data.gloss.replace(/\s+/g, " ").trim() : "";
+    gloss = gloss.replace(/^譯\s*[:：]?\s*/, "");
+    if (gloss && /[\u3400-\u9fff]/.test(gloss)) {
+      var glossLine = document.createElement("p");
+      glossLine.className = "ask-dict-gloss";
+      glossLine.lang = "zh-Hant";
+      glossLine.textContent = "譯 " + gloss;
+      wrap.appendChild(glossLine);
+    }
     for (i = 0; i < shown.length; i++) {
       var head = document.createElement("p");
       head.className = "ask-dict-head";
@@ -578,15 +589,6 @@
       ex.className = "ask-dict-ex";
       ex.textContent = "Example: " + data.example.trim();
       wrap.appendChild(ex);
-    }
-    var gloss = data && typeof data.gloss === "string" ? data.gloss.replace(/\s+/g, " ").trim() : "";
-    gloss = gloss.replace(/^譯\s*[:：]?\s*/, "");
-    if (gloss && /[\u3400-\u9fff]/.test(gloss)) {
-      var glossLine = document.createElement("p");
-      glossLine.className = "ask-dict-gloss";
-      glossLine.lang = "zh-Hant";
-      glossLine.textContent = "譯 " + gloss;
-      wrap.appendChild(glossLine);
     }
     dictLog.appendChild(wrap);
     syncShell();

@@ -336,7 +336,7 @@ test("cleanDictGloss keeps one short 繁體 phrase and drops a dump", () => {
 
   const shaped = shapeDictionaryEntry(howeverEntry);
   const glossed = applyDictGloss(shaped, "譯：然而；不論以何種方式");
-  assert.equal(glossed.reply, EN_REPLY + "\n譯 然而；不論以何種方式");
+  assert.equal(glossed.reply, "譯 然而；不論以何種方式\n" + EN_REPLY);
   assert.equal(glossed.gloss, "然而；不論以何種方式");
   assert.equal(glossed.example, shaped.example);
   assert.deepEqual(glossed.senses, shaped.senses);
@@ -354,7 +354,7 @@ test("cleanDictGloss keeps one short 繁體 phrase and drops a dump", () => {
   assert.match(message, /不要加「譯」/);
 });
 
-test("dict hit appends one 譯 gloss and a miss stays spelling-only", async () => {
+test("dict hit puts one 譯 gloss first and a miss stays spelling-only", async () => {
   const originalFetch = globalThis.fetch;
   const calls = [];
   const key = "unit-test-key-do-not-log";
@@ -380,7 +380,7 @@ test("dict hit appends one 譯 gloss and a miss stays spelling-only", async () =
     );
     const json = await res.json();
     assert.equal(res.status, 200);
-    assert.equal(json.reply, EN_REPLY + "\n譯 然而；不論以何種方式");
+    assert.equal(json.reply, "譯 然而；不論以何種方式\n" + EN_REPLY);
     assert.equal(json.gloss, "然而；不論以何種方式");
     assert.equal(json.word, "however");
     assert.equal(json.senses.length, 2);

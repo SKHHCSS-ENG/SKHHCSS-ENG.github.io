@@ -2,7 +2,7 @@
  * DeepSeek proxy + neural TTS for the Eng subject site.
  * Explain pages: Cohesion, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
- * Dict: mode "dict" (free dictionary English, then one DeepSeek 繁體書面語 gloss; no rate cap).
+ * Dict: mode "dict" (one DeepSeek 繁體書面語 gloss, then the free-dictionary English block; no rate cap).
  * SpeakNovel: mode "speaknovel" (Say It Louder on its own Pages host).
  * Neural TTS: mode "tts" (Azure Speech neural voices + zero-key en-GB MP3 fallback).
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.

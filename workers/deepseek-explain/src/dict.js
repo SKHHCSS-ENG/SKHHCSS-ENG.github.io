@@ -2,8 +2,8 @@
  * Free Dictionary lookup for the Ask sheet Dict chip.
  * Proxies https://api.dictionaryapi.dev (no key) for the English block.
  * index.js may call DeepSeek once afterwards for a single 繁體書面語 gloss.
- * Student reply: British spelling, headword + part of speech, 1–2 short
- * senses, one simple example when the API has one, then one「譯」line.
+ * Student reply: one「譯」line, then British spelling, headword + part of speech,
+ * 1–2 short senses, and one simple example when the API has one.
  * No IPA and no synonym lists. A miss stays "Try another spelling?" with no gloss.
  */
 
@@ -281,13 +281,13 @@ export function cleanDictGloss(raw) {
   return gloss;
 }
 
-/** Append `譯` + gloss under the English block. A bad gloss leaves the block unchanged. */
+/** Put `譯` + gloss above the English block. A bad gloss leaves the block unchanged. */
 export function applyDictGloss(shaped, raw) {
   if (!shaped || typeof shaped !== "object" || typeof shaped.reply !== "string") return shaped;
   const gloss = cleanDictGloss(raw);
   if (!gloss) return shaped;
   const next = {
-    reply: shaped.reply.replace(/\s+$/, "") + "\n譯 " + gloss,
+    reply: "譯 " + gloss + "\n" + shaped.reply.replace(/^\s+/, ""),
     word: shaped.word,
     senses: shaped.senses,
     gloss: gloss,
