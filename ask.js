@@ -6,7 +6,8 @@
  * the other modes. Chips read FIND, DICT, ASK. Send runs Find in Find mode,
  * posts mode "dict" in Dict mode, and posts one chat turn in Ask mode.
  * Find, Dict, and Ask have no student turn cap and no “n left” lock.
- * A Dict hit shows one 譯 gloss line, then the English senses. A miss is
+ * A Dict hit shows one 譯 gloss line, then the English senses. The gloss
+ * comes from the gloss field, or from a 譯 line in the reply. A miss is
  * "Try another spelling?" with no gloss line.
  * Closing the sheet clears the open chat. Worker: window.__EXPLAIN_WORKER__
  * (page "Ask"), else the deployed deepseek-explain host. No API key here.
@@ -548,6 +549,30 @@
     dictPanel.scrollTop = dictPanel.scrollHeight;
   }
 
+  function dictGlossLine(line) {
+    var matched = /^譯\s*[:：\-–—]?\s*(.+)$/.exec(String(line || "").replace(/\s+/g, " ").trim());
+    if (!matched) return "";
+    var text = matched[1].replace(/\s+/g, " ").trim().replace(/^譯\s*[:：\-–—]?\s*/, "");
+    if (!/[\u3400-\u9fff]/.test(text)) return "";
+    return text;
+  }
+
+  /** Prefer the gloss field. Otherwise a leading, or else a final, 譯 line in reply. */
+  function dictGlossText(data) {
+    var gloss = data && typeof data.gloss === "string" ? data.gloss.replace(/\s+/g, " ").trim() : "";
+    gloss = gloss.replace(/^譯\s*[:：\-–—]?\s*/, "");
+    if (gloss && /[\u3400-\u9fff]/.test(gloss)) return gloss;
+    var reply = data && typeof data.reply === "string" ? data.reply.replace(/\r/g, "") : "";
+    var lines = reply.split("\n").map(function (line) {
+      return line.replace(/\s+/g, " ").trim();
+    }).filter(Boolean);
+    if (!lines.length) return "";
+    var lead = dictGlossLine(lines[0]);
+    if (lead) return lead;
+    if (lines.length > 1) return dictGlossLine(lines[lines.length - 1]);
+    return "";
+  }
+
   function renderDictPayload(data) {
     var senses = data && Array.isArray(data.senses) ? data.senses : [];
     var word = data && typeof data.word === "string" ? data.word.trim() : "";
@@ -565,9 +590,8 @@
     }
     var wrap = document.createElement("div");
     wrap.className = "ask-reply ask-dict";
-    var gloss = data && typeof data.gloss === "string" ? data.gloss.replace(/\s+/g, " ").trim() : "";
-    gloss = gloss.replace(/^譯\s*[:：]?\s*/, "");
-    if (gloss && /[\u3400-\u9fff]/.test(gloss)) {
+    var gloss = dictGlossText(data);
+    if (gloss) {
       var glossLine = document.createElement("p");
       glossLine.className = "ask-dict-gloss";
       glossLine.lang = "zh-Hant";

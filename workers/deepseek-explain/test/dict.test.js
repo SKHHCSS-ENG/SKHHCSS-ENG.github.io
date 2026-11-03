@@ -327,10 +327,12 @@ test("cleanDictGloss keeps one short 繁體 phrase and drops a dump", () => {
   assert.equal(cleanDictGloss("然而\n這個詞用來表示轉折。"), "然而");
   assert.equal(cleanDictGloss("喺度"), "");
   assert.equal(cleanDictGloss("用嚟轉折"), "");
-  assert.equal(cleanDictGloss("这个"), "");
+  assert.equal(cleanDictGloss("这个"), "這個");
+  assert.equal(cleanDictGloss("然而，不过"), "然而，不過");
+  assert.equal(cleanDictGloss("然而。不論以何種方式"), "然而");
   assert.equal(cleanDictGloss("however"), "");
   assert.equal(cleanDictGloss("1. 然而"), "");
-  assert.equal(cleanDictGloss("然而！"), "");
+  assert.equal(cleanDictGloss("然而！"), "然而");
   assert.equal(cleanDictGloss("然而".repeat(20)), "");
   assert.equal(cleanDictGloss(""), "");
 
@@ -407,6 +409,74 @@ test("dict hit puts one 譯 gloss first and a miss stays spelling-only", async (
     assert.deepEqual(missJson, { error: "Try another spelling?" });
     assert.equal(calls.length, 1);
     assert.equal(String(calls[0].url).includes("dictionaryapi.dev"), true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("dict keeps a simplified or sentence-shaped gloss and retries a rejected one", async () => {
+  const originalFetch = globalThis.fetch;
+  const key = "unit-test-key-do-not-log";
+  const calls = [];
+  globalThis.fetch = async function (url) {
+    calls.push(String(url));
+    if (String(url).includes("dictionaryapi.dev")) {
+      return new Response(JSON.stringify(howeverEntry), { status: 200 });
+    }
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "然而，不过。不論以何種方式" } }],
+    }), { status: 200 });
+  };
+  try {
+    const kept = await handleRequest(
+      post({ mode: "dict", word: "however" }, "203.0.113.260"),
+      { DEEPSEEK_API_KEY: key }
+    );
+    const keptJson = await kept.json();
+    assert.equal(kept.status, 200);
+    assert.equal(keptJson.gloss, "然而，不過");
+    assert.equal(keptJson.reply, "譯 然而，不過\n" + EN_REPLY);
+    assert.equal(calls.filter(function (url) { return url.includes("api.deepseek.com"); }).length, 1);
+
+    calls.length = 0;
+    let deepseekCalls = 0;
+    globalThis.fetch = async function (url) {
+      calls.push(String(url));
+      if (String(url).includes("dictionaryapi.dev")) {
+        return new Response(JSON.stringify(howeverEntry), { status: 200 });
+      }
+      deepseekCalls += 1;
+      const content = deepseekCalls === 1 ? "however" : "然而";
+      return new Response(JSON.stringify({
+        choices: [{ message: { content: content } }],
+      }), { status: 200 });
+    };
+    const retried = await handleRequest(
+      post({ mode: "dict", word: "however" }, "203.0.113.261"),
+      { DEEPSEEK_API_KEY: key }
+    );
+    const retriedJson = await retried.json();
+    assert.equal(retriedJson.gloss, "然而");
+    assert.equal(retriedJson.reply, "譯 然而\n" + EN_REPLY);
+    assert.equal(deepseekCalls, 2);
+
+    calls.length = 0;
+    globalThis.fetch = async function (url) {
+      calls.push(String(url));
+      if (String(url).includes("dictionaryapi.dev")) {
+        return new Response(JSON.stringify({ title: "No Definitions Found" }), { status: 404 });
+      }
+      return new Response(JSON.stringify({
+        choices: [{ message: { content: "然而" } }],
+      }), { status: 200 });
+    };
+    const miss = await handleRequest(
+      post({ mode: "dict", word: "howeverr" }, "203.0.113.262"),
+      { DEEPSEEK_API_KEY: key }
+    );
+    assert.equal(miss.status, 404);
+    assert.deepEqual(await miss.json(), { error: "Try another spelling?" });
+    assert.equal(calls.some(function (url) { return url.includes("api.deepseek.com"); }), false);
   } finally {
     globalThis.fetch = originalFetch;
   }

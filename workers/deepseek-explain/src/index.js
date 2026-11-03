@@ -536,18 +536,33 @@ async function callDeepSeek(env, userMessage, options) {
   return { ok: true, explanation: text };
 }
 
-/** One gloss call after a dictionary hit. Any failure leaves the English block as-is. */
+/**
+ * One gloss call after a dictionary hit. DeepSeek is required (DEEPSEEK_API_KEY).
+ * A missing key, a rejected line, or an upstream error used to return the English
+ * block with no gloss field and no 譯 line. A rejected or failed call is tried
+ * once more. A missing key is not retried. If both attempts fail, the English
+ * block is still returned.
+ */
 async function attachDictGloss(env, shaped) {
   try {
-    const asked = await callDeepSeek(env, buildDictGlossMessage(shaped), {
-      system: DICT_GLOSS_SYSTEM,
-      maxTokens: 64,
-      maxChars: 120,
-      unavailable: "Dict gloss is unavailable just now.",
-      unconfigured: "Dict gloss is not available yet.",
-    });
-    if (!asked.ok) return shaped;
-    return applyDictGloss(shaped, asked.explanation);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const asked = await callDeepSeek(env, buildDictGlossMessage(shaped), {
+        system: DICT_GLOSS_SYSTEM,
+        maxTokens: 128,
+        maxChars: 120,
+        unavailable: "Dict gloss is unavailable just now.",
+        unconfigured: "Dict gloss is not available yet.",
+      });
+      if (!asked.ok) {
+        console.error(asked.status === 503 ? "dict_gloss_unconfigured" : "dict_gloss_unavailable");
+        if (asked.status === 503) return shaped;
+        continue;
+      }
+      const glossed = applyDictGloss(shaped, asked.explanation);
+      if (glossed && typeof glossed.gloss === "string" && glossed.gloss) return glossed;
+      console.error("dict_gloss_rejected");
+    }
+    return shaped;
   } catch (e) {
     console.error("dict_gloss_failed");
     return shaped;
