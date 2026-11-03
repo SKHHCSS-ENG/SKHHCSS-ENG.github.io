@@ -2,7 +2,7 @@
  * DeepSeek proxy + neural TTS for the Eng subject site.
  * Explain pages: Cohesion, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
- * Dict: mode "dict" (free dictionary lookup, no DeepSeek, no rate cap).
+ * Dict: mode "dict" (free dictionary English, then one DeepSeek 繁體書面語 gloss; no rate cap).
  * SpeakNovel: mode "speaknovel" (Say It Louder on its own Pages host).
  * Neural TTS: mode "tts" (Azure Speech neural voices + zero-key en-GB MP3 fallback).
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.
@@ -15,6 +15,9 @@
 
 import { ASK_SYSTEM_PROMPT, ASK_TASK } from "./askPrompt.js";
 import {
+  DICT_GLOSS_SYSTEM,
+  applyDictGloss,
+  buildDictGlossMessage,
   isDictMode,
   lookupDictionary,
   readDictFields,
@@ -533,6 +536,24 @@ async function callDeepSeek(env, userMessage, options) {
   return { ok: true, explanation: text };
 }
 
+/** One gloss call after a dictionary hit. Any failure leaves the English block as-is. */
+async function attachDictGloss(env, shaped) {
+  try {
+    const asked = await callDeepSeek(env, buildDictGlossMessage(shaped), {
+      system: DICT_GLOSS_SYSTEM,
+      maxTokens: 64,
+      maxChars: 120,
+      unavailable: "Dict gloss is unavailable just now.",
+      unconfigured: "Dict gloss is not available yet.",
+    });
+    if (!asked.ok) return shaped;
+    return applyDictGloss(shaped, asked.explanation);
+  } catch (e) {
+    console.error("dict_gloss_failed");
+    return shaped;
+  }
+}
+
 export async function handleRequest(request, env) {
   const originHeader = request.headers.get("Origin");
   const allowed = originAllowed(originHeader);
@@ -635,7 +656,8 @@ export async function handleRequest(request, env) {
     if (!looked.ok) {
       return jsonResponse(looked.status, { error: looked.error }, origin);
     }
-    return jsonResponse(200, looked.body, origin);
+    const glossed = await attachDictGloss(env, looked.body);
+    return jsonResponse(200, glossed, origin);
   }
   if (parsed.mode === "ask") {
     if (parsed.error === "required") {

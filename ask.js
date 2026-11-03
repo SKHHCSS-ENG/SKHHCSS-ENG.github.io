@@ -3,7 +3,7 @@
  * spot is kept in localStorage for this browser. A tap opens the sheet;
  * a tap again, Close, or a press outside collapses it. A drag does not toggle.
  * One shared box. The sheet opens in Find (site-find.js). Dict and Ask are
- * the other modes. Chips read Find, Dict, Ask. Send runs Find in Find mode,
+ * the other modes. Chips read FIND, DICT, ASK. Send runs Find in Find mode,
  * posts mode "dict" in Dict mode, and posts one chat turn in Ask mode.
  * Find, Dict, and Ask have no student turn cap and no “n left” lock.
  * Closing the sheet clears the open chat. Worker: window.__EXPLAIN_WORKER__
@@ -60,12 +60,12 @@
   var modeBar = document.createElement("div");
   modeBar.className = "ask-mode";
   modeBar.setAttribute("role", "tablist");
-  modeBar.setAttribute("aria-label", "Find, Dict, or Ask");
+  modeBar.setAttribute("aria-label", "FIND, DICT, or ASK");
   var findTab = document.createElement("button");
   findTab.type = "button";
   findTab.className = "ask-mode-btn is-on";
   findTab.id = "askModeFind";
-  findTab.textContent = "Find";
+  findTab.textContent = "FIND";
   findTab.setAttribute("role", "tab");
   findTab.setAttribute("aria-selected", "true");
   findTab.setAttribute("aria-controls", "askFindPanel");
@@ -74,7 +74,7 @@
   dictTab.type = "button";
   dictTab.className = "ask-mode-btn is-dict";
   dictTab.id = "askModeDict";
-  dictTab.textContent = "Dict";
+  dictTab.textContent = "DICT";
   dictTab.setAttribute("role", "tab");
   dictTab.setAttribute("aria-selected", "false");
   dictTab.setAttribute("aria-controls", "askDictPanel");
@@ -83,7 +83,7 @@
   askTab.type = "button";
   askTab.className = "ask-mode-btn is-ask";
   askTab.id = "askModeAsk";
-  askTab.textContent = "Ask";
+  askTab.textContent = "ASK";
   askTab.setAttribute("role", "tab");
   askTab.setAttribute("aria-selected", "false");
   askTab.setAttribute("aria-controls", "askChatPanel");
@@ -107,7 +107,7 @@
   box.id = "askBox";
   box.className = "ask-box";
   box.placeholder = "Format or topic";
-  box.setAttribute("aria-label", "Find a page");
+  box.setAttribute("aria-label", "FIND a page");
   box.autocomplete = "off";
   box.spellcheck = false;
   box.enterKeyHint = "search";
@@ -317,7 +317,7 @@
     if (finding) {
       if (box.type !== "search") box.type = "search";
       box.placeholder = "Format or topic";
-      box.setAttribute("aria-label", "Find a page");
+      box.setAttribute("aria-label", "FIND a page");
       box.enterKeyHint = "search";
       box.spellcheck = false;
       box.removeAttribute("maxlength");
@@ -330,7 +330,7 @@
       if (box.type !== "text") box.type = "text";
       box.maxLength = 40;
       box.placeholder = "Word or short phrase";
-      box.setAttribute("aria-label", "Dict");
+      box.setAttribute("aria-label", "DICT");
       box.enterKeyHint = "search";
       box.lang = "en-GB";
       box.spellcheck = true;
@@ -342,7 +342,7 @@
     }
     if (box.type !== "text") box.type = "text";
     box.maxLength = 400;
-    box.setAttribute("aria-label", "Ask");
+    box.setAttribute("aria-label", "ASK");
     box.enterKeyHint = "send";
     box.spellcheck = true;
     var busy = !!inflight;
@@ -578,6 +578,15 @@
       ex.className = "ask-dict-ex";
       ex.textContent = "Example: " + data.example.trim();
       wrap.appendChild(ex);
+    }
+    var gloss = data && typeof data.gloss === "string" ? data.gloss.replace(/\s+/g, " ").trim() : "";
+    gloss = gloss.replace(/^譯\s*[:：]?\s*/, "");
+    if (gloss && /[\u3400-\u9fff]/.test(gloss)) {
+      var glossLine = document.createElement("p");
+      glossLine.className = "ask-dict-gloss";
+      glossLine.lang = "zh-Hant";
+      glossLine.textContent = "譯 " + gloss;
+      wrap.appendChild(glossLine);
     }
     dictLog.appendChild(wrap);
     syncShell();

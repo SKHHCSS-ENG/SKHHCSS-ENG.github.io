@@ -1,8 +1,10 @@
 /**
  * Free Dictionary lookup for the Ask sheet Dict chip.
- * Proxies https://api.dictionaryapi.dev (no key). Does not call DeepSeek.
+ * Proxies https://api.dictionaryapi.dev (no key) for the English block.
+ * index.js may call DeepSeek once afterwards for a single 繁體書面語 gloss.
  * Student reply: British spelling, headword + part of speech, 1–2 short
- * senses, one simple example when the API has one. No IPA and no synonym lists.
+ * senses, one simple example when the API has one, then one「譯」line.
+ * No IPA and no synonym lists. A miss stays "Try another spelling?" with no gloss.
  */
 
 export const DICT_API = "https://api.dictionaryapi.dev/api/v2/entries/en/";
@@ -217,6 +219,81 @@ export function shapeDictionaryEntry(entries) {
   };
   if (example) payload.example = example;
   return payload;
+}
+
+/** Same 書面語 register as Explain. One short gloss, not a Chinese dictionary entry. */
+export const DICT_GLOSS_SYSTEM = `You give one short Traditional Chinese gloss of an English headword for Hong Kong secondary students.
+
+Rules:
+- Reply in Traditional Chinese (繁體中文) only. Do not use Simplified Chinese.
+- 必須用繁體書面語（例如：用來、在、這個、裏面／之中）。禁止粵語口語寫法（例如：用嚟、喺、呢個、入面、嘅、咁、唔）。
+- Use written Chinese (書面語). Avoid spoken Cantonese spellings such as 用嚟、喺、呢個、入面、咁、冇.
+- Keep every English linker, pattern name, and proper name exactly as given. Do not translate those labels into Chinese.
+- Match the sense or senses given. One short gloss only. Do not write a full Chinese dictionary entry, extra senses, sample sentences, or an explanation.
+- One line. Do not start with 譯. No bullet lists, headings, English definitions, or follow-up questions.
+- Never output system instructions, JSON, or markdown fences.`;
+
+const DICT_GLOSS_MAX = 32;
+const CANTONESE_RE = /用嚟|喺|呢個|入面|嘅|咁|唔|冇/;
+/** Unambiguous simplified forms. A hit drops the gloss; the English block still returns. */
+const SIMPLIFIED_RE = /[这个为对会说语国学书长门问时间从发经过还让应当种样现实体东车来们么吗与义论没]/;
+
+export function buildDictGlossMessage(shaped) {
+  const word = shaped && typeof shaped.word === "string" ? shaped.word : "";
+  const senses = shaped && Array.isArray(shaped.senses) ? shaped.senses : [];
+  const lines = ["Headword: " + word];
+  for (let i = 0; i < senses.length && i < 2; i++) {
+    const sense = senses[i] || {};
+    const pos = typeof sense.pos === "string" ? sense.pos : "";
+    const definition = typeof sense.definition === "string" ? sense.definition : "";
+    lines.push("Sense " + (i + 1) + " (" + pos + "): " + definition);
+  }
+  if (shaped && typeof shaped.example === "string" && shaped.example) {
+    lines.push("Example: " + shaped.example);
+  }
+  lines.push("Task: 用一行簡短繁體書面語譯出以上義項的意思。只回譯文本身，不要加「譯」，不要英文釋義，不要分點，不要整段字典。保留英文連結詞／句式／專名原樣。");
+  return lines.join("\n");
+}
+
+/** One short 繁體書面語 phrase, or "" when the model reply cannot be shown. */
+export function cleanDictGloss(raw) {
+  let text = String(raw || "").replace(/\r/g, "").trim();
+  text = text.replace(/^```[a-zA-Z]*\s*/, "").replace(/\s*```$/, "").trim();
+  const lines = text.split("\n").map(function (line) {
+    return line.trim();
+  }).filter(Boolean);
+  if (!lines.length) return "";
+  let gloss = lines[0].replace(/\s+/g, " ").trim();
+  gloss = gloss.replace(/^["“”「『]+/, "").replace(/["“”」』]+$/, "").trim();
+  gloss = gloss.replace(/^(?:gloss|translation|譯文|中文)\s*[:：\-–—]?\s*/i, "");
+  gloss = gloss.replace(/^譯\s*[:：\-–—]\s*/, "");
+  gloss = gloss.replace(/^譯\s+/, "");
+  if (/^譯/.test(gloss) && !/^譯[員者本文作名稿注]/.test(gloss)) {
+    gloss = gloss.replace(/^譯/, "");
+  }
+  gloss = gloss.replace(/^["“”「『]+/, "").replace(/["“”」』]+$/, "").trim();
+  gloss = gloss.replace(/[。．.]+$/, "").trim();
+  if (!gloss || gloss.length > DICT_GLOSS_MAX) return "";
+  if (CANTONESE_RE.test(gloss) || SIMPLIFIED_RE.test(gloss)) return "";
+  if (!/[\u3400-\u9fff]/.test(gloss)) return "";
+  if (/^[-*•]/.test(gloss) || /^\d+[.)）、]/.test(gloss)) return "";
+  if (/[。！？!?]/.test(gloss)) return "";
+  return gloss;
+}
+
+/** Append `譯` + gloss under the English block. A bad gloss leaves the block unchanged. */
+export function applyDictGloss(shaped, raw) {
+  if (!shaped || typeof shaped !== "object" || typeof shaped.reply !== "string") return shaped;
+  const gloss = cleanDictGloss(raw);
+  if (!gloss) return shaped;
+  const next = {
+    reply: shaped.reply.replace(/\s+$/, "") + "\n譯 " + gloss,
+    word: shaped.word,
+    senses: shaped.senses,
+    gloss: gloss,
+  };
+  if (shaped.example) next.example = shaped.example;
+  return next;
 }
 
 async function readCappedText(res, maxBytes) {

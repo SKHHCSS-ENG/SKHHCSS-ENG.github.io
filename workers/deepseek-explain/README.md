@@ -1,6 +1,6 @@
 # DeepSeek Explain worker
 
-Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), a free dictionary lookup (`mode: "dict"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, and SpeakNovel call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those three modes share that binding. Dict calls the Free Dictionary API and does not use that key. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
+Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), a free dictionary lookup (`mode: "dict"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, SpeakNovel, and the Dict gloss call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those calls share that binding. The Dict English block calls the Free Dictionary API and does not use that key. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
 
 Live site origins: `https://skhhcss-eng.github.io` and `https://learning.hcs.edu.hk` (the school LMS; pages live under `/english/`, which is not part of the Origin header).  
 This repo has no GitHub Pages preview origin. The org site is served from `main` on `skhhcss-eng.github.io` only.  
@@ -96,31 +96,36 @@ Find stays in the browser. Ask and Dict do not draw on the Explain allowance. Sp
 
 ## Dict
 
-Same URL and the same origin allowlist. `mode` must be `dict`. This does not call DeepSeek. There is no student lookup cap and no per-IP cap. No API key. The sheet does not show a usage counter.
+Same URL and the same origin allowlist. `mode` must be `dict`. There is no student lookup cap and no per-IP cap. The sheet does not show a usage counter.
 
 ```json
 { "mode": "dict", "word": "however" }
 ```
 
-`word` is one word or a short phrase (up to three words, letters, apostrophes, and hyphens, at most 40 characters). The Worker looks up `https://api.dictionaryapi.dev/api/v2/entries/en/{word}`.
+`word` is one word or a short phrase (up to three words, letters, apostrophes, and hyphens, at most 40 characters). The Worker looks up `https://api.dictionaryapi.dev/api/v2/entries/en/{word}` (no key). That API stays English-only.
 
-The reply is a short British English teacher line: headword and part of speech, one or two short senses, and one simple example when the API has one. IPA, audio, and synonym lists are left out. There is no Chinese gloss in this reply.
+On a hit, the Worker calls DeepSeek once, with the same `DEEPSEEK_API_KEY` as Explain, for a single Traditional Chinese 書面語 gloss of the kept sense or senses. The gloss is one short line, not a Chinese dictionary entry. English linker, pattern, and proper names stay as given.
+
+The English block is unchanged: headword and British part of speech, one or two short senses, and one simple example when the API has one. IPA, audio, and synonym lists are left out. The gloss line is appended under that block as `譯` plus the short gloss.
 
 Success (`200`):
 
 ```json
 {
-  "reply": "however — adverb\nNevertheless; yet, still; in spite of (that).\n\nhowever — conjunction\nIn whatever way or manner.\n\nExample: I did it anyway, however.",
+  "reply": "however — adverb\nNevertheless; yet, still; in spite of (that).\n\nhowever — conjunction\nIn whatever way or manner.\n\nExample: I did it anyway, however.\n譯 然而；不論以何種方式",
   "word": "however",
   "senses": [
     { "pos": "adverb", "definition": "Nevertheless; yet, still; in spite of (that)." },
     { "pos": "conjunction", "definition": "In whatever way or manner." }
   ],
-  "example": "I did it anyway, however."
+  "example": "I did it anyway, however.",
+  "gloss": "然而；不論以何種方式"
 }
 ```
 
-A missing word is `404` with `{ "error": "Try another spelling?" }`. An empty word is `400` (`Type a word.`). A word that is too long or not a short phrase is `400` (`Type one word or a short phrase.`). If the dictionary host is down, the error is `502` (`The dictionary is unavailable just now.`).
+`gloss` is omitted when DeepSeek is unconfigured, errors, or returns something that is not one short 繁體書面語 line. The English `reply`, `word`, `senses`, and `example` are still returned.
+
+A missing word is `404` with `{ "error": "Try another spelling?" }` and no gloss line. An empty word is `400` (`Type a word.`). A word that is too long or not a short phrase is `400` (`Type one word or a short phrase.`). If the dictionary host is down, the error is `502` (`The dictionary is unavailable just now.`). A gloss failure is not a `502`.
 
 Smoke (does not deploy). Run this after Nest deploys, or run `scripts/smoke-dict.sh`:
 

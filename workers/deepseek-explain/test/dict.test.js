@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { DICT_MISS, shapeDictionaryEntry, toBritish } from "../src/dict.js";
+import {
+  DICT_GLOSS_SYSTEM,
+  DICT_MISS,
+  applyDictGloss,
+  buildDictGlossMessage,
+  cleanDictGloss,
+  shapeDictionaryEntry,
+  toBritish,
+} from "../src/dict.js";
 import { handleRequest } from "../src/index.js";
 
 function post(body, ip, origin) {
@@ -187,6 +195,8 @@ test("dict proxies the free dictionary and returns a short British reply", async
     assert.equal(json.senses.length, 2);
     assert.equal(json.example, "I did it anyway, however.");
     assert.match(json.reply, /^however — adverb\n/);
+    assert.equal(json.reply.includes("譯"), false);
+    assert.equal(json.gloss, undefined);
     assert.equal(json.reply.includes("/hɑʊ"), false);
     assert.equal(json.explanation, undefined);
     assert.equal(calls.length, 1);
@@ -294,4 +304,144 @@ test("dict source has no API key", () => {
   assert.equal(src.includes("sk-"), false);
   assert.equal(src.includes("DEEPSEEK_API_KEY"), false);
   assert.equal(src.includes("api.dictionaryapi.dev"), true);
+});
+
+const EN_REPLY = [
+  "however — adverb",
+  "Nevertheless; yet, still; in spite of (that).",
+  "",
+  "however — conjunction",
+  "In whatever way or manner.",
+  "",
+  "Example: I did it anyway, however.",
+].join("\n");
+
+test("cleanDictGloss keeps one short 繁體 phrase and drops a dump", () => {
+  assert.equal(cleanDictGloss("然而；不論以何種方式"), "然而；不論以何種方式");
+  assert.equal(cleanDictGloss("  譯：然而。 \n"), "然而");
+  assert.equal(cleanDictGloss("「譯 然而」"), "然而");
+  assert.equal(cleanDictGloss("```\n然而\n```"), "然而");
+  assert.equal(cleanDictGloss("譯然而"), "然而");
+  assert.equal(cleanDictGloss("譯員"), "譯員");
+  assert.equal(cleanDictGloss("Physical 層面"), "Physical 層面");
+  assert.equal(cleanDictGloss("然而\n這個詞用來表示轉折。"), "然而");
+  assert.equal(cleanDictGloss("喺度"), "");
+  assert.equal(cleanDictGloss("用嚟轉折"), "");
+  assert.equal(cleanDictGloss("这个"), "");
+  assert.equal(cleanDictGloss("however"), "");
+  assert.equal(cleanDictGloss("1. 然而"), "");
+  assert.equal(cleanDictGloss("然而！"), "");
+  assert.equal(cleanDictGloss("然而".repeat(20)), "");
+  assert.equal(cleanDictGloss(""), "");
+
+  const shaped = shapeDictionaryEntry(howeverEntry);
+  const glossed = applyDictGloss(shaped, "譯：然而；不論以何種方式");
+  assert.equal(glossed.reply, EN_REPLY + "\n譯 然而；不論以何種方式");
+  assert.equal(glossed.gloss, "然而；不論以何種方式");
+  assert.equal(glossed.example, shaped.example);
+  assert.deepEqual(glossed.senses, shaped.senses);
+  assert.equal(shaped.gloss, undefined);
+  assert.equal(shaped.reply, EN_REPLY);
+  assert.equal(applyDictGloss(shaped, "喺度"), shaped);
+  assert.match(DICT_GLOSS_SYSTEM, /繁體中文/);
+  assert.match(DICT_GLOSS_SYSTEM, /書面語/);
+  assert.match(DICT_GLOSS_SYSTEM, /用嚟、喺、呢個、入面/);
+  const message = buildDictGlossMessage(shaped);
+  assert.match(message, /Headword: however/);
+  assert.match(message, /Sense 1 \(adverb\): Nevertheless/);
+  assert.match(message, /Sense 2 \(conjunction\): In whatever way/);
+  assert.match(message, /Example: I did it anyway, however\./);
+  assert.match(message, /不要加「譯」/);
+});
+
+test("dict hit appends one 譯 gloss and a miss stays spelling-only", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  const key = "unit-test-key-do-not-log";
+  globalThis.fetch = async function (url, init) {
+    calls.push({ url: String(url), init: init });
+    if (String(url).includes("dictionaryapi.dev")) {
+      return new Response(JSON.stringify(howeverEntry), { status: 200 });
+    }
+    const body = JSON.parse(init.body);
+    assert.equal(body.model, "deepseek-chat");
+    assert.equal(body.messages[0].content, DICT_GLOSS_SYSTEM);
+    assert.match(body.messages[1].content, /Headword: however/);
+    assert.match(body.messages[1].content, /Sense 1 \(adverb\)/);
+    assert.equal(body.messages[0].content.includes("sk-"), false);
+    return new Response(JSON.stringify({
+      choices: [{ message: { content: "然而；不論以何種方式" } }],
+    }), { status: 200 });
+  };
+  try {
+    const res = await handleRequest(
+      post({ mode: "dict", word: "however" }, "203.0.113.240"),
+      { DEEPSEEK_API_KEY: key }
+    );
+    const json = await res.json();
+    assert.equal(res.status, 200);
+    assert.equal(json.reply, EN_REPLY + "\n譯 然而；不論以何種方式");
+    assert.equal(json.gloss, "然而；不論以何種方式");
+    assert.equal(json.word, "however");
+    assert.equal(json.senses.length, 2);
+    assert.equal(json.example, "I did it anyway, however.");
+    assert.equal(json.explanation, undefined);
+    assert.equal(JSON.stringify(json).includes(key), false);
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].url, "https://api.dictionaryapi.dev/api/v2/entries/en/however");
+    assert.equal(calls[1].url, "https://api.deepseek.com/chat/completions");
+    assert.equal(calls[1].init.method, "POST");
+    assert.equal(calls[1].init.headers.Authorization, "Bearer " + key);
+
+    calls.length = 0;
+    globalThis.fetch = async function (url) {
+      calls.push({ url: String(url) });
+      return new Response(JSON.stringify({ title: "No Definitions Found" }), { status: 404 });
+    };
+    const miss = await handleRequest(
+      post({ mode: "dict", word: "howeverr" }, "203.0.113.241"),
+      { DEEPSEEK_API_KEY: key }
+    );
+    const missJson = await miss.json();
+    assert.equal(miss.status, 404);
+    assert.deepEqual(missJson, { error: "Try another spelling?" });
+    assert.equal(calls.length, 1);
+    assert.equal(String(calls[0].url).includes("dictionaryapi.dev"), true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("dict gloss failure still returns the English block", async () => {
+  const originalFetch = globalThis.fetch;
+  const key = "unit-test-key-do-not-log";
+  const cases = [
+    function () { return new Response("nope", { status: 500 }); },
+    function () { return new Response(JSON.stringify({ choices: [{ message: { content: "" } }] }), { status: 200 }); },
+    function () { return new Response(JSON.stringify({ choices: [{ message: { content: "喺度轉折" } }] }), { status: 200 }); },
+    function () { throw new Error("network"); },
+  ];
+  try {
+    for (let i = 0; i < cases.length; i++) {
+      globalThis.fetch = async function (url) {
+        if (String(url).includes("dictionaryapi.dev")) {
+          return new Response(JSON.stringify(howeverEntry), { status: 200 });
+        }
+        return cases[i]();
+      };
+      const res = await handleRequest(
+        post({ mode: "dict", word: "however" }, "203.0.113.25" + i),
+        { DEEPSEEK_API_KEY: key }
+      );
+      const json = await res.json();
+      assert.equal(res.status, 200);
+      assert.equal(json.reply, EN_REPLY);
+      assert.equal(json.gloss, undefined);
+      assert.equal(json.reply.includes("譯"), false);
+      assert.equal(json.senses.length, 2);
+      assert.equal(json.example, "I did it anyway, however.");
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
