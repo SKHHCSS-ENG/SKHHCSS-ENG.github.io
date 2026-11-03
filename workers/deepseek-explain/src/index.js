@@ -2,6 +2,7 @@
  * DeepSeek proxy + neural TTS for the Eng subject site.
  * Explain pages: Cohesion, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
+ * Dict: mode "dict" (free dictionary lookup, no DeepSeek, no rate cap).
  * SpeakNovel: mode "speaknovel" (Say It Louder on its own Pages host).
  * Neural TTS: mode "tts" (Azure Speech neural voices + zero-key en-GB MP3 fallback).
  * The API key lives only in the Worker secret DEEPSEEK_API_KEY.
@@ -13,6 +14,11 @@
  */
 
 import { ASK_SYSTEM_PROMPT, ASK_TASK } from "./askPrompt.js";
+import {
+  isDictMode,
+  lookupDictionary,
+  readDictFields,
+} from "./dict.js";
 import {
   SPEAKNOVEL_SYSTEM_PROMPT,
   SPEAKNOVEL_TASK,
@@ -62,7 +68,7 @@ const MAX_EXPLANATION_CHARS = 800;
 const RATE_LIMIT = 30;
 /** Own bucket so a SpeakNovel session cannot use up Ask or Explain. */
 export const SPEAKNOVEL_RATE_LIMIT = 20;
-/** Own bucket so Say It Louder voice playback cannot use up Ask, Explain, or SpeakNovel. */
+/** Own bucket so Say It Louder voice playback cannot use up Explain or SpeakNovel. */
 const TTS_RATE_LIMIT = 30;
 const RATE_WINDOW_MS = 60 * 1000;
 const UPSTREAM_TIMEOUT_MS = 20000;
@@ -103,7 +109,6 @@ const LIMITS = {
 export function buildAskUserMessage(fields) {
   return [
     "Page context: " + (fields.pagePath || "site"),
-    "Turn: " + fields.turn + " / 5",
     "Find hits (optional): " + (fields.findHits || ""),
     "Student: " + fields.message,
     "Task: " + ASK_TASK,
@@ -371,6 +376,7 @@ function readFields(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) return null;
   if (isTtsMode(data)) return readTtsFields(data);
   if (isSpeakNovelMode(data)) return readSpeakNovelFields(data);
+  if (isDictMode(data)) return readDictFields(data);
   const page = asLimitedString(data.page, LIMITS.page);
   if (!page.ok) return { error: "field" };
   if (page.value === "Ask") return readAskFields(data);
@@ -434,11 +440,14 @@ function asHitText(value, max) {
   return { ok: true, value: joined };
 }
 
-function readTurn(value) {
-  let turn = value;
-  if (typeof turn === "string" && /^[1-5]$/.test(turn.trim())) turn = Number(turn.trim());
-  if (turn !== 1 && turn !== 2 && turn !== 3 && turn !== 4 && turn !== 5) return null;
-  return turn;
+function isAskPage(data) {
+  return !!(
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    typeof data.page === "string" &&
+    data.page.trim() === "Ask"
+  );
 }
 
 function readAskFields(data) {
@@ -448,18 +457,15 @@ function readAskFields(data) {
     LIMITS.pagePath
   );
   const findHits = asHitText(data.findHits == null ? "" : data.findHits, LIMITS.findHits);
-  const turn = readTurn(data.turn);
   const checked = [message, pagePath, findHits];
   for (let i = 0; i < checked.length; i++) {
     if (!checked[i].ok) return { mode: "ask", error: "field" };
   }
-  if (!turn) return { mode: "ask", error: "turn" };
   if (!message.value) return { mode: "ask", error: "required" };
   return {
     mode: "ask",
     fields: {
       pagePath: pagePath.value || "site",
-      turn: turn,
       findHits: findHits.value,
       message: message.value,
     },
@@ -585,18 +591,24 @@ export async function handleRequest(request, env) {
   }
   const speaknovel = isSpeakNovelMode(data);
   const tts = isTtsMode(data);
+  const dict = isDictMode(data);
+  const ask = !speaknovel && !tts && !dict && isAskPage(data);
   if (!speaknovel && rawBytes > MAX_BODY_BYTES) {
     return jsonResponse(413, { error: "Request is too large." }, origin);
   }
 
-  const scope = tts ? "tts" : (speaknovel ? "speaknovel" : "study");
-  if (!allowRate(clientIp(request), undefined, scope)) {
-    const message = tts
-      ? "Too many voice requests. Wait a moment."
-      : (speaknovel
-        ? "Too many SpeakNovel turns. Wait a minute and try again."
-        : "Too many explanations. Wait a minute and try again.");
-    return jsonResponse(429, { error: message }, origin, { "Retry-After": "60" });
+  /* Find is browser-only. Ask and Dict have no student cap and no per-IP cap.
+     Explain, SpeakNovel, and TTS keep their own buckets. */
+  if (!ask && !dict) {
+    const scope = tts ? "tts" : (speaknovel ? "speaknovel" : "study");
+    if (!allowRate(clientIp(request), undefined, scope)) {
+      const message = tts
+        ? "Too many voice requests. Wait a moment."
+        : (speaknovel
+          ? "Too many SpeakNovel turns. Wait a minute and try again."
+          : "Too many explanations. Wait a minute and try again.");
+      return jsonResponse(429, { error: message }, origin, { "Retry-After": "60" });
+    }
   }
 
   const parsed = readFields(data);
@@ -612,10 +624,20 @@ export async function handleRequest(request, env) {
     }
     return handleTtsSynthesis(env, parsed.fields, origin);
   }
-  if (parsed.mode === "ask") {
-    if (parsed.error === "turn") {
-      return jsonResponse(400, { error: "Ask allows 5 turns in this open." }, origin);
+  if (parsed.mode === "dict") {
+    if (parsed.error === "required") {
+      return jsonResponse(400, { error: "Type a word." }, origin);
     }
+    if (parsed.error === "field") {
+      return jsonResponse(400, { error: "Type one word or a short phrase." }, origin);
+    }
+    const looked = await lookupDictionary(parsed.fields.word);
+    if (!looked.ok) {
+      return jsonResponse(looked.status, { error: looked.error }, origin);
+    }
+    return jsonResponse(200, looked.body, origin);
+  }
+  if (parsed.mode === "ask") {
     if (parsed.error === "required") {
       return jsonResponse(400, { error: "Type a short question." }, origin);
     }

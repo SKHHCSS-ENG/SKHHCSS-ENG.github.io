@@ -2,11 +2,12 @@
  * Ask — circle bottom-left. Drag moves it (touch or mouse) and the last
  * spot is kept in localStorage for this browser. A tap opens the sheet;
  * a tap again, Close, or a press outside collapses it. A drag does not toggle.
- * One shared box. The sheet opens in Find (site-find.js). Ask AI is the
- * other mode. Send runs Find in Find mode and posts one chat turn in Ask AI
- * mode. Five assistant replies per open; closing the sheet resets the count.
- * No daily cap. Worker: window.__EXPLAIN_WORKER__ (page "Ask"), else the
- * deployed deepseek-explain host. No API key here.
+ * One shared box. The sheet opens in Find (site-find.js). Dict and Ask are
+ * the other modes. Chips read Find, Dict, Ask. Send runs Find in Find mode,
+ * posts mode "dict" in Dict mode, and posts one chat turn in Ask mode.
+ * Find, Dict, and Ask have no student turn cap and no “n left” lock.
+ * Closing the sheet clears the open chat. Worker: window.__EXPLAIN_WORKER__
+ * (page "Ask"), else the deployed deepseek-explain host. No API key here.
  * Does not restyle the Tools dock. On drop, and whenever the dock, an open
  * Cohesion sheet, or an Explain pill would cover the circle, it snaps clear.
  * On a narrow screen (under 860px) a [data-ask-clear] zone is the same kind
@@ -18,14 +19,13 @@
   if (document.documentElement.getAttribute("data-ask-init") === "1") return;
   document.documentElement.setAttribute("data-ask-init", "1");
 
-  var TURNS = 5;
-  var NUDGE = "這次 Ask 已達 5 輪。請改用上方 Find 找頁面，或到樣本下的 Explain 查看該項目。";
   var FALLBACK_WORKER = "https://deepseek-explain.skhhcss-eng.workers.dev";
 
   var workerUrl = safeWorkerUrl(window.__EXPLAIN_WORKER__) || FALLBACK_WORKER;
-  var turns = 0;
   var seq = 0;
   var inflight = null;
+  var dictSeq = 0;
+  var dictInflight = null;
   var currentHits = [];
 
   var floater = document.createElement("button");
@@ -60,7 +60,7 @@
   var modeBar = document.createElement("div");
   modeBar.className = "ask-mode";
   modeBar.setAttribute("role", "tablist");
-  modeBar.setAttribute("aria-label", "Find or Ask AI");
+  modeBar.setAttribute("aria-label", "Find, Dict, or Ask");
   var findTab = document.createElement("button");
   findTab.type = "button";
   findTab.className = "ask-mode-btn is-on";
@@ -70,16 +70,26 @@
   findTab.setAttribute("aria-selected", "true");
   findTab.setAttribute("aria-controls", "askFindPanel");
   findTab.tabIndex = 0;
+  var dictTab = document.createElement("button");
+  dictTab.type = "button";
+  dictTab.className = "ask-mode-btn is-dict";
+  dictTab.id = "askModeDict";
+  dictTab.textContent = "Dict";
+  dictTab.setAttribute("role", "tab");
+  dictTab.setAttribute("aria-selected", "false");
+  dictTab.setAttribute("aria-controls", "askDictPanel");
+  dictTab.tabIndex = -1;
   var askTab = document.createElement("button");
   askTab.type = "button";
   askTab.className = "ask-mode-btn is-ask";
   askTab.id = "askModeAsk";
-  askTab.textContent = "Ask AI";
+  askTab.textContent = "Ask";
   askTab.setAttribute("role", "tab");
   askTab.setAttribute("aria-selected", "false");
   askTab.setAttribute("aria-controls", "askChatPanel");
   askTab.tabIndex = -1;
   modeBar.appendChild(findTab);
+  modeBar.appendChild(dictTab);
   modeBar.appendChild(askTab);
   var closeBtn = document.createElement("button");
   closeBtn.type = "button";
@@ -125,9 +135,21 @@
   log.setAttribute("aria-live", "polite");
   chat.appendChild(log);
 
+  var dictPanel = document.createElement("div");
+  dictPanel.className = "ask-chat";
+  dictPanel.id = "askDictPanel";
+  dictPanel.hidden = true;
+  dictPanel.setAttribute("role", "tabpanel");
+  dictPanel.setAttribute("aria-labelledby", "askModeDict");
+  var dictLog = document.createElement("div");
+  dictLog.className = "ask-log";
+  dictLog.setAttribute("aria-live", "polite");
+  dictPanel.appendChild(dictLog);
+
   sheet.appendChild(top);
   sheet.appendChild(form);
   sheet.appendChild(hitsBox);
+  sheet.appendChild(dictPanel);
   sheet.appendChild(chat);
 
   document.body.appendChild(floater);
@@ -250,27 +272,25 @@
   }
 
   function unlockComposer() {
-    if (turns >= TURNS || inflight || mode !== "ask") return;
+    if (inflight || mode !== "ask") return;
     box.disabled = false;
     sendBtn.disabled = false;
     box.placeholder = "Short question";
   }
 
-  function lockChat() {
-    if (mode !== "ask") return;
-    box.disabled = true;
-    sendBtn.disabled = true;
-    box.placeholder = "Find or Explain";
-  }
-
   function resetChat() {
     seq += 1;
+    dictSeq += 1;
     if (inflight) {
       inflight.abort();
       inflight = null;
     }
-    turns = 0;
+    if (dictInflight) {
+      dictInflight.abort();
+      dictInflight = null;
+    }
     log.textContent = "";
+    dictLog.textContent = "";
     box.value = "";
     box.disabled = false;
     sendBtn.disabled = false;
@@ -279,14 +299,21 @@
 
   function paintMode() {
     var finding = mode === "find";
+    var defining = mode === "dict";
+    var asking = mode === "ask";
     findTab.classList.toggle("is-on", finding);
-    askTab.classList.toggle("is-on", !finding);
+    dictTab.classList.toggle("is-on", defining);
+    askTab.classList.toggle("is-on", asking);
     findTab.setAttribute("aria-selected", finding ? "true" : "false");
-    askTab.setAttribute("aria-selected", finding ? "false" : "true");
+    dictTab.setAttribute("aria-selected", defining ? "true" : "false");
+    askTab.setAttribute("aria-selected", asking ? "true" : "false");
     findTab.tabIndex = finding ? 0 : -1;
-    askTab.tabIndex = finding ? -1 : 0;
+    dictTab.tabIndex = defining ? 0 : -1;
+    askTab.tabIndex = asking ? 0 : -1;
     sheet.setAttribute("data-ask-mode", mode);
-    chat.hidden = finding;
+    chat.hidden = !asking;
+    dictPanel.hidden = !defining;
+    box.removeAttribute("lang");
     if (finding) {
       if (box.type !== "search") box.type = "search";
       box.placeholder = "Format or topic";
@@ -299,16 +326,29 @@
       renderFind();
       return;
     }
+    if (defining) {
+      if (box.type !== "text") box.type = "text";
+      box.maxLength = 40;
+      box.placeholder = "Word or short phrase";
+      box.setAttribute("aria-label", "Dict");
+      box.enterKeyHint = "search";
+      box.lang = "en-GB";
+      box.spellcheck = true;
+      box.disabled = !!dictInflight;
+      sendBtn.disabled = !!dictInflight;
+      hitsBox.hidden = true;
+      syncShell();
+      return;
+    }
     if (box.type !== "text") box.type = "text";
     box.maxLength = 400;
-    box.setAttribute("aria-label", "Ask AI");
+    box.setAttribute("aria-label", "Ask");
     box.enterKeyHint = "send";
     box.spellcheck = true;
-    var capped = turns >= TURNS;
     var busy = !!inflight;
-    box.disabled = capped || busy;
-    sendBtn.disabled = capped || busy;
-    box.placeholder = capped ? "Find or Explain" : "Short question";
+    box.disabled = busy;
+    sendBtn.disabled = busy;
+    box.placeholder = "Short question";
     hitsBox.hidden = true;
     syncShell();
   }
@@ -348,9 +388,15 @@
     var cap = shellCapPx();
     var findLive = currentHits.length > 0;
     var askLive = log.children.length > 0;
+    var dictLive = dictLog.children.length > 0;
+    var liveCount = (findLive ? 1 : 0) + (askLive ? 1 : 0) + (dictLive ? 1 : 0);
     var shared = 0;
-    if (findLive && askLive) {
-      shared = chromePx() + Math.max(panelContentPx(hitsBox), panelContentPx(chat));
+    if (liveCount >= 2) {
+      var tallest = 0;
+      if (findLive) tallest = Math.max(tallest, panelContentPx(hitsBox));
+      if (askLive) tallest = Math.max(tallest, panelContentPx(chat));
+      if (dictLive) tallest = Math.max(tallest, panelContentPx(dictPanel));
+      shared = chromePx() + tallest;
     }
     var hold = Math.max(shared, shellMin || 0);
     if (!hold) {
@@ -361,7 +407,7 @@
   }
 
   function syncShell() {
-    var filled = mode === "find" ? currentHits.length > 0 : log.children.length > 0;
+    var filled = mode === "find" ? currentHits.length > 0 : (mode === "dict" ? dictLog.children.length > 0 : log.children.length > 0);
     sheet.classList.toggle("is-filled", filled);
     if (!filled) shellMin = 0;
     if (!sheetOpen() || placing) {
@@ -373,12 +419,18 @@
     placing = false;
   }
 
+  function modeFilled(which) {
+    if (which === "find") return currentHits.length > 0;
+    if (which === "dict") return dictLog.children.length > 0;
+    return log.children.length > 0;
+  }
+
   function setMode(next) {
-    if (next !== "find" && next !== "ask") return;
+    if (next !== "find" && next !== "dict" && next !== "ask") return;
     var changed = mode !== next;
     if (changed && sheetOpen()) {
-      var srcFilled = mode === "find" ? currentHits.length > 0 : log.children.length > 0;
-      var destFilled = next === "ask" && log.children.length > 0;
+      var srcFilled = modeFilled(mode);
+      var destFilled = modeFilled(next);
       shellMin = srcFilled && destFilled ? Math.round(sheet.getBoundingClientRect().height) : 0;
     } else if (changed) {
       shellMin = 0;
@@ -406,11 +458,15 @@
 
   function closeSheet() {
     seq += 1;
+    dictSeq += 1;
     if (inflight) {
       inflight.abort();
       inflight = null;
     }
-    turns = 0;
+    if (dictInflight) {
+      dictInflight.abort();
+      dictInflight = null;
+    }
     sheet.hidden = true;
     scrim.hidden = true;
     floater.setAttribute("aria-expanded", "false");
@@ -420,8 +476,7 @@
 
   function sendMessage(message) {
     var text = String(message || "").replace(/\s+/g, " ").trim();
-    if (!text || turns >= TURNS || inflight) return;
-    var turn = turns + 1;
+    if (!text || inflight) return;
     renderMine(text);
     box.value = "";
     var ticket = ++seq;
@@ -441,7 +496,6 @@
       body: JSON.stringify({
         page: "Ask",
         pagePath: pagePath(),
-        turn: turn,
         findHits: findHitsText(),
         message: text
       }),
@@ -456,16 +510,11 @@
       if (pending.parentNode) pending.parentNode.removeChild(pending);
       var reply = result.data && typeof result.data.reply === "string" ? result.data.reply.trim() : "";
       if (result.status === 200 && reply) {
-        if (turn === TURNS && reply.indexOf("\u9019\u6b21 Ask \u5df2\u9054 5 \u8f2a") === -1) {
-          reply = reply.replace(/\s+$/, "") + " " + NUDGE;
-        }
         renderReply(reply);
-        turns = turn;
-        if (turns >= TURNS) lockChat();
-        else unlockComposer();
+        unlockComposer();
         return;
       }
-      renderReply(result.status === 429 ? "Too many questions. Wait a minute." : "Ask is unavailable just now.");
+      renderReply("Ask is unavailable just now.");
       unlockComposer();
     }).catch(function (err) {
       if (err && err.name === "AbortError") return;
@@ -474,6 +523,123 @@
       if (pending.parentNode) pending.parentNode.removeChild(pending);
       renderReply("Ask is unavailable just now.");
       unlockComposer();
+    });
+  }
+
+  function renderDictMine(text) {
+    var p = document.createElement("p");
+    p.className = "ask-mine";
+    p.textContent = text;
+    dictLog.appendChild(p);
+    syncShell();
+  }
+
+  function renderDictText(text) {
+    var wrap = document.createElement("div");
+    wrap.className = "ask-reply ask-dict";
+    var p = document.createElement("p");
+    p.className = "ask-dict-plain";
+    p.textContent = text;
+    wrap.appendChild(p);
+    dictLog.appendChild(wrap);
+    syncShell();
+    dictPanel.scrollTop = dictPanel.scrollHeight;
+  }
+
+  function renderDictPayload(data) {
+    var senses = data && Array.isArray(data.senses) ? data.senses : [];
+    var word = data && typeof data.word === "string" ? data.word.trim() : "";
+    var shown = [];
+    var i;
+    for (i = 0; i < senses.length && shown.length < 2; i++) {
+      var pos = senses[i] && typeof senses[i].pos === "string" ? senses[i].pos.trim() : "";
+      var definition = senses[i] && typeof senses[i].definition === "string" ? senses[i].definition.trim() : "";
+      if (pos && definition) shown.push({ pos: pos, definition: definition });
+    }
+    if (!word || !shown.length) {
+      var reply = data && typeof data.reply === "string" ? data.reply.trim() : "";
+      renderDictText(reply || "Try another spelling?");
+      return;
+    }
+    var wrap = document.createElement("div");
+    wrap.className = "ask-reply ask-dict";
+    for (i = 0; i < shown.length; i++) {
+      var head = document.createElement("p");
+      head.className = "ask-dict-head";
+      head.textContent = word + " \u2014 " + shown[i].pos;
+      var def = document.createElement("p");
+      def.className = "ask-dict-def";
+      def.textContent = shown[i].definition;
+      wrap.appendChild(head);
+      wrap.appendChild(def);
+    }
+    if (data.example && typeof data.example === "string" && data.example.trim()) {
+      var ex = document.createElement("p");
+      ex.className = "ask-dict-ex";
+      ex.textContent = "Example: " + data.example.trim();
+      wrap.appendChild(ex);
+    }
+    dictLog.appendChild(wrap);
+    syncShell();
+    dictPanel.scrollTop = dictPanel.scrollHeight;
+  }
+
+  function unlockDict() {
+    if (dictInflight || mode !== "dict") return;
+    box.disabled = false;
+    sendBtn.disabled = false;
+    box.placeholder = "Word or short phrase";
+  }
+
+  function sendDict(message) {
+    var text = String(message || "").replace(/\s+/g, " ").trim();
+    if (!text || dictInflight || mode !== "dict") return;
+    renderDictMine(text);
+    box.value = "";
+    var ticket = ++dictSeq;
+    var controller = new AbortController();
+    dictInflight = controller;
+    box.disabled = true;
+    sendBtn.disabled = true;
+    var pending = document.createElement("p");
+    pending.className = "ask-reply";
+    pending.textContent = "\u2026";
+    dictLog.appendChild(pending);
+    syncShell();
+
+    fetch(workerUrl, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "dict", word: text }),
+      signal: controller.signal
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        return { status: res.status, data: data };
+      });
+    }).then(function (result) {
+      if (ticket !== dictSeq) return;
+      dictInflight = null;
+      if (pending.parentNode) pending.parentNode.removeChild(pending);
+      if (result.status === 200 && result.data && (result.data.reply || (result.data.senses && result.data.senses.length))) {
+        renderDictPayload(result.data);
+        unlockDict();
+        return;
+      }
+      if (result.status === 404) {
+        renderDictText("Try another spelling?");
+        unlockDict();
+        return;
+      }
+      renderDictText("The dictionary is unavailable just now.");
+      unlockDict();
+    }).catch(function (err) {
+      if (err && err.name === "AbortError") return;
+      if (ticket !== dictSeq) return;
+      dictInflight = null;
+      if (pending.parentNode) pending.parentNode.removeChild(pending);
+      renderDictText("The dictionary is unavailable just now.");
+      unlockDict();
     });
   }
 
@@ -849,15 +1015,21 @@
   scrim.addEventListener("click", closeSheet);
   closeBtn.addEventListener("click", closeSheet);
   findTab.addEventListener("click", function () { setMode("find"); });
+  dictTab.addEventListener("click", function () { setMode("dict"); });
   askTab.addEventListener("click", function () { setMode("ask"); });
   modeBar.addEventListener("keydown", function (e) {
+    var order = ["find", "dict", "ask"];
+    var tabs = { find: findTab, dict: dictTab, ask: askTab };
+    var idx = order.indexOf(mode);
     var next = "";
-    if (e.key === "ArrowRight" || e.key === "End") next = "ask";
-    else if (e.key === "ArrowLeft" || e.key === "Home") next = "find";
+    if (e.key === "ArrowRight") next = order[Math.min(order.length - 1, idx + 1)];
+    else if (e.key === "ArrowLeft") next = order[Math.max(0, idx - 1)];
+    else if (e.key === "End") next = "ask";
+    else if (e.key === "Home") next = "find";
     else return;
     e.preventDefault();
     setMode(next);
-    (next === "find" ? findTab : askTab).focus();
+    tabs[next].focus();
   });
   box.addEventListener("input", function () {
     if (mode === "find") renderFind();
@@ -868,6 +1040,7 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (mode === "find") renderFind();
+    else if (mode === "dict") sendDict(box.value);
     else sendMessage(box.value);
   });
   document.addEventListener("keydown", function (e) {

@@ -73,6 +73,7 @@ test("source has no key and no canned soft-sample replies", () => {
     readFileSync(new URL("../src/index.js", import.meta.url), "utf8"),
     readFileSync(new URL("../src/askPrompt.js", import.meta.url), "utf8"),
     readFileSync(new URL("../src/speakNovel.js", import.meta.url), "utf8"),
+    readFileSync(new URL("../src/dict.js", import.meta.url), "utf8"),
   ].join("\n");
   assert.equal(src.includes("PLACEHOLDER_SYSTEM_PROMPT"), false);
   assert.equal(src.includes(KEY), false);
@@ -229,7 +230,6 @@ test("Ask user message follows Tess’s template", () => {
     message,
     [
       "Page context: /learning-materials/useful-vocabulary/",
-      "Turn: 1 / 5",
       "Find hits (optional): Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
       "Cohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
       "Student: 讀者來函在哪",
@@ -237,11 +237,12 @@ test("Ask user message follows Tess’s template", () => {
     ].join("\n")
   );
   assert.match(ASK_SYSTEM_PROMPT, /繁體中文/);
-  assert.match(ASK_SYSTEM_PROMPT, /After the \*\*5th\*\* assistant reply in this open, end with: 這次 Ask 已達 5 輪。請改用上方 Find 找頁面，或到樣本下的 Explain 查看該項目。/);
+  assert.equal(ASK_SYSTEM_PROMPT.includes("5th"), false);
+  assert.equal(ASK_SYSTEM_PROMPT.includes("已達 5 輪"), false);
   assert.equal(ASK_SYSTEM_PROMPT.includes("已達 3 輪"), false);
   assert.equal(ASK_SYSTEM_PROMPT.includes("3rd"), false);
   assert.match(ASK_TASK, /用2至4句/);
-  assert.match(ASK_TASK, /若 Turn 已是 5，結尾加上五輪提示。/);
+  assert.equal(ASK_TASK.includes("五輪"), false);
   assert.match(SYSTEM_PROMPT, /繁體中文/);
   assert.match(SYSTEM_PROMPT, /書面語/);
   assert.equal(SYSTEM_PROMPT.includes("British English"), false);
@@ -273,30 +274,30 @@ test("Ask is a page mode on the same worker and does not replace Explain", async
     assert.equal(calls, 0);
 
     const sixth = await handleRequest(post({ page: "Ask", turn: 6, message: "hello" }, "203.0.113.61"), { DEEPSEEK_API_KEY: KEY });
-    assert.equal(sixth.status, 400);
-    assert.equal((await sixth.json()).error, "Ask allows 5 turns in this open.");
-    assert.equal(calls, 0);
-
-    const fifth = await handleRequest(post({ page: "Ask", turn: 5, message: "第五輪" }, "203.0.113.66"), { DEEPSEEK_API_KEY: KEY });
-    assert.equal(fifth.status, 200);
-    assert.equal(typeof (await fifth.json()).reply, "string");
+    assert.equal(sixth.status, 200);
+    assert.equal(typeof (await sixth.json()).reply, "string");
     assert.equal(calls, 1);
-    assert.match(JSON.parse(lastInit.init.body).messages[1].content, /Turn: 5 \/ 5\n/);
+    assert.equal(JSON.parse(lastInit.init.body).messages[1].content.includes("Turn:"), false);
+
+    const later = await handleRequest(post({ page: "Ask", message: "still open" }, "203.0.113.66"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(later.status, 200);
+    assert.equal(calls, 2);
+    assert.match(JSON.parse(lastInit.init.body).messages[1].content, /^Page context: site\nFind hits/);
 
     const fifthText = await handleRequest(post({ page: "Ask", turn: "5", message: "第五輪文字" }, "203.0.113.67"), { DEEPSEEK_API_KEY: KEY });
     assert.equal(fifthText.status, 200);
-    assert.equal(calls, 2);
+    assert.equal(calls, 3);
 
     const ok = await handleRequest(post(askBody, "203.0.113.62"), { DEEPSEEK_API_KEY: KEY });
     const okJson = await ok.json();
     assert.equal(ok.status, 200);
     assert.equal(typeof okJson.reply, "string");
     assert.equal(okJson.explanation, undefined);
-    assert.equal(calls, 3);
+    assert.equal(calls, 4);
     const sent = JSON.parse(lastInit.init.body);
     assert.equal(sent.messages[0].content, ASK_SYSTEM_PROMPT);
     assert.equal(sent.max_tokens, 360);
-    assert.match(sent.messages[1].content, /^Page context: site\nTurn: 1 \/ 5\n/);
+    assert.match(sent.messages[1].content, /^Page context: site\nFind hits \(optional\): \n/);
     assert.equal(sent.messages[0].content === SYSTEM_PROMPT, false);
 
     const explain = await handleRequest(post(cohesionBody, "203.0.113.63"), { DEEPSEEK_API_KEY: KEY });

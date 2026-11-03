@@ -1,6 +1,6 @@
 # DeepSeek Explain worker
 
-Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, and SpeakNovel call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those three modes share that binding. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
+Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), a free dictionary lookup (`mode: "dict"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, and SpeakNovel call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those three modes share that binding. Dict calls the Free Dictionary API and does not use that key. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
 
 Live site origins: `https://skhhcss-eng.github.io` and `https://learning.hcs.edu.hk` (the school LMS; pages live under `/english/`, which is not part of the Origin header).  
 This repo has no GitHub Pages preview origin. The org site is served from `main` on `skhhcss-eng.github.io` only.  
@@ -79,13 +79,12 @@ Same URL, same secret, same origin allowlist (`https://skhhcss-eng.github.io`, `
 {
   "page": "Ask",
   "pagePath": "/learning-materials/useful-vocabulary/",
-  "turn": 1,
   "findHits": "Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
   "message": "讀者來函在哪"
 }
 ```
 
-`turn` is 1, 2, 3, 4, or 5 for this open. `message` is required. `pagePath` defaults to `site`. `findHits` is optional, up to three `title — path` lines. The Ask system prompt is Tess’s 2026-10-29 text (Traditional Chinese 書面語), with the turn-limit line at 5. Soft sample replies are not stored here.
+`message` is required. `pagePath` defaults to `site`. `findHits` is optional, up to three `title — path` lines. `turn` may be sent by an older page and is ignored. There is no 5-turn close and no per-IP cap on Ask. The Ask system prompt is Tess’s 2026-10-29 text (Traditional Chinese 書面語) without the old turn-limit line. Soft sample replies are not stored here.
 
 Success:
 
@@ -93,7 +92,47 @@ Success:
 { "reply": "…" }
 ```
 
-Turns 1–5 are accepted. A 6th turn is rejected with 400 before any API call. The browser script also stops at 5 replies per open. There is no daily cap. Ask shares the Explain rate limit (30 requests per minute per IP). SpeakNovel does not draw on that allowance.
+Find stays in the browser. Ask and Dict do not draw on the Explain allowance. SpeakNovel and TTS keep their own limits.
+
+## Dict
+
+Same URL and the same origin allowlist. `mode` must be `dict`. This does not call DeepSeek. There is no student lookup cap and no per-IP cap. No API key. The sheet does not show a usage counter.
+
+```json
+{ "mode": "dict", "word": "however" }
+```
+
+`word` is one word or a short phrase (up to three words, letters, apostrophes, and hyphens, at most 40 characters). The Worker looks up `https://api.dictionaryapi.dev/api/v2/entries/en/{word}`.
+
+The reply is a short British English teacher line: headword and part of speech, one or two short senses, and one simple example when the API has one. IPA, audio, and synonym lists are left out. There is no Chinese gloss in this reply.
+
+Success (`200`):
+
+```json
+{
+  "reply": "however — adverb\nNevertheless; yet, still; in spite of (that).\n\nhowever — conjunction\nIn whatever way or manner.\n\nExample: I did it anyway, however.",
+  "word": "however",
+  "senses": [
+    { "pos": "adverb", "definition": "Nevertheless; yet, still; in spite of (that)." },
+    { "pos": "conjunction", "definition": "In whatever way or manner." }
+  ],
+  "example": "I did it anyway, however."
+}
+```
+
+A missing word is `404` with `{ "error": "Try another spelling?" }`. An empty word is `400` (`Type a word.`). A word that is too long or not a short phrase is `400` (`Type one word or a short phrase.`). If the dictionary host is down, the error is `502` (`The dictionary is unavailable just now.`).
+
+Smoke (does not deploy). Run this after Nest deploys, or run `scripts/smoke-dict.sh`:
+
+```bash
+curl -sS -D - \
+  -X POST "https://deepseek-explain.skhhcss-eng.workers.dev" \
+  -H "Origin: https://skhhcss-eng.github.io" \
+  -H "Content-Type: application/json" \
+  --data '{"mode":"dict","word":"however"}'
+```
+
+Expect `200` and one or two `senses`. Do not run `wrangler deploy` from this change; Nest deploys after a soft green.
 
 Ask, Explain, and SpeakNovel use one allowlist in `src/index.js` (`LIVE_ORIGINS`): `https://skhhcss-eng.github.io`, `https://learning.hcs.edu.hk`, and loopback. Paths are not part of Origin, so `https://skhhcss-eng.github.io` already covers `/say-it-louder/`. There is no Pages preview origin in this repo. `wrangler.toml` does not list origins.
 
@@ -153,7 +192,7 @@ npx wrangler secret put AZURE_SPEECH_REGION
 
 ## TTS
 
-Same URL and the same origin allowlist. `mode` must be `tts`. This does not call DeepSeek and does not draw on the Ask, Explain, or SpeakNovel rate limits. The voice limit is 30 requests per minute per IP. A 429 includes `Retry-After: 60`.
+Same URL and the same origin allowlist. `mode` must be `tts`. This does not call DeepSeek and does not draw on the Explain or SpeakNovel rate limits. Ask and Dict are not rate limited. The voice limit is 30 requests per minute per IP. A 429 includes `Retry-After: 60`.
 
 ```json
 {
@@ -170,6 +209,6 @@ Same URL and the same origin allowlist. `mode` must be `tts`. This does not call
 
 Success is `audio/mpeg`, not JSON. `X-TTS-Engine` is `azure-neural` when Azure accepts the SSML, or `cloud-en-gb-free` for the fallback (en-HK voices use that same en-GB stream). The body stays under the 4 KB Ask/Explain cap.
 
-Errors are JSON `{ "error": "…" }` with 400, 403, 405, 413, 415, 429, 502, or 503.
+Errors are JSON `{ "error": "…" }` with 400, 403, 404, 405, 413, 415, 429, 502, or 503.
 
-Ask and Explain: 30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`. SpeakNovel: 20 requests per minute per IP, counted separately. TTS: 30 requests per minute per IP, counted separately.
+Explain: 30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`. Ask and Dict are not counted. SpeakNovel: 20 requests per minute per IP, counted separately. TTS: 30 requests per minute per IP, counted separately.
