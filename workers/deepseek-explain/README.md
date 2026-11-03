@@ -1,6 +1,6 @@
 # DeepSeek Explain worker
 
-Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), and Say It Louder SpeakNovel (`mode: "speaknovel"`). The browser calls this Worker. The Worker calls DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Explain, Ask, and SpeakNovel share that binding. There is no second key.
+Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, and SpeakNovel call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those three modes share that binding. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
 
 Live site origins: `https://skhhcss-eng.github.io` and `https://learning.hcs.edu.hk` (the school LMS; pages live under `/english/`, which is not part of the Origin header).  
 This repo has no GitHub Pages preview origin. The org site is served from `main` on `skhhcss-eng.github.io` only.  
@@ -142,8 +142,34 @@ Success:
 
 SpeakNovel has its own limit of 20 requests per minute per IP, so a game session cannot use up the Ask and Explain allowance. A 429 includes `Retry-After: 60`.
 
-Deploy is unchanged: `npx wrangler secret put DEEPSEEK_API_KEY` if the secret is not already set, then `npx wrangler deploy`. No second secret.
+Deploy is unchanged for Ask, Explain, and SpeakNovel: `npx wrangler secret put DEEPSEEK_API_KEY` if the secret is not already set, then `npx wrangler deploy`. Do not commit keys. Optional voice secrets, only if Azure neural TTS should run:
+
+```bash
+npx wrangler secret put AZURE_SPEECH_KEY
+npx wrangler secret put AZURE_SPEECH_REGION
+```
+
+`AZURE_SPEECH_REGION` defaults to `eastasia` when the key is set and the region secret is empty. Omit both secrets and `mode: "tts"` still returns audio from the zero-key en-GB fallback.
+
+## TTS
+
+Same URL and the same origin allowlist. `mode` must be `tts`. This does not call DeepSeek and does not draw on the Ask, Explain, or SpeakNovel rate limits. The voice limit is 30 requests per minute per IP. A 429 includes `Retry-After: 60`.
+
+```json
+{
+  "mode": "tts",
+  "text": "Allow me to remake your drink right away.",
+  "voice": "en-GB-RyanNeural",
+  "style": "general",
+  "rate": "0%",
+  "pitch": "0%"
+}
+```
+
+`text` is required and at most 500 characters. `voice` is one of `en-GB-RyanNeural`, `en-GB-SoniaNeural`, `en-GB-LibbyNeural`, `en-GB-ThomasNeural`, `en-HK-YanNeural`, `en-HK-SamNeural` (anything else uses Ryan). `style` is `general`, `cheerful`, `sad`, `angry`, `friendly`, `excited`, or `customerservice`. `rate` and `pitch` are optional signed percentages of one or two digits, such as `+10%` or `-5%`.
+
+Success is `audio/mpeg`, not JSON. `X-TTS-Engine` is `azure-neural` when Azure accepts the SSML, or `cloud-en-gb-free` for the fallback (en-HK voices use that same en-GB stream). The body stays under the 4 KB Ask/Explain cap.
 
 Errors are JSON `{ "error": "…" }` with 400, 403, 405, 413, 415, 429, 502, or 503.
 
-Ask and Explain: 30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`. SpeakNovel: 20 requests per minute per IP, counted separately.
+Ask and Explain: 30 requests per minute per IP (`CF-Connecting-IP`) on each isolate. A 429 includes `Retry-After: 60`. SpeakNovel: 20 requests per minute per IP, counted separately. TTS: 30 requests per minute per IP, counted separately.

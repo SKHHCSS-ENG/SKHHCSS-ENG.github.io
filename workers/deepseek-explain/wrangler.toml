@@ -1,6 +1,9 @@
 # DeepSeek Explain — workers.dev deploy.
 # The API key is a Worker secret, not a var:
 #   npx wrangler secret put DEEPSEEK_API_KEY
+# Optional. mode "tts" uses Azure when both are set, otherwise the zero-key en-GB MP3 fallback.
+#   npx wrangler secret put AZURE_SPEECH_KEY
+#   npx wrangler secret put AZURE_SPEECH_REGION
 name = "deepseek-explain"
 main = "src/index.js"
 compatibility_date = "2026-10-29"
