@@ -7,6 +7,7 @@ Public GitHub Pages site for the English panel.
 - **Classroom:** https://skhhcss-eng.github.io/classroom/
 - **What's New:** https://skhhcss-eng.github.io/whats-new/
 - **HCS Live Class:** https://skhhcss-eng.github.io/classroom/hcs-live-class/
+- **HCS Live Class +:** https://skhhcss-eng.github.io/classroom/hcs-live-class-plus/
 - **Speech Festival:** https://skhhcss-eng.github.io/speech-festival/ (project site; the Eng folder remains until that host is live)
 - **Paper 1 - Exam Practice:** https://skhhcss-eng.github.io/paper-1-exam-practice/ (project site; the Eng folder remains until that host is live)
 - **Paper 2 - Exam Skills:** https://skhhcss-eng.github.io/learning-materials/paper-2-exam-skills/
@@ -18,6 +19,7 @@ Public GitHub Pages site for the English panel.
 | `/` | English Department home (Learning Materials · Classroom · What's New) |
 | `/learning-materials/` | Student practice hub (DSE papers, junior grammar, useful vocabulary). Speech Festival and Paper 1 - Exam Practice open on their own project sites. |
 | `/classroom/` | Teacher tools hub |
+| `/classroom/hcs-live-class-plus/` | HCS Live Class + (same Live Class tools, plus a classroom assistant). Seating storage and saved plan names stay separate from Live Class. |
 | `/classroom/hcs-live-class/` | HCS Live Class (live scoreboard / desks / points). `/classroom/class-activity-studio/` redirects here. |
 | `/whats-new/` | Site updates (newest first) |
 | `/speech-festival/` | Speech Festival source copy (hub card opens the project site). `redirect.html` beside each page points at that host. |

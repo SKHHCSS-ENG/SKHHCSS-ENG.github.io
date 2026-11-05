@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="HCS Live Class">
+  <!-- Bright mark only; solid #123a4d rounded ground (~18% rx) -->
+  <defs>
+    <linearGradient id="meshBright" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="23" ry="23" fill="#123a4d"/>
+  <g transform="translate(17,23)">
+    <rect x="0" y="0" width="96" height="22" rx="11" fill="url(#meshBright)"/>
+    <circle cx="12" cy="40" r="10" fill="#22d3ee"/>
+    <circle cx="48" cy="40" r="10" fill="#facc15"/>
+    <circle cx="84" cy="40" r="10" fill="#fb7185"/>
+    <circle cx="12" cy="72" r="10" fill="#22d3ee"/>
+    <circle cx="48" cy="72" r="10" fill="#facc15"/>
+  </g>
+</svg>

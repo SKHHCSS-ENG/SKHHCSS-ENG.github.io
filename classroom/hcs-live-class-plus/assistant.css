@@ -1,0 +1,250 @@
+/* HCS Live Class + assistant. Muse ball recipe (cream mesh home button).
+   Scoped to this page. The idle ball and the open unit (ball + strip +
+   reply) are both kept off desk name chips and the floor zoom bar. */
+
+.plus-float {
+  --mesh-cream: #f4f0e8;
+  --mesh-cream-deep: #e8e0d2;
+  --mesh-cream-mid: #efe8dc;
+  --highlight: rgba(255, 255, 255, 0.85);
+  --rim-dark: rgba(120, 100, 70, 0.35);
+  --shadow-soft: rgba(60, 45, 25, 0.28);
+  --shadow-tight: rgba(60, 45, 25, 0.18);
+  --ink: #3a3428;
+  --ink-muted: #7a7060;
+  --ball-size: 56px;
+  --strip-max: 260px;
+  position: fixed;
+  z-index: 46;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  margin: 0;
+  pointer-events: none;
+}
+
+.plus-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.plus-float .home-ball,
+.plus-float .command-strip,
+.plus-float .plus-reply,
+.plus-float .plus-confirm {
+  pointer-events: auto;
+}
+
+/* display:flex on the strip must not override the hidden attribute. */
+.plus-float .command-strip[hidden],
+.plus-float .plus-reply[hidden],
+.plus-float .plus-confirm[hidden] {
+  display: none !important;
+}
+
+.plus-float .home-ball {
+  width: var(--ball-size);
+  height: var(--ball-size);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  flex: 0 0 auto;
+  padding: 0;
+  background:
+    repeating-linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0.07) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      35deg,
+      rgba(140, 120, 80, 0.05) 0 1px,
+      transparent 1px 4px
+    ),
+    radial-gradient(
+      circle at 32% 28%,
+      var(--highlight) 0%,
+      rgba(255, 255, 255, 0.35) 18%,
+      var(--mesh-cream) 42%,
+      var(--mesh-cream-mid) 68%,
+      var(--mesh-cream-deep) 100%
+    );
+  box-shadow:
+    0 6px 14px var(--shadow-soft),
+    0 2px 4px var(--shadow-tight),
+    inset 0 -3px 6px var(--rim-dark),
+    inset 0 3px 5px rgba(255, 255, 255, 0.65),
+    inset 0 0 0 1px rgba(160, 140, 100, 0.22);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.plus-float .home-ball::before {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 16%;
+  width: 38%;
+  height: 28%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  pointer-events: none;
+}
+
+.plus-float .home-ball:active,
+.plus-float .home-ball.is-pressed {
+  transform: scale(0.92) translateY(1px);
+  box-shadow:
+    0 2px 6px var(--shadow-tight),
+    0 1px 2px rgba(60, 45, 25, 0.2),
+    inset 0 3px 8px rgba(90, 70, 40, 0.35),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.35),
+    inset 0 0 0 1px rgba(140, 120, 80, 0.28);
+}
+
+.plus-float.is-dragging .home-ball:active,
+.plus-float.is-dragging .home-ball.is-pressed {
+  transform: none;
+}
+
+.plus-float .home-ball:focus {
+  outline: none;
+}
+
+.plus-float .home-ball:focus-visible {
+  outline: 2px solid #8a7a55;
+  outline-offset: 3px;
+}
+
+.plus-float .command-strip,
+.plus-float .plus-reply,
+.plus-float .plus-confirm {
+  width: min(var(--strip-max), 72vw);
+  background:
+    repeating-linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0.06) 0 1px,
+      transparent 1px 3px
+    ),
+    var(--mesh-cream);
+  border: 1px solid rgba(160, 140, 100, 0.28);
+  border-radius: 14px;
+  box-shadow:
+    0 8px 20px rgba(60, 45, 25, 0.16),
+    0 2px 4px rgba(60, 45, 25, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+}
+
+.plus-float .command-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  touch-action: auto;
+}
+
+.plus-float .command-strip input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--ink);
+  outline: none;
+  min-width: 0;
+  padding: 0;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: auto;
+}
+
+.plus-float .command-strip input::placeholder {
+  color: var(--ink-muted);
+}
+
+.plus-float .command-strip .go {
+  flex-shrink: 0;
+  border: none;
+  background: rgba(90, 75, 50, 0.12);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 0.28rem 0.55rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.plus-float .command-strip .go:active {
+  background: rgba(90, 75, 50, 0.22);
+}
+
+.plus-float .plus-reply,
+.plus-float .plus-confirm {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  text-align: left;
+}
+
+/* Full Ask and Gloss text. JS sets max-height only when the bubble
+   would be taller than the clear space; then the rest scrolls inside. */
+.plus-float .plus-reply {
+  box-sizing: border-box;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  white-space: pre-wrap;
+  touch-action: pan-y;
+}
+
+.plus-float .plus-confirm {
+  cursor: pointer;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plus-float .plus-confirm:active {
+  background-color: #e8e0d2;
+}
+
+.plus-float .plus-confirm:focus-visible,
+.plus-float .command-strip .go:focus-visible,
+.plus-float .command-strip input:focus-visible {
+  outline: 2px solid #8a7a55;
+  outline-offset: 2px;
+}
+
+.desk-card.plus-selected {
+  outline: 2px solid #8a7a55;
+  outline-offset: 2px;
+}
