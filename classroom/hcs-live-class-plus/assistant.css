@@ -212,10 +212,16 @@
   text-align: left;
 }
 
+/* Full Ask and Gloss text. JS sets max-height only when the bubble
+   would be taller than the clear space; then the rest scrolls inside. */
 .plus-float .plus-reply {
-  max-height: calc(1.35em * 5);
-  overflow: hidden;
+  box-sizing: border-box;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   white-space: pre-wrap;
+  touch-action: pan-y;
 }
 
 .plus-float .plus-confirm {

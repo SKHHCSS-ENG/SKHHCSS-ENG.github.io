@@ -66,6 +66,12 @@ test('hub card sits above HCS Live Class', function () {
 test('Muse ball is an unmarked 56px cream home button', function () {
   assert.match(css, /--ball-size:\s*56px/);
   assert.match(css, /\.command-strip\[hidden\][\s\S]*display:\s*none/);
+  assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*max-height:\s*calc\(1\.35em \* 5\)/);
+  assert.match(css, /\.plus-reply\s*\{[^}]*overflow-y:\s*auto/);
+  assert.equal(
+    plus.plainActionNames('Ready to tidy the desks — please confirm to run tidy_snap.'),
+    'Ready to tidy the desks.'
+  );
   assert.match(css, /#f4f0e8/);
   assert.match(css, /circle at 32% 28%/);
   assert.match(css, /scale\(0\.92\)/);

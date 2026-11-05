@@ -100,8 +100,20 @@
       else top = Math.min(maxT, Math.max(bounds.top, top));
       return { left: left, top: top, right: left + width, bottom: top + height };
     }
-    var cur = clamp(box.left, box.top);
-    var guard = 16;
+    function area(candidate) {
+      var sum = 0;
+      for (var i = 0; i < obstacles.length; i++) {
+        var o = obstacles[i];
+        if (!overlaps(candidate, o, gap)) continue;
+        sum += Math.max(0, Math.min(candidate.right, o.right) - Math.max(candidate.left, o.left)) *
+          Math.max(0, Math.min(candidate.bottom, o.bottom) - Math.max(candidate.top, o.top));
+      }
+      return sum;
+    }
+    var origin = clamp(box.left, box.top);
+    if (area(origin) === 0) return origin;
+    var cur = origin;
+    var guard = 8;
     while (guard--) {
       var hit = hits(cur, obstacles, gap);
       if (!hit) return cur;
@@ -110,37 +122,45 @@
       var left = clamp(hit.left - gap - width, cur.top);
       var right = clamp(hit.right + gap, cur.top);
       var options = [above, left, right, below];
-      var bias = [0.65, 1, 1.15, 1.5];
       var best = null;
-      var bestCost = Infinity;
+      var bestArea = area(cur);
       for (var i = 0; i < options.length; i++) {
         var opt = options[i];
-        if (overlaps(opt, hit, gap)) continue;
-        var cost = (Math.abs(opt.left - cur.left) + Math.abs(opt.top - cur.top) + 0.01) * bias[i];
-        if (cost < bestCost) {
-          bestCost = cost;
+        var nextArea = area(opt);
+        if (nextArea < bestArea) {
           best = opt;
+          bestArea = nextArea;
         }
       }
-      if (!best || (best.left === cur.left && best.top === cur.top)) break;
+      if (!best) break;
       cur = best;
     }
-    if (!hits(cur, obstacles, gap)) return cur;
-    var startLeft = cur.left;
-    var startTop = cur.top;
-    var x = startLeft;
-    var y = startTop;
-    for (var n = 0; n < 120; n++) {
-      var trial = clamp(x, y);
-      if (!hits(trial, obstacles, gap)) return trial;
-      y -= 12;
-      if (y < bounds.top) {
-        y = startTop;
-        x -= 16;
-        if (x < bounds.left) break;
+    if (area(cur) === 0) return cur;
+    var nearest = cur;
+    var nearestArea = area(cur);
+    var nearestDist = Math.abs(cur.left - origin.left) + Math.abs(cur.top - origin.top);
+    for (var radius = 1; radius <= 48; radius++) {
+      for (var row = 0; row <= radius; row++) {
+        var col = radius - row;
+        var tops = [origin.top - row * 12];
+        if (row) tops.push(origin.top + row * 12);
+        var lefts = [origin.left - col * 16];
+        for (var t = 0; t < tops.length; t++) {
+          for (var l = 0; l < lefts.length; l++) {
+            var trial = clamp(lefts[l], tops[t]);
+            var trialArea = area(trial);
+            var dist = Math.abs(trial.left - origin.left) + Math.abs(trial.top - origin.top);
+            if (trialArea === 0) return trial;
+            if (trialArea < nearestArea || (trialArea === nearestArea && dist < nearestDist)) {
+              nearest = trial;
+              nearestArea = trialArea;
+              nearestDist = dist;
+            }
+          }
+        }
       }
     }
-    return cur;
+    return nearest;
   }
 
   function presentReply(data) {
@@ -150,9 +170,19 @@
       var lines = [];
       if (data.gloss_zh) lines.push(String(data.gloss_zh).trim());
       if (data.gloss_en) lines.push(String(data.gloss_en).trim());
-      if (lines.length) return lines.join('\n');
+      if (lines.length) return plainActionNames(lines.join('\n'));
     }
-    return data.reply ? String(data.reply).trim() : '';
+    return data.reply ? plainActionNames(String(data.reply).trim()) : '';
+  }
+
+  // The Worker sometimes names tidy_snap in a sentence. The chip already
+  // says "Tidy desks — go?". Shown replies use the plain words.
+  function plainActionNames(text) {
+    var out = String(text || '');
+    out = out.replace(/\s*[—–-]\s*please confirm to run tidy_snap\b/gi, '');
+    out = out.replace(/\bto run tidy_snap\b/gi, 'to tidy the desks');
+    out = out.replace(/\btidy_snap\b/g, 'tidy the desks');
+    return out.replace(/[ \t]{2,}/g, ' ').trim();
   }
 
   function readPayload(data) {
@@ -182,6 +212,7 @@
     workerUrlFor: workerUrlFor,
     resolveRect: resolveRect,
     presentReply: presentReply,
+    plainActionNames: plainActionNames,
     readPayload: readPayload
   };
   }
@@ -306,7 +337,7 @@
       if (zoom) {
         var z = zoom.getBoundingClientRect();
         if (z.width > 2 && z.height > 2) {
-          list.push({ left: z.left, top: z.top, right: z.right, bottom: z.bottom });
+          list.push({ left: z.left, top: z.top, right: z.right, bottom: z.bottom, floor: true });
         }
       }
       return list;
@@ -320,12 +351,132 @@
       return { left: left, top: top, right: left + w, bottom: top + h };
     }
 
+    function replyLimit() {
+      var box = bounds();
+      var room = box.bottom - box.top;
+      var reserve = 56 + 28;
+      if (!command.hidden) reserve += command.offsetHeight + 10;
+      if (!confirmBtn.hidden) reserve += confirmBtn.offsetHeight + 10;
+      var limit = room - reserve;
+      if (limit < 120) limit = 120;
+      return limit;
+    }
+
+    function boxHits(box, list, gap) {
+      for (var i = 0; i < list.length; i++) {
+        var o = list[i];
+        if (box.left < o.right + gap && box.right > o.left - gap &&
+            box.top < o.bottom + gap && box.bottom > o.top - gap) return true;
+      }
+      return false;
+    }
+
+    function fitReply() {
+      if (reply.hidden) {
+        reply.style.maxHeight = '';
+        return;
+      }
+      reply.style.maxHeight = 'none';
+      var limit = replyLimit();
+      if (reply.scrollHeight > limit + 1) reply.style.maxHeight = Math.round(limit) + 'px';
+    }
+
+    function relaxWidth() {
+      command.style.width = '';
+      reply.style.width = '';
+      confirmBtn.style.width = '';
+    }
+
+    function nameRightEdge(obs) {
+      var edge = 0;
+      for (var i = 0; i < obs.length; i++) {
+        if (obs[i].floor) continue;
+        if (obs[i].right > edge) edge = obs[i].right;
+      }
+      return edge;
+    }
+
+    // A long answer stays fully readable. The unit stays on its anchor, then
+    // lifts above any desk name or the floor zoom bar. If the header stops
+    // the lift, the bubble scrolls instead of covering those chips.
     function place() {
-      var resolved = api.resolveRect(boxFromAnchor(), obstacles(), bounds(), api.GAP);
-      unit.style.left = Math.round(resolved.left) + 'px';
-      unit.style.top = Math.round(resolved.top) + 'px';
+      relaxWidth();
+      fitReply();
+      var obs = obstacles();
+      var limitBox = bounds();
+      var room = limitBox.right - nameRightEdge(obs) - api.GAP - 6;
+      if (anchor.right < 80 && room >= 160 && room < 260) {
+        var w = Math.round(room) + 'px';
+        command.style.width = w;
+        reply.style.width = w;
+        confirmBtn.style.width = w;
+        fitReply();
+      }
+      var width = unit.offsetWidth || 56;
+      var height = unit.offsetHeight || 56;
+      var left = root.innerWidth - anchor.right - width;
+      var top = root.innerHeight - anchor.bottom - height;
+      if (left < limitBox.left) left = limitBox.left;
+      if (left + width > limitBox.right) left = Math.max(limitBox.left, limitBox.right - width);
+      if (top < limitBox.top) top = limitBox.top;
+      unit.style.left = Math.round(left) + 'px';
+      unit.style.top = Math.round(top) + 'px';
       unit.style.right = 'auto';
       unit.style.bottom = 'auto';
+      liftClear();
+    }
+
+    function liftClear() {
+      var guard = 24;
+      while (guard--) {
+        var box = unit.getBoundingClientRect();
+        var obs = obstacles();
+        var hit = null;
+        var beside = 0;
+        var best = 0;
+        for (var i = 0; i < obs.length; i++) {
+          var o = obs[i];
+          if (!boxHits(box, [o], api.GAP)) continue;
+          var hOverlap = Math.min(box.right, o.right) - Math.max(box.left, o.left);
+          var vOverlap = Math.min(box.bottom, o.bottom) - Math.max(box.top, o.top);
+          if (hOverlap <= 0 && vOverlap > 0 && !o.floor) {
+            beside = Math.max(beside, api.GAP - (box.left - o.right));
+            continue;
+          }
+          var area = Math.max(0, hOverlap) * Math.max(0, vOverlap);
+          if (!hit || area > best) {
+            hit = o;
+            best = area;
+          }
+        }
+        if (beside > 0) {
+          var narrower = Math.round((reply.clientWidth || command.clientWidth || 200) - beside - 4);
+          if (narrower >= 150) {
+            var wpx = narrower + 'px';
+            command.style.width = wpx;
+            reply.style.width = wpx;
+            confirmBtn.style.width = wpx;
+            var edge = bounds().right;
+            unit.style.left = Math.round(edge - unit.offsetWidth) + 'px';
+            continue;
+          }
+        }
+        if (!hit) return;
+        var limitBox = bounds();
+        var lift = box.bottom - (hit.top - api.GAP);
+        var top = parseFloat(unit.style.top) || 0;
+        if (top - lift >= limitBox.top - 1) {
+          unit.style.top = Math.round(top - lift) + 'px';
+          continue;
+        }
+        if (reply.hidden || reply.clientHeight <= 88) return;
+        var bottom = box.bottom;
+        var nextMax = reply.clientHeight - (limitBox.top - (top - lift)) - 8;
+        if (nextMax < 88) nextMax = 88;
+        if (Math.abs(nextMax - reply.clientHeight) < 2) return;
+        reply.style.maxHeight = Math.round(nextMax) + 'px';
+        unit.style.top = Math.round(bottom - unit.offsetHeight) + 'px';
+      }
     }
 
     function schedulePlace() {
@@ -412,7 +563,7 @@
         }
         var preview = board.preview(payload.action, payload.slots);
         if (!preview || preview.ok === false) {
-          showReply((preview && preview.message) || payload.reply || 'Which student?');
+          showReply((preview && preview.message) || api.plainActionNames(payload.reply) || 'Which student?');
           return;
         }
         showConfirm(preview.label, payload.action, preview.slots || payload.slots);
