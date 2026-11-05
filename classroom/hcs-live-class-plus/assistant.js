@@ -16,7 +16,6 @@
   var DEFAULT_WORKER_URL = 'https://live-class-plus.skhhcss-eng.workers.dev';
   var POS_KEY = 'hcsLiveClassPlus_ball_v1';
   var GAP = 10;
-  var TAP_PX = 8;
   var ACTIONS = {
     hide_names: 'Hide names — go?',
     show_names: 'Show names — go?',
@@ -229,6 +228,10 @@
     var pending = null;
     var drag = null;
     var swallowUntil = 0;
+    // Same 8px radius as the floor pan and the zoom chip. A finger that
+    // jitters a few pixels on both axes is still a tap. This has to live
+    // in boot: pointermove reads it, and factory locals are not in scope.
+    var TAP_PX = 8;
     var placeFrame = 0;
     var inflight = null;
     var seq = 0;
@@ -405,7 +408,9 @@
       unit.style.top = Math.round(top) + 'px';
       unit.style.right = 'auto';
       unit.style.bottom = 'auto';
-      liftClear();
+      // Follow the finger while it is down. Clear chips and the zoom bar
+      // when the gesture ends, so a desk under the path does not pin the ball.
+      if (!(drag && drag.moved)) liftClear();
     }
 
     var REPLY_MIN = 120;
@@ -606,7 +611,41 @@
       runPending();
     });
 
-    ball.addEventListener('pointerdown', function (e) {
+    function onBallPointerMove(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x;
+      var dy = e.clientY - drag.y;
+      if (!drag.moved && (dx * dx + dy * dy) < TAP_PX * TAP_PX) return;
+      if (!drag.moved) {
+        drag.moved = true;
+        unit.classList.add('is-dragging');
+        try { ball.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+      if (e.cancelable) e.preventDefault();
+      anchor.right = drag.right - dx;
+      anchor.bottom = drag.bottom - dy;
+      place();
+    }
+    function endDrag(e) {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      document.removeEventListener('pointermove', onBallPointerMove, { capture: true });
+      document.removeEventListener('pointerup', endDrag, true);
+      document.removeEventListener('pointercancel', endDrag, true);
+      var moved = drag.moved;
+      drag = null;
+      ball.classList.remove('is-pressed');
+      unit.classList.remove('is-dragging');
+      try { if (e) ball.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (moved) {
+        var resolved = api.resolveRect(boxFromAnchor(), obstacles(), bounds(), api.GAP);
+        anchor.right = root.innerWidth - resolved.right;
+        anchor.bottom = root.innerHeight - resolved.bottom;
+        place();
+        saveAnchor();
+        swallowUntil = Date.now() + 400;
+      }
+    }
+    function armBallPointer(e) {
       if (e.button != null && e.button !== 0) return;
       drag = {
         id: e.pointerId,
@@ -617,45 +656,32 @@
         moved: false
       };
       ball.classList.add('is-pressed');
-      try { ball.setPointerCapture(e.pointerId); } catch (err) {}
-    });
-    ball.addEventListener('pointermove', function (e) {
-      if (!drag || e.pointerId !== drag.id) return;
-      var dx = e.clientX - drag.x;
-      var dy = e.clientY - drag.y;
-      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < TAP_PX) return;
-      drag.moved = true;
-      unit.classList.add('is-dragging');
-      anchor.right = drag.right - dx;
-      anchor.bottom = drag.bottom - dy;
-      place();
-    });
-    function endDrag(e) {
-      if (!drag || (e && e.pointerId !== drag.id)) return;
-      var moved = drag.moved;
-      drag = null;
-      ball.classList.remove('is-pressed');
-      unit.classList.remove('is-dragging');
-      if (moved) {
-        var resolved = api.resolveRect(boxFromAnchor(), obstacles(), bounds(), api.GAP);
-        var w = unit.offsetWidth || 56;
-        var h = unit.offsetHeight || 56;
-        anchor.right = root.innerWidth - resolved.right;
-        anchor.bottom = root.innerHeight - resolved.bottom;
-        place();
-        saveAnchor();
-        swallowUntil = Date.now() + 400;
-      }
+      document.addEventListener('pointermove', onBallPointerMove, { capture: true, passive: false });
+      document.addEventListener('pointerup', endDrag, true);
+      document.addEventListener('pointercancel', endDrag, true);
     }
+    ball.addEventListener('pointerdown', armBallPointer);
+    ball.addEventListener('pointermove', onBallPointerMove);
     ball.addEventListener('pointerup', endDrag);
     ball.addEventListener('pointercancel', endDrag);
+    ball.addEventListener('touchmove', function (e) {
+      if (!drag || !e.cancelable) return;
+      e.preventDefault();
+    }, { passive: false });
     ball.addEventListener('click', function (e) {
       if (Date.now() < swallowUntil) {
         e.preventDefault();
+        e.stopPropagation();
         return;
       }
       setOpen(!openState);
     });
+    document.addEventListener('click', function (e) {
+      if (Date.now() >= swallowUntil) return;
+      swallowUntil = 0;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
 
     document.addEventListener('pointerdown', function (e) {
       if (!openState) return;
