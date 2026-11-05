@@ -387,31 +387,13 @@
       confirmBtn.style.width = '';
     }
 
-    function nameRightEdge(obs) {
-      var edge = 0;
-      for (var i = 0; i < obs.length; i++) {
-        if (obs[i].floor) continue;
-        if (obs[i].right > edge) edge = obs[i].right;
-      }
-      return edge;
-    }
-
-    // A long answer stays fully readable. The unit stays on its anchor, then
-    // lifts above any desk name or the floor zoom bar. If the header stops
-    // the lift, the bubble scrolls instead of covering those chips.
+    // A long answer stays fully readable. The strip keeps --strip-max
+    // (260px). liftClear moves the unit off desk names and the floor zoom
+    // bar. Narrow the strip only when a move still leaves a real overlap.
     function place() {
       relaxWidth();
       fitReply();
-      var obs = obstacles();
       var limitBox = bounds();
-      var room = limitBox.right - nameRightEdge(obs) - api.GAP - 6;
-      if (anchor.right < 80 && room >= 160 && room < 260) {
-        var w = Math.round(room) + 'px';
-        command.style.width = w;
-        reply.style.width = w;
-        confirmBtn.style.width = w;
-        fitReply();
-      }
       var width = unit.offsetWidth || 56;
       var height = unit.offsetHeight || 56;
       var left = root.innerWidth - anchor.right - width;
@@ -427,55 +409,43 @@
     }
 
     function liftClear() {
-      var guard = 24;
+      var guard = 12;
       while (guard--) {
         var box = unit.getBoundingClientRect();
         var obs = obstacles();
-        var hit = null;
-        var beside = 0;
-        var best = 0;
+        var blockTop = null;
         for (var i = 0; i < obs.length; i++) {
           var o = obs[i];
           if (!boxHits(box, [o], api.GAP)) continue;
           var hOverlap = Math.min(box.right, o.right) - Math.max(box.left, o.left);
-          var vOverlap = Math.min(box.bottom, o.bottom) - Math.max(box.top, o.top);
-          if (hOverlap <= 0 && vOverlap > 0 && !o.floor) {
-            beside = Math.max(beside, api.GAP - (box.left - o.right));
-            continue;
-          }
-          var area = Math.max(0, hOverlap) * Math.max(0, vOverlap);
-          if (!hit || area > best) {
-            hit = o;
-            best = area;
-          }
+          if (hOverlap <= 0 && !o.floor) continue;
+          if (blockTop == null || o.top < blockTop) blockTop = o.top;
         }
-        if (beside > 0) {
-          var narrower = Math.round((reply.clientWidth || command.clientWidth || 200) - beside - 4);
-          if (narrower >= 150) {
-            var wpx = narrower + 'px';
-            command.style.width = wpx;
-            reply.style.width = wpx;
-            confirmBtn.style.width = wpx;
-            var edge = bounds().right;
-            unit.style.left = Math.round(edge - unit.offsetWidth) + 'px';
-            continue;
-          }
-        }
-        if (!hit) return;
+        if (blockTop == null) return;
         var limitBox = bounds();
-        var lift = box.bottom - (hit.top - api.GAP);
-        var top = parseFloat(unit.style.top) || 0;
-        if (top - lift >= limitBox.top - 1) {
-          unit.style.top = Math.round(top - lift) + 'px';
+        var targetBottom = blockTop - api.GAP;
+        var height = unit.offsetHeight;
+        var targetTop = targetBottom - height;
+        if (targetTop >= limitBox.top - 1) {
+          unit.style.top = Math.round(targetTop) + 'px';
           continue;
         }
-        if (reply.hidden || reply.clientHeight <= 88) return;
-        var bottom = box.bottom;
-        var nextMax = reply.clientHeight - (limitBox.top - (top - lift)) - 8;
-        if (nextMax < 88) nextMax = 88;
-        if (Math.abs(nextMax - reply.clientHeight) < 2) return;
-        reply.style.maxHeight = Math.round(nextMax) + 'px';
-        unit.style.top = Math.round(bottom - unit.offsetHeight) + 'px';
+        if (reply.hidden) {
+          unit.style.top = Math.round(limitBox.top) + 'px';
+          return;
+        }
+        var replyBox = reply.getBoundingClientRect();
+        var chrome = height - replyBox.height;
+        var room = targetBottom - limitBox.top - chrome;
+        if (room < 36) room = 36;
+        if (replyBox.height <= room + 1) {
+          unit.style.top = Math.round(limitBox.top) + 'px';
+          return;
+        }
+        reply.style.maxHeight = Math.round(room) + 'px';
+        var nextTop = targetBottom - unit.offsetHeight;
+        if (nextTop < limitBox.top) nextTop = limitBox.top;
+        unit.style.top = Math.round(nextTop) + 'px';
       }
     }
 
