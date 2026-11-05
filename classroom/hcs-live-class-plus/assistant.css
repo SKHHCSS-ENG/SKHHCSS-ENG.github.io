@@ -1,17 +1,22 @@
-/* HCS Live Class + assistant. Muse ball recipe (cream mesh home button).
-   Scoped to this page. The idle ball and the open unit (ball + strip +
-   reply) are both kept off desk name chips and the floor zoom bar. */
+/* HCS Live Class + assistant. The ball uses the shared Eng api-mesh wash
+   (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
+   here so this page does not load ask.css. The command strip and reply
+   stay cream. The idle ball and the open unit (ball + strip + reply)
+   stay off desk name chips and the floor zoom bar. */
 
 .plus-float {
   --mesh-cream: #f4f0e8;
-  --mesh-cream-deep: #e8e0d2;
-  --mesh-cream-mid: #efe8dc;
-  --highlight: rgba(255, 255, 255, 0.85);
-  --rim-dark: rgba(120, 100, 70, 0.35);
-  --shadow-soft: rgba(60, 45, 25, 0.28);
-  --shadow-tight: rgba(60, 45, 25, 0.18);
   --ink: #3a3428;
   --ink-muted: #7a7060;
+  --api-mesh-ink: #f4f0e8;
+  --api-mesh-image: linear-gradient(
+    122deg,
+    #1458d6 0%,
+    #3a3ad0 24%,
+    #c42670 50%,
+    #be3a16 76%,
+    #7c6906 100%
+  );
   --ball-size: 56px;
   --strip-max: 260px;
   position: fixed;
@@ -66,36 +71,32 @@
   position: relative;
   flex: 0 0 auto;
   padding: 0;
-  background:
-    repeating-linear-gradient(
-      125deg,
-      rgba(255, 255, 255, 0.07) 0 1px,
-      transparent 1px 3px
-    ),
-    repeating-linear-gradient(
-      35deg,
-      rgba(140, 120, 80, 0.05) 0 1px,
-      transparent 1px 4px
-    ),
-    radial-gradient(
-      circle at 32% 28%,
-      var(--highlight) 0%,
-      rgba(255, 255, 255, 0.35) 18%,
-      var(--mesh-cream) 42%,
-      var(--mesh-cream-mid) 68%,
-      var(--mesh-cream-deep) 100%
-    );
+  color: var(--api-mesh-ink);
+  background-color: #1458d6;
+  background-image: var(--api-mesh-image);
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  background-position: 0% 40%;
+  animation: api-mesh-wash 10s ease-in-out infinite;
   box-shadow:
-    0 6px 14px var(--shadow-soft),
-    0 2px 4px var(--shadow-tight),
-    inset 0 -3px 6px var(--rim-dark),
-    inset 0 3px 5px rgba(255, 255, 255, 0.65),
-    inset 0 0 0 1px rgba(160, 140, 100, 0.22);
+    0 6px 14px rgba(18, 58, 77, 0.28),
+    0 2px 4px rgba(18, 58, 77, 0.18),
+    inset 0 2px 4px rgba(255, 255, 255, 0.28),
+    inset 0 -2px 5px rgba(18, 30, 80, 0.25);
   transition: transform 120ms ease, box-shadow 120ms ease;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-appearance: none;
+  appearance: none;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+@keyframes api-mesh-wash {
+  0% { background-position: 0% 40%; }
+  50% { background-position: 100% 60%; }
+  100% { background-position: 0% 40%; }
 }
 
 .plus-float .home-ball::before {
@@ -108,7 +109,7 @@
   border-radius: 50%;
   background: radial-gradient(
     ellipse at center,
-    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 255, 255, 0.45) 0%,
     rgba(255, 255, 255, 0) 70%
   );
   pointer-events: none;
@@ -118,16 +119,17 @@
 .plus-float .home-ball.is-pressed {
   transform: scale(0.92) translateY(1px);
   box-shadow:
-    0 2px 6px var(--shadow-tight),
-    0 1px 2px rgba(60, 45, 25, 0.2),
-    inset 0 3px 8px rgba(90, 70, 40, 0.35),
-    inset 0 -1px 2px rgba(255, 255, 255, 0.35),
-    inset 0 0 0 1px rgba(140, 120, 80, 0.28);
+    0 2px 6px rgba(18, 58, 77, 0.22),
+    0 1px 2px rgba(18, 58, 77, 0.2),
+    inset 0 3px 8px rgba(18, 30, 80, 0.35),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.28);
 }
 
+.plus-float.is-dragging .home-ball,
 .plus-float.is-dragging .home-ball:active,
 .plus-float.is-dragging .home-ball.is-pressed {
   transform: none;
+  cursor: grabbing;
 }
 
 .plus-float .home-ball:focus {
@@ -135,7 +137,7 @@
 }
 
 .plus-float .home-ball:focus-visible {
-  outline: 2px solid #8a7a55;
+  outline: 2px solid var(--api-mesh-ink, #f4f0e8);
   outline-offset: 3px;
 }
 
@@ -247,4 +249,12 @@
 .desk-card.plus-selected {
   outline: 2px solid #8a7a55;
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plus-float .home-ball {
+    animation: none !important;
+    background-size: 100% 100%;
+    background-position: 0% 50%;
+  }
 }

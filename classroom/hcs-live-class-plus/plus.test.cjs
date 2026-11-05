@@ -63,8 +63,9 @@ test('hub card sits above HCS Live Class', function () {
   assert.match(hub, /<h2>HCS Live Class<\/h2>/);
 });
 
-test('Muse ball is an unmarked 56px cream home button', function () {
+test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', function () {
   assert.match(css, /--ball-size:\s*56px/);
+  assert.match(css, /--strip-max:\s*260px/);
   assert.match(css, /\.command-strip\[hidden\][\s\S]*display:\s*none/);
   assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*max-height:\s*calc\(1\.35em \* 5\)/);
   assert.match(css, /\.plus-reply\s*\{[^}]*overflow-y:\s*auto/);
@@ -75,13 +76,39 @@ test('Muse ball is an unmarked 56px cream home button', function () {
     plus.plainActionNames('Ready to tidy the desks — please confirm to run tidy_snap.'),
     'Ready to tidy the desks.'
   );
-  assert.match(css, /#f4f0e8/);
-  assert.match(css, /circle at 32% 28%/);
+  assert.match(css, /--api-mesh-ink:\s*#f4f0e8/);
+  assert.match(css, /--api-mesh-image:\s*linear-gradient\(\s*122deg,\s*#1458d6 0%,\s*#3a3ad0 24%,\s*#c42670 50%,\s*#be3a16 76%,\s*#7c6906 100%\s*\)/);
+  assert.match(css, /@keyframes api-mesh-wash\s*\{[\s\S]*?0% 40%[\s\S]*?100% 60%[\s\S]*?0% 40%/);
+  assert.match(css, /\.plus-float \.home-ball\s*\{[^}]*background-image:\s*var\(--api-mesh-image\)[^}]*animation:\s*api-mesh-wash 10s ease-in-out infinite/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.plus-float \.home-ball\s*\{[^}]*animation:\s*none !important[^}]*background-size:\s*100% 100%[^}]*background-position:\s*0% 50%/);
+  assert.doesNotMatch(css, /circle at 32% 28%/);
+  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply,\s*\.plus-float \.plus-confirm\s*\{[^}]*var\(--mesh-cream\)/);
+  assert.doesNotMatch(css, /\.command-strip\s*\{[^}]*api-mesh-wash/);
+  assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*api-mesh/);
+  assert.doesNotMatch(html, /ask\.css/);
   assert.match(css, /scale\(0\.92\)/);
+  assert.match(css, /\.plus-float\.is-dragging \.home-ball[\s\S]*transform:\s*none/);
   assert.match(js, /Ask or say a command\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
+  assert.match(html, /assistant\.css\?v=20261106a/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
+});
+
+test('ball drag threshold is in boot scope and survives a finger leaving the ball', function () {
+  var factoryBody = js.slice(js.indexOf('function factory('), js.indexOf('function boot('));
+  var bootBody = js.slice(js.indexOf('function boot('));
+  assert.doesNotMatch(factoryBody, /TAP_PX/);
+  assert.match(bootBody, /var TAP_PX = 8/);
+  assert.match(bootBody, /dx \* dx \+ dy \* dy\) < TAP_PX \* TAP_PX/);
+  assert.doesNotMatch(js, /Math\.abs\(dx\) \+ Math\.abs\(dy\) < TAP_PX/);
+  var thresh = bootBody.indexOf('TAP_PX * TAP_PX');
+  var capture = bootBody.indexOf('setPointerCapture', thresh);
+  assert.ok(capture > thresh);
+  assert.match(bootBody, /document\.addEventListener\('pointermove', onBallPointerMove, \{ capture: true, passive: false \}\)/);
+  assert.match(bootBody, /touchmove/);
+  assert.match(bootBody, /if \(!\(drag && drag\.moved\)\) liftClear\(\)/);
+  assert.equal(plus.POS_KEY, 'hcsLiveClassPlus_ball_v1');
 });
 
 test('open strip moves off a name chip the idle ball does not cover', function () {
