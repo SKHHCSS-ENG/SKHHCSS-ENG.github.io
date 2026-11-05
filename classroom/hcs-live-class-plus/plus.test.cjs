@@ -68,6 +68,9 @@ test('Muse ball is an unmarked 56px cream home button', function () {
   assert.match(css, /\.command-strip\[hidden\][\s\S]*display:\s*none/);
   assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*max-height:\s*calc\(1\.35em \* 5\)/);
   assert.match(css, /\.plus-reply\s*\{[^}]*overflow-y:\s*auto/);
+  assert.match(js, /REPLY_MIN = 120/);
+  assert.match(js, /hOverlap < THIN_X/);
+  assert.doesNotMatch(js, /room < 36/);
   assert.equal(
     plus.plainActionNames('Ready to tidy the desks — please confirm to run tidy_snap.'),
     'Ready to tidy the desks.'

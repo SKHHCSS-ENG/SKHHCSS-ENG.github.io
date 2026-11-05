@@ -408,6 +408,9 @@
       liftClear();
     }
 
+    var REPLY_MIN = 120;
+    var THIN_X = 24;
+
     function liftClear() {
       var guard = 12;
       while (guard--) {
@@ -416,35 +419,37 @@
         var blockTop = null;
         for (var i = 0; i < obs.length; i++) {
           var o = obs[i];
-          if (!boxHits(box, [o], api.GAP)) continue;
+          if (!boxHits(box, [o], 0)) continue;
           var hOverlap = Math.min(box.right, o.right) - Math.max(box.left, o.left);
-          if (hOverlap <= 0 && !o.floor) continue;
+          // A sliver of a desk name under the strip edge is not a real cover.
+          if (!o.floor && hOverlap < THIN_X) continue;
           if (blockTop == null || o.top < blockTop) blockTop = o.top;
         }
         if (blockTop == null) return;
-        var limitBox = bounds();
+        var ceiling = 8;
         var targetBottom = blockTop - api.GAP;
         var height = unit.offsetHeight;
         var targetTop = targetBottom - height;
-        if (targetTop >= limitBox.top - 1) {
+        if (targetTop >= ceiling) {
           unit.style.top = Math.round(targetTop) + 'px';
           continue;
         }
         if (reply.hidden) {
-          unit.style.top = Math.round(limitBox.top) + 'px';
+          unit.style.top = Math.round(ceiling) + 'px';
           return;
         }
         var replyBox = reply.getBoundingClientRect();
         var chrome = height - replyBox.height;
-        var room = targetBottom - limitBox.top - chrome;
-        if (room < 36) room = 36;
+        var room = targetBottom - ceiling - chrome;
+        if (room < REPLY_MIN) room = REPLY_MIN;
+        reply.style.overflowY = 'auto';
         if (replyBox.height <= room + 1) {
-          unit.style.top = Math.round(limitBox.top) + 'px';
+          unit.style.top = Math.round(Math.max(ceiling, targetBottom - unit.offsetHeight)) + 'px';
           return;
         }
         reply.style.maxHeight = Math.round(room) + 'px';
         var nextTop = targetBottom - unit.offsetHeight;
-        if (nextTop < limitBox.top) nextTop = limitBox.top;
+        if (nextTop < ceiling) nextTop = ceiling;
         unit.style.top = Math.round(nextTop) + 'px';
       }
     }
