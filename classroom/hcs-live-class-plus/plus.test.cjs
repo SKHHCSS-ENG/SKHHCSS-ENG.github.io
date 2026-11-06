@@ -70,7 +70,8 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*max-height:\s*calc\(1\.35em \* 5\)/);
   assert.match(css, /\.plus-reply\s*\{[^}]*overflow-y:\s*auto/);
   assert.match(js, /REPLY_MIN = 120/);
-  assert.match(js, /hOverlap < THIN_X/);
+  assert.match(js, /if \(limit < REPLY_MIN\) limit = REPLY_MIN/);
+  assert.doesNotMatch(js, /liftClear|hOverlap|THIN_X/);
   assert.doesNotMatch(js, /room < 36/);
   assert.equal(
     plus.plainActionNames('Ready to tidy the desks — please confirm to run tidy_snap.'),
@@ -91,8 +92,9 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(js, /Ask or say a command\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106b/);
-  assert.match(html, /assistant\.js\?v=20261106b/);
+  assert.match(html, /assistant\.css\?v=20261106c/);
+  assert.match(html, /assistant\.js\?v=20261106c/);
+  assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
 
@@ -127,7 +129,11 @@ test('ball drag threshold is in boot scope and survives a finger leaving the bal
   assert.ok(capture > thresh);
   assert.match(bootBody, /document\.addEventListener\('pointermove', onBallPointerMove, \{ capture: true, passive: false \}\)/);
   assert.match(bootBody, /touchmove/);
-  assert.match(bootBody, /if \(!\(drag && drag\.moved\)\) liftClear\(\)/);
+  assert.match(bootBody, /api\.resolveRect\(boxFromAnchor\(\), obstacles\(\), bounds\(\), api\.GAP\)/);
+  assert.match(bootBody, /saveAnchor\(\)/);
+  assert.doesNotMatch(bootBody, /addEventListener\('scroll'/);
+  assert.doesNotMatch(bootBody, /MutationObserver/);
+  assert.match(bootBody, /root\.addEventListener\('resize', schedulePlace\)/);
   assert.equal(plus.POS_KEY, 'hcsLiveClassPlus_ball_v1');
 });
 

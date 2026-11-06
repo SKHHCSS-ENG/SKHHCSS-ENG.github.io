@@ -1,8 +1,8 @@
 /* HCS Live Class + assistant. The ball uses the shared Eng api-mesh wash
    (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
    here so this page does not load ask.css. The command strip and reply
-   stay cream. The idle ball and the open unit (ball + strip + reply)
-   stay off desk name chips and the floor zoom bar. */
+   stay cream. The ball keeps its viewport spot while the floor scrolls.
+   A drag can still park the unit off desk name chips and the zoom bar. */
 
 .plus-float {
   --mesh-cream: #f4f0e8;

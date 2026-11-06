@@ -2,9 +2,10 @@
  * HCS Live Class + assistant.
  * Nest: DEFAULT_WORKER_URL is the only assistant host. Do not point it at
  * deepseek-explain, say-it-louder, or ces-softspeak.
- * The open unit is the ball plus the cream strip (and any reply). Placement
- * and drag bounds use that whole box, so an open strip cannot sit on a
- * desk name chip or the floor zoom bar.
+ * The open unit is the ball plus the cream strip (and any reply). It keeps
+ * the viewport spot from the last drag (or the default corner). Floor
+ * scroll does not move it. A drag still settles the whole box clear of
+ * desk name chips and the floor zoom bar, then remembers that spot.
  */
 (function (root) {
   var api = factory();
@@ -347,23 +348,16 @@
       return { left: left, top: top, right: left + w, bottom: top + h };
     }
 
+    var REPLY_MIN = 120;
+
     function replyLimit() {
       var box = bounds();
       var room = box.bottom - box.top;
       var reserve = 56 + 28;
       if (!command.hidden) reserve += command.offsetHeight + 10;
       var limit = room - reserve;
-      if (limit < 120) limit = 120;
+      if (limit < REPLY_MIN) limit = REPLY_MIN;
       return limit;
-    }
-
-    function boxHits(box, list, gap) {
-      for (var i = 0; i < list.length; i++) {
-        var o = list[i];
-        if (box.left < o.right + gap && box.right > o.left - gap &&
-            box.top < o.bottom + gap && box.bottom > o.top - gap) return true;
-      }
-      return false;
     }
 
     function fitReply() {
@@ -381,9 +375,10 @@
       reply.style.width = '';
     }
 
-    // A long answer stays fully readable. The strip keeps --strip-max
-    // (260px). liftClear moves the unit off desk names and the floor zoom
-    // bar. Narrow the strip only when a move still leaves a real overlap.
+    // The saved corner is the bottom-right of the unit. A taller strip
+    // grows upward from that spot. Clamp into the viewport on resize and
+    // when the strip opens. Do not chase desk chips: floor scroll must
+    // leave the ball on the same viewport spot.
     function place() {
       relaxWidth();
       fitReply();
@@ -394,60 +389,12 @@
       var top = root.innerHeight - anchor.bottom - height;
       if (left < limitBox.left) left = limitBox.left;
       if (left + width > limitBox.right) left = Math.max(limitBox.left, limitBox.right - width);
+      if (top + height > limitBox.bottom) top = limitBox.bottom - height;
       if (top < limitBox.top) top = limitBox.top;
       unit.style.left = Math.round(left) + 'px';
       unit.style.top = Math.round(top) + 'px';
       unit.style.right = 'auto';
       unit.style.bottom = 'auto';
-      // Follow the finger while it is down. Clear chips and the zoom bar
-      // when the gesture ends, so a desk under the path does not pin the ball.
-      if (!(drag && drag.moved)) liftClear();
-    }
-
-    var REPLY_MIN = 120;
-    var THIN_X = 24;
-
-    function liftClear() {
-      var guard = 12;
-      while (guard--) {
-        var box = unit.getBoundingClientRect();
-        var obs = obstacles();
-        var blockTop = null;
-        for (var i = 0; i < obs.length; i++) {
-          var o = obs[i];
-          if (!boxHits(box, [o], 0)) continue;
-          var hOverlap = Math.min(box.right, o.right) - Math.max(box.left, o.left);
-          // A sliver of a desk name under the strip edge is not a real cover.
-          if (!o.floor && hOverlap < THIN_X) continue;
-          if (blockTop == null || o.top < blockTop) blockTop = o.top;
-        }
-        if (blockTop == null) return;
-        var ceiling = 8;
-        var targetBottom = blockTop - api.GAP;
-        var height = unit.offsetHeight;
-        var targetTop = targetBottom - height;
-        if (targetTop >= ceiling) {
-          unit.style.top = Math.round(targetTop) + 'px';
-          continue;
-        }
-        if (reply.hidden) {
-          unit.style.top = Math.round(ceiling) + 'px';
-          return;
-        }
-        var replyBox = reply.getBoundingClientRect();
-        var chrome = height - replyBox.height;
-        var room = targetBottom - ceiling - chrome;
-        if (room < REPLY_MIN) room = REPLY_MIN;
-        reply.style.overflowY = 'auto';
-        if (replyBox.height <= room + 1) {
-          unit.style.top = Math.round(Math.max(ceiling, targetBottom - unit.offsetHeight)) + 'px';
-          return;
-        }
-        reply.style.maxHeight = Math.round(room) + 'px';
-        var nextTop = targetBottom - unit.offsetHeight;
-        if (nextTop < ceiling) nextTop = ceiling;
-        unit.style.top = Math.round(nextTop) + 'px';
-      }
     }
 
     function schedulePlace() {
@@ -677,16 +624,11 @@
     });
 
     root.addEventListener('resize', schedulePlace);
-    var floor = document.getElementById('classroomViewport');
-    if (floor) floor.addEventListener('scroll', schedulePlace, { passive: true });
-    var desks = document.getElementById('desksContainer');
-    if (desks && typeof MutationObserver !== 'undefined') {
-      new MutationObserver(schedulePlace).observe(desks, { childList: true });
-    }
 
     place();
     root.addEventListener('load', place);
-    // Floor zoom bar and desk names settle after the Live Class layout pass.
+    // Header height settles after the first layout pass. This reclamps
+    // the saved corner; it does not follow the floor.
     root.setTimeout(place, 400);
     root.setTimeout(place, 1200);
   }
