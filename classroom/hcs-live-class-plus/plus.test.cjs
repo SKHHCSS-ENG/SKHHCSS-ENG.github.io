@@ -63,9 +63,9 @@ test('hub card sits above HCS Live Class', function () {
   assert.match(hub, /<h2>HCS Live Class<\/h2>/);
 });
 
-test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', function () {
-  assert.match(css, /--ball-size:\s*56px/);
-  assert.match(css, /--strip-max:\s*260px/);
+test('Muse ball is an unmarked 44px api-mesh button; the strip stays cream', function () {
+  assert.match(css, /--ball-size:\s*44px/);
+  assert.match(css, /--strip-max:\s*220px/);
   assert.match(css, /\.command-strip\[hidden\][\s\S]*display:\s*none/);
   assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*max-height:\s*calc\(1\.35em \* 5\)/);
   assert.match(css, /\.plus-reply\s*\{[^}]*overflow-y:\s*auto/);
@@ -155,13 +155,14 @@ test('open strip moves off a name chip the idle ball does not cover', function (
 });
 
 test('opening the strip keeps the ball and flips the panel toward the open side', function () {
-  assert.equal(plus.BALL, 56);
+  assert.equal(plus.BALL, 44);
   var bootBody = js.slice(js.indexOf('function boot('));
   assert.match(bootBody, /api\.ballRect\(anchor,/);
   assert.match(bootBody, /api\.layoutBeside\(ball,/);
   assert.match(bootBody, /panel-left/);
   assert.match(bootBody, /panel-right/);
   assert.doesNotMatch(bootBody, /offsetWidth \|\| 56/);
+  assert.doesNotMatch(bootBody, /offsetWidth \|\| 44/);
   assert.doesNotMatch(bootBody, /anchor\.right - width/);
   assert.match(css, /\.plus-float\s*\{[^}]*width:\s*var\(--ball-size\)[^}]*height:\s*var\(--ball-size\)/);
   assert.match(css, /\.plus-float\.panel-left \.plus-panel\s*\{[^}]*right:\s*calc\(var\(--ball-size\) \+ 10px\)/);
@@ -177,8 +178,8 @@ test('opening the strip keeps the ball and flips the panel toward the open side'
     deskBounds,
     plus.BALL
   );
-  assert.equal(deskBall.right - deskBall.left, 56);
-  assert.equal(deskBall.bottom - deskBall.top, 56);
+  assert.equal(deskBall.right - deskBall.left, 44);
+  assert.equal(deskBall.bottom - deskBall.top, 44);
   assert.equal(deskBall.right, 1280 - 18);
   assert.equal(deskBall.bottom, 800 - 36);
   var deskOpen = plus.layoutBeside(deskBall, { width: 260, height: 48 }, deskBounds, plus.GAP);
@@ -259,8 +260,8 @@ test('opening the strip keeps the ball and flips the panel toward the open side'
   assert.ok(clamped.top >= 8);
   assert.ok(clamped.right <= 192);
   assert.ok(clamped.bottom <= 172);
-  assert.equal(clamped.right - clamped.left, 56);
-  assert.equal(clamped.bottom - clamped.top, 56);
+  assert.equal(clamped.right - clamped.left, 44);
+  assert.equal(clamped.bottom - clamped.top, 44);
 });
 
 test('drag clamp keeps an open unit off the floor bar and a name chip', function () {
@@ -301,8 +302,17 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*display:\s*flex/);
   assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 1 0/);
   assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*height:\s*26px/);
+  assert.match(js, /var cap = 220/);
+  assert.match(js, /var BALL = 44/);
   assert.doesNotMatch(css, /\.mode-chip\s*\{[^}]*min-height:\s*44px/);
-  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background:\s*#3a3428/);
+  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background-color:\s*#1458d6/);
+  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background-image:\s*var\(--api-mesh-image\)/);
+  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*color:\s*var\(--api-mesh-ink\)/);
+  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*animation:\s*api-mesh-wash 10s ease-in-out infinite/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*color:\s*#1458d6/);
+  assert.match(css, /\.plus-float \.mode-chip:hover\s*\{[^}]*rgba\(58,\s*58,\s*208/);
+  assert.doesNotMatch(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*#3a3428/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.plus-float \.mode-chip\.is-selected\s*\{[^}]*animation:\s*none !important/);
   assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-cream\)/);
   var bootBody = js.slice(js.indexOf('function boot('));
   var submitAt = bootBody.indexOf("command.addEventListener('submit'");

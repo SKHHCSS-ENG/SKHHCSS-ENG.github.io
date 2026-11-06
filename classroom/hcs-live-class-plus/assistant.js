@@ -21,7 +21,7 @@
   var DEFAULT_WORKER_URL = 'https://live-class-plus.skhhcss-eng.workers.dev';
   var POS_KEY = 'hcsLiveClassPlus_ball_v1';
   var GAP = 10;
-  var BALL = 56;
+  var BALL = 44;
   var ACTIONS = {
     hide_names: 'Hide names',
     show_names: 'Show names',
@@ -457,7 +457,7 @@
   /**
    * Lay the cream panel beside the ball. The ball rect stays put.
    * The side with more room gets the strip; width shrinks to that room
-   * when the preferred width (260 / 72vw) does not fit.
+   * when the preferred width (220 / 72vw) does not fit.
    * `panel.strip` / `panel.reply` are the command and answer heights.
    * The command stays level with the ball. The answer sits below it
    * when that fits, otherwise above. A legacy `panel.height` is one
@@ -1135,7 +1135,7 @@
     function replyLimit() {
       var box = bounds();
       var room = box.bottom - box.top;
-      var reserve = 56 + 28;
+      var reserve = api.BALL + 28;
       if (!command.hidden) reserve += command.offsetHeight + 10;
       var limit = room - reserve;
       if (limit < REPLY_MIN) limit = REPLY_MIN;
@@ -1159,14 +1159,14 @@
     }
 
     function stripCap() {
-      var cap = 260;
+      var cap = 220;
       var vwCap = root.innerWidth * 0.72;
       if (vwCap < cap) cap = vwCap;
       return cap;
     }
 
     // The saved corner is the ball, not the open panel. The unit is the
-    // 56px circle. The cream strip is a child that flips beside it, so
+    // 44px circle. The cream strip is a child that flips beside it, so
     // opening or closing cannot change the circle's viewport spot.
     // Resize clamps the ball. Floor scroll does not call this.
     function place() {
