@@ -93,8 +93,8 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(js, /\+1 name, pick, pairs\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106g/);
-  assert.match(html, /assistant\.js\?v=20261106g/);
+  assert.match(html, /assistant\.css\?v=20261106h/);
+  assert.match(html, /assistant\.js\?v=20261106h/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -299,6 +299,8 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(js, /if \(!wasOpen\) setMode\('ask'\)/);
   assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*display:\s*flex/);
   assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 1 0/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*height:\s*26px/);
+  assert.doesNotMatch(css, /\.mode-chip\s*\{[^}]*min-height:\s*44px/);
   assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background:\s*#3a3428/);
   assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-cream\)/);
   var bootBody = js.slice(js.indexOf('function boot('));

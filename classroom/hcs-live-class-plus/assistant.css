@@ -193,9 +193,9 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.45rem;
+  gap: 0.3rem;
   margin: 0;
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.75rem 0.4rem;
   touch-action: auto;
 }
 
@@ -207,11 +207,11 @@
   min-width: 0;
 }
 
-/* Cream row under the text box. Three equal chips; the selected one is ink. */
+/* Slim cream row under the text box. Three equal chips; the selected one is ink. */
 .plus-float .mode-row {
   display: flex;
   align-items: stretch;
-  gap: 0.3rem;
+  gap: 0.2rem;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -220,17 +220,19 @@
 .plus-float .mode-chip {
   flex: 1 1 0;
   min-width: 0;
-  min-height: 44px;
+  height: 26px;
+  min-height: 0;
   margin: 0;
-  padding: 0 0.2rem;
+  padding: 0 0.15rem;
   border: 1px solid rgba(160, 140, 100, 0.45);
-  border-radius: 10px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.62);
   color: var(--ink);
   font: inherit;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1;
   white-space: nowrap;
   cursor: pointer;
 }
