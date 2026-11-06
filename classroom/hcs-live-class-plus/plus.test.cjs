@@ -92,8 +92,8 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(js, /Ask or say a command\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106e/);
-  assert.match(html, /assistant\.js\?v=20261106e/);
+  assert.match(html, /assistant\.css\?v=20261106f/);
+  assert.match(html, /assistant\.js\?v=20261106f/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -271,9 +271,13 @@ test('drag clamp keeps an open unit off the floor bar and a name chip', function
   assert.ok(separated(parked, name, 10), JSON.stringify(parked));
 });
 
-test('import chart stays on Live Class + and off the original page', function () {
-  assert.match(html, /id="btnImportChart"/);
-  assert.match(html, />\s*Import chart\s*</);
+test('import chart stays on the ball and off the original page', function () {
+  assert.doesNotMatch(html, /id="btnImportChart"/);
+  assert.doesNotMatch(html, />\s*Import chart\s*</);
+  assert.match(js, /chartBtn\.id = 'btnImportChart'/);
+  assert.match(js, /chartBtn\.textContent = 'Import chart'/);
+  assert.match(js, /command\.appendChild\(chartBtn\)/);
+  assert.match(css, /\.plus-float \.chart-chip/);
   assert.match(html, /applyChart: applyChartMoves/);
   assert.match(html, /chartPlan: chartPlanSnapshot/);
   assert.match(js, /tesseract\.js@5\.1\.1/);

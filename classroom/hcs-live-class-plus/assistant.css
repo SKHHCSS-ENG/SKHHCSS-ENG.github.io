@@ -191,11 +191,49 @@
 
 .plus-float .command-strip {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
   margin: 0;
   padding: 0.55rem 0.75rem;
   touch-action: auto;
+}
+
+.plus-float .command-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.plus-float .chart-chip {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 0.7rem;
+  border: 1px solid rgba(160, 140, 100, 0.45);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.plus-float .chart-chip:active {
+  background: rgba(90, 75, 50, 0.16);
+}
+
+.plus-float .chart-chip:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.plus-float .chart-chip:focus-visible {
+  outline: 2px solid #8a7a55;
+  outline-offset: 2px;
 }
 
 .plus-float .command-strip input {
@@ -271,8 +309,7 @@
   }
 }
 
-/* Import chart. The sheet uses the same cream as the command strip.
-   Toolbar chips stay on the page; this dialog is the preview. */
+/* Import chart preview. The chip that opens it lives on the ball strip. */
 .chart-file {
   position: absolute;
   width: 1px;

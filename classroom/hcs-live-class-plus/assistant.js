@@ -725,6 +725,8 @@
     command.id = 'plusCommand';
     command.hidden = true;
     command.setAttribute('aria-label', 'Command box');
+    var commandLine = document.createElement('div');
+    commandLine.className = 'command-line';
     var input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Ask or say a command\u2026';
@@ -736,8 +738,16 @@
     sendBtn.type = 'submit';
     sendBtn.className = 'go';
     sendBtn.textContent = 'Send';
-    command.appendChild(input);
-    command.appendChild(sendBtn);
+    commandLine.appendChild(input);
+    commandLine.appendChild(sendBtn);
+    var chartBtn = document.createElement('button');
+    chartBtn.type = 'button';
+    chartBtn.className = 'chart-chip';
+    chartBtn.id = 'btnImportChart';
+    chartBtn.textContent = 'Import chart';
+    chartBtn.title = 'Read a seating-chart photo and move desks by class number';
+    command.appendChild(commandLine);
+    command.appendChild(chartBtn);
 
     var reply = document.createElement('div');
     reply.className = 'plus-reply';
