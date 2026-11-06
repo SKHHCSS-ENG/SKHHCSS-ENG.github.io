@@ -63,7 +63,7 @@ test('hub card sits above HCS Live Class', function () {
   assert.match(hub, /<h2>HCS Live Class<\/h2>/);
 });
 
-test('Muse ball is an unmarked 44px api-mesh button; the strip stays cream', function () {
+test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', function () {
   assert.match(css, /--ball-size:\s*44px/);
   assert.match(css, /--strip-max:\s*220px/);
   assert.match(css, /\.command-strip\[hidden\][\s\S]*display:\s*none/);
@@ -83,7 +83,12 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip stays cream', fun
   assert.match(css, /\.plus-float \.home-ball\s*\{[^}]*background-image:\s*var\(--api-mesh-image\)[^}]*animation:\s*api-mesh-wash 10s ease-in-out infinite/);
   assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.plus-float \.home-ball\s*\{[^}]*animation:\s*none !important[^}]*background-size:\s*100% 100%[^}]*background-position:\s*0% 50%/);
   assert.doesNotMatch(css, /circle at 32% 28%/);
-  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-cream\)/);
+  assert.match(css, /--mesh-mist:\s*#ebeff8/);
+  assert.match(css, /--mesh-cream:\s*#f4f0e8/);
+  assert.match(css, /--ink:\s*#123a4d/);
+  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-mist\)/);
+  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*rgba\(20,\s*88,\s*214,\s*0\.35\)/);
+  assert.match(css, /\.chart-import-panel\s*\{[^}]*var\(--mesh-cream,\s*#f4f0e8\)/);
   assert.doesNotMatch(css, /\.command-strip\s*\{[^}]*api-mesh-wash/);
   assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*api-mesh/);
   assert.doesNotMatch(html, /ask\.css/);
@@ -94,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip stays cream', fun
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106j/);
-  assert.match(html, /assistant\.js\?v=20261106j/);
+  assert.match(html, /assistant\.css\?v=20261106k/);
+  assert.match(html, /assistant\.js\?v=20261106k/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -313,7 +318,7 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(css, /\.plus-float \.mode-chip:hover\s*\{[^}]*rgba\(58,\s*58,\s*208/);
   assert.doesNotMatch(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*#3a3428/);
   assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.plus-float \.mode-chip\.is-selected\s*\{[^}]*animation:\s*none !important/);
-  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-cream\)/);
+  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-mist\)/);
   var bootBody = js.slice(js.indexOf('function boot('));
   var submitAt = bootBody.indexOf("command.addEventListener('submit'");
   var submit = bootBody.slice(submitAt, submitAt + 450);

@@ -3,9 +3,9 @@
  * Nest: DEFAULT_WORKER_URL is the only assistant host. Do not point it at
  * deepseek-explain, say-it-louder, or ces-softspeak.
  * The ball keeps the viewport spot from the last drag (or the default
- * corner). Opening the strip does not move that circle: the cream panel
- * sits beside it and flips to the side, then up or down, that fits.
- * Under the text box, Ask, Command, and Import share one cream row.
+ * corner). Opening the strip does not move that circle: the Mesh mist
+ * panel sits beside it and flips to the side, then up or down, that fits.
+ * Under the text box, Ask, Command, and Import share one row.
  * Ask posts the line to this Worker. Command runs the line on the page.
  * Import opens the chart photo flow. The Worker host stays live-class-plus.
  * Floor scroll does not move the ball. A drag still settles the ball
@@ -455,7 +455,7 @@
   }
 
   /**
-   * Lay the cream panel beside the ball. The ball rect stays put.
+   * Lay the panel beside the ball. The ball rect stays put.
    * The side with more room gets the strip; width shrinks to that room
    * when the preferred width (220 / 72vw) does not fit.
    * `panel.strip` / `panel.reply` are the command and answer heights.
@@ -1166,7 +1166,7 @@
     }
 
     // The saved corner is the ball, not the open panel. The unit is the
-    // 44px circle. The cream strip is a child that flips beside it, so
+    // 44px circle. The strip is a child that flips beside it, so
     // opening or closing cannot change the circle's viewport spot.
     // Resize clamps the ball. Floor scroll does not call this.
     function place() {

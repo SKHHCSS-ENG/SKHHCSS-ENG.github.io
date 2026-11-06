@@ -1,15 +1,18 @@
 /* HCS Live Class + assistant. The ball uses the shared Eng api-mesh wash
    (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
-   here so this page does not load ask.css. The command strip and reply
-   stay cream. The unit is only the 44px ball, so opening the strip does
-   not move the circle. The panel flips to the side with room, then up
-   or down to stay on screen. Floor scroll does not move the ball. A drag
-   can still park the ball off desk name chips and the zoom bar. */
+   here so this page does not load ask.css. The open strip and reply use
+   Mesh mist (#ebeff8 fill, #123a4d ink), a soft wash of the ball's
+   #1458d6 stop — not the full mesh. Import chart chrome stays cream.
+   The unit is only the 44px ball, so opening the strip does not move
+   the circle. The panel flips to the side with room, then up or down
+   to stay on screen. Floor scroll does not move the ball. A drag can
+   still park the ball off desk name chips and the zoom bar. */
 
 .plus-float {
   --mesh-cream: #f4f0e8;
-  --ink: #3a3428;
-  --ink-muted: #7a7060;
+  --mesh-mist: #ebeff8;
+  --ink: #123a4d;
+  --ink-muted: rgba(18, 58, 77, 0.55);
   --api-mesh-ink: #f4f0e8;
   --api-mesh-image: linear-gradient(
     122deg,
@@ -161,12 +164,12 @@
       rgba(255, 255, 255, 0.06) 0 1px,
       transparent 1px 3px
     ),
-    var(--mesh-cream);
-  border: 1px solid rgba(160, 140, 100, 0.28);
+    var(--mesh-mist);
+  border: 1px solid rgba(20, 88, 214, 0.35);
   border-radius: 12px;
   box-shadow:
-    0 6px 14px rgba(60, 45, 25, 0.16),
-    0 1px 3px rgba(60, 45, 25, 0.1),
+    0 6px 14px rgba(18, 58, 77, 0.16),
+    0 1px 3px rgba(18, 58, 77, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
   color: var(--ink);
   font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
@@ -284,7 +287,7 @@
 .plus-float .command-strip .go {
   flex-shrink: 0;
   border: none;
-  background: rgba(90, 75, 50, 0.12);
+  background: rgba(20, 88, 214, 0.12);
   color: var(--ink);
   font-size: 0.68rem;
   font-weight: 650;
@@ -294,7 +297,7 @@
 }
 
 .plus-float .command-strip .go:active {
-  background: rgba(90, 75, 50, 0.22);
+  background: rgba(20, 88, 214, 0.22);
 }
 
 .plus-float .plus-reply {
@@ -318,7 +321,7 @@
 
 .plus-float .command-strip .go:focus-visible,
 .plus-float .command-strip input:focus-visible {
-  outline: 2px solid #8a7a55;
+  outline: 2px solid #1458d6;
   outline-offset: 2px;
 }
 
