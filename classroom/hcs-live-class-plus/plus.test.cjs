@@ -92,8 +92,8 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(js, /Ask or say a command\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106d/);
-  assert.match(html, /assistant\.js\?v=20261106d/);
+  assert.match(html, /assistant\.css\?v=20261106f/);
+  assert.match(html, /assistant\.js\?v=20261106f/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -269,4 +269,182 @@ test('drag clamp keeps an open unit off the floor bar and a name chip', function
   var parked = plus.resolveRect(proposed, [floor, name], bounds, 10);
   assert.ok(separated(parked, floor, 10), JSON.stringify(parked));
   assert.ok(separated(parked, name, 10), JSON.stringify(parked));
+});
+
+test('import chart stays on the ball and off the original page', function () {
+  assert.doesNotMatch(html, /id="btnImportChart"/);
+  assert.doesNotMatch(html, />\s*Import chart\s*</);
+  assert.match(js, /chartBtn\.id = 'btnImportChart'/);
+  assert.match(js, /chartBtn\.textContent = 'Import chart'/);
+  assert.match(js, /command\.appendChild\(chartBtn\)/);
+  assert.match(css, /\.plus-float \.chart-chip/);
+  assert.match(html, /applyChart: applyChartMoves/);
+  assert.match(html, /chartPlan: chartPlanSnapshot/);
+  assert.match(js, /tesseract\.js@5\.1\.1/);
+  assert.match(css, /\.chart-import-sheet/);
+  assert.doesNotMatch(original, /btnImportChart/);
+  assert.doesNotMatch(original, /Import chart/);
+  assert.doesNotMatch(original, /applyChartMoves/);
+});
+
+test('class numbers from a chart pad the same way as the roster', function () {
+  assert.equal(plus.normaliseClassNo('7'), '07');
+  assert.equal(plus.normaliseClassNo('#07'), '07');
+  assert.equal(plus.normaliseClassNo('24'), '24');
+  assert.equal(plus.normaliseClassNo(''), '');
+  assert.equal(plus.chartToken('5'), '05');
+  assert.equal(plus.chartToken('15'), '15');
+  assert.equal(plus.chartToken('2026'), '');
+  assert.equal(plus.chartToken('24 29'), '');
+});
+
+test('blue number ink forms desk rows and ignores a one-pixel speck', function () {
+  var width = 30;
+  var height = 40;
+  var data = new Uint8ClampedArray(width * height * 4);
+  for (var i = 0; i < data.length; i += 4) {
+    data[i] = 240;
+    data[i + 1] = 240;
+    data[i + 2] = 240;
+    data[i + 3] = 255;
+  }
+  function paint(x, y) {
+    var i = (y * width + x) * 4;
+    data[i] = 40;
+    data[i + 1] = 90;
+    data[i + 2] = 180;
+  }
+  for (var y = 12; y < 22; y++) {
+    for (var x = 2; x < 28; x++) paint(x, y);
+  }
+  paint(4, 2);
+  var blue = plus.blueMaskFromRGBA(data, width, height);
+  assert.ok(blue.count > 100);
+  var bands = plus.inkRowBands(blue.mask, width, height);
+  assert.equal(bands.length, 1);
+  assert.ok(bands[0].y0 >= 10 && bands[0].y1 <= 24);
+});
+
+test('chart marks keep empty seats so a short back row stays centred', function () {
+  // x positions from the 3A screen chart after the blue-number read.
+  var bands = [
+    { items: [{ text: '4', x: 4147, confidence: 0 }] },
+    { items: [{ text: '24', x: 2645, confidence: 96 }, { text: '29', x: 2976, confidence: 96 }] },
+    { items: [
+      { text: '35', x: 1144, confidence: 96 }, { text: '27', x: 1476, confidence: 95 },
+      { text: '5', x: 1908, confidence: 96 }, { text: '9', x: 2237, confidence: 96 },
+      { text: '36', x: 2644, confidence: 96 }, { text: '18', x: 2979, confidence: 95 },
+      { text: '26', x: 3396, confidence: 96 }
+    ] },
+    { items: [
+      { text: '11', x: 1147, confidence: 75 }, { text: '21', x: 1476, confidence: 96 },
+      { text: '14', x: 1897, confidence: 96 }, { text: '15', x: 2229, confidence: 0 },
+      { text: '8', x: 2657, confidence: 19 }, { text: '16', x: 2979, confidence: 0 },
+      { text: '17', x: 3398, confidence: 31 }
+    ] },
+    { items: [
+      { text: '20', x: 1145, confidence: 96 }, { text: '30', x: 1472, confidence: 96 },
+      { text: '12', x: 1897, confidence: 96 }, { text: '2', x: 2239, confidence: 97 },
+      { text: '4', x: 2657, confidence: 96 }, { text: '23', x: 2976, confidence: 95 },
+      { text: '1', x: 3411, confidence: 96 }
+    ] },
+    { items: [
+      { text: '13', x: 1147, confidence: 95 }, { text: '6', x: 1488, confidence: 96 },
+      { text: '19', x: 1897, confidence: 96 }, { text: '34', x: 2226, confidence: 38 },
+      { text: '7', x: 2657, confidence: 96 }, { text: '28', x: 2976, confidence: 96 },
+      { text: '25', x: 3395, confidence: 93 }
+    ] }
+  ];
+  var read = plus.seatingGridFromMarks(bands);
+  assert.deepEqual(read.grid, [
+    ['', '', '', '', '24', '29', ''],
+    ['35', '27', '05', '09', '36', '18', '26'],
+    ['11', '21', '14', '15', '08', '16', '17'],
+    ['20', '30', '12', '02', '04', '23', '01'],
+    ['13', '06', '19', '34', '07', '28', '25']
+  ]);
+});
+
+test('rematch moves desks by class number and leaves names, groups, and scores', function () {
+  var xs = [32, 188, 372, 528, 712, 868, 1052];
+  var ys = [28, 153, 278, 403, 528];
+  var slots = plus.layoutSlots(5, 7, 'pairs', false);
+  xs.forEach(function (x, c) {
+    assert.equal(slots[0][c].x, x);
+    assert.equal(slots[0][c].y, 28);
+  });
+  ys.forEach(function (y, r) { assert.equal(slots[r][0].y, y); });
+
+  var grid = [
+    ['', '', '', '', '24', '29', ''],
+    ['35', '27', '05', '09', '36', '18', '26'],
+    ['11', '21', '14', '15', '08', '16', '17'],
+    ['20', '30', '12', '02', '04', '23', '01'],
+    ['13', '06', '19', '34', '07', '28', '25']
+  ];
+  var numbers = [];
+  grid.forEach(function (row) {
+    row.forEach(function (no) { if (no) numbers.push(no); });
+  });
+  var students = numbers.map(function (no, i) {
+    return {
+      id: 's' + no,
+      classNo: no,
+      name: 'Pupil ' + no,
+      groupId: 'grp_' + ((i % 3) + 1),
+      score: i % 4,
+      x: xs[i % xs.length],
+      y: ys[Math.floor(i / xs.length) % ys.length],
+      sparkPts: [1]
+    };
+  });
+  // One pupil on the plan is not in the picture. One chart number is not on the plan.
+  students.push({ id: 's40', classNo: '40', name: 'Pat', groupId: 'grp_2', score: 3, x: 32, y: 28, sparkPts: [] });
+  grid[0][0] = '99';
+
+  var result = plus.rematchByClassNo(students, grid, {
+    frontAtTop: false,
+    chartBoardAtBottom: true,
+    layoutStyle: 'pairs'
+  });
+  function at(no) {
+    return result.moves.find(function (m) { return m.classNo === no; });
+  }
+  assert.equal(at('24').x, 712);
+  assert.equal(at('24').y, 28);
+  assert.equal(at('29').x, 868);
+  assert.equal(at('29').y, 28);
+  assert.equal(at('35').x, 32);
+  assert.equal(at('35').y, 153);
+  assert.equal(at('01').x, 1052);
+  assert.equal(at('01').y, 403);
+  assert.equal(at('13').x, 32);
+  assert.equal(at('13').y, 528);
+  assert.equal(at('99'), undefined);
+  assert.ok(result.notes.some(function (n) { return n.indexOf('#99') !== -1; }));
+  assert.ok(result.notes.some(function (n) { return n.indexOf('Pat') !== -1; }));
+
+  var next = plus.applySeatMoves(students, result.moves);
+  var ken = next.find(function (st) { return st.classNo === '24'; });
+  var beforeKen = students.find(function (st) { return st.classNo === '24'; });
+  assert.equal(ken.x, 712);
+  assert.equal(ken.y, 28);
+  assert.equal(ken.name, beforeKen.name);
+  assert.equal(ken.groupId, beforeKen.groupId);
+  assert.equal(ken.score, beforeKen.score);
+  assert.deepEqual(ken.sparkPts, beforeKen.sparkPts);
+  assert.equal(beforeKen.x, xs[0]);
+  var pat = next.find(function (st) { return st.id === 's40'; });
+  assert.equal(pat.x, 32);
+  assert.equal(pat.y, 28);
+  assert.equal(pat.score, 3);
+
+  var flipped = plus.rematchByClassNo(students, grid, {
+    frontAtTop: false,
+    chartBoardAtBottom: false,
+    layoutStyle: 'pairs'
+  });
+  var flipped13 = flipped.moves.find(function (m) { return m.classNo === '13'; });
+  assert.equal(flipped13.x, 32);
+  assert.equal(flipped13.y, 28);
 });

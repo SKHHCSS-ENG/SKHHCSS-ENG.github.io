@@ -20,7 +20,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="stylesheet" href="assistant.css?v=20261106d">
+  <link rel="stylesheet" href="assistant.css?v=20261106f">
   <meta name="theme-color" content="#123a4d">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11696,9 +11696,67 @@
         return { ok: false, message: 'I can\u2019t run that from here.' };
       }
 
+      function chartPlanSnapshot() {
+        var cls = getCurrentClass();
+        if (!cls) return null;
+        return {
+          id: cls.id,
+          editMode: boardEditsAllowed(),
+          frontAtTop: !!cls.frontAtTop,
+          layoutStyle: cls.layoutStyle || 'pairs',
+          gridRows: cls.gridRows,
+          gridCols: cls.gridCols,
+          name: cls.name || '',
+          students: (cls.students || []).map(function (st) {
+            return {
+              id: st.id,
+              classNo: st.classNo,
+              name: st.name,
+              groupId: st.groupId || '',
+              score: Number(st.score) || 0,
+              x: st.x,
+              y: st.y
+            };
+          })
+        };
+      }
+
+      // Names, groups, and scores stay. Only desk x/y move, plus the grid size
+      // the seating tools read. Save online is still the teacher's step.
+      function applyChartMoves(moves, meta) {
+        if (!boardEditsAllowed()) return { ok: false, message: 'Turn Edit on, then import the chart again.' };
+        var cls = getCurrentClass();
+        if (!cls) return { ok: false, message: 'Open a plan first.' };
+        var before = snapshotBoardEdit(cls);
+        var byId = {};
+        (moves || []).forEach(function (m) {
+          if (m && m.id) byId[m.id] = m;
+        });
+        var moved = 0;
+        cls.students.forEach(function (st) {
+          var m = byId[st.id];
+          if (!m || typeof m.x !== 'number' || typeof m.y !== 'number') return;
+          if (st.x === m.x && st.y === m.y) return;
+          st.x = m.x;
+          st.y = m.y;
+          moved += 1;
+        });
+        if (meta && meta.gridRows) cls.gridRows = meta.gridRows;
+        if (meta && meta.gridCols) cls.gridCols = meta.gridCols;
+        var after = snapshotBoardEdit(cls);
+        pushLayoutHistory(before, after, 'Import chart');
+        saveState();
+        renderAll();
+        if (!moved) return { ok: true, message: 'Those seats already match the chart.' };
+        showToast('Seats moved from the chart', '🪑');
+        return { ok: true, message: 'Seats moved. Save online if you want this kept in Drive.' };
+      }
+
       window.HcsLiveClassPlusBoard = {
         preview: plusPreview,
-        run: plusRun
+        run: plusRun,
+        chartPlan: chartPlanSnapshot,
+        applyChart: applyChartMoves
       };
 
       // Initialize App on Load
@@ -11767,7 +11825,7 @@
     // Nest: edit this host only. Do not use deepseek-explain, say-it-louder, or ces-softspeak.
     window.HCS_LIVE_CLASS_PLUS_WORKER = "https://live-class-plus.skhhcss-eng.workers.dev";
   </script>
-  <script src="assistant.js?v=20261106d"></script>
+  <script src="assistant.js?v=20261106f"></script>
 <script src="../../site-version.js?v=sv"></script>
 </body>
 </html>
