@@ -89,11 +89,12 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.doesNotMatch(html, /ask\.css/);
   assert.match(css, /scale\(0\.92\)/);
   assert.match(css, /\.plus-float\.is-dragging \.home-ball[\s\S]*transform:\s*none/);
-  assert.match(js, /Ask or say a command\\u2026/);
+  assert.match(js, /Ask a question\\u2026/);
+  assert.match(js, /\+1 name, pick, pairs\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106f/);
-  assert.match(html, /assistant\.js\?v=20261106f/);
+  assert.match(html, /assistant\.css\?v=20261106h/);
+  assert.match(html, /assistant\.js\?v=20261106h/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -274,10 +275,12 @@ test('drag clamp keeps an open unit off the floor bar and a name chip', function
 test('import chart stays on the ball and off the original page', function () {
   assert.doesNotMatch(html, /id="btnImportChart"/);
   assert.doesNotMatch(html, />\s*Import chart\s*</);
-  assert.match(js, /chartBtn\.id = 'btnImportChart'/);
-  assert.match(js, /chartBtn\.textContent = 'Import chart'/);
-  assert.match(js, /command\.appendChild\(chartBtn\)/);
-  assert.match(css, /\.plus-float \.chart-chip/);
+  assert.doesNotMatch(html, /mode-row|plusModeAsk|mode-chip/);
+  assert.match(js, /'btnImportChart', 'Import'/);
+  assert.match(js, /chartBtn\.setAttribute\('aria-label', 'Import chart'\)/);
+  assert.match(js, /command\.appendChild\(modeRow\)/);
+  assert.match(js, /title\.textContent = 'Import chart'/);
+  assert.match(css, /\.plus-float \.mode-chip/);
   assert.match(html, /applyChart: applyChartMoves/);
   assert.match(html, /chartPlan: chartPlanSnapshot/);
   assert.match(js, /tesseract\.js@5\.1\.1/);
@@ -285,6 +288,73 @@ test('import chart stays on the ball and off the original page', function () {
   assert.doesNotMatch(original, /btnImportChart/);
   assert.doesNotMatch(original, /Import chart/);
   assert.doesNotMatch(original, /applyChartMoves/);
+  assert.doesNotMatch(original, /mode-row/);
+});
+
+test('Ask, Command, and Import share one cream row under the text box', function () {
+  assert.match(js, /'plusModeAsk', 'Ask'/);
+  assert.match(js, /'plusModeCommand', 'Command'/);
+  assert.match(js, /'btnImportChart', 'Import'/);
+  assert.match(js, /var mode = 'ask'/);
+  assert.match(js, /if \(!wasOpen\) setMode\('ask'\)/);
+  assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*display:\s*flex/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 1 0/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*height:\s*26px/);
+  assert.doesNotMatch(css, /\.mode-chip\s*\{[^}]*min-height:\s*44px/);
+  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background:\s*#3a3428/);
+  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-cream\)/);
+  var bootBody = js.slice(js.indexOf('function boot('));
+  var submitAt = bootBody.indexOf("command.addEventListener('submit'");
+  var submit = bootBody.slice(submitAt, submitAt + 450);
+  assert.match(submit, /mode === 'import'/);
+  assert.match(submit, /chartBtn\.click\(\)/);
+  assert.match(submit, /mode === 'command'/);
+  assert.match(submit, /dispatchCommand\(input\.value\)/);
+  assert.match(submit, /send\(input\.value\);\s*focusCommand\(\)/);
+  var dispatch = bootBody.slice(bootBody.indexOf('function dispatchCommand'), bootBody.indexOf('function setOpen'));
+  assert.doesNotMatch(dispatch, /fetch\(/);
+  assert.match(js, /JSON\.stringify\(\{ text: text \}\)/);
+  assert.doesNotMatch(js, /mode:\s*['"]command['"]/);
+  assert.equal(plus.DEFAULT_WORKER_URL, 'https://live-class-plus.skhhcss-eng.workers.dev');
+});
+
+test('command lines dispatch the page controls', function () {
+  assert.equal(plus.parseCommand('+1 Ken').action, 'score_plus');
+  assert.equal(plus.parseCommand('+1 Ken').slots.student, 'ken');
+  assert.equal(plus.parseCommand('+1 Ken').slots.amount, 1);
+  assert.equal(plus.parseCommand('+1').slots.student, '');
+  assert.equal(plus.parseCommand('+1 #7').slots.student, '#7');
+  assert.equal(plus.parseCommand('all +1').action, 'all_plus');
+  assert.equal(plus.parseCommand('pair work').action, 'layout_pairs');
+  assert.equal(plus.parseCommand('pairs').action, 'layout_pairs');
+  assert.equal(plus.parseCommand('pick').action, 'random_pick');
+  assert.equal(plus.parseCommand('pick group').action, 'random_group');
+  assert.equal(plus.parseCommand('groups').action, 'layout_groups');
+  assert.equal(plus.parseCommand('group work').action, 'mode_group');
+  assert.equal(plus.parseCommand('exam').action, 'layout_rows');
+  assert.equal(plus.parseCommand('pods').action, 'layout_pods');
+  assert.equal(plus.parseCommand('tidy').action, 'tidy_snap');
+  assert.equal(plus.parseCommand('podium').action, 'open_podium');
+  assert.equal(plus.parseCommand('fit').action, 'zoom_reset');
+  assert.equal(plus.parseCommand('hide names').action, 'hide_names');
+  assert.equal(plus.parseCommand('help').action, 'help');
+  assert.equal(plus.parseCommand('+30').action, 'timer_add30');
+  assert.equal(plus.parseCommand('timer 3m').slots.seconds, 180);
+  assert.equal(plus.parseCommand('timer 90s').slots.seconds, 90);
+  assert.equal(plus.parseCommand('timer 2:30').slots.seconds, 150);
+  assert.deepEqual(plus.parseCommand('grid 4x6').slots, { rows: 4, cols: 6 });
+  assert.equal(plus.parseCommand('group +1 Lions').action, 'group_plus');
+  assert.equal(plus.parseCommand('group +1 Lions').slots.group, 'lions');
+  assert.equal(plus.parseCommand('-2 Amy').action, 'score_minus');
+  assert.equal(plus.parseCommand('individual').action, 'mode_individual');
+  assert.equal(plus.parseCommand('spark').action, 'skin_spark');
+  assert.equal(plus.parseCommand('undo').action, 'undo');
+  assert.equal(plus.parseCommand('what does metaphor mean'), null);
+  assert.match(plus.commandHelp(), /\+1 name/);
+  plus.commandCatalog().forEach(function (action) {
+    assert.notEqual(action, 'help');
+    assert.match(html, new RegExp(action.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  });
 });
 
 test('class numbers from a chart pad the same way as the roster', function () {
