@@ -2,10 +2,11 @@
  * HCS Live Class + assistant.
  * Nest: DEFAULT_WORKER_URL is the only assistant host. Do not point it at
  * deepseek-explain, say-it-louder, or ces-softspeak.
- * The open unit is the ball plus the cream strip (and any reply). It keeps
- * the viewport spot from the last drag (or the default corner). Floor
- * scroll does not move it. A drag still settles the whole box clear of
- * desk name chips and the floor zoom bar, then remembers that spot.
+ * The ball keeps the viewport spot from the last drag (or the default
+ * corner). Opening the strip does not move that circle: the cream panel
+ * sits beside it and flips to the side, then up or down, that fits.
+ * Floor scroll does not move the ball. A drag still settles the ball
+ * clear of desk name chips and the floor zoom bar, then remembers that spot.
  */
 (function (root) {
   var api = factory();
@@ -17,6 +18,7 @@
   var DEFAULT_WORKER_URL = 'https://live-class-plus.skhhcss-eng.workers.dev';
   var POS_KEY = 'hcsLiveClassPlus_ball_v1';
   var GAP = 10;
+  var BALL = 56;
   var ACTIONS = {
     hide_names: 'Hide names',
     show_names: 'Show names',
@@ -163,6 +165,79 @@
     return nearest;
   }
 
+  /**
+   * Viewport rect of the ball. `anchor` is the ball's inset from the
+   * right and bottom edges, the same {r, b} stored under POS_KEY.
+   * The open strip is not part of this box, so opening it cannot move
+   * the circle. Resize clamps the circle into `bounds`.
+   */
+  function ballRect(anchor, viewport, bounds, size) {
+    var ball = size > 0 ? size : BALL;
+    var width = viewport && viewport.width > 0 ? viewport.width : 0;
+    var height = viewport && viewport.height > 0 ? viewport.height : 0;
+    var left = width - anchor.right - ball;
+    var top = height - anchor.bottom - ball;
+    if (left < bounds.left) left = bounds.left;
+    if (left + ball > bounds.right) left = Math.max(bounds.left, bounds.right - ball);
+    if (top + ball > bounds.bottom) top = bounds.bottom - ball;
+    if (top < bounds.top) top = bounds.top;
+    return { left: left, top: top, right: left + ball, bottom: top + ball };
+  }
+
+  /**
+   * Lay the cream panel beside the ball. The ball rect stays put.
+   * The side with more room gets the strip; width shrinks to that room
+   * when the preferred width (260 / 72vw) does not fit.
+   * `panel.strip` / `panel.reply` are the command and answer heights.
+   * The command stays level with the ball. The answer sits below it
+   * when that fits, otherwise above. A legacy `panel.height` is one
+   * block centered on the ball. The stack then shifts to stay in bounds.
+   */
+  function layoutBeside(ball, panel, bounds, gap) {
+    gap = gap == null ? GAP : gap;
+    var prefW = panel && panel.width > 0 ? panel.width : 0;
+    var stripH = 0;
+    var replyH = 0;
+    if (panel && (typeof panel.strip === 'number' || typeof panel.reply === 'number')) {
+      stripH = panel.strip > 0 ? panel.strip : 0;
+      replyH = panel.reply > 0 ? panel.reply : 0;
+    } else if (panel && panel.height > 0) {
+      stripH = panel.height;
+    }
+    var spaceRight = bounds.right - ball.right - gap;
+    var spaceLeft = ball.left - bounds.left - gap;
+    var side = spaceLeft > spaceRight ? 'left' : 'right';
+    var room = side === 'left' ? spaceLeft : spaceRight;
+    if (room < 0) room = 0;
+    var width = prefW < room ? prefW : room;
+    var left = side === 'right' ? ball.right + gap : ball.left - gap - width;
+    var ballMid = ball.top + (ball.bottom - ball.top) / 2;
+    var stripTop = ballMid - stripH / 2;
+    var stackGap = replyH > 0 ? gap : 0;
+    var replyAbove = false;
+    if (replyH > 0) {
+      var spaceBelow = bounds.bottom - (stripTop + stripH) - stackGap;
+      var spaceAbove = stripTop - bounds.top - stackGap;
+      if (spaceBelow >= replyH) replyAbove = false;
+      else if (spaceAbove >= replyH) replyAbove = true;
+      else replyAbove = spaceAbove > spaceBelow;
+    }
+    var height = stripH + stackGap + replyH;
+    var top = replyAbove ? stripTop - stackGap - replyH : stripTop;
+    if (top + height > bounds.bottom) top = bounds.bottom - height;
+    if (top < bounds.top) top = bounds.top;
+    return {
+      side: side,
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+      right: left + width,
+      bottom: top + height,
+      replyAbove: replyAbove
+    };
+  }
+
   function presentReply(data) {
     if (!data || typeof data !== 'object') return '';
     var kind = String(data.kind || data.type || '');
@@ -206,11 +281,14 @@
     DEFAULT_WORKER_URL: DEFAULT_WORKER_URL,
     POS_KEY: POS_KEY,
     GAP: GAP,
+    BALL: BALL,
     ACTIONS: ACTIONS,
     safeWorkerUrl: safeWorkerUrl,
     isBlockedWorker: isBlockedWorker,
     workerUrlFor: workerUrlFor,
     resolveRect: resolveRect,
+    ballRect: ballRect,
+    layoutBeside: layoutBeside,
     presentReply: presentReply,
     plainActionNames: plainActionNames,
     readPayload: readPayload
@@ -274,9 +352,14 @@
     reply.hidden = true;
     reply.setAttribute('aria-live', 'polite');
 
+    var panel = document.createElement('div');
+    panel.className = 'plus-panel';
+    panel.hidden = true;
+    panel.appendChild(command);
+    panel.appendChild(reply);
+
     unit.appendChild(ball);
-    unit.appendChild(command);
-    unit.appendChild(reply);
+    unit.appendChild(panel);
     document.body.appendChild(unit);
 
     function loadAnchor() {
@@ -340,12 +423,15 @@
       return list;
     }
 
+    function ballBox() {
+      return api.ballRect(anchor, {
+        width: root.innerWidth,
+        height: root.innerHeight
+      }, bounds(), api.BALL);
+    }
+
     function boxFromAnchor() {
-      var w = unit.offsetWidth || 56;
-      var h = unit.offsetHeight || 56;
-      var left = root.innerWidth - anchor.right - w;
-      var top = root.innerHeight - anchor.bottom - h;
-      return { left: left, top: top, right: left + w, bottom: top + h };
+      return ballBox();
     }
 
     var REPLY_MIN = 120;
@@ -371,30 +457,47 @@
     }
 
     function relaxWidth() {
+      panel.style.width = '';
       command.style.width = '';
       reply.style.width = '';
     }
 
-    // The saved corner is the bottom-right of the unit. A taller strip
-    // grows upward from that spot. Clamp into the viewport on resize and
-    // when the strip opens. Do not chase desk chips: floor scroll must
-    // leave the ball on the same viewport spot.
+    function stripCap() {
+      var cap = 260;
+      var vwCap = root.innerWidth * 0.72;
+      if (vwCap < cap) cap = vwCap;
+      return cap;
+    }
+
+    // The saved corner is the ball, not the open panel. The unit is the
+    // 56px circle. The cream strip is a child that flips beside it, so
+    // opening or closing cannot change the circle's viewport spot.
+    // Resize clamps the ball. Floor scroll does not call this.
     function place() {
-      relaxWidth();
-      fitReply();
-      var limitBox = bounds();
-      var width = unit.offsetWidth || 56;
-      var height = unit.offsetHeight || 56;
-      var left = root.innerWidth - anchor.right - width;
-      var top = root.innerHeight - anchor.bottom - height;
-      if (left < limitBox.left) left = limitBox.left;
-      if (left + width > limitBox.right) left = Math.max(limitBox.left, limitBox.right - width);
-      if (top + height > limitBox.bottom) top = limitBox.bottom - height;
-      if (top < limitBox.top) top = limitBox.top;
-      unit.style.left = Math.round(left) + 'px';
-      unit.style.top = Math.round(top) + 'px';
+      var ball = ballBox();
+      unit.style.left = Math.round(ball.left) + 'px';
+      unit.style.top = Math.round(ball.top) + 'px';
       unit.style.right = 'auto';
       unit.style.bottom = 'auto';
+      if (panel.hidden) return;
+      relaxWidth();
+      var limitBox = bounds();
+      var rough = api.layoutBeside(ball, { width: stripCap(), height: 0 }, limitBox, api.GAP);
+      panel.style.width = Math.round(rough.width) + 'px';
+      fitReply();
+      var stripH = command.hidden ? 0 : command.offsetHeight;
+      var replyH = reply.hidden ? 0 : reply.offsetHeight;
+      var placed = api.layoutBeside(ball, {
+        width: stripCap(),
+        strip: stripH,
+        reply: replyH
+      }, limitBox, api.GAP);
+      panel.style.width = Math.round(placed.width) + 'px';
+      panel.style.top = Math.round(placed.top - ball.top) + 'px';
+      panel.style.bottom = 'auto';
+      unit.classList.toggle('panel-left', placed.side === 'left');
+      unit.classList.toggle('panel-right', placed.side === 'right');
+      unit.classList.toggle('reply-above', placed.replyAbove);
     }
 
     function schedulePlace() {
@@ -411,11 +514,13 @@
       ball.setAttribute('aria-label', openState ? 'Close Live Class + commands' : 'Open Live Class + commands');
       unit.classList.toggle('is-open', openState);
       if (openState) {
+        panel.hidden = false;
         command.hidden = false;
       } else {
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
+        panel.hidden = true;
       }
       place();
       root.requestAnimationFrame(place);

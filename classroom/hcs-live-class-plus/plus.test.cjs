@@ -92,8 +92,8 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(js, /Ask or say a command\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106c/);
-  assert.match(html, /assistant\.js\?v=20261106c/);
+  assert.match(html, /assistant\.css\?v=20261106d/);
+  assert.match(html, /assistant\.js\?v=20261106d/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -150,6 +150,115 @@ test('open strip moves off a name chip the idle ball does not cover', function (
   var lifted = plus.resolveRect(open, [ng], bounds, 10);
   assert.ok(separated(lifted, ng, 10), JSON.stringify(lifted));
   assert.ok(lifted.bottom <= ng.top - 10 || lifted.right <= ng.left - 10);
+});
+
+test('opening the strip keeps the ball and flips the panel toward the open side', function () {
+  assert.equal(plus.BALL, 56);
+  var bootBody = js.slice(js.indexOf('function boot('));
+  assert.match(bootBody, /api\.ballRect\(anchor,/);
+  assert.match(bootBody, /api\.layoutBeside\(ball,/);
+  assert.match(bootBody, /panel-left/);
+  assert.match(bootBody, /panel-right/);
+  assert.doesNotMatch(bootBody, /offsetWidth \|\| 56/);
+  assert.doesNotMatch(bootBody, /anchor\.right - width/);
+  assert.match(css, /\.plus-float\s*\{[^}]*width:\s*var\(--ball-size\)[^}]*height:\s*var\(--ball-size\)/);
+  assert.match(css, /\.plus-float\.panel-left \.plus-panel\s*\{[^}]*right:\s*calc\(var\(--ball-size\) \+ 10px\)/);
+  assert.match(css, /\.plus-float\.panel-right \.plus-panel\s*\{[^}]*left:\s*calc\(var\(--ball-size\) \+ 10px\)/);
+  assert.match(css, /\.plus-float\.reply-above \.plus-reply\s*\{[^}]*order:\s*-1/);
+  assert.match(bootBody, /reply-above/);
+  assert.match(css, /\.plus-panel\[hidden\][\s\S]*display:\s*none/);
+
+  var deskBounds = { left: 8, top: 48, right: 1272, bottom: 792 };
+  var deskBall = plus.ballRect(
+    { right: 18, bottom: 36 },
+    { width: 1280, height: 800 },
+    deskBounds,
+    plus.BALL
+  );
+  assert.equal(deskBall.right - deskBall.left, 56);
+  assert.equal(deskBall.bottom - deskBall.top, 56);
+  assert.equal(deskBall.right, 1280 - 18);
+  assert.equal(deskBall.bottom, 800 - 36);
+  var deskOpen = plus.layoutBeside(deskBall, { width: 260, height: 48 }, deskBounds, plus.GAP);
+  var deskClosed = plus.ballRect(
+    { right: 18, bottom: 36 },
+    { width: 1280, height: 800 },
+    deskBounds,
+    plus.BALL
+  );
+  assert.deepEqual(deskClosed, deskBall);
+  assert.equal(deskOpen.side, 'left');
+  assert.equal(deskOpen.width, 260);
+  assert.ok(deskOpen.right <= deskBall.left - plus.GAP);
+  assert.ok(deskOpen.left >= deskBounds.left);
+  assert.ok(deskOpen.top >= deskBounds.top);
+  assert.ok(deskOpen.bottom <= deskBounds.bottom);
+
+  var phoneBounds = { left: 8, top: 48, right: 382, bottom: 836 };
+  var phoneBall = plus.ballRect(
+    { right: 12, bottom: 28 },
+    { width: 390, height: 844 },
+    phoneBounds,
+    plus.BALL
+  );
+  var phoneOpen = plus.layoutBeside(phoneBall, { width: 260, height: 48 }, phoneBounds, plus.GAP);
+  assert.equal(phoneOpen.side, 'left');
+  assert.equal(phoneOpen.width, 260);
+  assert.ok(phoneOpen.right <= phoneBall.left - plus.GAP);
+  var phoneAgain = plus.ballRect(
+    { right: 12, bottom: 28 },
+    { width: 390, height: 844 },
+    phoneBounds,
+    plus.BALL
+  );
+  assert.deepEqual(phoneAgain, phoneBall);
+
+  var leftBall = { left: 8, top: 760, right: 64, bottom: 816 };
+  var leftOpen = plus.layoutBeside(leftBall, { width: 260, height: 48 }, phoneBounds, plus.GAP);
+  assert.equal(leftOpen.side, 'right');
+  assert.ok(leftOpen.left >= leftBall.right + plus.GAP);
+  assert.ok(leftOpen.right <= phoneBounds.right);
+
+  var tall = plus.layoutBeside(phoneBall, { width: 260, height: 400 }, phoneBounds, plus.GAP);
+  assert.equal(tall.side, 'left');
+  assert.equal(tall.replyAbove, false);
+  assert.ok(tall.top >= phoneBounds.top);
+  assert.ok(tall.bottom <= phoneBounds.bottom);
+  assert.ok(tall.top < phoneBall.top);
+
+  var stacked = plus.layoutBeside(phoneBall, { width: 260, strip: 46, reply: 400 }, phoneBounds, plus.GAP);
+  assert.equal(stacked.replyAbove, true);
+  assert.equal(stacked.side, 'left');
+  var stripTop = stacked.top + 400 + plus.GAP;
+  var ballMid = phoneBall.top + (phoneBall.bottom - phoneBall.top) / 2;
+  assert.ok(Math.abs((stripTop + 23) - ballMid) < 1, JSON.stringify(stacked));
+  assert.ok(stacked.top >= phoneBounds.top);
+  assert.ok(stacked.bottom <= phoneBounds.bottom);
+
+  var highBall = { left: 322, top: 48, right: 378, bottom: 104 };
+  var below = plus.layoutBeside(highBall, { width: 260, strip: 46, reply: 400 }, phoneBounds, plus.GAP);
+  assert.equal(below.replyAbove, false);
+  assert.ok(Math.abs((below.top + 23) - (highBall.top + 28)) < 1);
+
+  var mid = { left: 167, top: 400, right: 223, bottom: 456 };
+  var midOpen = plus.layoutBeside(mid, { width: 260, height: 48 }, phoneBounds, plus.GAP);
+  assert.ok(midOpen.width < 260);
+  assert.ok(midOpen.width > 0);
+  assert.ok(midOpen.left >= phoneBounds.left);
+  assert.ok(midOpen.right <= phoneBounds.right);
+
+  var clamped = plus.ballRect(
+    { right: 300, bottom: 300 },
+    { width: 200, height: 180 },
+    { left: 8, top: 8, right: 192, bottom: 172 },
+    plus.BALL
+  );
+  assert.ok(clamped.left >= 8);
+  assert.ok(clamped.top >= 8);
+  assert.ok(clamped.right <= 192);
+  assert.ok(clamped.bottom <= 172);
+  assert.equal(clamped.right - clamped.left, 56);
+  assert.equal(clamped.bottom - clamped.top, 56);
 });
 
 test('drag clamp keeps an open unit off the floor bar and a name chip', function () {
