@@ -1,8 +1,10 @@
 /* HCS Live Class + assistant. The ball uses the shared Eng api-mesh wash
    (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
    here so this page does not load ask.css. The command strip and reply
-   stay cream. The ball keeps its viewport spot while the floor scrolls.
-   A drag can still park the unit off desk name chips and the zoom bar. */
+   stay cream. The unit is only the 56px ball, so opening the strip does
+   not move the circle. The panel flips to the side with room, then up
+   or down to stay on screen. Floor scroll does not move the ball. A drag
+   can still park the ball off desk name chips and the zoom bar. */
 
 .plus-float {
   --mesh-cream: #f4f0e8;
@@ -21,14 +23,39 @@
   --strip-max: 260px;
   position: fixed;
   z-index: 46;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  width: max-content;
-  max-width: calc(100vw - 16px);
+  width: var(--ball-size);
+  height: var(--ball-size);
   margin: 0;
   pointer-events: none;
+}
+
+.plus-float .plus-panel {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: calc(var(--ball-size) + 10px);
+  left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: min(var(--strip-max), 72vw);
+  margin: 0;
+  pointer-events: auto;
+}
+
+.plus-float.panel-right .plus-panel {
+  left: calc(var(--ball-size) + 10px);
+  right: auto;
+}
+
+.plus-float.panel-left .plus-panel {
+  right: calc(var(--ball-size) + 10px);
+  left: auto;
+}
+
+.plus-float.reply-above .plus-reply {
+  order: -1;
 }
 
 .plus-badge {
@@ -55,6 +82,7 @@
 }
 
 /* display:flex on the strip must not override the hidden attribute. */
+.plus-float .plus-panel[hidden],
 .plus-float .command-strip[hidden],
 .plus-float .plus-reply[hidden] {
   display: none !important;
@@ -67,6 +95,7 @@
   border: none;
   cursor: pointer;
   position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   padding: 0;
   color: var(--api-mesh-ink);
@@ -141,7 +170,8 @@
 
 .plus-float .command-strip,
 .plus-float .plus-reply {
-  width: min(var(--strip-max), 72vw);
+  box-sizing: border-box;
+  width: 100%;
   background:
     repeating-linear-gradient(
       125deg,
