@@ -99,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106k/);
-  assert.match(html, /assistant\.js\?v=20261106k/);
+  assert.match(html, /assistant\.css\?v=20261106l/);
+  assert.match(html, /assistant\.js\?v=20261106l/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -283,7 +283,7 @@ test('import chart stays on the ball and off the original page', function () {
   assert.doesNotMatch(html, /id="btnImportChart"/);
   assert.doesNotMatch(html, />\s*Import chart\s*</);
   assert.doesNotMatch(html, /mode-row|plusModeAsk|mode-chip/);
-  assert.match(js, /'btnImportChart', 'Import'/);
+  assert.match(js, /'btnImportChart', 'IMPORT'/);
   assert.match(js, /chartBtn\.setAttribute\('aria-label', 'Import chart'\)/);
   assert.match(js, /command\.appendChild\(modeRow\)/);
   assert.match(js, /title\.textContent = 'Import chart'/);
@@ -299,9 +299,13 @@ test('import chart stays on the ball and off the original page', function () {
 });
 
 test('Ask, Command, and Import share one cream row under the text box', function () {
-  assert.match(js, /'plusModeAsk', 'Ask'/);
-  assert.match(js, /'plusModeCommand', 'Command'/);
-  assert.match(js, /'btnImportChart', 'Import'/);
+  assert.match(js, /'plusModeAsk', 'ASK'/);
+  assert.match(js, /'plusModeCommand', 'COMMAND'/);
+  assert.match(js, /'btnImportChart', 'IMPORT'/);
+  assert.match(js, /sendBtn\.textContent = 'SEND'/);
+  assert.match(js, /importing \? 'CHOOSE' : 'SEND'/);
+  assert.match(css, /\.plus-float \.command-strip\s*\{[^}]*gap:\s*0\.6rem/);
+  assert.match(css, /\.plus-float \.command-line\s*\{[^}]*gap:\s*0\.55rem/);
   assert.match(js, /var mode = 'ask'/);
   assert.match(js, /if \(!wasOpen\) setMode\('ask'\)/);
   assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*display:\s*flex/);

@@ -1010,7 +1010,7 @@
     var sendBtn = document.createElement('button');
     sendBtn.type = 'submit';
     sendBtn.className = 'go';
-    sendBtn.textContent = 'Send';
+    sendBtn.textContent = 'SEND';
     commandLine.appendChild(input);
     commandLine.appendChild(sendBtn);
     var mode = 'ask';
@@ -1031,9 +1031,9 @@
       modeRow.appendChild(btn);
       return btn;
     }
-    var askBtn = makeModeChip('plusModeAsk', 'Ask', 'ask', 'Ask a question');
-    var commandBtn = makeModeChip('plusModeCommand', 'Command', 'command', 'Run a class control');
-    var chartBtn = makeModeChip('btnImportChart', 'Import', 'import', 'Read a seating-chart photo and move desks by class number');
+    var askBtn = makeModeChip('plusModeAsk', 'ASK', 'ask', 'Ask a question');
+    var commandBtn = makeModeChip('plusModeCommand', 'COMMAND', 'command', 'Run a class control');
+    var chartBtn = makeModeChip('btnImportChart', 'IMPORT', 'import', 'Read a seating-chart photo and move desks by class number');
     chartBtn.setAttribute('aria-label', 'Import chart');
     command.appendChild(commandLine);
     command.appendChild(modeRow);
@@ -1212,7 +1212,7 @@
         ? 'Ask a question\u2026'
         : (commandMode ? '+1 name, pick, pairs\u2026' : 'Chart photo');
       input.setAttribute('aria-label', ask ? 'Ask a question' : (commandMode ? 'Command' : 'Import chart'));
-      sendBtn.textContent = importing ? 'Choose' : 'Send';
+      sendBtn.textContent = importing ? 'CHOOSE' : 'SEND';
       [askBtn, commandBtn, chartBtn].forEach(function (btn) {
         var on = btn.getAttribute('data-mode') === mode;
         btn.classList.toggle('is-selected', on);
