@@ -1,8 +1,8 @@
 /* HCS Live Class + assistant. The ball uses the shared Eng api-mesh wash
    (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
    here so this page does not load ask.css. The command strip and reply
-   stay cream. The idle ball and the open unit (ball + strip + reply)
-   stay off desk name chips and the floor zoom bar. */
+   stay cream. The ball keeps its viewport spot while the floor scrolls.
+   A drag can still park the unit off desk name chips and the zoom bar. */
 
 .plus-float {
   --mesh-cream: #f4f0e8;
@@ -50,15 +50,13 @@
 
 .plus-float .home-ball,
 .plus-float .command-strip,
-.plus-float .plus-reply,
-.plus-float .plus-confirm {
+.plus-float .plus-reply {
   pointer-events: auto;
 }
 
 /* display:flex on the strip must not override the hidden attribute. */
 .plus-float .command-strip[hidden],
-.plus-float .plus-reply[hidden],
-.plus-float .plus-confirm[hidden] {
+.plus-float .plus-reply[hidden] {
   display: none !important;
 }
 
@@ -142,8 +140,7 @@
 }
 
 .plus-float .command-strip,
-.plus-float .plus-reply,
-.plus-float .plus-confirm {
+.plus-float .plus-reply {
   width: min(var(--strip-max), 72vw);
   background:
     repeating-linear-gradient(
@@ -206,8 +203,7 @@
   background: rgba(90, 75, 50, 0.22);
 }
 
-.plus-float .plus-reply,
-.plus-float .plus-confirm {
+.plus-float .plus-reply {
   padding: 0.45rem 0.75rem;
   font-size: 0.82rem;
   line-height: 1.35;
@@ -226,20 +222,6 @@
   touch-action: pan-y;
 }
 
-.plus-float .plus-confirm {
-  cursor: pointer;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.plus-float .plus-confirm:active {
-  background-color: #e8e0d2;
-}
-
-.plus-float .plus-confirm:focus-visible,
 .plus-float .command-strip .go:focus-visible,
 .plus-float .command-strip input:focus-visible {
   outline: 2px solid #8a7a55;

@@ -2,9 +2,10 @@
  * HCS Live Class + assistant.
  * Nest: DEFAULT_WORKER_URL is the only assistant host. Do not point it at
  * deepseek-explain, say-it-louder, or ces-softspeak.
- * The open unit is the ball plus the cream strip (and any reply). Placement
- * and drag bounds use that whole box, so an open strip cannot sit on a
- * desk name chip or the floor zoom bar.
+ * The open unit is the ball plus the cream strip (and any reply). It keeps
+ * the viewport spot from the last drag (or the default corner). Floor
+ * scroll does not move it. A drag still settles the whole box clear of
+ * desk name chips and the floor zoom bar, then remembers that spot.
  */
 (function (root) {
   var api = factory();
@@ -17,15 +18,15 @@
   var POS_KEY = 'hcsLiveClassPlus_ball_v1';
   var GAP = 10;
   var ACTIONS = {
-    hide_names: 'Hide names — go?',
-    show_names: 'Show names — go?',
-    zoom_in: 'Zoom in — go?',
-    zoom_out: 'Zoom out — go?',
-    zoom_reset: 'Reset zoom — go?',
-    random_pick: 'Pick a student — go?',
-    open_seating: 'Open Seating — go?',
-    open_scores: 'Open Scores — go?',
-    tidy_snap: 'Tidy desks — go?'
+    hide_names: 'Hide names',
+    show_names: 'Show names',
+    zoom_in: 'Zoom in',
+    zoom_out: 'Zoom out',
+    zoom_reset: 'Reset zoom',
+    random_pick: 'Pick a student',
+    open_seating: 'Open Seating',
+    open_scores: 'Open Scores',
+    tidy_snap: 'Tidy desks'
   };
 
   function safeWorkerUrl(raw) {
@@ -174,8 +175,8 @@
     return data.reply ? plainActionNames(String(data.reply).trim()) : '';
   }
 
-  // The Worker sometimes names tidy_snap in a sentence. The chip already
-  // says "Tidy desks — go?". Shown replies use the plain words.
+  // The Worker sometimes names tidy_snap, or asks the teacher to confirm.
+  // Actions run on the first send, so a shown reply uses the plain words.
   function plainActionNames(text) {
     var out = String(text || '');
     out = out.replace(/\s*[—–-]\s*please confirm to run tidy_snap\b/gi, '');
@@ -225,7 +226,6 @@
     var narrowHome = root.innerWidth <= 420;
     var anchor = { right: narrowHome ? 12 : 18, bottom: narrowHome ? 28 : 36 };
     var openState = false;
-    var pending = null;
     var drag = null;
     var swallowUntil = 0;
     // Same 8px radius as the floor pan and the zoom chip. A finger that
@@ -268,11 +268,6 @@
     command.appendChild(input);
     command.appendChild(sendBtn);
 
-    var confirmBtn = document.createElement('button');
-    confirmBtn.type = 'button';
-    confirmBtn.className = 'plus-confirm';
-    confirmBtn.hidden = true;
-
     var reply = document.createElement('div');
     reply.className = 'plus-reply';
     reply.id = 'plusReply';
@@ -281,7 +276,6 @@
 
     unit.appendChild(ball);
     unit.appendChild(command);
-    unit.appendChild(confirmBtn);
     unit.appendChild(reply);
     document.body.appendChild(unit);
 
@@ -354,24 +348,16 @@
       return { left: left, top: top, right: left + w, bottom: top + h };
     }
 
+    var REPLY_MIN = 120;
+
     function replyLimit() {
       var box = bounds();
       var room = box.bottom - box.top;
       var reserve = 56 + 28;
       if (!command.hidden) reserve += command.offsetHeight + 10;
-      if (!confirmBtn.hidden) reserve += confirmBtn.offsetHeight + 10;
       var limit = room - reserve;
-      if (limit < 120) limit = 120;
+      if (limit < REPLY_MIN) limit = REPLY_MIN;
       return limit;
-    }
-
-    function boxHits(box, list, gap) {
-      for (var i = 0; i < list.length; i++) {
-        var o = list[i];
-        if (box.left < o.right + gap && box.right > o.left - gap &&
-            box.top < o.bottom + gap && box.bottom > o.top - gap) return true;
-      }
-      return false;
     }
 
     function fitReply() {
@@ -387,12 +373,12 @@
     function relaxWidth() {
       command.style.width = '';
       reply.style.width = '';
-      confirmBtn.style.width = '';
     }
 
-    // A long answer stays fully readable. The strip keeps --strip-max
-    // (260px). liftClear moves the unit off desk names and the floor zoom
-    // bar. Narrow the strip only when a move still leaves a real overlap.
+    // The saved corner is the bottom-right of the unit. A taller strip
+    // grows upward from that spot. Clamp into the viewport on resize and
+    // when the strip opens. Do not chase desk chips: floor scroll must
+    // leave the ball on the same viewport spot.
     function place() {
       relaxWidth();
       fitReply();
@@ -403,60 +389,12 @@
       var top = root.innerHeight - anchor.bottom - height;
       if (left < limitBox.left) left = limitBox.left;
       if (left + width > limitBox.right) left = Math.max(limitBox.left, limitBox.right - width);
+      if (top + height > limitBox.bottom) top = limitBox.bottom - height;
       if (top < limitBox.top) top = limitBox.top;
       unit.style.left = Math.round(left) + 'px';
       unit.style.top = Math.round(top) + 'px';
       unit.style.right = 'auto';
       unit.style.bottom = 'auto';
-      // Follow the finger while it is down. Clear chips and the zoom bar
-      // when the gesture ends, so a desk under the path does not pin the ball.
-      if (!(drag && drag.moved)) liftClear();
-    }
-
-    var REPLY_MIN = 120;
-    var THIN_X = 24;
-
-    function liftClear() {
-      var guard = 12;
-      while (guard--) {
-        var box = unit.getBoundingClientRect();
-        var obs = obstacles();
-        var blockTop = null;
-        for (var i = 0; i < obs.length; i++) {
-          var o = obs[i];
-          if (!boxHits(box, [o], 0)) continue;
-          var hOverlap = Math.min(box.right, o.right) - Math.max(box.left, o.left);
-          // A sliver of a desk name under the strip edge is not a real cover.
-          if (!o.floor && hOverlap < THIN_X) continue;
-          if (blockTop == null || o.top < blockTop) blockTop = o.top;
-        }
-        if (blockTop == null) return;
-        var ceiling = 8;
-        var targetBottom = blockTop - api.GAP;
-        var height = unit.offsetHeight;
-        var targetTop = targetBottom - height;
-        if (targetTop >= ceiling) {
-          unit.style.top = Math.round(targetTop) + 'px';
-          continue;
-        }
-        if (reply.hidden) {
-          unit.style.top = Math.round(ceiling) + 'px';
-          return;
-        }
-        var replyBox = reply.getBoundingClientRect();
-        var chrome = height - replyBox.height;
-        var room = targetBottom - ceiling - chrome;
-        if (room < REPLY_MIN) room = REPLY_MIN;
-        reply.style.overflowY = 'auto';
-        if (replyBox.height <= room + 1) {
-          unit.style.top = Math.round(Math.max(ceiling, targetBottom - unit.offsetHeight)) + 'px';
-          return;
-        }
-        reply.style.maxHeight = Math.round(room) + 'px';
-        var nextTop = targetBottom - unit.offsetHeight;
-        if (nextTop < ceiling) nextTop = ceiling;
-        unit.style.top = Math.round(nextTop) + 'px';
-      }
     }
 
     function schedulePlace() {
@@ -478,54 +416,61 @@
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
-        confirmBtn.hidden = true;
-        confirmBtn.textContent = '';
-        pending = null;
       }
       place();
       root.requestAnimationFrame(place);
-      if (openState) {
-        root.setTimeout(function () { input.focus(); }, 0);
+      if (openState) focusCommand();
+    }
+
+    // After Enter, the field is cleared and often blurred (Send takes the
+    // click, or the browser drops the caret). Put it back while the strip
+    // is open so the next line can be typed. A closed strip stays closed.
+    function focusCommand() {
+      if (!openState || command.hidden || input.disabled) return;
+      function aim() {
+        if (!openState || command.hidden || input.disabled) return;
+        try {
+          input.focus({ preventScroll: true });
+        } catch (err) {
+          try { input.focus(); } catch (e2) {}
+        }
       }
+      aim();
+      root.setTimeout(aim, 0);
     }
 
     function showReply(text) {
-      confirmBtn.hidden = true;
-      confirmBtn.textContent = '';
       var shown = String(text || '').trim();
       if (!shown) {
         reply.hidden = true;
         reply.textContent = '';
         place();
+        focusCommand();
         return;
       }
       reply.hidden = false;
       reply.textContent = shown;
       place();
       root.requestAnimationFrame(place);
+      focusCommand();
     }
 
-    function showConfirm(label, action, slots) {
-      pending = { action: action, slots: slots, label: label };
-      reply.hidden = true;
-      reply.textContent = '';
-      confirmBtn.hidden = false;
-      confirmBtn.textContent = label;
-      place();
-      root.requestAnimationFrame(place);
-    }
-
-    function runPending() {
-      if (!pending) return;
-      var job = pending;
-      pending = null;
-      confirmBtn.hidden = true;
+    function runAction(action, slots, replyText) {
       var board = root.HcsLiveClassPlusBoard;
       if (!board || typeof board.run !== 'function') {
         showReply('The board is still loading.');
         return;
       }
-      var result = board.run(job.action, job.slots);
+      var jobSlots = slots || {};
+      if (typeof board.preview === 'function') {
+        var preview = board.preview(action, jobSlots);
+        if (!preview || preview.ok === false) {
+          showReply((preview && preview.message) || api.plainActionNames(replyText) || 'Which student?');
+          return;
+        }
+        if (preview.slots) jobSlots = preview.slots;
+      }
+      var result = board.run(action, jobSlots);
       if (!result || result.ok === false) {
         showReply((result && result.message) || 'I can\u2019t run that from here.');
         return;
@@ -536,17 +481,7 @@
     function handlePayload(data) {
       var payload = api.readPayload(data);
       if (payload.kind === 'action' && payload.action) {
-        var board = root.HcsLiveClassPlusBoard;
-        if (!board || typeof board.preview !== 'function') {
-          showReply('The board is still loading.');
-          return;
-        }
-        var preview = board.preview(payload.action, payload.slots);
-        if (!preview || preview.ok === false) {
-          showReply((preview && preview.message) || api.plainActionNames(payload.reply) || 'Which student?');
-          return;
-        }
-        showConfirm(preview.label, payload.action, preview.slots || payload.slots);
+        runAction(payload.action, payload.slots, payload.reply);
         return;
       }
       var text = api.presentReply(payload);
@@ -558,16 +493,14 @@
       var text = String(message || '').replace(/\s+/g, ' ').trim();
       if (!text || inflight) return;
       input.value = '';
-      pending = null;
-      confirmBtn.hidden = true;
       reply.hidden = false;
       reply.textContent = '\u2026';
       place();
       var ticket = ++seq;
       var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       inflight = controller;
-      input.disabled = true;
       sendBtn.disabled = true;
+      focusCommand();
       var timer = root.setTimeout(function () {
         if (controller) controller.abort();
       }, 25000);
@@ -585,7 +518,6 @@
         if (ticket !== seq) return;
         inflight = null;
         root.clearTimeout(timer);
-        input.disabled = false;
         sendBtn.disabled = false;
         if (result.status === 200 && result.body) {
           handlePayload(result.body);
@@ -597,7 +529,6 @@
         if (ticket !== seq) return;
         inflight = null;
         root.clearTimeout(timer);
-        input.disabled = false;
         sendBtn.disabled = false;
         showReply('The assistant is unavailable just now.');
       });
@@ -606,9 +537,7 @@
     command.addEventListener('submit', function (e) {
       e.preventDefault();
       send(input.value);
-    });
-    confirmBtn.addEventListener('click', function () {
-      runPending();
+      focusCommand();
     });
 
     function onBallPointerMove(e) {
@@ -695,16 +624,11 @@
     });
 
     root.addEventListener('resize', schedulePlace);
-    var floor = document.getElementById('classroomViewport');
-    if (floor) floor.addEventListener('scroll', schedulePlace, { passive: true });
-    var desks = document.getElementById('desksContainer');
-    if (desks && typeof MutationObserver !== 'undefined') {
-      new MutationObserver(schedulePlace).observe(desks, { childList: true });
-    }
 
     place();
     root.addEventListener('load', place);
-    // Floor zoom bar and desk names settle after the Live Class layout pass.
+    // Header height settles after the first layout pass. This reclamps
+    // the saved corner; it does not follow the floor.
     root.setTimeout(place, 400);
     root.setTimeout(place, 1200);
   }
