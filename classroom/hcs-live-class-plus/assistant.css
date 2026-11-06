@@ -270,3 +270,208 @@
     background-position: 0% 50%;
   }
 }
+
+/* Import chart. The sheet uses the same cream as the command strip.
+   Toolbar chips stay on the page; this dialog is the preview. */
+.chart-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.chart-import-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.chart-import-panel {
+  width: 100%;
+  max-width: 40rem;
+  max-height: min(92vh, 44rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--mesh-cream, #f4f0e8);
+  color: #3a3428;
+  border-radius: 16px;
+  box-shadow: 0 16px 50px rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+}
+
+.chart-import-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fff;
+  border-bottom: 1px solid #e7e1d6;
+}
+
+.chart-import-bar h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #123a4d;
+}
+
+.chart-import-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: #f4f0e8;
+  color: #3a3428;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chart-import-body {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart-import-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 16px;
+}
+
+.chart-import-lead,
+.chart-import-where,
+.chart-import-summary {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.chart-import-where,
+.chart-import-summary {
+  color: #7a7060;
+  font-size: 13px;
+}
+
+.chart-import-orient,
+.chart-import-apply,
+.chart-import-cancel {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.chart-import-orient {
+  align-self: flex-start;
+  border: 1px solid #bae6fd;
+  background: #f0f9ff;
+  color: #075985;
+}
+
+.chart-import-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart-preview-grid {
+  display: grid;
+  gap: 6px;
+  min-width: min(100%, 36rem);
+}
+
+.chart-cell {
+  min-height: 3.25rem;
+  padding: 6px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e7e1d6;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.chart-cell.is-empty {
+  background: transparent;
+  border-style: dashed;
+}
+
+.chart-cell.is-missing,
+.chart-cell.is-duplicate {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.chart-cell-no {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 800;
+  color: #0369a1;
+}
+
+.chart-cell-name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.chart-import-notes {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.chart-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chart-import-apply {
+  flex: 1 1 8rem;
+  border: 0;
+  background: #0284c7;
+  color: #fff;
+}
+
+.chart-import-apply:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.chart-import-cancel {
+  flex: 1 1 8rem;
+  border: 1px solid #e7e1d6;
+  background: #fff;
+  color: #3a3428;
+}
+
+.chart-import-close:focus-visible,
+.chart-import-orient:focus-visible,
+.chart-import-apply:focus-visible,
+.chart-import-cancel:focus-visible {
+  outline: 2px solid #8a7a55;
+  outline-offset: 2px;
+}
+
+@media (min-width: 640px) {
+  .chart-import-sheet {
+    align-items: center;
+  }
+}

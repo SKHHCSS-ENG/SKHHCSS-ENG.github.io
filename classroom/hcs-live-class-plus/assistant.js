@@ -277,6 +277,388 @@
     };
   }
 
+  // Same roster rule as the floor: one to three digits pad to two, so a
+  // chart "7" matches a desk stored as "07". Anything else is kept as typed.
+  function normaliseClassNo(rawText) {
+    var next = String(rawText == null ? '' : rawText).replace(/\s+/g, ' ').trim();
+    if (next.charAt(0) === '#') next = next.slice(1).trim();
+    if (!next) return '';
+    if (next.length > 12) next = next.slice(0, 12).trim();
+    if (/^\d{1,3}$/.test(next)) return next.padStart(2, '0');
+    return next;
+  }
+
+  // OCR words are digits only. A date or a glued pair is not a class number.
+  function chartToken(text) {
+    var digits = String(text == null ? '' : text).replace(/\D/g, '');
+    if (!/^\d{1,3}$/.test(digits)) return '';
+    return normaliseClassNo(digits);
+  }
+
+  // Desk pitch copied from the floor. Pairs and pods use the 8px / 36px
+  // left-right gaps; exam rows use the even 16px column step.
+  var CHART_PITCH = {
+    stageWidth: 1120,
+    deskW: 148,
+    deskH: 115,
+    rowGapY: 10,
+    examColGapX: 16,
+    podInnerGapX: 8,
+    podAisleGapX: 36,
+    podRowAisleY: 24,
+    frontEdge: 8,
+    frontLabelH: 32,
+    frontRowGap: 10
+  };
+
+  function frontRowTopOffset(frontAtTop) {
+    var p = CHART_PITCH;
+    return frontAtTop ? (p.frontEdge + p.frontLabelH + p.frontRowGap) : 28;
+  }
+
+  function pairColOffset(c) {
+    var p = CHART_PITCH;
+    var pairIdx = Math.floor(c / 2);
+    var inPair = c % 2;
+    return pairIdx * (2 * p.deskW + p.podInnerGapX + p.podAisleGapX) + inPair * (p.deskW + p.podInnerGapX);
+  }
+
+  function podRowOffset(r) {
+    var p = CHART_PITCH;
+    var podRow = Math.floor(r / 2);
+    var inPod = r % 2;
+    return podRow * (2 * p.deskH + p.rowGapY + p.podRowAisleY) + inPod * (p.deskH + p.rowGapY);
+  }
+
+  function layoutOriginX(totalGridW) {
+    var p = CHART_PITCH;
+    var eff = Math.max(p.stageWidth, totalGridW + 64);
+    return Math.max(28, Math.round((eff - totalGridW) / 2));
+  }
+
+  // Row 0 is the top of the floor. frontAtTop puts the front label above it.
+  function layoutSlots(rows, cols, layoutStyle, frontAtTop) {
+    var p = CHART_PITCH;
+    var style = layoutStyle || 'pairs';
+    if (style !== 'rows' && style !== 'pairs' && style !== 'pods4' && style !== 'customGrid') style = 'rows';
+    var nRows = Math.max(1, rows | 0);
+    var nCols = Math.max(1, cols | 0);
+    var top = frontRowTopOffset(!!frontAtTop);
+    var stepY = p.deskH + p.rowGapY;
+    var stepX = p.deskW + p.examColGapX;
+    var totalW = (style === 'rows' || style === 'customGrid')
+      ? ((nCols - 1) * stepX + p.deskW)
+      : (pairColOffset(nCols - 1) + p.deskW);
+    var startX = layoutOriginX(totalW);
+    var slots = [];
+    for (var r = 0; r < nRows; r++) {
+      var row = [];
+      for (var c = 0; c < nCols; c++) {
+        var x = (style === 'rows' || style === 'customGrid') ? (startX + c * stepX) : (startX + pairColOffset(c));
+        var y = top + (style === 'pods4' ? podRowOffset(r) : r * stepY);
+        row.push({ x: x, y: y });
+      }
+      slots.push(row);
+    }
+    return slots;
+  }
+
+  function clusterAxis(values, tol) {
+    var sorted = [];
+    (values || []).forEach(function (v) {
+      if (typeof v === 'number' && isFinite(v)) sorted.push(v);
+    });
+    sorted.sort(function (a, b) { return a - b; });
+    var groups = [];
+    sorted.forEach(function (v) {
+      var g = groups.length ? groups[groups.length - 1] : null;
+      if (!g || v - g.mean > tol) groups.push({ sum: v, n: 1, mean: v });
+      else {
+        g.sum += v;
+        g.n += 1;
+        g.mean = g.sum / g.n;
+      }
+    });
+    return groups.map(function (g) { return Math.round(g.mean); });
+  }
+
+  // Reuse the open plan's column and row centres when they already match
+  // the chart. That keeps a dragged block's origin instead of recentering it.
+  function inferDeskAxes(students, rows, cols) {
+    var xs = [];
+    var ys = [];
+    (students || []).forEach(function (st) {
+      if (!st) return;
+      if (typeof st.x === 'number') xs.push(st.x);
+      if (typeof st.y === 'number') ys.push(st.y);
+    });
+    var cx = clusterAxis(xs, 40);
+    var cy = clusterAxis(ys, 50);
+    if (cx.length !== cols || cy.length !== rows) return null;
+    return { xs: cx, ys: cy };
+  }
+
+  function axesToSlots(xs, ys) {
+    var slots = [];
+    for (var r = 0; r < ys.length; r++) {
+      var row = [];
+      for (var c = 0; c < xs.length; c++) row.push({ x: xs[c], y: ys[r] });
+      slots.push(row);
+    }
+    return slots;
+  }
+
+  function blueMaskFromRGBA(data, width, height) {
+    var mask = new Uint8Array(width * height);
+    var count = 0;
+    var p = 0;
+    for (var i = 0; i < data.length && p < mask.length; i += 4, p++) {
+      var r = data[i];
+      var g = data[i + 1];
+      var b = data[i + 2];
+      if (b > r + 25 && b > g && b > 100 && r < 200 && (b - r) > 28) {
+        mask[p] = 1;
+        count += 1;
+      }
+    }
+    return { mask: mask, count: count, width: width, height: height };
+  }
+
+  // Horizontal runs of number ink. A short empty gap is one broken stroke,
+  // not a new desk row.
+  function inkRowBands(mask, width, height) {
+    var rows = new Uint32Array(height);
+    var max = 0;
+    for (var y = 0; y < height; y++) {
+      var s = 0;
+      var row = y * width;
+      for (var x = 0; x < width; x++) s += mask[row + x];
+      rows[y] = s;
+      if (s > max) max = s;
+    }
+    var thresh = Math.max(12, Math.floor(max * 0.25));
+    var bands = [];
+    var yy = 0;
+    while (yy < height) {
+      if (rows[yy] >= thresh) {
+        var y0 = yy;
+        // Keep the thinner top and bottom of the same digits. A full row
+        // sets the threshold; a short back row would otherwise be clipped.
+        while (y0 > 0 && rows[y0 - 1] >= 8) y0 -= 1;
+        while (yy < height && rows[yy] >= 8) yy += 1;
+        if (yy - y0 >= 8) bands.push({ y0: y0, y1: yy });
+      } else yy += 1;
+    }
+    var merged = [];
+    bands.forEach(function (b) {
+      var prev = merged.length ? merged[merged.length - 1] : null;
+      if (prev && b.y0 - prev.y1 <= 10) prev.y1 = b.y1;
+      else merged.push({ y0: b.y0, y1: b.y1 });
+    });
+    return merged;
+  }
+
+  function chooseDeskRows(bands) {
+    var kept = [];
+    (bands || []).forEach(function (band) {
+      var items = [];
+      ((band && band.items) || []).forEach(function (it) {
+        var raw = it && it.classNo != null ? it.classNo : (it && it.text);
+        var no = chartToken(raw);
+        var x = Number(it && it.x);
+        if (!no || !isFinite(x)) return;
+        var conf = Number(it && it.confidence);
+        if (!isFinite(conf)) conf = 100;
+        items.push({ classNo: no, x: x, confidence: conf });
+      });
+      if (!items.length) return;
+      if (items.length === 1 && items[0].confidence < 45) return;
+      items.sort(function (a, b) { return a.x - b.x; });
+      kept.push({ items: items });
+    });
+    return kept;
+  }
+
+  function medianGap(xs) {
+    if (!xs || xs.length < 2) return 0;
+    var gaps = [];
+    for (var i = 1; i < xs.length; i++) gaps.push(xs[i] - xs[i - 1]);
+    gaps.sort(function (a, b) { return a - b; });
+    return gaps[Math.floor((gaps.length - 1) / 2)];
+  }
+
+  function columnCenters(xs) {
+    var sorted = [];
+    xs.slice().sort(function (a, b) { return a - b; }).forEach(function (x) {
+      if (!sorted.length || x - sorted[sorted.length - 1] > 1) sorted.push(x);
+    });
+    if (sorted.length < 2) return sorted;
+    var median = medianGap(sorted);
+    if (!(median > 0)) return sorted;
+    var out = [sorted[0]];
+    for (var i = 1; i < sorted.length; i++) {
+      var dx = sorted[i] - sorted[i - 1];
+      var missing = Math.round(dx / median) - 1;
+      if (missing > 0 && missing <= 6 && dx > median * 1.65) {
+        for (var k = 1; k <= missing; k++) out.push(sorted[i - 1] + (dx * k) / (missing + 1));
+      }
+      out.push(sorted[i]);
+    }
+    return out;
+  }
+
+  // Photo order: the first band is the top of the picture. Empty cells stay
+  // blank so a short back row does not slide left.
+  function seatingGridFromMarks(bands) {
+    var rows = chooseDeskRows(bands);
+    var notes = [];
+    if (!rows.length) return { grid: [], notes: notes };
+    var seed = rows[0];
+    rows.forEach(function (row) {
+      if (row.items.length > seed.items.length) seed = row;
+    });
+    var centers = columnCenters(seed.items.map(function (it) { return it.x; }));
+    var median = medianGap(centers);
+    var tol = median > 0 ? median * 0.6 : 80;
+    var spanMin = centers[0];
+    var spanMax = centers[centers.length - 1];
+    var grid = [];
+    rows.forEach(function (row) {
+      var cells = [];
+      var claimed = {};
+      for (var c = 0; c < centers.length; c++) cells.push('');
+      row.items.forEach(function (it) {
+        if (it.x < spanMin - tol || it.x > spanMax + tol) {
+          notes.push('#' + it.classNo + ' sat outside the desk columns and was left off.');
+          return;
+        }
+        var best = 0;
+        var bestD = Infinity;
+        for (var i = 0; i < centers.length; i++) {
+          var d = Math.abs(it.x - centers[i]);
+          if (d < bestD) {
+            bestD = d;
+            best = i;
+          }
+        }
+        if (claimed[best]) {
+          notes.push('#' + it.classNo + ' overlapped another number in the same column and was left off.');
+          return;
+        }
+        claimed[best] = true;
+        cells[best] = it.classNo;
+      });
+      grid.push(cells);
+    });
+    return { grid: grid, notes: notes };
+  }
+
+  function resolveChartSlots(students, rows, cols, options) {
+    if (options && options.slots) return options.slots;
+    var inferred = inferDeskAxes(students, rows, cols);
+    if (inferred) return axesToSlots(inferred.xs, inferred.ys);
+    return layoutSlots(rows, cols, options && options.layoutStyle, !!(options && options.frontAtTop));
+  }
+
+  // grid is photo order, top row first. chartBoardAtBottom means the last
+  // photo row is the front. The floor's row 0 is the top of the screen.
+  // Those agree when the board is at the bottom and the floor front is too.
+  function rematchByClassNo(students, grid, options) {
+    options = options || {};
+    var list = students || [];
+    var source = grid || [];
+    var rows = source.length;
+    var cols = 0;
+    for (var r = 0; r < rows; r++) cols = Math.max(cols, (source[r] || []).length);
+    var frontAtTop = !!options.frontAtTop;
+    var chartBoardAtBottom = options.chartBoardAtBottom !== false;
+    var flip = chartBoardAtBottom === frontAtTop;
+    var floor = [];
+    for (var rr = 0; rr < rows; rr++) {
+      var src = flip ? rows - 1 - rr : rr;
+      var line = [];
+      for (var c = 0; c < cols; c++) {
+        var raw = source[src] && source[src][c] != null ? source[src][c] : '';
+        line.push(raw === '' ? '' : normaliseClassNo(raw));
+      }
+      floor.push(line);
+    }
+    var slots = rows && cols ? resolveChartSlots(list, rows, cols, options) : [];
+    var byNo = {};
+    list.forEach(function (st) {
+      if (!st) return;
+      var key = normaliseClassNo(st.classNo);
+      if (!key || byNo[key]) return;
+      byNo[key] = st;
+    });
+    var used = {};
+    var notes = (options.notes || []).slice();
+    var moves = [];
+    var preview = [];
+    for (var r = 0; r < rows; r++) {
+      var prow = [];
+      for (var cc = 0; cc < cols; cc++) {
+        var key = floor[r][cc];
+        var slot = slots[r] && slots[r][cc] ? slots[r][cc] : null;
+        if (!key) {
+          prow.push({ classNo: '', name: '', status: 'empty' });
+          continue;
+        }
+        if (used[key]) {
+          notes.push('#' + key + ' is on the chart twice. The second desk stays empty.');
+          prow.push({ classNo: key, name: '', status: 'duplicate' });
+          continue;
+        }
+        used[key] = true;
+        var st = byNo[key];
+        if (!st || !slot) {
+          notes.push('#' + key + ' is on the chart and not in this plan. That desk stays empty.');
+          prow.push({ classNo: key, name: '', status: 'missing' });
+          continue;
+        }
+        moves.push({ id: st.id, classNo: key, name: st.name || '', x: slot.x, y: slot.y });
+        prow.push({ classNo: key, name: st.name || '', status: 'matched', x: slot.x, y: slot.y });
+      }
+      preview.push(prow);
+    }
+    list.forEach(function (st) {
+      if (!st) return;
+      var key = normaliseClassNo(st.classNo);
+      if (key && byNo[key] && byNo[key].id !== st.id) {
+        notes.push((st.name || 'A student') + ' shares #' + key + ' and stays put.');
+        return;
+      }
+      if (key && used[key]) return;
+      var label = (key ? '#' + key + ' ' : '') + (st.name || 'A student');
+      notes.push(label.trim() + ' is not on the chart and stays put.');
+    });
+    return {
+      moves: moves,
+      notes: notes,
+      preview: preview,
+      gridRows: rows,
+      gridCols: cols
+    };
+  }
+
+  // Copy every field, then replace x and y. Groups, scores, and names stay.
+  function applySeatMoves(students, moves) {
+    var byId = {};
+    (moves || []).forEach(function (m) {
+      if (m && m.id) byId[m.id] = m;
+    });
+    return (students || []).map(function (st) {
+      var next = {};
+      Object.keys(st || {}).forEach(function (k) { next[k] = st[k]; });
+      var m = st && byId[st.id];
+      if (m && typeof m.x === 'number' && typeof m.y === 'number') {
+        next.x = m.x;
+        next.y = m.y;
+      }
+      return next;
+    });
+  }
+
   return {
     DEFAULT_WORKER_URL: DEFAULT_WORKER_URL,
     POS_KEY: POS_KEY,
@@ -291,7 +673,18 @@
     layoutBeside: layoutBeside,
     presentReply: presentReply,
     plainActionNames: plainActionNames,
-    readPayload: readPayload
+    readPayload: readPayload,
+    normaliseClassNo: normaliseClassNo,
+    chartToken: chartToken,
+    CHART_PITCH: CHART_PITCH,
+    layoutSlots: layoutSlots,
+    inferDeskAxes: inferDeskAxes,
+    blueMaskFromRGBA: blueMaskFromRGBA,
+    inkRowBands: inkRowBands,
+    chooseDeskRows: chooseDeskRows,
+    seatingGridFromMarks: seatingGridFromMarks,
+    rematchByClassNo: rematchByClassNo,
+    applySeatMoves: applySeatMoves
   };
   }
 
@@ -736,5 +1129,462 @@
     // the saved corner; it does not follow the floor.
     root.setTimeout(place, 400);
     root.setTimeout(place, 1200);
+    mountChartImport();
+
+    // Import chart reads blue class numbers on the device. The picture is
+    // not uploaded. Tesseract is loaded only after the teacher picks a file.
+    function mountChartImport() {
+      var button = document.getElementById('btnImportChart');
+      if (!button || button.getAttribute('data-chart-bound') === '1') return;
+      button.setAttribute('data-chart-bound', '1');
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.className = 'chart-file';
+      input.setAttribute('aria-hidden', 'true');
+      input.tabIndex = -1;
+      document.body.appendChild(input);
+      var sheet = null;
+      var token = 0;
+      var ocrPromise = null;
+
+      function closeSheet() {
+        token += 1;
+        button.disabled = false;
+        if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
+        sheet = null;
+      }
+
+      function loadTesseract() {
+        if (root.Tesseract && root.Tesseract.createWorker) return Promise.resolve(root.Tesseract);
+        return new Promise(function (resolve, reject) {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+          s.async = true;
+          s.onload = function () {
+            if (root.Tesseract && root.Tesseract.createWorker) resolve(root.Tesseract);
+            else reject(new Error('ocr'));
+          };
+          s.onerror = function () { reject(new Error('ocr')); };
+          document.head.appendChild(s);
+        });
+      }
+
+      function ocrWorker() {
+        if (ocrPromise) return ocrPromise;
+        ocrPromise = loadTesseract().then(function (T) {
+          return T.createWorker('eng', 1, {});
+        }).then(function (worker) {
+          return worker.setParameters({
+            tessedit_char_whitelist: '0123456789',
+            tessedit_pageseg_mode: '7',
+            user_defined_dpi: '300'
+          }).then(function () { return worker; });
+        }).catch(function (err) {
+          ocrPromise = null;
+          throw err;
+        });
+        return ocrPromise;
+      }
+
+      function wordsFromResult(data) {
+        if (data && data.words && data.words.length) return data.words;
+        var words = [];
+        var seen = {};
+        function add(word) {
+          if (!word) return;
+          var box = word.bbox || {};
+          var key = String(word.text || '') + '@' + box.x0 + ',' + box.y0;
+          if (seen[key]) return;
+          seen[key] = true;
+          words.push(word);
+        }
+        ((data && data.blocks) || []).forEach(function (block) {
+          (block.paragraphs || []).forEach(function (para) {
+            (para.lines || []).forEach(function (line) {
+              (line.words || []).forEach(add);
+            });
+          });
+        });
+        return words;
+      }
+
+      function chartScale(width) {
+        var w = width || 0;
+        if (w < 2000) return Math.min(3, 4800 / Math.max(1, w));
+        if (w > 4200) return 4200 / w;
+        return 1;
+      }
+
+      function imageMask(img) {
+        var scale = chartScale(img.naturalWidth || img.width);
+        var w = Math.max(1, Math.round((img.naturalWidth || img.width) * scale));
+        var h = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+        var image = ctx.getImageData(0, 0, w, h);
+        return api.blueMaskFromRGBA(image.data, w, h);
+      }
+
+      // A short row in a wide picture is easy to miss. Crop to the ink,
+      // and add the crop's left edge back onto each word.
+      function bandBounds(mask, width, y0, y1) {
+        var minX = width;
+        var maxX = -1;
+        for (var y = y0; y < y1; y++) {
+          var row = y * width;
+          for (var x = 0; x < width; x++) {
+            if (!mask[row + x]) continue;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+          }
+        }
+        if (maxX < minX) return null;
+        var padX = 24;
+        return {
+          x0: Math.max(0, minX - padX),
+          x1: Math.min(width, maxX + 1 + padX)
+        };
+      }
+
+      function bandCanvas(mask, width, y0, y1, x0, x1) {
+        var pad = 16;
+        var bh = Math.max(1, y1 - y0);
+        var bw = Math.max(1, x1 - x0);
+        var canvas = document.createElement('canvas');
+        canvas.width = bw + pad * 2;
+        canvas.height = bh + pad * 2;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        var img = ctx.createImageData(bw, bh);
+        var d = img.data;
+        for (var y = 0; y < bh; y++) {
+          var src = (y0 + y) * width + x0;
+          for (var x = 0; x < bw; x++) {
+            var v = mask[src + x] ? 0 : 255;
+            var i = (y * bw + x) * 4;
+            d[i] = d[i + 1] = d[i + 2] = v;
+            d[i + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, pad, pad);
+        return canvas;
+      }
+
+      function readChartImage(img) {
+        var painted = imageMask(img);
+        var bands = api.inkRowBands(painted.mask, painted.width, painted.height);
+        return ocrWorker().then(function (worker) {
+          var chain = Promise.resolve([]);
+          bands.forEach(function (band) {
+            chain = chain.then(function (acc) {
+              var bounds = bandBounds(painted.mask, painted.width, band.y0, band.y1);
+              if (!bounds) return acc;
+              var canvas = bandCanvas(painted.mask, painted.width, band.y0, band.y1, bounds.x0, bounds.x1);
+              return worker.recognize(canvas).then(function (res) {
+                var items = [];
+                wordsFromResult(res && res.data).forEach(function (word) {
+                  var box = word.bbox || {};
+                  var x0 = Number(box.x0);
+                  var x1 = Number(box.x1);
+                  if (!isFinite(x0) || !isFinite(x1)) return;
+                  var conf = Number(word.confidence);
+                  if (isFinite(conf) && conf > 0 && conf <= 1) conf = conf * 100;
+                  items.push({
+                    text: word.text,
+                    x: bounds.x0 - 16 + (x0 + x1) / 2,
+                    confidence: isFinite(conf) ? conf : 0
+                  });
+                });
+                acc.push({ items: items, y: (band.y0 + band.y1) / 2 });
+                return acc;
+              });
+            });
+          });
+          return chain;
+        }).then(function (marked) {
+          marked.sort(function (a, b) { return a.y - b.y; });
+          return api.seatingGridFromMarks(marked);
+        });
+      }
+
+      function ensureSheet() {
+        if (sheet) return sheet;
+        sheet = document.createElement('div');
+        sheet.className = 'chart-import-sheet';
+        sheet.setAttribute('role', 'dialog');
+        sheet.setAttribute('aria-modal', 'true');
+        sheet.setAttribute('aria-labelledby', 'chartImportTitle');
+        var panel = document.createElement('div');
+        panel.className = 'chart-import-panel';
+        var bar = document.createElement('div');
+        bar.className = 'chart-import-bar';
+        var title = document.createElement('h3');
+        title.id = 'chartImportTitle';
+        title.textContent = 'Import chart';
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'chart-import-close';
+        close.setAttribute('aria-label', 'Close');
+        close.textContent = '\u2715';
+        close.addEventListener('click', closeSheet);
+        bar.appendChild(title);
+        bar.appendChild(close);
+        var body = document.createElement('div');
+        body.className = 'chart-import-body';
+        panel.appendChild(bar);
+        panel.appendChild(body);
+        sheet.appendChild(panel);
+        sheet.addEventListener('click', function (e) {
+          if (e.target === sheet) closeSheet();
+        });
+        document.body.appendChild(sheet);
+        return sheet;
+      }
+
+      function setBody(node) {
+        ensureSheet();
+        var body = sheet.querySelector('.chart-import-body');
+        body.textContent = '';
+        body.appendChild(node);
+      }
+
+      function showMessage(text) {
+        var wrap = document.createElement('div');
+        wrap.className = 'chart-import-pad';
+        var p = document.createElement('p');
+        p.className = 'chart-import-lead';
+        p.textContent = text;
+        var row = document.createElement('div');
+        row.className = 'chart-import-actions';
+        var cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.className = 'chart-import-cancel';
+        cancel.textContent = 'Close';
+        cancel.addEventListener('click', closeSheet);
+        row.appendChild(cancel);
+        wrap.appendChild(p);
+        wrap.appendChild(row);
+        setBody(wrap);
+        cancel.focus();
+      }
+
+      function showPreview(plan, read) {
+        var boardAtBottom = true;
+        function draw() {
+          var result = api.rematchByClassNo(plan.students, read.grid, {
+            frontAtTop: !!plan.frontAtTop,
+            chartBoardAtBottom: boardAtBottom,
+            layoutStyle: plan.layoutStyle,
+            notes: read.notes || []
+          });
+          var wrap = document.createElement('div');
+          wrap.className = 'chart-import-pad';
+          var lead = document.createElement('p');
+          lead.className = 'chart-import-lead';
+          lead.textContent = 'Names, groups, and scores stay. Only seats move.';
+          wrap.appendChild(lead);
+
+          var orient = document.createElement('button');
+          orient.type = 'button';
+          orient.className = 'chart-import-orient';
+          orient.textContent = boardAtBottom ? 'Board in photo: Bottom' : 'Board in photo: Top';
+          orient.addEventListener('click', function () {
+            boardAtBottom = !boardAtBottom;
+            draw();
+          });
+          wrap.appendChild(orient);
+
+          var where = document.createElement('p');
+          where.className = 'chart-import-where';
+          var floorFront = plan.frontAtTop ? 'top' : 'bottom';
+          var photoFront = boardAtBottom ? 'bottom' : 'top';
+          where.textContent = 'Floor front is at the ' + floorFront + '. The ' + photoFront + ' row of the photo sits at the front.';
+          wrap.appendChild(where);
+
+          var byNo = {};
+          (plan.students || []).forEach(function (st) {
+            var key = api.normaliseClassNo(st.classNo);
+            if (key && !byNo[key]) byNo[key] = st;
+          });
+          var seenNo = {};
+          var scroller = document.createElement('div');
+          scroller.className = 'chart-import-scroll';
+          var grid = document.createElement('div');
+          grid.className = 'chart-preview-grid';
+          var cols = result.gridCols || 1;
+          grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(4.5rem, 1fr))';
+          // Photo order, top row first, so the grid can be checked against the picture.
+          // The board toggle changes where those rows land, not this preview.
+          (read.grid || []).forEach(function (row) {
+            for (var c = 0; c < cols; c++) {
+              var key = row && row[c] ? api.normaliseClassNo(row[c]) : '';
+              var box = document.createElement('div');
+              var status = 'empty';
+              var label = '';
+              if (key) {
+                if (seenNo[key]) status = 'duplicate';
+                else if (!byNo[key]) status = 'missing';
+                else {
+                  status = 'matched';
+                  label = byNo[key].name || 'Student';
+                }
+                seenNo[key] = true;
+              }
+              box.className = 'chart-cell is-' + status;
+              if (key) {
+                var no = document.createElement('span');
+                no.className = 'chart-cell-no';
+                no.textContent = '#' + key;
+                box.appendChild(no);
+              }
+              if (status === 'matched') label = label || 'Student';
+              else if (status === 'missing') label = 'No student';
+              else if (status === 'duplicate') label = 'Already used';
+              if (label) {
+                var name = document.createElement('span');
+                name.className = 'chart-cell-name';
+                name.textContent = label;
+                box.appendChild(name);
+              }
+              grid.appendChild(box);
+            }
+          });
+          scroller.appendChild(grid);
+          wrap.appendChild(scroller);
+
+          if (result.notes && result.notes.length) {
+            var list = document.createElement('ul');
+            list.className = 'chart-import-notes';
+            result.notes.forEach(function (note) {
+              var li = document.createElement('li');
+              li.textContent = note;
+              list.appendChild(li);
+            });
+            wrap.appendChild(list);
+          }
+
+          var summary = document.createElement('p');
+          summary.className = 'chart-import-summary';
+          var n = result.moves.length;
+          summary.textContent = n + (n === 1 ? ' student will move.' : ' students will move.');
+          wrap.appendChild(summary);
+
+          var actions = document.createElement('div');
+          actions.className = 'chart-import-actions';
+          var apply = document.createElement('button');
+          apply.type = 'button';
+          apply.className = 'chart-import-apply';
+          apply.textContent = 'Apply';
+          apply.disabled = n === 0;
+          apply.addEventListener('click', function () {
+            var board = root.HcsLiveClassPlusBoard;
+            var live = board && board.chartPlan ? board.chartPlan() : null;
+            if (!live || live.id !== plan.id) {
+              showMessage('The open plan changed. Import the chart again.');
+              return;
+            }
+            if (!live.editMode) {
+              showMessage('Turn Edit on, then import the chart again.');
+              return;
+            }
+            var fresh = api.rematchByClassNo(live.students, read.grid, {
+              frontAtTop: !!live.frontAtTop,
+              chartBoardAtBottom: boardAtBottom,
+              layoutStyle: live.layoutStyle,
+              notes: read.notes || []
+            });
+            var applied = board.applyChart(fresh.moves, {
+              gridRows: fresh.gridRows,
+              gridCols: fresh.gridCols
+            });
+            if (!applied || applied.ok === false) {
+              showMessage((applied && applied.message) || 'Couldn\'t move the desks.');
+              return;
+            }
+            closeSheet();
+          });
+          var cancel = document.createElement('button');
+          cancel.type = 'button';
+          cancel.className = 'chart-import-cancel';
+          cancel.textContent = 'Cancel';
+          cancel.addEventListener('click', closeSheet);
+          actions.appendChild(apply);
+          actions.appendChild(cancel);
+          wrap.appendChild(actions);
+          setBody(wrap);
+          if (!apply.disabled) apply.focus();
+          else cancel.focus();
+        }
+        draw();
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && sheet) closeSheet();
+      });
+
+      button.addEventListener('click', function () {
+        var board = root.HcsLiveClassPlusBoard;
+        var plan = board && board.chartPlan ? board.chartPlan() : null;
+        if (!plan || !plan.students || !plan.students.length) {
+          showMessage('Open a plan with class numbers first.');
+          return;
+        }
+        if (!plan.editMode) {
+          showMessage('Turn Edit on, then import the chart again.');
+          return;
+        }
+        input.value = '';
+        input.click();
+      });
+
+      input.addEventListener('change', function () {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var board = root.HcsLiveClassPlusBoard;
+        var plan = board && board.chartPlan ? board.chartPlan() : null;
+        if (!plan || !plan.students || !plan.students.length) {
+          showMessage('Open a plan with class numbers first.');
+          return;
+        }
+        var my = ++token;
+        button.disabled = true;
+        showMessage('Reading class numbers\u2026');
+        var img = new Image();
+        var url = URL.createObjectURL(file);
+        img.onload = function () {
+          URL.revokeObjectURL(url);
+          readChartImage(img).then(function (read) {
+            if (my !== token) return;
+            button.disabled = false;
+            var count = 0;
+            ((read && read.grid) || []).forEach(function (row) {
+              row.forEach(function (cell) { if (cell) count += 1; });
+            });
+            if (!count) {
+              showMessage('Couldn\'t read class numbers from that picture. Use a clear shot of the chart, with the numbers visible.');
+              return;
+            }
+            var live = board.chartPlan ? board.chartPlan() : plan;
+            showPreview(live && live.id === plan.id ? live : plan, read);
+          }).catch(function () {
+            if (my !== token) return;
+            button.disabled = false;
+            showMessage('The chart reader couldn\'t start. Check the connection and try the picture again.');
+          });
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(url);
+          button.disabled = false;
+          if (my !== token) return;
+          showMessage('That file couldn\'t be opened as a picture.');
+        };
+        img.src = url;
+      });
+    }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this);
