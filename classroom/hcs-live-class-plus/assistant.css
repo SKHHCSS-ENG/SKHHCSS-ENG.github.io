@@ -207,31 +207,54 @@
   min-width: 0;
 }
 
-.plus-float .chart-chip {
+/* Cream row under the text box. Three equal chips; the selected one is ink. */
+.plus-float .mode-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.3rem;
   width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.plus-float .mode-chip {
+  flex: 1 1 0;
+  min-width: 0;
   min-height: 44px;
   margin: 0;
-  padding: 0 0.7rem;
+  padding: 0 0.2rem;
   border: 1px solid rgba(160, 140, 100, 0.45);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.62);
   color: var(--ink);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.plus-float .chart-chip:active {
+.plus-float .mode-chip.is-selected {
+  background: #3a3428;
+  color: var(--mesh-cream);
+  border-color: #3a3428;
+}
+
+.plus-float .mode-chip:active {
   background: rgba(90, 75, 50, 0.16);
 }
 
-.plus-float .chart-chip:disabled {
+.plus-float .mode-chip.is-selected:active {
+  background: #2a261f;
+}
+
+.plus-float .mode-chip:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
-.plus-float .chart-chip:focus-visible {
+.plus-float .mode-chip:focus-visible {
   outline: 2px solid #8a7a55;
   outline-offset: 2px;
 }
@@ -309,7 +332,7 @@
   }
 }
 
-/* Import chart preview. The chip that opens it lives on the ball strip. */
+/* Import chart preview. The Import chip on the ball strip opens it. */
 .chart-file {
   position: absolute;
   width: 1px;

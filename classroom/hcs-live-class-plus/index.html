@@ -20,7 +20,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="stylesheet" href="assistant.css?v=20261106f">
+  <link rel="stylesheet" href="assistant.css?v=20261106g">
   <meta name="theme-color" content="#123a4d">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11570,6 +11570,17 @@
           if (!chosen) return { ok: false, message: 'Which student?' };
           return { ok: true, student: chosen };
         }
+        var no = normaliseClassNo(raw);
+        if (/^\d{2,3}$/.test(no)) {
+          var byNo = [];
+          cls.students.forEach(function (st) {
+            if (normaliseClassNo(st.classNo) === no) byNo.push(st);
+          });
+          if (byNo.length === 1) return { ok: true, student: byNo[0] };
+          if (byNo.length > 1) {
+            return { ok: false, message: 'Which student — ' + byNo.slice(0, 3).map(plusStudentLabel).join(', ') + '?' };
+          }
+        }
         var exact = [];
         var partial = [];
         cls.students.forEach(function (st) {
@@ -11583,6 +11594,33 @@
         if (hits.length === 1) return { ok: true, student: hits[0] };
         if (!hits.length) return { ok: false, message: 'No desk matches that name.' };
         return { ok: false, message: 'Which student — ' + hits.slice(0, 3).map(plusStudentLabel).join(', ') + '?' };
+      }
+
+      function plusFindGroup(query) {
+        var cls = getCurrentClass();
+        if (!cls) return { ok: false, message: 'No class is open.' };
+        var raw = String(query || '').replace(/\s+/g, ' ').trim();
+        if (!raw) {
+          if (state.lastPickedTarget && state.lastPickedTarget.type === 'group') {
+            var picked = getGroupById(cls, state.lastPickedTarget.id);
+            if (picked) return { ok: true, group: picked };
+          }
+          return { ok: false, message: 'Which group?' };
+        }
+        if (getGroupById(cls, raw)) return { ok: true, group: getGroupById(cls, raw) };
+        var q = raw.toLowerCase();
+        var exact = [];
+        var partial = [];
+        (cls.groups || []).forEach(function (g) {
+          var name = String(g.name || '').replace(/\s+/g, ' ').trim();
+          var low = name.toLowerCase();
+          if (low === q) exact.push(g);
+          else if (low && low.indexOf(q) !== -1) partial.push(g);
+        });
+        var hits = exact.length ? exact : partial;
+        if (hits.length === 1) return { ok: true, group: hits[0] };
+        if (!hits.length) return { ok: false, message: 'No group matches that name.' };
+        return { ok: false, message: 'Which group — ' + hits.slice(0, 3).map(function (g) { return g.name; }).join(', ') + '?' };
       }
 
       function plusOpenBand(id) {
@@ -11603,10 +11641,10 @@
         renderLeaderboardAndStats();
       }
 
-      // Allowlist the assistant may run. hide/show names is plus-only:
-      // Live Class has no name switch, so this cloaks desk labels.
-      // zoom_reset is the Fit control (btnZoomReset). Seating and Scores
-      // share one Tools band; each action opens it and scrolls that band.
+      // Allowlist the assistant may run. Ask still accepts the Worker list.
+      // Command parses on the page and calls these same handlers, plus the
+      // other controls the floor already exposes. hide/show names is plus-only.
+      // zoom_reset is the Fit control (btnZoomReset).
       var PLUS_CHIP = {
         hide_names: 'Hide names',
         show_names: 'Show names',
@@ -11614,9 +11652,77 @@
         zoom_out: 'Zoom out',
         zoom_reset: 'Reset zoom',
         random_pick: 'Pick a student',
+        random_group: 'Pick a group',
+        open_picker: 'Open random picker',
+        close_picker: 'Close random picker',
+        reset_pool: 'Reset picker pool',
         open_seating: 'Open Seating',
         open_scores: 'Open Scores',
-        tidy_snap: 'Tidy desks'
+        tidy_snap: 'Tidy desks',
+        layout_pairs: 'Paired desks',
+        layout_rows: 'Exam rows',
+        layout_pods: '4-desk pods',
+        layout_groups: 'Group clusters',
+        all_plus: 'Points for everyone',
+        all_minus: 'Take points from everyone',
+        open_podium: 'Open podium',
+        close_podium: 'Close podium',
+        open_timer: 'Open timer',
+        close_timer: 'Close timer',
+        timer_start: 'Start timer',
+        timer_pause: 'Pause timer',
+        timer_reset: 'Reset timer',
+        timer_add30: 'Add 30 seconds',
+        timer_set: 'Set timer',
+        edit_on: 'Edit on',
+        edit_off: 'Edit off',
+        sound_on: 'Sound on',
+        sound_off: 'Sound off',
+        undo: 'Undo',
+        redo: 'Redo',
+        flip_room: 'Flip room',
+        front_top: 'Front at top',
+        front_bottom: 'Front at bottom',
+        snap_on: 'Snap on',
+        snap_off: 'Snap off',
+        tools_on: 'Tools on',
+        tools_off: 'Tools off',
+        header_show: 'Show header',
+        header_hide: 'Hide header',
+        fullscreen: 'Fullscreen',
+        fullscreen_exit: 'Exit fullscreen',
+        panels_show: 'Show side panels',
+        panels_hide: 'Hide side panels',
+        panels_toggle: 'Side panels',
+        export_csv: 'Export CSV',
+        backup_json: 'Backup',
+        open_classes: 'Open classes',
+        close_classes: 'Close classes',
+        open_group_modal: 'Manage groups',
+        close_groups: 'Close groups',
+        brush_on: 'Assign groups',
+        brush_off: 'Done assigning',
+        clear_groups: 'Clear groups',
+        distribute_groups: 'Share groups',
+        reset_scores: 'Reset scores',
+        save_online: 'Save online',
+        open_plan: 'Open plan',
+        add_desk: 'Add desk',
+        add_group: 'Add group',
+        save_layout: 'Save layout',
+        load_layout: 'Load layout',
+        skin_default: 'Default skin',
+        skin_minimalist: 'Minimalist skin',
+        skin_spark: 'Spark skin',
+        mode_individual: 'Individual work',
+        mode_group: 'Group work',
+        lb_students: 'Student leaderboard',
+        lb_groups: 'Group leaderboard',
+        lb_feed: 'History',
+        scoreboard_toggle: 'Team scoreboard',
+        scoreboard_show: 'Show scoreboard',
+        scoreboard_hide: 'Hide scoreboard',
+        apply_grid: 'Apply grid'
       };
 
       function plusPreview(action, slots) {
@@ -11630,6 +11736,16 @@
             ok: true,
             label: sign + amount + ' for ' + plusStudentLabel(found.student) + '.',
             slots: { student: found.student.id, amount: amount }
+          };
+        }
+        if (action === 'group_plus' || action === 'group_minus') {
+          var gfound = plusFindGroup(slots.group);
+          if (!gfound.ok) return gfound;
+          var gAmount = plusScoreAmount(slots);
+          return {
+            ok: true,
+            label: (action === 'group_minus' ? '\u2212' : '+') + gAmount + ' for ' + gfound.group.name + '.',
+            slots: { group: gfound.group.id, amount: gAmount }
           };
         }
         if (!PLUS_CHIP[action]) return { ok: false, message: 'I can\u2019t run that from here.' };
@@ -11693,7 +11809,305 @@
           tidyCurrentLayout();
           return { ok: true, message: 'Desks tidied.' };
         }
+        var extra = plusCommandAction(action, slots);
+        if (extra) return extra;
         return { ok: false, message: 'I can\u2019t run that from here.' };
+      }
+
+      // Command mode. Each branch calls a control the page already has.
+      function plusClock(total) {
+        var s = Math.max(0, Math.round(Number(total) || 0));
+        var m = Math.floor(s / 60);
+        var r = s % 60;
+        return m + ':' + (r < 10 ? '0' : '') + r;
+      }
+
+      function plusClick(id, message, opts) {
+        opts = opts || {};
+        if (opts.needsClass !== false && !getCurrentClass()) return { ok: false, message: 'No class is open.' };
+        if (opts.needsEdit && !boardEditsAllowed()) {
+          return { ok: false, message: opts.editMessage || 'Turn Edit on, then try that again.' };
+        }
+        var el = document.getElementById(id);
+        if (!el) return { ok: false, message: 'That control is not on this page.' };
+        if (el.disabled) return { ok: false, message: opts.disabledMessage || 'That control is not available yet.' };
+        el.click();
+        return { ok: true, message: message };
+      }
+
+      function plusLayout(type, message) {
+        if (!boardEditsAllowed()) return { ok: false, message: 'Turn Edit on, then try that layout again.' };
+        if (!getCurrentClass()) return { ok: false, message: 'No class is open.' };
+        var btn = document.querySelector('.layout-preset-btn[data-layout="' + type + '"]');
+        if (!btn) return { ok: false, message: 'That layout is not on this page.' };
+        btn.click();
+        return { ok: true, message: message };
+      }
+
+      function plusTimerVisible(open) {
+        var pop = document.getElementById('timerPopover');
+        var toggle = document.getElementById('btnToggleTimerPanel');
+        if (!pop || !toggle) return { ok: false, message: 'Timer is not on this page.' };
+        var hidden = pop.classList.contains('hidden');
+        if (open && hidden) toggle.click();
+        if (!open && !hidden) {
+          var closeBtn = document.getElementById('btnCloseTimerPopover');
+          if (closeBtn) closeBtn.click();
+          else pop.classList.add('hidden');
+        }
+        return { ok: true, message: open ? 'Timer is open.' : 'Timer is closed.' };
+      }
+
+      function plusEdit(on) {
+        var isOn = state.editMode !== false;
+        if (isOn === on) return { ok: true, message: on ? 'Edit is already on.' : 'Edit is already off.' };
+        return plusClick('btnToggleEditName', on ? 'Edit on.' : 'Edit off.', { needsClass: false });
+      }
+
+      function plusSound(on) {
+        if (!!state.soundEnabled === on) return { ok: true, message: on ? 'Sound is already on.' : 'Sound is already off.' };
+        return plusClick('btnToggleSound', on ? 'Sound on.' : 'Sound off.', { needsClass: false });
+      }
+
+      function plusActivity(group) {
+        var want = group ? 'group' : 'individual';
+        if (state.activityMode === want) {
+          return { ok: true, message: group ? 'Already on group work.' : 'Already on individual work.' };
+        }
+        return plusClick(group ? 'btnModeGroup' : 'btnModeIndividual', group ? 'Group work.' : 'Individual work.', { needsClass: false });
+      }
+
+      function plusFront(atTop) {
+        if (!boardEditsAllowed()) return { ok: false, message: 'Turn Edit on, then flip the room again.' };
+        var cls = getCurrentClass();
+        if (!cls) return { ok: false, message: 'No class is open.' };
+        if (!!cls.frontAtTop === atTop) {
+          return { ok: true, message: atTop ? 'Front is already at the top.' : 'Front is already at the bottom.' };
+        }
+        flipClassroomOrientation();
+        return { ok: true, message: atTop ? 'Front is at the top.' : 'Front is at the bottom.' };
+      }
+
+      function plusSnap(on) {
+        if (!boardEditsAllowed()) return { ok: false, message: 'Turn Edit on, then change snap again.' };
+        if (!!state.snapToGrid === on) return { ok: true, message: on ? 'Snap is already on.' : 'Snap is already off.' };
+        return plusClick('btnToggleSnapGrid', on ? 'Snap on.' : 'Snap off.');
+      }
+
+      function plusTools(on) {
+        var open = state.studioBandsOpen !== false;
+        if (open === on) return { ok: true, message: on ? 'Tools are already on.' : 'Tools are already off.' };
+        return plusClick('btnToggleStudioBands', on ? 'Tools on.' : 'Tools off.', { needsClass: false });
+      }
+
+      function plusHeader(open) {
+        var isOpen = state.headerBannerOpen !== false;
+        if (isOpen === open) return { ok: true, message: open ? 'Header is already shown.' : 'Header is already hidden.' };
+        return plusClick('btnToggleHeaderBanner', open ? 'Header shown.' : 'Header hidden.', { needsClass: false });
+      }
+
+      function plusPanels(open) {
+        var now = sidePanelsAreOpen();
+        if (open == null) return plusClick('btnToggleSidePanels', 'Side panels toggled.', { needsClass: false });
+        if (now === open) return { ok: true, message: open ? 'Side panels are already shown.' : 'Side panels are already hidden.' };
+        return plusClick('btnToggleSidePanels', open ? 'Side panels shown.' : 'Side panels hidden.', { needsClass: false });
+      }
+
+      function plusFullscreen(exitOnly) {
+        var on = studioIsFullscreen();
+        if (exitOnly && !on) return { ok: true, message: 'Already out of fullscreen.' };
+        var leaving = exitOnly || on;
+        var pending = leaving ? exitStudioFullscreen() : requestStudioFullscreen();
+        pending.catch(function () {
+          showToast('Fullscreen is not available in this browser.', '\u26F6');
+        });
+        return { ok: true, message: leaving ? 'Leaving fullscreen.' : 'Fullscreen.' };
+      }
+
+      function plusBrush(on) {
+        if (!!state.brushMode === on) {
+          return { ok: true, message: on ? 'Assign groups is already on.' : 'Assign groups is already off.' };
+        }
+        if (on) return plusClick('btnToggleGroupBrush', 'Pick a colour, then tap desks.');
+        return plusClick('btnCloseBrushBar', 'Done assigning groups.');
+      }
+
+      function plusLeaderboard(tabId, message) {
+        if (!getCurrentClass()) return { ok: false, message: 'No class is open.' };
+        if (!sidePanelsAreOpen()) {
+          state.classPulseOpen = true;
+          state.leaderboardOpen = true;
+          saveState();
+          applySidePanels();
+          scheduleFloorFit();
+        }
+        return plusClick(tabId, message);
+      }
+
+      function plusScoreboard(open) {
+        var btn = document.getElementById('btnToggleTeamScoreboard');
+        if (!btn) return { ok: false, message: 'The team scoreboard is not on this page.' };
+        var now = state.teamScoreboardOpen === true;
+        if (open == null) {
+          btn.click();
+          return { ok: true, message: 'Team scoreboard toggled.' };
+        }
+        if (now === open) return { ok: true, message: open ? 'Scoreboard is already shown.' : 'Scoreboard is already hidden.' };
+        btn.click();
+        return { ok: true, message: open ? 'Scoreboard shown.' : 'Scoreboard hidden.' };
+      }
+
+      function plusCommandAction(action, slots) {
+        slots = slots || {};
+        if (action === 'all_plus' || action === 'all_minus') {
+          var clsAll = getCurrentClass();
+          if (!clsAll || !clsAll.students.length) return { ok: false, message: 'No students in this class.' };
+          var allAmount = plusScoreAmount(slots);
+          var allDelta = action === 'all_minus' ? -allAmount : allAmount;
+          adjustWholeClassScore(allDelta);
+          return { ok: true, message: (allDelta > 0 ? 'Added ' : 'Took ') + allAmount + ' for everyone.' };
+        }
+        if (action === 'group_plus' || action === 'group_minus') {
+          var gfound = plusFindGroup(slots.group);
+          if (!gfound.ok) return gfound;
+          var gAmount = plusScoreAmount(slots);
+          var gDelta = action === 'group_minus' ? -gAmount : gAmount;
+          adjustGroupScore(gfound.group.id, gDelta);
+          return { ok: true, message: (gDelta > 0 ? 'Added ' : 'Took ') + gAmount + ' for ' + gfound.group.name + '.' };
+        }
+        if (action === 'random_group') {
+          var clsPick = getCurrentClass();
+          if (!clsPick) return { ok: false, message: 'No class is open.' };
+          if (!clsPick.groups.length) return { ok: false, message: 'No groups to pick.' };
+          state.pickerMode = 'group';
+          openPickerModal();
+          triggerRandomPick();
+          return { ok: true, message: 'Picking a group.' };
+        }
+        if (action === 'layout_pairs') return plusLayout('pairs', 'Paired desks.');
+        if (action === 'layout_rows') return plusLayout('rows', 'Exam rows.');
+        if (action === 'layout_pods') return plusLayout('pods4', '4-desk pods.');
+        if (action === 'layout_groups') return plusLayout('groupClusters', 'Desks gathered by group.');
+        if (action === 'open_timer') return plusTimerVisible(true);
+        if (action === 'close_timer') return plusTimerVisible(false);
+        if (action === 'timer_start' || action === 'timer_pause' || action === 'timer_reset' || action === 'timer_add30') {
+          var shown = plusTimerVisible(true);
+          if (!shown.ok) return shown;
+          if (action === 'timer_start') {
+            if (!state.timerRunning) toggleTimerStartPause();
+            return { ok: true, message: 'Timer started.' };
+          }
+          if (action === 'timer_pause') {
+            if (state.timerRunning) toggleTimerStartPause();
+            return { ok: true, message: 'Timer paused.' };
+          }
+          if (action === 'timer_reset') {
+            setTimerSeconds(state.timerTotalSec || 180);
+            return { ok: true, message: 'Timer reset.' };
+          }
+          state.timerTotalSec += 30;
+          state.timerRemainingSec += 30;
+          renderTimerUI();
+          return { ok: true, message: 'Added 30 seconds.' };
+        }
+        if (action === 'timer_set') {
+          var sec = Math.round(Number(slots.seconds));
+          if (!isFinite(sec)) return { ok: false, message: 'How long?' };
+          sec = Math.max(5, Math.min(90 * 60, sec));
+          setTimerSeconds(sec);
+          plusTimerVisible(true);
+          return { ok: true, message: 'Timer set to ' + plusClock(sec) + '.' };
+        }
+        if (action === 'edit_on') return plusEdit(true);
+        if (action === 'edit_off') return plusEdit(false);
+        if (action === 'sound_on') return plusSound(true);
+        if (action === 'sound_off') return plusSound(false);
+        if (action === 'flip_room') {
+          if (!boardEditsAllowed()) return { ok: false, message: 'Turn Edit on, then flip the room again.' };
+          if (!getCurrentClass()) return { ok: false, message: 'No class is open.' };
+          flipClassroomOrientation();
+          return { ok: true, message: 'Room flipped.' };
+        }
+        if (action === 'front_top') return plusFront(true);
+        if (action === 'front_bottom') return plusFront(false);
+        if (action === 'snap_on') return plusSnap(true);
+        if (action === 'snap_off') return plusSnap(false);
+        if (action === 'tools_on') return plusTools(true);
+        if (action === 'tools_off') return plusTools(false);
+        if (action === 'header_show') return plusHeader(true);
+        if (action === 'header_hide') return plusHeader(false);
+        if (action === 'fullscreen') return plusFullscreen(false);
+        if (action === 'fullscreen_exit') return plusFullscreen(true);
+        if (action === 'panels_show') return plusPanels(true);
+        if (action === 'panels_hide') return plusPanels(false);
+        if (action === 'panels_toggle') return plusPanels(null);
+        if (action === 'brush_on') return plusBrush(true);
+        if (action === 'brush_off') return plusBrush(false);
+        if (action === 'mode_individual') return plusActivity(false);
+        if (action === 'mode_group') return plusActivity(true);
+        if (action === 'lb_students') return plusLeaderboard('tabLbStudents', 'Student leaderboard.');
+        if (action === 'lb_groups') return plusLeaderboard('tabLbGroups', 'Group leaderboard.');
+        if (action === 'lb_feed') return plusLeaderboard('tabLbFeed', 'History.');
+        if (action === 'scoreboard_toggle') return plusScoreboard(null);
+        if (action === 'scoreboard_show') return plusScoreboard(true);
+        if (action === 'scoreboard_hide') return plusScoreboard(false);
+        if (action === 'skin_default') return plusClick('btnSkinDefault', 'Default skin.', { needsClass: false });
+        if (action === 'skin_minimalist') return plusClick('btnSkinMinimalist', 'Minimalist skin.', { needsClass: false });
+        if (action === 'skin_spark') return plusClick('btnSkinSpark', 'Spark skin.', { needsClass: false });
+        if (action === 'clear_groups') {
+          var clsClear = getCurrentClass();
+          if (!clsClear) return { ok: false, message: 'No class is open.' };
+          var anyGroup = (clsClear.students || []).some(function (st) { return !!st.groupId; });
+          if (!anyGroup) return { ok: false, message: 'No group assignments.' };
+          return plusClick('btnClearGroups', 'Confirm clearing group assignments.');
+        }
+        if (action === 'distribute_groups') {
+          var clsShare = getCurrentClass();
+          if (!clsShare) return { ok: false, message: 'No class is open.' };
+          if (!clsShare.groups.length) return { ok: false, message: 'Add a group first.' };
+          return plusClick('btnEvenDistributeGroups', 'Shared students across the groups.');
+        }
+        if (action === 'apply_grid') {
+          if (!boardEditsAllowed()) return { ok: false, message: 'Turn Edit on, then set the grid again.' };
+          var rows = Math.max(1, Math.min(15, parseInt(slots.rows, 10) || 0));
+          var cols = Math.max(1, Math.min(12, parseInt(slots.cols, 10) || 0));
+          if (!rows || !cols) return { ok: false, message: 'Say grid 4x6.' };
+          var rInput = document.getElementById('quickRowsInput');
+          var cInput = document.getElementById('quickColsInput');
+          if (!rInput || !cInput) return { ok: false, message: 'The grid control is not on this page.' };
+          rInput.value = String(rows);
+          cInput.value = String(cols);
+          requestApplyCustomGrid();
+          return { ok: true, message: 'Confirm the ' + rows + ' \u00d7 ' + cols + ' grid.' };
+        }
+        var clicks = {
+          open_picker: ['btnOpenPickerModal', 'Random picker is open.'],
+          close_picker: ['btnClosePickerModal', 'Picker closed.', true],
+          reset_pool: ['btnResetPickerPool', 'Picker pool reset.'],
+          open_podium: ['btnOpenPodiumModal', 'Podium is open.'],
+          close_podium: ['btnClosePodiumModal', 'Podium closed.', true],
+          undo: ['btnUndoLayout', 'Undid the last change.', false, 'Nothing to undo.'],
+          redo: ['btnRedoLayout', 'Redid the last change.', false, 'Nothing to redo.'],
+          export_csv: ['btnExportCsv', 'Scores exported.'],
+          backup_json: ['btnBackupJson', 'Backup downloaded.'],
+          open_classes: ['btnOpenClassModal', 'Classes are open.'],
+          close_classes: ['btnCloseClassModal', 'Classes closed.', true],
+          open_group_modal: ['btnOpenGroupModal', 'Groups are open.'],
+          close_groups: ['btnCloseGroupModal', 'Groups closed.', true],
+          reset_scores: ['btnOpenResetModal', 'Confirm the score reset.'],
+          save_online: ['btnSaveOnline', 'Save online.', true],
+          open_plan: ['btnOpenPlan', 'Open a plan.', true],
+          add_desk: ['btnQuickAddStudent', 'Added a desk.'],
+          add_group: ['btnQuickAddGroup', 'Added a group.'],
+          save_layout: ['btnSetDefaultLayout', 'Layout saved.'],
+          load_layout: ['btnResetLayout', 'Layout loaded.']
+        };
+        var spec = clicks[action];
+        if (!spec) return null;
+        return plusClick(spec[0], spec[1], {
+          needsClass: spec[2] !== true,
+          disabledMessage: spec[3] || ''
+        });
       }
 
       function chartPlanSnapshot() {
@@ -11825,7 +12239,7 @@
     // Nest: edit this host only. Do not use deepseek-explain, say-it-louder, or ces-softspeak.
     window.HCS_LIVE_CLASS_PLUS_WORKER = "https://live-class-plus.skhhcss-eng.workers.dev";
   </script>
-  <script src="assistant.js?v=20261106f"></script>
+  <script src="assistant.js?v=20261106g"></script>
 <script src="../../site-version.js?v=sv"></script>
 </body>
 </html>

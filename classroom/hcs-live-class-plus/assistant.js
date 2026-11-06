@@ -5,6 +5,9 @@
  * The ball keeps the viewport spot from the last drag (or the default
  * corner). Opening the strip does not move that circle: the cream panel
  * sits beside it and flips to the side, then up or down, that fits.
+ * Under the text box, Ask, Command, and Import share one cream row.
+ * Ask posts the line to this Worker. Command runs the line on the page.
+ * Import opens the chart photo flow. The Worker host stays live-class-plus.
  * Floor scroll does not move the ball. A drag still settles the ball
  * clear of desk name chips and the floor zoom bar, then remembers that spot.
  */
@@ -28,8 +31,275 @@
     random_pick: 'Pick a student',
     open_seating: 'Open Seating',
     open_scores: 'Open Scores',
-    tidy_snap: 'Tidy desks'
+    tidy_snap: 'Tidy desks',
+    layout_pairs: 'Paired desks',
+    layout_rows: 'Exam rows',
+    layout_pods: '4-desk pods',
+    layout_groups: 'Group clusters',
+    random_group: 'Pick a group',
+    all_plus: 'All +1',
+    all_minus: 'All minus',
+    group_plus: 'Group +',
+    group_minus: 'Group minus'
   };
+
+  // Exact Command lines. Longer phrases are matched in parseCommand.
+  var COMMANDS = {
+    'hide names': 'hide_names',
+    'show names': 'show_names',
+    'names on': 'show_names',
+    'names off': 'hide_names',
+    'zoom in': 'zoom_in',
+    'zoom out': 'zoom_out',
+    'zoom +': 'zoom_in',
+    'zoom -': 'zoom_out',
+    'fit': 'zoom_reset',
+    'zoom fit': 'zoom_reset',
+    'reset zoom': 'zoom_reset',
+    'zoom reset': 'zoom_reset',
+    'pick': 'random_pick',
+    'random': 'random_pick',
+    'random pick': 'random_pick',
+    'pick student': 'random_pick',
+    'random student': 'random_pick',
+    'draw': 'random_pick',
+    'draw student': 'random_pick',
+    'pick group': 'random_group',
+    'random group': 'random_group',
+    'draw group': 'random_group',
+    'picker': 'open_picker',
+    'open picker': 'open_picker',
+    'close picker': 'close_picker',
+    'reset pool': 'reset_pool',
+    'seating': 'open_seating',
+    'open seating': 'open_seating',
+    'scores': 'open_scores',
+    'open scores': 'open_scores',
+    'tidy': 'tidy_snap',
+    'tidy desks': 'tidy_snap',
+    'pairs': 'layout_pairs',
+    'pair': 'layout_pairs',
+    'pair work': 'layout_pairs',
+    'paired': 'layout_pairs',
+    'paired desks': 'layout_pairs',
+    'exam': 'layout_rows',
+    'rows': 'layout_rows',
+    'exam rows': 'layout_rows',
+    'pods': 'layout_pods',
+    '4-desk': 'layout_pods',
+    '4 desk': 'layout_pods',
+    '4-desk pods': 'layout_pods',
+    'pods4': 'layout_pods',
+    'groups': 'layout_groups',
+    'cluster': 'layout_groups',
+    'clusters': 'layout_groups',
+    'group clusters': 'layout_groups',
+    'gather groups': 'layout_groups',
+    'gather desks': 'layout_groups',
+    'podium': 'open_podium',
+    'open podium': 'open_podium',
+    'close podium': 'close_podium',
+    'timer': 'open_timer',
+    'open timer': 'open_timer',
+    'close timer': 'close_timer',
+    'start timer': 'timer_start',
+    'timer start': 'timer_start',
+    'pause timer': 'timer_pause',
+    'timer pause': 'timer_pause',
+    'stop timer': 'timer_pause',
+    'reset timer': 'timer_reset',
+    'timer reset': 'timer_reset',
+    '+30': 'timer_add30',
+    'timer +30': 'timer_add30',
+    '+30 sec': 'timer_add30',
+    '+30s': 'timer_add30',
+    'edit on': 'edit_on',
+    'edit off': 'edit_off',
+    'sound on': 'sound_on',
+    'sound off': 'sound_off',
+    'mute': 'sound_off',
+    'unmute': 'sound_on',
+    'undo': 'undo',
+    'redo': 'redo',
+    'flip': 'flip_room',
+    'flip room': 'flip_room',
+    'front top': 'front_top',
+    'front bottom': 'front_bottom',
+    'snap on': 'snap_on',
+    'snap off': 'snap_off',
+    'tools on': 'tools_on',
+    'tools off': 'tools_off',
+    'show header': 'header_show',
+    'hide header': 'header_hide',
+    'collapse header': 'header_hide',
+    'fullscreen': 'fullscreen',
+    'full screen': 'fullscreen',
+    'exit fullscreen': 'fullscreen_exit',
+    'show panels': 'panels_show',
+    'hide panels': 'panels_hide',
+    'side panels': 'panels_toggle',
+    'export': 'export_csv',
+    'export csv': 'export_csv',
+    'csv': 'export_csv',
+    'backup': 'backup_json',
+    'classes': 'open_classes',
+    'roster': 'open_classes',
+    'open classes': 'open_classes',
+    'close classes': 'close_classes',
+    'manage groups': 'open_group_modal',
+    'edit groups': 'open_group_modal',
+    'open groups': 'open_group_modal',
+    'close groups': 'close_groups',
+    'brush': 'brush_on',
+    'assign groups': 'brush_on',
+    'paint groups': 'brush_on',
+    'brush off': 'brush_off',
+    'done assigning': 'brush_off',
+    'clear groups': 'clear_groups',
+    'distribute groups': 'distribute_groups',
+    'share groups': 'distribute_groups',
+    'even groups': 'distribute_groups',
+    'reset scores': 'reset_scores',
+    'save online': 'save_online',
+    'open plan': 'open_plan',
+    'add desk': 'add_desk',
+    'add student': 'add_desk',
+    'add group': 'add_group',
+    'add team': 'add_group',
+    'save layout': 'save_layout',
+    'load layout': 'load_layout',
+    'skin default': 'skin_default',
+    'default skin': 'skin_default',
+    'skin minimalist': 'skin_minimalist',
+    'minimalist': 'skin_minimalist',
+    'skin spark': 'skin_spark',
+    'spark': 'skin_spark',
+    'individual': 'mode_individual',
+    'individual work': 'mode_individual',
+    'individual mode': 'mode_individual',
+    'group work': 'mode_group',
+    'group mode': 'mode_group',
+    'students tab': 'lb_students',
+    'leaderboard': 'lb_students',
+    'groups tab': 'lb_groups',
+    'history': 'lb_feed',
+    'feed': 'lb_feed',
+    'scoreboard': 'scoreboard_toggle',
+    'team scoreboard': 'scoreboard_toggle',
+    'show scoreboard': 'scoreboard_show',
+    'hide scoreboard': 'scoreboard_hide',
+    'help': 'help',
+    'commands': 'help',
+    '?': 'help'
+  };
+
+  function commandLine(raw) {
+    var text = String(raw || '').replace(/[\u2212\u2013\u2014]/g, '-').replace(/\s+/g, ' ').trim();
+    text = text.replace(/[.!?]+$/g, '').trim();
+    text = text.replace(/\s+(please|now|thanks)$/i, '').trim();
+    return text;
+  }
+
+  function commandKey(text) {
+    return String(text || '').toLowerCase()
+      .replace(/\bplus\s+one\b/g, '+1')
+      .replace(/\bminus\s+one\b/g, '-1')
+      .replace(/\bplus\s+/g, '+')
+      .replace(/\bminus\s+/g, '-');
+  }
+
+  function scoreSlots(amount, who) {
+    var n = parseInt(amount, 10);
+    if (!isFinite(n) || n < 1) n = 1;
+    return { amount: n, student: who ? String(who).trim() : '' };
+  }
+
+  function groupSlots(amount, name) {
+    var n = parseInt(amount, 10);
+    if (!isFinite(n) || n < 1) n = 1;
+    return { amount: n, group: name ? String(name).trim() : '' };
+  }
+
+  // Short Command lines. Ask still goes to the Worker; this never calls it.
+  function parseCommand(raw) {
+    var text = commandLine(raw);
+    if (!text) return null;
+    var key = commandKey(text);
+    if (COMMANDS[key]) return { action: COMMANDS[key], slots: {} };
+
+    var m;
+    m = key.match(/^(?:all|everyone|class|whole class)\s+\+(\d{1,2})$/);
+    if (m) return { action: 'all_plus', slots: { amount: parseInt(m[1], 10) } };
+    m = key.match(/^(?:all|everyone|class|whole class)\s+-(\d{1,2})$/);
+    if (m) return { action: 'all_minus', slots: { amount: parseInt(m[1], 10) } };
+
+    m = key.match(/^group\s+\+(\d{1,2})(?:\s+(.+))?$/);
+    if (m) return { action: 'group_plus', slots: groupSlots(m[1], m[2]) };
+    m = key.match(/^group\s+-(\d{1,2})(?:\s+(.+))?$/);
+    if (m) return { action: 'group_minus', slots: groupSlots(m[1], m[2]) };
+    m = key.match(/^\+(\d{1,2})\s+group(?:\s+(.+))?$/);
+    if (m) return { action: 'group_plus', slots: groupSlots(m[1], m[2]) };
+    m = key.match(/^-(\d{1,2})\s+group(?:\s+(.+))?$/);
+    if (m) return { action: 'group_minus', slots: groupSlots(m[1], m[2]) };
+    m = key.match(/^(.+?)\s+group\s+\+(\d{1,2})$/);
+    if (m) return { action: 'group_plus', slots: groupSlots(m[2], m[1]) };
+    m = key.match(/^(.+?)\s+group\s+-(\d{1,2})$/);
+    if (m) return { action: 'group_minus', slots: groupSlots(m[2], m[1]) };
+
+    m = key.match(/^score\s+\+(\d{1,2})(?:\s+(.+))?$/);
+    if (m) return { action: 'score_plus', slots: scoreSlots(m[1], m[2]) };
+    m = key.match(/^score\s+-(\d{1,2})(?:\s+(.+))?$/);
+    if (m) return { action: 'score_minus', slots: scoreSlots(m[1], m[2]) };
+    m = key.match(/^\+(\d{1,2})(?:\s+(.+))?$/);
+    if (m) return { action: 'score_plus', slots: scoreSlots(m[1], m[2]) };
+    m = key.match(/^-(\d{1,2})(?:\s+(.+))?$/);
+    if (m) return { action: 'score_minus', slots: scoreSlots(m[1], m[2]) };
+    m = key.match(/^(.+?)\s+\+(\d{1,2})$/);
+    if (m) return { action: 'score_plus', slots: scoreSlots(m[2], m[1]) };
+    m = key.match(/^(.+?)\s+-(\d{1,2})$/);
+    if (m) return { action: 'score_minus', slots: scoreSlots(m[2], m[1]) };
+
+    m = key.match(/^(?:timer|set timer)\s+(\d{1,2}):(\d{2})$/);
+    if (m) {
+      return { action: 'timer_set', slots: { seconds: parseInt(m[1], 10) * 60 + parseInt(m[2], 10) } };
+    }
+    m = key.match(/^(?:timer|set timer)\s+(\d{1,3})\s*(m|min|mins|minute|minutes|s|sec|secs|second|seconds)?$/);
+    if (m) {
+      var n = parseInt(m[1], 10);
+      var unit = m[2] || 'm';
+      return { action: 'timer_set', slots: { seconds: unit.charAt(0) === 's' ? n : n * 60 } };
+    }
+
+    m = key.match(/^(?:grid\s+)?(\d{1,2})\s*(?:x|\u00d7|by)\s*(\d{1,2})(?:\s*grid)?$/);
+    if (m) return { action: 'apply_grid', slots: { rows: parseInt(m[1], 10), cols: parseInt(m[2], 10) } };
+
+    return null;
+  }
+
+  function commandHelp() {
+    return [
+      '+1 name, -1, +1 07, all +1, group +1 Lions',
+      'pick, pick group, pairs, exam, pods, groups, tidy',
+      'podium, timer, timer 3m, start timer, +30, fit',
+      'hide names, edit on, undo, individual, group work, spark'
+    ].join('\n');
+  }
+
+  function commandCatalog() {
+    var seen = { help: true };
+    var list = [];
+    function add(action) {
+      if (!action || seen[action]) return;
+      seen[action] = true;
+      list.push(action);
+    }
+    Object.keys(COMMANDS).forEach(function (k) { add(COMMANDS[k]); });
+    [
+      'score_plus', 'score_minus', 'all_plus', 'all_minus',
+      'group_plus', 'group_minus', 'timer_set', 'apply_grid'
+    ].forEach(add);
+    return list;
+  }
 
   function safeWorkerUrl(raw) {
     if (raw == null) return '';
@@ -674,6 +944,9 @@
     presentReply: presentReply,
     plainActionNames: plainActionNames,
     readPayload: readPayload,
+    parseCommand: parseCommand,
+    commandHelp: commandHelp,
+    commandCatalog: commandCatalog,
     normaliseClassNo: normaliseClassNo,
     chartToken: chartToken,
     CHART_PITCH: CHART_PITCH,
@@ -729,8 +1002,8 @@
     commandLine.className = 'command-line';
     var input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = 'Ask or say a command\u2026';
-    input.setAttribute('aria-label', 'Ask or say a command');
+    input.placeholder = 'Ask a question\u2026';
+    input.setAttribute('aria-label', 'Ask a question');
     input.autocomplete = 'off';
     input.spellcheck = false;
     input.enterKeyHint = 'send';
@@ -740,14 +1013,34 @@
     sendBtn.textContent = 'Send';
     commandLine.appendChild(input);
     commandLine.appendChild(sendBtn);
-    var chartBtn = document.createElement('button');
-    chartBtn.type = 'button';
-    chartBtn.className = 'chart-chip';
-    chartBtn.id = 'btnImportChart';
-    chartBtn.textContent = 'Import chart';
-    chartBtn.title = 'Read a seating-chart photo and move desks by class number';
+    var mode = 'ask';
+    var modeRow = document.createElement('div');
+    modeRow.className = 'mode-row';
+    modeRow.setAttribute('role', 'radiogroup');
+    modeRow.setAttribute('aria-label', 'Assistant mode');
+    function makeModeChip(id, label, value, title) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mode-chip';
+      btn.id = id;
+      btn.textContent = label;
+      btn.title = title;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('data-mode', value);
+      modeRow.appendChild(btn);
+      return btn;
+    }
+    var askBtn = makeModeChip('plusModeAsk', 'Ask', 'ask', 'Ask a question');
+    var commandBtn = makeModeChip('plusModeCommand', 'Command', 'command', 'Run a class control');
+    var chartBtn = makeModeChip('btnImportChart', 'Import', 'import', 'Read a seating-chart photo and move desks by class number');
+    chartBtn.setAttribute('aria-label', 'Import chart');
     command.appendChild(commandLine);
-    command.appendChild(chartBtn);
+    command.appendChild(modeRow);
+    applyModeChrome();
+    askBtn.addEventListener('click', function () { setMode('ask'); });
+    commandBtn.addEventListener('click', function () { setMode('command'); });
+    chartBtn.addEventListener('click', function () { setMode('import'); });
 
     var reply = document.createElement('div');
     reply.className = 'plus-reply';
@@ -911,7 +1204,47 @@
       });
     }
 
+    function applyModeChrome() {
+      var ask = mode === 'ask';
+      var commandMode = mode === 'command';
+      var importing = mode === 'import';
+      input.placeholder = ask
+        ? 'Ask a question\u2026'
+        : (commandMode ? '+1 name, pick, pairs\u2026' : 'Chart photo');
+      input.setAttribute('aria-label', ask ? 'Ask a question' : (commandMode ? 'Command' : 'Import chart'));
+      sendBtn.textContent = importing ? 'Choose' : 'Send';
+      [askBtn, commandBtn, chartBtn].forEach(function (btn) {
+        var on = btn.getAttribute('data-mode') === mode;
+        btn.classList.toggle('is-selected', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+    }
+
+    function setMode(next) {
+      if (next !== 'ask' && next !== 'command' && next !== 'import') next = 'ask';
+      mode = next;
+      applyModeChrome();
+      if (mode !== 'import' && openState) focusCommand();
+    }
+
+    function dispatchCommand(message) {
+      var text = String(message || '').replace(/\s+/g, ' ').trim();
+      if (!text) return;
+      input.value = '';
+      var parsed = api.parseCommand(text);
+      if (!parsed || !parsed.action) {
+        showReply('Command not recognised. Say help for the list, or switch to Ask.');
+        return;
+      }
+      if (parsed.action === 'help') {
+        showReply(api.commandHelp());
+        return;
+      }
+      runAction(parsed.action, parsed.slots || {}, '');
+    }
+
     function setOpen(next) {
+      var wasOpen = openState;
       openState = !!next;
       ball.setAttribute('aria-expanded', openState ? 'true' : 'false');
       ball.setAttribute('aria-label', openState ? 'Close Live Class + commands' : 'Open Live Class + commands');
@@ -919,6 +1252,7 @@
       if (openState) {
         panel.hidden = false;
         command.hidden = false;
+        if (!wasOpen) setMode('ask');
       } else {
         command.hidden = true;
         reply.hidden = true;
@@ -1044,6 +1378,15 @@
 
     command.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (mode === 'import') {
+        chartBtn.click();
+        return;
+      }
+      if (mode === 'command') {
+        dispatchCommand(input.value);
+        focusCommand();
+        return;
+      }
       send(input.value);
       focusCommand();
     });
