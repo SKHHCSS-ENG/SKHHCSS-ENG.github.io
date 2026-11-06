@@ -5,6 +5,7 @@ const path = require('path');
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 const day = fs.readFileSync(path.join(__dirname, 'assets/hcs-live-class-day.svg'), 'utf8');
+const bright = fs.readFileSync(path.join(__dirname, 'assets/hcs-live-class-bright.svg'), 'utf8');
 
 test('default document does not set a skin attribute', function () {
   assert.match(html, /<html lang="en">/);
@@ -12,8 +13,10 @@ test('default document does not set a skin attribute', function () {
 });
 
 test('Bright mark stays the default mast image', function () {
-  assert.match(html, /class="studio-mark-default" src="assets\/hcs-live-class-bright\.svg\?v=20261031a"/);
-  assert.match(html, /class="studio-mark-day" src="assets\/hcs-live-class-day\.svg\?v=20261101b" alt="HCS Live Class \+" width="380" height="86"/);
+  assert.match(html, /class="studio-mark-default" src="assets\/hcs-live-class-bright\.svg\?v=20261031b" alt="HCS Live Class" width="380" height="86"/);
+  assert.match(html, /class="studio-mark-day" src="assets\/hcs-live-class-day\.svg\?v=20261101c" alt="HCS Live Class" width="380" height="86"/);
+  assert.doesNotMatch(html, /plus-badge/);
+  assert.doesNotMatch(html, />\s*Live Class \+\s*</);
 });
 
 test('Skin control is on the toolbar and persists in localStorage', function () {
@@ -49,6 +52,12 @@ test('Day logo is the indigo-to-teal mark', function () {
   assert.match(day, /#2a8fad/);
   assert.match(day, /#334155/);
   assert.match(day, /HCS Live Class/);
+  assert.match(day, /id="logoPlus"/);
+  assert.match(bright, /id="logoPlus"/);
+  assert.match(bright, />HCS</);
+  assert.match(bright, />Live Class</);
+  assert.doesNotMatch(day, /Live Class \+/);
+  assert.doesNotMatch(bright, /Live Class \+/);
   assert.doesNotMatch(day, /#22d3ee/);
   assert.doesNotMatch(day, /#f8fafc/);
 });

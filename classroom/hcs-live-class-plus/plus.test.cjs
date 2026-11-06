@@ -91,10 +91,11 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(css, /\.plus-float\.is-dragging \.home-ball[\s\S]*transform:\s*none/);
   assert.match(js, /Ask a question\\u2026/);
   assert.match(js, /\+1 name, pick, pairs\\u2026/);
-  assert.match(html, /class="plus-badge"/);
+  assert.doesNotMatch(html, /plus-badge/);
+  assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106h/);
-  assert.match(html, /assistant\.js\?v=20261106h/);
+  assert.match(html, /assistant\.css\?v=20261106i/);
+  assert.match(html, /assistant\.js\?v=20261106i/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
