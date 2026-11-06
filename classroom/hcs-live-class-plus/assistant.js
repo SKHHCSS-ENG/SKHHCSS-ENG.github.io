@@ -17,15 +17,15 @@
   var POS_KEY = 'hcsLiveClassPlus_ball_v1';
   var GAP = 10;
   var ACTIONS = {
-    hide_names: 'Hide names — go?',
-    show_names: 'Show names — go?',
-    zoom_in: 'Zoom in — go?',
-    zoom_out: 'Zoom out — go?',
-    zoom_reset: 'Reset zoom — go?',
-    random_pick: 'Pick a student — go?',
-    open_seating: 'Open Seating — go?',
-    open_scores: 'Open Scores — go?',
-    tidy_snap: 'Tidy desks — go?'
+    hide_names: 'Hide names',
+    show_names: 'Show names',
+    zoom_in: 'Zoom in',
+    zoom_out: 'Zoom out',
+    zoom_reset: 'Reset zoom',
+    random_pick: 'Pick a student',
+    open_seating: 'Open Seating',
+    open_scores: 'Open Scores',
+    tidy_snap: 'Tidy desks'
   };
 
   function safeWorkerUrl(raw) {
@@ -174,8 +174,8 @@
     return data.reply ? plainActionNames(String(data.reply).trim()) : '';
   }
 
-  // The Worker sometimes names tidy_snap in a sentence. The chip already
-  // says "Tidy desks — go?". Shown replies use the plain words.
+  // The Worker sometimes names tidy_snap, or asks the teacher to confirm.
+  // Actions run on the first send, so a shown reply uses the plain words.
   function plainActionNames(text) {
     var out = String(text || '');
     out = out.replace(/\s*[—–-]\s*please confirm to run tidy_snap\b/gi, '');
@@ -225,7 +225,6 @@
     var narrowHome = root.innerWidth <= 420;
     var anchor = { right: narrowHome ? 12 : 18, bottom: narrowHome ? 28 : 36 };
     var openState = false;
-    var pending = null;
     var drag = null;
     var swallowUntil = 0;
     // Same 8px radius as the floor pan and the zoom chip. A finger that
@@ -268,11 +267,6 @@
     command.appendChild(input);
     command.appendChild(sendBtn);
 
-    var confirmBtn = document.createElement('button');
-    confirmBtn.type = 'button';
-    confirmBtn.className = 'plus-confirm';
-    confirmBtn.hidden = true;
-
     var reply = document.createElement('div');
     reply.className = 'plus-reply';
     reply.id = 'plusReply';
@@ -281,7 +275,6 @@
 
     unit.appendChild(ball);
     unit.appendChild(command);
-    unit.appendChild(confirmBtn);
     unit.appendChild(reply);
     document.body.appendChild(unit);
 
@@ -359,7 +352,6 @@
       var room = box.bottom - box.top;
       var reserve = 56 + 28;
       if (!command.hidden) reserve += command.offsetHeight + 10;
-      if (!confirmBtn.hidden) reserve += confirmBtn.offsetHeight + 10;
       var limit = room - reserve;
       if (limit < 120) limit = 120;
       return limit;
@@ -387,7 +379,6 @@
     function relaxWidth() {
       command.style.width = '';
       reply.style.width = '';
-      confirmBtn.style.width = '';
     }
 
     // A long answer stays fully readable. The strip keeps --strip-max
@@ -478,54 +469,61 @@
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
-        confirmBtn.hidden = true;
-        confirmBtn.textContent = '';
-        pending = null;
       }
       place();
       root.requestAnimationFrame(place);
-      if (openState) {
-        root.setTimeout(function () { input.focus(); }, 0);
+      if (openState) focusCommand();
+    }
+
+    // After Enter, the field is cleared and often blurred (Send takes the
+    // click, or the browser drops the caret). Put it back while the strip
+    // is open so the next line can be typed. A closed strip stays closed.
+    function focusCommand() {
+      if (!openState || command.hidden || input.disabled) return;
+      function aim() {
+        if (!openState || command.hidden || input.disabled) return;
+        try {
+          input.focus({ preventScroll: true });
+        } catch (err) {
+          try { input.focus(); } catch (e2) {}
+        }
       }
+      aim();
+      root.setTimeout(aim, 0);
     }
 
     function showReply(text) {
-      confirmBtn.hidden = true;
-      confirmBtn.textContent = '';
       var shown = String(text || '').trim();
       if (!shown) {
         reply.hidden = true;
         reply.textContent = '';
         place();
+        focusCommand();
         return;
       }
       reply.hidden = false;
       reply.textContent = shown;
       place();
       root.requestAnimationFrame(place);
+      focusCommand();
     }
 
-    function showConfirm(label, action, slots) {
-      pending = { action: action, slots: slots, label: label };
-      reply.hidden = true;
-      reply.textContent = '';
-      confirmBtn.hidden = false;
-      confirmBtn.textContent = label;
-      place();
-      root.requestAnimationFrame(place);
-    }
-
-    function runPending() {
-      if (!pending) return;
-      var job = pending;
-      pending = null;
-      confirmBtn.hidden = true;
+    function runAction(action, slots, replyText) {
       var board = root.HcsLiveClassPlusBoard;
       if (!board || typeof board.run !== 'function') {
         showReply('The board is still loading.');
         return;
       }
-      var result = board.run(job.action, job.slots);
+      var jobSlots = slots || {};
+      if (typeof board.preview === 'function') {
+        var preview = board.preview(action, jobSlots);
+        if (!preview || preview.ok === false) {
+          showReply((preview && preview.message) || api.plainActionNames(replyText) || 'Which student?');
+          return;
+        }
+        if (preview.slots) jobSlots = preview.slots;
+      }
+      var result = board.run(action, jobSlots);
       if (!result || result.ok === false) {
         showReply((result && result.message) || 'I can\u2019t run that from here.');
         return;
@@ -536,17 +534,7 @@
     function handlePayload(data) {
       var payload = api.readPayload(data);
       if (payload.kind === 'action' && payload.action) {
-        var board = root.HcsLiveClassPlusBoard;
-        if (!board || typeof board.preview !== 'function') {
-          showReply('The board is still loading.');
-          return;
-        }
-        var preview = board.preview(payload.action, payload.slots);
-        if (!preview || preview.ok === false) {
-          showReply((preview && preview.message) || api.plainActionNames(payload.reply) || 'Which student?');
-          return;
-        }
-        showConfirm(preview.label, payload.action, preview.slots || payload.slots);
+        runAction(payload.action, payload.slots, payload.reply);
         return;
       }
       var text = api.presentReply(payload);
@@ -558,16 +546,14 @@
       var text = String(message || '').replace(/\s+/g, ' ').trim();
       if (!text || inflight) return;
       input.value = '';
-      pending = null;
-      confirmBtn.hidden = true;
       reply.hidden = false;
       reply.textContent = '\u2026';
       place();
       var ticket = ++seq;
       var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       inflight = controller;
-      input.disabled = true;
       sendBtn.disabled = true;
+      focusCommand();
       var timer = root.setTimeout(function () {
         if (controller) controller.abort();
       }, 25000);
@@ -585,7 +571,6 @@
         if (ticket !== seq) return;
         inflight = null;
         root.clearTimeout(timer);
-        input.disabled = false;
         sendBtn.disabled = false;
         if (result.status === 200 && result.body) {
           handlePayload(result.body);
@@ -597,7 +582,6 @@
         if (ticket !== seq) return;
         inflight = null;
         root.clearTimeout(timer);
-        input.disabled = false;
         sendBtn.disabled = false;
         showReply('The assistant is unavailable just now.');
       });
@@ -606,9 +590,7 @@
     command.addEventListener('submit', function (e) {
       e.preventDefault();
       send(input.value);
-    });
-    confirmBtn.addEventListener('click', function () {
-      runPending();
+      focusCommand();
     });
 
     function onBallPointerMove(e) {

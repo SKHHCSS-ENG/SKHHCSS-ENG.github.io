@@ -82,7 +82,7 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(css, /\.plus-float \.home-ball\s*\{[^}]*background-image:\s*var\(--api-mesh-image\)[^}]*animation:\s*api-mesh-wash 10s ease-in-out infinite/);
   assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.plus-float \.home-ball\s*\{[^}]*animation:\s*none !important[^}]*background-size:\s*100% 100%[^}]*background-position:\s*0% 50%/);
   assert.doesNotMatch(css, /circle at 32% 28%/);
-  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply,\s*\.plus-float \.plus-confirm\s*\{[^}]*var\(--mesh-cream\)/);
+  assert.match(css, /\.plus-float \.command-strip,\s*\.plus-float \.plus-reply\s*\{[^}]*var\(--mesh-cream\)/);
   assert.doesNotMatch(css, /\.command-strip\s*\{[^}]*api-mesh-wash/);
   assert.doesNotMatch(css, /\.plus-reply\s*\{[^}]*api-mesh/);
   assert.doesNotMatch(html, /ask\.css/);
@@ -91,8 +91,28 @@ test('Muse ball is an unmarked 56px api-mesh button; the strip stays cream', fun
   assert.match(js, /Ask or say a command\\u2026/);
   assert.match(html, /class="plus-badge"/);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106a/);
+  assert.match(html, /assistant\.css\?v=20261106b/);
+  assert.match(html, /assistant\.js\?v=20261106b/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
+});
+
+test('class commands run on the first send and the command box keeps focus', function () {
+  assert.doesNotMatch(js, /showConfirm|confirmBtn|plus-confirm|— go\?/);
+  assert.doesNotMatch(css, /plus-confirm/);
+  assert.equal(plus.ACTIONS.random_pick, 'Pick a student');
+  assert.equal(plus.ACTIONS.tidy_snap, 'Tidy desks');
+  assert.doesNotMatch(plus.ACTIONS.hide_names, /go\?/);
+  var bootBody = js.slice(js.indexOf('function boot('));
+  assert.match(bootBody, /function runAction\(action, slots, replyText\)/);
+  assert.match(bootBody, /board\.run\(action, jobSlots\)/);
+  assert.doesNotMatch(bootBody, /preview\.label/);
+  assert.match(bootBody, /runAction\(payload\.action, payload\.slots, payload\.reply\)/);
+  assert.match(bootBody, /function focusCommand\(\)/);
+  assert.match(bootBody, /if \(!openState \|\| command\.hidden \|\| input\.disabled\) return/);
+  assert.match(bootBody, /input\.focus\(\{ preventScroll: true \}\)/);
+  assert.match(bootBody, /if \(openState\) focusCommand\(\)/);
+  assert.match(bootBody, /send\(input\.value\);\s*focusCommand\(\)/);
+  assert.doesNotMatch(bootBody, /input\.disabled\s*=/);
 });
 
 test('ball drag threshold is in boot scope and survives a finger leaving the ball', function () {
