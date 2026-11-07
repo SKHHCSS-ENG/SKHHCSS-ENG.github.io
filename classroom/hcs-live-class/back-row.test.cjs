@@ -2,46 +2,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-
-function extractFunction(source, name) {
-  const needle = 'function ' + name + '(';
-  const start = source.indexOf(needle);
-  assert.notEqual(start, -1, name);
-  let i = source.indexOf('{', start);
-  let depth = 0;
-  for (; i < source.length; i++) {
-    if (source[i] === '{') depth += 1;
-    else if (source[i] === '}') {
-      depth -= 1;
-      if (depth === 0) return source.slice(start, i + 1);
-    }
-  }
-  throw new Error('unclosed ' + name);
-}
-
-const sandbox = { module: { exports: {} }, exports: {} };
-vm.runInNewContext(
-  [
-    'const DESK_W = 148;',
-    'const DESK_H = 115;',
-    'const ROW_GAP_Y = 10;',
-    'const EXAM_COL_GAP_X = 16;',
-    'const FRONT_LABEL_H = 32;',
-    'const FRONT_EDGE = 8;',
-    'const FRONT_ROW_GAP = 10;',
-    'const STAGE_WIDTH = 1120;',
-    'const STAGE_HEIGHT = 640;',
-    extractFunction(html, 'frontRowTopOffset'),
-    extractFunction(html, 'planBackRowDesk'),
-    extractFunction(html, 'getContentStageBounds'),
-    'module.exports = { planBackRowDesk, getContentStageBounds, frontRowTopOffset };'
-  ].join('\n'),
-  sandbox
-);
-const { planBackRowDesk, getContentStageBounds } = sandbox.module.exports;
+const { planBackRowDesk, getContentStageBounds } = require('./studio-core.js');
 
 function applyPlan(students, frontAtTop) {
   const plan = planBackRowDesk(students, frontAtTop);
