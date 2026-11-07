@@ -2,9 +2,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('path');
-const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const { clampZoom, floorPinchNextZoom } = require('./studio-core.js');
 
 function extractFunction(source, name) {
   const needle = 'function ' + name + '(';
@@ -68,18 +68,6 @@ function walkCssRules(css, fn) {
 }
 
 test('floor pinch ratio feeds the same 35%–200% clamp as the wheel', function () {
-  const sandbox = { module: { exports: {} } };
-  vm.runInNewContext(
-    [
-      'const ZOOM_MIN = 0.35;',
-      'const ZOOM_MAX = 2;',
-      extractFunction(html, 'clampZoom'),
-      extractFunction(html, 'floorPinchNextZoom'),
-      'module.exports = { clampZoom, floorPinchNextZoom };'
-    ].join('\n'),
-    sandbox
-  );
-  const { clampZoom, floorPinchNextZoom } = sandbox.module.exports;
   assert.equal(floorPinchNextZoom(1, 100, 150), 1.5);
   assert.equal(floorPinchNextZoom(1, 120, 60), 0.5);
   assert.equal(floorPinchNextZoom(1, 0, 40), 1);

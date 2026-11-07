@@ -2,41 +2,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-
-function extractFunction(source, name) {
-  const needle = 'function ' + name + '(';
-  const start = source.indexOf(needle);
-  assert.notEqual(start, -1, name);
-  let i = source.indexOf('{', start);
-  let depth = 0;
-  for (; i < source.length; i++) {
-    if (source[i] === '{') depth += 1;
-    else if (source[i] === '}') {
-      depth -= 1;
-      if (depth === 0) return source.slice(start, i + 1);
-    }
-  }
-  throw new Error('unclosed ' + name);
-}
-
-const sandbox = { module: { exports: {} }, exports: {} };
-vm.runInNewContext(
-  [
-    'const DESK_W = 148;',
-    'const DESK_H = 115;',
-    extractFunction(html, 'deskOverlapArea'),
-    extractFunction(html, 'findSeatSwapTarget'),
-    extractFunction(html, 'axisClusterAnchor'),
-    extractFunction(html, 'layoutAxisAnchors'),
-    extractFunction(html, 'nearestLayoutAnchor'),
-    'module.exports = { findSeatSwapTarget, layoutAxisAnchors, nearestLayoutAnchor };'
-  ].join('\n'),
-  sandbox
-);
-const { findSeatSwapTarget, layoutAxisAnchors, nearestLayoutAnchor } = sandbox.module.exports;
+const { findSeatSwapTarget, layoutAxisAnchors, nearestLayoutAnchor } = require('./studio-core.js');
 
 const COL_SPAN = (148 + 8) / 2 - 1;
 const ROW_SPAN = (115 + 10) / 2 - 1;
@@ -98,4 +66,12 @@ test('Tidy snaps a wobble to this layout and keeps uneven columns', function () 
   const nearColumn = Array.from(layoutAxisAnchors(cols.concat([700]), COL_SPAN));
   assert.equal(nearColumn.indexOf(700), -1);
   assert.equal(nearestLayoutAnchor(700, nearColumn), 732);
+});
+
+test('the page still calls the shared tidy and swap helpers', function () {
+  assert.match(html, /findSeatSwapTarget\(cls, student, student\.x, student\.y\)/);
+  assert.match(html, /layoutAxisAnchors\(students\.map/);
+  assert.match(html, /nearestLayoutAnchor\(Number\(st\.x\) \|\| 0, colAnchors\)/);
+  assert.doesNotMatch(html, /function findSeatSwapTarget\(/);
+  assert.doesNotMatch(html, /function layoutAxisAnchors\(/);
 });
