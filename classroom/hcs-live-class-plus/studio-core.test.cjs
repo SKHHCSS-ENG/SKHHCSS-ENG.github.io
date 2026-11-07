@@ -97,16 +97,24 @@ test('a browser without module.exports receives HcsLiveCore', function () {
 });
 
 test('the core stays free of Drive and skins while Plus keeps Spark', function () {
+  const registry = fs.readFileSync(path.join(__dirname, 'skins/registry.js'), 'utf8');
+  const sparkJs = fs.readFileSync(path.join(__dirname, 'skins/spark.js'), 'utf8');
   assert.doesNotMatch(coreSrc, /\bdocument\b|\blocalStorage\b|window\.[A-Za-z_$]/);
   assert.doesNotMatch(coreSrc, /spark/i);
   assert.doesNotMatch(coreSrc, /data-skin/);
   assert.doesNotMatch(coreSrc, /SKHHCSS_STUDIO_DRIVE|FOLDER_STORAGE_KEY|PLAN_KIND/);
-  assert.match(html, /id="btnSkinSpark"[^>]*>Spark</);
+  assert.match(registry, /id:\s*'spark'/);
+  assert.match(registry, /buttonId:\s*'btnSkinSpark'/);
+  assert.match(registry, /label:\s*'Spark'/);
+  assert.match(sparkJs, /HcsSkinHost\.register/);
   assert.match(html, /src="spark-fire\.js"/);
-  assert.match(html, /setAttribute\("data-skin", "spark"\)/);
+  assert.match(html, /src="skins\/registry\.js"/);
+  assert.match(html, /data-hcs-skin="mount"/);
   assert.match(html, /id="btnSkinDefault"[^>]*>Default</);
   assert.match(html, /id="btnSkinMinimalist"[^>]*>Minimalist</);
   assert.match(html, /hcsLiveClassPlus_skin_v1/);
+  const coreCss = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
+  assert.doesNotMatch(coreCss, /data-skin="spark"/);
 });
 
 test('Drive OAuth paths and seating storage keys stay put', function () {
