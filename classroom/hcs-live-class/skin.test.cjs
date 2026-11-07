@@ -20,13 +20,26 @@ test('Skin control is on the toolbar and persists in localStorage', function () 
   assert.match(html, /aria-label="Skin"/);
   assert.match(html, /id="btnSkinDefault"[^>]*>Default</);
   assert.match(html, /id="btnSkinMinimalist"[^>]*>Minimalist</);
-  assert.match(html, /id="btnSkinSpark"[^>]*>Spark</);
-  assert.match(html, /id="btnSkinDefault"[\s\S]*id="btnSkinMinimalist"[\s\S]*id="btnSkinSpark"/);
+  assert.match(html, /id="btnSkinDefault"[\s\S]*id="btnSkinMinimalist"/);
+  assert.doesNotMatch(html, /id="btnSkinSpark"/);
+  assert.doesNotMatch(html, />Spark</);
   assert.match(html, /skhhcss_eng_hcs_live_class_skin_v1/);
   assert.match(html, /setAttribute\("data-skin", "minimalist"\)/);
-  assert.match(html, /setAttribute\("data-skin", "spark"\)/);
+  assert.doesNotMatch(html, /setAttribute\("data-skin", "spark"\)/);
   assert.match(html, /removeAttribute\("data-skin"\)/);
-  assert.match(html, /src="spark-fire\.js"/);
+  assert.doesNotMatch(html, /src="spark-fire\.js"/);
+  assert.doesNotMatch(html, /SparkFire/);
+  assert.doesNotMatch(html, /applySkin\("spark"\)/);
+});
+
+test('a saved Spark value loads as Default', function () {
+  const boot = html.slice(html.indexOf('<script>'), html.indexOf('</script>'));
+  assert.match(boot, /savedSkin === "spark"/);
+  assert.match(boot, /savedSkin = "default"/);
+  assert.match(boot, /localStorage\.setItem\(KEY, "default"\)/);
+  assert.match(boot, /removeAttribute\("data-skin"\)/);
+  assert.doesNotMatch(boot, /setAttribute\("data-skin", "spark"\)/);
+  assert.doesNotMatch(html, /html\[data-skin="spark"\]/);
 });
 
 test('Minimalist overrides are gated and use the approved tokens', function () {
@@ -53,19 +66,19 @@ test('Day logo is the indigo-to-teal mark', function () {
   assert.doesNotMatch(day, /#f8fafc/);
 });
 
-test('Spark keeps Bright and leaves Day on Minimalist', function () {
-  assert.match(html, /html\[data-skin="spark"\] \.studio-mark img\.studio-mark-default \{\s*display: block;/);
-  assert.match(html, /html\[data-skin="spark"\] \.studio-mark img\.studio-mark-day \{\s*display: none;/);
+test('Minimalist uses the Day mark and Default keeps Bright', function () {
+  assert.match(html, /html\[data-skin="minimalist"\] \.studio-mark img\.studio-mark-default \{\s*display: none;/);
   assert.match(html, /html\[data-skin="minimalist"\] \.studio-mark img\.studio-mark-day \{\s*display: block;/);
   assert.match(html, /html:not\(\[data-skin\]\) #btnSkinDefault/);
   assert.doesNotMatch(html, /html:not\(\[data-skin="minimalist"\]\) #btnSkinDefault/);
+  assert.doesNotMatch(html, /html\[data-skin="spark"\]/);
 });
 
-test('Spark burst is the +pts path only', function () {
-  assert.match(html, /delta > 0 && document\.documentElement\.getAttribute\('data-skin'\) === 'spark'/);
-  assert.match(html, /floatEl\.className = 'score-burst'/);
+test('score floats stay on the shared plus and minus path', function () {
   assert.match(html, /floatEl\.className = 'score-float '/);
   assert.match(html, /@keyframes floatUpFade/);
+  assert.doesNotMatch(html, /score-burst/);
+  assert.doesNotMatch(html, /data-skin'\) === 'spark'/);
 });
 
 function stripCssComments(css) {
@@ -114,101 +127,22 @@ function walkCssRules(css, fn) {
   }
 }
 
-test('Default and Minimalist never inherit Spark fire, burst, or tiers', function () {
+test('Spark fire, burst, and tier chrome are gone', function () {
   var css = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
-  var sawBurst = false;
-  var sawBurstShown = false;
-  var sawTier = false;
-  var sawFire = false;
-  var sawHide = false;
-  walkCssRules(css, function (selector, body, isKeyframes) {
-    var blob = selector + body;
-    var sparkToken = /score-burst|spark-tier|spark-fire|sparkBurst|sparkRing|emberPulse/;
-    if (isKeyframes) {
-      if (sparkToken.test(blob)) {
-        assert.match(selector, /@keyframes\s+(sparkBurst|sparkRing|emberPulse)\b/);
-      }
-      return;
-    }
-    if (!sparkToken.test(blob)) return;
-    if (selector.indexOf('html[data-skin="spark"]') !== -1) {
-      assert.equal(selector.indexOf('html[data-skin="minimalist"]'), -1);
-      if (/score-burst/.test(selector)) sawBurst = true;
-      if (selector.replace(/\s+/g, ' ').trim() === 'html[data-skin="spark"] .score-burst' && /display:\s*block/.test(body)) {
-        sawBurstShown = true;
-      }
-      if (/spark-tier-1/.test(selector)) sawTier = true;
-      if (/spark-fire/.test(selector)) sawFire = true;
-      return;
-    }
-    sawHide = true;
-    assert.doesNotMatch(selector, /minimalist|sparkBurst|sparkRing|emberPulse/);
-    assert.match(selector, /\.spark-tier-badge/);
-    assert.match(selector, /\.spark-fire/);
-    assert.match(selector, /\.spark-fire-mini/);
-    assert.match(selector, /\.score-burst/);
-    assert.equal(body.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ''), 'display:none;');
+  var sparkToken = /score-burst|spark-tier|spark-fire|sparkBurst|sparkRing|emberPulse|spark-burn|sparkMesh|On fire|data-skin="spark"/;
+  assert.doesNotMatch(css, sparkToken);
+  walkCssRules(css, function (selector, body) {
+    assert.doesNotMatch(selector + body, sparkToken);
   });
-  assert.equal(sawBurst, true);
-  assert.equal(sawBurstShown, true);
-  assert.equal(sawTier, true);
-  assert.equal(sawFire, true);
-  assert.equal(sawHide, true);
-  assert.match(html, />On fire</);
+  assert.doesNotMatch(html, />On fire</);
+  assert.doesNotMatch(html, /class="spark-/);
+  assert.doesNotMatch(html, /spark-fire\.js/);
+  assert.equal(fs.existsSync(path.join(__dirname, 'spark-fire.js')), false);
+  assert.equal(fs.existsSync(path.join(__dirname, 'spark-fire.test.cjs')), false);
   assert.match(html, /family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800/);
   assert.equal((html.match(/fonts\.googleapis\.com/g) || []).length, 2);
-});
-
-test('Spark On fire is one continuous burn, and the mast mesh loops without a cut', function () {
-  assert.doesNotMatch(html, /spark-flame f1|class="spark-flame"|sparkBarShine|sparkFlameFlicker|spark-ember/);
-  assert.match(html, /class="spark-burn-sheet"/);
-  assert.match(html, /class="spark-burn-halo"/);
-  assert.match(html, /class="spark-flame-wave w2"/);
-  assert.match(html, /class="spark-flame-wave"/);
-  assert.match(html, /M0,36 C14,36 12,14 24,18/);
-  assert.match(html, /html\[data-skin="spark"\] \.spark-burn-sheet \{/);
-  assert.match(html, /html\[data-skin="spark"\] \.spark-tier-badge \{[\s\S]*?top: -12px;\s*left: -10px;/);
-  assert.doesNotMatch(html, /html\[data-skin="spark"\] \.spark-tier-badge \{[\s\S]*?right: -10px;/);
-  assert.match(html, /html\[data-skin="spark"\] #studioHeader::before \{[\s\S]*?background-size: 200% 100%;[\s\S]*?animation: sparkMeshSlide 3\.6s linear infinite;/);
-  assert.match(html, /html\[data-skin="spark"\] #studioHeader::after \{[\s\S]*?background-size: 200% 100%;[\s\S]*?animation: sparkMeshSlide 5\.4s linear infinite reverse;/);
-  assert.match(html, /@keyframes sparkMeshSlide \{\s*0% \{ background-position: 0% 0; \}\s*100% \{ background-position: 100% 0; \}\s*\}/);
-  assert.match(html, /querySelector\('\.spark-burn-sheet'\)/);
-  assert.doesNotMatch(html, /rgba\(255, 179, 0, 0\.22\) 50%,\s*rgba\(255, 45, 149, 0\.18\) 50%/);
-  var meshCss = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
-  var meshRules = {};
-  walkCssRules(meshCss, function (selector, body, isKeyframes) {
-    if (isKeyframes) return;
-    if (selector === 'html[data-skin="spark"] #studioHeader::before' || selector === 'html[data-skin="spark"] #studioHeader::after') {
-      meshRules[selector] = body;
-    }
-  });
-  ['html[data-skin="spark"] #studioHeader::before', 'html[data-skin="spark"] #studioHeader::after'].forEach(function (selector) {
-    var stops = (meshRules[selector].match(/rgba?\([^)]+\)\s+[\d.]+%/g) || []).map(function (token) {
-      var parts = token.match(/^(rgba?\([^)]+\))\s+([\d.]+)%$/);
-      return { color: parts[1].replace(/\s+/g, ''), pos: Number(parts[2]) };
-    });
-    assert.ok(stops.length >= 3, selector);
-    function colorsAt(pos) {
-      return stops.filter(function (stop) { return stop.pos === pos; }).map(function (stop) { return stop.color; });
-    }
-    var edge = colorsAt(0);
-    assert.deepEqual(edge, colorsAt(50));
-    assert.deepEqual(edge, colorsAt(100));
-    assert.equal(edge.length, 1);
-    stops.forEach(function (stop) {
-      if (stop.pos > 50) return;
-      var twin = colorsAt(stop.pos + 50);
-      if (stop.pos === 0) assert.deepEqual(twin, edge);
-      else assert.deepEqual(twin, [stop.color]);
-    });
-  });
-  var css = html.slice(html.indexOf('<style>'), html.lastIndexOf('</style>'));
-  walkCssRules(css, function (selector, body, isKeyframes) {
-    if (isKeyframes) return;
-    if (!/spark-burn|sparkMeshSlide|sparkBurnFlicker|sparkBurnCore/.test(selector + body)) return;
-    assert.match(selector, /html\[data-skin="spark"\]/);
-    assert.equal(selector.indexOf('html[data-skin="minimalist"]'), -1);
-  });
+  assert.match(html, /html\[data-skin="minimalist"\]/);
+  assert.match(html, /--skin-bg: #fff/);
 });
 
 test('Tidy, Assign, Clear, Group, and Snap chrome stay on the Default master', function () {
@@ -247,5 +181,5 @@ test('Tidy, Assign, Clear, Group, and Snap chrome stay on the Default master', f
   assert.match(html, /html\[data-skin="minimalist"\] #btnConfirmApplyGrid/);
   assert.match(html, /html\[data-skin="minimalist"\] #applyGridModal \.shadow-2xl/);
   assert.match(html, /html\[data-skin="minimalist"\] #studioToolbarRow button/);
-  assert.match(html, /html\[data-skin="spark"\] #studioToolbarRow button/);
+  assert.doesNotMatch(html, /html\[data-skin="spark"\] #studioToolbarRow button/);
 });
