@@ -20,6 +20,27 @@
       buttonId: 'btnSkinSpark',
       css: 'skins/spark.css',
       js: 'skins/spark.js'
+    },
+    {
+      id: 'arcade',
+      label: 'Arcade',
+      buttonId: 'btnSkinArcade',
+      css: 'skins/arcade.css',
+      js: 'skins/arcade.js'
+    },
+    {
+      id: 'holo',
+      label: 'Holo',
+      buttonId: 'btnSkinHolo',
+      css: 'skins/holo.css',
+      js: 'skins/holo.js'
+    },
+    {
+      id: 'hyper',
+      label: 'Hyper',
+      buttonId: 'btnSkinHyper',
+      css: 'skins/hyper.css',
+      js: 'skins/hyper.js'
     }
   ];
 

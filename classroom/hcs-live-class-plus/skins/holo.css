@@ -1,0 +1,382 @@
+/* Cyber Grid / Holo skin pack — sci-fi tactical command deck with cryo-cyan #06b6d4,
+   electric aqua #00f5d4, and volt-lime #a3e635 HUD telemetry brackets.
+   Scoped strictly under html[data-skin="holo"]. Desk width stays 148px. */
+.holo-tier-badge,
+.holo-fire,
+.holo-fire-mini,
+.holo-burst { display: none; }
+
+html[data-skin="holo"] .studio-mark img.studio-mark-default {
+  display: block;
+}
+html[data-skin="holo"] .studio-mark img.studio-mark-day {
+  display: none;
+}
+html[data-skin="holo"] body {
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(6, 182, 212, 0.20), rgba(6, 182, 212, 0) 45%),
+    radial-gradient(ellipse at 90% 0%, rgba(163, 230, 53, 0.16), rgba(163, 230, 53, 0) 45%),
+    #ecfeff;
+}
+html[data-skin="holo"] #studioHeader {
+  background-color: #041016;
+  background-image: linear-gradient(120deg, #041016 0%, #083344 48%, #0f172a 78%, #064e3b 100%);
+  box-shadow:
+    0 0 0 2px rgba(0, 245, 212, 0.7),
+    0 0 24px rgba(6, 182, 212, 0.45),
+    inset 0 -2px 0 #a3e635,
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+html[data-skin="holo"] #studioHeader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(90deg,
+    rgba(0, 245, 212, 0) 0%,
+    rgba(0, 245, 212, 0.24) 12%,
+    rgba(163, 230, 53, 0.30) 25%,
+    rgba(0, 245, 212, 0.24) 38%,
+    rgba(0, 245, 212, 0) 50%,
+    rgba(0, 245, 212, 0.24) 62%,
+    rgba(163, 230, 53, 0.30) 75%,
+    rgba(0, 245, 212, 0.24) 88%,
+    rgba(0, 245, 212, 0) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: holoScanSlide 4.2s linear infinite;
+}
+html[data-skin="holo"] #studioHeader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(90deg,
+    rgba(6, 182, 212, 0) 0%,
+    rgba(6, 182, 212, 0.22) 10%,
+    rgba(56, 189, 248, 0.26) 25%,
+    rgba(6, 182, 212, 0.22) 40%,
+    rgba(6, 182, 212, 0) 50%,
+    rgba(6, 182, 212, 0.22) 60%,
+    rgba(56, 189, 248, 0.26) 75%,
+    rgba(6, 182, 212, 0.22) 90%,
+    rgba(6, 182, 212, 0) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: holoScanSlide 6.4s linear infinite reverse;
+  mix-blend-mode: screen;
+}
+html[data-skin="holo"] #studioMast,
+html[data-skin="holo"] #studioHeader .studio-header-bar {
+  position: relative;
+  z-index: 1;
+}
+html[data-skin="holo"] #studioHeaderCluster button,
+html[data-skin="holo"] #studioHeaderCluster button:hover,
+html[data-skin="holo"] #studioHeaderUtilities > .relative > button,
+html[data-skin="holo"] #studioHeaderUtilities > .relative > button:hover,
+html[data-skin="holo"] #studioHeaderUtilities > button,
+html[data-skin="holo"] #studioHeaderUtilities > button:hover,
+html[data-skin="holo"] #studioHeaderExportPair button,
+html[data-skin="holo"] #studioHeaderExportPair button:hover,
+html[data-skin="holo"] .studio-header-pin button,
+html[data-skin="holo"] .studio-header-pin button:hover {
+  border: 1.5px solid #00f5d4;
+  color: #041016;
+  background-color: #ecfeff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #cffafe 100%);
+  box-shadow: 0 3px 0 #0891b2, 0 0 12px rgba(0, 245, 212, 0.35);
+}
+html[data-skin="holo"] #btnModeIndividual.shadow-sm,
+html[data-skin="holo"] #btnModeGroup.shadow-sm,
+html[data-skin="holo"] #btnModeIndividual.shadow-sm:hover,
+html[data-skin="holo"] #btnModeGroup.shadow-sm:hover,
+html[data-skin="holo"] #btnOpenClassModal,
+html[data-skin="holo"] #btnOpenClassModal:hover {
+  border: 1.5px solid #a3e635;
+  color: #041016;
+  background-image: linear-gradient(135deg, #00f5d4 0%, #38bdf8 55%, #a3e635 100%);
+  box-shadow: 0 3px 0 #0e7490, 0 0 16px rgba(0, 245, 212, 0.65);
+}
+html[data-skin="holo"] #studioHeaderUtilities > #btnOpenPickerModal,
+html[data-skin="holo"] #studioHeaderUtilities > #btnOpenPickerModal:hover {
+  border: 1.5px solid #ecfccb;
+  color: #1a2e05;
+  background-image: linear-gradient(180deg, #d9f99d, #a3e635 55%, #84cc16);
+  box-shadow: 0 3px 0 #3f6212, 0 0 16px rgba(163, 230, 53, 0.55);
+}
+html[data-skin="holo"] #studioToolbar {
+  background:
+    linear-gradient(#f0fdfa, #f0fdfa) padding-box,
+    linear-gradient(90deg, #00f5d4, #06b6d4, #a3e635) border-box;
+  border-bottom: 3px solid transparent;
+  box-shadow: 0 8px 20px -10px rgba(6, 182, 212, 0.45);
+}
+html[data-skin="holo"] #studioToolbarRow button,
+html[data-skin="holo"] #studioToolbarRow button:hover {
+  border: 1.5px solid #06b6d4;
+  color: #083344;
+  background-image: linear-gradient(180deg, #ffffff 0%, #e0f2fe 100%);
+  box-shadow: 0 3px 0 #0e7490;
+}
+html[data-skin="holo"] #studioToolbarRow #btnSkinHolo,
+html[data-skin="holo"] #studioToolbarRow #btnSkinHolo:hover,
+html[data-skin="holo"] #btnSkinHolo,
+html[data-skin="holo"] #btnSkinHolo:hover {
+  background-image: linear-gradient(135deg, #00f5d4, #06b6d4, #a3e635);
+  border-color: #041016;
+  color: #041016;
+  box-shadow: 0 0 0 2px #00f5d4, 0 5px 14px rgba(0, 245, 212, 0.55);
+}
+html[data-skin="holo"] #pulseCard {
+  background-color: #041016;
+  background-image: linear-gradient(125deg, #041016 0%, #083344 55%, #134e4a 100%);
+  box-shadow: 0 0 0 2px #00f5d4, 0 12px 26px -8px rgba(6, 182, 212, 0.55);
+}
+html[data-skin="holo"] #pulseCard #statTotalPoints {
+  color: #a3e635;
+  text-shadow: 0 0 12px rgba(163, 230, 53, 0.8);
+}
+html[data-skin="holo"] #studioFloorSection {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#041016, #041016) padding-box,
+    linear-gradient(135deg, #00f5d4, #06b6d4, #a3e635) border-box;
+  box-shadow: 0 16px 36px -10px rgba(6, 182, 212, 0.5);
+}
+html[data-skin="holo"] .classroom-floor {
+  background-color: #041016;
+  background-image:
+    linear-gradient(to right, rgba(0, 245, 212, 0.10) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(0, 245, 212, 0.10) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(ellipse at 25% 10%, rgba(0, 245, 212, 0.24), rgba(0, 245, 212, 0) 50%),
+    radial-gradient(ellipse at 75% 90%, rgba(163, 230, 53, 0.18), rgba(163, 230, 53, 0) 50%),
+    linear-gradient(180deg, #041016 0%, #083344 55%, #0c4a6e 100%);
+  background-size: 32px 32px, 32px 32px, auto, auto, auto;
+  box-shadow: inset 0 0 40px rgba(0, 245, 212, 0.28);
+}
+html[data-skin="holo"] .classroom-floor.snap-active {
+  background-image:
+    linear-gradient(to right, rgba(163, 230, 53, 0.25) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(0, 245, 212, 0.25) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(180deg, #041016 0%, #083344 55%, #0c4a6e 100%);
+  background-size: 24px 24px, 24px 24px, auto;
+}
+html[data-skin="holo"] .front-of-room {
+  background: linear-gradient(90deg, #00f5d4, #38bdf8, #a3e635);
+  border-color: #fff;
+  color: #041016;
+  box-shadow: 0 0 18px rgba(0, 245, 212, 0.8);
+}
+html[data-skin="holo"] .desk-team-row {
+  position: relative;
+}
+html[data-skin="holo"] .desk-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 60%, #ccfbf1 100%);
+  transform: translateY(-5px);
+  box-shadow:
+    0 0 0 2px #00f5d4,
+    0 6px 0 #0891b2,
+    0 12px 22px rgba(4, 16, 22, 0.55),
+    0 0 18px rgba(0, 245, 212, 0.35);
+}
+html[data-skin="holo"] .desk-card:hover {
+  transform: translateY(-7px);
+  box-shadow:
+    0 0 0 2px #a3e635,
+    0 8px 0 #0e7490,
+    0 0 24px rgba(0, 245, 212, 0.55);
+}
+html[data-skin="holo"] .desk-card.spotlight-active {
+  transform: translateY(-7px) scale(1.07);
+  box-shadow:
+    0 0 0 3px #a3e635,
+    0 0 28px rgba(0, 245, 212, 0.9) !important;
+}
+html[data-skin="holo"] .desk-card.holo-tier-1,
+html[data-skin="holo"] .desk-card.holo-tier-2,
+html[data-skin="holo"] .desk-card.holo-tier-3 {
+  z-index: 12;
+}
+html[data-skin="holo"] .desk-card.holo-tier-1 {
+  background: linear-gradient(180deg, #f7fee7 0%, #d9f99d 45%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #a3e635,
+    0 8px 0 #4d7c0f,
+    0 0 26px rgba(163, 230, 53, 0.75);
+}
+html[data-skin="holo"] .desk-card.holo-tier-2 {
+  background: linear-gradient(180deg, #ecfeff 0%, #a5f3fc 45%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #00f5d4,
+    0 8px 0 #0e7490,
+    0 0 22px rgba(0, 245, 212, 0.65);
+}
+html[data-skin="holo"] .desk-card.holo-tier-3 {
+  background: linear-gradient(180deg, #f0f9ff 0%, #bae6fd 45%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #38bdf8,
+    0 8px 0 #0369a1,
+    0 0 20px rgba(56, 189, 248, 0.55);
+}
+html[data-skin="holo"] .holo-tier-badge {
+  display: inline-block;
+  position: absolute;
+  top: -12px;
+  left: -10px;
+  z-index: 7;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1.15;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 2px solid #041016;
+  color: #041016;
+  box-shadow: 0 3px 0 #041016, 0 0 14px rgba(0, 245, 212, 0.6);
+}
+html[data-skin="holo"] .holo-tier-1 .holo-tier-badge {
+  background: linear-gradient(135deg, #ecfccb, #a3e635);
+}
+html[data-skin="holo"] .holo-tier-2 .holo-tier-badge {
+  background: linear-gradient(135deg, #cffafe, #00f5d4);
+}
+html[data-skin="holo"] .holo-tier-3 .holo-tier-badge {
+  background: linear-gradient(135deg, #e0f2fe, #38bdf8);
+}
+html[data-skin="holo"] .desk-action-btn,
+html[data-skin="holo"] .desk-action-btn:hover,
+html[data-skin="holo"] .score-step,
+html[data-skin="holo"] .score-step:hover,
+html[data-skin="holo"] .team-score-step,
+html[data-skin="holo"] .team-score-step:hover {
+  border: none;
+  color: #083344;
+  background-image: linear-gradient(180deg, #cffafe, #22d3ee);
+  box-shadow: 0 3px 0 #0e7490;
+}
+html[data-skin="holo"] .desk-action-btn[data-desk-plus],
+html[data-skin="holo"] .desk-action-btn[data-desk-plus]:hover,
+html[data-skin="holo"] .desk-action-btn[data-desk-team-plus],
+html[data-skin="holo"] .desk-action-btn[data-desk-team-plus]:hover,
+html[data-skin="holo"] .score-step[data-lb-st-plus],
+html[data-skin="holo"] .score-step[data-lb-st-plus]:hover,
+html[data-skin="holo"] .score-step[data-grp-plus],
+html[data-skin="holo"] .score-step[data-grp-plus]:hover,
+html[data-skin="holo"] .team-score-step[data-grp-plus],
+html[data-skin="holo"] .team-score-step[data-grp-plus]:hover {
+  color: #041016;
+  background-image: linear-gradient(135deg, #00f5d4, #a3e635);
+  box-shadow: 0 3px 0 #0f766e, 0 0 12px rgba(0, 245, 212, 0.55);
+}
+html[data-skin="holo"] .holo-fire.is-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: .64rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: #041016;
+  background: linear-gradient(90deg, #00f5d4, #a3e635, #38bdf8);
+  box-shadow: 0 0 0 2px #041016, 0 0 16px rgba(0, 245, 212, 0.9);
+  animation: holoPulse 1s ease-in-out infinite;
+}
+html[data-skin="holo"] .holo-radar-svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+html[data-skin="holo"] .holo-burst {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.75rem;
+  z-index: 80;
+  color: #00f5d4;
+  -webkit-text-stroke: 1.2px #041016;
+  text-shadow: 0 0 12px #00f5d4, 0 0 24px #a3e635, 0 3px 0 #041016;
+  animation: holoFloatPop 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+html[data-skin="holo"] .holo-burst::before {
+  content: "⚡ ";
+  font-size: 0.95rem;
+  color: #a3e635;
+}
+html[data-skin="holo"] #leaderboardCard {
+  background: #041016;
+  border: 2px solid #00f5d4;
+  color: #ecfeff;
+  box-shadow: 0 14px 32px -12px rgba(0, 245, 212, 0.5);
+}
+html[data-skin="holo"] #leaderboardCard .panel-title-bar,
+html[data-skin="holo"] #leaderboardPanel .bg-slate-50\/70,
+html[data-skin="holo"] #leaderboardPanel .border-b {
+  background: linear-gradient(90deg, #083344, #0f766e);
+  border-color: rgba(0, 245, 212, 0.25);
+  color: #ecfeff;
+}
+html[data-skin="holo"] #leaderboardCard h2,
+html[data-skin="holo"] #leaderboardBody .text-slate-800,
+html[data-skin="holo"] #leaderboardBody .text-slate-400,
+html[data-skin="holo"] #leaderboardBody .text-slate-600 {
+  color: #ecfeff;
+}
+html[data-skin="holo"] #leaderboardBody > .border-slate-100,
+html[data-skin="holo"] #leaderboardBody > .border-slate-100:hover {
+  background: #083344;
+  border-color: rgba(0, 245, 212, 0.18);
+  color: #ecfeff;
+}
+html[data-skin="holo"] #leaderboardBody > .holo-tier-1 {
+  background: linear-gradient(90deg, #365314, #083344 65%);
+  box-shadow: inset 5px 0 0 #a3e635;
+}
+html[data-skin="holo"] #leaderboardBody > .holo-tier-2 {
+  background: linear-gradient(90deg, #115e59, #083344 65%);
+  box-shadow: inset 5px 0 0 #00f5d4;
+}
+html[data-skin="holo"] #leaderboardBody > .holo-tier-3 {
+  background: linear-gradient(90deg, #075985, #083344 65%);
+  box-shadow: inset 5px 0 0 #38bdf8;
+}
+html[data-skin="holo"] .holo-fire-mini {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: .6rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00f5d4, #a3e635);
+  color: #041016;
+}
+@keyframes holoScanSlide {
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+@keyframes holoPulse {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.22); transform: scale(1.05); }
+}
+@keyframes holoFloatPop {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(12px) scale(0.6); }
+  20%  { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.35); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-48px) scale(0.95); }
+}
