@@ -55,7 +55,7 @@ test('save fence does not reuse a Live Class plan filename', function () {
 });
 
 test('hub card sits above HCS Live Class', function () {
-  var plusAt = hub.indexOf('href="hcs-live-class-plus/"');
+  var plusAt = hub.indexOf('href="https://skhhcss-eng.github.io/classroom/hcs-live-class-plus/"');
   var liveAt = hub.indexOf('href="hcs-live-class/"');
   assert.ok(plusAt > 0 && liveAt > plusAt);
   assert.match(hub, /<h2>HCS Live Class \+<\/h2>/);
