@@ -8,6 +8,12 @@ const here = __dirname;
 const registrySrc = fs.readFileSync(path.join(here, 'skins/registry.js'), 'utf8');
 const loaderSrc = fs.readFileSync(path.join(here, 'skins/loader.js'), 'utf8');
 const sparkJs = fs.readFileSync(path.join(here, 'skins/spark.js'), 'utf8');
+const arcadeJs = fs.readFileSync(path.join(here, 'skins/arcade.js'), 'utf8');
+const holoJs = fs.readFileSync(path.join(here, 'skins/holo.js'), 'utf8');
+const hyperJs = fs.readFileSync(path.join(here, 'skins/hyper.js'), 'utf8');
+const arcadeCss = fs.readFileSync(path.join(here, 'skins/arcade.css'), 'utf8');
+const holoCss = fs.readFileSync(path.join(here, 'skins/holo.css'), 'utf8');
+const hyperCss = fs.readFileSync(path.join(here, 'skins/hyper.css'), 'utf8');
 const sparkFireSrc = fs.readFileSync(path.join(here, 'spark-fire.js'), 'utf8');
 
 function freshContext() {
@@ -31,20 +37,29 @@ function run(sandbox, code, filename) {
   vm.runInNewContext(code, sandbox, { filename: filename });
 }
 
-test('registry knows Spark and not the core skins', function () {
+test('registry knows Spark, Arcade, Holo, and Hyper and not the core skins', function () {
   const sandbox = freshContext();
   run(sandbox, registrySrc, 'registry.js');
   assert.equal(sandbox.HcsSkinRegistry.known('spark'), true);
+  assert.equal(sandbox.HcsSkinRegistry.known('arcade'), true);
+  assert.equal(sandbox.HcsSkinRegistry.known('holo'), true);
+  assert.equal(sandbox.HcsSkinRegistry.known('hyper'), true);
   assert.equal(sandbox.HcsSkinRegistry.known('minimalist'), false);
   assert.equal(sandbox.HcsSkinRegistry.known('default'), false);
   assert.equal(sandbox.HcsSkinRegistry.known(''), false);
   assert.equal(sandbox.HcsSkinRegistry.known(null), false);
-  assert.equal(sandbox.HcsSkinRegistry.packs.length, 1);
+  assert.equal(sandbox.HcsSkinRegistry.packs.length, 4);
   assert.equal(sandbox.HcsSkinRegistry.packs[0].css, 'skins/spark.css');
   assert.equal(sandbox.HcsSkinRegistry.packs[0].js, 'skins/spark.js');
+  assert.equal(sandbox.HcsSkinRegistry.packs[1].css, 'skins/arcade.css');
+  assert.equal(sandbox.HcsSkinRegistry.packs[1].js, 'skins/arcade.js');
+  assert.equal(sandbox.HcsSkinRegistry.packs[2].css, 'skins/holo.css');
+  assert.equal(sandbox.HcsSkinRegistry.packs[2].js, 'skins/holo.js');
+  assert.equal(sandbox.HcsSkinRegistry.packs[3].css, 'skins/hyper.css');
+  assert.equal(sandbox.HcsSkinRegistry.packs[3].js, 'skins/hyper.js');
 });
 
-test('boot writes the pack stylesheet and mount writes the Spark button', function () {
+test('boot writes pack stylesheets and mount writes Spark, Arcade, Holo, and Hyper buttons', function () {
   const boot = freshContext();
   const written = [];
   boot.document = {
@@ -54,7 +69,11 @@ test('boot writes the pack stylesheet and mount writes the Spark button', functi
   };
   run(boot, registrySrc, 'registry.js');
   run(boot, loaderSrc, 'loader.js');
-  assert.match(written.join(''), /<link rel="stylesheet" href="skins\/spark\.css">/);
+  const bootHtml = written.join('');
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/spark\.css">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/arcade\.css">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/holo\.css">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/hyper\.css">/);
 
   const mount = freshContext();
   const buttons = [];
@@ -65,12 +84,19 @@ test('boot writes the pack stylesheet and mount writes the Spark button', functi
   };
   run(mount, registrySrc, 'registry.js');
   run(mount, loaderSrc, 'loader.js');
-  assert.match(buttons.join(''), /id="btnSkinSpark"[^>]*>Spark</);
-  assert.match(buttons.join(''), /class="skin-choice"/);
-  assert.match(buttons.join(''), /data-skin-pack="spark"/);
+  const mountHtml = buttons.join('');
+  assert.match(mountHtml, /id="btnSkinSpark"[^>]*>Spark</);
+  assert.match(mountHtml, /id="btnSkinArcade"[^>]*>Arcade</);
+  assert.match(mountHtml, /id="btnSkinHolo"[^>]*>Holo</);
+  assert.match(mountHtml, /id="btnSkinHyper"[^>]*>Hyper</);
+  assert.match(mountHtml, /class="skin-choice"/);
+  assert.match(mountHtml, /data-skin-pack="spark"/);
+  assert.match(mountHtml, /data-skin-pack="arcade"/);
+  assert.match(mountHtml, /data-skin-pack="holo"/);
+  assert.match(mountHtml, /data-skin-pack="hyper"/);
 });
 
-test('wire applies Default, Minimalist, and Spark without a hardcoded Spark branch', function () {
+test('wire applies Default, Minimalist, Spark, Arcade, Holo, and Hyper without hardcoded pack branches', function () {
   const sandbox = freshContext();
   const store = {};
   function button(id, pressed) {
@@ -88,7 +114,10 @@ test('wire applies Default, Minimalist, and Spark without a hardcoded Spark bran
   const buttons = {
     btnSkinDefault: button('btnSkinDefault', 'true'),
     btnSkinMinimalist: button('btnSkinMinimalist', 'false'),
-    btnSkinSpark: button('btnSkinSpark', 'false')
+    btnSkinSpark: button('btnSkinSpark', 'false'),
+    btnSkinArcade: button('btnSkinArcade', 'false'),
+    btnSkinHolo: button('btnSkinHolo', 'false'),
+    btnSkinHyper: button('btnSkinHyper', 'false')
   };
   sandbox.localStorage = {
     setItem: function (key, value) { store[key] = value; },
@@ -112,8 +141,19 @@ test('wire applies Default, Minimalist, and Spark without a hardcoded Spark bran
   assert.equal(sandbox.document.documentElement.skin, 'spark');
   assert.equal(store.hcsLiveClassPlus_skin_v1, 'spark');
   assert.equal(buttons.btnSkinSpark.pressed, 'true');
-  assert.equal(buttons.btnSkinDefault.pressed, 'false');
-  assert.equal(buttons.btnSkinMinimalist.pressed, 'false');
+  buttons.btnSkinArcade.onclick();
+  assert.equal(sandbox.document.documentElement.skin, 'arcade');
+  assert.equal(store.hcsLiveClassPlus_skin_v1, 'arcade');
+  assert.equal(buttons.btnSkinArcade.pressed, 'true');
+  assert.equal(buttons.btnSkinSpark.pressed, 'false');
+  buttons.btnSkinHolo.onclick();
+  assert.equal(sandbox.document.documentElement.skin, 'holo');
+  assert.equal(store.hcsLiveClassPlus_skin_v1, 'holo');
+  assert.equal(buttons.btnSkinHolo.pressed, 'true');
+  buttons.btnSkinHyper.onclick();
+  assert.equal(sandbox.document.documentElement.skin, 'hyper');
+  assert.equal(store.hcsLiveClassPlus_skin_v1, 'hyper');
+  assert.equal(buttons.btnSkinHyper.pressed, 'true');
   buttons.btnSkinMinimalist.onclick();
   assert.equal(sandbox.document.documentElement.skin, 'minimalist');
   assert.equal(store.hcsLiveClassPlus_skin_v1, 'minimalist');
@@ -125,7 +165,7 @@ test('wire applies Default, Minimalist, and Spark without a hardcoded Spark bran
   assert.equal(buttons.btnSkinSpark.pressed, 'false');
 });
 
-test('Spark pack still notes, bursts, ranks, and clears through the host', function () {
+test('Spark, Arcade, Holo, and Hyper packs note, burst, rank, and clear through the host', function () {
   const sandbox = freshContext();
   let skin = 'spark';
   sandbox.document = {
@@ -137,6 +177,9 @@ test('Spark pack still notes, bursts, ranks, and clears through the host', funct
   run(sandbox, loaderSrc, 'loader.js');
   run(sandbox, sparkFireSrc, 'spark-fire.js');
   run(sandbox, sparkJs, 'spark.js');
+  run(sandbox, arcadeJs, 'arcade.js');
+  run(sandbox, holoJs, 'holo.js');
+  run(sandbox, hyperJs, 'hyper.js');
   const st = { id: 'a', classNo: '2', score: 10, sparkPts: [] };
   const other = { id: 'b', classNo: '1', score: 1, sparkPts: [] };
   const cls = { students: [st, other] };
@@ -174,6 +217,39 @@ test('Spark pack still notes, bursts, ranks, and clears through the host', funct
   const burst = sandbox.HcsSkinHost.scoreFloat(1);
   assert.equal(burst.className, 'score-burst');
   assert.equal(burst.ms, 1350);
+
+  // Switch to Arcade, Holo, and Hyper and verify their custom bursts and chrome
+  skin = 'arcade';
+  const arcadeBurst = sandbox.HcsSkinHost.scoreFloat(1);
+  assert.equal(arcadeBurst.className, 'arcade-burst');
+  assert.equal(arcadeBurst.ms, 1300);
+  const arcadeChrome = sandbox.HcsSkinHost.deskChrome(st, t + 2);
+  assert.match(arcadeChrome.className, /\barcade-tier-1\b/);
+  assert.match(arcadeChrome.badge, /class="arcade-tier-badge">1P ★ 1st</);
+  assert.match(arcadeChrome.fire, /class="arcade-fire is-on"/);
+  assert.match(arcadeChrome.fire, />COMBO!</);
+
+  skin = 'holo';
+  const holoBurst = sandbox.HcsSkinHost.scoreFloat(1);
+  assert.equal(holoBurst.className, 'holo-burst');
+  assert.equal(holoBurst.ms, 1300);
+  const holoChrome = sandbox.HcsSkinHost.deskChrome(st, t + 2);
+  assert.match(holoChrome.className, /\bholo-tier-1\b/);
+  assert.match(holoChrome.badge, /class="holo-tier-badge">◆ TIER I · 1st</);
+  assert.match(holoChrome.fire, /class="holo-fire is-on"/);
+  assert.match(holoChrome.fire, />OVERDRIVE</);
+
+  skin = 'hyper';
+  const hyperBurst = sandbox.HcsSkinHost.scoreFloat(1);
+  assert.equal(hyperBurst.className, 'hyper-burst');
+  assert.equal(hyperBurst.ms, 1600);
+  const hyperChrome = sandbox.HcsSkinHost.deskChrome(st, t + 2);
+  assert.match(hyperChrome.className, /\bhyper-tier-1\b/);
+  assert.match(hyperChrome.badge, /class="hyper-tier-badge">👑 CHAMP · 1st</);
+  assert.match(hyperChrome.fire, /class="hyper-fire is-on"/);
+  assert.match(hyperChrome.fire, /class="hyper-nova-sheet"/);
+  assert.match(hyperChrome.fire, />HYPER NOVA!</);
+
   skin = null;
   assert.equal(sandbox.HcsSkinHost.scoreFloat(1), null);
   assert.equal(sandbox.HcsSkinHost.scoreFloat(-1), null);
@@ -187,4 +263,19 @@ test('Spark pack still notes, bursts, ranks, and clears through the host', funct
   assert.equal(sandbox.SparkFire.onFire(st, t + 2), false);
   assert.equal(st.sparkPts.length, 0);
   sandbox.HcsSkinHost.refresh();
+});
+
+test('Arcade, Holo, and Hyper stylesheets scope all rules under html[data-skin="<id>"]', function () {
+  [
+    { id: 'arcade', css: arcadeCss },
+    { id: 'holo', css: holoCss },
+    { id: 'hyper', css: hyperCss }
+  ].forEach(function (pack) {
+    assert.match(pack.css, new RegExp('\\.studio-mark img\\.studio-mark-default'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #studioHeader'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] \\.desk-card'));
+    assert.match(pack.css, new RegExp('\\.' + pack.id + '-tier-badge[\\s\\S]*?display:\\s*none;'));
+    assert.doesNotMatch(pack.css, /html\[data-skin="minimalist"\]/);
+    assert.doesNotMatch(pack.css, /html\[data-skin="spark"\]/);
+  });
 });

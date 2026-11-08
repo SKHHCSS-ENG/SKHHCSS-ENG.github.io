@@ -1,0 +1,411 @@
+/* Arcade skin pack — 8-bit CRT midnight cabinet, neon emerald #22c55e,
+   coin gold #facc15, arcade cyan #38bdf8, and pixel magenta #f472b6.
+   Scoped strictly under html[data-skin="arcade"]. Desk width stays 148px. */
+.arcade-tier-badge,
+.arcade-fire,
+.arcade-fire-mini,
+.arcade-burst { display: none; }
+
+html[data-skin="arcade"] .studio-mark img.studio-mark-default {
+  display: block;
+}
+html[data-skin="arcade"] .studio-mark img.studio-mark-day {
+  display: none;
+}
+html[data-skin="arcade"] body {
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(34, 197, 94, 0.16), rgba(34, 197, 94, 0) 45%),
+    radial-gradient(ellipse at 85% 0%, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0) 45%),
+    #e2e8f0;
+}
+html[data-skin="arcade"] #studioHeader {
+  background-color: #090d16;
+  background-image: linear-gradient(180deg, #090d16 0%, #111827 55%, #1e1b4b 100%);
+  box-shadow:
+    0 0 0 2px #22c55e,
+    0 0 0 5px #090d16,
+    0 8px 0 #15803d,
+    0 14px 28px rgba(9, 13, 22, 0.65),
+    inset 0 -3px 0 #facc15,
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+html[data-skin="arcade"] #studioHeader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(90deg,
+    rgba(34, 197, 94, 0) 0%,
+    rgba(34, 197, 94, 0.24) 10%,
+    rgba(250, 204, 21, 0.30) 25%,
+    rgba(34, 197, 94, 0.24) 40%,
+    rgba(34, 197, 94, 0) 50%,
+    rgba(34, 197, 94, 0.24) 60%,
+    rgba(250, 204, 21, 0.30) 75%,
+    rgba(34, 197, 94, 0.24) 90%,
+    rgba(34, 197, 94, 0) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: arcadeMarqueeSlide 4s steps(24, end) infinite;
+}
+html[data-skin="arcade"] #studioHeader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(90deg,
+    rgba(56, 189, 248, 0) 0%,
+    rgba(56, 189, 248, 0.20) 12%,
+    rgba(244, 114, 182, 0.24) 25%,
+    rgba(56, 189, 248, 0.20) 38%,
+    rgba(56, 189, 248, 0) 50%,
+    rgba(56, 189, 248, 0.20) 62%,
+    rgba(244, 114, 182, 0.24) 75%,
+    rgba(56, 189, 248, 0.20) 88%,
+    rgba(56, 189, 248, 0) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: arcadeMarqueeSlide 6s steps(24, end) infinite reverse;
+  mix-blend-mode: screen;
+}
+html[data-skin="arcade"] #studioMast,
+html[data-skin="arcade"] #studioHeader .studio-header-bar {
+  position: relative;
+  z-index: 1;
+}
+html[data-skin="arcade"] #studioHeaderCluster button,
+html[data-skin="arcade"] #studioHeaderCluster button:hover,
+html[data-skin="arcade"] #studioHeaderUtilities > .relative > button,
+html[data-skin="arcade"] #studioHeaderUtilities > .relative > button:hover,
+html[data-skin="arcade"] #studioHeaderUtilities > button,
+html[data-skin="arcade"] #studioHeaderUtilities > button:hover,
+html[data-skin="arcade"] #studioHeaderExportPair button,
+html[data-skin="arcade"] #studioHeaderExportPair button:hover,
+html[data-skin="arcade"] .studio-header-pin button,
+html[data-skin="arcade"] .studio-header-pin button:hover {
+  border: 2px solid #090d16;
+  color: #090d16;
+  background-color: #fefce8;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fef08a 100%);
+  box-shadow: 0 4px 0 #b45309, inset 0 1px 0 #fff;
+}
+html[data-skin="arcade"] #btnModeIndividual.shadow-sm,
+html[data-skin="arcade"] #btnModeGroup.shadow-sm,
+html[data-skin="arcade"] #btnModeIndividual.shadow-sm:hover,
+html[data-skin="arcade"] #btnModeGroup.shadow-sm:hover,
+html[data-skin="arcade"] #btnOpenClassModal,
+html[data-skin="arcade"] #btnOpenClassModal:hover {
+  border: 2px solid #090d16;
+  color: #052e16;
+  background-image: linear-gradient(180deg, #86efac 0%, #22c55e 55%, #16a34a 100%);
+  box-shadow: 0 4px 0 #14532d, 0 0 14px rgba(34, 197, 94, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+html[data-skin="arcade"] #studioHeaderUtilities > #btnOpenPickerModal,
+html[data-skin="arcade"] #studioHeaderUtilities > #btnOpenPickerModal:hover {
+  border: 2px solid #090d16;
+  color: #422006;
+  background-image: linear-gradient(180deg, #fef08a, #facc15 55%, #eab308);
+  box-shadow: 0 4px 0 #854d0e, 0 0 14px rgba(250, 204, 21, 0.55), inset 0 1px 0 #fff;
+}
+html[data-skin="arcade"] #studioHeader #classSelect {
+  border: 2px solid #22c55e;
+  box-shadow: 0 4px 0 #14532d;
+}
+html[data-skin="arcade"] #studioHeaderCluster > div {
+  background: rgba(9, 13, 22, 0.75);
+  border-color: #22c55e;
+  box-shadow: 0 4px 0 #14532d;
+}
+html[data-skin="arcade"] #studioToolbar {
+  background: #fefce8;
+  border-bottom: 4px solid #090d16;
+  box-shadow: 0 4px 0 #22c55e;
+}
+html[data-skin="arcade"] #studioToolbarRow button,
+html[data-skin="arcade"] #studioToolbarRow button:hover {
+  border: 2px solid #090d16;
+  color: #090d16;
+  background-color: #fff;
+  background-image: linear-gradient(180deg, #fff 0%, #f1f5f9 100%);
+  box-shadow: 0 3px 0 #090d16;
+}
+html[data-skin="arcade"] #studioToolbarRow #btnAllPlusOne,
+html[data-skin="arcade"] #studioToolbarRow #btnAllPlusOne:hover,
+html[data-skin="arcade"] #studioToolbarRow #btnApplyCustomGrid,
+html[data-skin="arcade"] #studioToolbarRow #btnApplyCustomGrid:hover,
+html[data-skin="arcade"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm,
+html[data-skin="arcade"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm:hover {
+  border: 2px solid #090d16;
+  color: #052e16;
+  background-image: linear-gradient(180deg, #86efac, #22c55e);
+  box-shadow: 0 3px 0 #14532d;
+}
+html[data-skin="arcade"] #studioToolbarRow #btnSkinArcade,
+html[data-skin="arcade"] #studioToolbarRow #btnSkinArcade:hover,
+html[data-skin="arcade"] #btnSkinArcade,
+html[data-skin="arcade"] #btnSkinArcade:hover {
+  background-image: linear-gradient(135deg, #22c55e, #facc15);
+  border: 2px solid #090d16;
+  color: #090d16;
+  box-shadow: 0 3px 0 #14532d, 0 0 12px rgba(34, 197, 94, 0.55);
+}
+html[data-skin="arcade"] #pulseCard {
+  background-color: #090d16;
+  background-image: linear-gradient(135deg, #090d16 0%, #111827 60%, #064e3b 100%);
+  border: 2px solid #22c55e;
+  box-shadow: 0 6px 0 #090d16;
+}
+html[data-skin="arcade"] #pulseCard #statTotalPoints {
+  color: #facc15;
+  text-shadow: 2px 2px 0 #090d16, 0 0 10px rgba(250, 204, 21, 0.7);
+}
+html[data-skin="arcade"] #studioFloorSection {
+  border: 3px solid #090d16;
+  background: #090d16;
+  box-shadow: 0 0 0 3px #22c55e, 0 12px 0 #090d16;
+}
+html[data-skin="arcade"] .classroom-floor {
+  background-color: #090d16;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(34, 197, 94, 0.06) 0px, rgba(34, 197, 94, 0.06) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 6px),
+    radial-gradient(circle at 20% 20%, rgba(34, 197, 94, 0.18), rgba(34, 197, 94, 0) 45%),
+    radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0) 45%),
+    linear-gradient(180deg, #090d16 0%, #0f172a 100%);
+  box-shadow: inset 0 0 32px rgba(34, 197, 94, 0.22);
+}
+html[data-skin="arcade"] .classroom-floor.snap-active {
+  background-image:
+    linear-gradient(to right, rgba(34, 197, 94, 0.22) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(250, 204, 21, 0.18) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(180deg, #090d16 0%, #0f172a 100%);
+  background-size: 24px 24px, 24px 24px, auto;
+}
+html[data-skin="arcade"] .front-of-room {
+  background: linear-gradient(90deg, #22c55e, #facc15, #38bdf8);
+  border: 2px solid #090d16;
+  color: #090d16;
+  box-shadow: 0 4px 0 #090d16;
+}
+html[data-skin="arcade"] .desk-team-row {
+  position: relative;
+}
+html[data-skin="arcade"] .desk-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fefce8 100%);
+  border: 2px solid #090d16;
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 2px #38bdf8,
+    0 6px 0 #090d16,
+    0 10px 0 #1e293b;
+}
+html[data-skin="arcade"] .desk-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 0 0 2px #22c55e,
+    0 8px 0 #090d16,
+    0 12px 0 #15803d;
+}
+html[data-skin="arcade"] .desk-card.spotlight-active {
+  transform: translateY(-6px) scale(1.06);
+  box-shadow:
+    0 0 0 4px #facc15,
+    0 8px 0 #090d16,
+    0 0 24px rgba(250, 204, 21, 0.85) !important;
+}
+html[data-skin="arcade"] .desk-card.arcade-tier-1,
+html[data-skin="arcade"] .desk-card.arcade-tier-2,
+html[data-skin="arcade"] .desk-card.arcade-tier-3 {
+  z-index: 12;
+}
+html[data-skin="arcade"] .desk-card.arcade-tier-1 {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef08a 50%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #facc15,
+    0 7px 0 #854d0e,
+    0 12px 0 #090d16,
+    0 0 22px rgba(250, 204, 21, 0.65);
+}
+html[data-skin="arcade"] .desk-card.arcade-tier-2 {
+  background: linear-gradient(180deg, #f0f9ff 0%, #bae6fd 50%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #38bdf8,
+    0 7px 0 #0369a1,
+    0 12px 0 #090d16,
+    0 0 18px rgba(56, 189, 248, 0.55);
+}
+html[data-skin="arcade"] .desk-card.arcade-tier-3 {
+  background: linear-gradient(180deg, #fdf2f8 0%, #fbcfe8 50%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #f472b6,
+    0 7px 0 #9d174d,
+    0 12px 0 #090d16,
+    0 0 18px rgba(244, 114, 182, 0.55);
+}
+html[data-skin="arcade"] .arcade-tier-badge {
+  display: inline-block;
+  position: absolute;
+  top: -12px;
+  left: -10px;
+  z-index: 7;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: .68rem;
+  font-weight: 800;
+  line-height: 1.15;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 2px solid #090d16;
+  color: #090d16;
+  letter-spacing: .03em;
+  box-shadow: 0 3px 0 #090d16;
+}
+html[data-skin="arcade"] .arcade-tier-1 .arcade-tier-badge {
+  background: linear-gradient(180deg, #fef08a, #facc15);
+  color: #422006;
+}
+html[data-skin="arcade"] .arcade-tier-2 .arcade-tier-badge {
+  background: linear-gradient(180deg, #e0f2fe, #38bdf8);
+  color: #082f49;
+}
+html[data-skin="arcade"] .arcade-tier-3 .arcade-tier-badge {
+  background: linear-gradient(180deg, #fce7f3, #f472b6);
+  color: #500724;
+}
+html[data-skin="arcade"] .desk-action-btn,
+html[data-skin="arcade"] .desk-action-btn:hover,
+html[data-skin="arcade"] .score-step,
+html[data-skin="arcade"] .score-step:hover,
+html[data-skin="arcade"] .team-score-step,
+html[data-skin="arcade"] .team-score-step:hover {
+  border: 2px solid #090d16;
+  color: #422006;
+  background-image: linear-gradient(180deg, #fef08a, #facc15);
+  box-shadow: 0 3px 0 #090d16;
+}
+html[data-skin="arcade"] .desk-action-btn[data-desk-plus],
+html[data-skin="arcade"] .desk-action-btn[data-desk-plus]:hover,
+html[data-skin="arcade"] .desk-action-btn[data-desk-team-plus],
+html[data-skin="arcade"] .desk-action-btn[data-desk-team-plus]:hover,
+html[data-skin="arcade"] .score-step[data-lb-st-plus],
+html[data-skin="arcade"] .score-step[data-lb-st-plus]:hover,
+html[data-skin="arcade"] .score-step[data-grp-plus],
+html[data-skin="arcade"] .score-step[data-grp-plus]:hover,
+html[data-skin="arcade"] .team-score-step[data-grp-plus],
+html[data-skin="arcade"] .team-score-step[data-grp-plus]:hover {
+  border: 2px solid #090d16;
+  color: #052e16;
+  background-image: linear-gradient(180deg, #86efac, #22c55e);
+  box-shadow: 0 3px 0 #090d16;
+}
+html[data-skin="arcade"] .arcade-fire.is-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: .64rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 2px solid #090d16;
+  color: #090d16;
+  background: linear-gradient(90deg, #facc15, #22c55e, #38bdf8);
+  box-shadow: 0 3px 0 #090d16, 0 0 14px rgba(250, 204, 21, 0.85);
+  animation: arcadeBlink 0.7s steps(2, end) infinite;
+}
+html[data-skin="arcade"] .arcade-coin-svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+html[data-skin="arcade"] .arcade-burst {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.65rem;
+  z-index: 80;
+  color: #facc15;
+  -webkit-text-stroke: 1.5px #090d16;
+  text-shadow: 0 3px 0 #090d16, 0 0 14px #22c55e;
+  animation: arcadePopUp 1.3s steps(12, end) forwards;
+}
+html[data-skin="arcade"] .arcade-burst::before {
+  content: "1UP ";
+  font-size: 0.85rem;
+  color: #86efac;
+}
+html[data-skin="arcade"] #leaderboardCard {
+  background: #090d16;
+  border: 3px solid #22c55e;
+  color: #f8fafc;
+  box-shadow: 0 8px 0 #090d16;
+}
+html[data-skin="arcade"] #leaderboardCard .panel-title-bar,
+html[data-skin="arcade"] #leaderboardPanel .bg-slate-50\/70,
+html[data-skin="arcade"] #leaderboardPanel .border-b {
+  background: #111827;
+  border-color: #22c55e;
+  color: #facc15;
+}
+html[data-skin="arcade"] #leaderboardCard h2,
+html[data-skin="arcade"] #leaderboardBody .text-slate-800,
+html[data-skin="arcade"] #leaderboardBody .text-slate-400,
+html[data-skin="arcade"] #leaderboardBody .text-slate-600 {
+  color: #f8fafc;
+}
+html[data-skin="arcade"] #leaderboardBody > .border-slate-100,
+html[data-skin="arcade"] #leaderboardBody > .border-slate-100:hover {
+  background: #111827;
+  border-color: rgba(34, 197, 94, 0.25);
+  color: #f8fafc;
+}
+html[data-skin="arcade"] #leaderboardBody > .arcade-tier-1 {
+  background: linear-gradient(90deg, #713f12, #111827 65%);
+  box-shadow: inset 5px 0 0 #facc15;
+}
+html[data-skin="arcade"] #leaderboardBody > .arcade-tier-2 {
+  background: linear-gradient(90deg, #0c4a6e, #111827 65%);
+  box-shadow: inset 5px 0 0 #38bdf8;
+}
+html[data-skin="arcade"] #leaderboardBody > .arcade-tier-3 {
+  background: linear-gradient(90deg, #831843, #111827 65%);
+  box-shadow: inset 5px 0 0 #f472b6;
+}
+html[data-skin="arcade"] .arcade-fire-mini {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: .6rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1.5px solid #090d16;
+  background: #facc15;
+  color: #090d16;
+}
+@keyframes arcadeMarqueeSlide {
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+@keyframes arcadeBlink {
+  0%, 100% { filter: brightness(1); transform: translateY(0); }
+  50% { filter: brightness(1.22); transform: translateY(-1px); }
+}
+@keyframes arcadePopUp {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.7); }
+  20%  { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.25); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-46px) scale(1); }
+}
