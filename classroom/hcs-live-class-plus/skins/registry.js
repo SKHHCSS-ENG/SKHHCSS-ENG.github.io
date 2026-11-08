@@ -27,41 +27,6 @@
       buttonId: 'btnSkinArcade',
       css: 'skins/arcade.css',
       js: 'skins/arcade.js'
-    },
-    {
-      id: 'holo',
-      label: 'Holo',
-      buttonId: 'btnSkinHolo',
-      css: 'skins/holo.css',
-      js: 'skins/holo.js'
-    },
-    {
-      id: 'hyper',
-      label: 'Hyper',
-      buttonId: 'btnSkinHyper',
-      css: 'skins/hyper.css',
-      js: 'skins/hyper.js'
-    },
-    {
-      id: 'pixel',
-      label: 'Pixel',
-      buttonId: 'btnSkinPixel',
-      css: 'skins/pixel.css',
-      js: 'skins/pixel.js'
-    },
-    {
-      id: 'cyber',
-      label: 'Cyber',
-      buttonId: 'btnSkinCyber',
-      css: 'skins/cyber.css',
-      js: 'skins/cyber.js'
-    },
-    {
-      id: 'lofi',
-      label: 'Lo-Fi',
-      buttonId: 'btnSkinLofi',
-      css: 'skins/lofi.css',
-      js: 'skins/lofi.js'
     }
   ];
 
