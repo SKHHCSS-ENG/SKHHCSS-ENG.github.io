@@ -1,6 +1,6 @@
 /* Pixel Arcade skin pack (pixel.css) — 16-bit CRT coin-op cabinet with live combo chain timer,
    CONTINUE? undo feedback, and critical-hit float bursts.
-   Scoped strictly under html[data-skin="pixel"]. Desk width stays 148px. */
+   Scoped strictly under html[data-skin="pixel"]. Desk width stays 148px and position: absolute from core. */
 .pixel-tier-badge,
 .pixel-combo-hud,
 .pixel-board-tag,
@@ -138,13 +138,17 @@ html[data-skin="pixel"] .front-of-room {
 html[data-skin="pixel"] .desk-team-row {
   position: relative;
 }
+/* Keep core position: absolute on .desk-card so seating coordinates work */
 html[data-skin="pixel"] .desk-card {
-  position: relative;
   border: 3px solid #0b0f19;
   border-radius: 6px;
   background: linear-gradient(180deg, #ffffff 0%, #fefce8 100%);
   box-shadow: 0 5px 0 #0b0f19, inset 0 2px 0 #ffffff;
   transition: transform 120ms steps(4, end), box-shadow 120ms steps(4, end);
+}
+html[data-skin="pixel"] .desk-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 7px 0 #0b0f19, 0 0 12px rgba(250, 204, 21, 0.45);
 }
 html[data-skin="pixel"] .desk-card.pixel-chain-1 {
   border-color: #16a34a;

@@ -342,7 +342,7 @@ test('Pixel, Cyber, and Lo-Fi packs execute custom classroom mechanics (combo ti
   assert.equal(sandbox.HcsSkinHost.scoreFloat(1).className, 'lofi-burst');
 });
 
-test('All DLC stylesheets scope rules under html[data-skin="<id>"]', function () {
+test('All DLC stylesheets scope rules under html[data-skin="<id>"] and never override .desk-card position: absolute', function () {
   [
     { id: 'arcade', css: arcadeCss },
     { id: 'holo', css: holoCss },
@@ -357,5 +357,7 @@ test('All DLC stylesheets scope rules under html[data-skin="<id>"]', function ()
     assert.match(pack.css, new RegExp('\\.' + pack.id + '-tier-badge[\\s\\S]*?display:\\s*none;'));
     assert.doesNotMatch(pack.css, /html\[data-skin="minimalist"\]/);
     assert.doesNotMatch(pack.css, /html\[data-skin="spark"\]/);
+    assert.doesNotMatch(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*\\.desk-card\\s*\\{[^}]*position\\s*:\\s*relative', 'i'));
+    assert.doesNotMatch(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*\\.desk-card\\s*\\{[^}]*clip-path\\s*:', 'i'));
   });
 });

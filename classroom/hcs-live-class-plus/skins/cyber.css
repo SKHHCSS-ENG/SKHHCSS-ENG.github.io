@@ -1,6 +1,6 @@
 /* Cyberpunk Netrunner skin pack (cyber.css) — Night City cyberdeck HUD (#fcee0a cyber yellow,
    #00f0ff optics cyan, #ff003c glitch magenta), live uplink sort, and Street Cred tiers.
-   Scoped strictly under html[data-skin="cyber"]. Desk width stays 148px. */
+   Scoped strictly under html[data-skin="cyber"]. Desk width stays 148px and position: absolute from core. */
 .cyber-tier-badge,
 .cyber-uplink-hud,
 .cyber-board-tag,
@@ -133,13 +133,17 @@ html[data-skin="cyber"] .front-of-room {
 html[data-skin="cyber"] .desk-team-row {
   position: relative;
 }
+/* Keep core position: absolute and no clip-path so seating coordinates and corner badges work */
 html[data-skin="cyber"] .desk-card {
-  position: relative;
   border: 2px solid #0f172a;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  border-radius: 4px;
   background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-  box-shadow: 4px 4px 0 #0f172a;
+  box-shadow: 4px 4px 0 #0f172a, -2px -2px 0 #00f0ff;
   transition: transform 140ms ease, box-shadow 140ms ease;
+}
+html[data-skin="cyber"] .desk-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 4px 0 #ff003c, 0 0 14px rgba(0, 240, 255, 0.45);
 }
 html[data-skin="cyber"] .desk-card.cyber-uplink-live {
   border-color: #00f0ff;

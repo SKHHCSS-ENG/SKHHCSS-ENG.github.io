@@ -1,6 +1,6 @@
 /* Cozy Cafe / Lo-Fi Study skin pack (lofi.css) — warm espresso #4a3525, oat cream #fdfaf3,
    and matcha sage #4d7c5d with a 5-stamp cafe loyalty card mechanic and gentle steam float.
-   Scoped strictly under html[data-skin="lofi"]. Desk width stays 148px. */
+   Scoped strictly under html[data-skin="lofi"]. Desk width stays 148px and position: absolute from core. */
 .lofi-tier-badge,
 .lofi-stamp-card,
 .lofi-board-tag,
@@ -107,13 +107,18 @@ html[data-skin="lofi"] .front-of-room {
 html[data-skin="lofi"] .desk-team-row {
   position: relative;
 }
+/* Keep core position: absolute on .desk-card so seating coordinates work */
 html[data-skin="lofi"] .desk-card {
-  position: relative;
   border: 2px solid #e6ccb2;
   border-radius: 14px;
   background: linear-gradient(180deg, #fffdf9 0%, #faf3e8 100%);
   box-shadow: 0 4px 10px rgba(74, 53, 37, 0.08);
   transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+html[data-skin="lofi"] .desk-card:hover {
+  transform: translateY(-2px);
+  border-color: #4d7c5d;
+  box-shadow: 0 6px 14px rgba(74, 53, 37, 0.14);
 }
 html[data-skin="lofi"] .desk-card.lofi-fresh-brew {
   border-color: #4d7c5d;
