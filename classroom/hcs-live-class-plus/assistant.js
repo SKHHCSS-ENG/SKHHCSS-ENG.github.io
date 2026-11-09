@@ -10,6 +10,9 @@
  * Import opens the chart photo flow. The Worker host stays live-class-plus.
  * Floor scroll does not move the ball. A drag still settles the ball
  * clear of desk name chips and the floor zoom bar, then remembers that spot.
+ * Ask and Gloss stay in the small strip. Show class copies the current
+ * reply onto a centre board for the room. Close, Esc, or a tap outside
+ * returns to that strip.
  */
 (function (root) {
   var api = factory();
@@ -520,6 +523,56 @@
     return data.reply ? plainActionNames(String(data.reply).trim()) : '';
   }
 
+  // A looked-up word or short phrase. Questions and sentences stay in the body.
+  function classWord(text) {
+    var line = plainActionNames(String(text || '')).replace(/\s+/g, ' ').trim();
+    if (!line || line.length > 32) return '';
+    if (/[.!?。！？]/.test(line)) return '';
+    if (line.split(' ').length > 4) return '';
+    return line;
+  }
+
+  function classLine(text) {
+    return plainActionNames(typeof text === 'string' ? text : '').replace(/\s+/g, ' ').trim();
+  }
+
+  // Head is the word. Lines are the gloss or the Ask reply. The small strip
+  // still uses presentReply; this only feeds the class board.
+  function classBoardParts(payload, query) {
+    var data = payload && typeof payload === 'object' ? payload : {};
+    var kind = String(data.kind || data.type || '').trim();
+    var replyRaw = plainActionNames(typeof data.reply === 'string' ? data.reply : '').trim();
+    var reply = replyRaw.replace(/\s+/g, ' ').trim();
+    var zh = classLine(data.gloss_zh);
+    var en = classLine(data.gloss_en);
+    var gloss = kind === 'gloss' || !!(zh || en);
+    var head = '';
+    var lines = [];
+    if (gloss) {
+      head = classWord(reply) || classWord(query);
+      if (zh) lines.push(zh);
+      if (en && en !== zh) lines.push(en);
+      if (!lines.length && reply && reply !== head) lines.push(replyRaw.indexOf('\n') >= 0 ? replyRaw : reply);
+    } else {
+      head = classWord(query);
+      if (!head && reply) head = classWord(reply);
+      if (reply && reply !== head) lines.push(replyRaw.indexOf('\n') >= 0 ? replyRaw : reply);
+    }
+    var kept = [];
+    lines.forEach(function (line) {
+      if (line && line !== head && kept.indexOf(line) < 0) kept.push(line);
+    });
+    if (!head && !kept.length) return null;
+    return { head: head, lines: kept, gloss: !!gloss };
+  }
+
+  function canShowClass(data) {
+    if (!data || typeof data !== 'object') return false;
+    var kind = String(data.kind || data.type || '').trim();
+    if (kind !== 'ask' && kind !== 'gloss') return false;
+    return !!classBoardParts(data, '');
+  }
+
   // The Worker sometimes names tidy_snap, or asks the teacher to confirm.
   // Actions run on the first send, so a shown reply uses the plain words.
   function plainActionNames(text) {
@@ -942,6 +995,8 @@
     ballRect: ballRect,
     layoutBeside: layoutBeside,
     presentReply: presentReply,
+    classBoardParts: classBoardParts,
+    canShowClass: canShowClass,
     plainActionNames: plainActionNames,
     readPayload: readPayload,
     parseCommand: parseCommand,
@@ -979,6 +1034,10 @@
     var placeFrame = 0;
     var inflight = null;
     var seq = 0;
+    var classSheet = null;
+    var classPayload = null;
+    var classQuery = '';
+    var pendingQuery = '';
 
     loadAnchor();
 
@@ -1048,11 +1107,24 @@
     reply.hidden = true;
     reply.setAttribute('aria-live', 'polite');
 
+    var showClassBtn = document.createElement('button');
+    showClassBtn.type = 'button';
+    showClassBtn.className = 'plus-show-class';
+    showClassBtn.id = 'plusShowClass';
+    showClassBtn.hidden = true;
+    showClassBtn.textContent = 'Show class';
+    showClassBtn.setAttribute('aria-expanded', 'false');
+    showClassBtn.setAttribute('aria-controls', 'classBoard');
+    showClassBtn.addEventListener('click', function () {
+      openClassBoard();
+    });
+
     var panel = document.createElement('div');
     panel.className = 'plus-panel';
     panel.hidden = true;
     panel.appendChild(command);
     panel.appendChild(reply);
+    panel.appendChild(showClassBtn);
 
     unit.appendChild(ball);
     unit.appendChild(panel);
@@ -1183,6 +1255,7 @@
       fitReply();
       var stripH = command.hidden ? 0 : command.offsetHeight;
       var replyH = reply.hidden ? 0 : reply.offsetHeight;
+      if (!showClassBtn.hidden) replyH += showClassBtn.offsetHeight + api.GAP;
       var placed = api.layoutBeside(ball, {
         width: stripCap(),
         strip: stripH,
@@ -1257,6 +1330,11 @@
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
+        showClassBtn.hidden = true;
+        showClassBtn.setAttribute('aria-expanded', 'false');
+        classPayload = null;
+        classQuery = '';
+        closeClassBoard({ silent: true });
         panel.hidden = true;
       }
       place();
@@ -1281,20 +1359,152 @@
       root.setTimeout(aim, 0);
     }
 
-    function showReply(text) {
+    function showReply(text, opts) {
+      opts = opts || {};
       var shown = String(text || '').trim();
       if (!shown) {
         reply.hidden = true;
         reply.textContent = '';
+        showClassBtn.hidden = true;
+        showClassBtn.setAttribute('aria-expanded', 'false');
+        classPayload = null;
+        classQuery = '';
+        closeClassBoard({ silent: true });
         place();
         focusCommand();
         return;
       }
       reply.hidden = false;
       reply.textContent = shown;
+      var allow = !!opts.showClass;
+      showClassBtn.hidden = !allow;
+      if (!allow) showClassBtn.setAttribute('aria-expanded', 'false');
+      if (allow) {
+        classPayload = opts.payload || { kind: 'ask', reply: shown };
+        classQuery = opts.query || '';
+      } else {
+        classPayload = null;
+        classQuery = '';
+      }
+      if (classSheet) {
+        if (allow) paintClassBoard();
+        else closeClassBoard({ silent: true });
+      }
       place();
       root.requestAnimationFrame(place);
-      focusCommand();
+      if (!classSheet) focusCommand();
+    }
+
+    function ensureClassBoard() {
+      if (classSheet) return classSheet;
+      classSheet = document.createElement('div');
+      classSheet.className = 'class-board-sheet';
+      classSheet.addEventListener('click', function (e) {
+        if (e.target === classSheet) closeClassBoard();
+      });
+      var frame = document.createElement('div');
+      frame.className = 'class-board';
+      frame.id = 'classBoard';
+      frame.setAttribute('role', 'dialog');
+      frame.setAttribute('aria-modal', 'true');
+      var bar = document.createElement('div');
+      bar.className = 'class-board-bar';
+      var closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'class-board-close';
+      closeBtn.textContent = 'Close';
+      closeBtn.addEventListener('click', function () { closeClassBoard(); });
+      bar.appendChild(closeBtn);
+      var body = document.createElement('div');
+      body.className = 'class-board-body';
+      frame.appendChild(bar);
+      frame.appendChild(body);
+      classSheet.appendChild(frame);
+      document.body.appendChild(classSheet);
+      return classSheet;
+    }
+
+    function paintClassBoard() {
+      if (!classSheet || !classPayload) return;
+      var parts = api.classBoardParts(classPayload, classQuery);
+      if (!parts) {
+        closeClassBoard({ silent: true });
+        return;
+      }
+      var frame = classSheet.querySelector('.class-board');
+      var body = classSheet.querySelector('.class-board-body');
+      body.textContent = '';
+      body.classList.toggle('is-prose', !parts.head);
+      if (parts.head) {
+        var head = document.createElement('h2');
+        head.className = 'class-board-head';
+        head.id = 'classBoardTitle';
+        head.textContent = parts.head;
+        body.appendChild(head);
+        frame.setAttribute('aria-labelledby', 'classBoardTitle');
+        frame.removeAttribute('aria-label');
+      } else {
+        frame.removeAttribute('aria-labelledby');
+        frame.setAttribute('aria-label', 'Class board');
+      }
+      parts.lines.forEach(function (line, i) {
+        var p = document.createElement('p');
+        p.className = 'class-board-line' + (i === 0 && parts.lines.length > 1 ? ' is-lead' : '');
+        p.textContent = line;
+        body.appendChild(p);
+      });
+    }
+
+    function openClassBoard() {
+      if (showClassBtn.hidden || !classPayload) return;
+      ensureClassBoard();
+      paintClassBoard();
+      if (!classSheet) return;
+      showClassBtn.setAttribute('aria-expanded', 'true');
+      var closeBtn = classSheet.querySelector('.class-board-close');
+      if (closeBtn) {
+        try { closeBtn.focus({ preventScroll: true }); }
+        catch (err) { closeBtn.focus(); }
+      }
+    }
+
+    function closeClassBoard(opts) {
+      opts = opts || {};
+      if (!classSheet) return;
+      if (classSheet.parentNode) classSheet.parentNode.removeChild(classSheet);
+      classSheet = null;
+      showClassBtn.setAttribute('aria-expanded', 'false');
+      if (opts.silent) return;
+      if (!showClassBtn.hidden) {
+        try { showClassBtn.focus({ preventScroll: true }); }
+        catch (err) { try { showClassBtn.focus(); } catch (e2) {} }
+      }
+    }
+
+    function trapClassBoardTab(e) {
+      if (!classSheet) return;
+      var nodes = classSheet.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      var list = [];
+      for (var i = 0; i < nodes.length; i++) {
+        if (!nodes[i].disabled) list.push(nodes[i]);
+      }
+      if (!list.length) {
+        e.preventDefault();
+        return;
+      }
+      var first = list[0];
+      var last = list[list.length - 1];
+      var active = document.activeElement;
+      var inside = classSheet.contains(active);
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (!inside || active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
 
     function runAction(action, slots, replyText) {
@@ -1327,16 +1537,25 @@
         return;
       }
       var text = api.presentReply(payload);
-      if (!text) text = 'The assistant is unavailable just now.';
-      showReply(text);
+      if (!text) {
+        showReply('The assistant is unavailable just now.');
+        return;
+      }
+      showReply(text, {
+        showClass: api.canShowClass(payload),
+        payload: payload,
+        query: pendingQuery
+      });
     }
 
     function send(message) {
       var text = String(message || '').replace(/\s+/g, ' ').trim();
       if (!text || inflight) return;
+      pendingQuery = text;
       input.value = '';
       reply.hidden = false;
       reply.textContent = '\u2026';
+      showClassBtn.hidden = true;
       place();
       var ticket = ++seq;
       var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
@@ -1466,13 +1685,25 @@
     document.addEventListener('pointerdown', function (e) {
       if (!openState) return;
       if (unit.contains(e.target)) return;
+      if (classSheet && classSheet.contains(e.target)) return;
       setOpen(false);
     }, true);
 
     document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape' || !openState) return;
+      if (classSheet && e.key === 'Tab') {
+        trapClassBoardTab(e);
+        return;
+      }
+      if (e.key !== 'Escape') return;
+      if (classSheet) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        closeClassBoard();
+        return;
+      }
+      if (!openState) return;
       setOpen(false);
-    });
+    }, true);
 
     root.addEventListener('resize', schedulePlace);
 
