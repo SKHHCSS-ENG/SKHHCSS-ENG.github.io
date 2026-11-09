@@ -99,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261106l/);
-  assert.match(html, /assistant\.js\?v=20261106l/);
+  assert.match(html, /assistant\.css\?v=20261109a/);
+  assert.match(html, /assistant\.js\?v=20261109a/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -537,4 +537,71 @@ test('rematch moves desks by class number and leaves names, groups, and scores',
   var flipped13 = flipped.moves.find(function (m) { return m.classNo === '13'; });
   assert.equal(flipped13.x, 32);
   assert.equal(flipped13.y, 28);
+});
+
+test('Show class copies an Ask or Gloss reply onto a centre board', function () {
+  var gloss = plus.classBoardParts({
+    kind: 'gloss',
+    reply: 'meticulous',
+    gloss_zh: '一絲不苟',
+    gloss_en: 'very careful about small details'
+  }, 'meticulous');
+  assert.equal(gloss.head, 'meticulous');
+  assert.equal(gloss.gloss, true);
+  assert.deepEqual(gloss.lines, ['一絲不苟', 'very careful about small details']);
+  assert.equal(plus.presentReply({
+    kind: 'gloss',
+    reply: 'meticulous',
+    gloss_zh: '一絲不苟',
+    gloss_en: 'very careful about small details'
+  }), '一絲不苟\nvery careful about small details');
+
+  var fromQuery = plus.classBoardParts({
+    kind: 'gloss',
+    gloss_zh: '蘋果',
+    gloss_en: 'a common fruit'
+  }, 'apple');
+  assert.equal(fromQuery.head, 'apple');
+  assert.deepEqual(fromQuery.lines, ['蘋果', 'a common fruit']);
+
+  var ask = plus.classBoardParts({
+    kind: 'ask',
+    reply: 'A person who is meticulous cares about every small detail.'
+  }, 'meticulous');
+  assert.equal(ask.head, 'meticulous');
+  assert.deepEqual(ask.lines, ['A person who is meticulous cares about every small detail.']);
+
+  var prose = plus.classBoardParts({
+    kind: 'ask',
+    reply: 'Use a short example from today.'
+  }, 'How should I explain the past tense?');
+  assert.equal(prose.head, '');
+  assert.equal(prose.lines.length, 1);
+
+  assert.equal(plus.canShowClass({ kind: 'gloss', gloss_en: 'apple' }), true);
+  assert.equal(plus.canShowClass({ kind: 'ask', reply: 'A short answer.' }), true);
+  assert.equal(plus.canShowClass({ kind: 'clarify', reply: 'Which student?' }), false);
+  assert.equal(plus.canShowClass({ kind: 'off_list', reply: 'I can’t do that.' }), false);
+  assert.equal(plus.canShowClass({ kind: 'action', reply: 'Done.', action: 'tidy_snap' }), false);
+  assert.equal(plus.classBoardParts({}, ''), null);
+
+  assert.match(css, /\.plus-float \.plus-reply\s*\{[^}]*font-size:\s*0\.75rem/);
+  assert.match(css, /--strip-max:\s*220px/);
+  assert.match(css, /--ball-size:\s*44px/);
+  assert.match(css, /\.class-board\s*\{[^}]*#ebeff8/);
+  assert.match(css, /\.class-board\s*\{[^}]*#123a4d/);
+  assert.match(css, /\.class-board-line\s*\{[^}]*clamp\(1\.5rem/);
+  assert.match(css, /\.class-board-head\s*\{[^}]*clamp\(2\.4rem/);
+  assert.match(css, /\.plus-float \.plus-show-class\s*\{[^}]*font-size:\s*0\.72rem/);
+  assert.match(css, /\.plus-show-class\[hidden\][\s\S]*display:\s*none/);
+
+  var bootBody = js.slice(js.indexOf('function boot('));
+  assert.match(bootBody, /showClassBtn\.textContent = 'Show class'/);
+  assert.match(bootBody, /closeBtn\.textContent = 'Close'/);
+  assert.match(bootBody, /showClass: api\.canShowClass\(payload\)/);
+  assert.match(bootBody, /if \(e\.target === classSheet\) closeClassBoard\(\)/);
+  assert.match(bootBody, /aria-modal', 'true'/);
+  assert.match(bootBody, /if \(classSheet\) \{\s*e\.preventDefault\(\);\s*e\.stopImmediatePropagation\(\);\s*closeClassBoard\(\)/);
+  assert.doesNotMatch(bootBody, /Show Class|colorise|favorite/);
+  assert.equal(plus.BALL, 44);
 });
