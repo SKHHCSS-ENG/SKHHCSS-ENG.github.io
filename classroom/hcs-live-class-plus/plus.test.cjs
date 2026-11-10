@@ -99,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261109a/);
-  assert.match(html, /assistant\.js\?v=20261110a/);
+  assert.match(html, /assistant\.css\?v=20261110c/);
+  assert.match(html, /assistant\.js\?v=20261110c/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -298,8 +298,9 @@ test('import chart stays on the ball and off the original page', function () {
   assert.doesNotMatch(original, /mode-row/);
 });
 
-test('Ask, Command, and Import share one cream row under the text box', function () {
+test('Ask, Dict, Command, and Import share one row under the text box', function () {
   assert.match(js, /'plusModeAsk', 'ASK'/);
+  assert.match(js, /'plusModeDict', 'DICT', 'dict'/);
   assert.match(js, /'plusModeCommand', 'COMMAND'/);
   assert.match(js, /'btnImportChart', 'IMPORT'/);
   assert.match(js, /sendBtn\.textContent = 'SEND'/);
@@ -309,7 +310,9 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(js, /var mode = 'ask'/);
   assert.match(js, /if \(!wasOpen\) setMode\('ask'\)/);
   assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*display:\s*flex/);
-  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 1 0/);
+  assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*flex-wrap:\s*nowrap/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 0 auto/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*min-width:\s*max-content/);
   assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*height:\s*26px/);
   assert.match(js, /var cap = 220/);
   assert.match(js, /var BALL = 44/);
@@ -336,18 +339,75 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.doesNotMatch(dispatch, /fetch\(/);
   assert.doesNotMatch(dispatch, /askRequestBody|askThread/);
   var sendFn = bootBody.slice(bootBody.indexOf('function send('), bootBody.indexOf("command.addEventListener('submit'"));
+  assert.match(sendFn, /var glossing = mode === 'dict'/);
   assert.match(sendFn, /var prior = mode === 'ask' \? askThread\.snapshot\(\) : \[\]/);
-  assert.match(sendFn, /var payload = mode === 'ask' \? api\.askRequestBody\(text, prior\) : \{ text: text \}/);
+  assert.match(sendFn, /api\.glossRequestBody\(text\)/);
+  assert.match(sendFn, /mode === 'ask' \? api\.askRequestBody\(text, prior\) : \{ text: text \}/);
   assert.match(sendFn, /JSON\.stringify\(payload\)/);
+  assert.match(sendFn, /if \(mode === 'ask' && !glossing\)/);
   assert.match(sendFn, /if \(answered\.kind !== 'action'\) askThread\.remember\(text, api\.presentReply\(answered\)\)/);
+  assert.doesNotMatch(sendFn, /glossRequestBody\(text,\s*(prior|history|askThread)/);
   var setModeFn = bootBody.slice(bootBody.indexOf('function setMode'), bootBody.indexOf('function dispatchCommand'));
-  assert.match(setModeFn, /if \(next !== 'ask'\) askThread\.reset\(\)/);
+  assert.match(setModeFn, /if \(next === 'command' \|\| next === 'import'\) askThread\.reset\(\)/);
+  assert.doesNotMatch(setModeFn, /askLane|if \(next !== 'ask'\)/);
   var setOpenFn = bootBody.slice(bootBody.indexOf('function setOpen'), bootBody.indexOf('function focusCommand'));
   assert.match(setOpenFn, /\} else \{\s*askThread\.reset\(\)/);
   assert.doesNotMatch(js, /mode:\s*['"]command['"]/);
-  assert.doesNotMatch(js, /mode:\s*['"]gloss['"]/);
   assert.doesNotMatch(js, /'GLOSS'/);
   assert.equal(plus.DEFAULT_WORKER_URL, 'https://live-class-plus.skhhcss-eng.workers.dev');
+});
+
+test('ASK, DICT, COMMAND, and IMPORT are one row and there is no inner lane', function () {
+  assert.equal((js.match(/makeModeChip\('/g) || []).length, 4);
+  assert.equal((js.match(/makeLaneChip\(/g) || []).length, 0);
+  var order = js.slice(js.indexOf("makeModeChip('plusModeAsk'"), js.indexOf("chartBtn.setAttribute('aria-label'"));
+  assert.match(order, /plusModeAsk', 'ASK'[\s\S]*plusModeDict', 'DICT', 'dict'[\s\S]*plusModeCommand', 'COMMAND'[\s\S]*btnImportChart', 'IMPORT'/);
+  var makeMode = js.slice(js.indexOf('function makeModeChip'), js.indexOf('var askBtn'));
+  assert.match(makeMode, /modeRow\.appendChild\(btn\)/);
+  assert.doesNotMatch(makeMode, /askLaneRow|ask-lane/);
+  var mounted = js.slice(js.indexOf('command.appendChild(commandLine)'), js.indexOf('applyModeChrome();'));
+  assert.match(mounted, /command\.appendChild\(commandLine\);\s*command\.appendChild\(modeRow\);/);
+  assert.doesNotMatch(mounted, /askLaneRow/);
+  assert.doesNotMatch(js, /ask-lane-row|askLaneRow|plusLaneDict|plusLaneAsk|function setLane/);
+  assert.doesNotMatch(css, /ask-lane-row/);
+  assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*flex-wrap:\s*nowrap/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*overflow:\s*hidden/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*min-width:\s*max-content/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*font-size:\s*0\.58rem/);
+  assert.match(js, /A word or phrase\\u2026/);
+  assert.match(js, /Ask a question\\u2026/);
+  assert.match(js, /dictBtn\.addEventListener\('click', function \(\) \{ setMode\('dict'\)/);
+  var bootBody = js.slice(js.indexOf('function boot('));
+  var setModeFn = bootBody.slice(bootBody.indexOf('function setMode'), bootBody.indexOf('function dispatchCommand'));
+  assert.match(setModeFn, /next !== 'dict'/);
+  assert.match(setModeFn, /if \(next === 'command' \|\| next === 'import'\) askThread\.reset\(\)/);
+  assert.doesNotMatch(setModeFn, /askLane/);
+  assert.doesNotMatch(setModeFn, /if \(next !== 'ask'\)/);
+  var spark = fs.readFileSync(path.join(here, 'skins/spark.css'), 'utf8');
+  var arcade = fs.readFileSync(path.join(here, 'skins/arcade.css'), 'utf8');
+  assert.doesNotMatch(spark, /ask-lane|mode-chip/);
+  assert.doesNotMatch(arcade, /ask-lane|mode-chip/);
+  assert.doesNotMatch(html, /ask-lane|plusLaneDict|plusModeDict|mode-chip/);
+});
+
+test('Dict posts gloss with no history; Ask still posts mode ask', function () {
+  var clock = Date.parse('2026-11-10T02:00:00Z');
+  var thread = plus.createAskThread(function () { return clock; });
+  thread.remember('Help me think of a journal topic', 'Sure, what theme do you want it to be about?');
+  var looked = plus.glossRequestBody('  meticulous  ');
+  assert.equal(looked.mode, 'gloss');
+  assert.equal(looked.text, 'meticulous');
+  assert.equal(looked.history, undefined);
+  assert.equal(Object.prototype.hasOwnProperty.call(looked, 'history'), false);
+  assert.deepEqual(Object.keys(looked).sort(), ['mode', 'text']);
+  var stillAsk = plus.askRequestBody('what does meticulous mean', thread.snapshot());
+  assert.equal(stillAsk.mode, 'ask');
+  assert.equal(stillAsk.text, 'what does meticulous mean');
+  assert.equal(stillAsk.history.length, 2);
+  assert.equal(stillAsk.history.some(function (turn) { return turn.text === 'what does meticulous mean'; }), false);
+  thread.reset();
+  assert.equal(thread.snapshot().length, 0);
+  assert.equal(plus.glossRequestBody('school life').history, undefined);
 });
 
 test('Ask follow-up posts mode ask and prior turns, not the new line twice', function () {
@@ -644,6 +704,46 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
   }, 'How should I explain the past tense?');
   assert.equal(prose.head, '');
   assert.equal(prose.lines.length, 1);
+  assert.equal(prose.lines[0].indexOf('\n'), -1);
+
+  var ideas = plus.classBoardParts({
+    kind: 'ask',
+    reply: '- School sports day\n- A time I helped a friend\n- My favourite lesson'
+  }, 'Help me think of a journal topic');
+  assert.equal(ideas.head, '');
+  assert.equal(ideas.gloss, false);
+  assert.deepEqual(ideas.lines, [
+    '- School sports day',
+    '- A time I helped a friend',
+    '- My favourite lesson'
+  ]);
+  ideas.lines.forEach(function (line) {
+    assert.equal(line.indexOf('\n'), -1);
+  });
+  assert.equal(plus.presentReply({
+    kind: 'ask',
+    reply: '- School sports day\n- A time I helped a friend\n- My favourite lesson'
+  }), '- School sports day\n- A time I helped a friend\n- My favourite lesson');
+
+  var meaning = plus.classBoardParts({
+    kind: 'gloss',
+    reply: 'meticulous',
+    gloss_zh: '一絲不苟',
+    gloss_en: 'very careful about small details\nShe checked every line of the essay.'
+  }, 'meticulous');
+  assert.equal(meaning.head, 'meticulous');
+  assert.equal(meaning.gloss, true);
+  assert.deepEqual(meaning.lines, [
+    '一絲不苟',
+    'very careful about small details',
+    'She checked every line of the essay.'
+  ]);
+  assert.equal(plus.presentReply({
+    kind: 'gloss',
+    reply: 'meticulous',
+    gloss_zh: '一絲不苟',
+    gloss_en: 'very careful about small details\nShe checked every line of the essay.'
+  }), '一絲不苟\nvery careful about small details\nShe checked every line of the essay.');
 
   assert.equal(plus.canShowClass({ kind: 'gloss', gloss_en: 'apple' }), true);
   assert.equal(plus.canShowClass({ kind: 'ask', reply: 'A short answer.' }), true);
@@ -653,6 +753,9 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
   assert.equal(plus.classBoardParts({}, ''), null);
 
   assert.match(css, /\.plus-float \.plus-reply\s*\{[^}]*font-size:\s*0\.75rem/);
+  assert.match(css, /\.plus-float \.plus-reply-line\s*\{[^}]*display:\s*block/);
+  assert.match(js, /row\.className = 'plus-reply-line'/);
+  assert.match(js, /shown\.split\('\\n'\)|String\(text \|\| ''\)\.split\('\\n'\)/);
   assert.match(css, /--strip-max:\s*220px/);
   assert.match(css, /--ball-size:\s*44px/);
   assert.match(css, /\.class-board\s*\{[^}]*#ebeff8/);
