@@ -1,4 +1,4 @@
-/* HCS Live Class + assistant. Cache stamp: 20261110d.
+/* HCS Live Class + assistant. Cache stamp: 20261110e.
    The ball uses the shared Eng api-mesh wash
    (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
    here so this page does not load ask.css. The open strip and reply use
@@ -620,16 +620,23 @@
 }
 
 .class-board-close {
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   min-height: 44px;
-  min-width: 5.5rem;
   margin: 0;
-  padding: 0 16px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
   border: 1px solid rgba(18, 58, 77, 0.22);
   border-radius: 10px;
   background: #f4f0e8;
   color: #123a4d;
   font: inherit;
-  font-size: 1.05rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
