@@ -20,8 +20,8 @@
  * reply onto a centre board for the room. A drag on that board highlights
  * a stretch; another drag adds another highlight. A short click clears
  * them. Closing the board, or a new Show class reply, clears them too.
- * Nothing is saved. Close, Esc, or a tap outside returns to that strip.
- * Cache stamp: 20261110d.
+ * Nothing is saved. The X, Esc, or a tap outside returns to that strip.
+ * Cache stamp: 20261110e.
  */
 (function (root) {
   var api = factory();
@@ -1668,7 +1668,8 @@
       var closeBtn = document.createElement('button');
       closeBtn.type = 'button';
       closeBtn.className = 'class-board-close';
-      closeBtn.textContent = 'Close';
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.textContent = '\u2715';
       closeBtn.addEventListener('click', function () { closeClassBoard(); });
       bar.appendChild(closeBtn);
       var body = document.createElement('div');

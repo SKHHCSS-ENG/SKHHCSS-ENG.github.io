@@ -99,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261110d/);
-  assert.match(html, /assistant\.js\?v=20261110d/);
+  assert.match(html, /assistant\.css\?v=20261110e/);
+  assert.match(html, /assistant\.js\?v=20261110e/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -780,7 +780,11 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
 
   var bootBody = js.slice(js.indexOf('function boot('));
   assert.match(bootBody, /showClassBtn\.textContent = 'Show class'/);
-  assert.match(bootBody, /closeBtn\.textContent = 'Close'/);
+  assert.match(bootBody, /closeBtn\.setAttribute\('aria-label', 'Close'\)/);
+  assert.match(bootBody, /closeBtn\.textContent = '\\u2715'/);
+  assert.doesNotMatch(bootBody, /closeBtn\.textContent = 'Close'/);
+  assert.match(css, /\.class-board-close\s*\{[^}]*width:\s*44px/);
+  assert.match(css, /\.class-board-close\s*\{[^}]*height:\s*44px/);
   assert.match(bootBody, /showClass: api\.canShowClass\(payload\)/);
   assert.match(bootBody, /if \(e\.target === classSheet\) closeClassBoard\(\)/);
   assert.match(bootBody, /aria-modal', 'true'/);
@@ -790,10 +794,10 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
 });
 
 test('Dict word card is five lines in order', function () {
-  assert.match(js, /Cache stamp: 20261110d/);
-  assert.match(css, /Cache stamp: 20261110d/);
-  assert.match(html, /assistant\.css\?v=20261110d/);
-  assert.match(html, /assistant\.js\?v=20261110d/);
+  assert.match(js, /Cache stamp: 20261110e/);
+  assert.match(css, /Cache stamp: 20261110e/);
+  assert.match(html, /assistant\.css\?v=20261110e/);
+  assert.match(html, /assistant\.js\?v=20261110e/);
 
   var structured = plus.glossCard({
     kind: 'gloss',
