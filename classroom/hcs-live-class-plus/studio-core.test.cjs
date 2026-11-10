@@ -54,6 +54,37 @@ test('layout positions stay on the shared pitch', function () {
   assert.equal(Core.frontRowTopOffset(true), 50);
 });
 
+test('odd Pairs columns can put the single desk on either end', function () {
+  const end = Core.computeLayoutPositions(7, 'pairs', false, null, null, 7, 1);
+  const start = Core.computeLayoutPositions(7, 'pairs', false, null, null, 7, 1, 'start');
+  const endAgain = Core.computeLayoutPositions(7, 'pairs', false, null, null, 7, 1, 'end');
+  assert.deepEqual(end.map(function (p) { return p.x; }), [32, 188, 372, 528, 712, 868, 1052]);
+  assert.deepEqual(endAgain, end);
+  assert.deepEqual(start.map(function (p) { return p.x; }), [32, 216, 372, 556, 712, 896, 1052]);
+  const gaps = [];
+  for (let i = 1; i < start.length; i++) gaps.push(start[i].x - start[i - 1].x);
+  // desk+aisle, desk+inner, and so on: 1 2 2 2
+  assert.deepEqual(gaps, [184, 156, 184, 156, 184, 156]);
+  const evenEnd = Core.computeLayoutPositions(6, 'pairs', false, null, null, 6, 1);
+  const evenStart = Core.computeLayoutPositions(6, 'pairs', false, null, null, 6, 1, 'start');
+  assert.deepEqual(evenStart, evenEnd);
+  assert.deepEqual(Core.computeLayoutPositions(4, 'pods4', false, null, null, 4, 2), [
+    { x: 238, y: 28 },
+    { x: 394, y: 28 },
+    { x: 578, y: 28 },
+    { x: 734, y: 28 }
+  ]);
+  assert.equal(Core.nextPairSingleton('', 7), 'end');
+  assert.equal(Core.nextPairSingleton('end', 7), 'start');
+  assert.equal(Core.nextPairSingleton('start', 7), 'end');
+  assert.equal(Core.nextPairSingleton('end', 6), 'end');
+  assert.equal(Core.nextPairSingleton('start', 1), 'end');
+  const roomEnd = Core.columnRoomBox({ students: new Array(7), gridCols: 7, layoutStyle: 'pairs', pairSingleton: 'end' });
+  const roomStart = Core.columnRoomBox({ students: new Array(7), gridCols: 7, layoutStyle: 'pairs', pairSingleton: 'start' });
+  assert.equal(roomStart.width, roomEnd.width);
+  assert.equal(roomStart.center, roomEnd.center);
+});
+
 test('Plus studio-core.js matches the original seating module', function () {
   const original = fs.readFileSync(path.join(__dirname, '../hcs-live-class/studio-core.js'), 'utf8');
   assert.equal(coreSrc, original);
@@ -61,11 +92,13 @@ test('Plus studio-core.js matches the original seating module', function () {
 
 test('the Plus page loads the core and calls it by the same names', function () {
   const drive = html.indexOf('<script src="studio-drive.js"></script>');
-  const core = html.indexOf('<script src="studio-core.js"></script>');
+  const core = html.indexOf('<script src="studio-core.js?v=20261109c"></script>');
   const inline = html.indexOf("const STORAGE_KEY = 'hcsLiveClassPlus_classroom_v1'");
   assert.ok(drive > 0 && core > drive && inline > core);
-  assert.match(html, /<script src="studio-core\.js"><\/script>/);
-  assert.doesNotMatch(html, /studio-core\.js"[^>]*\b(?:async|defer)\b/);
+  assert.match(html, /<script src="studio-core\.js\?v=20261109c"><\/script>/);
+  assert.doesNotMatch(html, /studio-core\.js\?v=[^"']*"[^>]*\b(?:async|defer)\b/);
+  assert.match(html, /const nextPairSingleton = Core\.nextPairSingleton;/);
+  assert.match(html, /function choosePairSingleton\(cls, cols\)/);
   assert.match(html, /const Core = window\.HcsLiveCore;/);
   [
     'DESK_W',
