@@ -7,15 +7,21 @@
  * panel sits beside it and flips to the side, then up or down, that fits.
  * Under the text box, Ask, Dict, Command, and Import share one row.
  * Dict posts { text, mode: "gloss" } and does not send or store Ask history.
+ * A Dict card is five lines, in order: the word, the Chinese meaning,
+ * the part of speech, the English meaning, and a sample sentence.
  * Ask posts { text, mode: "ask" } and recent Ask turns in history.
- * Typing “what does X mean” while Ask is selected still posts mode ask.
+ * Ask stays in short points. Typing “what does X mean” while Ask is
+ * selected still posts mode ask.
  * Command runs the line on the page. Import opens the chart photo flow.
  * Neither of those sends the Ask thread. The Worker host stays live-class-plus.
  * Floor scroll does not move the ball. A drag still settles the ball
  * clear of desk name chips and the floor zoom bar, then remembers that spot.
  * Ask and Gloss stay in the small strip. Show class copies the current
- * reply onto a centre board for the room. Close, Esc, or a tap outside
- * returns to that strip.
+ * reply onto a centre board for the room. A drag on that board highlights
+ * a stretch; another drag adds another highlight. A short click clears
+ * them. Closing the board, or a new Show class reply, clears them too.
+ * Nothing is saved. Close, Esc, or a tap outside returns to that strip.
+ * Cache stamp: 20261110d.
  */
 (function (root) {
   var api = factory();
@@ -527,13 +533,88 @@
     return out;
   }
 
-  function presentReply(data) {
+  function oneLine(text) {
+    return plainActionNames(typeof text === 'string' ? text : '').replace(/\s+/g, ' ').trim();
+  }
+
+  // A part-of-speech label, not a definition. An unknown tag stays in the
+  // English line rather than being guessed into its own row.
+  function looksLikePos(text) {
+    var s = String(text || '').trim();
+    if (!s || s.length > 48) return false;
+    if (/[.!?。！？]/.test(s)) return false;
+    if (s.split(/\s+/).length > 4) return false;
+    return /^(?:(?:adj|adv|n|v|prep|conj|pron|det|art|interj|aux)\.?|(?:adjectives?|adverbs?|nouns?|verbs?|pronouns?|prepositions?|conjunctions?|interjections?|determiners?|articles?|phrases?|idioms?|phrasal verbs?|noun phrases?|verb phrases?|auxiliaries|auxiliary verbs?|modal verbs?|modals?|countable nouns?|uncountable nouns?|transitive verbs?|intransitive verbs?|linking verbs?|gerunds?|participles?|infinitives?))(?:\s|$)/i.test(s);
+  }
+
+  function looksLikeSample(text) {
+    var s = String(text || '').trim();
+    if (!s) return false;
+    if (/[.!?。！？]["'”’)\]]*\s*$/.test(s)) return true;
+    var words = s.split(/\s+/);
+    return words.length >= 5 && /^[A-Z"“']/.test(s);
+  }
+
+  // Older gloss_en is one string: "adjective · sense · example sentence".
+  // Three middle-dot parts are that card. Two parts split only when the
+  // first is a part of speech or the last is clearly a sentence.
+  // Otherwise the whole string stays the English meaning.
+  function splitLegacyGloss(raw) {
+    var text = plainActionNames(typeof raw === 'string' ? raw : '').trim();
+    if (!text) return { pos: '', en: '', sample: '', used: false };
+    var dot = /[·•・]/.test(text);
+    var parts = (dot ? text.split(/\s*[·•・]\s*/) : text.split(/\r?\n/))
+      .map(function (part) { return part.replace(/[ \t]+/g, ' ').trim(); })
+      .filter(Boolean);
+    if (dot && parts.length === 3) {
+      return { pos: oneLine(parts[0]), en: oneLine(parts[1]), sample: oneLine(parts[2]), used: true };
+    }
+    if (!dot && parts.length < 2) {
+      return { pos: '', en: oneLine(text), sample: '', used: false };
+    }
+    var pos = '';
+    var sample = '';
+    var mid = parts.slice();
+    if (mid.length >= 2 && looksLikePos(mid[0])) pos = oneLine(mid.shift());
+    if (mid.length >= 2 && looksLikeSample(mid[mid.length - 1])) sample = oneLine(mid.pop());
+    if (!pos && !sample) return { pos: '', en: oneLine(text), sample: '', used: false };
+    return {
+      pos: pos,
+      en: mid.join(' ').replace(/\s+/g, ' ').trim(),
+      sample: sample,
+      used: true
+    };
+  }
+
+  // Dict / kind gloss only. Five slots, always, in this order. Empty slots
+  // stay empty — a missing sense is not invented. Ask returns null.
+  function glossCard(data, query) {
+    if (!data || typeof data !== 'object') return null;
+    var kind = String(data.kind || data.type || '').trim();
+    if (kind && kind !== 'gloss') return null;
+    var zh = oneLine(data.gloss_zh);
+    var explicitPos = oneLine(typeof data.pos === 'string' && data.pos.trim() ? data.pos : data.part_of_speech);
+    var explicitSample = oneLine(typeof data.example === 'string' && data.example.trim() ? data.example : data.sample);
+    var split = splitLegacyGloss(data.gloss_en);
+    var pos = explicitPos || split.pos;
+    var sample = explicitSample || split.sample;
+    var en = split.used ? split.en : oneLine(data.gloss_en);
+    var hasField = !!(zh || explicitPos || explicitSample || (typeof data.gloss_en === 'string' && data.gloss_en.trim()));
+    if (!hasField) return null;
+    var word = oneLine(data.word) || oneLine(data.headword) || classWord(data.reply) || classWord(query);
+    return { word: word, zh: zh, pos: pos, en: en, sample: sample };
+  }
+
+  function glossLines(card) {
+    if (!card) return [];
+    return [card.word || '', card.zh || '', card.pos || '', card.en || '', card.sample || ''];
+  }
+
+  function presentReply(data, query) {
     if (!data || typeof data !== 'object') return '';
-    var kind = String(data.kind || data.type || '');
-    var lines = [];
-    if (kind === 'gloss') lines = pointLines(data.gloss_zh).concat(pointLines(data.gloss_en));
-    if (!lines.length) lines = pointLines(data.reply);
-    return lines.join('\n');
+    var card = glossCard(data, query);
+    if (card) return glossLines(card).join('\n');
+    return pointLines(data.reply).join('\n');
   }
 
   // A looked-up word or short phrase. Questions and sentences stay in the body.
@@ -545,39 +626,63 @@
     return line;
   }
 
-  // Head is the word. Each point is its own line, for the narrow strip
-  // and for Show class. A multiline gloss or Ask reply stays a list.
+  // Head is the word. A Dict card keeps four lines under it (Chinese,
+  // part of speech, English meaning, sample), blanks included. An Ask
+  // reply stays one point per line.
   function classBoardParts(payload, query) {
     var data = payload && typeof payload === 'object' ? payload : {};
-    var kind = String(data.kind || data.type || '').trim();
+    var card = glossCard(data, query);
+    if (card) {
+      return {
+        head: card.word,
+        lines: [card.zh, card.pos, card.en, card.sample],
+        gloss: true
+      };
+    }
     var replyRaw = plainActionNames(typeof data.reply === 'string' ? data.reply : '').trim();
     var reply = replyRaw.replace(/\s+/g, ' ').trim();
-    var zhLines = pointLines(data.gloss_zh);
-    var enLines = pointLines(data.gloss_en);
-    var gloss = kind === 'gloss' || !!(zhLines.length || enLines.length);
-    var head = '';
+    var head = classWord(query);
+    if (!head && reply) head = classWord(reply);
     var lines = [];
-    function pushPoints(list) {
-      list.forEach(function (line) {
-        if (line && lines.indexOf(line) < 0) lines.push(line);
+    pointLines(replyRaw).forEach(function (line) {
+      if (line && line !== head && lines.indexOf(line) < 0) lines.push(line);
+    });
+    if (!head && !lines.length) return null;
+    return { head: head, lines: lines, gloss: false };
+  }
+
+  // A drag farther than this is a highlight. A shorter press is a click
+  // and clears. Same 8px radius as the ball tap. Marks are not stored.
+  var CLASS_MARK_TAP = 8;
+
+  function classHighlightGesture(state, event) {
+    var marks = [];
+    if (state && Array.isArray(state.marks)) {
+      state.marks.forEach(function (mark) {
+        if (!mark) return;
+        marks.push({ start: mark.start, end: mark.end, text: mark.text });
       });
     }
-    if (gloss) {
-      head = classWord(reply) || classWord(query);
-      pushPoints(zhLines);
-      pushPoints(enLines);
-      if (!lines.length) pushPoints(pointLines(replyRaw));
-    } else {
-      head = classWord(query);
-      if (!head && reply) head = classWord(reply);
-      pushPoints(pointLines(replyRaw));
+    var type = event && event.type;
+    if (type === 'close' || type === 'open') return { marks: [], effect: 'clear' };
+    if (type !== 'up') return { marks: marks, effect: 'ignore' };
+    if (event.chrome) return { marks: marks, effect: 'ignore' };
+    var distance = Number(event.distance);
+    if (!isFinite(distance) || distance < 0) distance = 0;
+    if (distance <= CLASS_MARK_TAP) return { marks: [], effect: 'clear' };
+    var selection = event.selection;
+    var text = selection && typeof selection.text === 'string' ? selection.text : '';
+    var start = selection ? Number(selection.start) : NaN;
+    var end = selection ? Number(selection.end) : NaN;
+    if (!text || !isFinite(start) || !isFinite(end) || end <= start) {
+      return { marks: marks, effect: 'ignore' };
     }
-    var kept = [];
-    lines.forEach(function (line) {
-      if (line && line !== head && kept.indexOf(line) < 0) kept.push(line);
+    var next = { start: start, end: end, text: text };
+    var dup = marks.some(function (mark) {
+      return mark.start === next.start && mark.end === next.end;
     });
-    if (!head && !kept.length) return null;
-    return { head: head, lines: kept, gloss: !!gloss };
+    if (!dup) marks.push(next);
+    return { marks: marks, effect: 'add' };
   }
 
   function canShowClass(data) {
@@ -597,15 +702,26 @@
     return out.replace(/[ \t]{2,}/g, ' ').trim();
   }
 
+  function payloadText(data, key) {
+    if (!data || typeof data[key] !== 'string') return '';
+    return data[key].trim();
+  }
+
   function readPayload(data) {
     var kind = data && (data.kind || data.type) ? String(data.kind || data.type).trim() : '';
     var slots = data && data.slots && typeof data.slots === 'object' ? data.slots : {};
     return {
       kind: kind,
-      reply: data && typeof data.reply === 'string' ? data.reply.trim() : '',
-      gloss_zh: data && typeof data.gloss_zh === 'string' ? data.gloss_zh.trim() : '',
-      gloss_en: data && typeof data.gloss_en === 'string' ? data.gloss_en.trim() : '',
-      action: data && typeof data.action === 'string' ? data.action.trim() : '',
+      reply: payloadText(data, 'reply'),
+      word: payloadText(data, 'word') || payloadText(data, 'headword'),
+      headword: payloadText(data, 'headword'),
+      gloss_zh: payloadText(data, 'gloss_zh'),
+      pos: payloadText(data, 'pos') || payloadText(data, 'part_of_speech'),
+      part_of_speech: payloadText(data, 'part_of_speech'),
+      gloss_en: payloadText(data, 'gloss_en'),
+      example: payloadText(data, 'example') || payloadText(data, 'sample'),
+      sample: payloadText(data, 'sample'),
+      action: payloadText(data, 'action'),
       slots: {
         student: slots.student == null ? '' : String(slots.student).trim(),
         amount: slots.amount,
@@ -1091,8 +1207,12 @@
     ballRect: ballRect,
     layoutBeside: layoutBeside,
     presentReply: presentReply,
+    glossCard: glossCard,
+    glossLines: glossLines,
     classBoardParts: classBoardParts,
     canShowClass: canShowClass,
+    classHighlightGesture: classHighlightGesture,
+    CLASS_MARK_TAP: CLASS_MARK_TAP,
     plainActionNames: plainActionNames,
     readPayload: readPayload,
     parseCommand: parseCommand,
@@ -1139,6 +1259,8 @@
     var classPayload = null;
     var classQuery = '';
     var pendingQuery = '';
+    var boardMarks = [];
+    var boardPointer = null;
 
     loadAnchor();
 
@@ -1471,10 +1593,12 @@
 
     function showReply(text, opts) {
       opts = opts || {};
-      var shown = String(text || '').trim();
-      if (!shown) {
+      var raw = String(text == null ? '' : text);
+      var shown = opts.gloss ? raw : raw.trim();
+      if (!shown.replace(/\s+/g, '')) {
         reply.hidden = true;
         reply.textContent = '';
+        reply.classList.remove('is-gloss');
         showClassBtn.hidden = true;
         showClassBtn.setAttribute('aria-expanded', 'false');
         classPayload = null;
@@ -1485,7 +1609,7 @@
         return;
       }
       reply.hidden = false;
-      paintReply(shown);
+      paintReply(shown, opts);
       var allow = !!opts.showClass;
       showClassBtn.hidden = !allow;
       if (!allow) showClassBtn.setAttribute('aria-expanded', 'false');
@@ -1505,16 +1629,23 @@
       if (!classSheet) focusCommand();
     }
 
-    function paintReply(text) {
+    function paintReply(text, opts) {
+      opts = opts || {};
+      var gloss = !!opts.gloss;
       var bits = String(text || '').split('\n');
+      reply.classList.toggle('is-gloss', gloss);
       reply.textContent = '';
-      if (bits.length < 2) {
+      if (!gloss && bits.length < 2) {
         reply.textContent = bits[0] || '';
         return;
       }
-      bits.forEach(function (bit) {
+      bits.forEach(function (bit, i) {
         var row = document.createElement('div');
         row.className = 'plus-reply-line';
+        if (gloss) {
+          row.setAttribute('data-gloss-line', String(i + 1));
+          if (!bit) row.classList.add('is-blank');
+        }
         row.textContent = bit;
         reply.appendChild(row);
       });
@@ -1542,6 +1673,7 @@
       bar.appendChild(closeBtn);
       var body = document.createElement('div');
       body.className = 'class-board-body';
+      body.addEventListener('pointerdown', armBoardPointer);
       frame.appendChild(bar);
       frame.appendChild(body);
       classSheet.appendChild(frame);
@@ -1551,6 +1683,7 @@
 
     function paintClassBoard() {
       if (!classSheet || !classPayload) return;
+      boardMarks = api.classHighlightGesture({ marks: boardMarks }, { type: 'open' }).marks;
       var parts = api.classBoardParts(classPayload, classQuery);
       if (!parts) {
         closeClassBoard({ silent: true });
@@ -1559,23 +1692,45 @@
       var frame = classSheet.querySelector('.class-board');
       var body = classSheet.querySelector('.class-board-body');
       body.textContent = '';
-      body.classList.toggle('is-prose', !parts.head);
-      if (parts.head) {
+      body.classList.toggle('is-gloss', !!parts.gloss);
+      body.classList.toggle('is-prose', !parts.head && !parts.gloss);
+      if (parts.gloss || parts.head) {
         var head = document.createElement('h2');
         head.className = 'class-board-head';
         head.id = 'classBoardTitle';
-        head.textContent = parts.head;
+        head.textContent = parts.head || '';
+        if (!parts.head) {
+          head.classList.add('is-blank');
+          head.setAttribute('aria-hidden', 'true');
+        }
+        if (parts.gloss) head.setAttribute('data-gloss-line', '1');
         body.appendChild(head);
-        frame.setAttribute('aria-labelledby', 'classBoardTitle');
-        frame.removeAttribute('aria-label');
+        if (parts.head) {
+          frame.setAttribute('aria-labelledby', 'classBoardTitle');
+          frame.removeAttribute('aria-label');
+        } else {
+          frame.removeAttribute('aria-labelledby');
+          frame.setAttribute('aria-label', 'Class board');
+        }
       } else {
         frame.removeAttribute('aria-labelledby');
         frame.setAttribute('aria-label', 'Class board');
       }
-      parts.lines.forEach(function (line, i) {
+      var lines = parts.lines.slice();
+      if (parts.gloss) {
+        while (lines.length < 4) lines.push('');
+        lines = lines.slice(0, 4);
+      }
+      lines.forEach(function (line, i) {
         var p = document.createElement('p');
-        p.className = 'class-board-line' + (i === 0 && parts.lines.length > 1 ? ' is-lead' : '');
-        p.textContent = line;
+        var lead = !parts.gloss && i === 0 && lines.length > 1;
+        p.className = 'class-board-line' + (lead ? ' is-lead' : '');
+        if (!line) {
+          p.classList.add('is-blank');
+          p.setAttribute('aria-hidden', 'true');
+        }
+        if (parts.gloss) p.setAttribute('data-gloss-line', String(i + 2));
+        p.textContent = line || '';
         body.appendChild(p);
       });
     }
@@ -1595,7 +1750,12 @@
 
     function closeClassBoard(opts) {
       opts = opts || {};
+      boardMarks = api.classHighlightGesture({ marks: boardMarks }, { type: 'close' }).marks;
+      boardPointer = null;
+      document.removeEventListener('pointerup', finishBoardPointer, true);
+      document.removeEventListener('pointercancel', finishBoardPointer, true);
       if (!classSheet) return;
+      clearBoardSelection();
       if (classSheet.parentNode) classSheet.parentNode.removeChild(classSheet);
       classSheet = null;
       showClassBtn.setAttribute('aria-expanded', 'false');
@@ -1604,6 +1764,179 @@
         try { showClassBtn.focus({ preventScroll: true }); }
         catch (err) { try { showClassBtn.focus(); } catch (e2) {} }
       }
+    }
+
+    // Temporary marker stretches on the open board. Another drag adds
+    // another. A short click clears. Closing the board drops them. They
+    // are not written to the lesson or to localStorage.
+    function boardTextNodes(body) {
+      var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, null);
+      var nodes = [];
+      var n;
+      while ((n = walker.nextNode())) nodes.push(n);
+      return nodes;
+    }
+
+    function boardOffset(body, container, offset) {
+      var nodes = boardTextNodes(body);
+      if (!container) return -1;
+      if (container.nodeType === 3) {
+        var cursor = 0;
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i] === container) {
+            var at = offset;
+            if (at < 0) at = 0;
+            if (at > nodes[i].nodeValue.length) at = nodes[i].nodeValue.length;
+            return cursor + at;
+          }
+          cursor += nodes[i].nodeValue.length;
+        }
+        return -1;
+      }
+      var boundary;
+      try {
+        boundary = document.createRange();
+        boundary.setStart(container, offset);
+        boundary.collapse(true);
+      } catch (err) {
+        return -1;
+      }
+      var pos = 0;
+      for (var j = 0; j < nodes.length; j++) {
+        var nodeRange = document.createRange();
+        nodeRange.selectNodeContents(nodes[j]);
+        if (nodeRange.compareBoundaryPoints(Range.START_TO_START, boundary) >= 0) return pos;
+        pos += nodes[j].nodeValue.length;
+      }
+      return pos;
+    }
+
+    function boardSelection(body) {
+      var sel = window.getSelection ? window.getSelection() : null;
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+      var range = sel.getRangeAt(0);
+      if (!body.contains(range.startContainer) || !body.contains(range.endContainer)) return null;
+      var start = boardOffset(body, range.startContainer, range.startOffset);
+      var end = boardOffset(body, range.endContainer, range.endOffset);
+      if (start < 0 || end < 0 || end <= start) return null;
+      var nodes = boardTextNodes(body);
+      var all = '';
+      for (var i = 0; i < nodes.length; i++) all += nodes[i].nodeValue;
+      var text = all.slice(start, end);
+      if (!text || !String(text).replace(/\s+/g, '')) return null;
+      return { start: start, end: end, text: text };
+    }
+
+    function clearBoardSelection() {
+      var sel = window.getSelection ? window.getSelection() : null;
+      if (!sel || !sel.rangeCount || !sel.anchorNode) return;
+      if (classSheet && classSheet.contains(sel.anchorNode)) {
+        try { sel.removeAllRanges(); } catch (err) {}
+      }
+    }
+
+    function unwrapBoardMarks(body) {
+      var found = body.querySelectorAll('mark.class-board-mark');
+      for (var i = found.length - 1; i >= 0; i--) {
+        var mark = found[i];
+        var parent = mark.parentNode;
+        while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+        parent.removeChild(mark);
+      }
+      if (body.normalize) body.normalize();
+    }
+
+    function wrapBoardSlice(textNode, start, end) {
+      var value = textNode.nodeValue || '';
+      if (start < 0) start = 0;
+      if (end > value.length) end = value.length;
+      if (start >= end) return;
+      var mark = document.createElement('mark');
+      mark.className = 'class-board-mark';
+      var parent = textNode.parentNode;
+      if (start <= 0 && end >= value.length) {
+        parent.insertBefore(mark, textNode);
+        mark.appendChild(textNode);
+        return;
+      }
+      var before = value.slice(0, start);
+      var after = value.slice(end);
+      textNode.nodeValue = before;
+      mark.textContent = value.slice(start, end);
+      var anchor = textNode.nextSibling;
+      if (!before) parent.removeChild(textNode);
+      if (anchor) parent.insertBefore(mark, anchor);
+      else parent.appendChild(mark);
+      if (after) {
+        var tail = document.createTextNode(after);
+        if (mark.nextSibling) parent.insertBefore(tail, mark.nextSibling);
+        else parent.appendChild(tail);
+      }
+    }
+
+    function paintBoardMarks(body, ranges) {
+      unwrapBoardMarks(body);
+      var ordered = (ranges || []).slice().sort(function (a, b) { return b.start - a.start; });
+      ordered.forEach(function (range) {
+        if (!range || range.end <= range.start) return;
+        var nodes = boardTextNodes(body);
+        var cursor = 0;
+        var slices = [];
+        for (var i = 0; i < nodes.length; i++) {
+          var len = nodes[i].nodeValue.length;
+          var from = range.start > cursor ? range.start : cursor;
+          var to = range.end < cursor + len ? range.end : cursor + len;
+          if (from < to) slices.push({ node: nodes[i], start: from - cursor, end: to - cursor });
+          cursor += len;
+        }
+        for (var s = slices.length - 1; s >= 0; s--) {
+          wrapBoardSlice(slices[s].node, slices[s].start, slices[s].end);
+        }
+      });
+    }
+
+    function boardControlTarget(target) {
+      if (!target || !target.closest) return false;
+      return !!target.closest('button, a, input, select, textarea, .class-board-bar');
+    }
+
+    function finishBoardPointer(e) {
+      if (!boardPointer) return;
+      if (e && e.pointerId != null && e.pointerId !== boardPointer.id) return;
+      var down = boardPointer;
+      boardPointer = null;
+      document.removeEventListener('pointerup', finishBoardPointer, true);
+      document.removeEventListener('pointercancel', finishBoardPointer, true);
+      if (e && e.type === 'pointercancel') return;
+      var body = classSheet && classSheet.querySelector('.class-board-body');
+      if (!body) return;
+      var dx = (e && e.clientX != null ? e.clientX : down.x) - down.x;
+      var dy = (e && e.clientY != null ? e.clientY : down.y) - down.y;
+      var chrome = boardControlTarget(e && e.target);
+      var result = api.classHighlightGesture({ marks: boardMarks }, {
+        type: 'up',
+        chrome: chrome,
+        distance: Math.sqrt(dx * dx + dy * dy),
+        selection: chrome ? null : boardSelection(body)
+      });
+      boardMarks = result.marks;
+      if (result.effect === 'clear' || result.effect === 'add') {
+        paintBoardMarks(body, boardMarks);
+        var sel = window.getSelection ? window.getSelection() : null;
+        if (sel && sel.removeAllRanges) {
+          try { sel.removeAllRanges(); } catch (err) {}
+        }
+      }
+    }
+
+    function armBoardPointer(e) {
+      if (!e || (e.button != null && e.button !== 0)) return;
+      if (boardControlTarget(e.target)) return;
+      var body = classSheet && classSheet.querySelector('.class-board-body');
+      if (!body || !body.contains(e.target)) return;
+      boardPointer = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      document.addEventListener('pointerup', finishBoardPointer, true);
+      document.addEventListener('pointercancel', finishBoardPointer, true);
     }
 
     function trapClassBoardTab(e) {
@@ -1661,15 +1994,17 @@
         runAction(payload.action, payload.slots, payload.reply);
         return;
       }
-      var text = api.presentReply(payload);
-      if (!text) {
+      var card = api.glossCard(payload, pendingQuery);
+      var text = card ? api.glossLines(card).join('\n') : api.presentReply(payload);
+      if (!String(text || '').replace(/\s+/g, '')) {
         showReply('The assistant is unavailable just now.');
         return;
       }
       showReply(text, {
         showClass: api.canShowClass(payload),
         payload: payload,
-        query: pendingQuery
+        query: pendingQuery,
+        gloss: !!card
       });
     }
 
@@ -1679,6 +2014,7 @@
       pendingQuery = text;
       input.value = '';
       reply.hidden = false;
+      reply.classList.remove('is-gloss');
       reply.textContent = '\u2026';
       showClassBtn.hidden = true;
       place();

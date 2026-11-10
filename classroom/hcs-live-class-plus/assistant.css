@@ -1,4 +1,5 @@
-/* HCS Live Class + assistant. The ball uses the shared Eng api-mesh wash
+/* HCS Live Class + assistant. Cache stamp: 20261110d.
+   The ball uses the shared Eng api-mesh wash
    (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
    here so this page does not load ask.css. The open strip and reply use
    Mesh mist (#ebeff8 fill, #123a4d ink), a soft wash of the ball's
@@ -613,6 +614,9 @@
   justify-content: flex-end;
   flex: 0 0 auto;
   padding: 12px 12px 0;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .class-board-close {
@@ -651,6 +655,10 @@
   gap: 0.35em;
   padding: clamp(8px, 2vw, 20px) clamp(20px, 4vw, 56px) clamp(28px, 5vw, 64px);
   text-align: center;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: pan-y;
 }
 
 .class-board-body.is-prose {
@@ -685,6 +693,55 @@
   max-width: 40rem;
   font-size: clamp(1.5rem, 2.8vw, 2rem);
   font-weight: 650;
+}
+
+/* Dict on the board: the word stays the large first line. The next four
+   rows are Chinese, part of speech, English meaning, and a sample.
+   A blank slot keeps its row. Ask prose does not use this. */
+.class-board-body.is-gloss {
+  gap: 0.28em;
+}
+
+.class-board-body.is-gloss .class-board-head,
+.class-board-body.is-gloss .class-board-line {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.class-board-body.is-gloss .class-board-head.is-blank,
+.class-board-body.is-gloss .class-board-line.is-blank {
+  min-height: 1.2em;
+}
+
+.class-board-body.is-gloss .class-board-line[data-gloss-line="3"] {
+  font-size: clamp(1.15rem, 2.5vw, 1.65rem);
+  font-weight: 650;
+}
+
+.class-board-body.is-gloss .class-board-line[data-gloss-line="5"] {
+  font-style: italic;
+  font-weight: 600;
+}
+
+.class-board-mark {
+  background-color: #ffe14a;
+  color: #123a4d;
+  border-radius: 0.08em;
+  padding: 0.02em 0.08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.plus-float .plus-reply.is-gloss .plus-reply-line[data-gloss-line="1"] {
+  font-weight: 750;
+}
+
+.plus-float .plus-reply.is-gloss .plus-reply-line[data-gloss-line="5"] {
+  font-style: italic;
+}
+
+.plus-float .plus-reply.is-gloss .plus-reply-line.is-blank {
+  min-height: 1.15em;
 }
 
 .plus-float .plus-show-class {

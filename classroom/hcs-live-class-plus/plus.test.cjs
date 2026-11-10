@@ -99,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261110c/);
-  assert.match(html, /assistant\.js\?v=20261110c/);
+  assert.match(html, /assistant\.css\?v=20261110d/);
+  assert.match(html, /assistant\.js\?v=20261110d/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -675,13 +675,25 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
   }, 'meticulous');
   assert.equal(gloss.head, 'meticulous');
   assert.equal(gloss.gloss, true);
-  assert.deepEqual(gloss.lines, ['一絲不苟', 'very careful about small details']);
+  assert.deepEqual(gloss.lines, ['一絲不苟', '', 'very careful about small details', '']);
+  assert.deepEqual(plus.glossLines(plus.glossCard({
+    kind: 'gloss',
+    reply: 'meticulous',
+    gloss_zh: '一絲不苟',
+    gloss_en: 'very careful about small details'
+  }, 'meticulous')), [
+    'meticulous',
+    '一絲不苟',
+    '',
+    'very careful about small details',
+    ''
+  ]);
   assert.equal(plus.presentReply({
     kind: 'gloss',
     reply: 'meticulous',
     gloss_zh: '一絲不苟',
     gloss_en: 'very careful about small details'
-  }), '一絲不苟\nvery careful about small details');
+  }), 'meticulous\n一絲不苟\n\nvery careful about small details\n');
 
   var fromQuery = plus.classBoardParts({
     kind: 'gloss',
@@ -689,7 +701,7 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
     gloss_en: 'a common fruit'
   }, 'apple');
   assert.equal(fromQuery.head, 'apple');
-  assert.deepEqual(fromQuery.lines, ['蘋果', 'a common fruit']);
+  assert.deepEqual(fromQuery.lines, ['蘋果', '', 'a common fruit', '']);
 
   var ask = plus.classBoardParts({
     kind: 'ask',
@@ -735,6 +747,7 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
   assert.equal(meaning.gloss, true);
   assert.deepEqual(meaning.lines, [
     '一絲不苟',
+    '',
     'very careful about small details',
     'She checked every line of the essay.'
   ]);
@@ -743,7 +756,7 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
     reply: 'meticulous',
     gloss_zh: '一絲不苟',
     gloss_en: 'very careful about small details\nShe checked every line of the essay.'
-  }), '一絲不苟\nvery careful about small details\nShe checked every line of the essay.');
+  }), 'meticulous\n一絲不苟\n\nvery careful about small details\nShe checked every line of the essay.');
 
   assert.equal(plus.canShowClass({ kind: 'gloss', gloss_en: 'apple' }), true);
   assert.equal(plus.canShowClass({ kind: 'ask', reply: 'A short answer.' }), true);
@@ -774,4 +787,208 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
   assert.match(bootBody, /if \(classSheet\) \{\s*e\.preventDefault\(\);\s*e\.stopImmediatePropagation\(\);\s*closeClassBoard\(\)/);
   assert.doesNotMatch(bootBody, /Show Class|colorise|favorite/);
   assert.equal(plus.BALL, 44);
+});
+
+test('Dict word card is five lines in order', function () {
+  assert.match(js, /Cache stamp: 20261110d/);
+  assert.match(css, /Cache stamp: 20261110d/);
+  assert.match(html, /assistant\.css\?v=20261110d/);
+  assert.match(html, /assistant\.js\?v=20261110d/);
+
+  var structured = plus.glossCard({
+    kind: 'gloss',
+    word: 'meticulous',
+    gloss_zh: '一絲不苟',
+    pos: 'adjective',
+    gloss_en: 'very careful about small details',
+    example: 'She checked every line of the essay.'
+  });
+  assert.deepEqual(plus.glossLines(structured), [
+    'meticulous',
+    '一絲不苟',
+    'adjective',
+    'very careful about small details',
+    'She checked every line of the essay.'
+  ]);
+  assert.equal(plus.glossLines(structured).length, 5);
+
+  var legacy = plus.glossCard({
+    kind: 'gloss',
+    reply: '- 一絲不苟的；極其細心的\n- adjective · very careful about small details\n- She is meticulous about checking her work.',
+    gloss_zh: '一絲不苟的；極其細心的',
+    gloss_en: 'adjective · very careful and precise about small details · She is meticulous about checking her work.'
+  }, 'meticulous');
+  assert.deepEqual(plus.glossLines(legacy), [
+    'meticulous',
+    '一絲不苟的；極其細心的',
+    'adjective',
+    'very careful and precise about small details',
+    'She is meticulous about checking her work.'
+  ]);
+  assert.equal(legacy.word, 'meticulous');
+  assert.doesNotMatch(plus.glossLines(legacy).join('\n'), /British spelling|^- /m);
+
+  var named = plus.glossCard({
+    kind: 'gloss',
+    headword: 'meticulous',
+    gloss_zh: '一絲不苟',
+    part_of_speech: 'adjective',
+    gloss_en: 'adjective · very careful about small details · She checked every line of the essay.',
+    sample: 'She checked every line of the essay.'
+  });
+  assert.equal(named.word, 'meticulous');
+  assert.equal(named.pos, 'adjective');
+  assert.equal(named.en, 'very careful about small details');
+  assert.equal(named.sample, 'She checked every line of the essay.');
+
+  var plain = plus.glossCard({
+    kind: 'gloss',
+    reply: 'apple',
+    gloss_zh: '蘋果',
+    gloss_en: 'a common fruit'
+  });
+  assert.deepEqual(plus.glossLines(plain), ['apple', '蘋果', '', 'a common fruit', '']);
+  assert.equal(plain.pos, '');
+  assert.equal(plain.sample, '');
+
+  var tie = plus.glossCard({
+    kind: 'gloss',
+    word: 'tie',
+    gloss_zh: '平局',
+    gloss_en: 'a tie · a draw'
+  });
+  assert.equal(tie.pos, '');
+  assert.equal(tie.en, 'a tie · a draw');
+  assert.equal(tie.sample, '');
+
+  var noun = plus.glossCard({
+    kind: 'gloss',
+    word: 'apple',
+    gloss_en: 'noun · a common fruit'
+  });
+  assert.equal(noun.pos, 'noun');
+  assert.equal(noun.en, 'a common fruit');
+  assert.equal(noun.sample, '');
+
+  assert.equal(plus.glossCard({
+    kind: 'ask',
+    reply: '- School sports day\n- A time I helped a friend',
+    gloss_zh: '',
+    gloss_en: ''
+  }), null);
+  assert.equal(plus.presentReply({
+    kind: 'ask',
+    reply: '- School sports day\n- A time I helped a friend\n- My favourite lesson'
+  }), '- School sports day\n- A time I helped a friend\n- My favourite lesson');
+
+  var read = plus.readPayload({
+    kind: 'gloss',
+    word: 'apple',
+    gloss_zh: '蘋果',
+    part_of_speech: 'noun',
+    gloss_en: 'a common fruit',
+    sample: 'I ate an apple.'
+  });
+  assert.equal(read.word, 'apple');
+  assert.equal(read.pos, 'noun');
+  assert.equal(read.part_of_speech, 'noun');
+  assert.equal(read.sample, 'I ate an apple.');
+  assert.equal(read.example, 'I ate an apple.');
+  assert.deepEqual(plus.glossLines(plus.glossCard(read)), [
+    'apple',
+    '蘋果',
+    'noun',
+    'a common fruit',
+    'I ate an apple.'
+  ]);
+
+  var board = plus.classBoardParts(read, 'apple');
+  assert.equal(board.head, 'apple');
+  assert.deepEqual(board.lines, ['蘋果', 'noun', 'a common fruit', 'I ate an apple.']);
+
+  var bootBody = js.slice(js.indexOf('function boot('));
+  assert.match(bootBody, /gloss: !!card/);
+  assert.match(bootBody, /data-gloss-line/);
+  assert.match(bootBody, /row\.className = 'plus-reply-line'/);
+  assert.match(css, /\.plus-float \.plus-reply\.is-gloss \.plus-reply-line\[data-gloss-line="1"\]\s*\{[^}]*font-weight:\s*750/);
+  assert.match(css, /\.class-board-body\.is-gloss \.class-board-line\.is-blank\s*\{[^}]*min-height:\s*1\.2em/);
+  assert.match(css, /--strip-max:\s*220px/);
+});
+
+test('Show class highlights add, add another, and a short click or close clears', function () {
+  assert.equal(plus.CLASS_MARK_TAP, 8);
+  var none = { marks: [] };
+  var first = plus.classHighlightGesture(none, {
+    type: 'up',
+    chrome: false,
+    distance: plus.CLASS_MARK_TAP + 12,
+    selection: { start: 0, end: 10, text: 'meticulous' }
+  });
+  assert.equal(first.effect, 'add');
+  assert.equal(first.marks.length, 1);
+  assert.equal(first.marks[0].text, 'meticulous');
+  assert.equal(none.marks.length, 0);
+
+  var second = plus.classHighlightGesture(first, {
+    type: 'up',
+    chrome: false,
+    distance: 36,
+    selection: { start: 22, end: 29, text: 'careful' }
+  });
+  assert.equal(second.effect, 'add');
+  assert.equal(second.marks.length, 2);
+  assert.equal(second.marks[0].text, 'meticulous');
+  assert.equal(second.marks[1].text, 'careful');
+  assert.notEqual(second.marks[0].start, second.marks[1].start);
+
+  var click = plus.classHighlightGesture(second, {
+    type: 'up',
+    chrome: false,
+    distance: 2,
+    selection: null
+  });
+  assert.equal(click.effect, 'clear');
+  assert.deepEqual(click.marks, []);
+  assert.equal(second.marks.length, 2);
+
+  var closed = plus.classHighlightGesture(second, { type: 'close' });
+  assert.equal(closed.effect, 'clear');
+  assert.deepEqual(closed.marks, []);
+
+  var opened = plus.classHighlightGesture(second, { type: 'open' });
+  assert.equal(opened.effect, 'clear');
+  assert.deepEqual(opened.marks, []);
+
+  var button = plus.classHighlightGesture(second, {
+    type: 'up',
+    chrome: true,
+    distance: 1,
+    selection: { start: 0, end: 5, text: 'Close' }
+  });
+  assert.equal(button.effect, 'ignore');
+  assert.equal(button.marks.length, 2);
+  assert.equal(button.marks[0].text, 'meticulous');
+
+  var dragEmpty = plus.classHighlightGesture(second, {
+    type: 'up',
+    chrome: false,
+    distance: 40,
+    selection: null
+  });
+  assert.equal(dragEmpty.effect, 'ignore');
+  assert.equal(dragEmpty.marks.length, 2);
+
+  var bootBody = js.slice(js.indexOf('function boot('));
+  assert.match(bootBody, /classHighlightGesture/);
+  assert.match(bootBody, /type: 'close'/);
+  assert.match(bootBody, /type: 'open'/);
+  assert.match(bootBody, /body\.addEventListener\('pointerdown', armBoardPointer\)/);
+  assert.match(bootBody, /mark\.className = 'class-board-mark'/);
+  assert.match(bootBody, /function boardControlTarget/);
+  assert.doesNotMatch(bootBody, /localStorage\.setItem\([^)]*mark/i);
+  assert.doesNotMatch(bootBody, /localStorage[\s\S]{0,160}class-board-mark/);
+  assert.doesNotMatch(bootBody, /class-board-mark[\s\S]{0,160}localStorage/);
+  assert.match(css, /\.class-board-mark\s*\{[^}]*background-color:\s*#ffe14a/);
+  assert.match(css, /\.class-board-body\s*\{[^}]*user-select:\s*text/);
+  assert.match(css, /\.class-board-bar\s*\{[^}]*user-select:\s*none/);
 });
