@@ -5,9 +5,8 @@
  * The ball keeps the viewport spot from the last drag (or the default
  * corner). Opening the strip does not move that circle: the Mesh mist
  * panel sits beside it and flips to the side, then up or down, that fits.
- * Under the text box, Ask, Command, and Import share one row.
- * Inside Ask, Dict and Ask share a second row. Dict posts
- * { text, mode: "gloss" } and does not send or store Ask history.
+ * Under the text box, Ask, Dict, Command, and Import share one row.
+ * Dict posts { text, mode: "gloss" } and does not send or store Ask history.
  * Ask posts { text, mode: "ask" } and recent Ask turns in history.
  * Typing “what does X mean” while Ask is selected still posts mode ask.
  * Command runs the line on the page. Import opens the chart photo flow.
@@ -1194,40 +1193,18 @@
       return btn;
     }
     var askBtn = makeModeChip('plusModeAsk', 'ASK', 'ask', 'Ask a question');
+    var dictBtn = makeModeChip('plusModeDict', 'DICT', 'dict', 'Meaning of a word or phrase');
     var commandBtn = makeModeChip('plusModeCommand', 'COMMAND', 'command', 'Run a class control');
     var chartBtn = makeModeChip('btnImportChart', 'IMPORT', 'import', 'Read a seating-chart photo and move desks by class number');
     chartBtn.setAttribute('aria-label', 'Import chart');
-    var askLane = 'ask';
-    var askLaneRow = document.createElement('div');
-    askLaneRow.className = 'ask-lane-row';
-    askLaneRow.setAttribute('role', 'radiogroup');
-    askLaneRow.setAttribute('aria-label', 'Dict or Ask');
-    function makeLaneChip(id, label, value, title) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'mode-chip ask-lane-chip';
-      btn.id = id;
-      btn.textContent = label;
-      btn.title = title;
-      btn.setAttribute('role', 'radio');
-      btn.setAttribute('aria-checked', 'false');
-      btn.setAttribute('data-lane', value);
-      askLaneRow.appendChild(btn);
-      return btn;
-    }
-    var dictBtn = makeLaneChip('plusLaneDict', 'DICT', 'dict', 'Meaning of a word or phrase');
-    var laneAskBtn = makeLaneChip('plusLaneAsk', 'ASK', 'ask', 'Ask a classroom question');
     dictBtn.setAttribute('aria-label', 'Dict');
-    laneAskBtn.setAttribute('aria-label', 'Ask a classroom question');
     command.appendChild(commandLine);
-    command.appendChild(askLaneRow);
     command.appendChild(modeRow);
     applyModeChrome();
     askBtn.addEventListener('click', function () { setMode('ask'); });
+    dictBtn.addEventListener('click', function () { setMode('dict'); });
     commandBtn.addEventListener('click', function () { setMode('command'); });
     chartBtn.addEventListener('click', function () { setMode('import'); });
-    dictBtn.addEventListener('click', function () { setLane('dict'); });
-    laneAskBtn.addEventListener('click', function () { setLane('ask'); });
 
     var reply = document.createElement('div');
     reply.className = 'plus-reply';
@@ -1407,10 +1384,9 @@
 
     function applyModeChrome() {
       var ask = mode === 'ask';
+      var dicting = mode === 'dict';
       var commandMode = mode === 'command';
       var importing = mode === 'import';
-      var dicting = ask && askLane === 'dict';
-      var laneHidden = askLaneRow.hidden;
       input.placeholder = dicting
         ? 'A word or phrase\u2026'
         : (ask ? 'Ask a question\u2026' : (commandMode ? '+1 name, pick, pairs\u2026' : 'Chart photo'));
@@ -1418,33 +1394,16 @@
         ? 'Word or phrase'
         : (ask ? 'Ask a question' : (commandMode ? 'Command' : 'Import chart')));
       sendBtn.textContent = importing ? 'CHOOSE' : 'SEND';
-      askLaneRow.hidden = !ask;
-      [askBtn, commandBtn, chartBtn].forEach(function (btn) {
+      [askBtn, dictBtn, commandBtn, chartBtn].forEach(function (btn) {
         var on = btn.getAttribute('data-mode') === mode;
         btn.classList.toggle('is-selected', on);
         btn.setAttribute('aria-checked', on ? 'true' : 'false');
       });
-      [dictBtn, laneAskBtn].forEach(function (btn) {
-        var on = ask && btn.getAttribute('data-lane') === askLane;
-        btn.classList.toggle('is-selected', on);
-        btn.setAttribute('aria-checked', on ? 'true' : 'false');
-      });
-      if (openState && askLaneRow.hidden !== laneHidden) schedulePlace();
-    }
-
-    function setLane(next) {
-      if (next !== 'dict' && next !== 'ask') next = 'ask';
-      askLane = next;
-      applyModeChrome();
-      if (openState) focusCommand();
     }
 
     function setMode(next) {
-      if (next !== 'ask' && next !== 'command' && next !== 'import') next = 'ask';
-      if (next !== 'ask') {
-        askThread.reset();
-        askLane = 'ask';
-      }
+      if (next !== 'ask' && next !== 'dict' && next !== 'command' && next !== 'import') next = 'ask';
+      if (next === 'command' || next === 'import') askThread.reset();
       mode = next;
       applyModeChrome();
       if (mode !== 'import' && openState) focusCommand();
@@ -1478,7 +1437,6 @@
         if (!wasOpen) setMode('ask');
       } else {
         askThread.reset();
-        askLane = 'ask';
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
@@ -1735,8 +1693,8 @@
       // Ask sends the open-strip thread. Dict posts gloss and omits
       // history. Command and Import never call send. A non-Ask caller
       // still posts the line alone. glossing is fixed for this send.
-      var glossing = mode === 'ask' && askLane === 'dict';
-      var prior = mode === 'ask' && !glossing ? askThread.snapshot() : [];
+      var glossing = mode === 'dict';
+      var prior = mode === 'ask' ? askThread.snapshot() : [];
       var payload = glossing
         ? api.glossRequestBody(text)
         : (mode === 'ask' ? api.askRequestBody(text, prior) : { text: text });

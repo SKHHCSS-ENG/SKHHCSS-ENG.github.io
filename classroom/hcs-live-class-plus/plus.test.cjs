@@ -99,8 +99,8 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261110b/);
-  assert.match(html, /assistant\.js\?v=20261110b/);
+  assert.match(html, /assistant\.css\?v=20261110c/);
+  assert.match(html, /assistant\.js\?v=20261110c/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -298,8 +298,9 @@ test('import chart stays on the ball and off the original page', function () {
   assert.doesNotMatch(original, /mode-row/);
 });
 
-test('Ask, Command, and Import share one cream row under the text box', function () {
+test('Ask, Dict, Command, and Import share one row under the text box', function () {
   assert.match(js, /'plusModeAsk', 'ASK'/);
+  assert.match(js, /'plusModeDict', 'DICT', 'dict'/);
   assert.match(js, /'plusModeCommand', 'COMMAND'/);
   assert.match(js, /'btnImportChart', 'IMPORT'/);
   assert.match(js, /sendBtn\.textContent = 'SEND'/);
@@ -309,7 +310,9 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(js, /var mode = 'ask'/);
   assert.match(js, /if \(!wasOpen\) setMode\('ask'\)/);
   assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*display:\s*flex/);
-  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 1 0/);
+  assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*flex-wrap:\s*nowrap/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*flex:\s*1 0 auto/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*min-width:\s*max-content/);
   assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*height:\s*26px/);
   assert.match(js, /var cap = 220/);
   assert.match(js, /var BALL = 44/);
@@ -336,8 +339,8 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.doesNotMatch(dispatch, /fetch\(/);
   assert.doesNotMatch(dispatch, /askRequestBody|askThread/);
   var sendFn = bootBody.slice(bootBody.indexOf('function send('), bootBody.indexOf("command.addEventListener('submit'"));
-  assert.match(sendFn, /var glossing = mode === 'ask' && askLane === 'dict'/);
-  assert.match(sendFn, /var prior = mode === 'ask' && !glossing \? askThread\.snapshot\(\) : \[\]/);
+  assert.match(sendFn, /var glossing = mode === 'dict'/);
+  assert.match(sendFn, /var prior = mode === 'ask' \? askThread\.snapshot\(\) : \[\]/);
   assert.match(sendFn, /api\.glossRequestBody\(text\)/);
   assert.match(sendFn, /mode === 'ask' \? api\.askRequestBody\(text, prior\) : \{ text: text \}/);
   assert.match(sendFn, /JSON\.stringify\(payload\)/);
@@ -345,7 +348,8 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(sendFn, /if \(answered\.kind !== 'action'\) askThread\.remember\(text, api\.presentReply\(answered\)\)/);
   assert.doesNotMatch(sendFn, /glossRequestBody\(text,\s*(prior|history|askThread)/);
   var setModeFn = bootBody.slice(bootBody.indexOf('function setMode'), bootBody.indexOf('function dispatchCommand'));
-  assert.match(setModeFn, /if \(next !== 'ask'\) \{\s*askThread\.reset\(\)/);
+  assert.match(setModeFn, /if \(next === 'command' \|\| next === 'import'\) askThread\.reset\(\)/);
+  assert.doesNotMatch(setModeFn, /askLane|if \(next !== 'ask'\)/);
   var setOpenFn = bootBody.slice(bootBody.indexOf('function setOpen'), bootBody.indexOf('function focusCommand'));
   assert.match(setOpenFn, /\} else \{\s*askThread\.reset\(\)/);
   assert.doesNotMatch(js, /mode:\s*['"]command['"]/);
@@ -353,46 +357,37 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.equal(plus.DEFAULT_WORKER_URL, 'https://live-class-plus.skhhcss-eng.workers.dev');
 });
 
-test('Dict and Ask share one row inside the Ask panel', function () {
-  assert.equal((js.match(/makeModeChip\('/g) || []).length, 3);
-  assert.match(js, /'plusModeAsk', 'ASK'/);
-  assert.match(js, /'plusModeCommand', 'COMMAND'/);
-  assert.match(js, /'btnImportChart', 'IMPORT'/);
-  assert.equal((js.match(/makeLaneChip\('/g) || []).length, 2);
-  assert.match(js, /'plusLaneDict', 'DICT', 'dict'/);
-  assert.match(js, /'plusLaneAsk', 'ASK', 'ask'/);
+test('ASK, DICT, COMMAND, and IMPORT are one row and there is no inner lane', function () {
+  assert.equal((js.match(/makeModeChip\('/g) || []).length, 4);
+  assert.equal((js.match(/makeLaneChip\(/g) || []).length, 0);
+  var order = js.slice(js.indexOf("makeModeChip('plusModeAsk'"), js.indexOf("chartBtn.setAttribute('aria-label'"));
+  assert.match(order, /plusModeAsk', 'ASK'[\s\S]*plusModeDict', 'DICT', 'dict'[\s\S]*plusModeCommand', 'COMMAND'[\s\S]*btnImportChart', 'IMPORT'/);
   var makeMode = js.slice(js.indexOf('function makeModeChip'), js.indexOf('var askBtn'));
   assert.match(makeMode, /modeRow\.appendChild\(btn\)/);
-  assert.doesNotMatch(makeMode, /DICT|askLaneRow|gloss/);
-  var makeLane = js.slice(js.indexOf('function makeLaneChip'), js.indexOf('var dictBtn'));
-  assert.match(makeLane, /askLaneRow\.appendChild\(btn\)/);
-  assert.match(makeLane, /mode-chip ask-lane-chip/);
-  assert.doesNotMatch(makeLane, /modeRow\.appendChild/);
+  assert.doesNotMatch(makeMode, /askLaneRow|ask-lane/);
   var mounted = js.slice(js.indexOf('command.appendChild(commandLine)'), js.indexOf('applyModeChrome();'));
-  assert.match(mounted, /command\.appendChild\(commandLine\);\s*command\.appendChild\(askLaneRow\);\s*command\.appendChild\(modeRow\);/);
-  assert.match(js, /askLaneRow\.className = 'ask-lane-row'/);
-  assert.match(js, /askLaneRow\.setAttribute\('role', 'radiogroup'\)/);
-  assert.match(js, /askLaneRow\.hidden = !ask/);
-  assert.match(css, /\.plus-float \.ask-lane-row\s*\{[^}]*display:\s*flex/);
-  assert.match(css, /\.plus-float \.ask-lane-row\s*\{[^}]*flex-wrap:\s*nowrap/);
-  assert.match(css, /\.plus-float \.ask-lane-row\[hidden\]\s*\{[^}]*display:\s*none !important/);
-  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*height:\s*26px/);
+  assert.match(mounted, /command\.appendChild\(commandLine\);\s*command\.appendChild\(modeRow\);/);
+  assert.doesNotMatch(mounted, /askLaneRow/);
+  assert.doesNotMatch(js, /ask-lane-row|askLaneRow|plusLaneDict|plusLaneAsk|function setLane/);
+  assert.doesNotMatch(css, /ask-lane-row/);
+  assert.match(css, /\.plus-float \.mode-row\s*\{[^}]*flex-wrap:\s*nowrap/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*overflow:\s*hidden/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*min-width:\s*max-content/);
+  assert.match(css, /\.plus-float \.mode-chip\s*\{[^}]*font-size:\s*0\.58rem/);
   assert.match(js, /A word or phrase\\u2026/);
   assert.match(js, /Ask a question\\u2026/);
+  assert.match(js, /dictBtn\.addEventListener\('click', function \(\) \{ setMode\('dict'\)/);
   var bootBody = js.slice(js.indexOf('function boot('));
-  var setLaneFn = bootBody.slice(bootBody.indexOf('function setLane'), bootBody.indexOf('function setMode'));
-  assert.match(setLaneFn, /askLane = next/);
-  assert.match(setLaneFn, /applyModeChrome\(\)/);
-  assert.doesNotMatch(setLaneFn, /askThread|history|fetch\(/);
   var setModeFn = bootBody.slice(bootBody.indexOf('function setMode'), bootBody.indexOf('function dispatchCommand'));
-  assert.match(setModeFn, /askLane = 'ask'/);
-  var setOpenFn = bootBody.slice(bootBody.indexOf('function setOpen'), bootBody.indexOf('function focusCommand'));
-  assert.match(setOpenFn, /askLane = 'ask'/);
+  assert.match(setModeFn, /next !== 'dict'/);
+  assert.match(setModeFn, /if \(next === 'command' \|\| next === 'import'\) askThread\.reset\(\)/);
+  assert.doesNotMatch(setModeFn, /askLane/);
+  assert.doesNotMatch(setModeFn, /if \(next !== 'ask'\)/);
   var spark = fs.readFileSync(path.join(here, 'skins/spark.css'), 'utf8');
   var arcade = fs.readFileSync(path.join(here, 'skins/arcade.css'), 'utf8');
   assert.doesNotMatch(spark, /ask-lane|mode-chip/);
   assert.doesNotMatch(arcade, /ask-lane|mode-chip/);
-  assert.doesNotMatch(html, /ask-lane|plusLaneDict|plusLaneAsk/);
+  assert.doesNotMatch(html, /ask-lane|plusLaneDict|plusModeDict|mode-chip/);
 });
 
 test('Dict posts gloss with no history; Ask still posts mode ask', function () {

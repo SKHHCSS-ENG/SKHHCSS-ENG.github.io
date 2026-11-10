@@ -199,52 +199,42 @@
   min-width: 0;
 }
 
-/* Slim row under the text box. Three equal 26px chips.
+/* One row under the text box: Ask, Dict, Command, Import.
+   Four 26px chips, no wrap, inside the 220px strip on a phone.
    Idle and hover use the ball's mesh blue (#1458d6). The selected chip
-   paints the same api-mesh wash as the ball, with --api-mesh-ink. */
+   paints the same api-mesh wash as the ball, with --api-mesh-ink.
+   Default is the master. Minimalist, Spark, and Arcade do not restyle
+   this strip, so they keep this row. */
 .plus-float .mode-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.2rem;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Dict and Ask, one row inside the Ask panel. Same 26px chip as
-   Ask · Command · Import. Default is the master: Minimalist, Spark,
-   and Arcade do not restyle this strip, so they keep this row. */
-.plus-float .ask-lane-row {
   display: flex;
   flex-wrap: nowrap;
   align-items: stretch;
-  gap: 0.2rem;
+  justify-content: stretch;
+  gap: 0.12rem;
   width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 0;
 }
 
-.plus-float .ask-lane-row[hidden] {
-  display: none !important;
-}
-
 .plus-float .mode-chip {
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 1 0 auto;
+  min-width: max-content;
   height: 26px;
   min-height: 0;
   margin: 0;
-  padding: 0 0.15rem;
+  padding: 0 0.12rem;
   border: 1px solid rgba(20, 88, 214, 0.42);
   border-radius: 6px;
   background: rgba(20, 88, 214, 0.08);
   color: #1458d6;
   font: inherit;
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 650;
   letter-spacing: 0;
   line-height: 1;
   white-space: nowrap;
+  overflow: hidden;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
