@@ -6,7 +6,10 @@
  * corner). Opening the strip does not move that circle: the Mesh mist
  * panel sits beside it and flips to the side, then up or down, that fits.
  * Under the text box, Ask, Command, and Import share one row.
+ * Inside Ask, Dict and Ask share a second row. Dict posts
+ * { text, mode: "gloss" } and does not send or store Ask history.
  * Ask posts { text, mode: "ask" } and recent Ask turns in history.
+ * Typing “what does X mean” while Ask is selected still posts mode ask.
  * Command runs the line on the page. Import opens the chart photo flow.
  * Neither of those sends the Ask thread. The Worker host stays live-class-plus.
  * Floor scroll does not move the ball. A drag still settles the ball
@@ -512,16 +515,26 @@
     };
   }
 
+  // One scannable point per line. Blank lines drop out. A bullet or
+  // numbered marker stays, so a list is not folded into one paragraph.
+  function pointLines(text) {
+    var raw = plainActionNames(typeof text === 'string' ? text : '');
+    if (!raw) return [];
+    var out = [];
+    raw.split(/\r?\n/).forEach(function (part) {
+      var line = part.replace(/[ \t]+/g, ' ').trim();
+      if (line) out.push(line);
+    });
+    return out;
+  }
+
   function presentReply(data) {
     if (!data || typeof data !== 'object') return '';
     var kind = String(data.kind || data.type || '');
-    if (kind === 'gloss') {
-      var lines = [];
-      if (data.gloss_zh) lines.push(String(data.gloss_zh).trim());
-      if (data.gloss_en) lines.push(String(data.gloss_en).trim());
-      if (lines.length) return plainActionNames(lines.join('\n'));
-    }
-    return data.reply ? plainActionNames(String(data.reply).trim()) : '';
+    var lines = [];
+    if (kind === 'gloss') lines = pointLines(data.gloss_zh).concat(pointLines(data.gloss_en));
+    if (!lines.length) lines = pointLines(data.reply);
+    return lines.join('\n');
   }
 
   // A looked-up word or short phrase. Questions and sentences stay in the body.
@@ -533,31 +546,32 @@
     return line;
   }
 
-  function classLine(text) {
-    return plainActionNames(typeof text === 'string' ? text : '').replace(/\s+/g, ' ').trim();
-  }
-
-  // Head is the word. Lines are the gloss or the Ask reply. The small strip
-  // still uses presentReply; this only feeds the class board.
+  // Head is the word. Each point is its own line, for the narrow strip
+  // and for Show class. A multiline gloss or Ask reply stays a list.
   function classBoardParts(payload, query) {
     var data = payload && typeof payload === 'object' ? payload : {};
     var kind = String(data.kind || data.type || '').trim();
     var replyRaw = plainActionNames(typeof data.reply === 'string' ? data.reply : '').trim();
     var reply = replyRaw.replace(/\s+/g, ' ').trim();
-    var zh = classLine(data.gloss_zh);
-    var en = classLine(data.gloss_en);
-    var gloss = kind === 'gloss' || !!(zh || en);
+    var zhLines = pointLines(data.gloss_zh);
+    var enLines = pointLines(data.gloss_en);
+    var gloss = kind === 'gloss' || !!(zhLines.length || enLines.length);
     var head = '';
     var lines = [];
+    function pushPoints(list) {
+      list.forEach(function (line) {
+        if (line && lines.indexOf(line) < 0) lines.push(line);
+      });
+    }
     if (gloss) {
       head = classWord(reply) || classWord(query);
-      if (zh) lines.push(zh);
-      if (en && en !== zh) lines.push(en);
-      if (!lines.length && reply && reply !== head) lines.push(replyRaw.indexOf('\n') >= 0 ? replyRaw : reply);
+      pushPoints(zhLines);
+      pushPoints(enLines);
+      if (!lines.length) pushPoints(pointLines(replyRaw));
     } else {
       head = classWord(query);
       if (!head && reply) head = classWord(reply);
-      if (reply && reply !== head) lines.push(replyRaw.indexOf('\n') >= 0 ? replyRaw : reply);
+      pushPoints(pointLines(replyRaw));
     }
     var kept = [];
     lines.forEach(function (line) {
@@ -969,6 +983,7 @@
   // (a few questions and replies) without dragging in the whole lesson.
   // A quiet gap this long starts a fresh Ask. Closing the strip, or
   // leaving Ask for Command or Import, also drops the thread.
+  // Dict does not read or write this thread.
   var ASK_HISTORY_CAP = 8;
   var ASK_HISTORY_GAP_MS = 30 * 60 * 1000;
 
@@ -999,6 +1014,11 @@
     if (turns.length && turns[0].role === 'assistant') turns.shift();
     if (turns.length) body.history = turns;
     return body;
+  }
+
+  // Word or phrase lookup. No history key, even when an Ask thread is open.
+  function glossRequestBody(text) {
+    return { text: turnText(text), mode: 'gloss' };
   }
 
   // clock is optional. Tests pass a function; the page uses Date.now.
@@ -1093,6 +1113,7 @@
     ASK_HISTORY_CAP: ASK_HISTORY_CAP,
     ASK_HISTORY_GAP_MS: ASK_HISTORY_GAP_MS,
     askRequestBody: askRequestBody,
+    glossRequestBody: glossRequestBody,
     createAskThread: createAskThread
   };
   }
@@ -1176,12 +1197,37 @@
     var commandBtn = makeModeChip('plusModeCommand', 'COMMAND', 'command', 'Run a class control');
     var chartBtn = makeModeChip('btnImportChart', 'IMPORT', 'import', 'Read a seating-chart photo and move desks by class number');
     chartBtn.setAttribute('aria-label', 'Import chart');
+    var askLane = 'ask';
+    var askLaneRow = document.createElement('div');
+    askLaneRow.className = 'ask-lane-row';
+    askLaneRow.setAttribute('role', 'radiogroup');
+    askLaneRow.setAttribute('aria-label', 'Dict or Ask');
+    function makeLaneChip(id, label, value, title) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mode-chip ask-lane-chip';
+      btn.id = id;
+      btn.textContent = label;
+      btn.title = title;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('data-lane', value);
+      askLaneRow.appendChild(btn);
+      return btn;
+    }
+    var dictBtn = makeLaneChip('plusLaneDict', 'DICT', 'dict', 'Meaning of a word or phrase');
+    var laneAskBtn = makeLaneChip('plusLaneAsk', 'ASK', 'ask', 'Ask a classroom question');
+    dictBtn.setAttribute('aria-label', 'Dict');
+    laneAskBtn.setAttribute('aria-label', 'Ask a classroom question');
     command.appendChild(commandLine);
+    command.appendChild(askLaneRow);
     command.appendChild(modeRow);
     applyModeChrome();
     askBtn.addEventListener('click', function () { setMode('ask'); });
     commandBtn.addEventListener('click', function () { setMode('command'); });
     chartBtn.addEventListener('click', function () { setMode('import'); });
+    dictBtn.addEventListener('click', function () { setLane('dict'); });
+    laneAskBtn.addEventListener('click', function () { setLane('ask'); });
 
     var reply = document.createElement('div');
     reply.className = 'plus-reply';
@@ -1363,21 +1409,42 @@
       var ask = mode === 'ask';
       var commandMode = mode === 'command';
       var importing = mode === 'import';
-      input.placeholder = ask
-        ? 'Ask a question\u2026'
-        : (commandMode ? '+1 name, pick, pairs\u2026' : 'Chart photo');
-      input.setAttribute('aria-label', ask ? 'Ask a question' : (commandMode ? 'Command' : 'Import chart'));
+      var dicting = ask && askLane === 'dict';
+      var laneHidden = askLaneRow.hidden;
+      input.placeholder = dicting
+        ? 'A word or phrase\u2026'
+        : (ask ? 'Ask a question\u2026' : (commandMode ? '+1 name, pick, pairs\u2026' : 'Chart photo'));
+      input.setAttribute('aria-label', dicting
+        ? 'Word or phrase'
+        : (ask ? 'Ask a question' : (commandMode ? 'Command' : 'Import chart')));
       sendBtn.textContent = importing ? 'CHOOSE' : 'SEND';
+      askLaneRow.hidden = !ask;
       [askBtn, commandBtn, chartBtn].forEach(function (btn) {
         var on = btn.getAttribute('data-mode') === mode;
         btn.classList.toggle('is-selected', on);
         btn.setAttribute('aria-checked', on ? 'true' : 'false');
       });
+      [dictBtn, laneAskBtn].forEach(function (btn) {
+        var on = ask && btn.getAttribute('data-lane') === askLane;
+        btn.classList.toggle('is-selected', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      if (openState && askLaneRow.hidden !== laneHidden) schedulePlace();
+    }
+
+    function setLane(next) {
+      if (next !== 'dict' && next !== 'ask') next = 'ask';
+      askLane = next;
+      applyModeChrome();
+      if (openState) focusCommand();
     }
 
     function setMode(next) {
       if (next !== 'ask' && next !== 'command' && next !== 'import') next = 'ask';
-      if (next !== 'ask') askThread.reset();
+      if (next !== 'ask') {
+        askThread.reset();
+        askLane = 'ask';
+      }
       mode = next;
       applyModeChrome();
       if (mode !== 'import' && openState) focusCommand();
@@ -1411,6 +1478,7 @@
         if (!wasOpen) setMode('ask');
       } else {
         askThread.reset();
+        askLane = 'ask';
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
@@ -1459,7 +1527,7 @@
         return;
       }
       reply.hidden = false;
-      reply.textContent = shown;
+      paintReply(shown);
       var allow = !!opts.showClass;
       showClassBtn.hidden = !allow;
       if (!allow) showClassBtn.setAttribute('aria-expanded', 'false');
@@ -1477,6 +1545,21 @@
       place();
       root.requestAnimationFrame(place);
       if (!classSheet) focusCommand();
+    }
+
+    function paintReply(text) {
+      var bits = String(text || '').split('\n');
+      reply.textContent = '';
+      if (bits.length < 2) {
+        reply.textContent = bits[0] || '';
+        return;
+      }
+      bits.forEach(function (bit) {
+        var row = document.createElement('div');
+        row.className = 'plus-reply-line';
+        row.textContent = bit;
+        reply.appendChild(row);
+      });
     }
 
     function ensureClassBoard() {
@@ -1649,10 +1732,14 @@
       var timer = root.setTimeout(function () {
         if (controller) controller.abort();
       }, 25000);
-      // Ask sends the open-strip thread. Command and Import never call
-      // send, and a non-Ask caller still posts the line alone.
-      var prior = mode === 'ask' ? askThread.snapshot() : [];
-      var payload = mode === 'ask' ? api.askRequestBody(text, prior) : { text: text };
+      // Ask sends the open-strip thread. Dict posts gloss and omits
+      // history. Command and Import never call send. A non-Ask caller
+      // still posts the line alone. glossing is fixed for this send.
+      var glossing = mode === 'ask' && askLane === 'dict';
+      var prior = mode === 'ask' && !glossing ? askThread.snapshot() : [];
+      var payload = glossing
+        ? api.glossRequestBody(text)
+        : (mode === 'ask' ? api.askRequestBody(text, prior) : { text: text });
       fetch(workerUrl, {
         method: 'POST',
         mode: 'cors',
@@ -1670,7 +1757,7 @@
         sendBtn.disabled = false;
         if (result.status === 200 && result.body) {
           handlePayload(result.body);
-          if (mode === 'ask') {
+          if (mode === 'ask' && !glossing) {
             var answered = api.readPayload(result.body);
             if (answered.kind !== 'action') askThread.remember(text, api.presentReply(answered));
           }

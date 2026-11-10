@@ -211,6 +211,23 @@
   padding: 0;
 }
 
+/* Dict and Ask, one row inside the Ask panel. Same 26px chip as
+   Ask · Command · Import. Default is the master: Minimalist, Spark,
+   and Arcade do not restyle this strip, so they keep this row. */
+.plus-float .ask-lane-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.2rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.plus-float .ask-lane-row[hidden] {
+  display: none !important;
+}
+
 .plus-float .mode-chip {
   flex: 1 1 0;
   min-width: 0;
@@ -323,6 +340,16 @@
   overscroll-behavior: contain;
   white-space: pre-wrap;
   touch-action: pan-y;
+}
+
+.plus-float .plus-reply-line {
+  display: block;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.plus-float .plus-reply-line + .plus-reply-line {
+  margin-top: 0.28rem;
 }
 
 .plus-float .command-strip .go:focus-visible,
