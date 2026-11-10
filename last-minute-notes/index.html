@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261110b -->
+<!-- cache 20261110c -->
 <!-- First set only: DSE papers + Junior Grammar, in Learning Materials hub order. -->
 <html lang="en-GB">
 <head>
@@ -263,6 +263,13 @@
     box-shadow: var(--shadow);
   }
   .note-body p { margin: 0; }
+  .note-title {
+    margin: 0 0 10px;
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+  }
   .note-lead {
     margin: 0 0 8px;
     font-weight: 800;
@@ -482,26 +489,19 @@
         <h2 class="hub-heading-text">Paper 3 - Listening &amp; Integrated Skills</h2>
         <span class="hub-chevron" aria-hidden="true"></span>
       </summary>
-      <div class="hub-folders">
-        <details class="hub-folder">
-          <summary class="hub-heading">
-            <h3 class="hub-heading-text">Paper 3 - Exam Skills</h3>
-            <span class="hub-chevron" aria-hidden="true"></span>
-          </summary>
-          <div class="note-body">
-            <ul>
-              <li>Paper 3 is 30% of the subject; about 2 hours.</li>
-              <li>Part A is compulsory listening. Part B: choose B1 or B2 — listening plus a Data File, then one extended writing task.</li>
-              <li>B1 is more straightforward (A+B1 caps at Level 4). B2 is more demanding (full range, including Level 5 / 5**). Decide with your teacher before exam day.</li>
-              <li>Part B writing is marked on Content, Language, Organisation, and Appropriacy (register, tone, and format).</li>
-              <li>Before the audio, read the questions and underline keywords. Listen for gist and for detail (names, numbers, times).</li>
-              <li>Take short, readable notes. In Part B, skim the Data File first, then listen with purpose, then write.</li>
-              <li>Use only the Data File and the recording — don’t invent facts. Copy names and places carefully.</li>
-              <li>Cover every required bullet, and leave time to check facts, tone, and copy errors.</li>
-            </ul>
-            <a class="more-detail" href="../learning-materials/paper-3-exam-skills/">More detail →</a>
-          </div>
-        </details>
+      <div class="note-body">
+        <h3 class="note-title">Paper 3 - Exam Skills</h3>
+        <ul>
+          <li>Paper 3 is 30% of the subject; about 2 hours.</li>
+          <li>Part A is compulsory listening. Part B: choose B1 or B2 — listening plus a Data File, then one extended writing task.</li>
+          <li>B1 is more straightforward (A+B1 caps at Level 4). B2 is more demanding (full range, including Level 5 / 5**). Decide with your teacher before exam day.</li>
+          <li>Part B writing is marked on Content, Language, Organisation, and Appropriacy (register, tone, and format).</li>
+          <li>Before the audio, read the questions and underline keywords. Listen for gist and for detail (names, numbers, times).</li>
+          <li>Take short, readable notes. In Part B, skim the Data File first, then listen with purpose, then write.</li>
+          <li>Use only the Data File and the recording — don’t invent facts. Copy names and places carefully.</li>
+          <li>Cover every required bullet, and leave time to check facts, tone, and copy errors.</li>
+        </ul>
+        <a class="more-detail" href="../learning-materials/paper-3-exam-skills/">More detail →</a>
       </div>
     </details>
 
@@ -625,8 +625,8 @@
     syncChip();
   })();
 
-  /* Jump list opens the target section (and any closed parent) so the
-     heading is not the only thing in view. */
+  /* Jump list opens the paper and its first note folder so the points
+     are on screen. A heading tap still leaves the folders as they were. */
   (function () {
     function openTarget(id) {
       if (!id) return;
@@ -639,6 +639,9 @@
         current = current.parentElement;
       }
       for (var i = chain.length - 1; i >= 0; i--) chain[i].open = true;
+      if (!node.classList || !node.classList.contains('hub-section')) return;
+      var folders = node.querySelectorAll('.hub-folders > .hub-folder');
+      if (folders.length) folders[0].open = true;
     }
 
     function idFromHash(hash) {
@@ -653,6 +656,9 @@
         openTarget(idFromHash(this.getAttribute('href')));
       });
     }
+    window.addEventListener('hashchange', function () {
+      openTarget(idFromHash(location.hash));
+    });
     openTarget(idFromHash(location.hash));
   })();
   </script>
