@@ -6,8 +6,9 @@
  * corner). Opening the strip does not move that circle: the Mesh mist
  * panel sits beside it and flips to the side, then up or down, that fits.
  * Under the text box, Ask, Command, and Import share one row.
- * Ask posts the line to this Worker. Command runs the line on the page.
- * Import opens the chart photo flow. The Worker host stays live-class-plus.
+ * Ask posts { text, mode: "ask" } and recent Ask turns in history.
+ * Command runs the line on the page. Import opens the chart photo flow.
+ * Neither of those sends the Ask thread. The Worker host stays live-class-plus.
  * Floor scroll does not move the ball. A drag still settles the ball
  * clear of desk name chips and the floor zoom bar, then remembers that spot.
  * Ask and Gloss stay in the small strip. Show class copies the current
@@ -964,6 +965,82 @@
     };
   }
 
+  // Prior Ask lines sent with the new one. Eight keeps a short thread
+  // (a few questions and replies) without dragging in the whole lesson.
+  // A quiet gap this long starts a fresh Ask. Closing the strip, or
+  // leaving Ask for Command or Import, also drops the thread.
+  var ASK_HISTORY_CAP = 8;
+  var ASK_HISTORY_GAP_MS = 30 * 60 * 1000;
+
+  function turnText(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  // text is the line being sent. history is earlier Ask turns only.
+  // A trailing user turn that repeats text is dropped so the line is
+  // not posted twice. Missing history stays off the body.
+  function askRequestBody(text, history) {
+    var line = turnText(text);
+    var body = { text: line, mode: 'ask' };
+    var turns = [];
+    var list = Array.isArray(history) ? history : [];
+    for (var i = 0; i < list.length; i++) {
+      var turn = list[i];
+      if (!turn) continue;
+      var role = turn.role === 'user' || turn.role === 'assistant' ? turn.role : '';
+      var said = turnText(turn.text);
+      if (!role || !said) continue;
+      turns.push({ role: role, text: said });
+    }
+    if (turns.length && turns[turns.length - 1].role === 'user' && turns[turns.length - 1].text === line) {
+      turns.pop();
+    }
+    if (turns.length > ASK_HISTORY_CAP) turns = turns.slice(turns.length - ASK_HISTORY_CAP);
+    if (turns.length && turns[0].role === 'assistant') turns.shift();
+    if (turns.length) body.history = turns;
+    return body;
+  }
+
+  // clock is optional. Tests pass a function; the page uses Date.now.
+  function createAskThread(clock) {
+    var turns = [];
+    var at = null;
+    function now() {
+      return typeof clock === 'function' ? clock() : Date.now();
+    }
+    function expire(t) {
+      if (at != null && t - at > ASK_HISTORY_GAP_MS) {
+        turns = [];
+        at = null;
+      }
+    }
+    function trim() {
+      if (turns.length > ASK_HISTORY_CAP) turns = turns.slice(turns.length - ASK_HISTORY_CAP);
+      if (turns.length && turns[0].role === 'assistant') turns.shift();
+    }
+    return {
+      reset: function () {
+        turns = [];
+        at = null;
+      },
+      snapshot: function () {
+        expire(now());
+        return turns.slice();
+      },
+      remember: function (userText, assistantText) {
+        var user = turnText(userText);
+        var assistant = turnText(assistantText);
+        if (!user || !assistant) return;
+        var t = now();
+        expire(t);
+        turns.push({ role: 'user', text: user });
+        turns.push({ role: 'assistant', text: assistant });
+        trim();
+        at = t;
+      }
+    };
+  }
+
   // Copy every field, then replace x and y. Groups, scores, and names stay.
   function applySeatMoves(students, moves) {
     var byId = {};
@@ -1012,7 +1089,11 @@
     chooseDeskRows: chooseDeskRows,
     seatingGridFromMarks: seatingGridFromMarks,
     rematchByClassNo: rematchByClassNo,
-    applySeatMoves: applySeatMoves
+    applySeatMoves: applySeatMoves,
+    ASK_HISTORY_CAP: ASK_HISTORY_CAP,
+    ASK_HISTORY_GAP_MS: ASK_HISTORY_GAP_MS,
+    askRequestBody: askRequestBody,
+    createAskThread: createAskThread
   };
   }
 
@@ -1073,6 +1154,7 @@
     commandLine.appendChild(input);
     commandLine.appendChild(sendBtn);
     var mode = 'ask';
+    var askThread = api.createAskThread();
     var modeRow = document.createElement('div');
     modeRow.className = 'mode-row';
     modeRow.setAttribute('role', 'radiogroup');
@@ -1295,6 +1377,7 @@
 
     function setMode(next) {
       if (next !== 'ask' && next !== 'command' && next !== 'import') next = 'ask';
+      if (next !== 'ask') askThread.reset();
       mode = next;
       applyModeChrome();
       if (mode !== 'import' && openState) focusCommand();
@@ -1327,6 +1410,7 @@
         command.hidden = false;
         if (!wasOpen) setMode('ask');
       } else {
+        askThread.reset();
         command.hidden = true;
         reply.hidden = true;
         reply.textContent = '';
@@ -1565,11 +1649,15 @@
       var timer = root.setTimeout(function () {
         if (controller) controller.abort();
       }, 25000);
+      // Ask sends the open-strip thread. Command and Import never call
+      // send, and a non-Ask caller still posts the line alone.
+      var prior = mode === 'ask' ? askThread.snapshot() : [];
+      var payload = mode === 'ask' ? api.askRequestBody(text, prior) : { text: text };
       fetch(workerUrl, {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text }),
+        body: JSON.stringify(payload),
         signal: controller ? controller.signal : undefined
       }).then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (body) {
@@ -1582,6 +1670,10 @@
         sendBtn.disabled = false;
         if (result.status === 200 && result.body) {
           handlePayload(result.body);
+          if (mode === 'ask') {
+            var answered = api.readPayload(result.body);
+            if (answered.kind !== 'action') askThread.remember(text, api.presentReply(answered));
+          }
           return;
         }
         showReply('The assistant is unavailable just now.');
