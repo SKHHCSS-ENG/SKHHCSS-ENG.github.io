@@ -166,7 +166,42 @@
     return { x: Math.round(x), y: Math.round(y), shift: shift };
   }
 
-  function computeLayoutPositions(count, layoutType, frontAtTop, students, groups, customCols, customRows) {
+  // Left edge of column c inside a Paired Desks row.
+  // Even counts are always 2 2 2… . Odd counts default to 2 2 … 1
+  // (singleton on the right). singletonSide 'start' flips that to 1 2 … 2
+  // (singleton on the left). The aisle after a singleton is the same wide
+  // gap used between pairs. A one-column grid has nothing to flip.
+  function pairColumnOffset(col, cols, singletonSide) {
+    const c = Math.max(0, col | 0);
+    const n = Math.max(1, cols | 0);
+    const pitch = 2 * DESK_W + POD_INNER_GAP_X + POD_AISLE_GAP_X;
+    const inner = DESK_W + POD_INNER_GAP_X;
+    const lead = singletonSide === 'start' && (n % 2 === 1);
+    if (lead) {
+      if (c <= 0) return 0;
+      const shifted = c - 1;
+      const pairIdx = Math.floor(shifted / 2);
+      const inPair = shifted % 2;
+      return (DESK_W + POD_AISLE_GAP_X) + pairIdx * pitch + inPair * inner;
+    }
+    const pairIdx = Math.floor(c / 2);
+    const inPair = c % 2;
+    return pairIdx * pitch + inPair * inner;
+  }
+
+  // Next Pairs click when the column count is odd and greater than 1.
+  // onFloor is 'start' or 'end' when the desks already sit on that arrangement.
+  // Anything else (another layout, a dragged board, an even count) stays on
+  // the classic singleton-right arrangement. Even counts ignore the side.
+  function nextPairSingleton(onFloor, cols) {
+    const n = cols | 0;
+    if (n <= 1 || n % 2 === 0) return 'end';
+    if (onFloor === 'start') return 'end';
+    if (onFloor === 'end') return 'start';
+    return 'end';
+  }
+
+  function computeLayoutPositions(count, layoutType, frontAtTop, students, groups, customCols, customRows, pairSingleton) {
     const positions = [];
     const topOffset = frontRowTopOffset(frontAtTop);
     const stepX = DESK_W + EXAM_COL_GAP_X;
@@ -190,12 +225,10 @@
       // Paired Desks applied to (customRows x cols) grid.
       // Tight gap inside each pair; a wider left–right aisle between pairs.
       // Rows stay on the compact ROW_GAP_Y gutter (pairs are not stacked pods).
-      const pairInnerGap = POD_INNER_GAP_X;
-      const pairAisleGap = POD_AISLE_GAP_X;
+      // Odd column counts can put the leftover column on the right (default)
+      // or the left (pairSingleton === 'start').
       function getPairColOffset(c) {
-        const pairIdx = Math.floor(c / 2);
-        const inPair = c % 2;
-        return pairIdx * (2 * DESK_W + pairInnerGap + pairAisleGap) + inPair * (DESK_W + pairInnerGap);
+        return pairColumnOffset(c, cols, pairSingleton);
       }
       const totalGridW = cols > 0 ? (getPairColOffset(cols - 1) + DESK_W) : DESK_W;
       const effStageW = Math.max(STAGE_WIDTH, totalGridW + 64);
@@ -444,11 +477,15 @@
     return Math.max(1, Math.min(12, used));
   }
 
-  // Horizontal slot of column c. Pairs and 4-desk pods share the left–right pitch.
+  // Horizontal slot of column c. Pairs and 4-desk pods share the left–right pitch
+  // when the singleton sits on the right. A left singleton only changes pairs.
   // Exam rows use the even column step. This does not read the window.
-  function columnSlotOffset(col, layoutType) {
+  function columnSlotOffset(col, layoutType, cols, pairSingleton) {
     const c = Math.max(0, col);
-    if (layoutType === 'pairs' || layoutType === 'pods4') {
+    if (layoutType === 'pairs') {
+      return pairColumnOffset(c, cols == null ? c + 1 : cols, pairSingleton);
+    }
+    if (layoutType === 'pods4') {
       const podCol = Math.floor(c / 2);
       const inPod = c % 2;
       return podCol * (2 * DESK_W + POD_INNER_GAP_X + POD_AISLE_GAP_X) + inPod * (DESK_W + POD_INNER_GAP_X);
@@ -476,7 +513,7 @@
         return { cols: cols, width: width, center: minX + width / 2 };
       }
     }
-    const width = columnSlotOffset(cols - 1, style) + DESK_W;
+    const width = columnSlotOffset(cols - 1, style, cols, cls && cls.pairSingleton) + DESK_W;
     const effStageW = Math.max(STAGE_WIDTH, width + 64);
     const origin = Math.max(28, Math.round((effStageW - width) / 2));
     return { cols: cols, width: width, center: origin + width / 2 };
@@ -614,6 +651,8 @@
     frontRowTopOffset: frontRowTopOffset,
     planBackRowDesk: planBackRowDesk,
     computeLayoutPositions: computeLayoutPositions,
+    pairColumnOffset: pairColumnOffset,
+    nextPairSingleton: nextPairSingleton,
     ensureNoOverlaps: ensureNoOverlaps,
     ensureNoOverlapsProtecting: ensureNoOverlapsProtecting,
     clampZoom: clampZoom,

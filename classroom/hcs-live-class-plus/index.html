@@ -3289,7 +3289,7 @@
         </div>
 
         <button type="button" data-layout="rows" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Space the grid into separate exam desks" aria-label="Exam Rows">Exam</button>
-        <button type="button" data-layout="pairs" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns, with a wider aisle between pairs" aria-label="Paired Desks">Pairs</button>
+        <button type="button" data-layout="pairs" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Pair adjacent columns, with a wider aisle between pairs. An odd column count toggles the single column between the right and the left." aria-label="Paired Desks">Pairs</button>
         <button type="button" data-layout="pods4" class="layout-preset-btn px-3 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold text-slate-700 transition" title="Group desks into 2×2 pods, with a wider aisle between pods" aria-label="4-Desk Pods">4-Desk</button>
         <button type="button" data-layout="groupClusters" class="layout-preset-btn px-3 py-1 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 text-xs font-bold transition" title="Gather each group into a cluster, with a wider aisle between clusters" aria-label="Cluster by Groups">Groups</button>
 
@@ -3820,7 +3820,7 @@
   <script src="spark-fire.js"></script>
   <script src="skins/loader.js" data-hcs-skin="packs"></script>
   <script src="https://accounts.google.com/gsi/client" async></script>
-  <script src="studio-core.js"></script>
+  <script src="studio-core.js?v=20261109c"></script>
   <script>
     (function () {
       'use strict';
@@ -3842,6 +3842,7 @@
       const getSpatiallyOrderedStudents = Core.getSpatiallyOrderedStudents;
       const planBackRowDesk = Core.planBackRowDesk;
       const computeLayoutPositions = Core.computeLayoutPositions;
+      const nextPairSingleton = Core.nextPairSingleton;
       const ensureNoOverlaps = Core.ensureNoOverlaps;
       const ensureNoOverlapsProtecting = Core.ensureNoOverlapsProtecting;
       const clampZoom = Core.clampZoom;
@@ -5076,7 +5077,8 @@
           }),
           layoutStyle: cls.layoutStyle || '',
           gridRows: cls.gridRows,
-          gridCols: cls.gridCols
+          gridCols: cls.gridCols,
+          pairSingleton: cls.pairSingleton === 'start' ? 'start' : 'end'
         };
       }
 
@@ -5148,6 +5150,11 @@
         }
         if (fromSnap.gridRows !== toSnap.gridRows && toSnap.gridRows != null) cls.gridRows = toSnap.gridRows;
         if (fromSnap.gridCols !== toSnap.gridCols && toSnap.gridCols != null) cls.gridCols = toSnap.gridCols;
+        if (Object.prototype.hasOwnProperty.call(fromSnap, 'pairSingleton') || Object.prototype.hasOwnProperty.call(toSnap, 'pairSingleton')) {
+          if ((fromSnap.pairSingleton || 'end') !== (toSnap.pairSingleton || 'end')) {
+            cls.pairSingleton = toSnap.pairSingleton === 'start' ? 'start' : 'end';
+          }
+        }
 
         var fromStudents = indexById(fromSnap.students);
         var toStudents = indexById(toSnap.students);
@@ -5208,7 +5215,8 @@
         const cols = cls.gridCols || 6;
         const rows = cls.gridRows || Math.max(1, Math.ceil(ordered.length / cols));
         const style = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
-        const coords = computeLayoutPositions(ordered.length, style, !!cls.frontAtTop, ordered, cls.groups, cols, rows);
+        const pairSide = style === 'pairs' && cls.pairSingleton === 'start' ? 'start' : 'end';
+        const coords = computeLayoutPositions(ordered.length, style, !!cls.frontAtTop, ordered, cls.groups, cols, rows, style === 'pairs' ? pairSide : undefined);
         return ordered.map(function (st, i) {
           const c = coords[i] || { x: st.x, y: st.y };
           return { id: st.id, x: c.x, y: c.y };
@@ -5405,6 +5413,7 @@
           if ((Number(sa.score) || 0) !== (Number(sb.score) || 0)) return false;
         }
         if ((a.layoutStyle || '') !== (b.layoutStyle || '')) return false;
+        if ((a.pairSingleton || 'end') !== (b.pairSingleton || 'end')) return false;
         if (a.gridRows !== b.gridRows || a.gridCols !== b.gridCols) return false;
         return true;
       }
@@ -6002,7 +6011,9 @@
       }
 
       // True when the live desks are still the arrangement that preset would draw.
-      function layoutMatchesStyle(cls, style) {
+      // pairSingleton ('start' | 'end') is only read for Paired Desks. Omit it
+      // to use the side stored on the class. 'end' is the singleton on the right.
+      function layoutMatchesStyle(cls, style, pairSingleton) {
         if (!cls || !style || !cls.students || !cls.students.length) return false;
         const students = cls.students.map(function (st) {
           return {
@@ -6015,6 +6026,9 @@
         });
         const cols = cls.gridCols || (students.length > 30 ? 7 : 6);
         const rows = cls.gridRows || Math.max(1, Math.ceil(students.length / cols));
+        const pairSide = (pairSingleton === 'start' || pairSingleton === 'end')
+          ? pairSingleton
+          : (cls.pairSingleton === 'start' ? 'start' : 'end');
         if (style === 'groupClusters') {
           const coords = computeLayoutPositions(students.length, 'groupClusters', cls.frontAtTop, students, cls.groups, cols, rows);
           students.forEach(function (st, idx) {
@@ -6025,7 +6039,7 @@
           });
         } else {
           const spatiallyOrdered = getSpatiallyOrderedStudents(students);
-          const coords = computeLayoutPositions(spatiallyOrdered.length, style, cls.frontAtTop, spatiallyOrdered, cls.groups, cols, rows);
+          const coords = computeLayoutPositions(spatiallyOrdered.length, style, cls.frontAtTop, spatiallyOrdered, cls.groups, cols, rows, style === 'pairs' ? pairSide : undefined);
           spatiallyOrdered.forEach(function (st, idx) {
             if (coords[idx]) {
               st.x = coords[idx].x;
@@ -6041,6 +6055,54 @@
           if (!st || st.x !== students[i].x || st.y !== students[i].y) return false;
         }
         return true;
+      }
+
+      // Which odd-column Pairs arrangement is on the floor.
+      // '' when the count is even, the grid is a single column, or the desks
+      // are not sitting on either pairs preset.
+      function floorPairSingleton(cls) {
+        if (!cls || !cls.students || !cls.students.length) return '';
+        const cols = cls.gridCols || (cls.students.length > 30 ? 7 : 6);
+        if (!(cols > 1) || cols % 2 === 0) return '';
+        const onStart = layoutMatchesStyle(cls, 'pairs', 'start');
+        const onEnd = layoutMatchesStyle(cls, 'pairs', 'end');
+        // A single occupied column can sit on both drawings. That is not a toggle.
+        if (onStart === onEnd) return '';
+        if (onStart) return 'start';
+        if (onEnd) return 'end';
+        return '';
+      }
+
+      // Pairs click. Odd counts greater than 1 flip the singleton end.
+      // Even counts, and a first click from any other layout, stay on the right.
+      function choosePairSingleton(cls, cols) {
+        return nextPairSingleton(floorPairSingleton(cls), cols);
+      }
+
+      function syncPairsChip(btn, cls, activeStyle, pairChipSide) {
+        if (!btn) return;
+        const cols = cls ? (cls.gridCols || ((cls.students && cls.students.length > 30) ? 7 : 6)) : 6;
+        const odd = cols > 1 && cols % 2 === 1;
+        const side = (activeStyle === 'pairs' && pairChipSide) ? pairChipSide : '';
+        let label = 'Pairs';
+        let title = 'Pair adjacent columns, with a wider aisle between pairs';
+        let aria = 'Paired Desks';
+        if (side === 'start') {
+          label = '\u2039 Pairs';
+          title = 'Single column on the left. Click Pairs to move it to the right.';
+          aria = 'Paired Desks, single column on the left';
+        } else if (side === 'end') {
+          label = 'Pairs \u203a';
+          title = 'Single column on the right. Click Pairs to move it to the left.';
+          aria = 'Paired Desks, single column on the right';
+        } else if (odd) {
+          title = 'Pair adjacent columns. An odd count puts the single column on the right; click again to move it left.';
+        }
+        btn.textContent = label;
+        btn.title = title;
+        btn.setAttribute('aria-label', aria);
+        if (side) btn.setAttribute('data-pair-side', side);
+        else btn.removeAttribute('data-pair-side');
       }
 
       function renderHeaderControls() {
@@ -6089,6 +6151,12 @@
 
         // Highlight the preset only when the desks still sit on that preset.
         // Undo can restore an older arrangement; the chip must follow it.
+        // Odd-column Pairs also names which end holds the single column.
+        let pairChipSide = '';
+        if (cls) {
+          pairChipSide = floorPairSingleton(cls);
+          if (pairChipSide) cls.pairSingleton = pairChipSide;
+        }
         const activeStyle = (cls && cls.layoutStyle && layoutMatchesStyle(cls, cls.layoutStyle)) ? cls.layoutStyle : '';
         document.querySelectorAll('.layout-preset-btn').forEach(function (btn) {
           const lt = btn.getAttribute('data-layout');
@@ -6103,6 +6171,7 @@
                 ? 'bg-indigo-600 text-white shadow-xs font-bold'
                 : 'bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700');
           }
+          if (lt === 'pairs') syncPairsChip(btn, cls, activeStyle, pairChipSide);
         });
 
         // Sound button
@@ -7560,6 +7629,11 @@
         if (!cls || !boardEditsAllowed()) return;
         const before = snapshotBoardEdit(cls);
         const grid = syncGridInputsToClass(cls);
+        var pairSide = cls.pairSingleton === 'start' ? 'start' : 'end';
+        if (layoutType === 'pairs' && grid.cols > 1 && grid.cols % 2 === 1) {
+          pairSide = choosePairSingleton(cls, grid.cols);
+          cls.pairSingleton = pairSide;
+        }
         cls.layoutStyle = layoutType;
 
         if (layoutType === 'groupClusters') {
@@ -7573,7 +7647,8 @@
         } else {
           // Preserve the current spatial order of desks on the floor plan while transforming into Exam Rows, Paired Desks, or 4-Desk Pods
           const spatiallyOrdered = getSpatiallyOrderedStudents(cls.students);
-          const coords = computeLayoutPositions(spatiallyOrdered.length, layoutType, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows);
+          const pairArg = layoutType === 'pairs' ? pairSide : undefined;
+          const coords = computeLayoutPositions(spatiallyOrdered.length, layoutType, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows, pairArg);
           spatiallyOrdered.forEach(function (st, idx) {
             if (coords[idx]) {
               st.x = coords[idx].x;
@@ -7585,9 +7660,13 @@
         ensureNoOverlaps(cls.students);
         const actualRowsUsed = Math.max(1, Math.ceil(cls.students.length / grid.cols));
         const gridDesc = actualRowsUsed + '×' + grid.cols + ' grid';
+        var pairsLabel = 'Paired Desks (' + gridDesc + ')';
+        if (layoutType === 'pairs' && grid.cols > 1 && grid.cols % 2 === 1) {
+          pairsLabel += pairSide === 'start' ? ' — single on the left' : ' — single on the right';
+        }
         const labelMap = {
           rows: 'Exam Rows (' + gridDesc + ')',
-          pairs: 'Paired Desks (' + gridDesc + ')',
+          pairs: pairsLabel,
           pods4: '4-Desk Pods (' + gridDesc + ')',
           groupClusters: 'Group Clusters'
         };
@@ -7606,9 +7685,10 @@
         const grid = syncGridInputsToClass(cls);
         const activeStyle = (cls.layoutStyle && cls.layoutStyle !== 'groupClusters') ? cls.layoutStyle : 'rows';
         cls.layoutStyle = activeStyle;
+        const pairSide = activeStyle === 'pairs' && cls.pairSingleton === 'start' ? 'start' : 'end';
 
         const spatiallyOrdered = getSpatiallyOrderedStudents(cls.students);
-        const coords = computeLayoutPositions(spatiallyOrdered.length, activeStyle, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows);
+        const coords = computeLayoutPositions(spatiallyOrdered.length, activeStyle, cls.frontAtTop, spatiallyOrdered, cls.groups, grid.cols, grid.rows, activeStyle === 'pairs' ? pairSide : undefined);
         spatiallyOrdered.forEach(function (st, idx) {
           if (coords[idx]) {
             st.x = coords[idx].x;
