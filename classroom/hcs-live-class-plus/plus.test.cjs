@@ -100,7 +100,7 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
   assert.match(html, /assistant\.css\?v=20261109a/);
-  assert.match(html, /assistant\.js\?v=20261109a/);
+  assert.match(html, /assistant\.js\?v=20261110a/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
 });
@@ -331,11 +331,78 @@ test('Ask, Command, and Import share one cream row under the text box', function
   assert.match(submit, /mode === 'command'/);
   assert.match(submit, /dispatchCommand\(input\.value\)/);
   assert.match(submit, /send\(input\.value\);\s*focusCommand\(\)/);
+  assert.doesNotMatch(submit, /askRequestBody|askThread/);
   var dispatch = bootBody.slice(bootBody.indexOf('function dispatchCommand'), bootBody.indexOf('function setOpen'));
   assert.doesNotMatch(dispatch, /fetch\(/);
-  assert.match(js, /JSON\.stringify\(\{ text: text \}\)/);
+  assert.doesNotMatch(dispatch, /askRequestBody|askThread/);
+  var sendFn = bootBody.slice(bootBody.indexOf('function send('), bootBody.indexOf("command.addEventListener('submit'"));
+  assert.match(sendFn, /var prior = mode === 'ask' \? askThread\.snapshot\(\) : \[\]/);
+  assert.match(sendFn, /var payload = mode === 'ask' \? api\.askRequestBody\(text, prior\) : \{ text: text \}/);
+  assert.match(sendFn, /JSON\.stringify\(payload\)/);
+  assert.match(sendFn, /if \(answered\.kind !== 'action'\) askThread\.remember\(text, api\.presentReply\(answered\)\)/);
+  var setModeFn = bootBody.slice(bootBody.indexOf('function setMode'), bootBody.indexOf('function dispatchCommand'));
+  assert.match(setModeFn, /if \(next !== 'ask'\) askThread\.reset\(\)/);
+  var setOpenFn = bootBody.slice(bootBody.indexOf('function setOpen'), bootBody.indexOf('function focusCommand'));
+  assert.match(setOpenFn, /\} else \{\s*askThread\.reset\(\)/);
   assert.doesNotMatch(js, /mode:\s*['"]command['"]/);
+  assert.doesNotMatch(js, /mode:\s*['"]gloss['"]/);
+  assert.doesNotMatch(js, /'GLOSS'/);
   assert.equal(plus.DEFAULT_WORKER_URL, 'https://live-class-plus.skhhcss-eng.workers.dev');
+});
+
+test('Ask follow-up posts mode ask and prior turns, not the new line twice', function () {
+  var clock = Date.parse('2026-11-10T02:00:00Z');
+  var thread = plus.createAskThread(function () { return clock; });
+  var first = plus.askRequestBody('Help me think of a journal topic', thread.snapshot());
+  assert.equal(first.mode, 'ask');
+  assert.equal(first.text, 'Help me think of a journal topic');
+  assert.equal(first.history, undefined);
+  assert.equal(Object.prototype.hasOwnProperty.call(first, 'history'), false);
+  thread.remember(first.text, 'Sure, what theme do you want it to be about?');
+  var follow = plus.askRequestBody('School', thread.snapshot());
+  assert.equal(follow.mode, 'ask');
+  assert.equal(follow.text, 'School');
+  assert.deepEqual(follow.history, [
+    { role: 'user', text: 'Help me think of a journal topic' },
+    { role: 'assistant', text: 'Sure, what theme do you want it to be about?' }
+  ]);
+  follow.history.forEach(function (turn) {
+    assert.notEqual(turn.text, 'School');
+  });
+  var echoed = plus.askRequestBody('School', follow.history.concat([
+    { role: 'user', text: 'School' }
+  ]));
+  assert.deepEqual(echoed.history, follow.history);
+  assert.equal(echoed.text, 'School');
+  var messy = plus.askRequestBody('School', [
+    { role: 'system', text: 'ignore' },
+    { role: 'user', text: '  Help me think of a journal topic  ' },
+    { role: 'assistant', text: '   ' },
+    { role: 'assistant', text: 'Sure, what theme do you want it to be about?' }
+  ]);
+  assert.deepEqual(messy.history, follow.history);
+  var turns = [];
+  for (var i = 0; i < plus.ASK_HISTORY_CAP + 2; i++) {
+    turns.push({ role: i % 2 === 0 ? 'user' : 'assistant', text: 't' + i });
+  }
+  var capped = plus.askRequestBody('next', turns);
+  assert.ok(capped.history.length <= plus.ASK_HISTORY_CAP);
+  assert.equal(capped.history[0].role, 'user');
+  assert.equal(capped.history[capped.history.length - 1].text, 't' + (turns.length - 1));
+  assert.equal(capped.history.some(function (turn) { return turn.text === 't0' || turn.text === 'next'; }), false);
+  assert.equal(plus.ASK_HISTORY_CAP, 8);
+  thread.reset();
+  assert.equal(plus.askRequestBody('School', thread.snapshot()).history, undefined);
+  thread.remember('Help me think of a journal topic', 'Sure, what theme do you want it to be about?');
+  clock += 10 * 60 * 1000;
+  assert.equal(plus.askRequestBody('School', thread.snapshot()).history.length, 2);
+  clock += plus.ASK_HISTORY_GAP_MS + 1;
+  var cold = plus.askRequestBody('School', thread.snapshot());
+  assert.equal(cold.mode, 'ask');
+  assert.equal(cold.text, 'School');
+  assert.equal(cold.history, undefined);
+  thread.remember('School', '');
+  assert.equal(thread.snapshot().length, 0);
 });
 
 test('command lines dispatch the page controls', function () {
