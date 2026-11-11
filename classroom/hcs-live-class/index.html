@@ -1743,34 +1743,29 @@
         justify-self: center;
       }
     }
-    /* Mast: arrow-only Back on the left, Bright mark beside it (left of
-       Individual Work, not the centre and not the timer). The words live
-       in the link's aria-label ("Back to Classroom"). The control is a
-       44×44 tap. On the single row the arrow sits on the trailing edge
-       of that square so the mark can come up beside it without covering
-       the target. Column-gap is one studio step (8px), down from 16px —
-       that is the gap after Back, not a margin pull. The wordmark was
-       Muse's fs44 lock. Howard asked for more air, so the desk mark is
-       36px. The SVG asset stays. Below 861px the old clamp
+    /* Mast lives in the header row, before Class. Arrow-only Back on
+       the left, Bright mark beside it. The words live in the link's
+       aria-label ("Back to Classroom"). The control is a 44×44 tap.
+       The arrow sits on the trailing edge of that square so the mark
+       can sit beside it without covering the target. Column-gap is one
+       studio step (8px) — the gap after Back, not a margin pull. The
+       wordmark was Muse's fs44 lock. Howard asked for more air, so the
+       desk mark is 36px. The SVG asset stays. Below 861px the old clamp
        (16px / 5.6vw / 24px × 1.1) is scaled by 36/44, which is ×0.9.
-       Padding is another 4px on the top and 4px on the bottom from the
-       60px mast: desk 16px / 8px, stacked 16px / 16px. The 44px Back row
-       plus that pad is still the desk height, so the shorter mark sits
-       in the same bar. Back target stays 44×44. The gap after that
-       target is 8px. Remeasured: #studioMast stays 68px at 1280 and
-       1920, mark 36px. At 390 the mark is 19.66px and the mast is 70px
-       (was 74.41px with the 24px mark). */
+       The mast has no band of its own and no padding: the header bar
+       owns the inset, so this pair does not add a second row. On a
+       narrow window Class and Individual / Group wrap under the pair
+       instead of squeezing it. Back target stays 44×44. */
     .studio-mast {
       display: flex;
       align-items: center;
       justify-content: flex-start;
+      flex: 0 0 auto;
       column-gap: var(--studio-space);
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: calc(var(--studio-space) + 8px) var(--studio-inset) 8px;
-    }
-    @media (min-width: 640px) {
-      .studio-mast { padding: calc(var(--studio-space) + 8px) var(--studio-inset) 8px; }
+      max-width: 100%;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
     }
     .studio-back {
       display: inline-flex;
@@ -1790,8 +1785,7 @@
       min-width: 0;
       max-width: 100%;
     }
-    /* Shrink-wraps to the mark. Sits above the Back link's 44px tap
-       padding, which hangs into this row on small screens. */
+    /* Shrink-wraps to the mark. */
     .studio-title {
       position: relative;
       z-index: 2;
@@ -1807,37 +1801,13 @@
     .studio-mark img {
       display: block;
       width: auto;
-      /* Same stacked-mast clamp, scaled with the desk mark (44px → 36px). */
+      /* Same clamp as the old stacked mast, scaled with the desk mark (44px → 36px). */
       height: calc(clamp(16px, 5.6vw, var(--studio-type-title)) * 1.1 * 36 / 44);
     }
     @media (min-width: 861px) {
       .studio-mark img {
         height: 36px;
       }
-    }
-    @media (max-width: 860px) {
-      .studio-mast {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        row-gap: 0.15rem;
-        padding-bottom: calc(var(--studio-space) + 8px);
-      }
-      .studio-back {
-        align-self: flex-start;
-        justify-content: flex-start;
-        position: relative;
-        z-index: 1;
-        /* text-xs line is 16px. The rest of the 44px target hangs into
-           the mast padding and the row beneath, then negative margins
-           cancel that so the brand stays on the left without growing
-           the bar. The arrow lines up with the mark's left edge. */
-        padding-top: 8px;
-        padding-bottom: 20px;
-        margin-top: -8px;
-        margin-bottom: -20px;
-      }
-      .studio-brand { align-self: flex-start; width: auto; }
     }
     /* Toolbar band names. 12px / 700, the same step as the chips.
        All caps, no colon. Weight and tracking stay put so the heads do not shout. */
@@ -2262,19 +2232,23 @@
     }
     /* Column rhythm. These beat the Tailwind spacing utilities on the
        header, toolbar, and board frame. Behaviour and labels stay put. */
-    /* Two tracks. The main track wraps: class and mode stay on the first
-       line, and when Timer through Tools no longer fit beside them they
-       drop to a second line, left-aligned. Fullscreen and the collapse
-       arrow are the second track, so they stay top-right at every width.
-       The 8px column-gap is the same step that sat between Tools and
-       Fullscreen. Wide screens still read as one row: the class cluster's
-       right auto margin pushes the utility chips against the pin. */
+    /* Two tracks. The main track wraps: Back, the wordmark, class, and
+       mode share the first line while they fit. When class and mode no
+       longer fit beside the mark they drop to the next line, and when
+       Timer through Tools no longer fit they drop under that,
+       left-aligned. Fullscreen and the collapse arrow are the second
+       track, so they stay top-right at every width and never cover the
+       main track. The 8px column-gap is the same step that sat between
+       Tools and Fullscreen. Wide screens still read as one row: the
+       class cluster's right auto margin pushes the utility chips against
+       the pin. Top padding is one studio step so the 36px mark is not
+       flush with the viewport; collapse clears it. */
     #studioHeader .studio-header-bar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: start;
       justify-content: start;
-      padding: 0 var(--studio-inset) var(--studio-space);
+      padding: var(--studio-space) var(--studio-inset);
       column-gap: var(--studio-space);
       row-gap: var(--studio-space);
     }
@@ -3066,19 +3040,19 @@
 
   <!-- TOP NAVIGATION & ACTIVITY BAR -->
   <header id="studioHeader" class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
-    <div id="studioMast" class="studio-mast">
-      <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" aria-label="Back to Classroom">←</a>
-      <div class="studio-brand">
-        <div class="studio-title">
-          <h1 class="studio-mark">
-            <img class="studio-mark-default" src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
-            <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101b" alt="HCS Live Class" width="380" height="86">
-          </h1>
-        </div>
-      </div>
-    </div>
     <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1">
       <div class="studio-header-main">
+      <div id="studioMast" class="studio-mast">
+        <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" aria-label="Back to Classroom">←</a>
+        <div class="studio-brand">
+          <div class="studio-title">
+            <h1 class="studio-mark">
+              <img class="studio-mark-default" src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
+              <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101b" alt="HCS Live Class" width="380" height="86">
+            </h1>
+          </div>
+        </div>
+      </div>
 
       <!-- Center Controls: Class Preset Selector + Mode Switcher -->
       <div id="studioHeaderCluster" class="flex flex-wrap items-center gap-2 sm:gap-3">
