@@ -5,11 +5,11 @@
    pill box stays in learning-materials/explain.css).
    Find and Dict, when selected, stay solid #2a8fad with white text.
    Idle Find, Dict, and Ask share the pale chip.
-   Blue → violet → magenta → orange → yellow, one 10s loop.
+   Teal, one 10s loop.
    ASK, EXPLAIN, and SEND share the site stack, weight 800, and 0.04em
-   tracking. Ink is soft off-white #f4f0e8. Warm stops are deep enough that
-   this ink stays about 4.7:1 or better on every sRGB blend (lightest stop
-   #7c6906). The wash does not use Competition purple #6b2a80.
+   tracking. Ink is soft off-white #f4f0e8. Stops are deep enough that
+   this ink stays about 5:1 or better on every sRGB blend (lightest stop
+   #1a6f8c). The wash does not use Competition purple #6b2a80.
    Tools dock CSS is untouched.
    ask.js clamps the circle, stores the last spot, and snaps clear of the
    dock, an open Cohesion sheet, and Explain pills. */
@@ -19,11 +19,11 @@
   --api-mesh-ink: #f4f0e8;
   --api-mesh-image: linear-gradient(
     122deg,
-    #1458d6 0%,
-    #3a3ad0 24%,
-    #c42670 50%,
-    #be3a16 76%,
-    #7c6906 100%
+    #1a6f8c 0%,
+    #0e6b7a 24%,
+    #0c5a70 50%,
+    #0a4f63 76%,
+    #186887 100%
   );
 }
 
@@ -37,7 +37,7 @@
 .explain-btn.api-mesh:not(:disabled)::before,
 .ask-send.api-mesh::before,
 .ask-mode-btn.is-on.is-ask {
-  background-color: #1458d6;
+  background-color: #0c5a70;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
   background-size: 300% 300%;

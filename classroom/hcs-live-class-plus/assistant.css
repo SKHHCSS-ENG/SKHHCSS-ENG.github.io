@@ -1,9 +1,9 @@
 /* HCS Live Class + assistant. Cache stamp: 20261110e.
    The ball uses the shared Eng api-mesh wash
-   (blue → violet → magenta → orange → yellow, 10s). Tokens are copied
+   (teal, 122°, 10s). Tokens are copied
    here so this page does not load ask.css. The open strip and reply use
-   Mesh mist (#ebeff8 fill, #123a4d ink), a soft wash of the ball's
-   #1458d6 stop — not the full mesh. Import chart chrome stays cream.
+   Mesh mist (#ebeff8 fill, #123a4d ink), a soft wash of solid #1458d6
+   — not the full mesh. Import chart chrome stays cream.
    The unit is only the 44px ball, so opening the strip does not move
    the circle. The panel flips to the side with room, then up or down
    to stay on screen. Floor scroll does not move the ball. A drag can
@@ -17,11 +17,11 @@
   --api-mesh-ink: #f4f0e8;
   --api-mesh-image: linear-gradient(
     122deg,
-    #1458d6 0%,
-    #3a3ad0 24%,
-    #c42670 50%,
-    #be3a16 76%,
-    #7c6906 100%
+    #1a6f8c 0%,
+    #0e6b7a 24%,
+    #0c5a70 50%,
+    #0a4f63 76%,
+    #186887 100%
   );
   --ball-size: 44px;
   --strip-max: 220px;
@@ -92,7 +92,7 @@
   flex: 0 0 auto;
   padding: 0;
   color: var(--api-mesh-ink);
-  background-color: #1458d6;
+  background-color: #0c5a70;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
   background-size: 300% 300%;
@@ -202,7 +202,7 @@
 
 /* One row under the text box: Ask, Dict, Command, Import.
    Four 26px chips, no wrap, inside the 220px strip on a phone.
-   Idle and hover use the ball's mesh blue (#1458d6). The selected chip
+   Idle and hover stay solid #1458d6. The selected chip
    paints the same api-mesh wash as the ball, with --api-mesh-ink.
    Default is the master. Minimalist, Spark, and Arcade do not restyle
    this strip, so they keep this row. */
@@ -251,7 +251,7 @@
 }
 
 .plus-float .mode-chip.is-selected {
-  background-color: #1458d6;
+  background-color: #0c5a70;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
   background-size: 300% 300%;
