@@ -78,7 +78,7 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
     'Ready to tidy the desks.'
   );
   assert.match(css, /--api-mesh-ink:\s*#f4f0e8/);
-  assert.match(css, /--api-mesh-image:\s*linear-gradient\(\s*122deg,\s*#1458d6 0%,\s*#3a3ad0 24%,\s*#c42670 50%,\s*#be3a16 76%,\s*#7c6906 100%\s*\)/);
+  assert.match(css, /--api-mesh-image:\s*linear-gradient\(\s*122deg,\s*#1a6f8c 0%,\s*#0e6b7a 24%,\s*#0c5a70 50%,\s*#0a4f63 76%,\s*#186887 100%\s*\)/);
   assert.match(css, /@keyframes api-mesh-wash\s*\{[\s\S]*?0% 40%[\s\S]*?100% 60%[\s\S]*?0% 40%/);
   assert.match(css, /\.plus-float \.home-ball\s*\{[^}]*background-image:\s*var\(--api-mesh-image\)[^}]*animation:\s*api-mesh-wash 10s ease-in-out infinite/);
   assert.match(css, /prefers-reduced-motion:\s*reduce[\s\S]*\.plus-float \.home-ball\s*\{[^}]*animation:\s*none !important[^}]*background-size:\s*100% 100%[^}]*background-position:\s*0% 50%/);
@@ -99,7 +99,7 @@ test('Muse ball is an unmarked 44px api-mesh button; the strip is mesh mist', fu
   assert.doesNotMatch(html, /plus-badge/);
   assert.doesNotMatch(html, />\s*Live Class \+\s*</);
   assert.match(html, /Live Class \+/);
-  assert.match(html, /assistant\.css\?v=20261110e/);
+  assert.match(html, /assistant\.css\?v=20261111c/);
   assert.match(html, /assistant\.js\?v=20261110e/);
   assert.doesNotMatch(html, /— go\?/);
   assert.doesNotMatch(css, /\.home-ball[^}]*content:\s*["'][^"']+/);
@@ -317,7 +317,7 @@ test('Ask, Dict, Command, and Import share one row under the text box', function
   assert.match(js, /var cap = 220/);
   assert.match(js, /var BALL = 44/);
   assert.doesNotMatch(css, /\.mode-chip\s*\{[^}]*min-height:\s*44px/);
-  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background-color:\s*#1458d6/);
+  assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background-color:\s*#0c5a70/);
   assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*background-image:\s*var\(--api-mesh-image\)/);
   assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*color:\s*var\(--api-mesh-ink\)/);
   assert.match(css, /\.plus-float \.mode-chip\.is-selected\s*\{[^}]*animation:\s*api-mesh-wash 10s ease-in-out infinite/);
@@ -796,7 +796,7 @@ test('Show class copies an Ask or Gloss reply onto a centre board', function () 
 test('Dict word card is five lines in order', function () {
   assert.match(js, /Cache stamp: 20261110e/);
   assert.match(css, /Cache stamp: 20261110e/);
-  assert.match(html, /assistant\.css\?v=20261110e/);
+  assert.match(html, /assistant\.css\?v=20261111c/);
   assert.match(html, /assistant\.js\?v=20261110e/);
 
   var structured = plus.glossCard({
