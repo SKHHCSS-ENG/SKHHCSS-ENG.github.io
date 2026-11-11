@@ -1743,34 +1743,29 @@
         justify-self: center;
       }
     }
-    /* Mast: arrow-only Back on the left, Bright mark beside it (left of
-       Individual Work, not the centre and not the timer). The words live
-       in the link's aria-label ("Back to Classroom"). The control is a
-       44×44 tap. On the single row the arrow sits on the trailing edge
-       of that square so the mark can come up beside it without covering
-       the target. Column-gap is one studio step (8px), down from 16px —
-       that is the gap after Back, not a margin pull. The wordmark was
-       Muse's fs44 lock. Howard asked for more air, so the desk mark is
-       36px. The SVG asset stays. Below 861px the old clamp
+    /* Mast lives in the header row, before Class. Arrow-only Back on
+       the left, Bright mark beside it. The words live in the link's
+       aria-label ("Back to Classroom"). The control is a 44×44 tap.
+       The arrow sits on the trailing edge of that square so the mark
+       can sit beside it without covering the target. Column-gap is one
+       studio step (8px) — the gap after Back, not a margin pull. The
+       wordmark was Muse's fs44 lock. Howard asked for more air, so the
+       desk mark is 36px. The SVG asset stays. Below 861px the old clamp
        (16px / 5.6vw / 24px × 1.1) is scaled by 36/44, which is ×0.9.
-       Padding is another 4px on the top and 4px on the bottom from the
-       60px mast: desk 16px / 8px, stacked 16px / 16px. The 44px Back row
-       plus that pad is still the desk height, so the shorter mark sits
-       in the same bar. Back target stays 44×44. The gap after that
-       target is 8px. Remeasured: #studioMast stays 68px at 1280 and
-       1920, mark 36px. At 390 the mark is 19.66px and the mast is 70px
-       (was 74.41px with the 24px mark). */
+       The mast has no band of its own and no padding: the header bar
+       owns the inset. Back stays 44×44. The chips beside it may scale
+       down to 90% to stay on this line, then wrap. They do not scale
+       past that. */
     .studio-mast {
       display: flex;
       align-items: center;
       justify-content: flex-start;
+      flex: 0 0 auto;
       column-gap: var(--studio-space);
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: calc(var(--studio-space) + 8px) var(--studio-inset) 8px;
-    }
-    @media (min-width: 640px) {
-      .studio-mast { padding: calc(var(--studio-space) + 8px) var(--studio-inset) 8px; }
+      max-width: 100%;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
     }
     .studio-back {
       display: inline-flex;
@@ -1790,8 +1785,7 @@
       min-width: 0;
       max-width: 100%;
     }
-    /* Shrink-wraps to the mark. Sits above the Back link's 44px tap
-       padding, which hangs into this row on small screens. */
+    /* Shrink-wraps to the mark. */
     .studio-title {
       position: relative;
       z-index: 2;
@@ -1807,37 +1801,13 @@
     .studio-mark img {
       display: block;
       width: auto;
-      /* Same stacked-mast clamp, scaled with the desk mark (44px → 36px). */
+      /* Same clamp as the old stacked mast, scaled with the desk mark (44px → 36px). */
       height: calc(clamp(16px, 5.6vw, var(--studio-type-title)) * 1.1 * 36 / 44);
     }
     @media (min-width: 861px) {
       .studio-mark img {
         height: 36px;
       }
-    }
-    @media (max-width: 860px) {
-      .studio-mast {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        row-gap: 0.15rem;
-        padding-bottom: calc(var(--studio-space) + 8px);
-      }
-      .studio-back {
-        align-self: flex-start;
-        justify-content: flex-start;
-        position: relative;
-        z-index: 1;
-        /* text-xs line is 16px. The rest of the 44px target hangs into
-           the mast padding and the row beneath, then negative margins
-           cancel that so the brand stays on the left without growing
-           the bar. The arrow lines up with the mark's left edge. */
-        padding-top: 8px;
-        padding-bottom: 20px;
-        margin-top: -8px;
-        margin-bottom: -20px;
-      }
-      .studio-brand { align-self: flex-start; width: auto; }
     }
     /* Toolbar band names. 12px / 700, the same step as the chips.
        All caps, no colon. Weight and tracking stay put so the heads do not shout. */
@@ -2262,26 +2232,31 @@
     }
     /* Column rhythm. These beat the Tailwind spacing utilities on the
        header, toolbar, and board frame. Behaviour and labels stay put. */
-    /* Two tracks. The main track wraps: class and mode stay on the first
-       line, and when Timer through Tools no longer fit beside them they
-       drop to a second line, left-aligned. Fullscreen and the collapse
-       arrow are the second track, so they stay top-right at every width.
-       The 8px column-gap is the same step that sat between Tools and
-       Fullscreen. Wide screens still read as one row: the class cluster's
-       right auto margin pushes the utility chips against the pin. */
+    /* Two tracks. Back, the wordmark, Class, and Individual / Group
+       share the first line. Timer through Tools stay with them while a
+       scale of at least 0.9 is enough; after that they wrap, still at
+       a readable chip. Fullscreen and collapse are the second track,
+       full size, top right. Top padding is one studio step; collapse
+       clears it. */
     #studioHeader .studio-header-bar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: start;
       justify-content: start;
-      padding: 0 var(--studio-inset) var(--studio-space);
+      padding: var(--studio-space) var(--studio-inset);
       column-gap: var(--studio-space);
-      row-gap: var(--studio-space);
+      row-gap: 0;
+    }
+    .studio-header-fit {
+      min-width: 0;
+      display: flex;
+      align-items: center;
     }
     .studio-header-main {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+      width: 100%;
       min-width: 0;
       column-gap: var(--studio-space-2);
       row-gap: var(--studio-space);
@@ -2293,14 +2268,16 @@
       column-gap: var(--studio-space);
     }
     #studioHeaderCluster {
-      flex: 0 0 auto;
+      flex: 0 1 auto;
+      flex-wrap: wrap;
       max-width: 100%;
-      margin-right: auto;
+      margin-right: 0;
       column-gap: var(--studio-space);
       row-gap: var(--studio-space);
     }
     #studioHeaderUtilities {
-      flex: 0 0 auto;
+      flex: 0 1 auto;
+      flex-wrap: wrap;
       max-width: 100%;
       margin-left: 0;
       justify-content: flex-start;
@@ -2316,9 +2293,9 @@
       column-gap: var(--studio-space);
       row-gap: var(--studio-space);
     }
-    /* The pin owns the top-right corner, so these groups stay inside the
-       main column. On a phone the class chip is wider than that column;
-       wrap Classes under the select instead of sliding it under Fullscreen. */
+    /* On a narrow line these groups wrap inside themselves instead of
+       sliding under the pin. The fit script may hold them on one line
+       down to a 0.9 scale, then this wrap takes over. */
     #studioHeaderCluster > div {
       padding: 0;
       max-width: 100%;
@@ -2371,10 +2348,38 @@
         font-size: var(--studio-type-control);
       }
     }
-    #studioToolbarRow {
+    /* Default tools layout is two lines: REGISTER with HISTORY, then
+       SEATING with SCORES and SKIN. A line may scale down to 0.9 to
+       stay intact. Below that it wraps again at the normal chip size. */
+    .studio-toolbar-fit {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      min-width: 0;
       padding: var(--studio-space) var(--studio-inset);
+    }
+    #studioToolbarRow {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      row-gap: var(--studio-space);
+    }
+    .studio-toolbar-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      min-width: 0;
+      max-width: 100%;
       column-gap: var(--studio-space-2);
       row-gap: var(--studio-space);
+    }
+    .studio-toolbar-line > .studio-band {
+      max-width: 100%;
     }
     #studioToolbar .studio-band,
     #studioSeatingBand .studio-grid-setup {
@@ -3066,19 +3071,20 @@
 
   <!-- TOP NAVIGATION & ACTIVITY BAR -->
   <header id="studioHeader" class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
-    <div id="studioMast" class="studio-mast">
-      <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" aria-label="Back to Classroom">←</a>
-      <div class="studio-brand">
-        <div class="studio-title">
-          <h1 class="studio-mark">
-            <img class="studio-mark-default" src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
-            <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101b" alt="HCS Live Class" width="380" height="86">
-          </h1>
+    <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1">
+      <div class="studio-header-fit">
+      <div class="studio-header-main">
+      <div id="studioMast" class="studio-mast">
+        <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" aria-label="Back to Classroom">←</a>
+        <div class="studio-brand">
+          <div class="studio-title">
+            <h1 class="studio-mark">
+              <img class="studio-mark-default" src="assets/hcs-live-class-bright.svg?v=20261031a" alt="HCS Live Class" width="380" height="86">
+              <img class="studio-mark-day" src="assets/hcs-live-class-day.svg?v=20261101b" alt="HCS Live Class" width="380" height="86">
+            </h1>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1">
-      <div class="studio-header-main">
 
       <!-- Center Controls: Class Preset Selector + Mode Switcher -->
       <div id="studioHeaderCluster" class="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -3106,7 +3112,7 @@
         </div>
       </div>
 
-      <!-- Timer through Tools. Left-aligned when this group wraps under the class row. -->
+      <!-- Timer through Tools. Same line as Class; the fit step scales them. -->
       <div id="studioHeaderUtilities" class="flex flex-wrap items-center justify-start gap-1.5 sm:gap-2">
         <!-- Live Countdown Timer Button -->
         <div class="relative">
@@ -3115,56 +3121,6 @@
             <span id="headerTimerDisplay" class="font-mono tracking-wider text-amber-200">03:00</span>
           </button>
 
-          <!-- Floating Timer Popover Panel (Fixed & Viewport-Clamped so it never clips off-screen) -->
-          <div id="timerPopover" class="hidden fixed top-16 right-4 w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-80px)] overflow-y-auto bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
-            <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
-              <div class="flex items-center gap-2">
-                <span class="text-lg">⏱️</span>
-                <h3 class="font-display font-bold text-slate-800 text-base">Activity Timer</h3>
-              </div>
-              <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg" aria-label="Close">✕</button>
-            </div>
-
-            <!-- Big Timer Readout -->
-            <div id="timerCardBox" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl p-4 text-center mb-3 relative overflow-hidden">
-              <div id="timerProgressBar" class="absolute bottom-0 left-0 h-1.5 bg-emerald-400 transition-all duration-300" style="width: 100%;"></div>
-              <div id="timerBigDisplay" class="timer-digits font-mono font-extrabold tracking-widest text-amber-300">03:00</div>
-              <div id="timerStatusText" class="text-[11px] uppercase tracking-wider text-indigo-200 mt-1">Ready to start</div>
-            </div>
-
-            <!-- Play / Pause / Reset / +30s -->
-            <div class="grid grid-cols-3 gap-2 mb-3">
-              <button id="btnTimerStartPause" type="button" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-1.5">
-                <span id="timerStartPauseIcon">▶</span>
-                <span id="timerStartPauseLabel">Start</span>
-              </button>
-              <button id="btnTimerReset" type="button" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
-                Reset
-              </button>
-            </div>
-
-            <!-- Quick Preset Pills -->
-            <div class="mb-3">
-              <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Presets</div>
-              <div class="grid grid-cols-4 gap-1.5">
-                <button type="button" data-timer-sec="60" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">1m</button>
-                <button type="button" data-timer-sec="120" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">2m</button>
-                <button type="button" data-timer-sec="180" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">3m</button>
-                <button type="button" data-timer-sec="300" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">5m</button>
-                <button type="button" data-timer-sec="600" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">10m</button>
-                <button type="button" data-timer-sec="900" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">15m</button>
-                <button id="btnTimerAdd30" type="button" class="col-span-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs transition">+30 Sec</button>
-              </div>
-            </div>
-
-            <!-- Custom Minutes/Seconds -->
-            <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100">
-              <input id="customTimerMin" type="number" min="0" max="99" value="3" aria-label="Custom Minutes" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Min" />
-              <span class="font-bold text-slate-400">:</span>
-              <input id="customTimerSec" type="number" min="0" max="59" value="0" aria-label="Custom Seconds" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Sec" />
-              <button id="btnSetCustomTimer" type="button" class="flex-1 py-1.5 px-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">Set Time</button>
-            </div>
-          </div>
         </div>
 
         <!-- Random Picker Button -->
@@ -3200,7 +3156,8 @@
         </div>
       </div>
       </div>
-      <!-- Fullscreen and collapse stay top-right when the utility chips wrap. -->
+      </div>
+      <!-- Fullscreen and collapse stay top-right, full size. -->
       <div class="studio-header-pin">
         <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
           <svg id="fullscreenEnterIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
@@ -3213,9 +3170,62 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: REGISTER · HISTORY · SEATING · SCORES · SKIN (left to right). Wrap stays on. -->
+  <!-- Floating Timer Popover Panel (Fixed & Viewport-Clamped so it never clips off-screen) -->
+  <div id="timerPopover" class="hidden fixed top-16 right-4 w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-80px)] overflow-y-auto bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
+    <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">⏱️</span>
+        <h3 class="font-display font-bold text-slate-800 text-base">Activity Timer</h3>
+      </div>
+      <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Big Timer Readout -->
+    <div id="timerCardBox" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl p-4 text-center mb-3 relative overflow-hidden">
+      <div id="timerProgressBar" class="absolute bottom-0 left-0 h-1.5 bg-emerald-400 transition-all duration-300" style="width: 100%;"></div>
+      <div id="timerBigDisplay" class="timer-digits font-mono font-extrabold tracking-widest text-amber-300">03:00</div>
+      <div id="timerStatusText" class="text-[11px] uppercase tracking-wider text-indigo-200 mt-1">Ready to start</div>
+    </div>
+
+    <!-- Play / Pause / Reset / +30s -->
+    <div class="grid grid-cols-3 gap-2 mb-3">
+      <button id="btnTimerStartPause" type="button" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-1.5">
+        <span id="timerStartPauseIcon">▶</span>
+        <span id="timerStartPauseLabel">Start</span>
+      </button>
+      <button id="btnTimerReset" type="button" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
+        Reset
+      </button>
+    </div>
+
+    <!-- Quick Preset Pills -->
+    <div class="mb-3">
+      <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Presets</div>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button type="button" data-timer-sec="60" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">1m</button>
+        <button type="button" data-timer-sec="120" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">2m</button>
+        <button type="button" data-timer-sec="180" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">3m</button>
+        <button type="button" data-timer-sec="300" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">5m</button>
+        <button type="button" data-timer-sec="600" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">10m</button>
+        <button type="button" data-timer-sec="900" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">15m</button>
+        <button id="btnTimerAdd30" type="button" class="col-span-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs transition">+30 Sec</button>
+      </div>
+    </div>
+
+    <!-- Custom Minutes/Seconds -->
+    <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100">
+      <input id="customTimerMin" type="number" min="0" max="99" value="3" aria-label="Custom Minutes" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Min" />
+      <span class="font-bold text-slate-400">:</span>
+      <input id="customTimerSec" type="number" min="0" max="59" value="0" aria-label="Custom Seconds" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Sec" />
+      <button id="btnSetCustomTimer" type="button" class="flex-1 py-1.5 px-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">Set Time</button>
+    </div>
+  </div>
+
+  <!-- SECONDARY TOOLBAR: REGISTER with HISTORY, then SEATING with SCORES and SKIN. -->
   <section id="studioToolbar" class="bg-white border-b border-slate-200 shadow-sm z-30">
+    <div class="studio-toolbar-fit">
     <div id="studioToolbarRow" class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div class="studio-toolbar-line">
 
       <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Tidy, Manage Groups, Assign, Clear. -->
       <div class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
@@ -3273,7 +3283,9 @@
           Open plan
         </button>
       </div>
+      </div>
 
+      <div class="studio-toolbar-line">
       <!-- Seating: grid, presets, Snap, Front. Edit Off freezes these with desk drag. -->
       <div id="studioSeatingBand" class="studio-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2">
         <span class="studio-band-label">SEATING</span>
@@ -3319,6 +3331,8 @@
         <button type="button" id="btnSkinDefault" class="skin-choice" aria-pressed="true">Default</button>
         <button type="button" id="btnSkinMinimalist" class="skin-choice" aria-pressed="false">Minimalist</button>
       </div>
+    </div>
+    </div>
     </div>
 
     <!-- MANUAL GROUP PAINT BRUSH BAR (Visible when Paint Mode is active or in Group Mode) -->
@@ -10180,5 +10194,167 @@
     })();
   </script>
 <script src="../../site-version.js?v=sv"></script>
+<script>
+  (function () {
+    /* Chips may shrink to 90% of their normal size to hold a line.
+       Below that they wrap at the normal size. Back stays 44×44.
+       Header chips are 32px, so the floor is about 29px. Tools chips
+       are 24px, so the floor is about 22px. */
+    var FLOOR = 0.9;
+    function round3(n) { return Math.round(n * 1000) / 1000; }
+    function measure(el) {
+      if (!el) return 0;
+      var zoomed = [];
+      var node = el;
+      while (node && node !== document.documentElement) {
+        if (node.style && node.style.zoom) {
+          zoomed.push([node, node.style.zoom]);
+          node.style.zoom = '1';
+        }
+        node = node.parentElement;
+      }
+      var prev = { flexWrap: el.style.flexWrap, width: el.style.width, maxWidth: el.style.maxWidth, flexShrink: el.style.flexShrink };
+      el.style.flexWrap = 'nowrap';
+      el.style.width = 'max-content';
+      el.style.maxWidth = 'none';
+      el.style.flexShrink = '0';
+      var w = el.getBoundingClientRect().width;
+      el.style.flexWrap = prev.flexWrap;
+      el.style.width = prev.width;
+      el.style.maxWidth = prev.maxWidth;
+      el.style.flexShrink = prev.flexShrink;
+      for (var i = zoomed.length - 1; i >= 0; i--) zoomed[i][0].style.zoom = zoomed[i][1];
+      return w;
+    }
+    function fitHeader() {
+      var fit = document.querySelector('.studio-header-fit');
+      var main = document.querySelector('.studio-header-main');
+      var mast = document.getElementById('studioMast');
+      var cluster = document.getElementById('studioHeaderCluster');
+      var utils = document.getElementById('studioHeaderUtilities');
+      if (!fit || !main || !mast || !cluster || !utils) return;
+      if (fit.clientWidth <= 0 || window.getComputedStyle(mast).display === 'none') {
+        cluster.style.zoom = '';
+        utils.style.zoom = '';
+        return;
+      }
+      var available = fit.clientWidth - 2;
+      var gap = parseFloat(window.getComputedStyle(main).columnGap) || 0;
+      var mastW = measure(mast);
+      var clusterW = measure(cluster);
+      var utilsW = measure(utils);
+      function fullSizeWrap() {
+        cluster.style.zoom = '';
+        utils.style.zoom = '';
+        cluster.style.flexWrap = '';
+        utils.style.flexWrap = '';
+        cluster.style.flexShrink = '';
+        utils.style.flexShrink = '';
+        main.style.flexWrap = 'wrap';
+      }
+      var one = mastW + gap + clusterW + gap + utilsW;
+      if (one <= available) {
+        fullSizeWrap();
+        main.style.flexWrap = 'nowrap';
+        cluster.style.flexShrink = '0';
+        utils.style.flexShrink = '0';
+        return;
+      }
+      var z = (available - mastW - gap * 2) / Math.max(1, clusterW + utilsW);
+      if (z >= FLOOR) {
+        var zoom = String(round3(Math.min(1, z)));
+        cluster.style.zoom = zoom;
+        utils.style.zoom = zoom;
+        cluster.style.flexWrap = 'nowrap';
+        utils.style.flexWrap = 'nowrap';
+        cluster.style.flexShrink = '0';
+        utils.style.flexShrink = '0';
+        main.style.flexWrap = 'nowrap';
+        return;
+      }
+      fullSizeWrap();
+      if (mastW + gap + clusterW <= available) return;
+      var zClass = (available - mastW - gap) / Math.max(1, clusterW);
+      if (zClass >= FLOOR) {
+        cluster.style.zoom = String(round3(Math.min(1, zClass)));
+        cluster.style.flexWrap = 'nowrap';
+        cluster.style.flexShrink = '0';
+      }
+    }
+    function fitToolsLine(line) {
+      if (!line || window.getComputedStyle(line).display === 'none') return;
+      var parent = line.parentElement;
+      if (!parent || parent.clientWidth <= 0) return;
+      var pcs = window.getComputedStyle(parent);
+      var available = parent.clientWidth - parseFloat(pcs.paddingLeft) - parseFloat(pcs.paddingRight) - 1;
+      var gap = parseFloat(window.getComputedStyle(line).columnGap) || 0;
+      var needed = 0;
+      for (var i = 0; i < line.children.length; i++) needed += measure(line.children[i]);
+      if (line.children.length > 1) needed += gap * (line.children.length - 1);
+      if (needed <= available) {
+        line.style.zoom = '';
+        line.style.flexWrap = '';
+        line.style.width = '';
+        return;
+      }
+      var z = available / Math.max(1, needed);
+      var hold = z >= FLOOR;
+      for (var n = 0; n < line.children.length; n++) {
+        line.children[n].style.flexWrap = hold ? 'nowrap' : '';
+        line.children[n].style.maxWidth = hold ? 'none' : '';
+        line.children[n].style.flexShrink = hold ? '0' : '';
+      }
+      if (needed <= available) {
+        line.style.zoom = '';
+        line.style.flexWrap = '';
+        line.style.width = '';
+        return;
+      }
+      if (hold) {
+        line.style.width = 'max-content';
+        line.style.zoom = String(round3(z));
+        line.style.flexWrap = 'nowrap';
+        return;
+      }
+      line.style.zoom = '';
+      line.style.flexWrap = 'wrap';
+      line.style.width = '';
+    }
+    function fitRows() {
+      fitHeader();
+      var lines = document.querySelectorAll('.studio-toolbar-line');
+      for (var i = 0; i < lines.length; i++) fitToolsLine(lines[i]);
+    }
+    var queued = false;
+    function schedule() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        fitRows();
+      });
+    }
+    function start() {
+      fitRows();
+      if (window.ResizeObserver) {
+        var ro = new ResizeObserver(schedule);
+        var headerFit = document.querySelector('.studio-header-fit');
+        var toolbarFit = document.querySelector('.studio-toolbar-fit');
+        if (headerFit) ro.observe(headerFit);
+        if (toolbarFit) ro.observe(toolbarFit);
+      }
+      window.addEventListener('resize', schedule);
+      var mo = new MutationObserver(schedule);
+      [document.querySelector('.studio-header-main'), document.getElementById('studioToolbarRow'), document.getElementById('studioHeader'), document.getElementById('studioToolbar')].forEach(function (el) {
+        if (!el) return;
+        mo.observe(el, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['class'] });
+      });
+      window.addEventListener('load', schedule);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+  })();
+</script>
 </body>
 </html>
