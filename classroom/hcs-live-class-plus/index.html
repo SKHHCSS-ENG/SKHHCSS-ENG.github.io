@@ -1750,7 +1750,7 @@
        (16px / 5.6vw / 24px × 1.1) is scaled by 36/44, which is ×0.9.
        The mast has no band of its own and no padding: the header bar
        owns the inset. Back stays 44×44. The chips beside it may scale
-       down to 90% to stay on this line, then wrap. They do not scale
+       down to 74% to stay on this line, then wrap. They do not scale
        past that. */
     .studio-mast {
       display: flex;
@@ -2230,7 +2230,7 @@
        header, toolbar, and board frame. Behaviour and labels stay put. */
     /* Two tracks. Back, the wordmark, Class, and Individual / Group
        share the first line. Timer through Tools stay with them while a
-       scale of at least 0.9 is enough; after that they wrap, still at
+       scale of at least 0.74 is enough; after that they wrap, still at
        a readable chip. Fullscreen and collapse are the second track,
        full size, top right. Top padding is one studio step; collapse
        clears it. */
@@ -2291,7 +2291,7 @@
     }
     /* On a narrow line these groups wrap inside themselves instead of
        sliding under the pin. The fit script may hold them on one line
-       down to a 0.9 scale, then this wrap takes over. */
+       down to a 0.74 scale, then this wrap takes over. */
     #studioHeaderCluster > div {
       padding: 0;
       max-width: 100%;
@@ -2345,7 +2345,7 @@
       }
     }
     /* Default tools layout is two lines: REGISTER with HISTORY, then
-       SEATING with SCORES and SKIN. A line may scale down to 0.9 to
+       SEATING with SCORES and SKIN. A line may scale down to 0.85 to
        stay intact. Below that it wraps again at the normal chip size. */
     .studio-toolbar-fit {
       box-sizing: border-box;
@@ -10897,11 +10897,15 @@
 <script src="../../site-version.js?v=sv"></script>
 <script>
   (function () {
-    /* Chips may shrink to 90% of their normal size to hold a line.
-       Below that they wrap at the normal size. Back stays 44×44.
-       Header chips are 32px, so the floor is about 29px. Tools chips
-       are 24px, so the floor is about 22px. */
-    var FLOOR = 0.9;
+    /* Shrink to hold a line, then wrap at the normal size.
+       Header labels are 14px from 640px up. 0.74 is about 10.4px
+       and a 24px chip, which keeps Timer through Tools beside Class
+       on a 1280 desk, including a scrollbar. Tools labels are 12px.
+       0.85 is about 10px and a 20px chip, further than the old 90%
+       and still a clear label. Back stays 44×44. Fullscreen and
+       collapse are not scaled. */
+    var HEADER_FLOOR = 0.74;
+    var TOOLS_FLOOR = 0.85;
     function round3(n) { return Math.round(n * 1000) / 1000; }
     function measure(el) {
       if (!el) return 0;
@@ -10962,7 +10966,7 @@
         return;
       }
       var z = (available - mastW - gap * 2) / Math.max(1, clusterW + utilsW);
-      if (z >= FLOOR) {
+      if (z >= HEADER_FLOOR) {
         var zoom = String(round3(Math.min(1, z)));
         cluster.style.zoom = zoom;
         utils.style.zoom = zoom;
@@ -10976,7 +10980,7 @@
       fullSizeWrap();
       if (mastW + gap + clusterW <= available) return;
       var zClass = (available - mastW - gap) / Math.max(1, clusterW);
-      if (zClass >= FLOOR) {
+      if (zClass >= HEADER_FLOOR) {
         cluster.style.zoom = String(round3(Math.min(1, zClass)));
         cluster.style.flexWrap = 'nowrap';
         cluster.style.flexShrink = '0';
@@ -10999,7 +11003,7 @@
         return;
       }
       var z = available / Math.max(1, needed);
-      var hold = z >= FLOOR;
+      var hold = z >= TOOLS_FLOOR;
       for (var n = 0; n < line.children.length; n++) {
         line.children[n].style.flexWrap = hold ? 'nowrap' : '';
         line.children[n].style.maxWidth = hold ? 'none' : '';
