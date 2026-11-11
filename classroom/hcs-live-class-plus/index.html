@@ -1749,9 +1749,10 @@
        desk mark is 36px. The SVG asset stays. Below 861px the old clamp
        (16px / 5.6vw / 24px × 1.1) is scaled by 36/44, which is ×0.9.
        The mast has no band of its own and no padding: the header bar
-       owns the inset, so this pair does not add a second row. On a
-       narrow window Class and Individual / Group wrap under the pair
-       instead of squeezing it. Back target stays 44×44. */
+       owns the inset, so this pair does not add a second row. The whole
+       line, including this 44×44 Back, scales down together when the
+       chips no longer fit beside the pin. At a wide window the scale
+       stays 1 and Back stays 44×44. */
     .studio-mast {
       display: flex;
       align-items: center;
@@ -2228,33 +2229,37 @@
     }
     /* Column rhythm. These beat the Tailwind spacing utilities on the
        header, toolbar, and board frame. Behaviour and labels stay put. */
-    /* Two tracks. The main track wraps: Back, the wordmark, class, and
-       mode share the first line while they fit. When class and mode no
-       longer fit beside the mark they drop to the next line, and when
-       Timer through Tools no longer fit they drop under that,
-       left-aligned. Fullscreen and the collapse arrow are the second
-       track, so they stay top-right at every width and never cover the
-       main track. The 8px column-gap is the same step that sat between
-       Tools and Fullscreen. Wide screens still read as one row: the
-       class cluster's right auto margin pushes the utility chips against
-       the pin. Top padding is one studio step so the 36px mark is not
-       flush with the viewport; collapse clears it. */
+    /* Two tracks, one line. Back, the wordmark, Class, Individual /
+       Group, and Timer through Tools share the main track and do not
+       wrap. The fit box scales that line down to the space beside the
+       pin. Fullscreen and collapse are the second track, full size,
+       top right, and never covered. Top padding is one studio step so
+       the mark is not flush with the viewport; collapse clears it. */
     #studioHeader .studio-header-bar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
-      align-items: start;
+      align-items: center;
       justify-content: start;
       padding: var(--studio-space) var(--studio-inset);
       column-gap: var(--studio-space);
-      row-gap: var(--studio-space);
+      row-gap: 0;
+    }
+    .studio-header-fit {
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
     }
     .studio-header-main {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
-      min-width: 0;
+      flex: 0 0 auto;
+      width: max-content;
+      max-width: none;
+      min-width: max-content;
       column-gap: var(--studio-space-2);
-      row-gap: var(--studio-space);
+      row-gap: 0;
     }
     .studio-header-pin {
       display: flex;
@@ -2264,14 +2269,16 @@
     }
     #studioHeaderCluster {
       flex: 0 0 auto;
-      max-width: 100%;
-      margin-right: auto;
+      flex-wrap: nowrap;
+      max-width: none;
+      margin-right: 0;
       column-gap: var(--studio-space);
-      row-gap: var(--studio-space);
+      row-gap: 0;
     }
     #studioHeaderUtilities {
       flex: 0 0 auto;
-      max-width: 100%;
+      flex-wrap: nowrap;
+      max-width: none;
       margin-left: 0;
       justify-content: flex-start;
     }
@@ -2286,15 +2293,15 @@
       column-gap: var(--studio-space);
       row-gap: var(--studio-space);
     }
-    /* The pin owns the top-right corner, so these groups stay inside the
-       main column. On a phone the class chip is wider than that column;
-       wrap Classes under the select instead of sliding it under Fullscreen. */
+    /* One line. These groups stay inside the fit box, which scales them
+       down together. They do not wrap under each other or under the pin. */
     #studioHeaderCluster > div {
       padding: 0;
-      max-width: 100%;
+      max-width: none;
       min-width: 0;
-      flex-wrap: wrap;
-      row-gap: var(--studio-space);
+      flex-wrap: nowrap;
+      flex: 0 0 auto;
+      row-gap: 0;
     }
     #studioHeaderCluster > div:first-child {
       gap: var(--studio-space);
@@ -2341,10 +2348,35 @@
         font-size: var(--studio-type-control);
       }
     }
-    #studioToolbarRow {
+    /* One tools line. REGISTER through SKIN stay on it. The fit box
+       scales the line down to the window instead of wrapping a band. */
+    .studio-toolbar-fit {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
       padding: var(--studio-space) var(--studio-inset);
+    }
+    #studioToolbarRow {
+      flex-wrap: nowrap;
+      align-items: center;
+      flex: 0 0 auto;
+      width: max-content;
+      max-width: none;
+      min-width: max-content;
+      margin: 0;
+      padding: 0;
       column-gap: var(--studio-space-2);
-      row-gap: var(--studio-space);
+      row-gap: 0;
+    }
+    #studioToolbarRow > .studio-band {
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+      max-width: none;
     }
     #studioToolbar .studio-band,
     #studioSeatingBand .studio-grid-setup {
@@ -3039,6 +3071,7 @@
   <!-- TOP NAVIGATION & ACTIVITY BAR -->
   <header id="studioHeader" class="bg-gradient-to-r from-[#123a4d] via-[#2a8fad] to-[#5bbad5] text-white shadow-md sticky top-0 z-40">
     <div class="studio-header-bar max-w-[1600px] mx-auto px-3 sm:px-5 pb-2.5 pt-1">
+      <div class="studio-header-fit">
       <div class="studio-header-main">
       <div id="studioMast" class="studio-mast">
         <a href="../" class="studio-back shrink-0 text-xs font-bold text-white/90 hover:text-white hover:underline transition whitespace-nowrap" aria-label="Back to Classroom">←</a>
@@ -3078,7 +3111,7 @@
         </div>
       </div>
 
-      <!-- Timer through Tools. Left-aligned when this group wraps under the class row. -->
+      <!-- Timer through Tools. Same line as Class; the fit step scales them. -->
       <div id="studioHeaderUtilities" class="flex flex-wrap items-center justify-start gap-1.5 sm:gap-2">
         <!-- Live Countdown Timer Button -->
         <div class="relative">
@@ -3087,56 +3120,6 @@
             <span id="headerTimerDisplay" class="font-mono tracking-wider text-amber-200">03:00</span>
           </button>
 
-          <!-- Floating Timer Popover Panel (Fixed & Viewport-Clamped so it never clips off-screen) -->
-          <div id="timerPopover" class="hidden fixed top-16 right-4 w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-80px)] overflow-y-auto bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
-            <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
-              <div class="flex items-center gap-2">
-                <span class="text-lg">⏱️</span>
-                <h3 class="font-display font-bold text-slate-800 text-base">Activity Timer</h3>
-              </div>
-              <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg" aria-label="Close">✕</button>
-            </div>
-
-            <!-- Big Timer Readout -->
-            <div id="timerCardBox" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl p-4 text-center mb-3 relative overflow-hidden">
-              <div id="timerProgressBar" class="absolute bottom-0 left-0 h-1.5 bg-emerald-400 transition-all duration-300" style="width: 100%;"></div>
-              <div id="timerBigDisplay" class="timer-digits font-mono font-extrabold tracking-widest text-amber-300">03:00</div>
-              <div id="timerStatusText" class="text-[11px] uppercase tracking-wider text-indigo-200 mt-1">Ready to start</div>
-            </div>
-
-            <!-- Play / Pause / Reset / +30s -->
-            <div class="grid grid-cols-3 gap-2 mb-3">
-              <button id="btnTimerStartPause" type="button" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-1.5">
-                <span id="timerStartPauseIcon">▶</span>
-                <span id="timerStartPauseLabel">Start</span>
-              </button>
-              <button id="btnTimerReset" type="button" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
-                Reset
-              </button>
-            </div>
-
-            <!-- Quick Preset Pills -->
-            <div class="mb-3">
-              <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Presets</div>
-              <div class="grid grid-cols-4 gap-1.5">
-                <button type="button" data-timer-sec="60" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">1m</button>
-                <button type="button" data-timer-sec="120" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">2m</button>
-                <button type="button" data-timer-sec="180" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">3m</button>
-                <button type="button" data-timer-sec="300" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">5m</button>
-                <button type="button" data-timer-sec="600" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">10m</button>
-                <button type="button" data-timer-sec="900" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">15m</button>
-                <button id="btnTimerAdd30" type="button" class="col-span-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs transition">+30 Sec</button>
-              </div>
-            </div>
-
-            <!-- Custom Minutes/Seconds -->
-            <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100">
-              <input id="customTimerMin" type="number" min="0" max="99" value="3" aria-label="Custom Minutes" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Min" />
-              <span class="font-bold text-slate-400">:</span>
-              <input id="customTimerSec" type="number" min="0" max="59" value="0" aria-label="Custom Seconds" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Sec" />
-              <button id="btnSetCustomTimer" type="button" class="flex-1 py-1.5 px-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">Set Time</button>
-            </div>
-          </div>
         </div>
 
         <!-- Random Picker Button -->
@@ -3172,7 +3155,8 @@
         </div>
       </div>
       </div>
-      <!-- Fullscreen and collapse stay top-right when the utility chips wrap. -->
+      </div>
+      <!-- Fullscreen and collapse stay top-right, full size. -->
       <div class="studio-header-pin">
         <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
           <svg id="fullscreenEnterIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
@@ -3185,8 +3169,60 @@
     </div>
   </header>
 
-  <!-- SECONDARY TOOLBAR: REGISTER · HISTORY · SEATING · SCORES · SKIN (left to right). Wrap stays on. -->
+  <!-- Floating Timer Popover Panel (Fixed & Viewport-Clamped so it never clips off-screen) -->
+  <div id="timerPopover" class="hidden fixed top-16 right-4 w-80 max-w-[calc(100vw-24px)] max-h-[calc(100vh-80px)] overflow-y-auto bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
+    <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">⏱️</span>
+        <h3 class="font-display font-bold text-slate-800 text-base">Activity Timer</h3>
+      </div>
+      <button id="btnCloseTimerPopover" type="button" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Big Timer Readout -->
+    <div id="timerCardBox" class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-xl p-4 text-center mb-3 relative overflow-hidden">
+      <div id="timerProgressBar" class="absolute bottom-0 left-0 h-1.5 bg-emerald-400 transition-all duration-300" style="width: 100%;"></div>
+      <div id="timerBigDisplay" class="timer-digits font-mono font-extrabold tracking-widest text-amber-300">03:00</div>
+      <div id="timerStatusText" class="text-[11px] uppercase tracking-wider text-indigo-200 mt-1">Ready to start</div>
+    </div>
+
+    <!-- Play / Pause / Reset / +30s -->
+    <div class="grid grid-cols-3 gap-2 mb-3">
+      <button id="btnTimerStartPause" type="button" class="col-span-2 py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center justify-center gap-1.5">
+        <span id="timerStartPauseIcon">▶</span>
+        <span id="timerStartPauseLabel">Start</span>
+      </button>
+      <button id="btnTimerReset" type="button" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
+        Reset
+      </button>
+    </div>
+
+    <!-- Quick Preset Pills -->
+    <div class="mb-3">
+      <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Quick Presets</div>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button type="button" data-timer-sec="60" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">1m</button>
+        <button type="button" data-timer-sec="120" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">2m</button>
+        <button type="button" data-timer-sec="180" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">3m</button>
+        <button type="button" data-timer-sec="300" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">5m</button>
+        <button type="button" data-timer-sec="600" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">10m</button>
+        <button type="button" data-timer-sec="900" class="timer-preset-btn py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs transition">15m</button>
+        <button id="btnTimerAdd30" type="button" class="col-span-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs transition">+30 Sec</button>
+      </div>
+    </div>
+
+    <!-- Custom Minutes/Seconds -->
+    <div class="flex items-center gap-1.5 pt-2 border-t border-slate-100">
+      <input id="customTimerMin" type="number" min="0" max="99" value="3" aria-label="Custom Minutes" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Min" />
+      <span class="font-bold text-slate-400">:</span>
+      <input id="customTimerSec" type="number" min="0" max="59" value="0" aria-label="Custom Seconds" class="w-16 px-2 py-1 text-xs font-bold border border-slate-200 rounded-lg text-center" placeholder="Sec" />
+      <button id="btnSetCustomTimer" type="button" class="flex-1 py-1.5 px-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition">Set Time</button>
+    </div>
+  </div>
+
+  <!-- SECONDARY TOOLBAR: REGISTER · HISTORY · SEATING · SCORES · SKIN. One row; the fit step shrinks it. -->
   <section id="studioToolbar" class="bg-white border-b border-slate-200 shadow-sm z-30">
+    <div class="studio-toolbar-fit">
     <div id="studioToolbarRow" class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 flex flex-wrap items-center gap-x-3 gap-y-2">
 
       <!-- Register, left to right: Edit, ＋ Desk, ＋ Group, Tidy, Manage Groups, Assign, Clear. -->
@@ -3292,6 +3328,7 @@
         <button type="button" id="btnSkinMinimalist" class="skin-choice" aria-pressed="false">Minimalist</button>
         <script src="skins/loader.js" data-hcs-skin="mount"></script>
       </div>
+    </div>
     </div>
 
     <!-- MANUAL GROUP PAINT BRUSH BAR (Visible when Paint Mode is active or in Group Mode) -->
@@ -10855,5 +10892,57 @@
   </script>
   <script src="assistant.js?v=20261110e"></script>
 <script src="../../site-version.js?v=sv"></script>
+<script>
+  (function () {
+    function fitZoom(fit, row) {
+      if (!fit || !row || fit.clientWidth <= 0) return;
+      if (window.getComputedStyle(row).display === 'none') return;
+      var current = parseFloat(row.style.zoom);
+      if (!isFinite(current) || current <= 0) current = 1;
+      var visual = row.getBoundingClientRect().width;
+      if (visual < 1) return;
+      var natural = visual / current;
+      var cs = window.getComputedStyle(fit);
+      var available = Math.max(0, fit.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 1);
+      var zoom = natural > 0 ? Math.min(1, available / natural) : 1;
+      if (zoom > 0.999) zoom = 1;
+      if (Math.abs(zoom - current) < 0.004) return;
+      row.style.zoom = zoom >= 1 ? '' : String(Math.round(zoom * 1000) / 1000);
+    }
+    function fitRows() {
+      fitZoom(document.querySelector('.studio-header-fit'), document.querySelector('.studio-header-main'));
+      fitZoom(document.querySelector('.studio-toolbar-fit'), document.getElementById('studioToolbarRow'));
+    }
+    var queued = false;
+    function schedule() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        fitRows();
+      });
+    }
+    function start() {
+      fitRows();
+      if (window.ResizeObserver) {
+        var ro = new ResizeObserver(schedule);
+        var headerFit = document.querySelector('.studio-header-fit');
+        var toolbarFit = document.querySelector('.studio-toolbar-fit');
+        if (headerFit) ro.observe(headerFit);
+        if (toolbarFit) ro.observe(toolbarFit);
+      }
+      window.addEventListener('resize', schedule);
+      var mo = new MutationObserver(schedule);
+      [document.querySelector('.studio-header-main'), document.getElementById('studioToolbarRow'), document.getElementById('studioHeader'), document.getElementById('studioToolbar')].forEach(function (el) {
+        if (!el) return;
+        mo.observe(el, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['class'] });
+      });
+      window.addEventListener('load', schedule);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+  })();
+</script>
 </body>
 </html>
