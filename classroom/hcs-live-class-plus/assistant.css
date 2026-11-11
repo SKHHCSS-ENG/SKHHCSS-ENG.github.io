@@ -1,6 +1,6 @@
 /* HCS Live Class + assistant. Cache stamp: 20261110e.
    The ball uses the shared Eng api-mesh wash
-   (teal, 122°, 10s). Tokens are copied
+   (teal, 122°, 5s). Tokens are copied
    here so this page does not load ask.css. The open strip and reply use
    Mesh mist (#ebeff8 fill, #123a4d ink), a soft wash of solid #1458d6
    — not the full mesh. Import chart chrome stays cream.
@@ -18,8 +18,8 @@
   --api-mesh-image: linear-gradient(
     122deg,
     #1a6f8c 0%,
-    #0e6b7a 24%,
-    #0c5a70 50%,
+    #0a4f63 24%,
+    #073646 50%,
     #0a4f63 76%,
     #186887 100%
   );
@@ -92,12 +92,12 @@
   flex: 0 0 auto;
   padding: 0;
   color: var(--api-mesh-ink);
-  background-color: #0c5a70;
+  background-color: #073646;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 0% 40%;
-  animation: api-mesh-wash 10s ease-in-out infinite;
+  animation: api-mesh-wash 5s ease-in-out infinite;
   box-shadow:
     0 4px 10px rgba(18, 58, 77, 0.28),
     0 1px 3px rgba(18, 58, 77, 0.18),
@@ -251,12 +251,12 @@
 }
 
 .plus-float .mode-chip.is-selected {
-  background-color: #0c5a70;
+  background-color: #073646;
   background-image: var(--api-mesh-image);
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 0% 40%;
-  animation: api-mesh-wash 10s ease-in-out infinite;
+  animation: api-mesh-wash 5s ease-in-out infinite;
   color: var(--api-mesh-ink);
   border-color: transparent;
 }
