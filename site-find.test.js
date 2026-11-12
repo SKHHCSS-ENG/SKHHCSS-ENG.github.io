@@ -23,19 +23,19 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 29);
+  assert.equal(SiteFind.entries.length, 32);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 29);
+  assert.equal(new Set(paths).size, 32);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
-  assert.equal(SiteFind.entries[25].title, "What's New");
-  assert.equal(SiteFind.entries[25].path, "whats-new/");
-  assert.equal(SiteFind.entries[26].title, "Practice");
-  assert.equal(SiteFind.entries[26].path, "practice/");
-  assert.equal(SiteFind.entries[27].title, "Fun Projects");
-  assert.equal(SiteFind.entries[27].path, "fun-projects/");
-  assert.equal(SiteFind.entries[28].title, "Activities & Competitions");
-  assert.equal(SiteFind.entries[28].path, "activities-and-competitions/");
+  assert.equal(SiteFind.entries[28].title, "What's New");
+  assert.equal(SiteFind.entries[28].path, "whats-new/");
+  assert.equal(SiteFind.entries[29].title, "Practice");
+  assert.equal(SiteFind.entries[29].path, "practice/");
+  assert.equal(SiteFind.entries[30].title, "Fun Projects");
+  assert.equal(SiteFind.entries[30].path, "fun-projects/");
+  assert.equal(SiteFind.entries[31].title, "Activities & Competitions");
+  assert.equal(SiteFind.entries[31].path, "activities-and-competitions/");
   assert.equal(paths.includes("learning-materials/paper-1-exam-practice/"), false);
   assert.equal(paths.includes("speech-festival/"), false);
   assert.equal(paths.includes("say-it-louder/"), false);
@@ -75,6 +75,21 @@ test("Find uses the hub brain: norm, exact, prefix, substring, cap 3", () => {
   assert.equal(speech[0].title, "Speech");
   assert.equal(speech.length <= 3, true);
   assert.equal(speech.some((hit) => hit.title === "Speech Festival"), false);
+
+  const essay = SiteFind.search("essay");
+  assert.equal(essay[0].title, "Essay");
+  assert.equal(essay[0].path, "learning-materials/paper-2-writing-formats/essay/");
+  assert.equal(SiteFind.search("論說文")[0].title, "Essay");
+
+  const story = SiteFind.search("story");
+  assert.equal(story[0].title, "Story");
+  assert.equal(story[0].path, "learning-materials/paper-2-writing-formats/story/");
+  assert.equal(SiteFind.search("故事")[0].title, "Story");
+
+  const questionnaire = SiteFind.search("questionnaire");
+  assert.equal(questionnaire[0].title, "Questionnaire");
+  assert.equal(questionnaire[0].path, "learning-materials/paper-2-writing-formats/questionnaire/");
+  assert.equal(SiteFind.search("問卷")[0].title, "Questionnaire");
 
   const sp = SiteFind.search("sp");
   assert.equal(sp[0].title, "Sentence Patterns");
