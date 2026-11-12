@@ -1,7 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
  * Tess 2026-10-29, plus the Practice, Fun Projects, and
- * Activities & Competitions hubs (29 entries). Matching uses the hub brain:
+ * Activities & Competitions hubs (32 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -127,6 +127,16 @@
       ]
     },
     {
+      "title": "Questionnaire",
+      "path": "learning-materials/paper-2-writing-formats/questionnaire/",
+      "aliases": [
+        "questionnaire",
+        "問卷",
+        "course evaluation",
+        "course evaluation questionnaire"
+      ]
+    },
+    {
       "title": "Speech",
       "path": "learning-materials/paper-2-writing-formats/speech/",
       "aliases": [
@@ -134,6 +144,27 @@
         "演講辭",
         "演說",
         "assembly speech"
+      ]
+    },
+    {
+      "title": "Essay",
+      "path": "learning-materials/paper-2-writing-formats/essay/",
+      "aliases": [
+        "essay",
+        "argumentative essay",
+        "discursive essay",
+        "論說文",
+        "議論文"
+      ]
+    },
+    {
+      "title": "Story",
+      "path": "learning-materials/paper-2-writing-formats/story/",
+      "aliases": [
+        "story",
+        "short story",
+        "故事",
+        "narrative"
       ]
     },
     {
