@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache 20261103a -->
+<!-- cache 20261112a -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -228,6 +228,23 @@
   }
   .hub-folder > .cards { margin: 0 10px 10px; }
   .hub-folder > .coming-soon { margin: 0 14px 12px; }
+  .hub-crosslink {
+    margin: 0 14px 12px;
+    color: var(--muted);
+    font-size: .9rem;
+    font-weight: 700;
+  }
+  .hub-crosslink a {
+    color: var(--accent-ink);
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .hub-crosslink a:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
   /* WebKit keeps expanded .hub-folders row tracks when Collapse All closes
      nested folders in the same turn as the DSE section. display:none pulls
      that grid out of the box tree so reopening DSE lays the closed folders
@@ -404,10 +421,6 @@
     font-weight: 800;
     color: var(--navy);
   }
-  /* Long leaf titles (Roaming Mic Challenge) stay one line; marks keep their column. */
-  a.card.has-marks > h3.card-title-single {
-    white-space: nowrap;
-  }
   .card p {
     margin: 0;
     color: var(--muted);
@@ -487,7 +500,7 @@
   }
   @media (max-width: 639px) {
     .hub-find-pills {
-      /* 44px 🛠 + 12px dock inset: last wrap (Desktop) stays left of the FAB. */
+      /* 44px 🛠 + 12px dock inset: the last wrap stays left of the FAB. */
       padding-right: calc(56px + env(safe-area-inset-right, 0px));
       padding-bottom: 0;
     }
@@ -658,9 +671,6 @@
     color: var(--muted);
     text-align: center;
   }
-  @media (max-width: 430px) {
-    a.card.has-marks > h3.card-title-single { font-size: 1.08rem; }
-  }
   @media (min-width: 640px) {
     .hub-section { margin-top: 32px; }
     .hub-heading { font-size: 1.18rem; }
@@ -695,10 +705,7 @@
         <button type="button" class="hub-find-star" data-hub-star aria-pressed="false">★ Bookmarked</button>
         <button type="button" class="hub-find-pill" data-hub-tag="DSE" aria-pressed="false">DSE</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Junior" aria-pressed="false">Junior</button>
-        <button type="button" class="hub-find-pill" data-hub-tag="Competition" aria-pressed="false">Competition</button>
-        <button type="button" class="hub-find-pill" data-hub-tag="Activity" aria-pressed="false">Activity</button>
         <button type="button" class="hub-find-pill" data-hub-tag="Phone" aria-pressed="false">Phone</button>
-        <button type="button" class="hub-find-pill" data-hub-tag="Desktop" aria-pressed="false">Desktop</button>
       </div>
       <input type="search" class="hub-find-q" placeholder="Search topics…" aria-label="Search topics" autocomplete="off" spellcheck="false">
     </div>
@@ -726,13 +733,8 @@
               <p>Paper map, reading skills and exam habits.</p>
               <span class="card-arrow">Open →</span>
             </a>
-            <a class="card" href="https://skhhcss-eng.github.io/paper-1-exam-practice/" target="_blank" rel="noopener noreferrer">
-              <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-desktop">Desktop</span></p>
-              <h3>Paper 1 - Exam Practice</h3>
-              <p>Question types, topics and past papers.</p>
-              <span class="card-arrow">Open →</span>
-            </a>
           </div>
+          <p class="hub-crosslink"><a href="../practice/">Paper 1 - Exam Practice</a> is on the Practice page.</p>
         </details>
 
         <details class="hub-folder">
@@ -825,48 +827,6 @@
           <p class="card-kicker"><span class="badge badge-junior">Junior</span><span class="badge badge-dse">DSE</span><span class="badge badge-phone">Phone</span></p>
           <h3>Sentence Patterns</h3>
           <p>Basic · Building · Exam-Ready frames with Hong Kong examples — pick 2–3 per writing task.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-        <a class="card" href="https://skhhcss-eng.github.io/say-it-louder/" target="_blank" rel="noopener noreferrer">
-          <p class="card-kicker"><span class="badge badge-junior">Junior</span><span class="badge badge-dse">DSE</span></p>
-          <h3>Say It Louder</h3>
-          <p>Practise speaking in a short interactive story.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-      </div>
-    </details>
-
-    <details class="hub-section">
-      <summary class="hub-heading" id="sec-competitions">
-        <h2 class="hub-heading-text">Competitions</h2>
-        <span class="hub-chevron" aria-hidden="true"></span>
-      </summary>
-      <div class="cards">
-        <a class="card" href="https://skhhcss-eng.github.io/speech-festival/" target="_blank" rel="noopener noreferrer">
-          <p class="card-kicker"><span class="badge badge-competition">Competition</span><span class="badge badge-phone">Phone</span></p>
-          <h3>Speech Festival</h3>
-          <p>Solo verse practice pages with model audio for Hong Kong Schools Speech Festival entries.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-        <a class="card" href="https://nets.edb.edcity.hk/page.php?p=339" target="_blank" rel="noopener noreferrer">
-          <p class="card-kicker"><span class="badge badge-competition">Competition</span></p>
-          <h3>Speak Up – Act Out Drama Competition</h3>
-          <p>NET Section drama competition for secondary schools — devise a short English drama.</p>
-          <span class="card-arrow">Open →</span>
-        </a>
-      </div>
-    </details>
-
-    <details class="hub-section">
-      <summary class="hub-heading" id="sec-activities">
-        <h2 class="hub-heading-text">Activities</h2>
-        <span class="hub-chevron" aria-hidden="true"></span>
-      </summary>
-      <div class="cards">
-        <a class="card" href="https://nets.edb.edcity.hk/page.php?p=671" target="_blank" rel="noopener noreferrer">
-          <p class="card-kicker"><span class="badge badge-activity">Activity</span></p>
-          <h3 class="card-title-single">Roaming Mic Challenge</h3>
-          <p>NET Section school-wide English speaking challenge — short reels with a shared mic.</p>
           <span class="card-arrow">Open →</span>
         </a>
       </div>
@@ -1322,7 +1282,7 @@
     }
   })();
   </script>
-<script src="../site-find.js?v=20261102f"></script>
+<script src="../site-find.js?v=20261112a"></script>
 <script src="../ask.js?v=20261103d"></script>
 <script src="../site-version.js?v=sv"></script>
 </body>
