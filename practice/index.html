@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!-- cache 20261112a -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="../ask.css?v=20261111d">
+<title>Practice · SKH Holy Carpenter Secondary School</title>
+<meta name="description" content="Exam-style English practice for SKH Holy Carpenter Secondary School, starting with Paper 1.">
+<style>
+  :root {
+    --accent: #5bbad5;
+    --accent-deep: #2a8fad;
+    --accent-ink: #0c5a70;
+    --accent-soft: #e8f7fb;
+    --navy: #123a4d;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --card: #ffffff;
+    --bg: #f5fafc;
+    --border: #d3e8ef;
+    --shadow: 0 4px 16px rgba(18, 58, 77, 0.07);
+    --phone: #2f6b3c;
+    --phone-soft: #e7f6ea;
+    --desktop: #3d4570;
+    --desktop-soft: #eceef8;
+    --dse: #0c5a70;
+    --dse-soft: #e8f7fb;
+    --junior: #6b430c;
+    --junior-soft: #fff4dc;
+    --competition: #6b2a80;
+    --competition-soft: #f4e6fb;
+    --activity: #8f3d00;
+    --activity-soft: #ffead6;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 18px 48px;
+  }
+  a.back {
+    display: inline-block;
+    margin-bottom: 14px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+    text-decoration: none;
+  }
+  a.back:hover, a.back:focus-visible { text-decoration: underline; outline: none; }
+  a.back:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  header.hero {
+    background: var(--card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .hero-accent {
+    height: 6px;
+    background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 20px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand img {
+    height: 58px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: block;
+  }
+  .hero-body { padding: 14px 20px 18px; }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+  }
+  .subject {
+    margin: 0;
+    font-size: .95rem;
+    color: var(--muted);
+  }
+  .hub-section { margin-top: 22px; }
+  .hub-heading {
+    margin: 0 0 10px;
+    padding: 10px 4px 10px 12px;
+    border-left: 4px solid var(--accent-deep);
+    font-size: 1.12rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+  }
+  .cards { display: grid; gap: 14px; margin-top: 0; }
+  a.card {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    box-shadow: var(--shadow);
+    min-height: 44px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  a.card:hover, a.card:focus-visible {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 6px 20px rgba(91, 186, 213, 0.22);
+  }
+  a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .card-kicker { margin: 0 0 6px; }
+  .badge {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .badge-dse { background: var(--dse-soft); color: var(--dse); }
+  .badge-junior { background: var(--junior-soft); color: var(--junior); }
+  .badge-competition { background: var(--competition-soft); color: var(--competition); }
+  .badge-activity { background: var(--activity-soft); color: var(--activity); }
+  .badge-phone { background: var(--phone-soft); color: var(--phone); }
+  .badge-desktop { background: var(--desktop-soft); color: var(--desktop); }
+  .card .badge { color: var(--accent-ink); background: var(--accent-soft); }
+  .card .badge-dse { color: var(--dse); background: var(--dse-soft); }
+  .card .badge-junior { color: var(--junior); background: var(--junior-soft); }
+  .card .badge-competition { color: var(--competition); background: var(--competition-soft); }
+  .card .badge-activity { color: var(--activity); background: var(--activity-soft); }
+  .card .badge-phone { color: var(--phone); background: var(--phone-soft); }
+  .card .badge-desktop { color: var(--desktop); background: var(--desktop-soft); }
+  .card-kicker .badge + .badge { margin-left: 6px; }
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: .9rem;
+  }
+  .card-arrow {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+  }
+  footer {
+    margin-top: 36px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: .78rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  @media (min-width: 640px) {
+    .hub-heading { font-size: 1.18rem; }
+  }
+  @media print {
+    body { background: #fff; }
+    a.card { box-shadow: none; break-inside: avoid; }
+    a.back { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../">← Back to English Home</a>
+
+    <header class="hero">
+      <div class="hero-accent" aria-hidden="true"></div>
+      <div class="brand">
+        <img src="https://www.hcs.edu.hk/template/app/img/logo.png" width="276" height="58" alt="SKH Holy Carpenter Secondary School logo">
+      </div>
+      <div class="hero-body">
+        <h1>Practice</h1>
+        <p class="subject">English Language</p>
+      </div>
+    </header>
+
+    <section class="hub-section" aria-labelledby="paper-1-reading">
+      <h2 class="hub-heading" id="paper-1-reading">Paper 1 - Reading</h2>
+      <div class="cards">
+        <a class="card" href="https://skhhcss-eng.github.io/paper-1-exam-practice/" target="_blank" rel="noopener noreferrer">
+          <p class="card-kicker"><span class="badge badge-dse">DSE</span><span class="badge badge-desktop">Desktop</span></p>
+          <h3>Paper 1 - Exam Practice</h3>
+          <p>Question types, topics and past papers.</p>
+          <span class="card-arrow">Open →</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      Materials for school use
+    </footer>
+  </div>
+<script src="../site-find.js?v=20261112a"></script>
+<script src="../ask.js?v=20261103d"></script>
+<script src="../site-version.js?v=sv"></script>
+</body>
+</html>

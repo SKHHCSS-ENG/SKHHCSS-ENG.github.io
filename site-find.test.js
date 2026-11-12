@@ -23,23 +23,35 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 26);
+  assert.equal(SiteFind.entries.length, 29);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 26);
+  assert.equal(new Set(paths).size, 29);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
   assert.equal(SiteFind.entries[25].title, "What's New");
   assert.equal(SiteFind.entries[25].path, "whats-new/");
+  assert.equal(SiteFind.entries[26].title, "Practice");
+  assert.equal(SiteFind.entries[26].path, "practice/");
+  assert.equal(SiteFind.entries[27].title, "Fun projects");
+  assert.equal(SiteFind.entries[27].path, "fun-projects/");
+  assert.equal(SiteFind.entries[28].title, "Activities & Competitions");
+  assert.equal(SiteFind.entries[28].path, "activities-and-competitions/");
   assert.equal(paths.includes("learning-materials/paper-1-exam-practice/"), false);
   assert.equal(paths.includes("speech-festival/"), false);
-  assert.equal(SiteFind.search("paper 1 exam practice").length, 0);
-  assert.equal(SiteFind.search("quest hub").length, 0);
-  assert.equal(SiteFind.search("朗誦節").length, 0);
+  assert.equal(paths.includes("say-it-louder/"), false);
+
+  const practice = SiteFind.search("paper 1 exam practice");
+  assert.equal(practice.length, 1);
+  assert.equal(practice[0].title, "Practice");
+  assert.equal(practice[0].path, "practice/");
+  assert.equal(SiteFind.search("quest hub")[0].title, "Practice");
+  assert.equal(SiteFind.search("say it louder")[0].path, "fun-projects/");
+  assert.equal(SiteFind.search("朗誦節")[0].path, "activities-and-competitions/");
+  assert.equal(SiteFind.search("roaming mic")[0].path, "activities-and-competitions/");
+  assert.equal(SiteFind.search("speak up")[0].title, "Activities & Competitions");
   assert.equal(SiteFind.search("u41").length, 0);
-  assert.equal(SiteFind.search("say it louder").length, 0);
   assert.equal(SiteFind.search("lost bag").length, 0);
   assert.equal(SiteFind.search("club fair").length, 0);
-  assert.equal(paths.includes("say-it-louder/"), false);
 });
 
 test("Find uses the hub brain: norm, exact, prefix, substring, cap 3", () => {
@@ -201,17 +213,55 @@ test("Spelling Watchlist aliases jump to the new part names", () => {
 });
 
 test("Paper 1 practice and Speech Festival hub cards open the project sites", () => {
-  const hub = fs.readFileSync(new URL("./learning-materials/index.html", import.meta.url), "utf8");
+  const notes = fs.readFileSync(new URL("./learning-materials/index.html", import.meta.url), "utf8");
+  const practicePage = fs.readFileSync(new URL("./practice/index.html", import.meta.url), "utf8");
+  const funPage = fs.readFileSync(new URL("./fun-projects/index.html", import.meta.url), "utf8");
+  const activitiesPage = fs.readFileSync(new URL("./activities-and-competitions/index.html", import.meta.url), "utf8");
+
   assert.match(
-    hub,
+    practicePage,
     /href="https:\/\/skhhcss-eng\.github\.io\/paper-1-exam-practice\/" target="_blank" rel="noopener noreferrer"/
   );
+  assert.match(practicePage, /Paper 1 - Reading/);
+  assert.match(practicePage, /Question types, topics and past papers\./);
+  assert.equal(practicePage.includes('href="paper-1-exam-practice/"'), false);
+
   assert.match(
-    hub,
+    funPage,
+    /href="https:\/\/skhhcss-eng\.github\.io\/say-it-louder\/" target="_blank" rel="noopener noreferrer"/
+  );
+  assert.match(funPage, /Practise speaking in a short interactive story\./);
+
+  assert.match(
+    activitiesPage,
     /href="https:\/\/skhhcss-eng\.github\.io\/speech-festival\/" target="_blank" rel="noopener noreferrer"/
   );
-  assert.equal(hub.includes('href="paper-1-exam-practice/"'), false);
-  assert.equal(hub.includes('href="../speech-festival/"'), false);
+  assert.match(
+    activitiesPage,
+    /href="https:\/\/nets\.edb\.edcity\.hk\/page\.php\?p=339" target="_blank" rel="noopener noreferrer"/
+  );
+  assert.match(
+    activitiesPage,
+    /href="https:\/\/nets\.edb\.edcity\.hk\/page\.php\?p=671" target="_blank" rel="noopener noreferrer"/
+  );
+  const competitionsAt = activitiesPage.indexOf('id="sec-competitions"');
+  const activitiesAt = activitiesPage.indexOf('id="sec-activities"');
+  const roamingAt = activitiesPage.indexOf("Roaming Mic Challenge");
+  assert.equal(competitionsAt !== -1 && activitiesAt > competitionsAt && roamingAt > activitiesAt, true);
+  assert.equal(activitiesPage.slice(competitionsAt, activitiesAt).includes("Roaming Mic Challenge"), false);
+
+  assert.equal(notes.includes("https://skhhcss-eng.github.io/paper-1-exam-practice/"), false);
+  assert.equal(notes.includes("https://skhhcss-eng.github.io/say-it-louder/"), false);
+  assert.equal(notes.includes("https://skhhcss-eng.github.io/speech-festival/"), false);
+  assert.equal(notes.includes("nets.edb.edcity.hk"), false);
+  assert.equal(notes.includes("Say It Louder"), false);
+  assert.equal(notes.includes("Roaming Mic"), false);
+  assert.match(notes, /href="\.\.\/practice\/"/);
+  assert.equal(notes.includes('href="paper-1-exam-practice/"'), false);
+  assert.equal(notes.includes('href="../speech-festival/"'), false);
+  assert.equal(notes.includes('>Competition</button>'), false);
+  assert.equal(notes.includes('>Activity</button>'), false);
+  assert.equal(notes.includes('>Desktop</button>'), false);
 
   const practice = fs.readFileSync(
     new URL("./learning-materials/paper-1-exam-practice/index.html", import.meta.url),
@@ -241,6 +291,35 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
     assert.match(html, new RegExp("location\\.search \\+ location\\.hash"));
     assert.match(html, new RegExp('content="0; url=' + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
   }
+});
+
+test("English home cards each have one job, in order", () => {
+  const home = fs.readFileSync(new URL("./index.html", import.meta.url), "utf8");
+  const titles = [...home.matchAll(/<h2>([^<]+)<\/h2>/g)].map((hit) => hit[1]);
+  assert.deepEqual(titles, [
+    "Learning Materials",
+    "Practice",
+    "Fun projects",
+    "Activities &amp; Competitions",
+    "Classroom",
+    "What's New"
+  ]);
+  assert.match(home, /Exam skills, writing formats, junior grammar, and useful vocabulary\./);
+  assert.match(home, /Exam-style practice, starting with Paper 1\./);
+  assert.match(home, /Say It Louder, with more fun English projects to come\./);
+  assert.match(home, /Speech Festival, Speak Up, and challenges like Roaming Mic\./);
+  assert.match(home, /Teacher tools for live lessons — HCS Live Class \(desks, roster, live points\)\./);
+  assert.match(home, /See what was added or changed on the English subject site\./);
+  assert.match(home, /href="learning-materials\/"/);
+  assert.match(home, /href="practice\/"/);
+  assert.match(home, /href="fun-projects\/"/);
+  assert.match(home, /href="activities-and-competitions\/"/);
+  assert.match(home, /href="classroom\/"/);
+  assert.match(home, /href="whats-new\/"/);
+  assert.match(home, /badge-teacher">Teacher</);
+  assert.equal(home.includes("last-minute-notes"), false);
+  assert.equal(home.includes("instagram"), false);
+  assert.equal(home.includes("Highlights"), false);
 });
 
 test("rectsOverlap is a soft-fail check for the Ask circle and the dock", () => {

@@ -1,6 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
- * Tess 2026-10-29 (26 entries). Matching uses the hub brain:
+ * Tess 2026-10-29, plus the Practice, Fun projects, and
+ * Activities & Competitions hubs (29 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -325,6 +326,45 @@
         "whats new",
         "更新",
         "最新消息"
+      ]
+    },
+    {
+      "title": "Practice",
+      "path": "practice/",
+      "aliases": [
+        "practice",
+        "exam practice",
+        "paper 1 exam practice",
+        "paper 1 practice",
+        "paper 1 - exam practice",
+        "quest hub",
+        "練習"
+      ]
+    },
+    {
+      "title": "Fun projects",
+      "path": "fun-projects/",
+      "aliases": [
+        "fun projects",
+        "fun project",
+        "say it louder",
+        "say-it-louder"
+      ]
+    },
+    {
+      "title": "Activities & Competitions",
+      "path": "activities-and-competitions/",
+      "aliases": [
+        "activities",
+        "competitions",
+        "activities and competitions",
+        "activities & competitions",
+        "speech festival",
+        "朗誦節",
+        "speak up",
+        "act out",
+        "roaming mic",
+        "roaming mic challenge"
       ]
     }
   ];
