@@ -316,27 +316,5 @@ test('Studio chrome keeps local Save / Load and adds the Drive chips after them'
   var hub = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
   assert.match(hub, /href="hcs-live-class\/"/);
   assert.equal(hub.indexOf('class-activity-studio'), -1);
-  var redirect = fs.readFileSync(path.join(__dirname, '../class-activity-studio/index.html'), 'utf8');
-  assert.match(redirect, /location\.replace\(\(at === -1 \? "\/classroom" : path\.slice\(0, at\)\) \+ "\/hcs-live-class\/" \+ location\.search \+ location\.hash\)/);
-  assert.match(redirect, /http-equiv="refresh" content="0; url=\.\.\/hcs-live-class\/"/);
-  assert.match(redirect, /href="\.\.\/hcs-live-class\/"/);
-  assert.equal(redirect.indexOf('<style'), -1);
-  var vm = require('node:vm');
-  var script = redirect.slice(redirect.indexOf('<script>') + '<script>'.length, redirect.indexOf('</script>'));
-  function landed(pathname, search, hash) {
-    var next = '';
-    vm.runInNewContext(script, {
-      location: {
-        pathname: pathname,
-        search: search || '',
-        hash: hash || '',
-        replace: function (url) { next = url; }
-      }
-    });
-    return next;
-  }
-  assert.equal(landed('/classroom/class-activity-studio/', '', ''), '/classroom/hcs-live-class/');
-  assert.equal(landed('/classroom/class-activity-studio', '?a=1', '#room'), '/classroom/hcs-live-class/?a=1#room');
-  assert.equal(landed('/english/classroom/class-activity-studio/', '', ''), '/english/classroom/hcs-live-class/');
-  assert.equal(landed('/english/classroom/class-activity-studio/index.html', '', '#x'), '/english/classroom/hcs-live-class/#x');
+  assert.equal(fs.existsSync(path.join(__dirname, '../class-activity-studio/index.html')), false);
 });

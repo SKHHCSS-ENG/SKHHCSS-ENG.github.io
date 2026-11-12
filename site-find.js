@@ -1,6 +1,6 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
- * Tess 2026-10-29, plus the Practice, Fun projects, and
+ * Tess 2026-10-29, plus the Practice, Fun Projects, and
  * Activities & Competitions hubs (29 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
@@ -50,7 +50,7 @@
     },
     {
       "title": "Letter to the Editor",
-      "path": "learning-materials/paper-2-exam-skills/letter-to-the-editor/",
+      "path": "learning-materials/paper-2-writing-formats/letter-to-the-editor/",
       "aliases": [
         "letter to the editor",
         "lte",
@@ -62,7 +62,7 @@
     },
     {
       "title": "Formal Letter / Email",
-      "path": "learning-materials/paper-2-exam-skills/formal-letter/",
+      "path": "learning-materials/paper-2-writing-formats/formal-letter/",
       "aliases": [
         "formal letter",
         "formal email",
@@ -78,7 +78,7 @@
     },
     {
       "title": "Article",
-      "path": "learning-materials/paper-2-exam-skills/article/",
+      "path": "learning-materials/paper-2-writing-formats/article/",
       "aliases": [
         "article",
         "magazine article",
@@ -88,7 +88,7 @@
     },
     {
       "title": "Blog Entry",
-      "path": "learning-materials/paper-2-exam-skills/blog/",
+      "path": "learning-materials/paper-2-writing-formats/blog/",
       "aliases": [
         "blog",
         "blog entry",
@@ -98,7 +98,7 @@
     },
     {
       "title": "Review",
-      "path": "learning-materials/paper-2-exam-skills/review/",
+      "path": "learning-materials/paper-2-writing-formats/review/",
       "aliases": [
         "review",
         "書評",
@@ -110,7 +110,7 @@
     },
     {
       "title": "Proposal",
-      "path": "learning-materials/paper-2-exam-skills/proposal/",
+      "path": "learning-materials/paper-2-writing-formats/proposal/",
       "aliases": [
         "proposal",
         "建議書",
@@ -119,7 +119,7 @@
     },
     {
       "title": "Report",
-      "path": "learning-materials/paper-2-exam-skills/report/",
+      "path": "learning-materials/paper-2-writing-formats/report/",
       "aliases": [
         "report",
         "報告",
@@ -128,7 +128,7 @@
     },
     {
       "title": "Speech",
-      "path": "learning-materials/paper-2-exam-skills/speech/",
+      "path": "learning-materials/paper-2-writing-formats/speech/",
       "aliases": [
         "speech",
         "演講辭",
@@ -342,7 +342,7 @@
       ]
     },
     {
-      "title": "Fun projects",
+      "title": "Fun Projects",
       "path": "fun-projects/",
       "aliases": [
         "fun projects",

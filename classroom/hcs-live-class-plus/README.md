@@ -1,6 +1,6 @@
 # HCS Live Class +
 
-A copy of HCS Live Class with a classroom assistant. The original page at `classroom/hcs-live-class/` is not modified, and `/classroom/class-activity-studio/` still redirects there.
+A copy of HCS Live Class with a classroom assistant. The original page at `classroom/hcs-live-class/` is not modified.
 
 ## Storage
 

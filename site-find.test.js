@@ -32,7 +32,7 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.entries[25].path, "whats-new/");
   assert.equal(SiteFind.entries[26].title, "Practice");
   assert.equal(SiteFind.entries[26].path, "practice/");
-  assert.equal(SiteFind.entries[27].title, "Fun projects");
+  assert.equal(SiteFind.entries[27].title, "Fun Projects");
   assert.equal(SiteFind.entries[27].path, "fun-projects/");
   assert.equal(SiteFind.entries[28].title, "Activities & Competitions");
   assert.equal(SiteFind.entries[28].path, "activities-and-competitions/");
@@ -62,7 +62,7 @@ test("Find uses the hub brain: norm, exact, prefix, substring, cap 3", () => {
   const lte = SiteFind.search("lte");
   assert.equal(lte.length, 1);
   assert.equal(lte[0].title, "Letter to the Editor");
-  assert.equal(lte[0].path, "learning-materials/paper-2-exam-skills/letter-to-the-editor/");
+  assert.equal(lte[0].path, "learning-materials/paper-2-writing-formats/letter-to-the-editor/");
 
   const zh = SiteFind.search("讀者來函");
   assert.equal(zh[0].title, "Letter to the Editor");
@@ -95,7 +95,12 @@ test("hub cards reuse this index and do not grow a second list", () => {
 
   const formats = SiteFind.extraHaystack("paper-2-writing-formats/");
   assert.match(formats, /writing formats/i);
-  assert.equal(formats.includes("lte"), false);
+  assert.match(formats, /\blte\b/);
+  assert.match(formats, /letter to the editor/i);
+
+  const skills = SiteFind.extraHaystack("paper-2-exam-skills/");
+  assert.match(skills, /paper 2 exam skills/i);
+  assert.equal(skills.includes("lte"), false);
 
   const home = SiteFind.extraHaystack("../");
   assert.match(home, /english home/i);
@@ -119,8 +124,8 @@ test("Find and Ask jump links stay at the origin root on GitHub Pages", () => {
   assert.equal(SiteFind.hrefFor("/"), "/");
   assert.equal(SiteFind.hrefFor("/", ""), "/");
   assert.equal(
-    SiteFind.hrefFor("learning-materials/paper-2-exam-skills/letter-to-the-editor/", ""),
-    "/learning-materials/paper-2-exam-skills/letter-to-the-editor/"
+    SiteFind.hrefFor("learning-materials/paper-2-writing-formats/letter-to-the-editor/", ""),
+    "/learning-materials/paper-2-writing-formats/letter-to-the-editor/"
   );
   assert.equal(
     SiteFind.hrefFor("learning-materials/useful-vocabulary/#coh-h", ""),
@@ -149,8 +154,8 @@ test("Find and Ask jump links prefix /english/ on the school LMS", () => {
   assert.equal(SiteFind.hrefFor("/", base), "/english/");
   assert.equal(SiteFind.hrefFor("", base), "/english/");
   assert.equal(
-    SiteFind.hrefFor("learning-materials/paper-2-exam-skills/letter-to-the-editor/", base),
-    "/english/learning-materials/paper-2-exam-skills/letter-to-the-editor/"
+    SiteFind.hrefFor("learning-materials/paper-2-writing-formats/letter-to-the-editor/", base),
+    "/english/learning-materials/paper-2-writing-formats/letter-to-the-editor/"
   );
   assert.equal(
     SiteFind.hrefFor("learning-materials/useful-vocabulary/#coh-h", base),
@@ -167,8 +172,8 @@ test("script URL sets the base used by Find and Ask jumps", () => {
   );
   assert.equal(pages.siteBase(), "");
   assert.equal(
-    pages.hrefFor("learning-materials/paper-2-exam-skills/letter-to-the-editor/"),
-    "/learning-materials/paper-2-exam-skills/letter-to-the-editor/"
+    pages.hrefFor("learning-materials/paper-2-writing-formats/letter-to-the-editor/"),
+    "/learning-materials/paper-2-writing-formats/letter-to-the-editor/"
   );
   assert.equal(pages.hrefFor("/"), "/");
 
@@ -230,6 +235,8 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
     funPage,
     /href="https:\/\/skhhcss-eng\.github\.io\/say-it-louder\/" target="_blank" rel="noopener noreferrer"/
   );
+  assert.match(funPage, /<title>Fun Projects ·/);
+  assert.match(funPage, /<h1>Fun Projects<\/h1>/);
   assert.match(funPage, /Practise speaking in a short interactive story\./);
 
   assert.match(
@@ -276,20 +283,17 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
   assert.match(festival, /href="solo-verse\/"/);
   assert.match(festival, /href="u41\/"/);
 
-  const stubs = [
-    ["learning-materials/paper-1-exam-practice/redirect.html", "https://skhhcss-eng.github.io/paper-1-exam-practice/"],
-    ["learning-materials/reading-paper-1/index.html", "https://skhhcss-eng.github.io/paper-1-exam-practice/"],
-    ["speech-festival/redirect.html", "https://skhhcss-eng.github.io/speech-festival/"],
-    ["speech-festival/solo-verse/redirect.html", "https://skhhcss-eng.github.io/speech-festival/solo-verse/"],
-    ["speech-festival/u41/redirect.html", "https://skhhcss-eng.github.io/speech-festival/u41/"],
-    ["speech-festival/u47/redirect.html", "https://skhhcss-eng.github.io/speech-festival/u47/"],
-    ["speech-festival/u66/redirect.html", "https://skhhcss-eng.github.io/speech-festival/u66/"]
+  const removedRedirects = [
+    "learning-materials/paper-1-exam-practice/redirect.html",
+    "learning-materials/reading-paper-1/index.html",
+    "speech-festival/redirect.html",
+    "speech-festival/solo-verse/redirect.html",
+    "speech-festival/u41/redirect.html",
+    "speech-festival/u47/redirect.html",
+    "speech-festival/u66/redirect.html"
   ];
-  for (const [file, url] of stubs) {
-    const html = fs.readFileSync(new URL("./" + file, import.meta.url), "utf8");
-    assert.match(html, new RegExp("location\\.replace\\(\"" + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-    assert.match(html, new RegExp("location\\.search \\+ location\\.hash"));
-    assert.match(html, new RegExp('content="0; url=' + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '"'));
+  for (const file of removedRedirects) {
+    assert.equal(fs.existsSync(new URL("./" + file, import.meta.url)), false, file);
   }
 });
 
@@ -299,7 +303,7 @@ test("English home cards each have one job, in order", () => {
   assert.deepEqual(titles, [
     "Learning Materials",
     "Practice",
-    "Fun projects",
+    "Fun Projects",
     "Activities &amp; Competitions",
     "Classroom",
     "What's New"

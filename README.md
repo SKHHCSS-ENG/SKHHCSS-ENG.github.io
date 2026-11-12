@@ -5,7 +5,7 @@ Public GitHub Pages site for the English panel.
 - **Home:** https://skhhcss-eng.github.io/
 - **Learning materials:** https://skhhcss-eng.github.io/learning-materials/
 - **Practice:** https://skhhcss-eng.github.io/practice/
-- **Fun projects:** https://skhhcss-eng.github.io/fun-projects/
+- **Fun Projects:** https://skhhcss-eng.github.io/fun-projects/
 - **Activities & Competitions:** https://skhhcss-eng.github.io/activities-and-competitions/
 - **Classroom:** https://skhhcss-eng.github.io/classroom/
 - **What's New:** https://skhhcss-eng.github.io/whats-new/
@@ -19,24 +19,23 @@ Public GitHub Pages site for the English panel.
 
 | Path | What |
 |------|------|
-| `/` | English Department home (Learning Materials · Practice · Fun projects · Activities & Competitions · Classroom · What's New) |
+| `/` | English Department home (Learning Materials · Practice · Fun Projects · Activities & Competitions · Classroom · What's New) |
 | `/learning-materials/` | Student notes (exam skills, writing formats, junior grammar, useful vocabulary). Paper 1 - Reading links across to Practice. |
 | `/practice/` | Exam-style practice. Paper 1 - Exam Practice opens on its project site. |
-| `/fun-projects/` | Fun projects. Say It Louder opens on its project site. |
+| `/fun-projects/` | Fun Projects. Say It Louder opens on its project site. |
 | `/activities-and-competitions/` | Competitions (Speech Festival, Speak Up) and activities (Roaming Mic Challenge). |
 | `/classroom/` | Teacher tools hub |
 | `/classroom/hcs-live-class-plus/` | HCS Live Class + (same Live Class tools, plus a classroom assistant). Seating storage and saved plan names stay separate from Live Class. |
-| `/classroom/hcs-live-class/` | HCS Live Class (live scoreboard / desks / points). `/classroom/class-activity-studio/` redirects here. |
+| `/classroom/hcs-live-class/` | HCS Live Class (live scoreboard / desks / points). |
 | `/whats-new/` | Site updates (newest first) |
-| `/speech-festival/` | Speech Festival source copy (the Activities & Competitions card opens the project site). `redirect.html` beside each page points at that host. |
+| `/speech-festival/` | Speech Festival source copy (the Activities & Competitions card opens the project site). |
 | `/speech-festival/u41/` | U41 *Last Day* (Clare Bevan) — S3 Girls |
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |
 | `/speech-festival/u66/` | U66 *Late Home* (Gervase Phinn) — S3 Boys |
 | `/learning-materials/paper-1-exam-skills/` | Paper 1 - Exam Skills |
-| `/learning-materials/paper-1-exam-practice/` | Paper 1 - Exam Practice source copy (the Practice card opens the project site). Opening it under `/learning-materials/` redirects to the project site. `redirect.html` is the same soft redirect. |
-| `/learning-materials/reading-paper-1/` | Old Paper 1 practice address; redirects to the project site |
+| `/learning-materials/paper-1-exam-practice/` | Paper 1 - Exam Practice source copy (the Practice card opens the project site). Opening `index.html` under `/learning-materials/` still redirects to the project site. |
 | `/learning-materials/paper-2-exam-skills/` | Paper 2 - Exam Skills |
-| `/learning-materials/paper-2-writing-formats/` | Paper 2 - Writing Formats |
+| `/learning-materials/paper-2-writing-formats/` | Paper 2 - Writing Formats (letter to the editor, formal letter, article, blog, review, proposal, report, speech) |
 | `/learning-materials/paper-4-speaking-expressions/` | Paper 4 - Speaking Expressions |
 | `/learning-materials/grammar/` | Grammar |
 
