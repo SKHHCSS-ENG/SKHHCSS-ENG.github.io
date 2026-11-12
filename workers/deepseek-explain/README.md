@@ -79,7 +79,7 @@ Same URL, same secret, same origin allowlist (`https://skhhcss-eng.github.io`, `
 {
   "page": "Ask",
   "pagePath": "/learning-materials/useful-vocabulary/",
-  "findHits": "Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
+  "findHits": "Letter to the Editor — learning-materials/paper-2-writing-formats/letter-to-the-editor/",
   "message": "讀者來函在哪"
 }
 ```

@@ -223,14 +223,14 @@ test("Ask user message follows Tess’s template", () => {
   const message = buildAskUserMessage({
     pagePath: "/learning-materials/useful-vocabulary/",
     turn: 1,
-    findHits: "Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/\nCohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
+    findHits: "Letter to the Editor — learning-materials/paper-2-writing-formats/letter-to-the-editor/\nCohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
     message: "讀者來函在哪",
   });
   assert.equal(
     message,
     [
       "Page context: /learning-materials/useful-vocabulary/",
-      "Find hits (optional): Letter to the Editor — learning-materials/paper-2-exam-skills/letter-to-the-editor/",
+      "Find hits (optional): Letter to the Editor — learning-materials/paper-2-writing-formats/letter-to-the-editor/",
       "Cohesion (Linking Words) — learning-materials/useful-vocabulary/#coh-h",
       "Student: 讀者來函在哪",
       "Task: " + ASK_TASK,
@@ -257,7 +257,7 @@ test("Ask is a page mode on the same worker and does not replace Explain", async
     calls += 1;
     lastInit = { url: String(url), init: init };
     return new Response(JSON.stringify({
-      choices: [{ message: { content: "Letter to the Editor 在寫作格式頁。可開啟 learning-materials/paper-2-exam-skills/letter-to-the-editor/ 。" } }],
+      choices: [{ message: { content: "Letter to the Editor 在寫作格式頁。可開啟 learning-materials/paper-2-writing-formats/letter-to-the-editor/ 。" } }],
     }), { status: 200, headers: { "Content-Type": "application/json" } });
   };
   try {
