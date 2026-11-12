@@ -215,6 +215,62 @@ test('Drive client lists the folder, creates, and overwrites without a new paren
   assert.match(calls[4].url, /\/files\/file9/);
 });
 
+test('trashPlan moves a file to Drive trash and does not delete it', async function () {
+  var calls = [];
+  function clientWith(handler) {
+    return SD.createClient({
+      fetch: function (url, init) {
+        calls.push({ url: url, method: (init && init.method) || 'GET', body: init && init.body, headers: init && init.headers });
+        return Promise.resolve(handler(url, init));
+      },
+      getToken: function () { return Promise.resolve('token-1'); },
+      apiBase: 'https://example.test/drive/v3',
+      uploadBase: 'https://example.test/upload/drive/v3'
+    });
+  }
+  var ok = clientWith(function () {
+    return { ok: true, status: 200, text: async function () { return JSON.stringify({ id: 'ab/cd', name: '3A English.json', trashed: true }); } };
+  });
+  var trashed = await ok.trashPlan('ab/cd');
+  assert.equal(trashed.trashed, true);
+  assert.equal(trashed.id, 'ab/cd');
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].method, 'PATCH');
+  assert.equal(calls[0].url.indexOf('/upload/'), -1);
+  assert.match(calls[0].url, /https:\/\/example\.test\/drive\/v3\/files\/ab%2Fcd\?/);
+  assert.match(calls[0].url, /supportsAllDrives=true/);
+  assert.equal(calls[0].body, '{"trashed":true}');
+  assert.match(calls[0].headers.Authorization, /Bearer token-1/);
+  assert.equal(calls[0].headers['Content-Type'], 'application/json');
+
+  calls.length = 0;
+  var denied = clientWith(function () {
+    return { ok: false, status: 403, text: async function () { return ''; } };
+  });
+  await assert.rejects(denied.trashPlan('file9'), function (err) { return err && err.status === 403; });
+  assert.equal(calls[0].method, 'PATCH');
+  assert.equal(String(calls[0].body).indexOf('"trashed":false'), -1);
+});
+
+test('Open plan confirms by name, then moves that file to Drive trash', function () {
+  var html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  assert.match(html, /class="plan-item"/);
+  assert.match(html, /class="plan-row" data-plan-index="/);
+  assert.match(html, /class="plan-trash" data-plan-trash="/);
+  assert.match(html, /aria-label="Move ' \+ escapeHtml\(title\) \+ ' to trash"/);
+  assert.match(html, /Move ' \+ escapeHtml\(title\) \+ ' to trash\?/);
+  assert.match(html, /id="btnConfirmTrashPlan" class="plan-action">Move to trash</);
+  assert.match(html, /client\(\)\.trashPlan\(file\.id\)/);
+  assert.match(html, /showToast\('Moved ' \+ SD\.titleFromFileName\(file\.name\) \+ ' to trash'/);
+  var trashFn = html.slice(html.indexOf('function commitTrash'), html.indexOf('function openPlanFile'));
+  assert.ok(trashFn.indexOf('function commitTrash') === 0);
+  assert.equal(trashFn.indexOf('saveState'), -1);
+  assert.equal(trashFn.indexOf('applyPlanToState'), -1);
+  assert.equal(trashFn.indexOf('localStorage'), -1);
+  assert.equal(trashFn.indexOf('.delete('), -1);
+  assert.match(trashFn, /driveFailed\(err, 'Plans'\)/);
+});
+
 test('public client id is set, with no secret, and only an empty id is refused', function () {
   var cfg = fs.readFileSync(path.join(__dirname, 'drive-config.js'), 'utf8');
   assert.match(cfg, /clientId:\s*"322774470382-v8tevo6q55satejpvhqcd24l4ujmdruv\.apps\.googleusercontent\.com"/);
