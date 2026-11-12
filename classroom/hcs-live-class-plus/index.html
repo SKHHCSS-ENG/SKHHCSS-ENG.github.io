@@ -2167,6 +2167,44 @@
       outline: 2px solid #2a8fad;
       outline-offset: -2px;
     }
+    #planSheet .plan-item {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid #e8eef2;
+      background: #fff;
+    }
+    #planSheet .plan-item .plan-row {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      border-bottom: 0;
+    }
+    #planSheet .plan-trash {
+      flex: 0 0 44px;
+      width: 44px;
+      min-height: 44px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-left: 1px solid #e8eef2;
+      background: #fff;
+      color: #94a3b8;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    #planSheet .plan-trash:hover {
+      background: #fff1f2;
+      color: #e11d48;
+    }
+    #planSheet .plan-trash:focus-visible {
+      outline: 2px solid #2a8fad;
+      outline-offset: -2px;
+    }
+    #planSheet .plan-trash:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
     #planSheet .plan-row-title {
       font-size: 14px;
       font-weight: 700;
@@ -3029,6 +3067,16 @@
       color: var(--skin-text);
     }
     html[data-skin="minimalist"] #planSheet .plan-row-sub { color: var(--skin-muted); }
+    html[data-skin="minimalist"] #planSheet .plan-item {
+      background: var(--skin-bg);
+      border-bottom-color: var(--skin-line);
+    }
+    html[data-skin="minimalist"] #planSheet .plan-trash,
+    html[data-skin="minimalist"] #planSheet .plan-trash:hover {
+      background: var(--skin-bg);
+      color: var(--skin-muted);
+      border-left-color: var(--skin-line);
+    }
     html[data-skin="minimalist"] #planSheet .plan-action,
     html[data-skin="minimalist"] #planSheet .plan-action:hover {
       background: var(--skin-bg);
@@ -4232,7 +4280,9 @@
         plusSelectedId: '' // Last tapped desk. Not written by Live Class.
       };
 
-      let timerIntervalId = null;
+      let timerTimeoutId = null;
+      let timerEndsAt = null;
+      let timerFinishArmed = false;
       let pickerSpinIntervalId = null;
       let nameEditLock = false;
       let groupEditToken = 0;
@@ -8262,50 +8312,131 @@
         }
       }
 
-      function toggleTimerStartPause() {
-        if (state.timerRunning) {
-          clearInterval(timerIntervalId);
-          timerIntervalId = null;
-          state.timerRunning = false;
-          renderTimerUI();
-        } else {
-          if (state.timerRemainingSec <= 0) {
-            state.timerRemainingSec = state.timerTotalSec || 180;
-          }
-          state.timerRunning = true;
-          playSubtleSound('tick');
-          renderTimerUI();
-          if (timerIntervalId) clearInterval(timerIntervalId);
-          timerIntervalId = setInterval(function () {
-            if (state.timerRemainingSec > 0) {
-              state.timerRemainingSec--;
-              if (state.timerRemainingSec <= 5 && state.timerRemainingSec > 0) {
-                playSubtleSound('tick');
-              }
-              renderTimerUI();
-            }
-            if (state.timerRemainingSec <= 0) {
-              clearInterval(timerIntervalId);
-              timerIntervalId = null;
-              state.timerRunning = false;
-              playSubtleSound('fanfare', true);
-              renderTimerUI();
-              showToast('⏰ Classroom Timer Finished!', '🔔');
-            }
-          }, 1000);
+      // Ceil keeps the displayed second up until that second has fully elapsed.
+      function secondsLeftAt(endsAt, now) {
+        var ms = endsAt - now;
+        if (!(ms > 0)) return 0;
+        return Math.ceil(ms / 1000);
+      }
+
+      function clearTimerTick() {
+        if (timerTimeoutId) {
+          clearTimeout(timerTimeoutId);
+          timerTimeoutId = null;
         }
       }
 
-      function setTimerSeconds(seconds) {
-        if (timerIntervalId) {
-          clearInterval(timerIntervalId);
-          timerIntervalId = null;
+      function scheduleTimerTick(now) {
+        clearTimerTick();
+        if (!state.timerRunning || timerEndsAt == null) return;
+        var ms = timerEndsAt - now;
+        if (ms <= 0) {
+          timerTimeoutId = setTimeout(syncTimerToClock, 0);
+          return;
         }
+        var into = ms % 1000;
+        var wait = (into === 0 ? 1000 : into) + 20;
+        timerTimeoutId = setTimeout(syncTimerToClock, wait);
+      }
+
+      function completeTimer() {
+        var play = timerFinishArmed;
+        timerFinishArmed = false;
+        clearTimerTick();
+        timerEndsAt = null;
+        state.timerRemainingSec = 0;
+        state.timerRunning = false;
+        if (!play) {
+          renderTimerUI();
+          return;
+        }
+        playSubtleSound('fanfare', true);
+        renderTimerUI();
+        showToast('⏰ Classroom Timer Finished!', '🔔');
+      }
+
+      function syncTimerToClock() {
+        if (!state.timerRunning || timerEndsAt == null) return;
+        var now = Date.now();
+        var prev = state.timerRemainingSec;
+        var next = secondsLeftAt(timerEndsAt, now);
+        if (next <= 0) {
+          completeTimer();
+          return;
+        }
+        if (next !== prev) {
+          state.timerRemainingSec = next;
+          // A one-second step inside the last five seconds plays one tick.
+          // A background gap plays at most one tick if still in those five
+          // seconds, and none once the end time has already passed.
+          if (prev > next && next <= 5) playSubtleSound('tick');
+          renderTimerUI();
+        }
+        scheduleTimerTick(now);
+      }
+
+      function armTimerDeadline() {
+        var now = Date.now();
+        timerEndsAt = now + state.timerRemainingSec * 1000;
+        timerFinishArmed = true;
+        scheduleTimerTick(now);
+      }
+
+      function pauseTimer() {
+        var left = timerEndsAt == null ? state.timerRemainingSec : secondsLeftAt(timerEndsAt, Date.now());
+        if (left <= 0 && timerFinishArmed) {
+          completeTimer();
+          return;
+        }
+        clearTimerTick();
+        timerEndsAt = null;
+        timerFinishArmed = false;
+        state.timerRemainingSec = left;
+        state.timerRunning = false;
+        renderTimerUI();
+      }
+
+      function toggleTimerStartPause() {
+        if (state.timerRunning) {
+          pauseTimer();
+          return;
+        }
+        if (state.timerRemainingSec <= 0) {
+          state.timerRemainingSec = state.timerTotalSec || 180;
+        }
+        state.timerRunning = true;
+        playSubtleSound('tick');
+        renderTimerUI();
+        armTimerDeadline();
+      }
+
+      function setTimerSeconds(seconds) {
+        clearTimerTick();
+        timerEndsAt = null;
+        timerFinishArmed = false;
         state.timerRunning = false;
         state.timerTotalSec = Math.max(5, seconds);
         state.timerRemainingSec = state.timerTotalSec;
         renderTimerUI();
       }
+
+      function addTimerThirty() {
+        state.timerTotalSec += 30;
+        if (state.timerRunning) {
+          if (timerEndsAt == null) timerEndsAt = Date.now() + state.timerRemainingSec * 1000;
+          timerEndsAt += 30000;
+          timerFinishArmed = true;
+          state.timerRemainingSec = secondsLeftAt(timerEndsAt, Date.now());
+          scheduleTimerTick(Date.now());
+        } else {
+          state.timerRemainingSec += 30;
+        }
+        renderTimerUI();
+      }
+
+      document.addEventListener('visibilitychange', syncTimerToClock);
+      window.addEventListener('pageshow', syncTimerToClock);
+      window.addEventListener('focus', syncTimerToClock);
 
       // ===================================================================
       // CSV SCORE EXPORT & JSON BACKUP
@@ -8937,6 +9068,7 @@
         var folderTask = null;
         var viewGen = 0;
         var saving = false;
+        var trashing = false;
         var entryTitle = 'Save online';
 
         function currentClientId() {
@@ -8967,6 +9099,7 @@
           authWait = null;
           if (finish) finish('');
           saving = false;
+          trashing = false;
           var sheet = document.getElementById('planSheet');
           if (sheet) sheet.classList.add('hidden');
         }
@@ -9199,16 +9332,28 @@
           setBody('<div class="plan-list">' + files.map(function (f, i) {
             var title = SD.titleFromFileName(f.name);
             var sub = SD.formatSavedStamp(f.modifiedTime, SD.planWho(f));
-            return '<button type="button" class="plan-row" data-plan-index="' + i + '">' +
-              '<span class="plan-row-title">' + escapeHtml(title) + '</span>' +
-              (sub ? '<span class="plan-row-sub">' + escapeHtml(sub) + '</span>' : '') +
-              '</button>';
+            return '<div class="plan-item">' +
+              '<button type="button" class="plan-row" data-plan-index="' + i + '">' +
+                '<span class="plan-row-title">' + escapeHtml(title) + '</span>' +
+                (sub ? '<span class="plan-row-sub">' + escapeHtml(sub) + '</span>' : '') +
+              '</button>' +
+              '<button type="button" class="plan-trash" data-plan-trash="' + i + '" aria-label="Move ' + escapeHtml(title) + ' to trash">🗑️</button>' +
+              '</div>';
           }).join('') + '</div>');
           document.querySelectorAll('#planSheetBody [data-plan-index]').forEach(function (row) {
             row.addEventListener('click', function () {
               var f = files[Number(row.getAttribute('data-plan-index'))];
               if (!f) return;
               openPlanFile(f.id);
+            });
+          });
+          document.querySelectorAll('#planSheetBody [data-plan-trash]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              var f = files[Number(btn.getAttribute('data-plan-trash'))];
+              if (!f) return;
+              showTrashConfirm(f);
             });
           });
         }
@@ -9221,14 +9366,54 @@
           var gen = captureView();
           openSheet('Plans');
           setBody('');
-          ensureFolder().then(function (folderId) {
+          reloadPlans(gen).catch(function (err) {
+            if (!still(gen)) return;
+            driveFailed(err, 'Plans');
+          });
+        }
+
+        function reloadPlans(gen) {
+          return ensureFolder().then(function (folderId) {
             if (!folderId || !still(gen)) return;
             return client().listPlans(folderId).then(function (files) {
               if (!still(gen)) return;
               renderPlanList(files);
             });
-          }).catch(function (err) {
+          });
+        }
+
+        function showTrashConfirm(file) {
+          var title = SD.titleFromFileName(file.name);
+          openSheet('Plans');
+          setBody(
+            '<div class="plan-sheet-pad">' +
+              '<p class="plan-confirm">Move ' + escapeHtml(title) + ' to trash?</p>' +
+              '<button type="button" id="btnConfirmTrashPlan" class="plan-action">Move to trash</button>' +
+            '</div>'
+          );
+          document.getElementById('btnConfirmTrashPlan').addEventListener('click', function () {
+            commitTrash(file);
+          });
+        }
+
+        function commitTrash(file) {
+          if (trashing || !file || !file.id) return;
+          trashing = true;
+          var gen = captureView();
+          var btn = document.getElementById('btnConfirmTrashPlan');
+          if (btn) btn.disabled = true;
+          client().trashPlan(file.id).then(function () {
+            trashing = false;
+            showToast('Moved ' + SD.titleFromFileName(file.name) + ' to trash', '🗑️');
             if (!still(gen)) return;
+            return reloadPlans(gen).catch(function (err) {
+              if (!still(gen)) return;
+              driveFailed(err, 'Plans');
+            });
+          }).catch(function (err) {
+            trashing = false;
+            if (!still(gen)) return;
+            if (btn) btn.disabled = false;
             driveFailed(err, 'Plans');
           });
         }
@@ -9795,9 +9980,7 @@
           });
         });
         document.getElementById('btnTimerAdd30').addEventListener('click', function () {
-          state.timerTotalSec += 30;
-          state.timerRemainingSec += 30;
-          renderTimerUI();
+          addTimerThirty();
         });
         document.getElementById('btnSetCustomTimer').addEventListener('click', function () {
           const m = parseInt(document.getElementById('customTimerMin').value, 10) || 0;
@@ -10688,9 +10871,7 @@
             setTimerSeconds(state.timerTotalSec || 180);
             return { ok: true, message: 'Timer reset.' };
           }
-          state.timerTotalSec += 30;
-          state.timerRemainingSec += 30;
-          renderTimerUI();
+          addTimerThirty();
           return { ok: true, message: 'Added 30 seconds.' };
         }
         if (action === 'timer_set') {

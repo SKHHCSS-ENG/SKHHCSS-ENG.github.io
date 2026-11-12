@@ -340,6 +340,16 @@
           name: fileName,
           mimeType: PLAN_MIME
         }, payload);
+      },
+      trashPlan: function (fileId) {
+        var params = new URLSearchParams();
+        params.set('supportsAllDrives', 'true');
+        params.set('fields', 'id,name,trashed');
+        return driveFetch(apiBase + '/files/' + encodeURIComponent(fileId) + '?' + params.toString(), {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trashed: true })
+        }).then(function (res) { return readBody(res, false); });
       }
     };
   }
