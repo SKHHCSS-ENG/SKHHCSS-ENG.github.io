@@ -294,7 +294,7 @@ test('Studio chrome keeps local Save / Load and adds the Drive chips after them'
   var open = html.indexOf('id="btnOpenPlan"');
   assert.ok(save > 0 && load > save && online > load && open > online);
   assert.match(html, /id="btnSaveOnline"[^>]*>\s*Save online\s*</);
-  assert.match(html, /id="btnOpenPlan"[^>]*>\s*Open plan\s*</);
+  assert.match(html, /id="btnOpenPlan"[^>]*>\s*Load online\s*</);
   assert.match(html, /id="btnBackupJson"/);
   assert.match(html, /id="importJsonInput"/);
   assert.match(html, /id="planSheetTitle"/);

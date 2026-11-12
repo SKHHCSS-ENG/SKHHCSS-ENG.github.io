@@ -496,6 +496,8 @@ test('command lines dispatch the page controls', function () {
   assert.equal(plus.parseCommand('individual').action, 'mode_individual');
   assert.equal(plus.parseCommand('spark').action, 'skin_spark');
   assert.equal(plus.parseCommand('undo').action, 'undo');
+  assert.equal(plus.parseCommand('open plan').action, 'open_plan');
+  assert.equal(plus.parseCommand('load online').action, 'open_plan');
   assert.equal(plus.parseCommand('what does metaphor mean'), null);
   assert.match(plus.commandHelp(), /\+1 name/);
   plus.commandCatalog().forEach(function (action) {

@@ -3326,7 +3326,7 @@
           Save online
         </button>
         <button id="btnOpenPlan" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition">
-          Open plan
+          Load online
         </button>
       </div>
       </div>
@@ -9438,7 +9438,7 @@
             renderAll();
             renderIfModalOpen();
             closeSheet();
-            showToast('Opened ' + cls.name, '✅');
+            showToast('Loaded ' + cls.name, '✅');
           }).catch(function (err) {
             if (!still(gen)) return;
             driveFailed(err, 'Plans');
@@ -10572,7 +10572,7 @@
         distribute_groups: 'Share groups',
         reset_scores: 'Reset scores',
         save_online: 'Save online',
-        open_plan: 'Open plan',
+        open_plan: 'Load online',
         add_desk: 'Add desk',
         add_group: 'Add group',
         save_layout: 'Save layout',
@@ -10960,7 +10960,7 @@
           close_groups: ['btnCloseGroupModal', 'Groups closed.', true],
           reset_scores: ['btnOpenResetModal', 'Confirm the score reset.'],
           save_online: ['btnSaveOnline', 'Save online.', true],
-          open_plan: ['btnOpenPlan', 'Open a plan.', true],
+          open_plan: ['btnOpenPlan', 'Load online.', true],
           add_desk: ['btnQuickAddStudent', 'Added a desk.'],
           add_group: ['btnQuickAddGroup', 'Added a group.'],
           save_layout: ['btnSetDefaultLayout', 'Layout saved.'],

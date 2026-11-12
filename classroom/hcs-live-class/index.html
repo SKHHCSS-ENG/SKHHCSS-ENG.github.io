@@ -3328,7 +3328,7 @@
           Save online
         </button>
         <button id="btnOpenPlan" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition">
-          Open plan
+          Load online
         </button>
       </div>
       </div>
@@ -9365,7 +9365,7 @@
             renderAll();
             renderIfModalOpen();
             closeSheet();
-            showToast('Opened ' + cls.name, '✅');
+            showToast('Loaded ' + cls.name, '✅');
           }).catch(function (err) {
             if (!still(gen)) return;
             driveFailed(err, 'Plans');

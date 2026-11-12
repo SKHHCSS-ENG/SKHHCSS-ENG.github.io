@@ -174,6 +174,7 @@
     'reset scores': 'reset_scores',
     'save online': 'save_online',
     'open plan': 'open_plan',
+    'load online': 'open_plan',
     'add desk': 'add_desk',
     'add student': 'add_desk',
     'add group': 'add_group',
