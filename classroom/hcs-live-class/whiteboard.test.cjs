@@ -76,19 +76,22 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113f"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113f"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113f"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113f"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113g"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113g"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113g"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113g"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113f"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113g"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
 
 test('the board is memory only and does not join Ask or Dict', function () {
   assert.match(src, /id="wbColour"[^>]*aria-label="Colour"/);
+  assert.match(src, /id="wbColourPop"/);
+  assert.match(src, /setColour/);
+  assert.doesNotMatch(src, /cycleColour/);
   assert.doesNotMatch(src, /Color/);
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB/);
   assert.doesNotMatch(src + css, /HcsStudioDrive|gapi/);
@@ -112,7 +115,8 @@ test('ink stays for the session, and clear can be undone', function () {
   const board = wb.createSession();
   assert.equal(board.tool(), 'pen');
   assert.equal(board.colour().id, 'navy');
-  assert.notEqual(board.cycleColour().id, 'navy');
+  assert.equal(board.setColour('red').id, 'red');
+  assert.equal(board.colour().id, 'red');
   board.beginStroke(0.1, 0.2, 0.4);
   board.extendStroke(0.4, 0.5);
   assert.equal(board.endStroke(), true);
