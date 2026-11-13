@@ -76,13 +76,13 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113g"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113g"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113g"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113g"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113h"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113h"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113h"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113h"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113g"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113h"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
@@ -117,6 +117,9 @@ test('ink stays for the session, and clear can be undone', function () {
   assert.equal(board.colour().id, 'navy');
   assert.equal(board.setColour('red').id, 'red');
   assert.equal(board.colour().id, 'red');
+  assert.ok(wb.COLOURS.length > 6);
+  assert.equal(board.setColour('black').id, 'black');
+  assert.equal(board.setColour('purple').id, 'purple');
   board.beginStroke(0.1, 0.2, 0.4);
   board.extendStroke(0.4, 0.5);
   assert.equal(board.endStroke(), true);

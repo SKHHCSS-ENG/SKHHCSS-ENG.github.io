@@ -14,12 +14,21 @@
   }
 })(typeof window !== 'undefined' ? window : this, function (root) {
   var COLOURS = [
+    { id: 'black', hex: '#111827' },
     { id: 'navy', hex: '#123a4d' },
+    { id: 'grey', hex: '#64748b' },
+    { id: 'brown', hex: '#92400e' },
     { id: 'teal', hex: '#0e6b7a' },
     { id: 'blue', hex: '#2563eb' },
-    { id: 'red', hex: '#dc2626' },
+    { id: 'sky', hex: '#0284c7' },
+    { id: 'green', hex: '#15803d' },
+    { id: 'lime', hex: '#65a30d' },
+    { id: 'yellow', hex: '#ca8a04' },
     { id: 'amber', hex: '#b45309' },
-    { id: 'pink', hex: '#db2777' }
+    { id: 'orange', hex: '#ea580c' },
+    { id: 'red', hex: '#dc2626' },
+    { id: 'pink', hex: '#db2777' },
+    { id: 'purple', hex: '#7c3aed' }
   ];
   var PEN_BASE = 5;
   var PEN_PRESS = 2;
@@ -54,6 +63,9 @@
     var redo = [];
     var tool = 'pen';
     var colourIdx = 0;
+    for (var ci = 0; ci < COLOURS.length; ci++) {
+      if (COLOURS[ci].id === 'navy') { colourIdx = ci; break; }
+    }
     var nextTextId = 1;
     var open = false;
     var drawing = null;

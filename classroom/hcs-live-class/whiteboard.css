@@ -1,4 +1,4 @@
-/* HCS Live Class teacher whiteboard. Cache stamp: 20261113g.
+/* HCS Live Class teacher whiteboard. Cache stamp: 20261113h.
    Full-board overlay. Ink stays in memory for this tab. */
 
 .wb-sheet {
@@ -136,12 +136,12 @@
   z-index: 4;
   box-sizing: border-box;
   width: max-content;
-  max-width: min(16rem, calc(100vw - 24px));
-  padding: 12px;
-  border-radius: 16px;
+  max-width: min(12rem, calc(100vw - 24px));
+  padding: 8px;
+  border-radius: 12px;
   background: #fff;
   color: #123a4d;
-  box-shadow: 0 16px 40px rgba(18, 58, 77, 0.28);
+  box-shadow: 0 12px 28px rgba(18, 58, 77, 0.28);
 }
 
 .wb-colour-pop[hidden] {
@@ -149,30 +149,30 @@
 }
 
 .wb-colour-heading {
-  margin: 0 0 10px;
-  font-size: 14px;
+  margin: 0 0 6px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1.2;
 }
 
 .wb-colour-choices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(5, 28px);
+  gap: 6px;
 }
 
 .wb-colour-choice {
   box-sizing: border-box;
   appearance: none;
   -webkit-appearance: none;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   padding: 0;
   border: 2px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 0 1.5px rgba(18, 58, 77, 0.35);
+  box-shadow: 0 0 0 1px rgba(18, 58, 77, 0.35);
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -182,7 +182,7 @@
 }
 
 .wb-colour-choice[aria-pressed="true"] {
-  box-shadow: 0 0 0 3px #123a4d;
+  box-shadow: 0 0 0 2px #123a4d;
 }
 
 .wb-colour-choice:focus-visible {
