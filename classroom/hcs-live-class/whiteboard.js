@@ -305,6 +305,8 @@
       '<div class="wb-panel" role="dialog" aria-modal="true" aria-labelledby="whiteboardTitle" tabindex="-1">',
       '  <div class="wb-bar">',
       '    <h2 id="whiteboardTitle" class="wb-title">Whiteboard</h2>',
+      '    <div class="wb-brand studio-mark" id="wbBrand"></div>',
+      '    <div class="wb-actions">',
       '    <div class="wb-tools" role="toolbar" aria-label="Whiteboard tools">',
       '      <button type="button" class="wb-tool" data-wb-tool="pen" aria-pressed="true" aria-label="Pen" title="Pen"><span aria-hidden="true">✏️</span></button>',
       '      <button type="button" class="wb-tool" data-wb-tool="highlighter" aria-pressed="false" aria-label="Highlighter" title="Highlighter"><span aria-hidden="true">🖍️</span></button>',
@@ -322,6 +324,7 @@
       '      <button type="button" class="wb-tool" id="wbClear" aria-label="Clear" title="Clear"><span aria-hidden="true">🗑️</span></button>',
       '    </div>',
       '    <button type="button" class="wb-close" id="wbClose" aria-label="Close" title="Close">X</button>',
+      '    </div>',
       '  </div>',
       '  <div class="wb-stage">',
       '    <canvas id="wbCanvas" aria-label="Whiteboard drawing"></canvas>',
@@ -339,6 +342,13 @@
       '</div>'
     ].join('');
     doc.body.appendChild(sheet);
+
+    var brand = sheet.querySelector('#wbBrand');
+    var sourceMark = doc.querySelector('h1.studio-mark') || doc.querySelector('.studio-mark');
+    if (brand && sourceMark) {
+      var marks = sourceMark.querySelectorAll('img');
+      for (var mi = 0; mi < marks.length; mi++) brand.appendChild(marks[mi].cloneNode(true));
+    }
 
     var panel = sheet.querySelector('.wb-panel');
     var canvas = sheet.querySelector('#wbCanvas');
