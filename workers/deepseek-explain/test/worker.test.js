@@ -46,8 +46,9 @@ test("system prompt is Tess’s text, verbatim", () => {
   assert.equal(SYSTEM_PROMPT, TESS_PROMPT);
 });
 
-test("Explain allows Cohesion, Aspects, and Sentence Patterns", () => {
-  assert.deepEqual(ALLOWED_PAGES, ["Cohesion", "Aspects", "Sentence Patterns"]);
+test("Explain allows Cohesion, Aspects, Sentence Patterns, and Paper 1 vocabulary", () => {
+  assert.deepEqual(ALLOWED_PAGES, ["Cohesion", "Aspects", "Sentence Patterns", "Paper 1 - Past Paper Vocabulary"]);
+  for (const page of ALLOWED_PAGES) assert.equal(page.length <= 40, true);
 });
 
 test("user message fills the template and does not invent a reply", () => {
@@ -192,6 +193,20 @@ test("requests: cors, validation, rate limit, and a live API call", async () => 
     assert.match(aspectsSent.messages[1].content, /Category: Person/);
     assert.match(aspectsSent.messages[1].content, /Highlight: physical/);
     assert.match(aspectsSent.messages[1].content, /Gloss: 身體／生理/);
+
+    const paper1 = await handleRequest(post({
+      page: "Paper 1 - Past Paper Vocabulary",
+      itemLabel: "merely",
+      category: "2023 — How much, and how far",
+      sampleText: "The notice was merely a reminder, not a new rule.",
+      highlight: "merely",
+      gloss: "只不過",
+    }, "203.0.113.29"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(paper1.status, 200);
+    const paper1Sent = JSON.parse(lastInit.init.body);
+    assert.match(paper1Sent.messages[1].content, /^Page: Paper 1 - Past Paper Vocabulary\nItem: merely\n/);
+    assert.match(paper1Sent.messages[1].content, /Highlight: merely/);
+    assert.match(paper1Sent.messages[1].content, /Gloss: 只不過/);
 
     const listed = await handleRequest(post({
       page: "Sentence Patterns",

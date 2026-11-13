@@ -23,19 +23,25 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 35);
+  assert.equal(SiteFind.entries.length, 36);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 35);
+  assert.equal(new Set(paths).size, 36);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
-  assert.equal(SiteFind.entries[31].title, "What's New");
-  assert.equal(SiteFind.entries[31].path, "whats-new/");
-  assert.equal(SiteFind.entries[32].title, "Practice");
-  assert.equal(SiteFind.entries[32].path, "practice/");
-  assert.equal(SiteFind.entries[33].title, "Fun Projects");
-  assert.equal(SiteFind.entries[33].path, "fun-projects/");
-  assert.equal(SiteFind.entries[34].title, "Activities & Competitions");
-  assert.equal(SiteFind.entries[34].path, "activities-and-competitions/");
+  assert.equal(SiteFind.entries[28].title, "Paper 1 - Past Paper Vocabulary");
+  assert.equal(SiteFind.entries[28].path, "learning-materials/paper-1-past-paper-vocabulary/");
+  assert.equal(SiteFind.entries[32].title, "What's New");
+  assert.equal(SiteFind.entries[32].path, "whats-new/");
+  assert.equal(SiteFind.entries[33].title, "Practice");
+  assert.equal(SiteFind.entries[33].path, "practice/");
+  assert.equal(SiteFind.entries[34].title, "Fun Projects");
+  assert.equal(SiteFind.entries[34].path, "fun-projects/");
+  assert.equal(SiteFind.entries[35].title, "Activities & Competitions");
+  assert.equal(SiteFind.entries[35].path, "activities-and-competitions/");
+  const pastPaperVocab = SiteFind.search("past paper vocabulary");
+  assert.equal(pastPaperVocab.length, 1);
+  assert.equal(pastPaperVocab[0].title, "Paper 1 - Past Paper Vocabulary");
+  assert.equal(pastPaperVocab[0].path, "learning-materials/paper-1-past-paper-vocabulary/");
   assert.equal(paths.includes("learning-materials/paper-1-exam-practice/"), false);
   assert.equal(paths.includes("speech-festival/"), false);
   assert.equal(paths.includes("say-it-louder/"), false);
