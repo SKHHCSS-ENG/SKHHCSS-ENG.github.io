@@ -21,6 +21,7 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
   <link rel="stylesheet" href="assistant.css?v=20261111d">
+  <link rel="stylesheet" href="../hcs-live-class/whiteboard.css?v=20261113c">
   <meta name="theme-color" content="#123a4d">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -484,6 +485,55 @@
     .panel-title-bar h2 {
       margin: 0;
       text-align: center;
+    }
+    /* Podium is on the right of this heading. Hidden side panels hide it too. */
+    #leaderboardCard .panel-title-bar {
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 48px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      container-type: inline-size;
+    }
+    #leaderboardCard .panel-title-bar h2 {
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: left;
+    }
+    #btnOpenPodiumModal {
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      gap: 4px;
+      min-width: 44px;
+      min-height: 40px;
+      margin: 0;
+      padding: 0 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      color: #123a4d;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    #btnOpenPodiumModal:hover {
+      background: #f8fafc;
+    }
+    #btnOpenPodiumModal:focus-visible {
+      outline: 2px solid #2a8fad;
+      outline-offset: 2px;
+    }
+    @container (max-width: 280px) {
+      #btnOpenPodiumModal {
+        gap: 2px;
+        padding: 0 8px;
+        font-size: 11px;
+      }
     }
     /* The tab stays on the right edge of the classroom frame, at the
        vertical middle of the viewport. Panels open: ▶ tucks them.
@@ -1831,12 +1881,11 @@
         padding: 0 var(--studio-space);
       }
     }
-    /* Tools sits in the header, immediately after Export CSV.
-       The outer chip matches Podium and Sound: white/15 fill, white/25
+    /* Tools stays in the header utilities, after Whiteboard.
+       The outer chip matches Sound: white/15 fill, white/25
        border, rounded-xl, text-xs then text-sm from 640px. Amber and
        muted live only on the inner ON/OFF capsule. Collapsing the bands
-       does not move this slot. Export stays in the utility row; it does
-       not push itself to the right edge when that row wraps. */
+       does not move this slot. */
     #btnToggleStudioBands.edit-switch,
     #btnToggleStudioBands.edit-switch.is-on,
     #btnToggleStudioBands.edit-switch.is-off {
@@ -2339,12 +2388,7 @@
     }
     #studioHeaderCluster > div:first-child {
       gap: var(--studio-space);
-    }
-    #studioHeaderCluster label[for="classSelect"] {
-      padding: 0 var(--studio-space);
-      font-size: var(--studio-type-control);
-      font-weight: 700;
-      line-height: 1;
+      flex-wrap: nowrap;
     }
     #classSelect,
     #btnOpenClassModal,
@@ -2352,9 +2396,8 @@
     #btnModeGroup,
     #btnToggleTimerPanel,
     #btnOpenPickerModal,
-    #btnOpenPodiumModal,
     #btnToggleSound,
-    #btnExportCsv {
+    #btnOpenWhiteboard {
       box-sizing: border-box;
       height: var(--studio-header-chip);
       min-height: var(--studio-header-chip);
@@ -2364,10 +2407,38 @@
       line-height: 1;
     }
     #classSelect {
+      min-width: 0;
+      max-width: min(18rem, calc(100vw - 9rem));
       padding-right: var(--studio-header-chip);
     }
     #btnOpenClassModal {
-      margin-left: 0;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #fff;
+      box-shadow: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #btnOpenClassModal:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+    #btnOpenClassModal:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    #btnOpenClassModal svg {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
+    }
+    #btnOpenWhiteboard {
+      min-width: var(--studio-header-chip);
     }
     @media (min-width: 640px) {
       #classSelect,
@@ -2376,9 +2447,8 @@
       #btnModeGroup,
       #btnToggleTimerPanel,
       #btnOpenPickerModal,
-      #btnOpenPodiumModal,
       #btnToggleSound,
-      #btnExportCsv {
+      #btnOpenWhiteboard {
         font-size: var(--studio-type-control);
       }
     }
@@ -2590,11 +2660,11 @@
       box-shadow: none;
     }
     html[data-skin="minimalist"] #studioHeader #btnOpenPickerModal,
-    html[data-skin="minimalist"] #studioHeader #btnExportCsv,
     html[data-skin="minimalist"] #studioHeader #btnOpenClassModal,
+    html[data-skin="minimalist"] #studioHeader #btnOpenWhiteboard,
     html[data-skin="minimalist"] #studioHeader #btnOpenPickerModal:hover,
-    html[data-skin="minimalist"] #studioHeader #btnExportCsv:hover,
-    html[data-skin="minimalist"] #studioHeader #btnOpenClassModal:hover {
+    html[data-skin="minimalist"] #studioHeader #btnOpenClassModal:hover,
+    html[data-skin="minimalist"] #studioHeader #btnOpenWhiteboard:hover {
       box-shadow: inset 0 0 0 1px var(--skin-line);
     }
     html[data-skin="minimalist"] #btnModeIndividual.shadow-sm,
@@ -2885,6 +2955,13 @@
     html[data-skin="minimalist"] #leaderboardBody .text-slate-800 {
       color: var(--skin-text);
     }
+    html[data-skin="minimalist"] #btnOpenPodiumModal,
+    html[data-skin="minimalist"] #btnOpenPodiumModal:hover {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
     html[data-skin="minimalist"] #leaderboardSortHint {
       color: var(--skin-muted);
       background: var(--skin-bg);
@@ -3136,13 +3213,12 @@
       <div id="studioHeaderCluster" class="flex flex-wrap items-center gap-2 sm:gap-3">
         <!-- Preset Class Selector -->
         <div class="flex items-center bg-white/15 backdrop-blur-sm rounded-xl p-1 border border-white/20">
-          <label for="classSelect" class="text-xs font-semibold px-2 text-sky-100 hidden md:inline">Class:</label>
-          <select id="classSelect" aria-label="Select Preset Class" class="bg-white text-slate-800 text-xs sm:text-sm font-bold rounded-lg px-2.5 py-1.5 pr-7 focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer shadow-sm">
-          </select>
-          <button id="btnOpenClassModal" type="button" class="ml-1.5 px-2.5 py-1.5 rounded-lg bg-[#0c5a70]/50 hover:bg-[#0c5a70]/80 text-xs font-semibold text-white flex items-center gap-1 transition" title="Edit class lists and student names">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <button id="btnOpenClassModal" type="button" title="Edit class lists and student names" aria-label="Edit class lists and student names">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             <span>Class</span>
           </button>
+          <select id="classSelect" aria-label="Select Preset Class" class="bg-white text-slate-800 text-xs sm:text-sm font-bold rounded-lg px-2.5 py-1.5 pr-7 focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer shadow-sm">
+          </select>
         </div>
 
         <!-- Mode Switcher: Individual vs Group Work -->
@@ -3175,25 +3251,20 @@
           <span>Random</span>
         </button>
 
-        <!-- Podium Celebration Button -->
-        <button id="btnOpenPodiumModal" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" title="Show the live podium" aria-label="Podium">
-          <span aria-hidden="true">🏆</span>
-          <span class="hidden sm:inline">Podium</span>
-        </button>
-
         <!-- Sound Toggle -->
         <button id="btnToggleSound" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition" aria-label="Sound">
           <span id="soundIcon">🔊</span>
           <span id="soundLabel" class="hidden sm:inline">Sound</span>
         </button>
 
-        <!-- Export stays with Tools on the utility row. -->
+        <button id="btnOpenWhiteboard" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Whiteboard" aria-label="Whiteboard">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12" rx="1.5"/><path d="M8 20h8"/><path d="M12 16v4"/><path d="M7.5 8.5h5"/><path d="M7.5 11.5h3.5"/></svg>
+          <span class="hidden sm:inline">Whiteboard</span>
+        </button>
+
+        <!-- Tools stays at the end of the utility row. -->
         <div class="studio-header-export flex items-center gap-1.5 shrink-0">
           <div id="studioHeaderExportPair" class="flex items-center gap-1.5 shrink-0">
-            <button id="btnExportCsv" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span class="hidden sm:inline">Export CSV</span>
-            </button>
             <button type="button" id="btnToggleStudioBands" class="edit-switch is-on" aria-expanded="true" aria-pressed="true" aria-controls="studioToolbarRow" aria-label="Tools On">
               <span class="edit-switch-name">Tools</span>
               <span class="edit-switch-value" aria-hidden="true">ON</span>
@@ -3327,6 +3398,9 @@
         </button>
         <button id="btnOpenPlan" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition">
           Load online
+        </button>
+        <button id="btnExportCsv" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
+          Export CSV
         </button>
       </div>
       </div>
@@ -3483,6 +3557,10 @@
       <div id="leaderboardCard" class="bg-white rounded-2xl shadow-sm border border-slate-200/90 flex flex-col overflow-hidden min-h-0 is-open">
         <div class="panel-title-bar border-b border-slate-100 bg-slate-50/70">
           <h2 class="font-display font-bold text-slate-800 text-sm">Live Leaderboard</h2>
+          <button id="btnOpenPodiumModal" type="button" title="Show the live podium" aria-label="Podium">
+            <span aria-hidden="true">🏆</span>
+            <span class="podium-word">Podium</span>
+          </button>
         </div>
         <div id="leaderboardPanel" class="flex flex-col min-h-0 flex-1 overflow-hidden">
         <!-- Leaderboard tabs -->
@@ -3883,6 +3961,7 @@
   <script src="skins/loader.js" data-hcs-skin="packs"></script>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="studio-core.js?v=20261109c"></script>
+  <script src="../hcs-live-class/whiteboard.js?v=20261113c"></script>
   <script>
     (function () {
       'use strict';
