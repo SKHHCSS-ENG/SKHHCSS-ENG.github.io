@@ -152,7 +152,7 @@
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch];
       });
       var idAttr = String(pack.id || '').replace(/"/g, '');
-      buttons += '<button type="button" id="' + buttonId(pack) + '" class="skin-choice" data-skin-pack="' + idAttr + '" aria-pressed="false">' + label + '</button>';
+      buttons += '<button type="button" id="' + buttonId(pack) + '" class="skin-choice" data-skin-pack="' + idAttr + '" role="option" aria-pressed="false" aria-selected="false">' + label + '</button>';
     }
     writeDuringParse(buttons);
     return;
@@ -182,15 +182,42 @@
       return 'default';
     }
 
+    function skinLabel(skin) {
+      if (skin === 'minimalist') return 'Minimalist';
+      for (var n = 0; n < registryPacks.length; n++) {
+        if (registryPacks[n].id === skin) return registryPacks[n].label || registryPacks[n].id;
+      }
+      return 'Default';
+    }
+
+    function markChoice(btn, on) {
+      if (!btn) return;
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+
+    function setSkinMenuOpen(open) {
+      var menuBtn = document.getElementById('btnSkinMenu');
+      var list = document.getElementById('skinMenuList');
+      if (!menuBtn || !list) return;
+      menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) list.removeAttribute('hidden');
+      else list.setAttribute('hidden', '');
+    }
+
     function syncPressed() {
       var skin = skinNow();
-      var defBtn = document.getElementById('btnSkinDefault');
-      var minBtn = document.getElementById('btnSkinMinimalist');
-      if (defBtn) defBtn.setAttribute('aria-pressed', skin === 'default' ? 'true' : 'false');
-      if (minBtn) minBtn.setAttribute('aria-pressed', skin === 'minimalist' ? 'true' : 'false');
+      var label = skinLabel(skin);
+      markChoice(document.getElementById('btnSkinDefault'), skin === 'default');
+      markChoice(document.getElementById('btnSkinMinimalist'), skin === 'minimalist');
       for (var n = 0; n < registryPacks.length; n++) {
-        var btn = document.getElementById(buttonId(registryPacks[n]));
-        if (btn) btn.setAttribute('aria-pressed', skin === registryPacks[n].id ? 'true' : 'false');
+        markChoice(document.getElementById(buttonId(registryPacks[n])), skin === registryPacks[n].id);
+      }
+      var menuBtn = document.getElementById('btnSkinMenu');
+      if (menuBtn) {
+        var name = menuBtn.querySelector('.skin-menu-name');
+        if (name) name.textContent = label;
+        menuBtn.setAttribute('aria-label', 'Skin, ' + label);
       }
     }
 
@@ -205,6 +232,7 @@
         localStorage.setItem(KEY, skin);
       } catch (err) {}
       syncPressed();
+      setSkinMenuOpen(false);
     }
 
     var defBtn = document.getElementById('btnSkinDefault');
@@ -217,6 +245,27 @@
         if (btn) btn.addEventListener('click', function () { applySkin(pack.id); });
       })(registryPacks[k]);
     }
+
+    var menuBtn = document.getElementById('btnSkinMenu');
+    var menuList = document.getElementById('skinMenuList');
+    if (menuBtn && menuList) {
+      menuBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setSkinMenuOpen(menuBtn.getAttribute('aria-expanded') !== 'true');
+      });
+      document.addEventListener('click', function (e) {
+        var menu = document.querySelector('.skin-menu');
+        if (!menu || menu.contains(e.target)) return;
+        setSkinMenuOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (menuBtn.getAttribute('aria-expanded') !== 'true') return;
+        setSkinMenuOpen(false);
+        menuBtn.focus();
+      });
+    }
+
     syncPressed();
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this);
