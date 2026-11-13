@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { ASK_SYSTEM_PROMPT, ASK_TASK, LIVE_ORIGINS, SYSTEM_PROMPT, buildAskUserMessage, buildUserMessage, handleRequest } from "../src/index.js";
+import { ALLOWED_PAGES, ASK_SYSTEM_PROMPT, ASK_TASK, LIVE_ORIGINS, SYSTEM_PROMPT, buildAskUserMessage, buildUserMessage, handleRequest } from "../src/index.js";
 
 const TESS_PROMPT = `You explain short English language points for Hong Kong secondary students on a phone study page.
 
@@ -44,6 +44,10 @@ const cohesionBody = {
 
 test("system prompt is Tess’s text, verbatim", () => {
   assert.equal(SYSTEM_PROMPT, TESS_PROMPT);
+});
+
+test("Explain allows Cohesion, Aspects, and Sentence Patterns", () => {
+  assert.deepEqual(ALLOWED_PAGES, ["Cohesion", "Aspects", "Sentence Patterns"]);
 });
 
 test("user message fills the template and does not invent a reply", () => {
@@ -171,6 +175,23 @@ test("requests: cors, validation, rate limit, and a live API call", async () => 
     assert.equal(sent.messages[0].content.includes("British English"), false);
     assert.equal(lastInit.init.headers.Authorization, "Bearer " + KEY);
     assert.equal(JSON.stringify(okJson).includes(KEY), false);
+
+
+    const aspects = await handleRequest(post({
+      page: "Aspects",
+      itemLabel: "Physical",
+      category: "Person",
+      set: "Person",
+      sampleText: "From a physical aspect, long hours of homework leave many Form 5 students with sore necks and tired eyes.",
+      highlight: "physical",
+      gloss: "身體／生理",
+    }, "203.0.113.28"), { DEEPSEEK_API_KEY: KEY });
+    assert.equal(aspects.status, 200);
+    const aspectsSent = JSON.parse(lastInit.init.body);
+    assert.match(aspectsSent.messages[1].content, /^Page: Aspects\nItem: Physical\n/);
+    assert.match(aspectsSent.messages[1].content, /Category: Person/);
+    assert.match(aspectsSent.messages[1].content, /Highlight: physical/);
+    assert.match(aspectsSent.messages[1].content, /Gloss: 身體／生理/);
 
     const listed = await handleRequest(post({
       page: "Sentence Patterns",

@@ -63,7 +63,7 @@ An empty string keeps the control quiet (`Explain soon`, not tappable). The clie
 
 The user message is built from Tess’s template. The Task line asks for 2–4 short Traditional Chinese sentences and tells the model to keep English linker, pattern, and Aspects names. `gloss` is added only when the page sent one. Soft sample replies in the prompt pack are not stored here. Every accepted request calls `https://api.deepseek.com/chat/completions` (`deepseek-chat`).
 
-Explain stays a separate path: `page` must be `Cohesion` or `Sentence Patterns`, and the reply is `{ "explanation": "…" }` in Traditional Chinese 書面語. The system prompt includes the Aspects rule from the pack; this Worker still rejects an Aspects page.
+Explain stays a separate path: `page` must be `Cohesion`, `Aspects`, or `Sentence Patterns`, and the reply is `{ "explanation": "…" }` in Traditional Chinese 書面語.
 
 Success:
 
