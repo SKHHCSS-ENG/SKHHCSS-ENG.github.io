@@ -415,7 +415,13 @@
       bar.style.setProperty('--wb-scale', '1');
       var avail = bar.clientWidth;
       if (avail < 2) return;
-      var need = bar.scrollWidth;
+      var brand = bar.querySelector('.wb-brand');
+      var actions = bar.querySelector('.wb-actions');
+      var styles = root.getComputedStyle(bar);
+      var gap = parseFloat(styles.columnGap || styles.gap) || 0;
+      var pad = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+      var need = (brand ? brand.scrollWidth : 0) + (actions ? actions.scrollWidth : 0) + gap + pad;
+      if (bar.scrollWidth > need) need = bar.scrollWidth;
       var scale = need > avail + 1 ? avail / need : 1;
       if (scale < 32 / 44) {
         scale = 32 / 44;
