@@ -2187,3 +2187,11 @@ test("Learning Materials hub card uses the locked title and DSE + Phone pills", 
   const folder = hub.slice(hub.indexOf('id="sec-dse-p1"'), hub.indexOf('id="sec-dse-p2"'));
   assert.equal(folder.includes('href="paper-1-past-paper-vocabulary/"'), true);
 });
+
+test("phone CSS insets the last chip row and More links away from Ask", () => {
+  const css = fs.readFileSync(new URL("./page.css", import.meta.url), "utf8");
+  assert.match(html, /page\.css\?v=20261113c/);
+  assert.match(css, /@media \(max-width: 480px\)/);
+  assert.match(css, /padding-left: calc\(48px \+ env\(safe-area-inset-left, 0px\)\)/);
+  assert.match(css, /padding-bottom: calc\(72px \+ env\(safe-area-inset-bottom, 0px\)\)/);
+});

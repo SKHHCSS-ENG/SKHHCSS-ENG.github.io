@@ -132,4 +132,10 @@ body.p1-vocab.zh-on .year-set.hw-wrap {
   body.p1-vocab .more-vocab {
     padding-left: calc(48px + env(safe-area-inset-left, 0px));
   }
+
+  /* The last chip row can sit in the same corner as Ask and Tools.
+     Inset the list so the last row stays clear of the dock. */
+  body.p1-vocab .vocab-chips {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
 }
