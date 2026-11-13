@@ -79,13 +79,13 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113o"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113l"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113o"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113l"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113p"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113m"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113p"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113m"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113l"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113m"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
@@ -108,8 +108,13 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.match(src, /querySelector\('h1\.studio-mark'\)/);
   assert.match(src, /cloneNode\(true\)/);
   assert.match(css, /\.wb-brand \{[^}]*margin-right:\s*auto/);
-  assert.match(css, /#wbBrand\.studio-mark img \{[^}]*height:\s*36px/);
+  assert.match(css, /#wbBrand\.studio-mark img \{[^}]*height:\s*calc\(36px \* var\(--wb-scale, 1\)\)/);
   assert.doesNotMatch(css, /#wbBrand\.studio-mark img \{[^}]*display:\s*block/);
+  assert.match(css, /\.wb-bar \{[^}]*flex-wrap:\s*nowrap/);
+  assert.match(css, /\.wb-bar\.wb-bar-tight \{[^}]*flex-wrap:\s*wrap/);
+  assert.match(src, /function fitWbBar\(/);
+  assert.match(src, /--wb-scale/);
+  assert.doesNotMatch(css, /46vw|max-width:\s*861|@media \(max-width: 420px\)/);
   assert.match(css, /\.wb-tools \{[^}]*justify-content:\s*flex-end/);
   assert.match(css, /\.wb-actions \{[^}]*justify-content:\s*flex-end/);
   assert.match(css, /\.wb-close \{[^}]*margin-left:\s*0/);
@@ -117,7 +122,7 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.doesNotMatch(src, /<\/div>',\s*'    <button type="button" class="wb-close"/);
   assert.match(css, /\.wb-colour-pop \{[^}]*right:\s*0/);
   assert.match(css, /min-height:\s*44px/);
-  assert.match(css, /width:\s*44px/);
+  assert.match(css, /width:\s*calc\(44px \* var\(--wb-scale, 1\)\)/);
   assert.match(css, /html\[data-skin="minimalist"\] \.wb-bar/);
   assert.match(css, /html\[data-skin="minimalist"\] \.wb-bar \{[^}]*background:\s*var\(--skin-bg/);
   assert.match(css, /html\[data-skin="minimalist"\] \.wb-tool\[aria-pressed="true"\] \{[^}]*background:\s*var\(--skin-accent/);

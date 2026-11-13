@@ -1,4 +1,4 @@
-/* HCS Live Class teacher whiteboard. Cache stamp: 20261113l.
+/* HCS Live Class teacher whiteboard. Cache stamp: 20261113p.
    Full-board overlay. Ink stays in memory for this tab. */
 
 .wb-sheet {
@@ -30,14 +30,19 @@
   position: relative;
   z-index: 3;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: calc(8px * var(--wb-scale, 1));
   flex: 0 0 auto;
   padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left));
   background: linear-gradient(to right, #123a4d, #2a8fad, #5bbad5);
   color: #fff;
+  --wb-scale: 1;
+}
+
+.wb-bar.wb-bar-tight {
+  flex-wrap: wrap;
 }
 
 .wb-brand {
@@ -45,35 +50,37 @@
   align-items: center;
   margin-right: auto;
   min-width: 0;
-  flex: 1 1 10rem;
+  flex: 0 0 auto;
   padding-right: 4px;
 }
 
 .wb-brand img {
   display: block;
   width: auto;
-  height: 36px;
-  max-width: min(240px, 46vw);
+  height: calc(36px * var(--wb-scale, 1));
   object-fit: contain;
   object-position: left center;
 }
 
 #wbBrand.studio-mark img {
   width: auto;
-  height: 36px;
-  max-width: min(240px, 46vw);
+  height: calc(36px * var(--wb-scale, 1));
   object-fit: contain;
   object-position: left center;
 }
 
 .wb-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: calc(6px * var(--wb-scale, 1));
   flex: 0 1 auto;
   min-width: 0;
+}
+
+.wb-bar.wb-bar-tight .wb-actions {
+  flex-wrap: wrap;
 }
 
 .wb-title {
@@ -91,11 +98,15 @@
 .wb-tools {
   display: flex;
   flex: 0 1 auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: calc(6px * var(--wb-scale, 1));
   min-width: 0;
+}
+
+.wb-bar.wb-bar-tight .wb-tools {
+  flex-wrap: wrap;
 }
 
 .wb-tool,
@@ -115,20 +126,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
+  gap: calc(6px * var(--wb-scale, 1));
+  width: calc(44px * var(--wb-scale, 1));
+  height: calc(44px * var(--wb-scale, 1));
+  min-width: calc(44px * var(--wb-scale, 1));
+  min-height: calc(44px * var(--wb-scale, 1));
   padding: 0;
-  flex: 0 0 44px;
+  flex: 0 0 calc(44px * var(--wb-scale, 1));
   border: 1px solid rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
 }
 
 .wb-tool {
-  font-size: 20px;
+  font-size: calc(20px * var(--wb-scale, 1));
   font-weight: 600;
   line-height: 1;
 }
@@ -158,8 +169,8 @@
 }
 
 .wb-swatch {
-  width: 20px;
-  height: 20px;
+  width: calc(20px * var(--wb-scale, 1));
+  height: calc(20px * var(--wb-scale, 1));
   border-radius: 50%;
   box-shadow: 0 0 0 1.5px #fff;
   flex: 0 0 auto;
@@ -237,12 +248,12 @@
 }
 
 .wb-close {
-  flex: 0 0 auto;
+  flex: 0 0 calc(44px * var(--wb-scale, 1));
   margin-left: 0;
   background: #fff;
   color: #123a4d;
   border-color: #fff;
-  font-size: 18px;
+  font-size: calc(18px * var(--wb-scale, 1));
   font-weight: 800;
 }
 
@@ -384,17 +395,6 @@
 
 #wbConfirmClear:hover {
   background: #be123c;
-}
-
-@media (max-width: 420px) {
-  .wb-tool,
-  .wb-close {
-    padding: 0 8px;
-  }
-
-  .wb-tool {
-    font-size: 18px;
-  }
 }
 
 /* Minimalist uses a white header, so the board bar matches that chrome. */
