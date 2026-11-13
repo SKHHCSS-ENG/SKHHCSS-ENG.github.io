@@ -1,6 +1,6 @@
 # DeepSeek Explain worker
 
-Short explanations for the Cohesion sheet and Sentence Patterns samples, a short Ask chat (`page: "Ask"`), a free dictionary lookup (`mode: "dict"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, SpeakNovel, and the Dict gloss call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those calls share that binding. The Dict English block calls the Free Dictionary API and does not use that key. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
+Short explanations for the Cohesion, Aspects, Sentence Patterns, and Paper 1 vocabulary samples, a short Ask chat (`page: "Ask"`), a free dictionary lookup (`mode: "dict"`), Say It Louder SpeakNovel (`mode: "speaknovel"`), and neural speech (`mode: "tts"`). The browser calls this Worker. Explain, Ask, SpeakNovel, and the Dict gloss call DeepSeek. The API key stays here as the secret `DEEPSEEK_API_KEY`. Those calls share that binding. The Dict English block calls the Free Dictionary API and does not use that key. Voice uses optional secrets `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`; without them, `tts` falls back to a zero-key en-GB MP3.
 
 Live site origins: `https://skhhcss-eng.github.io` and `https://learning.hcs.edu.hk` (the school LMS; pages live under `/english/`, which is not part of the Origin header).  
 This repo has no GitHub Pages preview origin. The org site is served from `main` on `skhhcss-eng.github.io` only.  
@@ -59,11 +59,11 @@ An empty string keeps the control quiet (`Explain soon`, not tappable). The clie
 }
 ```
 
-`page` must be `Cohesion` or `Sentence Patterns`. `itemLabel` and `sampleText` are required. `label` and `sample` are accepted as aliases. `category`, `highlight` (string or short list), `gloss`, and `locale` are optional. `locale` does not switch the reply language. Explain replies are Traditional Chinese 書面語 (Howard lock 2026-10-29). English linker names, pattern names, aspect names, and quoted sample words stay as given.
+`page` must be `Cohesion`, `Aspects`, `Sentence Patterns`, or `Paper 1 - Past Paper Vocabulary`. `itemLabel` and `sampleText` are required. `label` and `sample` are accepted as aliases. `category`, `highlight` (string or short list), `gloss`, and `locale` are optional. `locale` does not switch the reply language. Explain replies are Traditional Chinese 書面語 (Howard lock 2026-10-29). English linker names, pattern names, aspect names, and quoted sample words stay as given.
 
 The user message is built from Tess’s template. The Task line asks for 2–4 short Traditional Chinese sentences and tells the model to keep English linker, pattern, and Aspects names. `gloss` is added only when the page sent one. Soft sample replies in the prompt pack are not stored here. Every accepted request calls `https://api.deepseek.com/chat/completions` (`deepseek-chat`).
 
-Explain stays a separate path: `page` must be `Cohesion`, `Aspects`, or `Sentence Patterns`, and the reply is `{ "explanation": "…" }` in Traditional Chinese 書面語.
+Explain stays a separate path: `page` must be `Cohesion`, `Aspects`, `Sentence Patterns`, or `Paper 1 - Past Paper Vocabulary`, and the reply is `{ "explanation": "…" }` in Traditional Chinese 書面語.
 
 Success:
 
