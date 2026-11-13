@@ -125,3 +125,11 @@ body.p1-vocab.zh-on .year-set.hw-wrap {
     display: none !important;
   }
 }
+
+/* At phone widths the wrap is full-bleed, so the second More link can sit
+   in the same corner as the Ask chip. Indent the links so the label stays clear. */
+@media (max-width: 480px) {
+  body.p1-vocab .more-vocab {
+    padding-left: calc(48px + env(safe-area-inset-left, 0px));
+  }
+}
