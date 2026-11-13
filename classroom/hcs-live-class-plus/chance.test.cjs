@@ -49,7 +49,7 @@ test('More is a 32px chip after Tools and before Fullscreen', function () {
   assert.match(html, /--studio-header-chip:\s*32px/);
   assert.match(html, /id="btnMore"[^>]*title="More"/);
   assert.match(html, /id="btnMore"[^>]*aria-label="More"/);
-  assert.match(html, /id="btnMore"[^>]*>\+<\/button>/);
+  assert.match(html, /id="btnMore"[^>]*>➕<\/button>/);
   assert.doesNotMatch(html, /id="btnMore"[^>]*aria-label="\+"/);
   assert.match(html, /#btnMore,\s*#btnStudioFullscreen,\s*#btnToggleHeaderBanner\s*\{[^}]*width:\s*var\(--studio-header-chip\)/);
   assert.match(html, /#btnMore\s*\{[^}]*height:\s*var\(--studio-header-chip\)/);

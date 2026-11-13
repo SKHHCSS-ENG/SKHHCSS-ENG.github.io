@@ -2000,10 +2000,13 @@
       padding-right: 0;
     }
     #btnMore {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       height: var(--studio-header-chip);
       min-height: var(--studio-header-chip);
       padding: 0;
-      font-size: 20px;
+      font-size: 18px;
       line-height: 1;
     }
     #btnToggleHeaderBanner {
@@ -3620,7 +3623,7 @@
       <!-- More, then Fullscreen and collapse. 32px chips, full size, top-right. -->
       <div class="studio-header-pin">
         <div class="more-menu">
-          <button type="button" id="btnMore" class="studio-lesson-btn" title="More" aria-label="More" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenuList">+</button>
+          <button type="button" id="btnMore" class="studio-lesson-btn" title="More" aria-label="More" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenuList">➕</button>
           <div id="moreMenuList" class="more-menu-list" role="menu" aria-label="More" hidden>
             <!-- Later Plus extras go in this menu, not as new header chips. Chance stays first. -->
             <button type="button" id="btnOpenChance" class="more-menu-item" role="menuitem" data-more-action="chance">Chance</button>
