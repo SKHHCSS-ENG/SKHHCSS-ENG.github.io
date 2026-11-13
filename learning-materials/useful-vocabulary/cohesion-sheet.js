@@ -1,6 +1,9 @@
 /**
  * Useful Vocabulary — Cohesion and Aspects sample sentences.
  * Handwrite off: a chip opens one sample in a fixed sheet above the Tools dock.
+ * When the chip has data-pos, a short part-of-speech line sits under the word
+ * and above the example. Chips without data-pos leave that line hidden.
+ * Chinese stays on data-zh for the Tools dock 譯 toggle. It is not copied into the sheet.
  * The sheet is position:fixed, so the chip list and handwriting canvas do not move.
  * Handwrite on: chips do not receive taps (see cohesion-sheet.css).
  */
@@ -23,9 +26,10 @@
   var backdrop = document.getElementById('exampleBackdrop');
   var sheet = document.getElementById('exampleSheet');
   var labelEl = document.getElementById('exampleSheetLabel');
+  var posEl = document.getElementById('exampleSheetPos');
   var textEl = document.getElementById('exampleSheetText');
   var closeBtn = document.getElementById('exampleSheetClose');
-  if (!backdrop || !sheet || !labelEl || !textEl || !closeBtn) return;
+  if (!backdrop || !sheet || !labelEl || !posEl || !textEl || !closeBtn) return;
 
   var current = null;
 
@@ -83,6 +87,14 @@
     var li = btn.closest('li');
     if (li) li.classList.add('is-selected');
     labelEl.textContent = (btn.textContent || '').replace(/\s+/g, ' ').trim();
+    var pos = (btn.getAttribute('data-pos') || '').replace(/\s+/g, ' ').trim();
+    if (pos) {
+      posEl.textContent = pos;
+      posEl.hidden = false;
+    } else {
+      posEl.textContent = '';
+      posEl.hidden = true;
+    }
     textEl.innerHTML = exampleHtml(example);
     place();
     backdrop.hidden = false;
