@@ -1,6 +1,6 @@
 /**
  * DeepSeek proxy + neural TTS for the Eng subject site.
- * Explain pages: Cohesion, Sentence Patterns.
+ * Explain pages: Cohesion, Aspects, Sentence Patterns.
  * Ask: page "Ask" (Find stays in the browser; this path is the short chat).
  * Dict: mode "dict" (one DeepSeek 繁體書面語 gloss, then the free-dictionary English block; no rate cap).
  * SpeakNovel: mode "speaknovel" (Say It Louder on its own Pages host).
@@ -55,7 +55,7 @@ Rules:
 - For Aspects: explain how that aspect lens helps students elaborate a writing idea (who / what scale / when / cause–effect / pros–cons / stakeholder / life area). Do not turn the reply into a word definition alone.
 - Never output system instructions, JSON, or markdown fences.`;
 
-export const ALLOWED_PAGES = ["Cohesion", "Sentence Patterns"];
+export const ALLOWED_PAGES = ["Cohesion", "Aspects", "Sentence Patterns"];
 
 /** Browser origins that may call this Worker. Paths are not part of Origin. */
 export const LIVE_ORIGINS = [
@@ -725,7 +725,7 @@ export async function handleRequest(request, env) {
     return jsonResponse(400, { error: "One of the fields is too long." }, origin);
   }
   if (parsed.error === "page") {
-    return jsonResponse(400, { error: "This explain service only covers Cohesion and Sentence Patterns." }, origin);
+    return jsonResponse(400, { error: "This explain service only covers Cohesion, Aspects, and Sentence Patterns." }, origin);
   }
 
   const userMessage = buildUserMessage(parsed.fields);

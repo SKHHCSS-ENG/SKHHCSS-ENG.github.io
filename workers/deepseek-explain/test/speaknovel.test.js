@@ -276,7 +276,7 @@ test("SpeakNovel returns the game schema and does not replace Ask or Explain", a
       scenarioId: "level_1_lost_bag",
     }, "203.0.113.121"), { DEEPSEEK_API_KEY: KEY });
     assert.equal(oldCoach.status, 400);
-    assert.equal((await oldCoach.json()).error, "This explain service only covers Cohesion and Sentence Patterns.");
+    assert.equal((await oldCoach.json()).error, "This explain service only covers Cohesion, Aspects, and Sentence Patterns.");
     assert.equal(calls, 0);
 
     const missing = await handleRequest(post({ mode: "speaknovel", episode: "ep1_boba" }, "203.0.113.122"), { DEEPSEEK_API_KEY: KEY });
