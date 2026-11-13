@@ -89,18 +89,19 @@ test('More menu paints above Zoom the same way the Skin menu does', function () 
   assert.match(html, /#chanceSheet\s*\{\s*z-index:\s*80;\s*\}/);
 });
 
-test('Chance sheet title, tip, and draw labels', function () {
-  assert.equal(chance.TIP, 'Draw a card and follow the instruction.');
+test('Chance sheet title and draw labels, with no extra Chance or tip', function () {
   assert.equal(chance.DRAW_LABEL, 'Draw a card');
   assert.equal(chance.REDRAW_LABEL, 'Draw again');
+  assert.equal(chance.TIP, undefined);
   assert.match(html, /id="chanceSheetTitle">Chance</);
-  assert.match(html, /id="chanceTip"[^>]*>Draw a card and follow the instruction\.</);
+  assert.doesNotMatch(html, /id="chanceTip"|chance-tip|chance-card-kicker/);
+  assert.doesNotMatch(html + js, /Draw a card and follow the instruction/);
   assert.match(html, /id="btnDrawChance"[^>]*>Draw a card</);
   assert.match(html, /id="btnCloseChanceSheet"[^>]*aria-label="Close"/);
   assert.match(js, /drawBtn\.textContent = api\.REDRAW_LABEL/);
   assert.match(js, /promptEl\.textContent = step\.prompt/);
-  assert.match(html, /chance\.js\?v=20261114a/);
-  assert.match(js, /Cache stamp: 20261114a/);
+  assert.match(html, /chance\.js\?v=20261114b/);
+  assert.match(js, /Cache stamp: 20261114b/);
 });
 
 test('the 12 prompts match the locked set and the page never says Monopoly', function () {
