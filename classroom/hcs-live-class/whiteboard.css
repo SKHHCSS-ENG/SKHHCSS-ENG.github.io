@@ -1,4 +1,4 @@
-/* HCS Live Class teacher whiteboard. Cache stamp: 20261113j.
+/* HCS Live Class teacher whiteboard. Cache stamp: 20261113k.
    Full-board overlay. Ink stays in memory for this tab. */
 
 .wb-sheet {
@@ -356,4 +356,41 @@
   .wb-tool {
     font-size: 18px;
   }
+}
+
+/* Minimalist uses a white header, so the board bar matches that chrome. */
+html[data-skin="minimalist"] .wb-bar {
+  background: var(--skin-bg, #fff);
+  color: var(--skin-text, #0f172a);
+  box-shadow: inset 0 -1px 0 var(--skin-line, #e2e8f0);
+}
+
+html[data-skin="minimalist"] .wb-tool,
+html[data-skin="minimalist"] .wb-close {
+  background: var(--skin-bg, #fff);
+  color: var(--skin-text, #0f172a);
+  border-color: var(--skin-line, #e2e8f0);
+}
+
+html[data-skin="minimalist"] .wb-tool:hover,
+html[data-skin="minimalist"] .wb-close:hover {
+  background: #f8fafc;
+  color: var(--skin-text, #0f172a);
+}
+
+html[data-skin="minimalist"] .wb-tool[aria-pressed="true"] {
+  background: #fcd34d;
+  border-color: #f59e0b;
+  color: #0f172a;
+}
+
+html[data-skin="minimalist"] .wb-tool:focus-visible,
+html[data-skin="minimalist"] .wb-close:focus-visible,
+html[data-skin="minimalist"] .wb-confirm-actions button:focus-visible,
+html[data-skin="minimalist"] .wb-text:focus-visible {
+  outline-color: var(--skin-accent, #2a8fad);
+}
+
+html[data-skin="minimalist"] .wb-swatch {
+  box-shadow: 0 0 0 1.5px var(--skin-text, #0f172a);
 }

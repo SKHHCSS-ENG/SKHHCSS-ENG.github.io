@@ -68,6 +68,9 @@ function assertPageChrome(html, label) {
   assert.match(html, /#btnToggleTimerPanel,\s*#btnOpenPickerModal,\s*#btnToggleSound,\s*#btnOpenWhiteboard \{/);
   assert.doesNotMatch(html, /#btnOpenPodiumModal,\s*#btnToggleSound/);
   assert.doesNotMatch(html, /#btnExportCsv,/);
+  const inset = sliceBetween(html, 'html[data-skin="minimalist"] #studioHeader #btnOpenPickerModal', 'box-shadow: inset 0 0 0 1px var(--skin-line);');
+  assert.match(inset, /#btnOpenClassModal/);
+  assert.doesNotMatch(inset, /#btnOpenWhiteboard/);
   assert.match(html, /document\.getElementById\('btnOpenPodiumModal'\)\.addEventListener\('click', openPodiumModal\)/);
   assert.match(html, /document\.getElementById\('btnExportCsv'\)\.addEventListener\('click', exportClassScoresToCsv\)/);
   assert.match(html, /document\.getElementById\('btnOpenClassModal'\)\.addEventListener\('click', openClassModal\)/);
@@ -76,9 +79,9 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113j"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113k"/);
   assert.match(liveHtml, /src="whiteboard\.js\?v=20261113j"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113j"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113k"/);
   assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113j"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
@@ -102,6 +105,8 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.doesNotMatch(src, /id="wbClose">Close</);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /width:\s*44px/);
+  assert.match(css, /html\[data-skin="minimalist"\] \.wb-bar/);
+  assert.match(css, /html\[data-skin="minimalist"\] \.wb-bar \{[^}]*background:\s*var\(--skin-bg/);
   assert.match(css, /\.wb-close/);
   assert.match(src, /Clear the whiteboard\? Undo brings it back/);
   assert.match(src, /e\.key !== 'Escape'/);
