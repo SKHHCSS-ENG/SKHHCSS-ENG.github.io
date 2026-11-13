@@ -5,7 +5,7 @@
  * then the next draw takes the next card from what is left.
  * Later Plus extras belong in #moreMenuList (data-more-action), not as new
  * header chips. Add the action on MORE_ACTIONS.
- * Cache stamp: 20261114a.
+ * Cache stamp: 20261114b.
  */
 (function (root) {
   var api = factory();
@@ -21,7 +21,6 @@
   function factory() {
     var DRAW_LABEL = 'Draw a card';
     var REDRAW_LABEL = 'Draw again';
-    var TIP = 'Draw a card and follow the instruction.';
     var CARDS = [
       { text: 'Lucky! Choose a classmate to draw the next card.' },
       { text: 'You have 15 seconds: name as many snacks as you can, in English.' },
@@ -75,7 +74,6 @@
       CARDS: CARDS,
       DRAW_LABEL: DRAW_LABEL,
       REDRAW_LABEL: REDRAW_LABEL,
-      TIP: TIP,
       shuffle: shuffle,
       drawChance: drawChance
     };

@@ -2393,14 +2393,7 @@
       outline: 2px solid #2a8fad;
       outline-offset: 2px;
     }
-    #chanceSheet .chance-tip {
-      margin: 0;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      font-weight: 600;
-      color: #475569;
-    }
-    /* A classroom card: amber band, cream face, prompt large enough for a phone. */
+    /* A classroom card: cream face, prompt large enough for a phone. */
     #chanceSheet .chance-card {
       margin: 0;
       border-radius: 16px;
@@ -2410,21 +2403,9 @@
       box-shadow: 0 6px 0 #d97706;
     }
     #chanceSheet .chance-card[hidden] { display: none; }
-    #chanceSheet .chance-card-kicker {
-      margin: 0;
-      padding: 8px 14px;
-      background: linear-gradient(90deg, #f59e0b, #fbbf24);
-      color: #431407;
-      font-family: var(--font-display);
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      line-height: 1.2;
-    }
     #chanceSheet .chance-card-prompt {
       margin: 0;
-      padding: 16px 14px 18px;
+      padding: 18px 14px;
       font-size: clamp(1.25rem, 4.8vw, 1.5rem);
       line-height: 1.35;
       font-weight: 700;
@@ -2442,8 +2423,7 @@
       color: var(--skin-text);
       box-shadow: inset 0 -1px 0 var(--skin-line);
     }
-    html[data-skin="minimalist"] #chanceSheet .plan-close,
-    html[data-skin="minimalist"] #chanceSheet .chance-tip {
+    html[data-skin="minimalist"] #chanceSheet .plan-close {
       color: var(--skin-text);
     }
     html[data-skin="minimalist"] #chanceSheet .plan-action,
@@ -4313,9 +4293,7 @@
         <button type="button" id="btnCloseChanceSheet" class="plan-close" aria-label="Close">✕</button>
       </div>
       <div class="plan-sheet-pad">
-        <p id="chanceTip" class="chance-tip">Draw a card and follow the instruction.</p>
         <div id="chanceCard" class="chance-card" hidden>
-          <p class="chance-card-kicker">Chance</p>
           <p id="chancePrompt" class="chance-card-prompt"></p>
         </div>
         <button type="button" id="btnDrawChance" class="plan-action">Draw a card</button>
@@ -11528,7 +11506,7 @@
     window.HCS_LIVE_CLASS_PLUS_WORKER = "https://live-class-plus.skhhcss-eng.workers.dev";
   </script>
   <script src="assistant.js?v=20261110e"></script>
-  <script src="chance.js?v=20261114a"></script>
+  <script src="chance.js?v=20261114b"></script>
 <script src="../../site-version.js?v=sv"></script>
 <script>
   (function () {
