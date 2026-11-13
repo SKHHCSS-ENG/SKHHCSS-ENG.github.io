@@ -21,7 +21,7 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
   <link rel="stylesheet" href="assistant.css?v=20261111d">
-  <link rel="stylesheet" href="../hcs-live-class/whiteboard.css?v=20261113c">
+  <link rel="stylesheet" href="../hcs-live-class/whiteboard.css?v=20261113d">
   <meta name="theme-color" content="#123a4d">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2567,7 +2567,6 @@
       padding: 0 var(--studio-space-2);
       font-size: var(--studio-type-label);
     }
-    #leaderboardSortHint,
     #pulseBody .grid > div > div:first-child {
       font-size: var(--studio-type-label);
       line-height: 16px;
@@ -2962,11 +2961,6 @@
       border-color: var(--skin-line);
       box-shadow: none;
     }
-    html[data-skin="minimalist"] #leaderboardSortHint {
-      color: var(--skin-muted);
-      background: var(--skin-bg);
-      box-shadow: inset 0 0 0 1px var(--skin-line);
-    }
     html[data-skin="minimalist"] #tabLbStudents.shadow-sm,
     html[data-skin="minimalist"] #tabLbGroups.shadow-sm,
     html[data-skin="minimalist"] #tabLbFeed.shadow-sm {
@@ -3258,7 +3252,7 @@
         </button>
 
         <button id="btnOpenWhiteboard" type="button" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm" title="Whiteboard" aria-label="Whiteboard">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="12" rx="1.5"/><path d="M8 20h8"/><path d="M12 16v4"/><path d="M7.5 8.5h5"/><path d="M7.5 11.5h3.5"/></svg>
+          <span aria-hidden="true">🖊️</span>
           <span class="hidden sm:inline">Whiteboard</span>
         </button>
 
@@ -3565,10 +3559,6 @@
         <div id="leaderboardPanel" class="flex flex-col min-h-0 flex-1 overflow-hidden">
         <!-- Leaderboard tabs -->
         <div class="px-3 pt-2 pb-3 border-b border-slate-100 bg-slate-50/70">
-          <div class="flex items-center justify-end mb-2">
-            <span id="leaderboardSortHint" class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Real-Time Rank</span>
-          </div>
-
           <!-- Segmented Tabs: Students | Groups | Feed -->
           <div class="grid grid-cols-3 gap-1 bg-slate-200/75 p-1 rounded-xl">
             <button id="tabLbStudents" type="button" class=" py-1.5 rounded-lg text-xs font-bold transition bg-white text-indigo-700 shadow-sm">
@@ -3961,7 +3951,7 @@
   <script src="skins/loader.js" data-hcs-skin="packs"></script>
   <script src="https://accounts.google.com/gsi/client" async></script>
   <script src="studio-core.js?v=20261109c"></script>
-  <script src="../hcs-live-class/whiteboard.js?v=20261113c"></script>
+  <script src="../hcs-live-class/whiteboard.js?v=20261113d"></script>
   <script>
     (function () {
       'use strict';

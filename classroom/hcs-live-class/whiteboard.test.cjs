@@ -39,6 +39,8 @@ function assertPageChrome(html, label) {
   });
   assert.match(utils, /hidden sm:inline">Whiteboard</);
   assert.match(utils, /aria-label="Whiteboard"/);
+  assert.match(utils, /🖊️/);
+  assert.doesNotMatch(utils, /<svg/);
   assert.doesNotMatch(utils, /btnOpenPodiumModal|btnExportCsv/);
 
   const toolbar = sliceBetween(html, 'id="studioToolbarRow"', 'id="studioWorkspace"');
@@ -58,6 +60,7 @@ function assertPageChrome(html, label) {
   assert.match(card, /🏆/);
   assert.match(card, /class="podium-word">Podium</);
   assert.match(card, /title="Show the live podium"/);
+  assert.doesNotMatch(html, /Real-Time Rank|leaderboardSortHint/);
   assert.equal((html.match(/id="btnOpenPodiumModal"/g) || []).length, 1);
   assert.equal((html.match(/id="btnExportCsv"/g) || []).length, 1);
   assert.equal((html.match(/id="btnOpenWhiteboard"/g) || []).length, 1);
@@ -73,13 +76,13 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113c"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113c"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113c"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113c"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113d"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113d"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113d"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113d"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113c"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113d"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
@@ -88,7 +91,11 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.match(src, />Colour</);
   assert.doesNotMatch(src, /Color/);
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB/);
-  assert.doesNotMatch(src + css, /highlighter|HcsStudioDrive|gapi/);
+  assert.doesNotMatch(src + css, /HcsStudioDrive|gapi/);
+  assert.match(src, /data-wb-tool="highlighter"[^>]*>Highlighter</);
+  assert.match(src, /id="wbClose"[^>]*>X</);
+  assert.match(src, /aria-label="Close"/);
+  assert.doesNotMatch(src, /id="wbClose">Close</);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /\.wb-close/);
   assert.match(src, /Clear the whiteboard\? Undo brings it back/);
@@ -160,4 +167,25 @@ test('text is placed, edited, and kept out of the pen', function () {
   assert.equal(board.strokes()[0].width, wb.ERASER);
   board.endStroke();
   assert.deepEqual(board.texts().map(function (item) { return item.value; }), ['Hello', 'Keep me']);
+});
+
+test('highlighter makes a wider translucent stroke and leaves text alone', function () {
+  const board = wb.createSession();
+  board.setTool('highlighter');
+  assert.equal(board.tool(), 'highlighter');
+  board.beginStroke(0.2, 0.2, 0.5);
+  board.extendStroke(0.5, 0.4);
+  assert.equal(board.endStroke(), true);
+  assert.equal(board.strokes()[0].highlight, true);
+  assert.equal(board.strokes()[0].erase, false);
+  assert.ok(board.strokes()[0].width > wb.PEN_BASE);
+  assert.ok(board.strokes()[0].width >= wb.HIGHLIGHT_BASE);
+  board.setTool('text');
+  assert.equal(board.beginStroke(0.3, 0.3, 1), null);
+  const note = board.placeText(0.1, 0.1);
+  board.commitText(note.id, 'Keep');
+  board.setTool('highlighter');
+  board.beginStroke(0.1, 0.1, 0.5);
+  board.endStroke();
+  assert.deepEqual(board.texts().map(function (item) { return item.value; }), ['Keep']);
 });
