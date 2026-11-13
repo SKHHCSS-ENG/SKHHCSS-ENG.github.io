@@ -132,8 +132,13 @@
         return tool;
       },
       colour: colour,
-      cycleColour: function () {
-        colourIdx = (colourIdx + 1) % COLOURS.length;
+      setColour: function (id) {
+        for (var i = 0; i < COLOURS.length; i++) {
+          if (COLOURS[i].id === id) {
+            colourIdx = i;
+            break;
+          }
+        }
         return colour();
       },
       strokes: function () { return strokes; },
@@ -289,14 +294,20 @@
       '  <div class="wb-bar">',
       '    <h2 id="whiteboardTitle" class="wb-title">Whiteboard</h2>',
       '    <div class="wb-tools" role="toolbar" aria-label="Whiteboard tools">',
-      '      <button type="button" class="wb-tool" data-wb-tool="pen" aria-pressed="true">Pen</button>',
-      '      <button type="button" class="wb-tool" data-wb-tool="highlighter" aria-pressed="false">Highlighter</button>',
-      '      <button type="button" class="wb-tool" id="wbColour"><span class="wb-swatch" aria-hidden="true"></span><span>Colour</span></button>',
-      '      <button type="button" class="wb-tool" data-wb-tool="eraser" aria-pressed="false">Eraser</button>',
-      '      <button type="button" class="wb-tool" data-wb-tool="text" aria-pressed="false">Text</button>',
-      '      <button type="button" class="wb-tool" id="wbUndo">Undo</button>',
-      '      <button type="button" class="wb-tool" id="wbRedo">Redo</button>',
-      '      <button type="button" class="wb-tool" id="wbClear">Clear</button>',
+      '      <button type="button" class="wb-tool" data-wb-tool="pen" aria-pressed="true" aria-label="Pen" title="Pen"><span aria-hidden="true">✏️</span></button>',
+      '      <button type="button" class="wb-tool" data-wb-tool="highlighter" aria-pressed="false" aria-label="Highlighter" title="Highlighter"><span aria-hidden="true">🖍️</span></button>',
+      '      <div class="wb-colour-wrap">',
+      '        <button type="button" class="wb-tool" id="wbColour" aria-label="Colour" title="Colour" aria-haspopup="dialog" aria-expanded="false" aria-controls="wbColourPop"><span class="wb-swatch" aria-hidden="true"></span></button>',
+      '        <div class="wb-colour-pop" id="wbColourPop" hidden role="dialog" aria-labelledby="wbColourPopTitle">',
+      '          <p id="wbColourPopTitle" class="wb-colour-heading">Colour</p>',
+      '          <div class="wb-colour-choices"></div>',
+      '        </div>',
+      '      </div>',
+      '      <button type="button" class="wb-tool" data-wb-tool="eraser" aria-pressed="false" aria-label="Eraser" title="Eraser"><span aria-hidden="true">🧽</span></button>',
+      '      <button type="button" class="wb-tool" data-wb-tool="text" aria-pressed="false" aria-label="Text" title="Text"><span aria-hidden="true">🔤</span></button>',
+      '      <button type="button" class="wb-tool" id="wbUndo" aria-label="Undo" title="Undo"><span aria-hidden="true">↩️</span></button>',
+      '      <button type="button" class="wb-tool" id="wbRedo" aria-label="Redo" title="Redo"><span aria-hidden="true">↪️</span></button>',
+      '      <button type="button" class="wb-tool" id="wbClear" aria-label="Clear" title="Clear"><span aria-hidden="true">🗑️</span></button>',
       '    </div>',
       '    <button type="button" class="wb-close" id="wbClose" aria-label="Close" title="Close">X</button>',
       '  </div>',
@@ -322,7 +333,19 @@
     var layer = sheet.querySelector('#wbTextLayer');
     var stage = sheet.querySelector('.wb-stage');
     var colourBtn = sheet.querySelector('#wbColour');
+    var colourPop = sheet.querySelector('#wbColourPop');
+    var colourChoices = sheet.querySelector('.wb-colour-choices');
     var swatch = sheet.querySelector('.wb-swatch');
+    COLOURS.forEach(function (c) {
+      var btn = doc.createElement('button');
+      btn.type = 'button';
+      btn.className = 'wb-colour-choice';
+      btn.setAttribute('data-wb-colour', c.id);
+      btn.setAttribute('aria-label', c.id.charAt(0).toUpperCase() + c.id.slice(1));
+      btn.title = c.id.charAt(0).toUpperCase() + c.id.slice(1);
+      btn.style.background = c.hex;
+      colourChoices.appendChild(btn);
+    });
     var undoBtn = sheet.querySelector('#wbUndo');
     var redoBtn = sheet.querySelector('#wbRedo');
     var clearBtn = sheet.querySelector('#wbClear');
@@ -438,11 +461,29 @@
       });
     }
 
+    function hideColourPop() {
+      colourPop.hidden = true;
+      colourBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function showColourPop() {
+      hideConfirm();
+      colourPop.hidden = false;
+      colourBtn.setAttribute('aria-expanded', 'true');
+      syncColour();
+      var on = colourPop.querySelector('[data-wb-colour="' + session.colour().id + '"]');
+      if (on && on.focus) on.focus();
+    }
+
     function syncColour() {
       var c = session.colour();
+      var name = c.id.charAt(0).toUpperCase() + c.id.slice(1);
       swatch.style.background = c.hex;
-      colourBtn.setAttribute('aria-label', 'Colour: ' + c.id + '. Tap to change.');
-      colourBtn.title = 'Colour: ' + c.id;
+      colourBtn.setAttribute('aria-label', 'Colour: ' + name + '. Tap to choose.');
+      colourBtn.title = 'Colour: ' + name;
+      Array.prototype.forEach.call(colourPop.querySelectorAll('[data-wb-colour]'), function (btn) {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-wb-colour') === c.id ? 'true' : 'false');
+      });
     }
 
     function syncTools() {
@@ -478,6 +519,7 @@
 
     function openSheet() {
       hideConfirm();
+      hideColourPop();
       session.openBoard();
       sheet.hidden = false;
       openBtn.setAttribute('aria-pressed', 'true');
@@ -493,6 +535,7 @@
     function closeSheet() {
       finishEditing();
       hideConfirm();
+      hideColourPop();
       session.closeBoard();
       sheet.hidden = true;
       openBtn.setAttribute('aria-pressed', 'false');
@@ -510,9 +553,23 @@
       else closeSheet();
     });
     closeBtn.addEventListener('click', closeSheet);
-    colourBtn.addEventListener('click', function () {
-      session.cycleColour();
+    colourBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (colourPop.hidden) showColourPop();
+      else hideColourPop();
+    });
+    colourPop.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var choice = e.target.closest ? e.target.closest('[data-wb-colour]') : null;
+      if (!choice) return;
+      session.setColour(choice.getAttribute('data-wb-colour'));
+      hideColourPop();
       syncColour();
+    });
+    sheet.addEventListener('click', function (e) {
+      if (colourPop.hidden) return;
+      if (colourBtn.contains(e.target) || colourPop.contains(e.target)) return;
+      hideColourPop();
     });
     undoBtn.addEventListener('click', function () {
       finishEditing();
@@ -527,6 +584,7 @@
     clearBtn.addEventListener('click', function () {
       finishEditing();
       if (!session.hasInk()) return;
+      hideColourPop();
       confirm.hidden = false;
       confirmCancel.focus();
     });
@@ -560,6 +618,11 @@
     });
 
     canvas.addEventListener('pointerdown', function (e) {
+      if (!colourPop.hidden) {
+        hideColourPop();
+        e.preventDefault();
+        return;
+      }
       if (session.tool() === 'text') return;
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (activePointer != null) return;
@@ -603,6 +666,10 @@
       e.stopPropagation();
       if (!confirm.hidden) {
         hideConfirm();
+        return;
+      }
+      if (!colourPop.hidden) {
+        hideColourPop();
         return;
       }
       closeSheet();
