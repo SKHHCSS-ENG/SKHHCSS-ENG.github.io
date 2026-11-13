@@ -49,9 +49,16 @@
   padding-right: 4px;
 }
 
-#wbBrand.studio-mark img,
 .wb-brand img {
   display: block;
+  width: auto;
+  height: 36px;
+  max-width: min(240px, 46vw);
+  object-fit: contain;
+  object-position: left center;
+}
+
+#wbBrand.studio-mark img {
   width: auto;
   height: 36px;
   max-width: min(240px, 46vw);
