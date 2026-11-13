@@ -23,8 +23,21 @@
   ];
   var PEN_BASE = 5;
   var PEN_PRESS = 2;
+  var HIGHLIGHT_BASE = 22;
+  var HIGHLIGHT_PRESS = 6;
+  var HIGHLIGHT_ALPHA = 0.38;
   var ERASER = 36;
   var HISTORY_LIMIT = 80;
+
+  function colourWithAlpha(hex, alpha) {
+    var n = String(hex || '').replace('#', '');
+    if (n.length === 3) n = n[0] + n[0] + n[1] + n[1] + n[2] + n[2];
+    var r = parseInt(n.slice(0, 2), 16);
+    var g = parseInt(n.slice(2, 4), 16);
+    var b = parseInt(n.slice(4, 6), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return hex;
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+  }
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -115,7 +128,7 @@
       closeBoard: function () { open = false; },
       tool: function () { return tool; },
       setTool: function (next) {
-        if (next === 'pen' || next === 'eraser' || next === 'text') tool = next;
+        if (next === 'pen' || next === 'highlighter' || next === 'eraser' || next === 'text') tool = next;
         return tool;
       },
       colour: colour,
@@ -130,12 +143,17 @@
       hasInk: hasInk,
       beginStroke: function (x, y, pressure) {
         if (tool === 'text' || drawing) return null;
-        var width = tool === 'eraser' ? ERASER : PEN_BASE + pressureOf(pressure) * PEN_PRESS;
+        var width = tool === 'eraser'
+          ? ERASER
+          : tool === 'highlighter'
+            ? HIGHLIGHT_BASE + pressureOf(pressure) * HIGHLIGHT_PRESS
+            : PEN_BASE + pressureOf(pressure) * PEN_PRESS;
         pendingUndo = snapshot();
         drawing = {
           colour: colour().hex,
           width: width,
           erase: tool === 'eraser',
+          highlight: tool === 'highlighter',
           points: [{ x: x, y: y }]
         };
         strokes.push(drawing);
@@ -239,8 +257,9 @@
       ctx.fillStyle = 'rgba(0,0,0,1)';
     } else {
       ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = stroke.colour;
-      ctx.fillStyle = stroke.colour;
+      var ink = stroke.highlight ? colourWithAlpha(stroke.colour, HIGHLIGHT_ALPHA) : stroke.colour;
+      ctx.strokeStyle = ink;
+      ctx.fillStyle = ink;
     }
     if (pts.length === 1) {
       ctx.beginPath();
@@ -271,6 +290,7 @@
       '    <h2 id="whiteboardTitle" class="wb-title">Whiteboard</h2>',
       '    <div class="wb-tools" role="toolbar" aria-label="Whiteboard tools">',
       '      <button type="button" class="wb-tool" data-wb-tool="pen" aria-pressed="true">Pen</button>',
+      '      <button type="button" class="wb-tool" data-wb-tool="highlighter" aria-pressed="false">Highlighter</button>',
       '      <button type="button" class="wb-tool" id="wbColour"><span class="wb-swatch" aria-hidden="true"></span><span>Colour</span></button>',
       '      <button type="button" class="wb-tool" data-wb-tool="eraser" aria-pressed="false">Eraser</button>',
       '      <button type="button" class="wb-tool" data-wb-tool="text" aria-pressed="false">Text</button>',
@@ -278,7 +298,7 @@
       '      <button type="button" class="wb-tool" id="wbRedo">Redo</button>',
       '      <button type="button" class="wb-tool" id="wbClear">Clear</button>',
       '    </div>',
-      '    <button type="button" class="wb-close" id="wbClose">Close</button>',
+      '    <button type="button" class="wb-close" id="wbClose" aria-label="Close" title="Close">X</button>',
       '  </div>',
       '  <div class="wb-stage">',
       '    <canvas id="wbCanvas" aria-label="Whiteboard drawing"></canvas>',
@@ -603,6 +623,7 @@
   return {
     COLOURS: COLOURS,
     PEN_BASE: PEN_BASE,
+    HIGHLIGHT_BASE: HIGHLIGHT_BASE,
     ERASER: ERASER,
     createSession: createSession,
     drawStroke: drawStroke,
