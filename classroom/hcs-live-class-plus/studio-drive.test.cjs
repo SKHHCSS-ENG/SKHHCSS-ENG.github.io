@@ -283,7 +283,7 @@ test('public client id is set, with no secret, and only an empty id is refused',
   assert.equal(html.split("showToast('Google sign-in is not set up.'").length - 1, 2);
   assert.match(html, /if \(!configured\(\)\) \{\s*showToast\('Google sign-in is not set up\.', '⚠️'\);\s*return;\s*\}/);
   var saveHandler = html.slice(html.indexOf("getElementById('btnSaveOnline')"), html.indexOf("getElementById('btnOpenPlan')"));
-  assert.match(saveHandler, /if \(!hasToken\(\)\) \{\s*showSignIn\('Save online'\);\s*return;\s*\}/);
+  assert.match(saveHandler, /if \(!hasToken\(\)\) \{\s*showSignIn\('Save Online'\);\s*return;\s*\}/);
   assert.equal(saveHandler.indexOf('startSignIn'), -1);
 });
 
@@ -294,8 +294,8 @@ test('Studio chrome keeps local Save / Load and adds the Drive chips after them'
   var online = html.indexOf('id="btnSaveOnline"');
   var open = html.indexOf('id="btnOpenPlan"');
   assert.ok(save > 0 && load > save && online > load && open > online);
-  assert.match(html, /id="btnSaveOnline"[^>]*>\s*Save online\s*</);
-  assert.match(html, /id="btnOpenPlan"[^>]*>\s*Load online\s*</);
+  assert.match(html, /id="btnSaveOnline"[^>]*>\s*Save Online\s*</);
+  assert.match(html, /id="btnOpenPlan"[^>]*>\s*Load Online\s*</);
   assert.match(html, /id="btnBackupJson"/);
   assert.match(html, /id="importJsonInput"/);
   assert.match(html, /id="planSheetTitle"/);
