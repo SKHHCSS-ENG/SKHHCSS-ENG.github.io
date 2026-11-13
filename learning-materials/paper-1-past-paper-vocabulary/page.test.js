@@ -690,7 +690,7 @@ test("Explain posts this page name, and More links to the two locked pages", () 
   assert.match(explainJs, /Paper 1 - Past Paper Vocabulary/);
   assert.match(explainJs, /body\.classList\.contains\("p1-vocab"\)/);
   assert.match(html, /href="\.\.\/paper-1-exam-skills\/">Paper 1 - Exam Skills →/);
-  assert.match(html, /href="\.\.\/useful-vocabulary\/">Vocabulary in Context →/);
+  assert.match(html, /href="\.\.\/useful-vocabulary\/">Useful Vocabulary →/);
   assert.match(html, /tools-dock\.js\?v=20261022d/);
   assert.match(html, /id="zhToggle"/);
   assert.match(html, /id="dockFold"[^>]*>🛠/);
