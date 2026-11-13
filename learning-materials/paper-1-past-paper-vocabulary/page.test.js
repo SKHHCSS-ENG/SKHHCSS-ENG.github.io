@@ -2190,8 +2190,10 @@ test("Learning Materials hub card uses the locked title and DSE + Phone pills", 
 
 test("phone CSS insets the last chip row and More links away from Ask", () => {
   const css = fs.readFileSync(new URL("./page.css", import.meta.url), "utf8");
-  assert.match(html, /page\.css\?v=20261113c/);
+  assert.match(html, /page\.css\?v=20261113d/);
   assert.match(css, /@media \(max-width: 480px\)/);
   assert.match(css, /padding-left: calc\(48px \+ env\(safe-area-inset-left, 0px\)\)/);
+  assert.match(css, /padding-left: calc\(32px \+ env\(safe-area-inset-left, 0px\)\)/);
+  assert.match(css, /padding-right: calc\(44px \+ env\(safe-area-inset-right, 0px\)\)/);
   assert.match(css, /padding-bottom: calc\(72px \+ env\(safe-area-inset-bottom, 0px\)\)/);
 });
