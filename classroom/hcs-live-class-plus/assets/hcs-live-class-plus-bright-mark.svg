@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="HCS Live Class +">
+  <!-- Bright mark only (no wordmark), Plus in the open cell. Ground = Default mast deep teal #123a4d. -->
+  <rect width="128" height="128" fill="#123a4d"/>
+  <defs>
+    <linearGradient id="meshBright" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(17,23)">
+    <rect x="0" y="0" width="96" height="22" rx="11" fill="url(#meshBright)"/>
+    <circle cx="12" cy="40" r="10" fill="#22d3ee"/>
+    <circle cx="48" cy="40" r="10" fill="#facc15"/>
+    <circle cx="84" cy="40" r="10" fill="#fb7185"/>
+    <circle cx="12" cy="72" r="10" fill="#22d3ee"/>
+    <circle cx="48" cy="72" r="10" fill="#facc15"/>
+    <!-- Plus in the open cell of the school mark, same geometry as the Plus header logo. -->
+    <g fill="#f8fafc">
+      <rect x="80.5" y="62" width="7" height="20" rx="1.5"/>
+      <rect x="74" y="68.5" width="20" height="7" rx="1.5"/>
+    </g>
+  </g>
+</svg>
