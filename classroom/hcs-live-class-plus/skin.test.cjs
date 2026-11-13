@@ -277,5 +277,7 @@ test('Tidy, Assign, Clear, Group, and Snap chrome stay on the Default master', f
   assert.match(html, /html\[data-skin="minimalist"\] #btnConfirmApplyGrid/);
   assert.match(html, /html\[data-skin="minimalist"\] #applyGridModal \.shadow-2xl/);
   assert.match(html, /html\[data-skin="minimalist"\] #studioToolbarRow button/);
+  assert.match(html, /#studioToolbarRow button,[\s\S]*?#groupBrushBar button \{[\s\S]*?border-width: 1px/);
+
   assert.match(sparkCss, /html\[data-skin="spark"\] #studioToolbarRow button/);
 });
