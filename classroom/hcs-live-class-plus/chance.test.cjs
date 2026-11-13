@@ -99,8 +99,8 @@ test('Chance sheet title, tip, and draw labels', function () {
   assert.match(html, /id="btnCloseChanceSheet"[^>]*aria-label="Close"/);
   assert.match(js, /drawBtn\.textContent = api\.REDRAW_LABEL/);
   assert.match(js, /promptEl\.textContent = step\.prompt/);
-  assert.match(html, /chance\.js\?v=20261113a/);
-  assert.match(js, /Cache stamp: 20261113a/);
+  assert.match(html, /chance\.js\?v=20261114a/);
+  assert.match(js, /Cache stamp: 20261114a/);
 });
 
 test('the 12 prompts match the locked set and the page never says Monopoly', function () {
@@ -126,50 +126,71 @@ test('a pack does not repeat until all 12 are used, then it may reshuffle', func
       seen.push(text);
     });
     assert.equal(shown.indexOf(step.prompt), -1);
-    assert.notEqual(step.prompt, BONUS);
     assert.equal(step.prompt.indexOf('11'), -1);
     shown.push(step.prompt);
     pack = step.pack;
   }
   assert.equal(seen.length, 12);
-  assert.equal(shown.length, 11);
+  assert.equal(shown.length, 12);
+  assert.ok(shown.indexOf(BONUS) >= 0);
   assert.deepEqual(seen.slice().sort(), PROMPTS.slice().sort());
 });
 
-test('the bonus card draws again from the remaining pack', function () {
+test('the bonus card is shown, then the next draw takes the remaining pack', function () {
   var next = chance.CARDS[9];
   var bonus = chance.CARDS[10];
   var step = chance.drawChance({ pack: [next, bonus] }, function () {
     throw new Error('remaining cards should be used before a reshuffle');
   });
-  assert.equal(step.prompt, next.text);
-  assert.deepEqual(step.consumed, [bonus.text, next.text]);
-  assert.equal(step.pack.length, 0);
+  assert.equal(step.prompt, BONUS);
+  assert.deepEqual(step.consumed, [bonus.text]);
+  assert.equal(step.pack.length, 1);
+  assert.equal(step.pack[0].text, next.text);
   assert.equal(step.reshuffled, false);
 
-  var again = chance.drawChance({ pack: [bonus] }, function () { return 0; });
+  var follow = chance.drawChance({ pack: step.pack }, function () {
+    throw new Error('remaining cards should be used before a reshuffle');
+  });
+  assert.equal(follow.prompt, next.text);
+  assert.deepEqual(follow.consumed, [next.text]);
+  assert.equal(follow.pack.length, 0);
+  assert.equal(follow.reshuffled, false);
+
+  var last = chance.drawChance({ pack: [bonus] }, function () {
+    throw new Error('a last bonus card should not reshuffle');
+  });
+  assert.equal(last.prompt, BONUS);
+  assert.equal(last.reshuffled, false);
+  assert.equal(last.pack.length, 0);
+
+  var again = chance.drawChance({ pack: last.pack }, function () { return 0; });
   assert.equal(again.reshuffled, true);
-  assert.equal(again.consumed[0], BONUS);
-  assert.equal(again.prompt, PROMPTS[0]);
-  assert.notEqual(again.prompt, BONUS);
+  assert.notEqual(again.prompt, undefined);
+  assert.equal(PROMPTS.indexOf(again.prompt) >= 0, true);
 });
 
-test('several full packs never show the bonus text or a repeat inside a pack', function () {
+test('several full packs show each card once, including the bonus line', function () {
   [1, 2, 99, 12345].forEach(function (seed) {
     var rng = mulberry32(seed);
     var state = { pack: [] };
     var cycle = [];
-    for (var n = 0; n < 40; n++) {
+    var sawBonus = false;
+    for (var n = 0; n < 48; n++) {
       var step = chance.drawChance(state, rng);
-      assert.notEqual(step.prompt, BONUS);
       assert.equal(PROMPTS.indexOf(step.prompt) >= 0, true);
       step.consumed.forEach(function (text) {
         assert.equal(cycle.indexOf(text), -1, 'seed ' + seed + ' repeated ' + text);
         cycle.push(text);
-        if (cycle.length === 12) cycle = [];
+        if (text === BONUS) sawBonus = true;
+        if (cycle.length === 12) {
+          assert.deepEqual(cycle.slice().sort(), PROMPTS.slice().sort());
+          cycle = [];
+        }
       });
       state = { pack: step.pack };
     }
+    assert.equal(sawBonus, true);
+    assert.equal(cycle.length, 0);
   });
 });
 

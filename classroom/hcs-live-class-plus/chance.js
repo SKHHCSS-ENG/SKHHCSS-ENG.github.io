@@ -1,11 +1,11 @@
 /**
  * Chance for HCS Live Class +.
  * One pack of 12. A draw does not repeat until every card has been used,
- * then the pack is shuffled again. The bonus card is used up and immediately
- * draws the next card from what is left. The page shows the prompt only.
+ * then the pack is shuffled again. The bonus card is shown on the sheet,
+ * then the next draw takes the next card from what is left.
  * Later Plus extras belong in #moreMenuList (data-more-action), not as new
  * header chips. Add the action on MORE_ACTIONS.
- * Cache stamp: 20261113a.
+ * Cache stamp: 20261114a.
  */
 (function (root) {
   var api = factory();
@@ -56,45 +56,12 @@
       var consumed = [];
       var reshuffled = false;
 
-      function take() {
-        if (!pack.length) {
-          pack = shuffle(CARDS, rand);
-          reshuffled = true;
-        }
-        var card = pack.pop();
-        consumed.push(card.text);
-        return card;
-      }
-
-      function takeNonBonus() {
-        for (var i = pack.length - 1; i >= 0; i--) {
-          if (!pack[i].bonus) {
-            var found = pack.splice(i, 1)[0];
-            consumed.push(found.text);
-            return found;
-          }
-        }
-        var rest = [];
-        for (var n = 0; n < CARDS.length; n++) {
-          if (!CARDS[n].bonus) rest.push(CARDS[n]);
-        }
-        pack = shuffle(rest, rand);
+      if (!pack.length) {
+        pack = shuffle(CARDS, rand);
         reshuffled = true;
-        var card = pack.pop();
-        consumed.push(card.text);
-        return card;
       }
-
-      var card = take();
-      var hops = 0;
-      while (card && card.bonus) {
-        hops += 1;
-        if (hops > CARDS.length) {
-          card = takeNonBonus();
-          break;
-        }
-        card = take();
-      }
+      var card = pack.pop();
+      consumed.push(card.text);
 
       return {
         prompt: card.text,
