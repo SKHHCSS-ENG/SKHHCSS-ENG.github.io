@@ -76,13 +76,13 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113h"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113h"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113h"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113h"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113j"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113j"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113j"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113j"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113h"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113j"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
@@ -101,6 +101,7 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.match(src, /aria-label="Close"/);
   assert.doesNotMatch(src, /id="wbClose">Close</);
   assert.match(css, /min-height:\s*44px/);
+  assert.match(css, /width:\s*44px/);
   assert.match(css, /\.wb-close/);
   assert.match(src, /Clear the whiteboard\? Undo brings it back/);
   assert.match(src, /e\.key !== 'Escape'/);
@@ -118,6 +119,8 @@ test('ink stays for the session, and clear can be undone', function () {
   assert.equal(board.setColour('red').id, 'red');
   assert.equal(board.colour().id, 'red');
   assert.ok(wb.COLOURS.length > 6);
+  assert.equal(wb.COLOURS.find((c) => c.id === 'yellow').hex, '#FACC15');
+  assert.equal(wb.COLOURS.find((c) => c.id === 'green').hex, '#22C55E');
   assert.equal(board.setColour('black').id, 'black');
   assert.equal(board.setColour('purple').id, 'purple');
   board.beginStroke(0.1, 0.2, 0.4);

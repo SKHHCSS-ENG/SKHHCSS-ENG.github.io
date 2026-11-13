@@ -14,21 +14,21 @@
   }
 })(typeof window !== 'undefined' ? window : this, function (root) {
   var COLOURS = [
-    { id: 'black', hex: '#111827' },
-    { id: 'navy', hex: '#123a4d' },
-    { id: 'grey', hex: '#64748b' },
-    { id: 'brown', hex: '#92400e' },
-    { id: 'teal', hex: '#0e6b7a' },
-    { id: 'blue', hex: '#2563eb' },
-    { id: 'sky', hex: '#0284c7' },
-    { id: 'green', hex: '#15803d' },
-    { id: 'lime', hex: '#65a30d' },
-    { id: 'yellow', hex: '#ca8a04' },
-    { id: 'amber', hex: '#b45309' },
-    { id: 'orange', hex: '#ea580c' },
-    { id: 'red', hex: '#dc2626' },
-    { id: 'pink', hex: '#db2777' },
-    { id: 'purple', hex: '#7c3aed' }
+    { id: 'black', hex: '#111111' },
+    { id: 'navy', hex: '#1E40AF' },
+    { id: 'grey', hex: '#9CA3AF' },
+    { id: 'brown', hex: '#C26A21' },
+    { id: 'teal', hex: '#14B8A6' },
+    { id: 'blue', hex: '#3B82F6' },
+    { id: 'sky', hex: '#38BDF8' },
+    { id: 'green', hex: '#22C55E' },
+    { id: 'lime', hex: '#A3E635' },
+    { id: 'yellow', hex: '#FACC15' },
+    { id: 'amber', hex: '#F59E0B' },
+    { id: 'orange', hex: '#FF8A00' },
+    { id: 'red', hex: '#EF4444' },
+    { id: 'pink', hex: '#F472B6' },
+    { id: 'purple', hex: '#A855F7' }
   ];
   var PEN_BASE = 5;
   var PEN_PRESS = 2;
