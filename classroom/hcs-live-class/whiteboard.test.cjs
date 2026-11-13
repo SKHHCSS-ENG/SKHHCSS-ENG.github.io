@@ -37,7 +37,7 @@ function assertPageChrome(html, label) {
     assert.ok(next > at, label + ' header order ' + id);
     at = next;
   });
-  assert.match(utils, /hidden sm:inline">Whiteboard</);
+  assert.match(utils, /hidden sm:inline">Board</);
   assert.match(utils, /aria-label="Whiteboard"/);
   assert.match(utils, /🖊️/);
   assert.doesNotMatch(utils, /<svg/);
