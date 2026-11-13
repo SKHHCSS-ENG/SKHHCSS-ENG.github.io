@@ -3415,10 +3415,10 @@
           Load
         </button>
         <button id="btnSaveOnline" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition">
-          Save online
+          Save Online
         </button>
         <button id="btnOpenPlan" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold whitespace-nowrap transition">
-          Load online
+          Load Online
         </button>
         <button id="btnExportCsv" type="button" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-200 text-xs font-bold whitespace-nowrap transition" title="Download class and group scores as a CSV file" aria-label="Export CSV">
           Export CSV
@@ -9165,7 +9165,7 @@
         var viewGen = 0;
         var saving = false;
         var trashing = false;
-        var entryTitle = 'Save online';
+        var entryTitle = 'Save Online';
 
         function currentClientId() {
           return String((window.SKHHCSS_STUDIO_DRIVE || {}).clientId || '').trim();
@@ -9374,7 +9374,7 @@
         function renderSaveForm() {
           var cls = getCurrentClass();
           if (!cls) return;
-          openSheet('Save online');
+          openSheet('Save Online');
           setBody(
             '<form id="planSaveForm" class="plan-sheet-pad">' +
               '<input id="planNameInput" type="text" autocomplete="off" enterkeyhint="done" aria-label="Plan name" />' +
@@ -9394,7 +9394,7 @@
         }
 
         function showOverwrite(name) {
-          openSheet('Save online');
+          openSheet('Save Online');
           setBody(
             '<div class="plan-sheet-pad">' +
               '<p class="plan-confirm">Overwrite ' + escapeHtml(name) + '?</p>' +
@@ -9408,14 +9408,14 @@
 
         function showSaveForm() {
           var gen = captureView();
-          openSheet('Save online');
+          openSheet('Save Online');
           setBody('');
           ensureFolder().then(function (folderId) {
             if (!folderId || !still(gen)) return;
             renderSaveForm();
           }).catch(function (err) {
             if (!still(gen)) return;
-            driveFailed(err, 'Save online');
+            driveFailed(err, 'Save Online');
           });
         }
 
@@ -9588,7 +9588,7 @@
             saving = false;
             if (!still(gen)) return;
             if (btn) btn.disabled = false;
-            driveFailed(err, 'Save online');
+            driveFailed(err, 'Save Online');
           });
         }
 
@@ -9604,13 +9604,13 @@
         });
 
         document.getElementById('btnSaveOnline').addEventListener('click', function () {
-          entryTitle = 'Save online';
+          entryTitle = 'Save Online';
           if (!configured()) {
             showToast('Google sign-in is not set up.', '⚠️');
             return;
           }
           if (!hasToken()) {
-            showSignIn('Save online');
+            showSignIn('Save Online');
             return;
           }
           showSaveForm();
@@ -10667,8 +10667,8 @@
         clear_groups: 'Clear groups',
         distribute_groups: 'Share groups',
         reset_scores: 'Reset scores',
-        save_online: 'Save online',
-        open_plan: 'Load online',
+        save_online: 'Save Online',
+        open_plan: 'Load Online',
         add_desk: 'Add desk',
         add_group: 'Add group',
         save_layout: 'Save layout',
@@ -11055,8 +11055,8 @@
           open_group_modal: ['btnOpenGroupModal', 'Groups are open.'],
           close_groups: ['btnCloseGroupModal', 'Groups closed.', true],
           reset_scores: ['btnOpenResetModal', 'Confirm the score reset.'],
-          save_online: ['btnSaveOnline', 'Save online.', true],
-          open_plan: ['btnOpenPlan', 'Load online.', true],
+          save_online: ['btnSaveOnline', 'Save Online.', true],
+          open_plan: ['btnOpenPlan', 'Load Online.', true],
           add_desk: ['btnQuickAddStudent', 'Added a desk.'],
           add_group: ['btnQuickAddGroup', 'Added a group.'],
           save_layout: ['btnSetDefaultLayout', 'Layout saved.'],
