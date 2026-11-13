@@ -199,10 +199,15 @@
     function setSkinMenuOpen(open) {
       var menuBtn = document.getElementById('btnSkinMenu');
       var list = document.getElementById('skinMenuList');
+      var bar = document.getElementById('studioToolbar');
       if (!menuBtn || !list) return;
       menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       if (open) list.removeAttribute('hidden');
       else list.setAttribute('hidden', '');
+      if (bar) {
+        if (open) bar.classList.add('is-skin-menu-open');
+        else bar.classList.remove('is-skin-menu-open');
+      }
     }
 
     function syncPressed() {

@@ -2634,6 +2634,11 @@
       position: relative;
       flex-wrap: nowrap;
     }
+    /* Above the Zoom chip (z-index 40) while the menu is open, so Spark and Arcade
+       stay visible on a 390 phone. Closed toolbar stays z-30 and does not cover Zoom. */
+    #studioToolbar.is-skin-menu-open {
+      z-index: 45;
+    }
     .skin-menu {
       position: relative;
       flex: 0 0 auto;
