@@ -1,7 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
  * Tess 2026-10-29, plus the Practice, Fun Projects, and
- * Activities & Competitions hubs (32 entries). Matching uses the hub brain:
+ * Activities & Competitions hubs (35 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -152,9 +152,40 @@
       "aliases": [
         "essay",
         "argumentative essay",
-        "discursive essay",
         "論說文",
         "議論文"
+      ]
+    },
+    {
+      "title": "One-sided Argumentative",
+      "path": "learning-materials/paper-2-writing-formats/essay/#one-sided",
+      "aliases": [
+        "one-sided argumentative",
+        "one-sided",
+        "one-side argumentative",
+        "one sided argumentative",
+        "單邊議論文"
+      ]
+    },
+    {
+      "title": "Two-sided Argumentative",
+      "path": "learning-materials/paper-2-writing-formats/essay/#two-sided",
+      "aliases": [
+        "two-sided argumentative",
+        "two-sided",
+        "two-side argumentative",
+        "two sided argumentative",
+        "雙邊議論文"
+      ]
+    },
+    {
+      "title": "Discursive",
+      "path": "learning-materials/paper-2-writing-formats/essay/#discursive",
+      "aliases": [
+        "discursive",
+        "discursive essay",
+        "discursive writing",
+        "討論文"
       ]
     },
     {
