@@ -408,8 +408,26 @@
       });
     }
 
+    function fitWbBar() {
+      var bar = sheet.querySelector('.wb-bar');
+      if (!bar || sheet.hidden) return;
+      bar.classList.remove('wb-bar-tight');
+      bar.style.setProperty('--wb-scale', '1');
+      var avail = bar.clientWidth;
+      if (avail < 2) return;
+      var need = bar.scrollWidth;
+      var scale = need > avail + 1 ? avail / need : 1;
+      if (scale < 32 / 44) {
+        scale = 32 / 44;
+        bar.classList.add('wb-bar-tight');
+      }
+      if (scale > 0.995) scale = 1;
+      bar.style.setProperty('--wb-scale', String(scale));
+    }
+
     function sizeCanvas() {
       if (sheet.hidden) return;
+      fitWbBar();
       var rect = stage.getBoundingClientRect();
       if (rect.width < 2 || rect.height < 2) return;
       var dpr = Math.min((root.devicePixelRatio || 1), 2);
