@@ -1989,13 +1989,22 @@
     .studio-lesson-btn[hidden] {
       display: none;
     }
-    /* Enter and exit icons share one square with ▲/▼, so the bar does not jump. */
+    /* Enter and exit icons share one square with ▲/▼, so the bar does not jump.
+       More is the same 32px chip, before Fullscreen. */
+    #btnMore,
     #btnStudioFullscreen,
     #btnToggleHeaderBanner {
       width: var(--studio-header-chip);
       min-width: var(--studio-header-chip);
       padding-left: 0;
       padding-right: 0;
+    }
+    #btnMore {
+      height: var(--studio-header-chip);
+      min-height: var(--studio-header-chip);
+      padding: 0;
+      font-size: 20px;
+      line-height: 1;
     }
     #btnToggleHeaderBanner {
       font-size: 16px;
@@ -2011,6 +2020,7 @@
       display: none;
     }
     @media (min-width: 640px) {
+      #btnMore,
       #btnStudioFullscreen,
       #btnToggleHeaderBanner {
         width: var(--studio-header-chip);
@@ -2312,6 +2322,132 @@
       font-size: 14px;
       font-weight: 700;
       color: #123a4d;
+    }
+    /* Chance uses the same sheet family as Plans: overlay, rounded card, Close. */
+    #chanceSheet { z-index: 80; }
+    #chanceSheet .plan-panel {
+      width: 100%;
+      max-width: 22rem;
+      max-height: min(80vh, 34rem);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      color: #123a4d;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 20px 40px rgba(18, 58, 77, 0.18);
+    }
+    #chanceSheet .plan-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 8px 4px 16px;
+      background: linear-gradient(90deg, #123a4d, #2a8fad);
+      color: #fff;
+    }
+    #chanceSheet .plan-bar h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    #chanceSheet .plan-close {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #chanceSheet .plan-close:hover { background: rgba(255, 255, 255, 0.15); }
+    #chanceSheet .plan-close:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: -4px;
+    }
+    #chanceSheet .plan-sheet-pad {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    }
+    #chanceSheet .plan-action {
+      min-height: 44px;
+      border-radius: 0.5rem;
+      border: 1px solid #bae6fd;
+      background: #f0f9ff;
+      color: #0c4a6e;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #chanceSheet .plan-action:hover { background: #e0f2fe; }
+    #chanceSheet .plan-action:focus-visible {
+      outline: 2px solid #2a8fad;
+      outline-offset: 2px;
+    }
+    #chanceSheet .chance-tip {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      font-weight: 600;
+      color: #475569;
+    }
+    /* A classroom card: amber band, cream face, prompt large enough for a phone. */
+    #chanceSheet .chance-card {
+      margin: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fffdf8;
+      border: 2px solid #e8a317;
+      box-shadow: 0 6px 0 #d97706;
+    }
+    #chanceSheet .chance-card[hidden] { display: none; }
+    #chanceSheet .chance-card-kicker {
+      margin: 0;
+      padding: 8px 14px;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      color: #431407;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    #chanceSheet .chance-card-prompt {
+      margin: 0;
+      padding: 16px 14px 18px;
+      font-size: clamp(1.25rem, 4.8vw, 1.5rem);
+      line-height: 1.35;
+      font-weight: 700;
+      color: #1c1917;
+    }
+    html[data-skin="minimalist"] #chanceSheet .plan-panel {
+      background: var(--skin-bg);
+      color: var(--skin-text);
+      border-color: var(--skin-line);
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #chanceSheet .plan-bar {
+      background: var(--skin-bg);
+      background-image: none;
+      color: var(--skin-text);
+      box-shadow: inset 0 -1px 0 var(--skin-line);
+    }
+    html[data-skin="minimalist"] #chanceSheet .plan-close,
+    html[data-skin="minimalist"] #chanceSheet .chance-tip {
+      color: var(--skin-text);
+    }
+    html[data-skin="minimalist"] #chanceSheet .plan-action,
+    html[data-skin="minimalist"] #chanceSheet .plan-action:hover {
+      background: var(--skin-bg);
+      color: var(--skin-accent);
+      border-color: var(--skin-line);
     }
     /* Column rhythm. These beat the Tailwind spacing utilities on the
        header, toolbar, and board frame. Behaviour and labels stay put. */
@@ -2638,6 +2774,110 @@
        stay visible on a 390 phone. Closed toolbar stays z-30 and does not cover Zoom. */
     #studioToolbar.is-skin-menu-open {
       z-index: 45;
+    }
+    /* Same approach as the Skin menu. While More is open, lift the header
+       above the Zoom chip (z-index 40). 46 also clears the open Skin toolbar
+       (z-index 45), so a dragged Zoom control cannot cover the menu.
+       The closed header stays at z-40. */
+    #studioHeader.is-more-open {
+      z-index: 46;
+      overflow: visible;
+    }
+    #studioHeader.is-more-open .studio-header-bar,
+    #studioHeader.is-more-open .studio-header-pin,
+    #studioHeader.is-more-open .more-menu {
+      overflow: visible;
+    }
+    .more-menu {
+      position: relative;
+      z-index: 2;
+      flex: 0 0 auto;
+      display: flex;
+    }
+    .more-menu-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 40;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: max-content;
+      min-width: 7.5rem;
+      max-width: calc(100vw - 24px);
+      margin: 0;
+      padding: 4px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+    }
+    .more-menu-list[hidden] { display: none; }
+    .more-menu-list.is-align-start {
+      right: auto;
+      left: 0;
+    }
+    .more-menu-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 44px;
+      margin: 0;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #123a4d;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+      text-align: left;
+      white-space: normal;
+      cursor: pointer;
+    }
+    .more-menu-item:hover,
+    .more-menu-item:focus-visible {
+      background: #f0f9ff;
+      outline: none;
+    }
+    .more-menu-item:focus-visible {
+      outline: 2px solid #2a8fad;
+      outline-offset: -2px;
+    }
+    /* Pin skins paint every button in the pin. Keep the dropdown a menu. */
+    html[data-skin="minimalist"] #studioHeader .more-menu-list {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+    html[data-skin="minimalist"] #studioHeader .more-menu-list .more-menu-item,
+    html[data-skin="minimalist"] #studioHeader .more-menu-list .more-menu-item:hover {
+      background: transparent;
+      background-image: none;
+      color: var(--skin-text);
+      border-color: transparent;
+      box-shadow: none;
+    }
+    html[data-skin="minimalist"] #studioHeader .more-menu-list .more-menu-item:hover,
+    html[data-skin="minimalist"] #studioHeader .more-menu-list .more-menu-item:focus-visible {
+      background: #f0f9ff;
+    }
+    .studio-header-pin .more-menu-list .more-menu-item,
+    .studio-header-pin .more-menu-list .more-menu-item:hover {
+      border: 0;
+      color: #123a4d;
+      background: transparent;
+      background-image: none;
+      box-shadow: none;
+      text-shadow: none;
+      width: 100%;
+      height: auto;
+      min-height: 44px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.3;
     }
     .skin-menu {
       position: relative;
@@ -3377,8 +3617,15 @@
       </div>
       </div>
       </div>
-      <!-- Fullscreen and collapse stay top-right, full size. -->
+      <!-- More, then Fullscreen and collapse. 32px chips, full size, top-right. -->
       <div class="studio-header-pin">
+        <div class="more-menu">
+          <button type="button" id="btnMore" class="studio-lesson-btn" title="More" aria-label="More" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenuList">+</button>
+          <div id="moreMenuList" class="more-menu-list" role="menu" aria-label="More" hidden>
+            <!-- Later Plus extras go in this menu, not as new header chips. Chance stays first. -->
+            <button type="button" id="btnOpenChance" class="more-menu-item" role="menuitem" data-more-action="chance">Chance</button>
+          </div>
+        </div>
         <button type="button" id="btnStudioFullscreen" class="studio-lesson-btn" aria-pressed="false" aria-label="Fullscreen">
           <svg id="fullscreenEnterIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
           <svg id="fullscreenExitIcon" class="studio-fs-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
@@ -4053,6 +4300,23 @@
         <button type="button" id="btnClosePlanSheet" class="plan-close" aria-label="Close">✕</button>
       </div>
       <div id="planSheetBody"></div>
+    </div>
+  </div>
+
+  <div id="chanceSheet" class="hidden fixed inset-0 z-50 bg-slate-900/60 flex items-end sm:items-center justify-center p-3 sm:p-5" role="dialog" aria-modal="true" aria-labelledby="chanceSheetTitle">
+    <div class="plan-panel">
+      <div class="plan-bar">
+        <h3 id="chanceSheetTitle">Chance</h3>
+        <button type="button" id="btnCloseChanceSheet" class="plan-close" aria-label="Close">✕</button>
+      </div>
+      <div class="plan-sheet-pad">
+        <p id="chanceTip" class="chance-tip">Draw a card and follow the instruction.</p>
+        <div id="chanceCard" class="chance-card" hidden>
+          <p class="chance-card-kicker">Chance</p>
+          <p id="chancePrompt" class="chance-card-prompt"></p>
+        </div>
+        <button type="button" id="btnDrawChance" class="plan-action">Draw a card</button>
+      </div>
     </div>
   </div>
 
@@ -11261,6 +11525,7 @@
     window.HCS_LIVE_CLASS_PLUS_WORKER = "https://live-class-plus.skhhcss-eng.workers.dev";
   </script>
   <script src="assistant.js?v=20261110e"></script>
+  <script src="chance.js?v=20261113a"></script>
 <script src="../../site-version.js?v=sv"></script>
 <script>
   (function () {
