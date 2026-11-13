@@ -1,4 +1,4 @@
-/* HCS Live Class teacher whiteboard. Cache stamp: 20261113d.
+/* HCS Live Class teacher whiteboard. Cache stamp: 20261113e.
    Full-board overlay. Ink stays in memory for this tab. */
 
 .wb-sheet {
@@ -33,7 +33,7 @@
   gap: 8px;
   flex: 0 0 auto;
   padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left));
-  background: #123a4d;
+  background: linear-gradient(to right, #123a4d, #2a8fad, #5bbad5);
   color: #fff;
 }
 
