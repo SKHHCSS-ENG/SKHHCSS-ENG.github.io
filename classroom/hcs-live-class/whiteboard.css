@@ -410,9 +410,9 @@ html[data-skin="minimalist"] .wb-close:hover {
 }
 
 html[data-skin="minimalist"] .wb-tool[aria-pressed="true"] {
-  background: #fcd34d;
-  border-color: #f59e0b;
-  color: #0f172a;
+  background: var(--skin-accent, #2a8fad);
+  border-color: var(--skin-accent, #2a8fad);
+  color: #fff;
 }
 
 html[data-skin="minimalist"] .wb-tool:focus-visible,
