@@ -79,13 +79,13 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113m"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113k"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113m"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113k"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113n"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113l"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113n"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113l"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113k"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113l"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
@@ -108,9 +108,12 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.match(src, /querySelector\('h1\.studio-mark'\)/);
   assert.match(src, /cloneNode\(true\)/);
   assert.match(css, /\.wb-brand \{[^}]*margin-right:\s*auto/);
+  assert.match(css, /#wbBrand\.studio-mark img[^}]*height:\s*36px/);
   assert.match(css, /\.wb-tools \{[^}]*justify-content:\s*flex-end/);
   assert.match(css, /\.wb-actions \{[^}]*justify-content:\s*flex-end/);
   assert.match(css, /\.wb-close \{[^}]*margin-left:\s*0/);
+  assert.match(src, /id="wbClear"[\s\S]*id="wbClose"[\s\S]*<\/div>',\s*'    <\/div>'/);
+  assert.doesNotMatch(src, /<\/div>',\s*'    <button type="button" class="wb-close"/);
   assert.match(css, /\.wb-colour-pop \{[^}]*right:\s*0/);
   assert.match(css, /min-height:\s*44px/);
   assert.match(css, /width:\s*44px/);
