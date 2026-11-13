@@ -1,5 +1,6 @@
 /**
- * Explain — Cohesion and Aspects sample sheet, and Sentence Patterns cards.
+ * Explain — Cohesion and Aspects sample sheet, Sentence Patterns cards,
+ * and Paper 1 - Past Paper Vocabulary samples.
  * Worker URL: window.__EXPLAIN_WORKER__ (empty until Nest pastes the workers.dev URL).
  * No API key here.
  */
@@ -327,6 +328,78 @@
     });
   }
 
+  function mountPaper1Vocab() {
+    if (!document.body.classList.contains("p1-vocab")) return;
+    var sheet = document.getElementById("exampleSheet");
+    var textEl = document.getElementById("exampleSheetText");
+    var inner = sheet && sheet.querySelector(".example-sheet-inner");
+    var root = document.getElementById("yearSets");
+    if (!sheet || !textEl || !inner || !root) return;
+    if (document.getElementById("exampleExplainBtn")) return;
+
+    var row = document.createElement("div");
+    row.className = "explain-row";
+    var btn = makeButton();
+    btn.id = "exampleExplainBtn";
+    var panel = makePanel("exampleExplainPanel");
+    btn.setAttribute("aria-controls", panel.id);
+    row.appendChild(btn);
+    inner.appendChild(row);
+    inner.appendChild(panel);
+
+    var shownKey = "";
+
+    function expandedChip() {
+      return root.querySelector('.year-set:not([hidden]) .vocab-example[aria-expanded="true"]');
+    }
+
+    function currentPayload() {
+      var chip = expandedChip();
+      if (!chip) return null;
+      var raw = chip.getAttribute("data-example") || "";
+      var sampleText = squash(decodeSample(raw));
+      var set = chip.closest(".year-set");
+      var category = set ? squash(set.getAttribute("data-theme") || "") : "";
+      var itemLabel = squash(chip.textContent);
+      return {
+        page: "Paper 1 - Past Paper Vocabulary",
+        itemLabel: itemLabel,
+        label: itemLabel,
+        category: category,
+        sampleText: sampleText,
+        sample: sampleText,
+        highlight: highlightsFromHtml(raw),
+        gloss: squash(chip.getAttribute("data-zh") || ""),
+      };
+    }
+
+    function sync() {
+      if (sheet.hidden) {
+        cancelAsk();
+        hidePanel(btn, panel);
+        setBusy(btn, false);
+        shownKey = "";
+        return;
+      }
+      var payload = currentPayload();
+      if (!payload) return;
+      var key = payloadKey(payload);
+      if (key === shownKey) return;
+      cancelAsk();
+      shownKey = key;
+      hidePanel(btn, panel);
+      setBusy(btn, false);
+    }
+
+    wire(btn, panel, currentPayload);
+
+    var observer = new MutationObserver(sync);
+    observer.observe(sheet, { attributes: true, attributeFilter: ["hidden"] });
+    observer.observe(textEl, { childList: true, characterData: true, subtree: true });
+    sync();
+  }
+
   mountCohesion();
   mountPatterns();
+  mountPaper1Vocab();
 })();

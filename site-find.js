@@ -1,7 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
  * Tess 2026-10-29, plus the Practice, Fun Projects, and
- * Activities & Competitions hubs (35 entries). Matching uses the hub brain:
+ * Activities & Competitions hubs (36 entries). Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -343,6 +343,18 @@
         "reading skills",
         "閱讀技巧",
         "paper 1 skills"
+      ]
+    },
+    {
+      "title": "Paper 1 - Past Paper Vocabulary",
+      "path": "learning-materials/paper-1-past-paper-vocabulary/",
+      "aliases": [
+        "paper 1 past paper vocabulary",
+        "paper 1 vocabulary",
+        "p1 vocabulary",
+        "past paper vocabulary",
+        "vocabulary in context",
+        "語境詞義"
       ]
     },
     {

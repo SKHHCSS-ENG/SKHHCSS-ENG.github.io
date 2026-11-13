@@ -1,0 +1,127 @@
+/* Paper 1 - Past Paper Vocabulary — year dropdown, chip selection, sheet fields.
+   Chip pills and the sample sheet chrome come from the shared writing styles
+   and cohesion-sheet.css. This file only adds what those sheets do not cover. */
+
+body.p1-vocab footer {
+  margin-top: 110px;
+}
+
+body.p1-vocab.tools-page {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+
+body.p1-vocab.tools-page.dock-open {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+
+.year-pick {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px 14px;
+  margin: 0 0 14px;
+  box-shadow: var(--shadow);
+}
+
+.year-pick label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: .88rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.year-pick select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  touch-action: manipulation;
+}
+
+.year-pick select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+body.p1-vocab .year-set {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0 0 14px;
+  box-shadow: var(--shadow);
+}
+
+body.p1-vocab .year-set[hidden] {
+  display: none !important;
+}
+
+body.p1-vocab .year-set .section-lead:last-child {
+  margin-bottom: 0;
+}
+
+body.p1-vocab .vocab-chips li {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+body.p1-vocab .vocab-chips li.is-selected {
+  background: #d4f0f8;
+  border-color: var(--accent-deep);
+}
+
+/* Handwrite on: chips must not take the tap — drawing passes through. */
+body.p1-vocab.hw-on .vocab-chips li {
+  pointer-events: none;
+  cursor: auto;
+}
+
+/* Span, not button: a real button adds a pixel of line box and shifts saved ink. */
+body.p1-vocab .vocab-example:focus {
+  outline: none;
+}
+
+body.p1-vocab .vocab-example:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+body.p1-vocab.zh-on .vocab-chips .gloss::after {
+  white-space: normal;
+}
+
+body.p1-vocab.zh-on .year-set.hw-wrap {
+  overflow: visible;
+}
+
+.example-sheet-pos {
+  margin: 4px 0 0;
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  line-height: 1.3;
+  color: var(--accent-ink);
+}
+
+.example-sheet-def {
+  margin: 2px 0 0;
+  font-size: .95rem;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+@media print {
+  body.p1-vocab .year-set[hidden] {
+    display: none !important;
+  }
+}
