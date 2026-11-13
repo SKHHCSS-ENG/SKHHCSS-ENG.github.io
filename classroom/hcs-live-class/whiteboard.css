@@ -1,4 +1,4 @@
-/* HCS Live Class teacher whiteboard. Cache stamp: 20261113e.
+/* HCS Live Class teacher whiteboard. Cache stamp: 20261113f.
    Full-board overlay. Ink stays in memory for this tab. */
 
 .wb-sheet {
@@ -78,10 +78,16 @@
   gap: 6px;
   min-height: 44px;
   min-width: 44px;
-  padding: 0 12px;
+  padding: 0 10px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
+}
+
+.wb-tool {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .wb-tool:hover,
@@ -109,8 +115,8 @@
 }
 
 .wb-swatch {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   box-shadow: 0 0 0 1.5px #fff;
   flex: 0 0 auto;
@@ -269,7 +275,10 @@
 @media (max-width: 420px) {
   .wb-tool,
   .wb-close {
-    padding: 0 10px;
-    font-size: 13px;
+    padding: 0 8px;
+  }
+
+  .wb-tool {
+    font-size: 18px;
   }
 }

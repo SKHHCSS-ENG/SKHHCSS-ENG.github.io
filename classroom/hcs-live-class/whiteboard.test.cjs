@@ -76,23 +76,24 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113e"/);
-  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113e"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113e"/);
-  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113e"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113f"/);
+  assert.match(liveHtml, /src="whiteboard\.js\?v=20261113f"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113f"/);
+  assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113f"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
-  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113e"></script>');
+  const board = liveHtml.indexOf('<script src="whiteboard.js?v=20261113f"></script>');
   const inline = liveHtml.indexOf("const STORAGE_KEY = 'skhhcss_eng_classroom_v4'");
   assert.ok(drive > 0 && core > drive && board > core && inline > board);
 });
 
 test('the board is memory only and does not join Ask or Dict', function () {
-  assert.match(src, />Colour</);
+  assert.match(src, /id="wbColour"[^>]*aria-label="Colour"/);
   assert.doesNotMatch(src, /Color/);
   assert.doesNotMatch(src, /localStorage|sessionStorage|indexedDB/);
   assert.doesNotMatch(src + css, /HcsStudioDrive|gapi/);
-  assert.match(src, /data-wb-tool="highlighter"[^>]*>Highlighter</);
+  assert.match(src, /data-wb-tool="highlighter"[^>]*aria-label="Highlighter"/);
+  assert.match(src, /✏️|🖍️|🧽|🔤|↩️|↪️|🗑️/);
   assert.match(src, /id="wbClose"[^>]*>X</);
   assert.match(src, /aria-label="Close"/);
   assert.doesNotMatch(src, /id="wbClose">Close</);
