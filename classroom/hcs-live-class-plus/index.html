@@ -2623,6 +2623,83 @@
       outline: 2px solid #123a4d;
       outline-offset: 2px;
     }
+    /* Plus only: Skin is one dropdown so later packs do not add a Tools row. */
+    #studioToolbar,
+    .studio-toolbar-fit,
+    .studio-toolbar-line,
+    .studio-skin-band {
+      overflow: visible;
+    }
+    .studio-skin-band {
+      position: relative;
+      flex-wrap: nowrap;
+    }
+    .skin-menu {
+      position: relative;
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+    #btnSkinMenu {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      cursor: pointer;
+      gap: 4px;
+      max-width: 11.5rem;
+    }
+    #btnSkinMenu:hover,
+    #btnSkinMenu[aria-expanded="true"] {
+      background: #e2e8f0;
+    }
+    #btnSkinMenu:focus-visible {
+      outline: 2px solid #123a4d;
+      outline-offset: 2px;
+    }
+    html[data-skin="minimalist"] #btnSkinMenu:focus-visible {
+      outline-color: var(--skin-accent);
+    }
+    #btnSkinMenu .skin-menu-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #btnSkinMenu .skin-menu-caret {
+      flex-shrink: 0;
+      font-size: 10px;
+      line-height: 1;
+    }
+    .skin-menu-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 40;
+      box-sizing: border-box;
+      min-width: max(100%, 9.5rem);
+      padding: 4px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+    }
+    .skin-menu-list[hidden] {
+      display: none;
+    }
+    .skin-menu-list:not([hidden]) {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .skin-menu-list .skin-choice {
+      width: 100%;
+      justify-content: flex-start;
+      white-space: nowrap;
+    }
+    html[data-skin="minimalist"] .skin-menu-list {
+      background: var(--skin-bg);
+      border-color: var(--skin-line);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
     html:not([data-skin]) #btnSkinDefault,
     html:not([data-skin]) #btnSkinDefault:hover {
       background: #4f46e5;
@@ -3467,11 +3544,19 @@
         </button>
       </div>
 
-      <div class="studio-band studio-skin-band flex max-w-full flex-wrap items-center gap-1.5 sm:gap-2" role="group" aria-label="Skin">
+      <div class="studio-band studio-skin-band flex max-w-full items-center gap-1.5 sm:gap-2" role="group" aria-label="Skin">
         <span class="studio-band-label">SKIN</span>
-        <button type="button" id="btnSkinDefault" class="skin-choice" aria-pressed="true">Default</button>
-        <button type="button" id="btnSkinMinimalist" class="skin-choice" aria-pressed="false">Minimalist</button>
-        <script src="skins/loader.js" data-hcs-skin="mount"></script>
+        <div class="skin-menu">
+          <button type="button" id="btnSkinMenu" aria-haspopup="listbox" aria-controls="skinMenuList" aria-expanded="false" title="Skin" aria-label="Skin, Default">
+            <span class="skin-menu-name">Default</span>
+            <span class="skin-menu-caret" aria-hidden="true">▾</span>
+          </button>
+          <div id="skinMenuList" class="skin-menu-list" role="listbox" aria-label="Skin" hidden>
+            <button type="button" id="btnSkinDefault" class="skin-choice" role="option" aria-pressed="true" aria-selected="true">Default</button>
+            <button type="button" id="btnSkinMinimalist" class="skin-choice" role="option" aria-pressed="false" aria-selected="false">Minimalist</button>
+            <script src="skins/loader.js" data-hcs-skin="mount"></script>
+          </div>
+        </div>
       </div>
     </div>
     </div>
