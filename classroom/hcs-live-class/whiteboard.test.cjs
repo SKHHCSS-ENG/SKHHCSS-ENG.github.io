@@ -79,9 +79,9 @@ function assertPageChrome(html, label) {
 test('Live Class and Live Class + share the header, tools, and leaderboard placement', function () {
   assertPageChrome(liveHtml, 'Live Class');
   assertPageChrome(plusHtml, 'Live Class +');
-  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113l"/);
+  assert.match(liveHtml, /href="whiteboard\.css\?v=20261113m"/);
   assert.match(liveHtml, /src="whiteboard\.js\?v=20261113k"/);
-  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113l"/);
+  assert.match(plusHtml, /href="\.\.\/hcs-live-class\/whiteboard\.css\?v=20261113m"/);
   assert.match(plusHtml, /src="\.\.\/hcs-live-class\/whiteboard\.js\?v=20261113k"/);
   const drive = liveHtml.indexOf('<script src="studio-drive.js"></script>');
   const core = liveHtml.indexOf('<script src="studio-core.js?v=20261109c"></script>');
@@ -116,6 +116,9 @@ test('the board is memory only and does not join Ask or Dict', function () {
   assert.match(css, /width:\s*44px/);
   assert.match(css, /html\[data-skin="minimalist"\] \.wb-bar/);
   assert.match(css, /html\[data-skin="minimalist"\] \.wb-bar \{[^}]*background:\s*var\(--skin-bg/);
+  assert.match(css, /html\[data-skin="minimalist"\] \.wb-tool\[aria-pressed="true"\] \{[^}]*background:\s*var\(--skin-accent/);
+  assert.doesNotMatch(css, /html\[data-skin="minimalist"\] \.wb-tool\[aria-pressed="true"\] \{[^}]*(?:#fcd34d|#f59e0b)/);
+  assert.match(css, /\n\.wb-tool\[aria-pressed="true"\] \{\s*background:\s*#fcd34d/);
   assert.match(css, /\.wb-close/);
   assert.match(src, /Clear the whiteboard\? Undo brings it back/);
   assert.match(src, /e\.key !== 'Escape'/);
