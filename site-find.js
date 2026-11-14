@@ -346,14 +346,17 @@
       ]
     },
     {
-      "title": "Paper 1 - Past Paper Vocabulary",
-      "path": "learning-materials/paper-1-past-paper-vocabulary/",
+      "title": "Paper 1 - Meaning from Context",
+      "path": "learning-materials/paper-1-meaning-from-context/",
       "aliases": [
-        "paper 1 past paper vocabulary",
+        "paper 1 meaning from context",
+        "paper 1 vocabulary in context",
         "paper 1 vocabulary",
         "p1 vocabulary",
-        "past paper vocabulary",
+        "meaning from context",
         "vocabulary in context",
+        "paper 1 past paper vocabulary",
+        "past paper vocabulary",
         "語境詞義"
       ]
     },

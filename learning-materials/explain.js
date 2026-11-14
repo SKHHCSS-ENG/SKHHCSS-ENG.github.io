@@ -1,6 +1,6 @@
 /**
  * Explain — Cohesion and Aspects sample sheet, Sentence Patterns cards,
- * and Paper 1 - Past Paper Vocabulary samples.
+ * and Paper 1 - Meaning from Context samples.
  * Worker URL: window.__EXPLAIN_WORKER__ (empty until Nest pastes the workers.dev URL).
  * No API key here.
  */
@@ -350,7 +350,7 @@
     var shownKey = "";
 
     function expandedChip() {
-      return root.querySelector('.year-set:not([hidden]) .vocab-example[aria-expanded="true"]');
+      return root.querySelector('.skill-set:not([hidden]) .vocab-example[aria-expanded="true"]');
     }
 
     function currentPayload() {
@@ -358,11 +358,11 @@
       if (!chip) return null;
       var raw = chip.getAttribute("data-example") || "";
       var sampleText = squash(decodeSample(raw));
-      var set = chip.closest(".year-set");
+      var set = chip.closest(".skill-set");
       var category = set ? squash(set.getAttribute("data-theme") || "") : "";
       var itemLabel = squash(chip.textContent);
       return {
-        page: "Paper 1 - Past Paper Vocabulary",
+        page: "Paper 1 - Meaning from Context",
         itemLabel: itemLabel,
         label: itemLabel,
         category: category,

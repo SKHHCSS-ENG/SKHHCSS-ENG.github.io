@@ -1,4 +1,4 @@
-/* Paper 1 - Past Paper Vocabulary — year dropdown, chip selection, sheet fields.
+/* Paper 1 - Meaning from Context — skill dropdown, chip selection, sheet fields.
    Chip pills and the sample sheet chrome come from the shared writing styles
    and cohesion-sheet.css. This file only adds what those sheets do not cover. */
 
@@ -14,7 +14,7 @@ body.p1-vocab.tools-page.dock-open {
   padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
 }
 
-.year-pick {
+.skill-pick {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -23,7 +23,7 @@ body.p1-vocab.tools-page.dock-open {
   box-shadow: var(--shadow);
 }
 
-.year-pick label {
+.skill-pick label {
   display: block;
   margin: 0 0 6px;
   font-size: .88rem;
@@ -31,7 +31,7 @@ body.p1-vocab.tools-page.dock-open {
   color: var(--navy);
 }
 
-.year-pick select {
+.skill-pick select {
   display: block;
   width: 100%;
   min-height: 44px;
@@ -47,12 +47,12 @@ body.p1-vocab.tools-page.dock-open {
   touch-action: manipulation;
 }
 
-.year-pick select:focus-visible {
+.skill-pick select:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
-body.p1-vocab .year-set {
+body.p1-vocab .skill-set {
   position: relative;
   background: var(--card);
   border: 1px solid var(--border);
@@ -62,11 +62,11 @@ body.p1-vocab .year-set {
   box-shadow: var(--shadow);
 }
 
-body.p1-vocab .year-set[hidden] {
+body.p1-vocab .skill-set[hidden] {
   display: none !important;
 }
 
-body.p1-vocab .year-set .section-lead:last-child {
+body.p1-vocab .skill-set .section-lead:last-child {
   margin-bottom: 0;
 }
 
@@ -100,7 +100,7 @@ body.p1-vocab.zh-on .vocab-chips .gloss::after {
   white-space: normal;
 }
 
-body.p1-vocab.zh-on .year-set.hw-wrap {
+body.p1-vocab.zh-on .skill-set.hw-wrap {
   overflow: visible;
 }
 
@@ -121,7 +121,7 @@ body.p1-vocab.zh-on .year-set.hw-wrap {
 }
 
 @media print {
-  body.p1-vocab .year-set[hidden] {
+  body.p1-vocab .skill-set[hidden] {
     display: none !important;
   }
 }
@@ -133,7 +133,7 @@ body.p1-vocab.zh-on .year-set.hw-wrap {
     padding-left: calc(48px + env(safe-area-inset-left, 0px));
   }
 
-  /* Chips sit in the year card (wrap 16px + card 16px). At 390, inset
+  /* Chips sit in the skill card (wrap 16px + card 16px). At 390, inset
      the list so left-edge chips start at x=64 (8px clear of Ask at 56)
      and right-edge chips end before the folded dock (left edge 322). */
   body.p1-vocab .vocab-chips {

@@ -28,8 +28,8 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(new Set(paths).size, 36);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
-  assert.equal(SiteFind.entries[28].title, "Paper 1 - Past Paper Vocabulary");
-  assert.equal(SiteFind.entries[28].path, "learning-materials/paper-1-past-paper-vocabulary/");
+  assert.equal(SiteFind.entries[28].title, "Paper 1 - Meaning from Context");
+  assert.equal(SiteFind.entries[28].path, "learning-materials/paper-1-meaning-from-context/");
   assert.equal(SiteFind.entries[32].title, "What's New");
   assert.equal(SiteFind.entries[32].path, "whats-new/");
   assert.equal(SiteFind.entries[33].title, "Practice");
@@ -40,8 +40,12 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.entries[35].path, "activities-and-competitions/");
   const pastPaperVocab = SiteFind.search("past paper vocabulary");
   assert.equal(pastPaperVocab.length, 1);
-  assert.equal(pastPaperVocab[0].title, "Paper 1 - Past Paper Vocabulary");
-  assert.equal(pastPaperVocab[0].path, "learning-materials/paper-1-past-paper-vocabulary/");
+  assert.equal(pastPaperVocab[0].title, "Paper 1 - Meaning from Context");
+  assert.equal(pastPaperVocab[0].path, "learning-materials/paper-1-meaning-from-context/");
+  const meaning = SiteFind.search("meaning from context");
+  assert.equal(meaning.length, 1);
+  assert.equal(meaning[0].title, "Paper 1 - Meaning from Context");
+  assert.equal(meaning[0].path, "learning-materials/paper-1-meaning-from-context/");
   assert.equal(paths.includes("learning-materials/paper-1-exam-practice/"), false);
   assert.equal(paths.includes("speech-festival/"), false);
   assert.equal(paths.includes("say-it-louder/"), false);
