@@ -874,6 +874,17 @@ html[data-skin="arcade"] .arcade-chance-panel {
     0 12px 0 #090d16,
     0 20px 36px rgba(9, 13, 22, 0.65);
 }
+/* #chanceSheet is the full-screen dimmer — keep the classroom visible behind the card. */
+html[data-skin="arcade"] #chanceSheet,
+html[data-skin="arcade"] #chanceModal,
+html[data-skin="arcade"] #chanceSheet.arcade-chance-panel,
+html[data-skin="arcade"] #chanceModal.arcade-chance-panel {
+  background: rgba(15, 23, 42, 0.6);
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: inherit;
+}
 html[data-skin="arcade"] #chanceSheet .chance-bar,
 html[data-skin="arcade"] #chanceSheet .chance-header,
 html[data-skin="arcade"] #chanceSheet .chance-head,
@@ -931,7 +942,12 @@ html[data-skin="arcade"] #chanceCardTitle,
 html[data-skin="arcade"] #chanceResultTitle,
 html[data-skin="arcade"] .chance-text,
 html[data-skin="arcade"] #chanceText,
-html[data-skin="arcade"] #chanceCardText {
+html[data-skin="arcade"] #chanceCardText,
+html[data-skin="arcade"] #chancePrompt,
+html[data-skin="arcade"] #chanceSheet .chance-card-prompt,
+html[data-skin="arcade"] #chanceSheet .chance-card p,
+html[data-skin="arcade"] #chanceModal .chance-card-prompt,
+html[data-skin="arcade"] #chanceModal .chance-card p {
   color: #fef08a;
   text-shadow: 2px 2px 0 #090d16;
 }

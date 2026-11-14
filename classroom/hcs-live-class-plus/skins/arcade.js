@@ -77,7 +77,12 @@
           if (!titleEl) titleEl = h;
         }
       });
-      toggleClass(dlg, 'arcade-chance-panel', !!(active && isChanceSheet));
+      var panel = dlg.querySelector
+        ? dlg.querySelector('.plan-panel, .chance-panel, .chance-dialog')
+        : null;
+      // The sheet node is the full-screen dimmer; paint the inner card only.
+      toggleClass(dlg, 'arcade-chance-panel', !!(active && isChanceSheet && !panel));
+      if (panel) toggleClass(panel, 'arcade-chance-panel', !!(active && isChanceSheet));
       if (dlg.parentNode && dlg.parentNode.classList && dlg.parentNode !== document.body) {
         toggleClass(dlg.parentNode, 'arcade-chance-sheet', !!(active && isChanceSheet));
       }
