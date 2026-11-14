@@ -216,6 +216,8 @@ test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle b
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #pickerModal'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] \\.wb-sheet'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #chanceSheet'));
+    assert.match(pack.css, /#chanceSheet\.arcade-chance-panel[\s\S]{0,400}background:\s*rgba\(15,\s*23,\s*42,\s*0\.6\)/);
+    assert.match(pack.css, /#chanceSheet \.chance-card-prompt[\s\S]{0,400}color:\s*#fef08a/);
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnMore'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnChance'));
     assert.match(pack.css, /@keyframes arcadePageMesh/);
