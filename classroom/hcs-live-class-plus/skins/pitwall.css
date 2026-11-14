@@ -74,17 +74,12 @@ html[data-skin="pitwall"] #studioHeader::before {
   z-index: 0;
   background-image: linear-gradient(90deg,
     rgba(255, 128, 0, 0) 0%,
-    rgba(255, 128, 0, 0.28) 12%,
-    rgba(0, 210, 190, 0.30) 25%,
-    rgba(255, 128, 0, 0.28) 38%,
-    rgba(255, 128, 0, 0) 50%,
-    rgba(255, 128, 0, 0.28) 62%,
-    rgba(0, 210, 190, 0.30) 75%,
-    rgba(255, 128, 0, 0.28) 88%,
-    rgba(255, 128, 0, 0) 100%);
+    rgba(255, 128, 0, 0.28) 25%,
+    rgba(0, 210, 190, 0.28) 75%,
+    rgba(0, 210, 190, 0) 100%);
   background-size: 200% 100%;
   background-repeat: no-repeat;
-  animation: pitwallGantrySweep 3.8s linear infinite;
+  animation: pitwallLightSweep 4.8s linear infinite;
 }
 html[data-skin="pitwall"] #studioHeader::after {
   content: "";
@@ -92,20 +87,12 @@ html[data-skin="pitwall"] #studioHeader::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: linear-gradient(90deg,
-    rgba(0, 210, 190, 0) 0%,
-    rgba(0, 210, 190, 0.22) 12%,
-    rgba(250, 204, 21, 0.26) 25%,
-    rgba(0, 210, 190, 0.22) 38%,
-    rgba(0, 210, 190, 0) 50%,
-    rgba(0, 210, 190, 0.22) 62%,
-    rgba(250, 204, 21, 0.26) 75%,
-    rgba(0, 210, 190, 0.22) 88%,
-    rgba(0, 210, 190, 0) 100%);
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: pitwallGantrySweep 5.6s linear infinite reverse;
-  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201200%2096%22%3E%20%3C%21--%20Start%20Gantry%205%20Lights%20--%3E%20%3Cg%20fill=%22#e11d48%22%20stroke=%22#0b0d12%22%20stroke-width=%221.5%22%3E%20%3Ccircle%20cx=%22540%22%20cy=%2214%22%20r=%226%22/%3E%3Ccircle%20cx=%22560%22%20cy=%2214%22%20r=%226%22/%3E%3Ccircle%20cx=%22580%22%20cy=%2214%22%20r=%226%22/%3E%3Ccircle%20cx=%22600%22%20cy=%2214%22%20r=%226%22/%3E%3Ccircle%20cx=%22620%22%20cy=%2214%22%20r=%226%22/%3E%20%3C/g%3E%20%3C%21--%20Cute%20Mini%20Papaya%20Car%20--%3E%20%3Cg%20transform=%22translate(220,%2054)%20scale(0.58)%22%3E%20%3Cline%20x1=%22-50%22%20y1=%2226%22%20x2=%22-6%22%20y2=%2226%22%20stroke=%22#00d2be%22%20stroke-width=%225%22%20stroke-linecap=%22round%22/%3E%20%3Cpath%20d=%22M14%2026%20L48%2014%20L118%2018%20L158%2032%20L158%2042%20L14%2042%20Z%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%2278%22%20cy=%2214%22%20r=%2212%22%20fill=%22#facc15%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%2215%22%20fill=%22#0b0d12%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%2215%22%20fill=%22#0b0d12%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3C/g%3E%20%3C%21--%20Cute%20Mini%20Teal%20Car%20--%3E%20%3Cg%20transform=%22translate(820,%2054)%20scale(0.58)%22%3E%20%3Cline%20x1=%22-50%22%20y1=%2226%22%20x2=%22-6%22%20y2=%2226%22%20stroke=%22#ff8000%22%20stroke-width=%225%22%20stroke-linecap=%22round%22/%3E%20%3Cpath%20d=%22M14%2026%20L48%2014%20L118%2018%20L158%2032%20L158%2042%20L14%2042%20Z%22%20fill=%22#00d2be%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%2278%22%20cy=%2214%22%20r=%2212%22%20fill=%22#ffffff%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%2215%22%20fill=%22#0b0d12%22%20stroke=%22#facc15%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%2215%22%20fill=%22#0b0d12%22%20stroke=%22#facc15%22%20stroke-width=%224%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 1200px 96px;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+  opacity: 0.92;
+  animation: pitwallHeaderCarsRoll 12s linear infinite;
 }
 html[data-skin="pitwall"] #studioMast,
 html[data-skin="pitwall"] #studioHeader .studio-header-bar {
@@ -1303,8 +1290,17 @@ html[data-skin="pitwall"] #btnConfirmApplyGrid {
 
 
 /* =====================================================================
-   CALM THEME-RELATED STILL PICTURE CYCLE (Page, Seating Floor, Header)
+   RACE PADDOCK & PIT LANE SCENE WITH ROLLING RACING CARS & PIT CREW
    ===================================================================== */
+html[data-skin="pitwall"] body {
+  position: relative;
+}
+html[data-skin="pitwall"] #studioToolbar,
+html[data-skin="pitwall"] #studioWorkspace,
+html[data-skin="pitwall"] .site-version-footer {
+  position: relative;
+  z-index: 1;
+}
 html[data-skin="pitwall"] body::before,
 html[data-skin="pitwall"] body::after {
   content: "";
@@ -1312,19 +1308,21 @@ html[data-skin="pitwall"] body::after {
   inset: 0;
   pointer-events: none;
   z-index: -1;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 html[data-skin="pitwall"] body::before {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%20900%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpolygon%20points=%22120,0%20380,900%2020,900%22%20fill=%22#ff8000%22%20fill-opacity=%220.28%22/%3E%20%3Cpolygon%20points=%221480,0%201580,900%201220,900%22%20fill=%22#00d2be%22%20fill-opacity=%220.28%22/%3E%20%3Crect%20x=%22420%22%20y=%2228%22%20width=%22760%22%20height=%2218%22%20rx=%224%22%20fill=%22#1e293b%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.70%22%20stroke-width=%222%22/%3E%20%3Cg%20fill=%22#e11d48%22%20fill-opacity=%220.75%22%20stroke=%22#0f172a%22%20stroke-width=%222%22%3E%20%3Ccircle%20cx=%22560%22%20cy=%2268%22%20r=%2214%22/%3E%3Ccircle%20cx=%22680%22%20cy=%2268%22%20r=%2214%22/%3E%3Ccircle%20cx=%22800%22%20cy=%2268%22%20r=%2214%22/%3E%3Ccircle%20cx=%22920%22%20cy=%2268%22%20r=%2214%22/%3E%3Ccircle%20cx=%221040%22%20cy=%2268%22%20r=%2214%22/%3E%20%3C/g%3E%20%3Cpath%20d=%22M0%20780%20L360%20640%20L1240%20640%20L1600%20780%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.44%22%20stroke-width=%223%22%20stroke-dasharray=%2218%2012%22/%3E%20%3Cpath%20d=%22M80%20860%20L420%20680%20M1520%20860%20L1180%20680%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.44%22%20stroke-width=%224%22/%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.9;
-  animation: pitwallPicFadeA 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%20900%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3Cstyle%3E%20.crewBob%20%7B%20animation:%20crewBob%203.2s%20ease-in-out%20infinite;%20transform-origin:%20145px%20760px;%20%7D%20.flagWave%20%7B%20animation:%20flagWave%201.8s%20ease-in-out%20infinite;%20transform-origin:%20185px%20685px;%20%7D%20.driverBob%20%7B%20animation:%20crewBob%203.8s%20ease-in-out%20infinite%20reverse;%20transform-origin:%201455px%20760px;%20%7D%20%40keyframes%20crewBob%20%7B%200%,%20100%%20%7B%20transform:%20translateY(0px)%20rotate(-1deg);%20%7D%2050%%20%7B%20transform:%20translateY(-5px)%20rotate(1.5deg);%20%7D%20%7D%20%40keyframes%20flagWave%20%7B%200%,%20100%%20%7B%20transform:%20rotate(-10deg);%20%7D%2050%%20%7B%20transform:%20rotate(16deg);%20%7D%20%7D%20%40media%20(prefers-reduced-motion:%20reduce)%20%7B%20.crewBob,%20.flagWave,%20.driverBob%20%7B%20animation:%20none%20%21important;%20%7D%20%7D%20%3C/style%3E%20%3C%21--%20Stadium%20Floodlight%20Beams%20--%3E%20%3Cpolygon%20points=%2290,0%20420,900%200,900%22%20fill=%22#ff8000%22%20fill-opacity=%220.12%22/%3E%20%3Cpolygon%20points=%221510,0%201600,900%201180,900%22%20fill=%22#00d2be%22%20fill-opacity=%220.12%22/%3E%20%3C%21--%20Pit%20Lane%20Asphalt%20Apron%20%26%20Red/White%20FIA%20Kerbs%20at%20Bottom%20--%3E%20%3Crect%20x=%220%22%20y=%22755%22%20width=%221600%22%20height=%22145%22%20fill=%22#161922%22%20fill-opacity=%220.94%22/%3E%20%3Cpath%20d=%22M0%20755%20L1600%20755%22%20stroke=%22#ff8000%22%20stroke-width=%226%22%20stroke-dasharray=%2228%2028%22/%3E%20%3Cpath%20d=%22M28%20755%20L1600%20755%22%20stroke=%22#ffffff%22%20stroke-width=%226%22%20stroke-dasharray=%2228%2028%22/%3E%20%3Cpath%20d=%22M0%20825%20L1600%20825%22%20stroke=%22#00d2be%22%20stroke-width=%222.5%22%20stroke-dasharray=%2222%2016%22%20stroke-opacity=%220.65%22/%3E%20%3C%21--%20Left%20Pit%20Garage%20Box%20(#04%20PAPAYA%20RACING)%20--%3E%20%3Cg%3E%20%3Crect%20x=%2212%22%20y=%22455%22%20width=%22235%22%20height=%22300%22%20rx=%228%22%20fill=%22#1e2433%22%20stroke=%22#ff8000%22%20stroke-width=%223%22/%3E%20%3Crect%20x=%2224%22%20y=%22468%22%20width=%22211%22%20height=%2234%22%20rx=%225%22%20fill=%22#ff8000%22/%3E%20%3Crect%20x=%2234%22%20y=%22514%22%20width=%22191%22%20height=%22240%22%20rx=%224%22%20fill=%22#0b0d12%22%20stroke=%22#00d2be%22%20stroke-width=%222%22/%3E%20%3C%21--%20Overhead%20Pit%20Gantry%20Rig%20%26%20Tyre%20Stacks%20inside%20Garage%20--%3E%20%3Ccircle%20cx=%2262%22%20cy=%22722%22%20r=%2222%22%20fill=%22#1e293b%22%20stroke=%22#e11d48%22%20stroke-width=%225%22/%3E%20%3Ccircle%20cx=%2262%22%20cy=%22676%22%20r=%2222%22%20fill=%22#1e293b%22%20stroke=%22#facc15%22%20stroke-width=%225%22/%3E%20%3Ccircle%20cx=%22195%22%20cy=%22722%22%20r=%2222%22%20fill=%22#1e293b%22%20stroke=%22#00d2be%22%20stroke-width=%225%22/%3E%20%3C/g%3E%20%3C%21--%20Right%20Pit%20Garage%20Box%20(#16%20X-MODE%20TELEMETRY)%20--%3E%20%3Cg%3E%20%3Crect%20x=%221353%22%20y=%22455%22%20width=%22235%22%20height=%22300%22%20rx=%228%22%20fill=%22#1e2433%22%20stroke=%22#00d2be%22%20stroke-width=%223%22/%3E%20%3Crect%20x=%221365%22%20y=%22468%22%20width=%22211%22%20height=%2234%22%20rx=%225%22%20fill=%22#00d2be%22/%3E%20%3Crect%20x=%221375%22%20y=%22514%22%20width=%22191%22%20height=%22240%22%20rx=%224%22%20fill=%22#0b0d12%22%20stroke=%22#ff8000%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%221405%22%20cy=%22722%22%20r=%2222%22%20fill=%22#1e293b%22%20stroke=%22#ff8000%22%20stroke-width=%225%22/%3E%20%3Ccircle%20cx=%221538%22%20cy=%22722%22%20r=%2222%22%20fill=%22#1e293b%22%20stroke=%22#facc15%22%20stroke-width=%225%22/%3E%20%3Ccircle%20cx=%221538%22%20cy=%22676%22%20r=%2222%22%20fill=%22#1e293b%22%20stroke=%22#ffffff%22%20stroke-width=%225%22/%3E%20%3C/g%3E%20%3C%21--%20CUTE%20ORIGINAL%20CHARACTER%20#1%20(Left%20Pit%20Wall):%20Chibi%20Pit-Crew%20Engineer%20with%20Headset%20%26%20Waving%20Chequered%20Flag%20--%3E%20%3Cg%20class=%22crewBob%22%3E%20%3C%21--%20Race%20Suit%20Body%20--%3E%20%3Cpath%20d=%22M110%20778%20L122%20695%20L168%20695%20L180%20778%20Z%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M126%20695%20L145%20735%20L164%20695%20Z%22%20fill=%22#161922%22%20stroke=%22#00d2be%22%20stroke-width=%222%22/%3E%20%3C%21--%20Waving%20Chequered%20Flag%20Arm%20--%3E%20%3Cg%20class=%22flagWave%22%3E%20%3Cline%20x1=%22172%22%20y1=%22705%22%20x2=%22215%22%20y2=%22625%22%20stroke=%22#ffffff%22%20stroke-width=%224%22%20stroke-linecap=%22round%22/%3E%20%3Crect%20x=%22212%22%20y=%22618%22%20width=%2246%22%20height=%2232%22%20rx=%223%22%20fill=%22#ffffff%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%22212%22%20y=%22618%22%20width=%2215%22%20height=%2216%22%20fill=%22#0b0d12%22/%3E%20%3Crect%20x=%22242%22%20y=%22618%22%20width=%2216%22%20height=%2216%22%20fill=%22#0b0d12%22/%3E%20%3Crect%20x=%22227%22%20y=%22634%22%20width=%2215%22%20height=%2216%22%20fill=%22#0b0d12%22/%3E%20%3C/g%3E%20%3C%21--%20Chibi%20Head%20%26%20Racing%20Headset%20--%3E%20%3Cpath%20d=%22M108%20658%20A37%2037%200%200%201%20182%20658%22%20stroke=%22#00d2be%22%20stroke-width=%226%22%20fill=%22none%22/%3E%20%3Crect%20x=%22100%22%20y=%22646%22%20width=%2212%22%20height=%2224%22%20rx=%226%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%22178%22%20y=%22646%22%20width=%2212%22%20height=%2224%22%20rx=%226%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%22145%22%20cy=%22658%22%20r=%2232%22%20fill=%22#fde68a%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3C%21--%20Racing%20Cap%20--%3E%20%3Cpath%20d=%22M112%20648%20Q145%20612%20178%20648%20Z%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M112%20648%20L192%20648%22%20stroke=%22#00d2be%22%20stroke-width=%224%22%20stroke-linecap=%22round%22/%3E%20%3C%21--%20Eyes%20%26%20Smile%20--%3E%20%3Ccircle%20cx=%22133%22%20cy=%22660%22%20r=%224%22%20fill=%22#0b0d12%22/%3E%20%3Ccircle%20cx=%22157%22%20cy=%22660%22%20r=%224%22%20fill=%22#0b0d12%22/%3E%20%3Cpath%20d=%22M136%20672%20Q145%20679%20154%20672%22%20stroke=%22#0b0d12%22%20stroke-width=%222.8%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3C/g%3E%20%3C%21--%20CUTE%20ORIGINAL%20CHARACTER%20#2%20(Right%20Paddock):%20Chibi%20Race%20Driver%20in%20Helmet%20holding%20Trophy%20--%3E%20%3Cg%20class=%22driverBob%22%3E%20%3Cpath%20d=%22M1422%20778%20L1434%20698%20L1476%20698%20L1488%20778%20Z%22%20fill=%22#00d2be%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Crect%20x=%221434%22%20y=%22718%22%20width=%2242%22%20height=%2210%22%20fill=%22#ff8000%22/%3E%20%3C%21--%20Racing%20Helmet%20--%3E%20%3Ccircle%20cx=%221455%22%20cy=%22658%22%20r=%2234%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Crect%20x=%221428%22%20y=%22644%22%20width=%2254%22%20height=%2222%22%20rx=%2210%22%20fill=%22#0b0d12%22%20stroke=%22#00d2be%22%20stroke-width=%222.5%22/%3E%20%3Cpath%20d=%22M1436%20651%20L1466%20651%22%20stroke=%22#38bdf8%22%20stroke-width=%223%22%20stroke-linecap=%22round%22/%3E%20%3C%21--%20Gold%20Trophy%20in%20Hand%20--%3E%20%3Cpath%20d=%22M1392%20682%20L1416%20682%20L1412%20706%20L1396%20706%20Z%22%20fill=%22#facc15%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%221398%22%20y=%22706%22%20width=%2212%22%20height=%2210%22%20fill=%22#facc15%22%20stroke=%22#0b0d12%22%20stroke-width=%222%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  opacity: 0.95;
 }
 html[data-skin="pitwall"] body::after {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%20900%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M180%20680%20C120%20420%20280%20160%20540%20180%20L1080%20180%20C1340%20180%201440%20420%201280%20620%20L920%20740%20L340%20740%20Z%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.54%22%20stroke-width=%228%22%20stroke-linejoin=%22round%22/%3E%20%3Cpath%20d=%22M180%20680%20C120%20420%20280%20160%20540%20180%20L1080%20180%20C1340%20180%201440%20420%201280%20620%20L920%20740%20L340%20740%20Z%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.56%22%20stroke-width=%222%22%20stroke-dasharray=%2214%2010%22/%3E%20%3Ccircle%20cx=%22540%22%20cy=%22180%22%20r=%2210%22%20fill=%22#ff8000%22%20fill-opacity=%220.61%22/%3E%20%3Ccircle%20cx=%221080%22%20cy=%22180%22%20r=%2210%22%20fill=%22#00d2be%22%20fill-opacity=%220.61%22/%3E%20%3Ccircle%20cx=%221280%22%20cy=%22620%22%20r=%2210%22%20fill=%22#fde047%22%20fill-opacity=%220.61%22/%3E%20%3Ccircle%20cx=%22240%22%20cy=%22220%22%20r=%2290%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.42%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%221360%22%20cy=%22220%22%20r=%2290%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.42%22%20stroke-width=%222%22/%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.1;
-  animation: pitwallPicFadeB 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201200%20900%22%3E%20%3C%21--%20Cute%20Chibi%20Formula%20Car%20#1%20(Papaya%20#ff8000)%20rolling%20along%20bottom%20pit%20lane%20--%3E%20%3Cg%20transform=%22translate(180,%20775)%22%3E%20%3C%21--%20Overtake%20Energy%20Trail%20--%3E%20%3Cline%20x1=%22-75%22%20y1=%2226%22%20x2=%22-10%22%20y2=%2226%22%20stroke=%22#00d2be%22%20stroke-width=%225%22%20stroke-linecap=%22round%22%20stroke-opacity=%220.85%22/%3E%20%3Cline%20x1=%22-55%22%20y1=%2238%22%20x2=%22-5%22%20y2=%2238%22%20stroke=%22#ff8000%22%20stroke-width=%224%22%20stroke-linecap=%22round%22%20stroke-opacity=%220.85%22/%3E%20%3C%21--%20Rear%20Wing%20--%3E%20%3Crect%20x=%220%22%20y=%226%22%20width=%2218%22%20height=%2232%22%20rx=%223%22%20fill=%22#0b0d12%22%20stroke=%22#ff8000%22%20stroke-width=%222.5%22/%3E%20%3C%21--%20Car%20Body%20/%20Sidepod%20--%3E%20%3Cpath%20d=%22M14%2026%20L48%2014%20L118%2018%20L158%2032%20L158%2042%20L14%2042%20Z%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M52%2026%20L112%2026%20L125%2036%20L52%2036%20Z%22%20fill=%22#00d2be%22/%3E%20%3C%21--%20Cute%20Driver%20Helmet%20in%20Cockpit%20--%3E%20%3Ccircle%20cx=%2278%22%20cy=%2214%22%20r=%2212%22%20fill=%22#facc15%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%2276%22%20y=%2210%22%20width=%2212%22%20height=%227%22%20rx=%223%22%20fill=%22#0b0d12%22/%3E%20%3C%21--%20Halo%20Bar%20--%3E%20%3Cpath%20d=%22M62%2018%20Q82%204%2098%2020%22%20stroke=%22#0b0d12%22%20stroke-width=%224%22%20fill=%22none%22/%3E%20%3C%21--%20Front%20Wing%20--%3E%20%3Crect%20x=%22148%22%20y=%2232%22%20width=%2224%22%20height=%2212%22%20rx=%223%22%20fill=%22#00d2be%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3C%21--%20Pirelli-style%20Slick%20Tyres%20--%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%2216%22%20fill=%22#0b0d12%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%226%22%20fill=%22#94a3b8%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%2216%22%20fill=%22#0b0d12%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%226%22%20fill=%22#94a3b8%22/%3E%20%3C/g%3E%20%3C%21--%20Cute%20Chibi%20Formula%20Car%20#2%20(Teal%20#00d2be)%20rolling%20along%20pit%20lane%20--%3E%20%3Cg%20transform=%22translate(760,%20785)%22%3E%20%3Cline%20x1=%22-70%22%20y1=%2226%22%20x2=%22-10%22%20y2=%2226%22%20stroke=%22#ff8000%22%20stroke-width=%225%22%20stroke-linecap=%22round%22%20stroke-opacity=%220.85%22/%3E%20%3Crect%20x=%220%22%20y=%226%22%20width=%2218%22%20height=%2232%22%20rx=%223%22%20fill=%22#0b0d12%22%20stroke=%22#00d2be%22%20stroke-width=%222.5%22/%3E%20%3Cpath%20d=%22M14%2026%20L48%2014%20L118%2018%20L158%2032%20L158%2042%20L14%2042%20Z%22%20fill=%22#00d2be%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M52%2026%20L112%2026%20L125%2036%20L52%2036%20Z%22%20fill=%22#ff8000%22/%3E%20%3Ccircle%20cx=%2278%22%20cy=%2214%22%20r=%2212%22%20fill=%22#ffffff%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%2276%22%20y=%2210%22%20width=%2212%22%20height=%227%22%20rx=%223%22%20fill=%22#0b0d12%22/%3E%20%3Cpath%20d=%22M62%2018%20Q82%204%2098%2020%22%20stroke=%22#0b0d12%22%20stroke-width=%224%22%20fill=%22none%22/%3E%20%3Crect%20x=%22148%22%20y=%2232%22%20width=%2224%22%20height=%2212%22%20rx=%223%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%2216%22%20fill=%22#0b0d12%22%20stroke=%22#facc15%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%226%22%20fill=%22#94a3b8%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%2216%22%20fill=%22#0b0d12%22%20stroke=%22#facc15%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%226%22%20fill=%22#94a3b8%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 1200px 100%;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+  opacity: 0.95;
+  animation: pitwallCarsRoll 14s linear infinite;
 }
 html[data-skin="pitwall"] .classroom-floor::before,
 html[data-skin="pitwall"] .classroom-floor::after {
@@ -1333,18 +1331,20 @@ html[data-skin="pitwall"] .classroom-floor::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
 }
 html[data-skin="pitwall"] .classroom-floor::before {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%20preserveAspectRatio=%22none%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M0%2044%20L88%200%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.64%22%20stroke-width=%2210%22%20stroke-dasharray=%2216%2016%22/%3E%20%3Cpath%20d=%22M992%200%20L1080%2044%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.64%22%20stroke-width=%2210%22%20stroke-dasharray=%2216%2016%22/%3E%20%3Cpath%20d=%22M0%20676%20L88%20720%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.56%22%20stroke-width=%2210%22%20stroke-dasharray=%2216%2016%22/%3E%20%3Cpath%20d=%22M992%20720%20L1080%20676%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.56%22%20stroke-width=%2210%22%20stroke-dasharray=%2216%2016%22/%3E%20%3Cpath%20d=%22M220%2090%20L220%2062%20L320%2062%20L320%2090%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.48%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M760%2090%20L760%2062%20L860%2062%20L860%2090%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.48%22%20stroke-width=%223%22/%3E%20%3Crect%20x=%2236%22%20y=%2234%22%20width=%221008%22%20height=%22652%22%20rx=%2218%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.42%22%20stroke-width=%222%22/%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.9;
-  animation: pitwallPicFadeA 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%20preserveAspectRatio=%22none%22%3E%20%3C%21--%20Top%20%26%20Bottom%20FIA%20Red/White%20%26%20Papaya/Teal%20Kerb%20Strips%20--%3E%20%3Cpath%20d=%22M0%2012%20L1080%2012%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.55%22%20stroke-width=%228%22%20stroke-dasharray=%2224%2024%22/%3E%20%3Cpath%20d=%22M24%2012%20L1080%2012%22%20stroke=%22#ffffff%22%20stroke-opacity=%220.45%22%20stroke-width=%228%22%20stroke-dasharray=%2224%2024%22/%3E%20%3Cpath%20d=%22M0%20708%20L1080%20708%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.55%22%20stroke-width=%228%22%20stroke-dasharray=%2224%2024%22/%3E%20%3Cpath%20d=%22M24%20708%20L1080%20708%22%20stroke=%22#ffffff%22%20stroke-opacity=%220.45%22%20stroke-width=%228%22%20stroke-dasharray=%2224%2024%22/%3E%20%3C%21--%20Pit%20Stop%20Box%20Markings%20%26%20Corner%20Tyre%20Stacks%20--%3E%20%3Cpath%20d=%22M40%2085%20L40%2042%20L150%2042%20L150%2085%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.45%22%20stroke-width=%223%22%20fill=%22none%22/%3E%20%3Cpath%20d=%22M930%2085%20L930%2042%20L1040%2042%20L1040%2085%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.45%22%20stroke-width=%223%22%20fill=%22none%22/%3E%20%3Cg%20transform=%22translate(26,%20618)%22%3E%20%3Ccircle%20cx=%2224%22%20cy=%2254%22%20r=%2218%22%20fill=%22#1e293b%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%2264%22%20cy=%2254%22%20r=%2218%22%20fill=%22#1e293b%22%20stroke=%22#facc15%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%2244%22%20cy=%2224%22%20r=%2218%22%20fill=%22#1e293b%22%20stroke=%22#00d2be%22%20stroke-width=%224%22/%3E%20%3C/g%3E%20%3C%21--%20Bottom-Right%20Chibi%20Pit%20Mechanic%20with%20Lollipop%20Sign%20--%3E%20%3Cg%20transform=%22translate(970,%20595)%22%3E%20%3Cline%20x1=%2212%22%20y1=%2288%22%20x2=%2212%22%20y2=%2218%22%20stroke=%22#cbd5e1%22%20stroke-width=%223.5%22/%3E%20%3Ccircle%20cx=%2212%22%20cy=%2218%22%20r=%2216%22%20fill=%22#ff8000%22%20stroke=%22#ffffff%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%2252%22%20cy=%2252%22%20r=%2220%22%20fill=%22#00d2be%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%2236%22%20y=%2244%22%20width=%2232%22%20height=%2212%22%20rx=%225%22%20fill=%22#0b0d12%22%20stroke=%22#ff8000%22%20stroke-width=%222%22/%3E%20%3Cpath%20d=%22M34%2092%20L40%2068%20L64%2068%20L70%2092%20Z%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.94;
 }
 html[data-skin="pitwall"] .classroom-floor::after {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%20preserveAspectRatio=%22none%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M90%20660%20C240%20520%20360%20180%20540%20180%20C720%20180%20840%20520%20990%20660%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.40%22%20stroke-width=%224%22%20stroke-dasharray=%2214%2010%22/%3E%20%3Ccircle%20cx=%22140%22%20cy=%22130%22%20r=%2246%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.44%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22940%22%20cy=%22130%22%20r=%2246%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.44%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22140%22%20cy=%22590%22%20r=%2246%22%20stroke=%22#00d2be%22%20stroke-opacity=%220.54%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22940%22%20cy=%22590%22%20r=%2246%22%20stroke=%22#ff8000%22%20stroke-opacity=%220.54%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M480%20680%20L540%20650%20L600%20680%22%20stroke=%22#fde047%22%20stroke-opacity=%220.56%22%20stroke-width=%223%22/%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.1;
-  animation: pitwallPicFadeB 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%3E%20%3Cg%20transform=%22translate(120,%20662)%20scale(0.72)%22%3E%20%3Cline%20x1=%22-55%22%20y1=%2226%22%20x2=%22-8%22%20y2=%2226%22%20stroke=%22#00d2be%22%20stroke-width=%225%22%20stroke-linecap=%22round%22/%3E%20%3Crect%20x=%220%22%20y=%226%22%20width=%2218%22%20height=%2232%22%20rx=%223%22%20fill=%22#0b0d12%22%20stroke=%22#ff8000%22%20stroke-width=%222.5%22/%3E%20%3Cpath%20d=%22M14%2026%20L48%2014%20L118%2018%20L158%2032%20L158%2042%20L14%2042%20Z%22%20fill=%22#ff8000%22%20stroke=%22#0b0d12%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%2278%22%20cy=%2214%22%20r=%2212%22%20fill=%22#facc15%22%20stroke=%22#0b0d12%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%2238%22%20cy=%2242%22%20r=%2215%22%20fill=%22#0b0d12%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3Ccircle%20cx=%22132%22%20cy=%2242%22%20r=%2215%22%20fill=%22#0b0d12%22%20stroke=%22#e11d48%22%20stroke-width=%224%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 1080px 720px;
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  opacity: 0.92;
+  animation: pitwallFloorCarsRoll 15s linear infinite;
 }
 html[data-skin="pitwall"] #classroomScaleHost {
   position: relative;
@@ -1360,35 +1360,37 @@ html[data-skin="pitwall"] #classroomScaleHost {
   100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 50%; }
 }
 @keyframes pitwallFloorMesh {
-  0%   { background-position: 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
 }
 @keyframes pitwallFloorMeshSnap {
   0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
   100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
 }
-@keyframes pitwallGantrySweep {
+@keyframes pitwallLightSweep {
   0%   { background-position: 0% 0; }
   100% { background-position: 100% 0; }
 }
-@keyframes pitwallPulse {
+@keyframes pitwallCarsRoll {
+  0%   { background-position: 0px bottom; }
+  100% { background-position: 1200px bottom; }
+}
+@keyframes pitwallFloorCarsRoll {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 1080px 0px; }
+}
+@keyframes pitwallHeaderCarsRoll {
+  0%   { background-position: 0px bottom; }
+  100% { background-position: 1200px bottom; }
+}
+@keyframes pitwallBoostPulse {
   0%, 100% { filter: brightness(1); transform: translateY(0); }
-  50%      { filter: brightness(1.22); transform: translateY(-1px); }
+  50%      { filter: brightness(1.18); transform: translateY(-1px); }
 }
 @keyframes pitwallPopUp {
   0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.7); }
   20%  { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.28); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-48px) scale(1); }
-}
-@keyframes pitwallPicFadeA {
-  0%, 42%   { opacity: 0.92; }
-  50%, 92%  { opacity: 0.08; }
-  100%      { opacity: 0.92; }
-}
-@keyframes pitwallPicFadeB {
-  0%, 42%   { opacity: 0.08; }
-  50%, 92%  { opacity: 0.92; }
-  100%      { opacity: 0.08; }
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-skin="pitwall"] body,
@@ -1402,10 +1404,5 @@ html[data-skin="pitwall"] #classroomScaleHost {
   html[data-skin="pitwall"] .classroom-floor.snap-active,
   html[data-skin="pitwall"] .pitwall-fire.is-on {
     animation: none !important;
-  }
-  html[data-skin="pitwall"] body::after,
-  html[data-skin="pitwall"] #studioHeader::after,
-  html[data-skin="pitwall"] .classroom-floor::after {
-    opacity: 0 !important;
   }
 }
