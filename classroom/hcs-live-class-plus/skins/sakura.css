@@ -80,20 +80,11 @@ html[data-skin="sakura"] #studioHeader::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: linear-gradient(90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.65) 14%,
-    rgba(244, 114, 182, 0.18) 26%,
-    rgba(255, 255, 255, 0.65) 38%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(255, 255, 255, 0.65) 64%,
-    rgba(244, 114, 182, 0.18) 76%,
-    rgba(255, 255, 255, 0.65) 88%,
-    rgba(255, 255, 255, 0) 100%);
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%2096%22%20preserveAspectRatio=%22none%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M0%2024%20Q260%2068%20520%2022%20T1040%2026%20T1600%2020%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.64%22%20stroke-width=%223%22/%3E%20%3Cg%20fill=%22#ffd6e7%22%20fill-opacity=%220.90%22%20stroke=%22#ffffff%22%20stroke-width=%222%22%3E%20%3Ccircle%20cx=%22240%22%20cy=%2242%22%20r=%2214%22/%3E%3Ccircle%20cx=%22520%22%20cy=%2224%22%20r=%2212%22/%3E%3Ccircle%20cx=%22820%22%20cy=%2240%22%20r=%2214%22/%3E%3Ccircle%20cx=%221120%22%20cy=%2226%22%20r=%2212%22/%3E%3Ccircle%20cx=%221380%22%20cy=%2238%22%20r=%2214%22/%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E"), linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.65) 25%, rgba(244, 114, 182, 0.18) 75%, rgba(255, 255, 255, 0) 100%);
-  background-size: 100% 100%, 200% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%2096%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3C%21--%20Blossoming%20sakura%20branches%20along%20header%20top%20--%3E%20%3Cpath%20d=%22M0%2018%20Q180%2054%20380%2016%20T780%2024%20T1180%2018%20T1600%2026%22%20stroke=%22#db2777%22%20stroke-opacity=%220.42%22%20stroke-width=%224%22%20fill=%22none%22/%3E%20%3Cg%20fill=%22#ffd6e7%22%20fill-opacity=%220.9%22%20stroke=%22#f472b6%22%20stroke-width=%222%22%3E%20%3Ccircle%20cx=%22140%22%20cy=%2224%22%20r=%2218%22/%3E%3Ccircle%20cx=%22170%22%20cy=%2218%22%20r=%2214%22/%3E%3Ccircle%20cx=%22360%22%20cy=%2220%22%20r=%2216%22/%3E%20%3Ccircle%20cx=%22640%22%20cy=%2222%22%20r=%2218%22/%3E%3Ccircle%20cx=%22940%22%20cy=%2220%22%20r=%2216%22/%3E%3Ccircle%20cx=%221260%22%20cy=%2222%22%20r=%2218%22/%3E%3Ccircle%20cx=%221490%22%20cy=%2220%22%20r=%2216%22/%3E%20%3C/g%3E%20%3C%21--%20Hanging%20Chochin%20Lanterns%20--%3E%20%3Cg%20fill=%22#ffffff%22%20stroke=%22#ec4899%22%20stroke-width=%222%22%3E%20%3Cellipse%20cx=%22265%22%20cy=%2234%22%20rx=%2212%22%20ry=%2215%22/%3E%3Cellipse%20cx=%22785%22%20cy=%2232%22%20rx=%2212%22%20ry=%2215%22/%3E%3Cellipse%20cx=%221145%22%20cy=%2234%22%20rx=%2212%22%20ry=%2215%22/%3E%20%3C/g%3E%20%3C%21--%20Cute%20peeking%20chibi%20character%20in%20header%20--%3E%20%3Cg%20transform=%22translate(470,%2012)%22%3E%20%3Ccircle%20cx=%2230%22%20cy=%2238%22%20r=%2220%22%20fill=%22#fff5f7%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3Cpath%20d=%22M10%2034%20Q20%2014%2030%2016%20Q40%2014%2050%2034%20Q40%2024%2030%2032%20Q20%2024%2010%2034%20Z%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%2212%22%20cy=%2226%22%20r=%225.5%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22/%3E%20%3Ccircle%20cx=%2248%22%20cy=%2226%22%20r=%225.5%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22/%3E%20%3Ccircle%20cx=%2223%22%20cy=%2239%22%20r=%222.8%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%2237%22%20cy=%2239%22%20r=%222.8%22%20fill=%22#831843%22/%3E%20%3Cellipse%20cx=%2218%22%20cy=%2244%22%20rx=%224%22%20ry=%222%22%20fill=%22#ff8fab%22/%3E%20%3Cellipse%20cx=%2242%22%20cy=%2244%22%20rx=%224%22%20ry=%222%22%20fill=%22#ff8fab%22/%3E%20%3Cpath%20d=%22M26%2046%20Q30%2050%2034%2046%22%20stroke=%22#831843%22%20stroke-width=%222%22%20fill=%22none%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: cover;
+  background-position: center top;
   background-repeat: no-repeat;
-  animation: sakuraPicFadeA 24s ease-in-out infinite;
+  opacity: 0.95;
 }
 html[data-skin="sakura"] #studioHeader::after {
   content: "";
@@ -101,20 +92,11 @@ html[data-skin="sakura"] #studioHeader::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: linear-gradient(90deg,
-    rgba(255, 182, 193, 0) 0%,
-    rgba(255, 182, 193, 0.22) 15%,
-    rgba(255, 255, 255, 0.55) 28%,
-    rgba(255, 182, 193, 0.22) 40%,
-    rgba(255, 182, 193, 0) 50%,
-    rgba(255, 182, 193, 0.22) 65%,
-    rgba(255, 255, 255, 0.55) 78%,
-    rgba(255, 182, 193, 0.22) 90%,
-    rgba(255, 182, 193, 0) 100%);
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%2096%22%20preserveAspectRatio=%22none%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M0%2036%20Q320%2010%20640%2038%20T1280%2032%20T1600%2038%22%20stroke=%22#f9a8d4%22%20stroke-opacity=%220.61%22%20stroke-width=%223%22/%3E%20%3Cg%20fill=%22#ffffff%22%20fill-opacity=%220.93%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.8%22%20stroke-width=%222%22%3E%20%3Cellipse%20cx=%22340%22%20cy=%2230%22%20rx=%2214%22%20ry=%2218%22/%3E%3Cellipse%20cx=%22720%22%20cy=%2234%22%20rx=%2214%22%20ry=%2218%22/%3E%3Cellipse%20cx=%221060%22%20cy=%2228%22%20rx=%2214%22%20ry=%2218%22/%3E%3Cellipse%20cx=%221440%22%20cy=%2234%22%20rx=%2214%22%20ry=%2218%22/%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E"), linear-gradient(90deg, rgba(255, 182, 193, 0) 0%, rgba(255, 182, 193, 0.22) 50%, rgba(255, 182, 193, 0) 100%);
-  background-size: 100% 100%, 200% 100%;
-  background-repeat: no-repeat;
-  animation: sakuraPicFadeB 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20800%20500%22%3E%20%3Cg%20fill=%22#ff8fab%22%20fill-opacity=%220.72%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22%3E%20%3Cpath%20d=%22M80%2060%20C92%2048%20108%2056%2096%2072%20C84%2084%2068%2072%2080%2060%20Z%22/%3E%20%3Cpath%20d=%22M240%20140%20C252%20128%20268%20136%20256%20152%20C244%20164%20228%20152%20240%20140%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M420%2085%20C432%2073%20448%2081%20436%2097%20C424%20109%20408%2097%20420%2085%20Z%22/%3E%20%3Cpath%20d=%22M610%20165%20C622%20153%20638%20161%20626%20177%20C614%20189%20598%20177%20610%20165%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M730%2075%20C742%2063%20758%2071%20746%2087%20C734%2099%20718%2087%20730%2075%20Z%22/%3E%20%3Cpath%20d=%22M140%20310%20C152%20298%20168%20306%20156%20322%20C144%20334%20128%20322%20140%20310%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M350%20280%20C362%20268%20378%20276%20366%20292%20C354%20304%20338%20292%20350%20280%20Z%22/%3E%20%3Cpath%20d=%22M530%20360%20C542%20348%20558%20356%20546%20372%20C534%20384%20518%20372%20530%20360%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M690%20295%20C702%20283%20718%20291%20706%20307%20C694%20319%20678%20307%20690%20295%20Z%22/%3E%20%3Cpath%20d=%22M60%20430%20C72%20418%2088%20426%2076%20442%20C64%20454%2048%20442%2060%20430%20Z%22/%3E%20%3Cpath%20d=%22M460%20445%20C472%20433%20488%20441%20476%20457%20C464%20469%20448%20457%20460%20445%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 420px 220px;
+  background-repeat: repeat;
+  opacity: 0.85;
+  animation: sakuraHeaderPetals 14s linear infinite;
 }
 html[data-skin="sakura"] #studioMast,
 html[data-skin="sakura"] #studioHeader .studio-header-bar {
@@ -410,20 +392,29 @@ html[data-skin="sakura"] #pulseCard h2 {
   font-family: var(--sakura-font-display);
   color: #831843;
 }
+html[data-skin="sakura"] #pulseCard [class*="bg-white/"] {
+  background-color: rgba(255, 255, 255, 0.86);
+  border-color: #f9a8d4;
+}
+html[data-skin="sakura"] #pulseCard .text-indigo-100 {
+  color: #9d174d;
+  font-weight: 700;
+}
 html[data-skin="sakura"] #pulseCard #statTotalPoints {
   font-family: var(--sakura-font-display);
   color: #db2777;
   text-shadow: 0 1px 0 #ffffff, 0 0 12px rgba(244, 114, 182, 0.35);
 }
-html[data-skin="sakura"] #pulseCard .text-indigo-100 {
-  color: #9d174d;
-}
 html[data-skin="sakura"] #pulseCard .text-white,
 html[data-skin="sakura"] #pulseCard .text-amber-300,
-html[data-skin="sakura"] #pulseCard .text-emerald-300,
-html[data-skin="sakura"] #pulseCard #statTopStudent,
-html[data-skin="sakura"] #pulseCard #statTopGroup {
+html[data-skin="sakura"] #pulseCard .text-emerald-300 {
   color: #831843;
+}
+html[data-skin="sakura"] #pulseCard #statTopStudent {
+  color: #831843;
+}
+html[data-skin="sakura"] #pulseCard #statTopGroup {
+  color: #be185d;
 }
 html[data-skin="sakura"] #studioFloorSection {
   border: 3px solid #f472b6;
@@ -1329,8 +1320,17 @@ html[data-skin="sakura"] #btnConfirmApplyGrid {
 
 
 /* =====================================================================
-   CALM THEME-RELATED STILL PICTURE CYCLE (Page, Seating Floor, Header)
+   JAPANESE STREET & SAKURA COURTYARD SCENE WITH MOVING CHARACTER & PETALS
    ===================================================================== */
+html[data-skin="sakura"] body {
+  position: relative;
+}
+html[data-skin="sakura"] #studioToolbar,
+html[data-skin="sakura"] #studioWorkspace,
+html[data-skin="sakura"] .site-version-footer {
+  position: relative;
+  z-index: 1;
+}
 html[data-skin="sakura"] body::before,
 html[data-skin="sakura"] body::after {
   content: "";
@@ -1338,19 +1338,21 @@ html[data-skin="sakura"] body::after {
   inset: 0;
   pointer-events: none;
   z-index: -1;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 html[data-skin="sakura"] body::before {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%20900%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M0%20820%20Q420%20710%20840%20790%20T1600%20750%20L1600%20900%20L0%20900%20Z%22%20fill=%22#ffe4ee%22%20fill-opacity=%220.8%22/%3E%20%3Cpath%20d=%22M0%20860%20Q520%20760%201080%20830%20T1600%20810%20L1600%20900%20L0%20900%20Z%22%20fill=%22#ffd6e7%22%20fill-opacity=%220.85%22/%3E%20%3Cpath%20d=%22M0%20110%20Q180%20140%20340%2070%20Q240%20160%20410%20190%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.75%22%20stroke-width=%225%22%20stroke-linecap=%22round%22/%3E%20%3Cpath%20d=%22M1600%2095%20Q1410%20135%201250%2065%20Q1350%20155%201190%20185%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.75%22%20stroke-width=%225%22%20stroke-linecap=%22round%22/%3E%20%3Cg%20fill=%22#ffb3c6%22%20fill-opacity=%220.74%22%20stroke=%22#ffffff%22%20stroke-width=%222%22%3E%20%3Ccircle%20cx=%22160%22%20cy=%22115%22%20r=%2222%22/%3E%3Ccircle%20cx=%22285%22%20cy=%2292%22%20r=%2218%22/%3E%3Ccircle%20cx=%22375%22%20cy=%22165%22%20r=%2220%22/%3E%20%3Ccircle%20cx=%221430%22%20cy=%22110%22%20r=%2222%22/%3E%3Ccircle%20cx=%221305%22%20cy=%2288%22%20r=%2218%22/%3E%3Ccircle%20cx=%221220%22%20cy=%22162%22%20r=%2220%22/%3E%20%3Ccircle%20cx=%22220%22%20cy=%22175%22%20r=%2214%22%20fill=%22#ffffff%22%20fill-opacity=%220.90%22/%3E%20%3Ccircle%20cx=%221370%22%20cy=%22172%22%20r=%2214%22%20fill=%22#ffffff%22%20fill-opacity=%220.90%22/%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.92;
-  animation: sakuraPicFadeA 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%20900%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3Cstyle%3E%20.sway%20%7B%20animation:%20sway%204.5s%20ease-in-out%20infinite;%20transform-origin:%20140px%20760px;%20%7D%20.sway2%20%7B%20animation:%20sway%205.2s%20ease-in-out%20infinite%20reverse;%20transform-origin:%201460px%20760px;%20%7D%20.wave%20%7B%20animation:%20wave%202.2s%20ease-in-out%20infinite;%20transform-origin:%20162px%20710px;%20%7D%20.boughL%20%7B%20animation:%20bough%205s%20ease-in-out%20infinite;%20transform-origin:%200px%2080px;%20%7D%20.boughR%20%7B%20animation:%20bough%205.5s%20ease-in-out%20infinite%20reverse;%20transform-origin:%201600px%2080px;%20%7D%20.lantern%20%7B%20animation:%20lantern%203.6s%20ease-in-out%20infinite;%20transform-origin:%20center%20top;%20%7D%20%40keyframes%20sway%20%7B%200%,%20100%%20%7B%20transform:%20rotate(-1.5deg)%20translateY(0px);%20%7D%2050%%20%7B%20transform:%20rotate(1.8deg)%20translateY(-4px);%20%7D%20%7D%20%40keyframes%20wave%20%7B%200%,%20100%%20%7B%20transform:%20rotate(-8deg);%20%7D%2050%%20%7B%20transform:%20rotate(18deg);%20%7D%20%7D%20%40keyframes%20bough%20%7B%200%,%20100%%20%7B%20transform:%20rotate(0deg);%20%7D%2050%%20%7B%20transform:%20rotate(1.6deg);%20%7D%20%7D%20%40keyframes%20lantern%20%7B%200%,%20100%%20%7B%20transform:%20rotate(-3deg);%20%7D%2050%%20%7B%20transform:%20rotate(3deg);%20%7D%20%7D%20%40media%20(prefers-reduced-motion:%20reduce)%20%7B%20.sway,%20.sway2,%20.wave,%20.boughL,%20.boughR,%20.lantern%20%7B%20animation:%20none%20%21important;%20%7D%20%7D%20%3C/style%3E%20%3C%21--%20Soft%20distant%20spring%20hills%20%26%20Mount%20Fuji%20silhouette%20--%3E%20%3Cpath%20d=%22M0%20760%20Q320%20660%20640%20730%20T1280%20710%20T1600%20750%20L1600%20900%20L0%20900%20Z%22%20fill=%22#ffd6e7%22%20fill-opacity=%220.72%22/%3E%20%3Cpath%20d=%22M580%20730%20L740%20535%20L860%20535%20L1020%20730%20Z%22%20fill=%22#fbcfe8%22%20fill-opacity=%220.65%22/%3E%20%3Cpath%20d=%22M705%20578%20L740%20535%20L860%20535%20L895%20578%20Q845%20595%20800%20575%20Q755%20595%20705%20578%20Z%22%20fill=%22#ffffff%22%20fill-opacity=%220.92%22/%3E%20%3C%21--%20Courtyard%20cobblestone%20street%20%26%20stepping%20stones%20--%3E%20%3Crect%20x=%220%22%20y=%22775%22%20width=%221600%22%20height=%22125%22%20fill=%22#ffe4ee%22%20fill-opacity=%220.88%22/%3E%20%3Cpath%20d=%22M0%20778%20L1600%20778%22%20stroke=%22#f472b6%22%20stroke-width=%223%22%20stroke-opacity=%220.55%22/%3E%20%3Cg%20fill=%22#ffffff%22%20fill-opacity=%220.78%22%20stroke=%22#f9a8d4%22%20stroke-width=%222%22%3E%20%3Cellipse%20cx=%22180%22%20cy=%22835%22%20rx=%2246%22%20ry=%2214%22/%3E%3Cellipse%20cx=%22310%22%20cy=%22855%22%20rx=%2252%22%20ry=%2215%22/%3E%20%3Cellipse%20cx=%221290%22%20cy=%22855%22%20rx=%2252%22%20ry=%2215%22/%3E%3Cellipse%20cx=%221420%22%20cy=%22835%22%20rx=%2246%22%20ry=%2214%22/%3E%20%3C/g%3E%20%3C%21--%20Left%20Japanese%20Machiya%20Storefront%20%26%20Courtyard%20Wall%20--%3E%20%3Cg%3E%20%3Crect%20x=%2214%22%20y=%22470%22%20width=%22210%22%20height=%22310%22%20rx=%228%22%20fill=%22#fff9fb%22%20stroke=%22#f472b6%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M4%20480%20L120%20415%20L245%20480%20Z%22%20fill=%22#f472b6%22%20fill-opacity=%220.85%22%20stroke=%22#be185d%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M12%20478%20L236%20478%22%20stroke=%22#ffffff%22%20stroke-width=%224%22/%3E%20%3C%21--%20Wooden%20lattice%20window%20%26%20noren%20curtain%20--%3E%20%3Crect%20x=%2238%22%20y=%22515%22%20width=%2268%22%20height=%2282%22%20rx=%224%22%20fill=%22#ffe4ee%22%20stroke=%22#db2777%22%20stroke-width=%222.5%22/%3E%20%3Cline%20x1=%2272%22%20y1=%22515%22%20x2=%2272%22%20y2=%22597%22%20stroke=%22#db2777%22%20stroke-width=%222%22/%3E%20%3Cline%20x1=%2238%22%20y1=%22556%22%20x2=%22106%22%20y2=%22556%22%20stroke=%22#db2777%22%20stroke-width=%222%22/%3E%20%3C%21--%20Noren%20shop%20curtain%20--%3E%20%3Crect%20x=%22122%22%20y=%22510%22%20width=%2284%22%20height=%2258%22%20rx=%224%22%20fill=%22#ff8fab%22%20stroke=%22#be185d%22%20stroke-width=%222.5%22/%3E%20%3Cline%20x1=%22150%22%20y1=%22530%22%20x2=%22150%22%20y2=%22568%22%20stroke=%22#ffffff%22%20stroke-width=%222%22/%3E%20%3Cline%20x1=%22178%22%20y1=%22530%22%20x2=%22178%22%20y2=%22568%22%20stroke=%22#ffffff%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%22164%22%20cy=%22536%22%20r=%2210%22%20fill=%22#ffffff%22%20fill-opacity=%220.9%22/%3E%20%3C/g%3E%20%3C%21--%20Right%20Japanese%20Torii%20Gate%20%26%20Stone%20Lantern%20Courtyard%20--%3E%20%3Cg%3E%20%3Cpath%20d=%22M1365%20445%20L1585%20445%20L1572%20468%20L1378%20468%20Z%22%20fill=%22#ec4899%22%20stroke=%22#9d174d%22%20stroke-width=%223%22/%3E%20%3Crect%20x=%221385%22%20y=%22488%22%20width=%22180%22%20height=%2214%22%20rx=%224%22%20fill=%22#f472b6%22%20stroke=%22#9d174d%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%221405%22%20y=%22468%22%20width=%2218%22%20height=%22310%22%20fill=%22#f472b6%22%20stroke=%22#9d174d%22%20stroke-width=%222.5%22/%3E%20%3Crect%20x=%221527%22%20y=%22468%22%20width=%2218%22%20height=%22310%22%20fill=%22#f472b6%22%20stroke=%22#9d174d%22%20stroke-width=%222.5%22/%3E%20%3C%21--%20Hanging%20Chochin%20Lanterns%20--%3E%20%3Cg%20class=%22lantern%22%3E%20%3Cline%20x1=%22255%22%20y1=%22475%22%20x2=%22255%22%20y2=%22505%22%20stroke=%22#be185d%22%20stroke-width=%222.5%22/%3E%20%3Cellipse%20cx=%22255%22%20cy=%22526%22%20rx=%2218%22%20ry=%2222%22%20fill=%22#ffd6e7%22%20stroke=%22#db2777%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%22255%22%20cy=%22526%22%20r=%228%22%20fill=%22#ffffff%22%20fill-opacity=%220.9%22/%3E%20%3C/g%3E%20%3Cg%20class=%22lantern%22%3E%20%3Cline%20x1=%221345%22%20y1=%22468%22%20x2=%221345%22%20y2=%22498%22%20stroke=%22#be185d%22%20stroke-width=%222.5%22/%3E%20%3Cellipse%20cx=%221345%22%20cy=%22519%22%20rx=%2218%22%20ry=%2222%22%20fill=%22#ffd6e7%22%20stroke=%22#db2777%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%221345%22%20cy=%22519%22%20r=%228%22%20fill=%22#ffffff%22%20fill-opacity=%220.9%22/%3E%20%3C/g%3E%20%3C/g%3E%20%3C%21--%20Lush%20Blossoming%20Cherry%20Trees%20(Left%20%26%20Right%20Canopies)%20--%3E%20%3Cg%20class=%22boughL%22%3E%20%3Cpath%20d=%22M0%20390%20Q95%20340%20165%20210%20Q220%20120%20350%2085%22%20stroke=%22#9d174d%22%20stroke-width=%2214%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Cpath%20d=%22M120%20285%20Q215%20245%20295%20190%22%20stroke=%22#9d174d%22%20stroke-width=%229%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Ccircle%20cx=%2295%22%20cy=%22145%22%20r=%2288%22%20fill=%22#ffd6e7%22%20fill-opacity=%220.95%22%20stroke=%22#f472b6%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22215%22%20cy=%22115%22%20r=%2296%22%20fill=%22#ffe4ee%22%20fill-opacity=%220.95%22%20stroke=%22#f472b6%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22330%22%20cy=%22135%22%20r=%2278%22%20fill=%22#ffffff%22%20fill-opacity=%220.92%22%20stroke=%22#f9a8d4%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22160%22%20cy=%22215%22%20r=%2274%22%20fill=%22#ffb3c6%22%20fill-opacity=%220.85%22%20stroke=%22#ffffff%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%22275%22%20cy=%22195%22%20r=%2268%22%20fill=%22#ffd6e7%22%20fill-opacity=%220.92%22%20stroke=%22#f472b6%22%20stroke-width=%222.5%22/%3E%20%3C/g%3E%20%3Cg%20class=%22boughR%22%3E%20%3Cpath%20d=%22M1600%20390%20Q1505%20340%201435%20210%20Q1380%20120%201250%2085%22%20stroke=%22#9d174d%22%20stroke-width=%2214%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Cpath%20d=%22M1480%20285%20Q1385%20245%201305%20190%22%20stroke=%22#9d174d%22%20stroke-width=%229%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Ccircle%20cx=%221505%22%20cy=%22145%22%20r=%2288%22%20fill=%22#ffd6e7%22%20fill-opacity=%220.95%22%20stroke=%22#f472b6%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%221385%22%20cy=%22115%22%20r=%2296%22%20fill=%22#ffe4ee%22%20fill-opacity=%220.95%22%20stroke=%22#f472b6%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%221270%22%20cy=%22135%22%20r=%2278%22%20fill=%22#ffffff%22%20fill-opacity=%220.92%22%20stroke=%22#f9a8d4%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%221440%22%20cy=%22215%22%20r=%2274%22%20fill=%22#ffb3c6%22%20fill-opacity=%220.85%22%20stroke=%22#ffffff%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%221325%22%20cy=%22195%22%20r=%2268%22%20fill=%22#ffd6e7%22%20fill-opacity=%220.92%22%20stroke=%22#f472b6%22%20stroke-width=%222.5%22/%3E%20%3C/g%3E%20%3C%21--%20CUTE%20ORIGINAL%20CHARACTER%20#1%20(Left%20Courtyard):%20Anime%20Chibi%20Girl%20with%20Sakura%20Wagasa%20Parasol%20%26%20Waving%20Hand%20--%3E%20%3Cg%20class=%22sway%22%3E%20%3C%21--%20Pastel%20Wagasa%20Parasol%20behind%20character%20--%3E%20%3Cline%20x1=%22118%22%20y1=%22735%22%20x2=%2292%22%20y2=%22605%22%20stroke=%22#9d174d%22%20stroke-width=%224%22%20stroke-linecap=%22round%22/%3E%20%3Cpath%20d=%22M28%20622%20Q92%20555%20158%20612%20Z%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%223%22/%3E%20%3Cpath%20d=%22M48%20618%20Q92%20572%20138%20612%20Z%22%20fill=%22#ffd6e7%22%20stroke=%22#f472b6%22%20stroke-width=%222%22/%3E%20%3C%21--%20Chibi%20Body%20(White%20%26%20Soft%20Pink%20Hakama%20/%20Sailor%20Outfit)%20--%3E%20%3Cpath%20d=%22M104%20785%20L120%20698%20L156%20698%20L172%20785%20Z%22%20fill=%22#f472b6%22%20stroke=%22#831843%22%20stroke-width=%223%22%20stroke-linejoin=%22round%22/%3E%20%3Cpath%20d=%22M112%20700%20L164%20700%20L158%20742%20L118%20742%20Z%22%20fill=%22#ffffff%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3C%21--%20Pink%20Sailor%20Collar%20%26%20Ribbon%20Bow%20--%3E%20%3Cpath%20d=%22M120%20700%20L138%20722%20L156%20700%22%20fill=%22#ffd6e7%22%20stroke=%22#db2777%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%22138%22%20cy=%22723%22%20r=%226%22%20fill=%22#ec4899%22/%3E%20%3C%21--%20Waving%20Right%20Arm%20--%3E%20%3Cg%20class=%22wave%22%3E%20%3Cpath%20d=%22M158%20708%20Q182%20692%20188%20672%22%20stroke=%22#ffffff%22%20stroke-width=%2211%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Cpath%20d=%22M158%20708%20Q182%20692%20188%20672%22%20stroke=%22#831843%22%20stroke-width=%223%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Ccircle%20cx=%22190%22%20cy=%22669%22%20r=%227%22%20fill=%22#fff0f5%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3C/g%3E%20%3C%21--%20Cute%20Chibi%20Head%20%26%20Twin-Tails%20with%20Sakura%20Hair%20Clips%20--%3E%20%3Ccircle%20cx=%2298%22%20cy=%22656%22%20r=%2218%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%22178%22%20cy=%22656%22%20r=%2218%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%22138%22%20cy=%22658%22%20r=%2234%22%20fill=%22#fff5f7%22%20stroke=%22#831843%22%20stroke-width=%223%22/%3E%20%3C%21--%20Hair%20Bangs%20--%3E%20%3Cpath%20d=%22M104%20652%20Q118%20618%20138%20622%20Q158%20618%20172%20652%20Q158%20636%20146%20648%20Q138%20632%20128%20648%20Q116%20636%20104%20652%20Z%22%20fill=%22#831843%22/%3E%20%3C%21--%20Sakura%20Hair%20Clips%20--%3E%20%3Ccircle%20cx=%22108%22%20cy=%22642%22%20r=%228%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%22168%22%20cy=%22642%22%20r=%228%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%222%22/%3E%20%3C%21--%20Expressive%20Anime%20Eyes,%20Blush%20%26%20Smile%20--%3E%20%3Cellipse%20cx=%22125%22%20cy=%22662%22%20rx=%224.5%22%20ry=%226%22%20fill=%22#831843%22/%3E%20%3Cellipse%20cx=%22151%22%20cy=%22662%22%20rx=%224.5%22%20ry=%226%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%22123%22%20cy=%22659%22%20r=%222%22%20fill=%22#ffffff%22/%3E%20%3Ccircle%20cx=%22149%22%20cy=%22659%22%20r=%222%22%20fill=%22#ffffff%22/%3E%20%3Cellipse%20cx=%22116%22%20cy=%22671%22%20rx=%226%22%20ry=%223.5%22%20fill=%22#ff8fab%22%20fill-opacity=%220.75%22/%3E%20%3Cellipse%20cx=%22160%22%20cy=%22671%22%20rx=%226%22%20ry=%223.5%22%20fill=%22#ff8fab%22%20fill-opacity=%220.75%22/%3E%20%3Cpath%20d=%22M132%20673%20Q138%20679%20144%20673%22%20stroke=%22#831843%22%20stroke-width=%222.5%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3C/g%3E%20%3C%21--%20CUTE%20ORIGINAL%20MASCOT%20#2%20(Right%20Courtyard):%20White-Pink%20Sakura%20Neko%20/%20Cat%20Companion%20on%20Stepping%20Stone%20--%3E%20%3Cg%20class=%22sway2%22%3E%20%3Cellipse%20cx=%221465%22%20cy=%22765%22%20rx=%2228%22%20ry=%2222%22%20fill=%22#ffffff%22%20stroke=%22#831843%22%20stroke-width=%223%22/%3E%20%3Ccircle%20cx=%221465%22%20cy=%22732%22%20r=%2224%22%20fill=%22#ffffff%22%20stroke=%22#831843%22%20stroke-width=%223%22/%3E%20%3Cpolygon%20points=%221444,718%201450,694%201462,712%22%20fill=%22#ffd6e7%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3Cpolygon%20points=%221486,718%201480,694%201468,712%22%20fill=%22#ffd6e7%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3Ccircle%20cx=%221456%22%20cy=%22732%22%20r=%223.5%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%221474%22%20cy=%22732%22%20r=%223.5%22%20fill=%22#831843%22/%3E%20%3Cellipse%20cx=%221448%22%20cy=%22738%22%20rx=%225%22%20ry=%222.5%22%20fill=%22#ff8fab%22/%3E%20%3Cellipse%20cx=%221482%22%20cy=%22738%22%20rx=%225%22%20ry=%222.5%22%20fill=%22#ff8fab%22/%3E%20%3Cpath%20d=%22M1460%20738%20Q1465%20743%201470%20738%22%20stroke=%22#831843%22%20stroke-width=%222%22%20fill=%22none%22/%3E%20%3C%21--%20Ribbon%20Collar%20%26%20Sakura%20Flower%20on%20Head%20--%3E%20%3Cpath%20d=%22M1448%20750%20Q1465%20756%201482%20750%22%20stroke=%22#f472b6%22%20stroke-width=%225%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Ccircle%20cx=%221465%22%20cy=%22753%22%20r=%225%22%20fill=%22#ff8fab%22%20stroke=%22#831843%22%20stroke-width=%221.5%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  opacity: 0.96;
+  animation: sakuraSceneBreath 8s ease-in-out infinite;
 }
 html[data-skin="sakura"] body::after {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201600%20900%22%20preserveAspectRatio=%22xMidYMid%20slice%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M180%20850%20Q800%20650%201420%20850%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.64%22%20stroke-width=%228%22%20stroke-linecap=%22round%22/%3E%20%3Cpath%20d=%22M260%20850%20Q800%20690%201340%20850%22%20stroke=%22#ffffff%22%20stroke-opacity=%220.9%22%20stroke-width=%224%22/%3E%20%3Cg%20fill=%22#ffd6e7%22%20fill-opacity=%220.8%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.70%22%20stroke-width=%222%22%3E%20%3Cellipse%20cx=%22260%22%20cy=%22240%22%20rx=%2218%22%20ry=%2210%22%20transform=%22rotate%28-18%20260%20240%29%22/%3E%20%3Cellipse%20cx=%22480%22%20cy=%22150%22%20rx=%2215%22%20ry=%228%22%20transform=%22rotate%2824%20480%20150%29%22/%3E%20%3Cellipse%20cx=%221140%22%20cy=%22160%22%20rx=%2218%22%20ry=%2210%22%20transform=%22rotate%28-22%201140%20160%29%22/%3E%20%3Cellipse%20cx=%221360%22%20cy=%22250%22%20rx=%2216%22%20ry=%229%22%20transform=%22rotate%2815%201360%20250%29%22/%3E%20%3Cellipse%20cx=%22780%22%20cy=%22120%22%20rx=%2214%22%20ry=%228%22%20transform=%22rotate%28-12%20780%20120%29%22/%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.08;
-  animation: sakuraPicFadeB 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20800%20500%22%3E%20%3Cg%20fill=%22#ff8fab%22%20fill-opacity=%220.72%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22%3E%20%3Cpath%20d=%22M80%2060%20C92%2048%20108%2056%2096%2072%20C84%2084%2068%2072%2080%2060%20Z%22/%3E%20%3Cpath%20d=%22M240%20140%20C252%20128%20268%20136%20256%20152%20C244%20164%20228%20152%20240%20140%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M420%2085%20C432%2073%20448%2081%20436%2097%20C424%20109%20408%2097%20420%2085%20Z%22/%3E%20%3Cpath%20d=%22M610%20165%20C622%20153%20638%20161%20626%20177%20C614%20189%20598%20177%20610%20165%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M730%2075%20C742%2063%20758%2071%20746%2087%20C734%2099%20718%2087%20730%2075%20Z%22/%3E%20%3Cpath%20d=%22M140%20310%20C152%20298%20168%20306%20156%20322%20C144%20334%20128%20322%20140%20310%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M350%20280%20C362%20268%20378%20276%20366%20292%20C354%20304%20338%20292%20350%20280%20Z%22/%3E%20%3Cpath%20d=%22M530%20360%20C542%20348%20558%20356%20546%20372%20C534%20384%20518%20372%20530%20360%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M690%20295%20C702%20283%20718%20291%20706%20307%20C694%20319%20678%20307%20690%20295%20Z%22/%3E%20%3Cpath%20d=%22M60%20430%20C72%20418%2088%20426%2076%20442%20C64%20454%2048%20442%2060%20430%20Z%22/%3E%20%3Cpath%20d=%22M460%20445%20C472%20433%20488%20441%20476%20457%20C464%20469%20448%20457%20460%20445%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 640px 420px;
+  background-repeat: repeat;
+  opacity: 0.88;
+  animation: sakuraPetalDrift 18s linear infinite;
 }
 html[data-skin="sakura"] .classroom-floor::before,
 html[data-skin="sakura"] .classroom-floor::after {
@@ -1359,18 +1361,19 @@ html[data-skin="sakura"] .classroom-floor::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
 }
 html[data-skin="sakura"] .classroom-floor::before {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%20preserveAspectRatio=%22none%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Cpath%20d=%22M0%2080%20Q95%2065%20165%2018%20M0%2080%20Q80%20110%20135%20145%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.70%22%20stroke-width=%224%22%20stroke-linecap=%22round%22/%3E%20%3Cpath%20d=%22M1080%2080%20Q985%2065%20915%2018%20M1080%2080%20Q1000%20110%20945%20145%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.70%22%20stroke-width=%224%22%20stroke-linecap=%22round%22/%3E%20%3Cg%20fill=%22#ffd6e7%22%20fill-opacity=%220.85%22%20stroke=%22#ffffff%22%20stroke-width=%222%22%3E%20%3Ccircle%20cx=%2295%22%20cy=%2252%22%20r=%2216%22/%3E%3Ccircle%20cx=%22152%22%20cy=%2228%22%20r=%2213%22/%3E%3Ccircle%20cx=%22122%22%20cy=%22128%22%20r=%2214%22/%3E%20%3Ccircle%20cx=%22985%22%20cy=%2252%22%20r=%2216%22/%3E%3Ccircle%20cx=%22928%22%20cy=%2228%22%20r=%2213%22/%3E%3Ccircle%20cx=%22958%22%20cy=%22128%22%20r=%2214%22/%3E%20%3Ccircle%20cx=%2272%22%20cy=%22655%22%20r=%2215%22/%3E%3Ccircle%20cx=%221008%22%20cy=%22655%22%20r=%2215%22/%3E%20%3C/g%3E%20%3Crect%20x=%2228%22%20y=%2228%22%20width=%221024%22%20height=%22664%22%20rx=%2220%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.44%22%20stroke-width=%222%22/%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.92;
-  animation: sakuraPicFadeA 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%20preserveAspectRatio=%22none%22%3E%20%3Cstyle%3E%20.fsway%20%7B%20animation:%20fsway%204.2s%20ease-in-out%20infinite;%20transform-origin:%20995px%20655px;%20%7D%20%40keyframes%20fsway%20%7B%200%,%20100%%20%7B%20transform:%20rotate(-2deg)%20translateY(0px);%20%7D%2050%%20%7B%20transform:%20rotate(2deg)%20translateY(-3px);%20%7D%20%7D%20%40media%20(prefers-reduced-motion:%20reduce)%20%7B%20.fsway%20%7B%20animation:%20none%20%21important;%20%7D%20%7D%20%3C/style%3E%20%3C%21--%20Soft%20courtyard%20garden%20border%20%26%20corner%20blossom%20canopies%20--%3E%20%3Crect%20x=%2214%22%20y=%2214%22%20width=%221052%22%20height=%22692%22%20rx=%2222%22%20fill=%22none%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.35%22%20stroke-width=%223%22/%3E%20%3C%21--%20Top-left%20%26%20Top-right%20blossoming%20cherry%20tree%20branches%20--%3E%20%3Cpath%20d=%22M0%2095%20Q85%2065%20155%2012%20M0%2095%20Q75%20120%20125%20155%22%20stroke=%22#9d174d%22%20stroke-opacity=%220.55%22%20stroke-width=%226%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Cpath%20d=%22M1080%2095%20Q995%2065%20925%2012%20M1080%2095%20Q1005%20120%20955%20155%22%20stroke=%22#9d174d%22%20stroke-opacity=%220.55%22%20stroke-width=%226%22%20stroke-linecap=%22round%22%20fill=%22none%22/%3E%20%3Cg%20fill=%22#ffd6e7%22%20fill-opacity=%220.82%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.55%22%20stroke-width=%222.5%22%3E%20%3Ccircle%20cx=%2252%22%20cy=%2248%22%20r=%2246%22/%3E%3Ccircle%20cx=%22118%22%20cy=%2236%22%20r=%2240%22/%3E%3Ccircle%20cx=%2288%22%20cy=%2296%22%20r=%2236%22/%3E%20%3Ccircle%20cx=%221028%22%20cy=%2248%22%20r=%2246%22/%3E%3Ccircle%20cx=%22962%22%20cy=%2236%22%20r=%2240%22/%3E%3Ccircle%20cx=%22992%22%20cy=%2296%22%20r=%2236%22/%3E%20%3C/g%3E%20%3C%21--%20Bottom-left%20Japanese%20Stone%20Lantern%20(Toro)%20%26%20Stepping%20Stones%20--%3E%20%3Cg%20transform=%22translate(26,%20585)%22%3E%20%3Crect%20x=%2214%22%20y=%2292%22%20width=%2244%22%20height=%2212%22%20rx=%224%22%20fill=%22#fbcfe8%22%20stroke=%22#db2777%22%20stroke-width=%222%22/%3E%20%3Crect%20x=%2226%22%20y=%2248%22%20width=%2220%22%20height=%2244%22%20fill=%22#ffe4ee%22%20stroke=%22#db2777%22%20stroke-width=%222%22/%3E%20%3Crect%20x=%2220%22%20y=%2224%22%20width=%2232%22%20height=%2224%22%20rx=%223%22%20fill=%22#fff9fb%22%20stroke=%22#db2777%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%2236%22%20cy=%2236%22%20r=%226%22%20fill=%22#ff8fab%22/%3E%20%3Cpath%20d=%22M8%2026%20L36%206%20L64%2026%20Z%22%20fill=%22#f472b6%22%20stroke=%22#be185d%22%20stroke-width=%222%22/%3E%20%3C/g%3E%20%3C%21--%20Bottom-right%20Cute%20Chibi%20Character%20under%20Sakura%20Branch%20--%3E%20%3Cg%20class=%22fsway%22%3E%20%3Ccircle%20cx=%22995%22%20cy=%22640%22%20r=%2222%22%20fill=%22#fff5f7%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3Cpath%20d=%22M973%20636%20Q985%20612%20995%20615%20Q1005%20612%201017%20636%20Q1005%20626%20995%20634%20Q985%20626%20973%20636%20Z%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%22974%22%20cy=%22628%22%20r=%226%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22/%3E%20%3Ccircle%20cx=%221016%22%20cy=%22628%22%20r=%226%22%20fill=%22#ff8fab%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22/%3E%20%3Ccircle%20cx=%22987%22%20cy=%22642%22%20r=%223%22%20fill=%22#831843%22/%3E%20%3Ccircle%20cx=%221003%22%20cy=%22642%22%20r=%223%22%20fill=%22#831843%22/%3E%20%3Cellipse%20cx=%22981%22%20cy=%22648%22%20rx=%224.5%22%20ry=%222.5%22%20fill=%22#ff8fab%22/%3E%20%3Cellipse%20cx=%221009%22%20cy=%22648%22%20rx=%224.5%22%20ry=%222.5%22%20fill=%22#ff8fab%22/%3E%20%3Cpath%20d=%22M991%20650%20Q995%20654%20999%20650%22%20stroke=%22#831843%22%20stroke-width=%222%22%20fill=%22none%22/%3E%20%3Cpath%20d=%22M976%20698%20L984%20662%20L1006%20662%20L1014%20698%20Z%22%20fill=%22#ff8fab%22%20stroke=%22#831843%22%20stroke-width=%222.5%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.94;
 }
 html[data-skin="sakura"] .classroom-floor::after {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%201080%20720%22%20preserveAspectRatio=%22none%22%3E%20%3Cg%20fill=%22none%22%3E%20%3Ccircle%20cx=%22180%22%20cy=%22160%22%20r=%2254%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.40%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%22180%22%20cy=%22160%22%20r=%2282%22%20stroke=%22#fbcfe8%22%20stroke-opacity=%220.70%22%20stroke-width=%221.5%22/%3E%20%3Ccircle%20cx=%22900%22%20cy=%22560%22%20r=%2254%22%20stroke=%22#f472b6%22%20stroke-opacity=%220.40%22%20stroke-width=%222%22/%3E%20%3Ccircle%20cx=%22900%22%20cy=%22560%22%20r=%2282%22%20stroke=%22#fbcfe8%22%20stroke-opacity=%220.70%22%20stroke-width=%221.5%22/%3E%20%3Cg%20fill=%22#ffb3c6%22%20fill-opacity=%220.74%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22%3E%20%3Cellipse%20cx=%22180%22%20cy=%22160%22%20rx=%2214%22%20ry=%228%22%20transform=%22rotate%28-20%20180%20160%29%22/%3E%20%3Cellipse%20cx=%22900%22%20cy=%22560%22%20rx=%2214%22%20ry=%228%22%20transform=%22rotate%2818%20900%20560%29%22/%3E%20%3Cellipse%20cx=%22890%22%20cy=%22140%22%20rx=%2213%22%20ry=%227%22%20transform=%22rotate%28-15%20890%20140%29%22/%3E%20%3Cellipse%20cx=%22190%22%20cy=%22570%22%20rx=%2213%22%20ry=%227%22%20transform=%22rotate%2822%20190%20570%29%22/%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E");
-  opacity: 0.08;
-  animation: sakuraPicFadeB 24s ease-in-out infinite;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20800%20500%22%3E%20%3Cg%20fill=%22#ff8fab%22%20fill-opacity=%220.72%22%20stroke=%22#ffffff%22%20stroke-width=%221.5%22%3E%20%3Cpath%20d=%22M80%2060%20C92%2048%20108%2056%2096%2072%20C84%2084%2068%2072%2080%2060%20Z%22/%3E%20%3Cpath%20d=%22M240%20140%20C252%20128%20268%20136%20256%20152%20C244%20164%20228%20152%20240%20140%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M420%2085%20C432%2073%20448%2081%20436%2097%20C424%20109%20408%2097%20420%2085%20Z%22/%3E%20%3Cpath%20d=%22M610%20165%20C622%20153%20638%20161%20626%20177%20C614%20189%20598%20177%20610%20165%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M730%2075%20C742%2063%20758%2071%20746%2087%20C734%2099%20718%2087%20730%2075%20Z%22/%3E%20%3Cpath%20d=%22M140%20310%20C152%20298%20168%20306%20156%20322%20C144%20334%20128%20322%20140%20310%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M350%20280%20C362%20268%20378%20276%20366%20292%20C354%20304%20338%20292%20350%20280%20Z%22/%3E%20%3Cpath%20d=%22M530%20360%20C542%20348%20558%20356%20546%20372%20C534%20384%20518%20372%20530%20360%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3Cpath%20d=%22M690%20295%20C702%20283%20718%20291%20706%20307%20C694%20319%20678%20307%20690%20295%20Z%22/%3E%20%3Cpath%20d=%22M60%20430%20C72%20418%2088%20426%2076%20442%20C64%20454%2048%20442%2060%20430%20Z%22/%3E%20%3Cpath%20d=%22M460%20445%20C472%20433%20488%20441%20476%20457%20C464%20469%20448%20457%20460%20445%20Z%22%20fill=%22#ffd6e7%22/%3E%20%3C/g%3E%20%3C/svg%3E");
+  background-size: 520px 340px;
+  background-repeat: repeat;
+  opacity: 0.78;
+  animation: sakuraPetalDrift 16s linear infinite;
 }
 html[data-skin="sakura"] #classroomScaleHost {
   position: relative;
@@ -1393,19 +1396,17 @@ html[data-skin="sakura"] #classroomScaleHost {
   0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
   100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
 }
-@keyframes sakuraBannerBreeze {
-  0%   { background-position: 0% 0; }
-  100% { background-position: 100% 0; }
+@keyframes sakuraSceneBreath {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%      { transform: translateY(-3px) scale(1.004); }
 }
-@keyframes sakuraPicFadeA {
-  0%, 42%   { opacity: 0.92; }
-  50%, 92%  { opacity: 0.08; }
-  100%      { opacity: 0.92; }
+@keyframes sakuraPetalDrift {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 640px 420px; }
 }
-@keyframes sakuraPicFadeB {
-  0%, 42%   { opacity: 0.08; }
-  50%, 92%  { opacity: 0.92; }
-  100%      { opacity: 0.08; }
+@keyframes sakuraHeaderPetals {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 420px 110px; }
 }
 @keyframes sakuraPulse {
   0%, 100% { filter: brightness(1); transform: translateY(0); }
@@ -1428,10 +1429,5 @@ html[data-skin="sakura"] #classroomScaleHost {
   html[data-skin="sakura"] .classroom-floor.snap-active,
   html[data-skin="sakura"] .sakura-fire.is-on {
     animation: none !important;
-  }
-  html[data-skin="sakura"] body::after,
-  html[data-skin="sakura"] #studioHeader::after,
-  html[data-skin="sakura"] .classroom-floor::after {
-    opacity: 0 !important;
   }
 }
