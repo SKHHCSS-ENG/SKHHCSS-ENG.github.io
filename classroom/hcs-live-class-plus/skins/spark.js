@@ -11,6 +11,12 @@
     return window.HcsSkinHost && window.HcsSkinHost.context ? window.HcsSkinHost.context() : null;
   }
 
+  function isActive() {
+    return typeof document !== 'undefined' &&
+      document.documentElement &&
+      document.documentElement.getAttribute('data-skin') === 'spark';
+  }
+
   function sparkFireInnerHtml() {
     sparkBurnSeq += 1;
     var gid = 'sparkBurn' + sparkBurnSeq;
@@ -51,7 +57,113 @@
     return tiers[st.id] || 0;
   }
 
+  function toggleClass(el, clsName, on) {
+    if (!el || !el.classList) return;
+    if (on) el.classList.add(clsName);
+    else el.classList.remove(clsName);
+  }
+
+  function isFullScreenOverlay(el) {
+    if (!el) return false;
+    var id = el.id || '';
+    if (id === 'chanceSheet' || id === 'chanceModal' || id === 'planSheet' || id === 'pickerModal') {
+      return true;
+    }
+    if (el.classList && (
+      el.classList.contains('chance-sheet') ||
+      el.classList.contains('chance-modal') ||
+      el.classList.contains('fixed') ||
+      el.classList.contains('inset-0')
+    )) {
+      return true;
+    }
+    return typeof document !== 'undefined' && el.parentNode === document.body;
+  }
+
+  function syncSparkChrome() {
+    if (typeof document === 'undefined' || !document.querySelectorAll) return;
+    var active = isActive();
+    var buttons = document.querySelectorAll('button');
+    buttons.forEach(function (btn) {
+      var txt = (btn.textContent || '').replace(/\s+/g, ' ').trim();
+      var label = (btn.getAttribute && (btn.getAttribute('aria-label') || btn.getAttribute('title'))) || '';
+      var isMore = txt === 'More' || /^More\b/.test(txt) || label === 'More';
+      var isChanceBtn = (txt === 'Chance' || /\bChance\b/.test(txt) || label === 'Chance') &&
+        !/Draw/.test(txt);
+      var isChanceDraw = txt === 'Draw a card' || txt === 'Draw again' ||
+        /\bDraw a card\b|\bDraw again\b/.test(txt);
+      toggleClass(btn, 'spark-more-btn', !!(active && isMore));
+      toggleClass(btn, 'spark-chance-btn', !!(active && isChanceBtn));
+      toggleClass(btn, 'spark-chance-draw', !!(active && isChanceDraw));
+      if (isMore && btn.getAttribute && typeof document.getElementById === 'function') {
+        var ctrlId = btn.getAttribute('aria-controls');
+        var pop = ctrlId ? document.getElementById(ctrlId) : null;
+        if (pop) toggleClass(pop, 'spark-more-pop', !!active);
+      }
+    });
+
+    var dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], #chanceSheet, #chanceModal, .chance-sheet, .chance-modal');
+    dialogs.forEach(function (dlg) {
+      var headings = dlg.querySelectorAll ? dlg.querySelectorAll('h1, h2, h3, h4, [id*="Title"], [class*="title"]') : [];
+      var isChanceSheet = false;
+      var titleEl = null;
+      headings.forEach(function (h) {
+        if (((h.textContent || '').trim()) === 'Chance') {
+          isChanceSheet = true;
+          if (!titleEl) titleEl = h;
+        }
+      });
+
+      var overlay = isFullScreenOverlay(dlg)
+        ? dlg
+        : (dlg.parentNode && dlg.parentNode !== document.body ? dlg.parentNode : null);
+      var innerPanel = isFullScreenOverlay(dlg)
+        ? ((dlg.querySelector && dlg.querySelector('.chance-panel, .chance-dialog, .plan-panel, [class*="panel"], [class*="dialog"]')) || dlg.firstElementChild)
+        : dlg;
+
+      /* Keep the full-screen overlay a dim scrim; style the inner card only. */
+      if (overlay) {
+        toggleClass(overlay, 'spark-chance-sheet', !!(active && isChanceSheet));
+        toggleClass(overlay, 'spark-chance-panel', false);
+      }
+      if (innerPanel && innerPanel !== overlay) {
+        toggleClass(innerPanel, 'spark-chance-panel', !!(active && isChanceSheet));
+      }
+
+      if (titleEl && titleEl.parentNode && titleEl.parentNode !== overlay && titleEl.parentNode !== innerPanel) {
+        toggleClass(titleEl.parentNode, 'spark-chance-bar', !!(active && isChanceSheet));
+      }
+
+      if (isChanceSheet && dlg.querySelectorAll) {
+        var closeBtns = dlg.querySelectorAll('button[aria-label="Close"], .chance-close, .plan-close');
+        closeBtns.forEach(function (cb) {
+          toggleClass(cb, 'spark-chance-close', !!active);
+        });
+        var cards = dlg.querySelectorAll('#chanceCard, #chanceCardBox, #chanceStage, #chanceStageBox, .chance-card, .chance-stage, .chance-card-box, .chance-card-face, .chance-card-body');
+        cards.forEach(function (card) {
+          toggleClass(card, 'spark-chance-card', !!active);
+        });
+        var prompts = dlg.querySelectorAll('#chancePrompt, #chancePromptText, #chanceCardPrompt, #chanceQuestion, #chanceText, #chanceCardText, .chance-prompt, .chance-prompt-text, .chance-card-prompt, .chance-question, .chance-text, .chance-card-text, .chance-card p, .chance-card-face p, .chance-card-body p, #chanceCard p, #chanceCardBox p');
+        prompts.forEach(function (pr) {
+          var pt = (pr.textContent || '').replace(/\s+/g, ' ').trim();
+          if (pt !== 'Lucky! Draw again — this one is a bonus turn.') {
+            toggleClass(pr, 'spark-chance-prompt', !!active);
+          }
+        });
+      }
+    });
+
+    var bonusNodes = document.querySelectorAll('p, div, span');
+    bonusNodes.forEach(function (node) {
+      var t = (node.textContent || '').replace(/\s+/g, ' ').trim();
+      if (t === 'Lucky! Draw again — this one is a bonus turn.') {
+        toggleClass(node, 'spark-chance-bonus', !!active);
+      }
+    });
+  }
+
   function syncSparkSeats() {
+    syncSparkChrome();
     var api = ctx();
     if (!api || !api.getClass || !window.SparkFire) return;
     var cls = api.getClass();
@@ -171,4 +283,21 @@
       };
     }
   });
+
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('click', function () {
+      if (isActive()) syncSparkChrome();
+    });
+  }
+
+  if (typeof document !== 'undefined' && typeof MutationObserver === 'function' && document.documentElement) {
+    var obs = new MutationObserver(function () {
+      syncSparkSeats();
+      if (isActive()) {
+        var api = ctx();
+        if (api && api.renderLeaderboard) api.renderLeaderboard();
+      }
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-skin'] });
+  }
 })();

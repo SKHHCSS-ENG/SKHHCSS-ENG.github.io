@@ -1,5 +1,8 @@
-/* Spark punch. Loud cyan #00e5ff, amber #ffb300, magenta #ff2d95,
-   plus violet and lime. Heavy 3D lives only under html[data-skin="spark"].
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Righteous&display=swap');
+
+/* Spark punch — remastered cosmic prism & neon stage skin.
+   Loud cyan #00e5ff, solar amber #ffb300, hot magenta #ff2d95,
+   plus cosmic violet and lime. Heavy 3D lives only under html[data-skin="spark"].
    Default (no attribute) and Minimalist keep their chrome.
    Same desk size as Default (148px; phone height stays as it is).
    Bright mast stays. Day stays Minimalist-only.
@@ -8,18 +11,54 @@
 .spark-fire,
 .spark-fire-mini,
 .score-burst { display: none; }
+
+html[data-skin="spark"] {
+  --spark-font-display: 'Righteous', 'Outfit', var(--font-display), 'Fredoka', 'Inter', sans-serif;
+  --spark-font-ui: 'Outfit', var(--font-display), 'Fredoka', 'Inter', sans-serif;
+}
+
 html[data-skin="spark"] .studio-mark img.studio-mark-default {
   display: block;
 }
 html[data-skin="spark"] .studio-mark img.studio-mark-day {
   display: none;
 }
+
+/* =====================================================================
+   WHOLE PLUS PAGE BACKGROUND: Cosmic prism stage surround with
+   stardust dot pattern, aurora corner spotlights & calm motion
+   ===================================================================== */
 html[data-skin="spark"] body {
-  background:
-    radial-gradient(ellipse at 0% 0%, rgba(0, 229, 255, 0.18), transparent 42%),
-    radial-gradient(ellipse at 100% 0%, rgba(255, 45, 149, 0.16), transparent 40%),
-    #eef2ff;
+  background-color: #12092b;
+  background-image:
+    radial-gradient(ellipse 90% 45% at 15% 0%, rgba(0, 229, 255, 0.26) 0%, rgba(168, 85, 247, 0.14) 48%, rgba(18, 9, 43, 0) 75%),
+    radial-gradient(ellipse 90% 45% at 85% 0%, rgba(255, 45, 149, 0.25) 0%, rgba(255, 179, 0, 0.12) 48%, rgba(18, 9, 43, 0) 75%),
+    radial-gradient(circle at 10% 85%, rgba(168, 85, 247, 0.22) 0%, rgba(168, 85, 247, 0) 45%),
+    radial-gradient(ellipse 85% 42% at 80% 100%, rgba(255, 179, 0, 0.20) 0%, rgba(255, 45, 149, 0.12) 48%, rgba(18, 9, 43, 0) 75%),
+    radial-gradient(rgba(0, 229, 255, 0.15) 1px, rgba(0, 0, 0, 0) 1.6px),
+    radial-gradient(rgba(255, 45, 149, 0.13) 1px, rgba(0, 0, 0, 0) 1.6px),
+    linear-gradient(130deg,
+      #0f0728 0%,
+      #1a0a3c 24%,
+      #2e1065 48%,
+      #4a044e 72%,
+      #1e1b4b 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 28px 28px, 28px 28px, 220% 220%;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 0% 50%;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+  animation: sparkPageMesh 16s ease-in-out infinite;
 }
+html[data-skin="spark"] .site-version-footer,
+html[data-skin="spark"] .site-version-line {
+  background: rgba(26, 10, 60, 0.88);
+  border-color: rgba(0, 229, 255, 0.45);
+  color: #e2e8f0;
+  font-family: var(--spark-font-ui);
+}
+
+/* =====================================================================
+   HEADER & MAST MESH
+   ===================================================================== */
 html[data-skin="spark"] #studioHeader {
   background-color: #1a0a3c;
   background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 28%, #3b0764 55%, #831843 78%, #7c2d12 100%);
@@ -33,9 +72,7 @@ html[data-skin="spark"] #studioHeader {
 /* Colour mesh, painted inside the header so a translated strip cannot
    leave a gap. background-size 200% with position 0% → 100% shows one
    half, then the other. Those halves are the same palindrome and
-   0% / 50% / 100% are one colour, so the join is a same-hue fade.
-   A hard stop (amber against magenta) travels for the whole loop.
-   `transparent` is rgba(0,0,0,0) and greys that fade. */
+   0% / 50% / 100% are one colour, so the join is a same-hue fade. */
 html[data-skin="spark"] #studioHeader::before {
   content: "";
   position: absolute;
@@ -91,16 +128,34 @@ html[data-skin="spark"] #studioHeader .studio-header-bar {
   position: relative;
   z-index: 1;
 }
+
+/* =====================================================================
+   HEADER & UTILITY BUTTONS (including More and Chance + Pack Fonts)
+   ===================================================================== */
 html[data-skin="spark"] #studioHeaderCluster button,
 html[data-skin="spark"] #studioHeaderCluster button:hover,
 html[data-skin="spark"] #studioHeaderUtilities > .relative > button,
 html[data-skin="spark"] #studioHeaderUtilities > .relative > button:hover,
 html[data-skin="spark"] #studioHeaderUtilities > button,
 html[data-skin="spark"] #studioHeaderUtilities > button:hover,
+html[data-skin="spark"] #studioHeaderUtilities button,
+html[data-skin="spark"] #studioHeaderUtilities button:hover,
 html[data-skin="spark"] #studioHeaderExportPair button,
 html[data-skin="spark"] #studioHeaderExportPair button:hover,
 html[data-skin="spark"] .studio-header-pin button,
-html[data-skin="spark"] .studio-header-pin button:hover {
+html[data-skin="spark"] .studio-header-pin button:hover,
+html[data-skin="spark"] #btnMore,
+html[data-skin="spark"] #btnMore:hover,
+html[data-skin="spark"] #btnToggleMore,
+html[data-skin="spark"] #btnToggleMore:hover,
+html[data-skin="spark"] #btnOpenMore,
+html[data-skin="spark"] #btnOpenMore:hover,
+html[data-skin="spark"] .more-btn,
+html[data-skin="spark"] .more-btn:hover,
+html[data-skin="spark"] .spark-more-btn,
+html[data-skin="spark"] .spark-more-btn:hover {
+  font-family: var(--spark-font-ui);
+  letter-spacing: 0.015em;
   border: none;
   color: #0f172a;
   background-color: #fff;
@@ -116,6 +171,7 @@ html[data-skin="spark"] #btnModeIndividual.shadow-sm:hover,
 html[data-skin="spark"] #btnModeGroup.shadow-sm:hover,
 html[data-skin="spark"] #btnOpenClassModal,
 html[data-skin="spark"] #btnOpenClassModal:hover {
+  font-family: var(--spark-font-ui);
   color: #fff;
   background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #ff2d95 100%);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -126,7 +182,10 @@ html[data-skin="spark"] #btnOpenClassModal:hover {
     0 0 18px rgba(0, 229, 255, 0.55);
 }
 html[data-skin="spark"] #studioHeaderUtilities > #btnOpenPickerModal,
-html[data-skin="spark"] #studioHeaderUtilities > #btnOpenPickerModal:hover {
+html[data-skin="spark"] #studioHeaderUtilities > #btnOpenPickerModal:hover,
+html[data-skin="spark"] #btnOpenPickerModal,
+html[data-skin="spark"] #btnOpenPickerModal:hover {
+  font-family: var(--spark-font-ui);
   color: #083344;
   background-image: linear-gradient(180deg, #67f6ff, #00e5ff 45%, #00b8d4);
   text-shadow: none;
@@ -135,10 +194,105 @@ html[data-skin="spark"] #studioHeaderUtilities > #btnOpenPickerModal:hover {
     0 8px 18px rgba(0, 229, 255, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
+html[data-skin="spark"] #btnChance,
+html[data-skin="spark"] #btnChance:hover,
+html[data-skin="spark"] #btnOpenChance,
+html[data-skin="spark"] #btnOpenChance:hover,
+html[data-skin="spark"] #btnOpenChanceModal,
+html[data-skin="spark"] #btnOpenChanceModal:hover,
+html[data-skin="spark"] #btnOpenChanceSheet,
+html[data-skin="spark"] #btnOpenChanceSheet:hover,
+html[data-skin="spark"] #btnToggleChance,
+html[data-skin="spark"] #btnToggleChance:hover,
+html[data-skin="spark"] .chance-btn,
+html[data-skin="spark"] .chance-btn:hover,
+html[data-skin="spark"] .spark-chance-btn,
+html[data-skin="spark"] .spark-chance-btn:hover {
+  font-family: var(--spark-font-ui);
+  letter-spacing: 0.015em;
+  border: none;
+  color: #422006;
+  background-color: #ffb300;
+  background-image: linear-gradient(135deg, #fff7ad 0%, #ffb300 50%, #ff2d95 100%);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 4px 0 #9d174d,
+    0 8px 18px rgba(255, 45, 149, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+html[data-skin="spark"] #btnMore[aria-expanded="true"],
+html[data-skin="spark"] #btnToggleMore[aria-expanded="true"],
+html[data-skin="spark"] #btnOpenMore[aria-expanded="true"],
+html[data-skin="spark"] .more-btn[aria-expanded="true"],
+html[data-skin="spark"] .spark-more-btn[aria-expanded="true"] {
+  color: #fff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #ff2d95 100%);
+  box-shadow:
+    0 4px 0 #6b21a8,
+    0 0 16px rgba(0, 229, 255, 0.55);
+}
+
+/* More Popover / Dropdown Menu */
+html[data-skin="spark"] #morePopover,
+html[data-skin="spark"] #moreMenu,
+html[data-skin="spark"] #morePanel,
+html[data-skin="spark"] #moreSheet,
+html[data-skin="spark"] .more-popover,
+html[data-skin="spark"] .more-menu,
+html[data-skin="spark"] .more-panel,
+html[data-skin="spark"] .more-sheet,
+html[data-skin="spark"] .studio-more-pop,
+html[data-skin="spark"] .studio-more-menu,
+html[data-skin="spark"] .spark-more-pop {
+  font-family: var(--spark-font-ui);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
+    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
+  color: #0f172a;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  box-shadow:
+    0 14px 32px rgba(168, 85, 247, 0.45),
+    0 0 20px rgba(0, 229, 255, 0.3);
+}
+html[data-skin="spark"] #morePopover button,
+html[data-skin="spark"] #moreMenu button,
+html[data-skin="spark"] #morePanel button,
+html[data-skin="spark"] .more-popover button,
+html[data-skin="spark"] .more-menu button,
+html[data-skin="spark"] .more-panel button,
+html[data-skin="spark"] .studio-more-pop button,
+html[data-skin="spark"] .studio-more-menu button,
+html[data-skin="spark"] .spark-more-pop button {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  box-shadow:
+    0 3px 0 #be185d,
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html[data-skin="spark"] #morePopover button:hover,
+html[data-skin="spark"] #moreMenu button:hover,
+html[data-skin="spark"] #morePanel button:hover,
+html[data-skin="spark"] .more-popover button:hover,
+html[data-skin="spark"] .more-menu button:hover,
+html[data-skin="spark"] .more-panel button:hover,
+html[data-skin="spark"] .studio-more-pop button:hover,
+html[data-skin="spark"] .studio-more-menu button:hover,
+html[data-skin="spark"] .spark-more-pop button:hover {
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 55%, #ff2d95 100%);
+  box-shadow: 0 3px 0 #6b21a8;
+}
+
 html[data-skin="spark"] #headerTimerDisplay {
+  font-family: var(--spark-font-display);
   color: #083344;
 }
 html[data-skin="spark"] #studioHeader #classSelect {
+  font-family: var(--spark-font-ui);
   border: 2px solid #00e5ff;
   box-shadow: 0 0 0 2px rgba(255, 45, 149, 0.35), 0 4px 0 #6b21a8;
 }
@@ -150,15 +304,34 @@ html[data-skin="spark"] #studioHeaderCluster > div {
 html[data-skin="spark"] #studioHeader .text-sky-100 {
   color: #67f6ff;
 }
+
+/* =====================================================================
+   TOOLBAR & CONTROLS
+   ===================================================================== */
 html[data-skin="spark"] #studioToolbar {
   background:
-    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
     linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95) border-box;
   border-bottom: 3px solid transparent;
   box-shadow: 0 10px 24px -12px rgba(255, 45, 149, 0.45);
 }
+html[data-skin="spark"] .studio-band {
+  border-color: rgba(168, 85, 247, 0.35);
+  background: rgba(250, 232, 255, 0.45);
+}
+html[data-skin="spark"] .studio-band-label {
+  font-family: var(--spark-font-display);
+  color: #6b21a8;
+  letter-spacing: 0.04em;
+}
 html[data-skin="spark"] #studioToolbarRow button,
-html[data-skin="spark"] #studioToolbarRow button:hover {
+html[data-skin="spark"] #studioToolbarRow button:hover,
+html[data-skin="spark"] #groupBrushBar button,
+html[data-skin="spark"] #groupBrushBar button:hover,
+html[data-skin="spark"] #btnToggleTeamScoreboard,
+html[data-skin="spark"] #btnToggleTeamScoreboard:hover {
+  font-family: var(--spark-font-ui);
+  letter-spacing: 0.015em;
   border: none;
   color: #0f172a;
   background-color: #fff;
@@ -173,7 +346,9 @@ html[data-skin="spark"] #studioToolbarRow #btnAllPlusOne:hover,
 html[data-skin="spark"] #studioToolbarRow #btnApplyCustomGrid,
 html[data-skin="spark"] #studioToolbarRow #btnApplyCustomGrid:hover,
 html[data-skin="spark"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm,
-html[data-skin="spark"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm:hover {
+html[data-skin="spark"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm:hover,
+html[data-skin="spark"] #groupBrushBar #btnClusterAfterBrush,
+html[data-skin="spark"] #groupBrushBar #btnClusterAfterBrush:hover {
   color: #fff;
   background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 55%, #ff2d95 100%);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
@@ -206,13 +381,9 @@ html[data-skin="spark"] #studioToolbarRow .layout-preset-btn.ring-2:hover {
     0 0 0 2px rgba(0, 229, 255, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
-html[data-skin="spark"] .skin-menu-list {
-  background: #0f172a;
-  border: 2px solid #334155;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.45);
-}
 html[data-skin="spark"] #studioToolbarRow .skin-choice,
 html[data-skin="spark"] #studioToolbarRow .skin-choice:hover {
+  font-family: var(--spark-font-ui);
   border: 2px solid #334155;
   background: #0f172a;
   color: #f8fafc;
@@ -222,6 +393,7 @@ html[data-skin="spark"] #studioToolbarRow #btnSkinSpark,
 html[data-skin="spark"] #studioToolbarRow #btnSkinSpark:hover,
 html[data-skin="spark"] #btnSkinSpark,
 html[data-skin="spark"] #btnSkinSpark:hover {
+  font-family: var(--spark-font-display);
   background: linear-gradient(135deg, #00e5ff, #ff2d95);
   background-image: linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95);
   border-color: #fff;
@@ -231,6 +403,18 @@ html[data-skin="spark"] #btnSkinSpark:hover {
     0 6px 16px rgba(255, 45, 149, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
+html[data-skin="spark"] #groupBrushBar {
+  font-family: var(--spark-font-ui);
+  background: linear-gradient(90deg, #fdf4ff, #eef2ff, #ecfeff);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+html[data-skin="spark"] #groupScoreDock .group-score-dock-bar h2 {
+  font-family: var(--spark-font-display);
+}
+
+/* =====================================================================
+   PULSE CARD & SEATING FLOOR (Richer Cosmic Aurora & Prism Stage Floor)
+   ===================================================================== */
 html[data-skin="spark"] #pulseCard {
   background-color: #3b0764;
   background-image: linear-gradient(115deg, #083344 0%, #3b0764 42%, #831843 78%, #7c2d12 100%);
@@ -238,7 +422,12 @@ html[data-skin="spark"] #pulseCard {
     0 0 0 2px rgba(0, 229, 255, 0.45),
     0 12px 28px -8px rgba(255, 45, 149, 0.55);
 }
+html[data-skin="spark"] #pulseCard h2 {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.03em;
+}
 html[data-skin="spark"] #pulseCard #statTotalPoints {
+  font-family: var(--spark-font-display);
   color: #ffb300;
   text-shadow: 0 0 12px rgba(255, 179, 0, 0.75);
 }
@@ -252,24 +441,58 @@ html[data-skin="spark"] #studioFloorSection {
     0 18px 40px -12px rgba(168, 85, 247, 0.45);
 }
 html[data-skin="spark"] .classroom-floor {
-  background-color: #1e1b4b;
+  background-color: #160c38;
   background-image:
-    radial-gradient(ellipse at 18% 0%, rgba(0, 229, 255, 0.28), transparent 52%),
-    radial-gradient(ellipse at 82% 100%, rgba(255, 45, 149, 0.22), transparent 48%),
-    linear-gradient(180deg, #1e1b4b 0%, #312e81 42%, #4c1d95 100%);
-  background-size: auto, auto, auto;
-  box-shadow: inset 0 0 40px rgba(168, 85, 247, 0.35);
+    linear-gradient(to right, rgba(0, 229, 255, 0.10) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(255, 45, 149, 0.10) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(circle at 16% 24%, rgba(0, 229, 255, 0.24) 0px, rgba(0, 229, 255, 0) 3.5px),
+    radial-gradient(circle at 82% 20%, rgba(255, 179, 0, 0.24) 0px, rgba(255, 179, 0, 0) 3.5px),
+    radial-gradient(circle at 38% 74%, rgba(255, 45, 149, 0.22) 0px, rgba(255, 45, 149, 0) 3.5px),
+    radial-gradient(circle at 78% 76%, rgba(168, 85, 247, 0.24) 0px, rgba(168, 85, 247, 0) 3.5px),
+    linear-gradient(90deg,
+      rgba(255, 45, 149, 0) 0%,
+      rgba(0, 229, 255, 0.15) 14%,
+      rgba(168, 85, 247, 0.18) 25%,
+      rgba(255, 179, 0, 0.14) 36%,
+      rgba(255, 45, 149, 0) 50%,
+      rgba(0, 229, 255, 0.15) 64%,
+      rgba(168, 85, 247, 0.18) 75%,
+      rgba(255, 179, 0, 0.14) 86%,
+      rgba(255, 45, 149, 0) 100%),
+    radial-gradient(ellipse at 18% 0%, rgba(0, 229, 255, 0.28), rgba(0, 229, 255, 0) 52%),
+    radial-gradient(ellipse at 82% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 50%),
+    linear-gradient(180deg, #160c38 0%, #1e1b4b 38%, #312e81 70%, #4c1d95 100%);
+  background-size: 96px 96px, 96px 96px, 170px 170px, 190px 190px, 180px 180px, 200px 200px, 200% 100%, auto, auto, auto;
+  animation: sparkFloorMesh 14s linear infinite;
+  box-shadow: inset 0 0 40px rgba(168, 85, 247, 0.35), inset 0 0 14px rgba(0, 229, 255, 0.2);
 }
 html[data-skin="spark"] .classroom-floor.snap-active {
   background-image:
-    linear-gradient(to right, rgba(0, 229, 255, 0.16) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 45, 149, 0.14) 1px, transparent 1px),
-    radial-gradient(ellipse at 18% 0%, rgba(0, 229, 255, 0.28), transparent 52%),
-    radial-gradient(ellipse at 82% 100%, rgba(255, 45, 149, 0.22), transparent 48%),
-    linear-gradient(180deg, #1e1b4b 0%, #312e81 42%, #4c1d95 100%);
-  background-size: 24px 24px, 24px 24px, auto, auto, auto;
+    linear-gradient(to right, rgba(0, 229, 255, 0.18) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(255, 45, 149, 0.15) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to right, rgba(255, 179, 0, 0.12) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(168, 85, 247, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(circle at 16% 24%, rgba(0, 229, 255, 0.22) 0px, rgba(0, 229, 255, 0) 3.5px),
+    radial-gradient(circle at 82% 20%, rgba(255, 179, 0, 0.22) 0px, rgba(255, 179, 0, 0) 3.5px),
+    linear-gradient(90deg,
+      rgba(255, 45, 149, 0) 0%,
+      rgba(0, 229, 255, 0.14) 14%,
+      rgba(168, 85, 247, 0.16) 25%,
+      rgba(255, 179, 0, 0.13) 36%,
+      rgba(255, 45, 149, 0) 50%,
+      rgba(0, 229, 255, 0.14) 64%,
+      rgba(168, 85, 247, 0.16) 75%,
+      rgba(255, 179, 0, 0.13) 86%,
+      rgba(255, 45, 149, 0) 100%),
+    radial-gradient(ellipse at 18% 0%, rgba(0, 229, 255, 0.28), rgba(0, 229, 255, 0) 52%),
+    radial-gradient(ellipse at 82% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 50%),
+    linear-gradient(180deg, #160c38 0%, #1e1b4b 38%, #312e81 70%, #4c1d95 100%);
+  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px, 170px 170px, 190px 190px, 200% 100%, auto, auto, auto;
+  animation: sparkFloorMeshSnap 14s linear infinite;
 }
 html[data-skin="spark"] .front-of-room {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.06em;
   background: linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95);
   border-color: #fff;
   color: #0f172a;
@@ -279,11 +502,31 @@ html[data-skin="spark"] .front-of-room {
 }
 html[data-skin="spark"] .zoom-chip,
 html[data-skin="spark"] .zoom-chip.is-dragging {
+  font-family: var(--spark-font-ui);
+  background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%);
   border: 2px solid #00e5ff;
   box-shadow:
     0 0 0 2px rgba(255, 45, 149, 0.35),
     0 8px 20px rgba(15, 23, 42, 0.28);
 }
+html[data-skin="spark"] .zoom-chip-label,
+html[data-skin="spark"] .zoom-chip-btn,
+html[data-skin="spark"] .zoom-chip-fit {
+  font-family: var(--spark-font-ui);
+  color: #0f172a;
+  font-weight: 800;
+}
+html[data-skin="spark"] #btnToggleSidePanels.side-panels-tab {
+  font-family: var(--spark-font-ui);
+  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  color: #0f172a;
+  border: 2px solid #00e5ff;
+  box-shadow: 0 3px 0 #be185d;
+}
+
+/* =====================================================================
+   DESKS, TIERS, ON FIRE & SCORE BURST (Desk metrics & name layout untouched)
+   ===================================================================== */
 html[data-skin="spark"] .desk-team-row {
   position: relative;
 }
@@ -378,7 +621,7 @@ html[data-skin="spark"] .spark-tier-badge {
   left: -10px;
   z-index: 7;
   pointer-events: none;
-  font-family: var(--font-display);
+  font-family: var(--spark-font-display);
   font-size: .72rem;
   font-weight: 700;
   line-height: 1.2;
@@ -411,6 +654,7 @@ html[data-skin="spark"] .score-step,
 html[data-skin="spark"] .score-step:hover,
 html[data-skin="spark"] .team-score-step,
 html[data-skin="spark"] .team-score-step:hover {
+  font-family: var(--spark-font-ui);
   border: none;
   color: #422006;
   background-color: #ffb300;
@@ -429,6 +673,7 @@ html[data-skin="spark"] .score-step[data-grp-plus],
 html[data-skin="spark"] .score-step[data-grp-plus]:hover,
 html[data-skin="spark"] .team-score-step[data-grp-plus],
 html[data-skin="spark"] .team-score-step[data-grp-plus]:hover {
+  font-family: var(--spark-font-ui);
   color: #fff;
   background-image: linear-gradient(135deg, #00e5ff, #a855f7 55%, #ff2d95);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
@@ -455,7 +700,7 @@ html[data-skin="spark"] .spark-fire.is-on {
   isolation: isolate;
   overflow: visible;
   white-space: nowrap;
-  font-family: var(--font-display);
+  font-family: var(--spark-font-display);
   font-size: .68rem;
   font-weight: 700;
   line-height: 1;
@@ -541,51 +786,14 @@ html[data-skin="spark"] .desk-card:has(.spark-fire.is-on)::after {
   z-index: -1;
   animation: sparkHeatPulse 1.1s ease-in-out infinite;
 }
-@keyframes emberPulse {
-  0%, 100% { filter: brightness(1) saturate(1.25); transform: scale(1); }
-  50% { filter: brightness(1.28) saturate(1.55); transform: scale(1.06); }
-}
-@keyframes sparkFireRush {
-  0% { background-position: 0% 50%, 0% 50%; }
-  100% { background-position: 0% 50%, 240% 50%; }
-}
-@keyframes sparkBurnFlicker {
-  0%, 100% { transform: scaleY(1) translateY(0); filter: brightness(1); }
-  35% { transform: scaleY(1.12) translateY(-1px); filter: brightness(1.2); }
-  70% { transform: scaleY(0.94) translateY(0.5px); filter: brightness(1.05); }
-}
-@keyframes sparkBurnCore {
-  0%, 100% { opacity: 0.9; }
-  50% { opacity: 1; }
-}
-@keyframes sparkHeatPulse {
-  0%, 100% { opacity: 0.7; transform: scaleX(1); }
-  50% { opacity: 1; transform: scaleX(1.12); }
-}
-@keyframes sparkMeshSlide {
-  0% { background-position: 0% 0; }
-  100% { background-position: 100% 0; }
-}
-@keyframes sparkPulsePlus {
-  0% { transform: translateY(-6px) scale(1); }
-  35% { transform: translateY(-10px) scale(1.09); }
-  100% { transform: translateY(-6px) scale(1); }
-}
-@keyframes sparkPulseMinus {
-  0% { transform: translateY(-6px) scale(1); }
-  30% { transform: translateY(-6px) scale(0.95) translateX(-3px); }
-  60% { transform: translateY(-6px) scale(0.97) translateX(3px); }
-  100% { transform: translateY(-6px) scale(1); }
-}
 html[data-skin="spark"] .score-burst {
   display: block;
   position: absolute;
   left: 50%;
-  /* Mock stage puts the burst 10px above the desk, then it rises. */
   top: -10px;
   transform: translateX(-50%);
   pointer-events: none;
-  font-family: var(--font-display);
+  font-family: var(--spark-font-display);
   font-weight: 700;
   font-size: 1.85rem;
   letter-spacing: -0.03em;
@@ -625,21 +833,10 @@ html[data-skin="spark"] .score-burst::after {
   animation: sparkRing 1.35s ease-out forwards;
   z-index: -1;
 }
-@keyframes sparkBurst {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.55) rotate(-8deg); }
-  15%  { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.45) rotate(4deg); }
-  45%  { opacity: 1; transform: translateX(-50%) translateY(-26px) scale(1.2) rotate(-2deg); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-52px) scale(0.9) rotate(6deg); }
-}
-@keyframes sparkRing {
-  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.25); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); }
-}
-@keyframes sparkStarSpin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.3); }
-  100% { transform: rotate(360deg) scale(1); }
-}
+
+/* =====================================================================
+   LEADERBOARD CARD
+   ===================================================================== */
 html[data-skin="spark"] #leaderboardCard {
   background:
     linear-gradient(#1e1b4b, #1e1b4b) padding-box,
@@ -656,6 +853,21 @@ html[data-skin="spark"] #leaderboardPanel .border-b {
   border-color: rgba(255, 255, 255, 0.12);
   color: #fff;
 }
+html[data-skin="spark"] #leaderboardCard .panel-title-bar h2 {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.03em;
+}
+html[data-skin="spark"] #btnOpenPodiumModal,
+html[data-skin="spark"] #btnOpenPodiumModal:hover {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #422006;
+  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  box-shadow:
+    0 3px 0 #b45309,
+    0 6px 14px rgba(255, 179, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
 html[data-skin="spark"] #leaderboardCard h2,
 html[data-skin="spark"] #leaderboardBody .text-slate-800,
 html[data-skin="spark"] #leaderboardBody .text-slate-400,
@@ -665,16 +877,19 @@ html[data-skin="spark"] #leaderboardBody .text-slate-600 {
 html[data-skin="spark"] #tabLbStudents,
 html[data-skin="spark"] #tabLbGroups,
 html[data-skin="spark"] #tabLbFeed {
+  font-family: var(--spark-font-ui);
   color: #e2e8f0;
 }
 html[data-skin="spark"] #tabLbStudents.shadow-sm,
 html[data-skin="spark"] #tabLbGroups.shadow-sm,
 html[data-skin="spark"] #tabLbFeed.shadow-sm {
+  font-family: var(--spark-font-ui);
   color: #0f172a;
   background: linear-gradient(135deg, #00e5ff, #ffb300);
   box-shadow: 0 3px 0 #0e7490;
 }
 html[data-skin="spark"] #lbSearchInput {
+  font-family: var(--spark-font-ui);
   background: #0f172a;
   color: #f8fafc;
   border-color: #00e5ff;
@@ -727,7 +942,7 @@ html[data-skin="spark"] .spark-fire-mini {
   flex: none;
   overflow: visible;
   isolation: isolate;
-  font-family: var(--font-display);
+  font-family: var(--spark-font-display);
   font-size: .62rem;
   font-weight: 700;
   line-height: 1.2;
@@ -754,4 +969,630 @@ html[data-skin="spark"] .spark-fire-mini::before {
   z-index: -1;
   pointer-events: none;
   animation: sparkHeatPulse 1.2s ease-in-out infinite;
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 1. TIMER (#timerPopover)
+   ===================================================================== */
+html[data-skin="spark"] #timerPopover {
+  font-family: var(--spark-font-ui);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
+    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
+  color: #0f172a;
+  border: 3px solid transparent;
+  box-shadow:
+    0 18px 38px rgba(168, 85, 247, 0.5),
+    0 0 24px rgba(0, 229, 255, 0.35);
+}
+html[data-skin="spark"] #timerPopover h3 {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.02em;
+  color: #3b0764;
+}
+html[data-skin="spark"] #timerPopover .border-b,
+html[data-skin="spark"] #timerPopover .border-t {
+  border-color: rgba(168, 85, 247, 0.25);
+}
+html[data-skin="spark"] #btnCloseTimerPopover {
+  font-family: var(--spark-font-ui);
+  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  color: #be185d;
+  box-shadow: 0 2px 0 #be185d;
+}
+html[data-skin="spark"] #timerCardBox {
+  background-color: #1a0a3c;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(0, 229, 255, 0.25), rgba(0, 229, 255, 0) 55%),
+    linear-gradient(135deg, #0b1026 0%, #1a0a3c 42%, #3b0764 76%, #831843 100%);
+  border: 2px solid rgba(0, 229, 255, 0.65);
+  box-shadow:
+    inset 0 0 24px rgba(255, 45, 149, 0.3),
+    0 8px 20px rgba(59, 7, 100, 0.45);
+}
+html[data-skin="spark"] #timerBigDisplay {
+  font-family: var(--spark-font-display);
+  color: #fff7ad;
+  text-shadow:
+    0 0 12px rgba(255, 179, 0, 0.8),
+    0 0 24px rgba(255, 45, 149, 0.55);
+}
+html[data-skin="spark"] #timerStatusText {
+  font-family: var(--spark-font-ui);
+  color: #67f6ff;
+  font-weight: 800;
+}
+html[data-skin="spark"] #timerProgressBar {
+  background: linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95);
+  height: 6px;
+}
+html[data-skin="spark"] #timerPopover button,
+html[data-skin="spark"] #timerPopover button:hover {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  box-shadow:
+    0 3px 0 #be185d,
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html[data-skin="spark"] #timerPopover #btnTimerStartPause,
+html[data-skin="spark"] #timerPopover #btnTimerStartPause:hover {
+  font-family: var(--spark-font-display);
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 4px 0 #6b21a8,
+    0 0 16px rgba(0, 229, 255, 0.55);
+}
+html[data-skin="spark"] #customTimerMin,
+html[data-skin="spark"] #customTimerSec,
+html[data-skin="spark"] #customTimerMinInput,
+html[data-skin="spark"] #customTimerSecInput {
+  font-family: var(--spark-font-ui);
+  border: 2px solid #a855f7;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 2. RANDOM (#pickerModal)
+   Full-screen overlay stays a dim scrim; inner .picker-dialog styled.
+   ===================================================================== */
+html[data-skin="spark"] #pickerModal {
+  background-color: rgba(15, 7, 40, 0.68);
+}
+html[data-skin="spark"] #pickerModal .picker-dialog {
+  font-family: var(--spark-font-ui);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
+    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
+  color: #0f172a;
+  border: 3px solid transparent;
+  box-shadow:
+    0 22px 44px rgba(168, 85, 247, 0.55),
+    0 0 28px rgba(0, 229, 255, 0.35);
+}
+html[data-skin="spark"] #pickerModal .bg-gradient-to-r {
+  background-color: #1a0a3c;
+  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 32%, #3b0764 62%, #831843 85%, #ff2d95 100%);
+  color: #ffffff;
+  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+}
+html[data-skin="spark"] #pickerModal .bg-gradient-to-r h2 {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.02em;
+  color: #fff7ad;
+}
+html[data-skin="spark"] #pickerModal #btnClosePickerModal {
+  font-family: var(--spark-font-ui);
+  border: 2px solid #00e5ff;
+  background: rgba(15, 23, 42, 0.75);
+  color: #67f6ff;
+}
+html[data-skin="spark"] #pickerModal #btnPickerTypeStudent,
+html[data-skin="spark"] #pickerModal #btnPickerTypeGroup {
+  font-family: var(--spark-font-ui);
+  background: #ffffff;
+  color: #3b0764;
+}
+html[data-skin="spark"] #pickerModal #btnPickerTypeStudent.shadow-sm,
+html[data-skin="spark"] #pickerModal #btnPickerTypeGroup.shadow-sm {
+  font-family: var(--spark-font-ui);
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  box-shadow: 0 3px 0 #6b21a8;
+}
+html[data-skin="spark"] #pickerStudentOptions {
+  background: #ffffff;
+  border: 2px solid rgba(168, 85, 247, 0.35);
+}
+html[data-skin="spark"] #pickerGroupFilter {
+  font-family: var(--spark-font-ui);
+  border: 2px solid #a855f7;
+  background: #fdf4ff;
+  color: #0f172a;
+}
+html[data-skin="spark"] #pickerStageBox {
+  background-color: #1a0a3c;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(0, 229, 255, 0.26), rgba(0, 229, 255, 0) 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 55%),
+    linear-gradient(135deg, #0b1026 0%, #1a0a3c 45%, #3b0764 78%, #831843 100%);
+  border: 2px solid rgba(0, 229, 255, 0.65);
+  box-shadow:
+    inset 0 0 28px rgba(255, 45, 149, 0.3),
+    0 8px 22px rgba(59, 7, 100, 0.45);
+}
+html[data-skin="spark"] #pickerBadge {
+  font-family: var(--spark-font-display);
+  background: linear-gradient(135deg, #fff7ad, #ffb300);
+  color: #422006;
+  box-shadow: 0 2px 0 #b45309;
+}
+html[data-skin="spark"] #pickerResultTitle {
+  font-family: var(--spark-font-display);
+  color: #fff7ad;
+  text-shadow:
+    0 0 12px rgba(0, 229, 255, 0.65),
+    0 0 24px rgba(255, 45, 149, 0.55);
+}
+html[data-skin="spark"] #pickerResultSub {
+  font-family: var(--spark-font-ui);
+  color: #67f6ff;
+}
+html[data-skin="spark"] #pickerCurrentScorePill {
+  font-family: var(--spark-font-ui);
+  background: rgba(15, 23, 42, 0.75);
+  border: 2px solid #ffb300;
+  color: #fff7ad;
+}
+html[data-skin="spark"] #btnPickerPlusOne,
+html[data-skin="spark"] #btnPickerPlusOne:hover {
+  font-family: var(--spark-font-ui);
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 55%, #ff2d95 100%);
+  box-shadow: 0 3px 0 #6b21a8;
+}
+html[data-skin="spark"] #btnPickerMinusOne,
+html[data-skin="spark"] #btnPickerMinusOne:hover {
+  font-family: var(--spark-font-ui);
+  color: #422006;
+  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  box-shadow: 0 3px 0 #b45309;
+}
+html[data-skin="spark"] #pickerModal #btnTriggerRandomPick,
+html[data-skin="spark"] #pickerModal #btnTriggerRandomPick:hover {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.02em;
+  color: #083344;
+  background-image: linear-gradient(180deg, #67f6ff 0%, #00e5ff 50%, #00b8d4 100%);
+  box-shadow:
+    0 5px 0 #0e7490,
+    0 10px 22px rgba(0, 229, 255, 0.55);
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 3. BOARD (Whiteboard .wb-sheet)
+   ===================================================================== */
+html[data-skin="spark"] .wb-sheet {
+  font-family: var(--spark-font-ui);
+  background: #fdf4ff;
+  color: #0f172a;
+}
+html[data-skin="spark"] .wb-bar {
+  background-color: #1a0a3c;
+  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 28%, #3b0764 55%, #831843 78%, #7c2d12 100%);
+  color: #ffffff;
+  border-bottom: 2px solid rgba(0, 229, 255, 0.65);
+  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+}
+html[data-skin="spark"] .wb-title {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.02em;
+  color: #fff7ad;
+}
+html[data-skin="spark"] .wb-tool,
+html[data-skin="spark"] .wb-close {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  box-shadow:
+    0 3px 0 #be185d,
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html[data-skin="spark"] .wb-tool:hover,
+html[data-skin="spark"] .wb-close:hover {
+  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  color: #422006;
+}
+html[data-skin="spark"] .wb-tool[aria-pressed="true"] {
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  box-shadow:
+    0 3px 0 #6b21a8,
+    0 0 14px rgba(0, 229, 255, 0.65);
+}
+html[data-skin="spark"] .wb-swatch {
+  box-shadow: 0 0 0 2px #0f172a;
+}
+html[data-skin="spark"] .wb-colour-pop,
+html[data-skin="spark"] .wb-confirm-card {
+  font-family: var(--spark-font-ui);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
+    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
+  color: #0f172a;
+  border: 3px solid transparent;
+  box-shadow: 0 14px 32px rgba(168, 85, 247, 0.45);
+}
+html[data-skin="spark"] #wbConfirmCancel,
+html[data-skin="spark"] #wbConfirmCancel:hover {
+  font-family: var(--spark-font-ui);
+  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  color: #0f172a;
+  box-shadow: 0 3px 0 #be185d;
+}
+html[data-skin="spark"] #wbConfirmClear,
+html[data-skin="spark"] #wbConfirmClear:hover {
+  font-family: var(--spark-font-ui);
+  background-image: linear-gradient(135deg, #ff2d95 0%, #e11d48 100%);
+  color: #ffffff;
+  box-shadow: 0 3px 0 #881337;
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 4. CHANCE (Chance sheet / modal)
+   - Full-screen overlay stays a dim scrim so the classroom remains visible.
+   - Only the inner card/panel is styled as a cosmic prism card.
+   - Darkened card face restyles the prompt text to light solar gold (#fff7ad).
+   - Locked student-facing copy stays untouched.
+   ===================================================================== */
+html[data-skin="spark"] #chanceSheet,
+html[data-skin="spark"] #chanceModal,
+html[data-skin="spark"] .chance-sheet,
+html[data-skin="spark"] .chance-modal,
+html[data-skin="spark"] .spark-chance-sheet {
+  background-color: rgba(15, 7, 40, 0.68);
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+}
+html[data-skin="spark"] #chanceSheet .chance-panel,
+html[data-skin="spark"] #chanceSheet .chance-dialog,
+html[data-skin="spark"] #chanceSheet .plan-panel,
+html[data-skin="spark"] #chanceSheet > div,
+html[data-skin="spark"] #chanceModal .chance-panel,
+html[data-skin="spark"] #chanceModal .chance-dialog,
+html[data-skin="spark"] #chanceModal > div,
+html[data-skin="spark"] .chance-sheet .chance-panel,
+html[data-skin="spark"] .chance-sheet .chance-dialog,
+html[data-skin="spark"] .chance-sheet > div,
+html[data-skin="spark"] .chance-modal > div,
+html[data-skin="spark"] #chancePopover,
+html[data-skin="spark"] .spark-chance-panel:not(#chanceSheet):not(#chanceModal):not(.chance-sheet):not(.chance-modal):not(.fixed) {
+  font-family: var(--spark-font-ui);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
+    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
+  color: #0f172a;
+  border: 3px solid transparent;
+  box-shadow:
+    0 22px 44px rgba(168, 85, 247, 0.55),
+    0 0 28px rgba(0, 229, 255, 0.35);
+}
+html[data-skin="spark"] #chanceSheet .chance-bar,
+html[data-skin="spark"] #chanceSheet .chance-header,
+html[data-skin="spark"] #chanceSheet .chance-head,
+html[data-skin="spark"] #chanceSheet .plan-bar,
+html[data-skin="spark"] #chanceModal .chance-bar,
+html[data-skin="spark"] #chanceModal .chance-header,
+html[data-skin="spark"] #chanceModal .bg-gradient-to-r,
+html[data-skin="spark"] .chance-bar,
+html[data-skin="spark"] .chance-header,
+html[data-skin="spark"] .chance-head,
+html[data-skin="spark"] #chanceBar,
+html[data-skin="spark"] #chanceHeader,
+html[data-skin="spark"] .spark-chance-bar {
+  background-color: #1a0a3c;
+  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 30%, #3b0764 60%, #831843 85%, #ff2d95 100%);
+  color: #fff7ad;
+  border-bottom: 2px solid rgba(0, 229, 255, 0.65);
+  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+}
+html[data-skin="spark"] #chanceTitle,
+html[data-skin="spark"] #chanceSheetTitle,
+html[data-skin="spark"] .chance-title,
+html[data-skin="spark"] .chance-bar h2,
+html[data-skin="spark"] .chance-bar h3,
+html[data-skin="spark"] .chance-header h2,
+html[data-skin="spark"] .chance-header h3 {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.02em;
+  color: #fff7ad;
+  text-shadow: 0 2px 6px rgba(11, 16, 38, 0.75);
+}
+html[data-skin="spark"] #chanceCard,
+html[data-skin="spark"] #chanceCardBox,
+html[data-skin="spark"] #chanceStage,
+html[data-skin="spark"] #chanceStageBox,
+html[data-skin="spark"] .chance-card,
+html[data-skin="spark"] .chance-stage,
+html[data-skin="spark"] .chance-card-box,
+html[data-skin="spark"] .chance-card-face,
+html[data-skin="spark"] .chance-card-body,
+html[data-skin="spark"] .spark-chance-card {
+  font-family: var(--spark-font-ui);
+  background-color: #1a0a3c;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(0, 229, 255, 0.25), rgba(0, 229, 255, 0) 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 55%),
+    linear-gradient(135deg, #0b1026 0%, #1a0a3c 42%, #3b0764 76%, #831843 100%);
+  color: #fff7ad;
+  border: 2px solid rgba(0, 229, 255, 0.65);
+  box-shadow:
+    inset 0 0 28px rgba(255, 45, 149, 0.3),
+    0 8px 22px rgba(59, 7, 100, 0.45);
+}
+/* Light solar-gold prompt text on the darkened Chance card face */
+html[data-skin="spark"] #chancePrompt,
+html[data-skin="spark"] #chancePromptText,
+html[data-skin="spark"] #chanceCardPrompt,
+html[data-skin="spark"] #chanceQuestion,
+html[data-skin="spark"] #chanceText,
+html[data-skin="spark"] #chanceCardText,
+html[data-skin="spark"] #chanceCardTitle,
+html[data-skin="spark"] #chanceResultTitle,
+html[data-skin="spark"] .chance-prompt,
+html[data-skin="spark"] .chance-prompt-text,
+html[data-skin="spark"] .chance-card-prompt,
+html[data-skin="spark"] .chance-question,
+html[data-skin="spark"] .chance-text,
+html[data-skin="spark"] .chance-card-text,
+html[data-skin="spark"] .chance-card-title,
+html[data-skin="spark"] .chance-card h2,
+html[data-skin="spark"] .chance-card h3,
+html[data-skin="spark"] .chance-card h4,
+html[data-skin="spark"] .chance-card p,
+html[data-skin="spark"] .chance-card-face p,
+html[data-skin="spark"] .chance-card-body p,
+html[data-skin="spark"] #chanceCard p,
+html[data-skin="spark"] #chanceCardBox p,
+html[data-skin="spark"] .spark-chance-card p,
+html[data-skin="spark"] .spark-chance-prompt {
+  font-family: var(--spark-font-ui);
+  color: #fff7ad;
+  text-shadow:
+    0 1px 3px rgba(11, 16, 38, 0.9),
+    0 0 12px rgba(0, 229, 255, 0.35);
+}
+html[data-skin="spark"] #chanceBonus,
+html[data-skin="spark"] #chanceBonusLine,
+html[data-skin="spark"] .chance-bonus,
+html[data-skin="spark"] .chance-bonus-line,
+html[data-skin="spark"] .chance-lucky,
+html[data-skin="spark"] .spark-chance-bonus {
+  font-family: var(--spark-font-ui);
+  background: linear-gradient(90deg, rgba(255, 179, 0, 0.28), rgba(255, 45, 149, 0.28), rgba(0, 229, 255, 0.24));
+  color: #fff7ad;
+  border: 2px solid #ffb300;
+  border-radius: 999px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(11, 16, 38, 0.85);
+}
+html[data-skin="spark"] #chanceSheet button,
+html[data-skin="spark"] #chanceModal button,
+html[data-skin="spark"] .chance-sheet button,
+html[data-skin="spark"] .chance-modal button,
+html[data-skin="spark"] .chance-action,
+html[data-skin="spark"] .spark-chance-sheet button,
+html[data-skin="spark"] .spark-chance-panel button {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  box-shadow:
+    0 3px 0 #be185d,
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html[data-skin="spark"] #btnChanceDraw,
+html[data-skin="spark"] #btnChanceDraw:hover,
+html[data-skin="spark"] #btnDrawChance,
+html[data-skin="spark"] #btnDrawChance:hover,
+html[data-skin="spark"] #btnTriggerChance,
+html[data-skin="spark"] #btnTriggerChance:hover,
+html[data-skin="spark"] #chanceDraw,
+html[data-skin="spark"] #chanceDraw:hover,
+html[data-skin="spark"] #chanceDrawBtn,
+html[data-skin="spark"] #chanceDrawBtn:hover,
+html[data-skin="spark"] .chance-draw,
+html[data-skin="spark"] .chance-draw:hover,
+html[data-skin="spark"] .chance-draw-btn,
+html[data-skin="spark"] .chance-draw-btn:hover,
+html[data-skin="spark"] .chance-primary,
+html[data-skin="spark"] .chance-primary:hover,
+html[data-skin="spark"] .spark-chance-draw,
+html[data-skin="spark"] .spark-chance-draw:hover {
+  font-family: var(--spark-font-display);
+  letter-spacing: 0.02em;
+  border: none;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #ff2d95 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 4px 0 #6b21a8,
+    0 8px 18px rgba(168, 85, 247, 0.55),
+    0 0 16px rgba(0, 229, 255, 0.55);
+  font-weight: 800;
+}
+html[data-skin="spark"] #btnCloseChance,
+html[data-skin="spark"] #btnCloseChanceSheet,
+html[data-skin="spark"] #btnCloseChanceModal,
+html[data-skin="spark"] #chanceClose,
+html[data-skin="spark"] .chance-close,
+html[data-skin="spark"] .spark-chance-close {
+  font-family: var(--spark-font-ui);
+  border: 2px solid #00e5ff;
+  background: rgba(15, 23, 42, 0.75);
+  background-image: none;
+  color: #67f6ff;
+  box-shadow: none;
+}
+
+/* =====================================================================
+   SUPPORTING MODALS & SHEETS (Podium, Class, Group, Plans, Confirmations)
+   Full-screen overlays stay dim scrims; inner panels get prism styling.
+   ===================================================================== */
+html[data-skin="spark"] #podiumModal,
+html[data-skin="spark"] #classModal,
+html[data-skin="spark"] #groupModal,
+html[data-skin="spark"] #resetModal,
+html[data-skin="spark"] #applyGridModal,
+html[data-skin="spark"] #clearGroupsModal,
+html[data-skin="spark"] #planSheet {
+  background-color: rgba(15, 7, 40, 0.68);
+}
+html[data-skin="spark"] #podiumModal > .bg-gradient-to-b {
+  font-family: var(--spark-font-ui);
+  background-color: #1a0a3c;
+  background-image: linear-gradient(180deg, #0b1026 0%, #1a0a3c 45%, #3b0764 80%, #831843 100%);
+  border: 2px solid #00e5ff;
+  box-shadow:
+    0 0 0 3px rgba(255, 45, 149, 0.45),
+    0 20px 44px rgba(168, 85, 247, 0.55);
+}
+html[data-skin="spark"] #podiumModal h2 {
+  font-family: var(--spark-font-display);
+}
+html[data-skin="spark"] #btnDonePodiumModal,
+html[data-skin="spark"] #btnDonePodiumModal:hover {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #422006;
+  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  box-shadow: 0 3px 0 #b45309;
+}
+html[data-skin="spark"] #planSheet .plan-panel,
+html[data-skin="spark"] #classModal .shadow-2xl,
+html[data-skin="spark"] #groupModal .shadow-2xl,
+html[data-skin="spark"] #resetModal .shadow-2xl,
+html[data-skin="spark"] #applyGridModal .shadow-2xl,
+html[data-skin="spark"] #clearGroupsModal .shadow-2xl {
+  font-family: var(--spark-font-ui);
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
+    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
+  color: #0f172a;
+  border: 3px solid transparent;
+  box-shadow: 0 18px 38px rgba(168, 85, 247, 0.5);
+}
+html[data-skin="spark"] #planSheet .plan-bar,
+html[data-skin="spark"] #classModal .bg-gradient-to-r,
+html[data-skin="spark"] #groupModal .bg-gradient-to-r {
+  background-color: #1a0a3c;
+  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 32%, #3b0764 62%, #831843 85%, #ff2d95 100%);
+  color: #fff7ad;
+  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+}
+html[data-skin="spark"] #planSheet .plan-bar h3,
+html[data-skin="spark"] #classModal h2,
+html[data-skin="spark"] #groupModal h2,
+html[data-skin="spark"] #resetModal h3,
+html[data-skin="spark"] #applyGridModal h3,
+html[data-skin="spark"] #clearGroupsModal h3 {
+  font-family: var(--spark-font-display);
+}
+html[data-skin="spark"] #planSheet .plan-action,
+html[data-skin="spark"] #planSheet .plan-action:hover,
+html[data-skin="spark"] #classModal .bg-indigo-600,
+html[data-skin="spark"] #groupModal .bg-indigo-600,
+html[data-skin="spark"] #btnConfirmApplyGrid {
+  font-family: var(--spark-font-ui);
+  border: none;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  box-shadow: 0 3px 0 #6b21a8;
+}
+
+/* =====================================================================
+   KEYFRAMES & REDUCED MOTION
+   ===================================================================== */
+@keyframes sparkPageMesh {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 0% 50%; }
+  50%  { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 100% 50%; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 0% 50%; }
+}
+@keyframes sparkFloorMesh {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
+}
+@keyframes sparkFloorMeshSnap {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
+}
+@keyframes emberPulse {
+  0%, 100% { filter: brightness(1) saturate(1.25); transform: scale(1); }
+  50% { filter: brightness(1.28) saturate(1.55); transform: scale(1.06); }
+}
+@keyframes sparkFireRush {
+  0% { background-position: 0% 50%, 0% 50%; }
+  100% { background-position: 0% 50%, 240% 50%; }
+}
+@keyframes sparkBurnFlicker {
+  0%, 100% { transform: scaleY(1) translateY(0); filter: brightness(1); }
+  35% { transform: scaleY(1.12) translateY(-1px); filter: brightness(1.2); }
+  70% { transform: scaleY(0.94) translateY(0.5px); filter: brightness(1.05); }
+}
+@keyframes sparkBurnCore {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+@keyframes sparkHeatPulse {
+  0%, 100% { opacity: 0.7; transform: scaleX(1); }
+  50% { opacity: 1; transform: scaleX(1.12); }
+}
+@keyframes sparkMeshSlide {
+  0% { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+@keyframes sparkPulsePlus {
+  0% { transform: translateY(-6px) scale(1); }
+  35% { transform: translateY(-10px) scale(1.09); }
+  100% { transform: translateY(-6px) scale(1); }
+}
+@keyframes sparkPulseMinus {
+  0% { transform: translateY(-6px) scale(1); }
+  30% { transform: translateY(-6px) scale(0.95) translateX(-3px); }
+  60% { transform: translateY(-6px) scale(0.97) translateX(3px); }
+  100% { transform: translateY(-6px) scale(1); }
+}
+@keyframes sparkBurst {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.55) rotate(-8deg); }
+  15%  { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.45) rotate(4deg); }
+  45%  { opacity: 1; transform: translateX(-50%) translateY(-26px) scale(1.2) rotate(-2deg); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-52px) scale(0.9) rotate(6deg); }
+}
+@keyframes sparkRing {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.25); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); }
+}
+@keyframes sparkStarSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.3); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin="spark"] body,
+  html[data-skin="spark"] #studioHeader::before,
+  html[data-skin="spark"] #studioHeader::after,
+  html[data-skin="spark"] .classroom-floor,
+  html[data-skin="spark"] .classroom-floor.snap-active,
+  html[data-skin="spark"] .spark-fire.is-on {
+    animation: none !important;
+  }
 }
