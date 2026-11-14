@@ -23,7 +23,7 @@
     return '<svg class="pitwall-wing-svg" viewBox="0 0 16 16" aria-hidden="true">' +
       '<path d="M2 11 L8 3 L14 11 L11 11 L8 7 L5 11 Z" fill="#fef08a" stroke="#0b0d12" stroke-width="1.4"/>' +
       '</svg>' +
-      '<span class="pitwall-fire-label">DRS ACTIVE</span>';
+      '<span class="pitwall-fire-label">OVERTAKE</span>';
   }
 
   function pitwallFireBadgeHtml() {
@@ -247,7 +247,7 @@
       var onFire = window.SparkFire.onFire(st, now);
       return {
         className: tier ? ('pitwall-tier-' + tier) : '',
-        fire: onFire ? '<span class="pitwall-fire-mini" title="3+ pts in the last ~3 min">DRS ACTIVE</span>' : ''
+        fire: onFire ? '<span class="pitwall-fire-mini" title="3+ pts in the last ~3 min">OVERTAKE</span>' : ''
       };
     }
   };

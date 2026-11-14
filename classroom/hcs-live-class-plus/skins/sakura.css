@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800&family=Quicksand:wght@600;700&display=swap');
 
-/* Sakura skin pack — Anime Twilight Festival & Golden-Hour Lanterns.
-   Sunset coral #ff6b8b, lantern amber-gold #ffb703, twilight lacquer-plum #2b193d,
-   moonlit aqua #48cae4, and warm blossom cream #fffdf9.
+/* Sakura skin pack — Soft White & Pastel Sakura Blossom.
+   Porcelain milk-white #ffffff, soft petal blush #fff0f5, pastel sakura pink #ffe4ee,
+   cherry blossom rose #f472b6, strawberry milk #ff8fab, and deep sakura berry ink #831843.
    Scoped strictly under html[data-skin="sakura"]. Desk width stays 148px. */
 .sakura-tier-badge,
 .sakura-fire,
@@ -15,29 +15,29 @@ html[data-skin="sakura"] {
 }
 
 html[data-skin="sakura"] .studio-mark img.studio-mark-default {
-  display: block;
+  display: none;
 }
 html[data-skin="sakura"] .studio-mark img.studio-mark-day {
-  display: none;
+  display: block;
 }
 
 /* =====================================================================
-   WHOLE PLUS PAGE BACKGROUND: Golden-Hour Twilight Sky & Sakura Bokeh
+   WHOLE PLUS PAGE BACKGROUND: Soft White & Pastel Sakura Petal Breeze
    ===================================================================== */
 html[data-skin="sakura"] body {
-  background-color: #1f1130;
+  background-color: #fff5f8;
   background-image:
-    radial-gradient(ellipse 90% 48% at 20% 0%, rgba(255, 107, 139, 0.28) 0%, rgba(255, 183, 3, 0.14) 48%, rgba(31, 17, 48, 0) 75%),
-    radial-gradient(ellipse 90% 48% at 80% 0%, rgba(255, 183, 3, 0.26) 0%, rgba(255, 107, 139, 0.14) 48%, rgba(31, 17, 48, 0) 75%),
-    radial-gradient(ellipse 85% 45% at 50% 100%, rgba(255, 107, 139, 0.24) 0%, rgba(72, 202, 228, 0.12) 48%, rgba(31, 17, 48, 0) 78%),
-    radial-gradient(circle, rgba(255, 183, 3, 0.24) 1.5px, rgba(0, 0, 0, 0) 2.5px),
-    radial-gradient(circle, rgba(255, 182, 193, 0.26) 2px, rgba(0, 0, 0, 0) 3px),
+    radial-gradient(ellipse 90% 48% at 18% 0%, rgba(255, 182, 193, 0.45) 0%, rgba(255, 240, 245, 0.2) 52%, rgba(255, 255, 255, 0) 78%),
+    radial-gradient(ellipse 90% 48% at 82% 0%, rgba(244, 114, 182, 0.25) 0%, rgba(255, 228, 238, 0.2) 52%, rgba(255, 255, 255, 0) 78%),
+    radial-gradient(ellipse 85% 45% at 50% 100%, rgba(255, 194, 209, 0.42) 0%, rgba(255, 240, 245, 0.18) 52%, rgba(255, 255, 255, 0) 78%),
+    radial-gradient(circle, rgba(244, 114, 182, 0.24) 2px, rgba(0, 0, 0, 0) 3px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 2.5px, rgba(0, 0, 0, 0) 3.5px),
     linear-gradient(135deg,
-      #1b0e2a 0%,
-      #2b193d 25%,
-      #4a1942 52%,
-      #6b204b 78%,
-      #2b193d 100%);
+      #ffffff 0%,
+      #fff9fb 25%,
+      #fff0f5 52%,
+      #ffe4ee 78%,
+      #fff7fa 100%);
   background-size: 100% 100%, 100% 100%, 100% 100%, 56px 56px, 84px 84px, 220% 220%;
   background-position: 0 0, 0 0, 0 0, 0 0, 28px 28px, 0% 50%;
   background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
@@ -45,24 +45,33 @@ html[data-skin="sakura"] body {
 }
 html[data-skin="sakura"] .site-version-footer,
 html[data-skin="sakura"] .site-version-line {
-  background: rgba(33, 17, 48, 0.92);
-  border-color: #ffb703;
-  color: #fde2e8;
+  background: rgba(255, 245, 248, 0.94);
+  border-color: #f472b6;
+  color: #9d174d;
   font-family: var(--sakura-font-ui);
 }
 
 /* =====================================================================
-   HEADER & FESTIVAL LANTERN BANNER (#studioHeader)
+   HEADER & SOFT WHITE-PINK SILK BANNER (#studioHeader)
    ===================================================================== */
 html[data-skin="sakura"] #studioHeader {
-  background-color: #240e35;
-  background-image: linear-gradient(115deg, #1b0e2a 0%, #3c1642 35%, #6e2046 68%, #9d2246 100%);
+  background-color: #fff0f5;
+  background-image: linear-gradient(115deg, #ffffff 0%, #fff5f8 35%, #ffe4ee 72%, #ffd6e7 100%);
+  color: #831843;
   box-shadow:
-    0 0 0 2px #ffb703,
-    0 0 0 5px rgba(255, 107, 139, 0.38),
-    0 14px 34px rgba(27, 14, 42, 0.72),
-    inset 0 -4px 0 #ffb703,
-    inset 0 2px 0 rgba(255, 255, 255, 0.24);
+    0 0 0 2px #f472b6,
+    0 0 0 5px rgba(251, 207, 232, 0.72),
+    0 12px 28px rgba(244, 114, 182, 0.22),
+    inset 0 -3px 0 #f472b6,
+    inset 0 2px 0 #ffffff;
+}
+html[data-skin="sakura"] #studioHeader h1,
+html[data-skin="sakura"] #studioHeader .studio-back,
+html[data-skin="sakura"] #studioHeader .text-white,
+html[data-skin="sakura"] #studioHeader .text-slate-100,
+html[data-skin="sakura"] #studioHeader .text-slate-200 {
+  color: #831843;
+  text-shadow: 0 1px 0 #ffffff;
 }
 html[data-skin="sakura"] #studioHeader::before {
   content: "";
@@ -71,18 +80,18 @@ html[data-skin="sakura"] #studioHeader::before {
   pointer-events: none;
   z-index: 0;
   background-image: linear-gradient(90deg,
-    rgba(255, 107, 139, 0) 0%,
-    rgba(255, 107, 139, 0.28) 12%,
-    rgba(255, 183, 3, 0.34) 25%,
-    rgba(255, 107, 139, 0.28) 38%,
-    rgba(255, 107, 139, 0) 50%,
-    rgba(255, 107, 139, 0.28) 62%,
-    rgba(255, 183, 3, 0.34) 75%,
-    rgba(255, 107, 139, 0.28) 88%,
-    rgba(255, 107, 139, 0) 100%);
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.65) 14%,
+    rgba(244, 114, 182, 0.18) 26%,
+    rgba(255, 255, 255, 0.65) 38%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(255, 255, 255, 0.65) 64%,
+    rgba(244, 114, 182, 0.18) 76%,
+    rgba(255, 255, 255, 0.65) 88%,
+    rgba(255, 255, 255, 0) 100%);
   background-size: 200% 100%;
   background-repeat: no-repeat;
-  animation: sakuraBannerBreeze 4.4s linear infinite;
+  animation: sakuraBannerBreeze 5.2s linear infinite;
 }
 html[data-skin="sakura"] #studioHeader::after {
   content: "";
@@ -91,19 +100,18 @@ html[data-skin="sakura"] #studioHeader::after {
   pointer-events: none;
   z-index: 0;
   background-image: linear-gradient(90deg,
-    rgba(72, 202, 228, 0) 0%,
-    rgba(72, 202, 228, 0.20) 12%,
-    rgba(255, 214, 165, 0.28) 25%,
-    rgba(72, 202, 228, 0.20) 38%,
-    rgba(72, 202, 228, 0) 50%,
-    rgba(72, 202, 228, 0.20) 62%,
-    rgba(255, 214, 165, 0.28) 75%,
-    rgba(72, 202, 228, 0.20) 88%,
-    rgba(72, 202, 228, 0) 100%);
+    rgba(255, 182, 193, 0) 0%,
+    rgba(255, 182, 193, 0.22) 15%,
+    rgba(255, 255, 255, 0.55) 28%,
+    rgba(255, 182, 193, 0.22) 40%,
+    rgba(255, 182, 193, 0) 50%,
+    rgba(255, 182, 193, 0.22) 65%,
+    rgba(255, 255, 255, 0.55) 78%,
+    rgba(255, 182, 193, 0.22) 90%,
+    rgba(255, 182, 193, 0) 100%);
   background-size: 200% 100%;
   background-repeat: no-repeat;
-  animation: sakuraBannerBreeze 6.4s linear infinite reverse;
-  mix-blend-mode: screen;
+  animation: sakuraBannerBreeze 7.2s linear infinite reverse;
 }
 html[data-skin="sakura"] #studioMast,
 html[data-skin="sakura"] #studioHeader .studio-header-bar {
@@ -138,26 +146,26 @@ html[data-skin="sakura"] .sakura-more-btn,
 html[data-skin="sakura"] .sakura-more-btn:hover {
   font-family: var(--sakura-font-ui);
   letter-spacing: 0.015em;
-  border: 2px solid #ffb703;
-  color: #3c1642;
-  background-color: #fff5f7;
-  background-image: linear-gradient(180deg, #ffffff 0%, #ffe3ec 100%);
-  box-shadow: 0 4px 0 #9d2246, inset 0 1px 0 #ffffff;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 60%, #ffe4ee 100%);
+  box-shadow: 0 4px 0 #f9a8d4, inset 0 1px 0 #ffffff;
 }
 html[data-skin="sakura"] #headerTimerDisplay {
   font-family: var(--sakura-font-display);
-  color: #3c1642;
+  color: #831843;
   font-weight: 800;
 }
 html[data-skin="sakura"] #btnToggleStudioBands.edit-switch.is-on .edit-switch-value {
-  background: #ff6b8b;
+  background: #f472b6;
   color: #ffffff;
-  border: 1.5px solid #2b193d;
+  border: 1.5px solid #db2777;
 }
 html[data-skin="sakura"] #btnToggleStudioBands.edit-switch.is-off .edit-switch-value {
-  background: #fde2e8;
-  color: #3c1642;
-  border: 1.5px solid #2b193d;
+  background: #ffe4ee;
+  color: #831843;
+  border: 1.5px solid #f472b6;
 }
 html[data-skin="sakura"] #btnModeIndividual.shadow-sm,
 html[data-skin="sakura"] #btnModeGroup.shadow-sm,
@@ -166,21 +174,21 @@ html[data-skin="sakura"] #btnModeGroup.shadow-sm:hover,
 html[data-skin="sakura"] #btnOpenClassModal,
 html[data-skin="sakura"] #btnOpenClassModal:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #e63966 55%, #9d2246 100%);
-  text-shadow: 0 1px 2px rgba(33, 17, 48, 0.55);
-  box-shadow: 0 4px 0 #4a154b, 0 0 16px rgba(255, 107, 139, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  background-image: linear-gradient(135deg, #ff8fab 0%, #f472b6 55%, #ec4899 100%);
+  text-shadow: 0 1px 2px rgba(131, 24, 67, 0.35);
+  box-shadow: 0 4px 0 #db2777, 0 0 14px rgba(244, 114, 182, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 html[data-skin="sakura"] #studioHeaderUtilities > #btnOpenPickerModal,
 html[data-skin="sakura"] #studioHeaderUtilities > #btnOpenPickerModal:hover,
 html[data-skin="sakura"] #btnOpenPickerModal,
 html[data-skin="sakura"] #btnOpenPickerModal:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffffff;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0 0%, #ffb703 55%, #f48c06 100%);
-  box-shadow: 0 4px 0 #9d2246, 0 0 16px rgba(255, 183, 3, 0.6), inset 0 1px 0 #ffffff;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffd6e7 60%, #fbcfe8 100%);
+  box-shadow: 0 4px 0 #ec4899, 0 0 14px rgba(244, 114, 182, 0.38), inset 0 1px 0 #ffffff;
 }
 html[data-skin="sakura"] #btnChance,
 html[data-skin="sakura"] #btnChance:hover,
@@ -198,24 +206,24 @@ html[data-skin="sakura"] .sakura-chance-btn,
 html[data-skin="sakura"] .sakura-chance-btn:hover {
   font-family: var(--sakura-font-ui);
   letter-spacing: 0.015em;
-  border: 2px solid #fff3b0;
-  color: #3c1642;
-  background-color: #ffb703;
-  background-image: linear-gradient(135deg, #fff3b0 0%, #ffb703 48%, #ff6b8b 100%);
-  box-shadow: 0 4px 0 #6e2046, 0 0 16px rgba(255, 183, 3, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 2px solid #ffffff;
+  color: #831843;
+  background-color: #ffd6e7;
+  background-image: linear-gradient(135deg, #ffffff 0%, #ffd6e7 48%, #ff8fab 100%);
+  box-shadow: 0 4px 0 #ec4899, 0 0 14px rgba(244, 114, 182, 0.45), inset 0 1px 0 #ffffff;
 }
 html[data-skin="sakura"] #btnMore[aria-expanded="true"],
 html[data-skin="sakura"] #btnToggleMore[aria-expanded="true"],
 html[data-skin="sakura"] #btnOpenMore[aria-expanded="true"],
 html[data-skin="sakura"] .more-btn[aria-expanded="true"],
 html[data-skin="sakura"] .sakura-more-btn[aria-expanded="true"] {
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #9d2246 100%);
-  box-shadow: 0 4px 0 #3c1642, 0 0 14px rgba(255, 107, 139, 0.65);
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 4px 0 #be185d, 0 0 14px rgba(244, 114, 182, 0.55);
 }
 
-/* More Popover / Dropdown Menu — Solid Lacquer-Plum Festival Shell */
+/* More Popover / Dropdown Menu — Solid Pastel Sakura Blush Shell */
 html[data-skin="sakura"] #morePopover,
 html[data-skin="sakura"] #moreMenu,
 html[data-skin="sakura"] #morePanel,
@@ -228,14 +236,14 @@ html[data-skin="sakura"] .studio-more-pop,
 html[data-skin="sakura"] .studio-more-menu,
 html[data-skin="sakura"] .sakura-more-pop {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 52%, #591c47 85%, #6e2046 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 48%, #ffe4ee 82%, #ffd6e7 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
   border-radius: 16px;
   box-shadow:
-    0 0 0 3px #ff6b8b,
-    0 18px 38px rgba(20, 10, 32, 0.82);
+    0 0 0 3px #ffffff,
+    0 18px 36px rgba(219, 39, 119, 0.28);
 }
 html[data-skin="sakura"] #morePopover button,
 html[data-skin="sakura"] #moreMenu button,
@@ -247,11 +255,11 @@ html[data-skin="sakura"] .studio-more-pop button,
 html[data-skin="sakura"] .studio-more-menu button,
 html[data-skin="sakura"] .sakura-more-pop button {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  color: #3c1642;
-  background-color: #fff5f7;
-  background-image: linear-gradient(180deg, #ffffff 0%, #ffe3ec 100%);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #morePopover button:hover,
 html[data-skin="sakura"] #moreMenu button:hover,
@@ -262,49 +270,51 @@ html[data-skin="sakura"] .more-panel button:hover,
 html[data-skin="sakura"] .studio-more-pop button:hover,
 html[data-skin="sakura"] .studio-more-menu button:hover,
 html[data-skin="sakura"] .sakura-more-pop button:hover {
-  border-color: #fff3b0;
+  border-color: #ec4899;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #9d2246 100%);
-  box-shadow: 0 3px 0 #3c1642;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #be185d;
 }
 
 html[data-skin="sakura"] #studioHeader #classSelect {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  box-shadow: 0 4px 0 #6e2046;
+  background-color: #ffffff;
+  color: #831843;
+  border: 2px solid #f472b6;
+  box-shadow: 0 4px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #studioHeaderCluster > div {
-  background: rgba(33, 17, 48, 0.72);
-  border-color: #ffb703;
-  box-shadow: 0 4px 0 #6e2046;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #f472b6;
+  box-shadow: 0 4px 0 #f9a8d4;
 }
 
 /* =====================================================================
-   TOOLBAR & CONTROLS (Twilight Matsuri Ribbon)
+   TOOLBAR & CONTROLS (Soft White-Pink Sakura Ribbon)
    ===================================================================== */
 html[data-skin="sakura"] #studioToolbar {
-  background-color: #2b193d;
-  background-image: linear-gradient(90deg, #211130 0%, #3c1642 45%, #591c47 100%);
-  border-bottom: 3px solid #ffb703;
-  box-shadow: 0 3px 0 #ff6b8b, 0 10px 24px rgba(27, 14, 42, 0.55);
+  background-color: #fff5f8;
+  background-image: linear-gradient(90deg, #ffffff 0%, #fff5f8 48%, #ffe4ee 100%);
+  border-bottom: 3px solid #f472b6;
+  box-shadow: 0 3px 0 #fbcfe8, 0 8px 20px rgba(244, 114, 182, 0.16);
 }
 html[data-skin="sakura"] .studio-band {
-  border: 1.5px solid rgba(255, 183, 3, 0.55);
-  background: rgba(33, 17, 48, 0.65);
+  border: 1.5px solid #f9a8d4;
+  background: rgba(255, 240, 245, 0.85);
 }
 html[data-skin="sakura"] .studio-band-label {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
+  color: #9d174d;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
 html[data-skin="sakura"] .studio-grid-setup {
-  background: rgba(33, 17, 48, 0.85);
-  border-color: #ffb703;
+  background: #ffffff;
+  border-color: #f472b6;
 }
 html[data-skin="sakura"] .studio-grid-setup span,
 html[data-skin="sakura"] .studio-grid-setup label {
-  color: #fde2e8;
+  color: #831843;
 }
 html[data-skin="sakura"] #studioToolbarRow button,
 html[data-skin="sakura"] #studioToolbarRow button:hover,
@@ -314,11 +324,11 @@ html[data-skin="sakura"] #btnToggleTeamScoreboard,
 html[data-skin="sakura"] #btnToggleTeamScoreboard:hover {
   font-family: var(--sakura-font-ui);
   letter-spacing: 0.015em;
-  border: 1.5px solid #ffb703;
-  color: #3c1642;
-  background-color: #fff5f7;
-  background-image: linear-gradient(180deg, #ffffff 0%, #ffe3ec 100%);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 1.5px solid #f472b6;
+  color: #831843;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #studioToolbarRow #btnAllPlusOne,
 html[data-skin="sakura"] #studioToolbarRow #btnAllPlusOne:hover,
@@ -332,26 +342,26 @@ html[data-skin="sakura"] #studioToolbarRow .layout-preset-btn.shadow-xs:hover,
 html[data-skin="sakura"] #studioToolbarRow .layout-preset-btn.ring-2:hover,
 html[data-skin="sakura"] #groupBrushBar #btnClusterAfterBrush,
 html[data-skin="sakura"] #groupBrushBar #btnClusterAfterBrush:hover {
-  border: 1.5px solid #fff3b0;
+  border: 1.5px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #e63966 55%, #9d2246 100%);
-  box-shadow: 0 3px 0 #4a154b;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #f472b6 55%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777;
 }
 html[data-skin="sakura"] #studioToolbarRow #btnOpenResetModal,
 html[data-skin="sakura"] #studioToolbarRow #btnOpenResetModal:hover,
 html[data-skin="sakura"] #studioToolbarRow #btnToggleEditName.edit-switch.is-on,
 html[data-skin="sakura"] #studioToolbarRow #btnToggleEditName.edit-switch.is-on:hover {
-  border: 1.5px solid #ffffff;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0, #ffb703);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 1.5px solid #f472b6;
+  color: #831843;
+  background-image: linear-gradient(180deg, #ffffff, #ffd6e7);
+  box-shadow: 0 3px 0 #ec4899;
 }
 html[data-skin="sakura"] #studioToolbarRow .skin-choice,
 html[data-skin="sakura"] #studioToolbarRow .skin-choice:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #9d2246;
-  background: #1b0e2a;
-  color: #fff5f7;
+  border: 2px solid #f9a8d4;
+  background: #ffffff;
+  color: #831843;
   box-shadow: none;
 }
 html[data-skin="sakura"] #studioToolbarRow #btnSkinSakura,
@@ -359,166 +369,168 @@ html[data-skin="sakura"] #studioToolbarRow #btnSkinSakura:hover,
 html[data-skin="sakura"] #btnSkinSakura,
 html[data-skin="sakura"] #btnSkinSakura:hover {
   font-family: var(--sakura-font-display);
-  background-image: linear-gradient(135deg, #ff6b8b, #ffb703);
+  background-image: linear-gradient(135deg, #ff8fab, #f472b6);
   border: 2px solid #ffffff;
-  color: #3c1642;
-  box-shadow: 0 3px 0 #6e2046, 0 0 14px rgba(255, 107, 139, 0.65);
+  color: #ffffff;
+  box-shadow: 0 3px 0 #db2777, 0 0 12px rgba(244, 114, 182, 0.55);
 }
 html[data-skin="sakura"] #groupBrushBar {
   font-family: var(--sakura-font-ui);
-  background: linear-gradient(90deg, #211130, #3c1642, #591c47);
-  border-color: #ffb703;
-  color: #fff5f7;
+  background: linear-gradient(90deg, #ffffff, #fff0f5, #ffe4ee);
+  border-color: #f472b6;
+  color: #831843;
 }
 html[data-skin="sakura"] #groupBrushBar span {
-  color: #fff3b0;
+  color: #9d174d;
 }
 html[data-skin="sakura"] #groupScoreDock {
-  background: linear-gradient(90deg, #211130, #3c1642);
-  border-bottom: 2px solid #ffb703;
-  color: #fff5f7;
+  background: linear-gradient(90deg, #ffffff, #fff0f5);
+  border-bottom: 2px solid #f472b6;
+  color: #831843;
 }
 html[data-skin="sakura"] #groupScoreDock .group-score-dock-bar h2 {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
+  color: #9d174d;
 }
 
 /* =====================================================================
-   PULSE CARD & TWILIGHT FESTIVAL COURTYARD SEATING FLOOR
+   PULSE CARD & WHITE-PINK BLOSSOM COURTYARD SEATING FLOOR
    ===================================================================== */
 html[data-skin="sakura"] #pulseCard {
-  background-color: #2b193d;
-  background-image: linear-gradient(135deg, #211130 0%, #4a1942 52%, #722040 100%);
-  border: 3px solid #ffb703;
-  box-shadow: 0 0 0 3px #ff6b8b, 0 12px 28px rgba(27, 14, 42, 0.65);
+  background-color: #ffe4ee;
+  background-image: linear-gradient(135deg, #ffffff 0%, #fff0f5 52%, #ffe4ee 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
+  box-shadow: 0 0 0 3px #ffffff, 0 12px 26px rgba(244, 114, 182, 0.25);
 }
 html[data-skin="sakura"] #pulseCard h2 {
   font-family: var(--sakura-font-display);
+  color: #831843;
 }
 html[data-skin="sakura"] #pulseCard #statTotalPoints {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
-  text-shadow: 0 0 14px rgba(255, 183, 3, 0.85);
+  color: #db2777;
+  text-shadow: 0 1px 0 #ffffff, 0 0 12px rgba(244, 114, 182, 0.35);
 }
 html[data-skin="sakura"] #studioFloorSection {
-  border: 3px solid #ffb703;
-  background: #1f1130;
-  box-shadow: 0 0 0 3px #ff6b8b, 0 16px 36px rgba(27, 14, 42, 0.65);
+  border: 3px solid #f472b6;
+  background: #fff9fb;
+  box-shadow: 0 0 0 3px #ffffff, 0 14px 32px rgba(244, 114, 182, 0.22);
 }
 html[data-skin="sakura"] .classroom-floor {
-  background-color: #1f1130;
+  background-color: #fff9fb;
   background-image:
-    radial-gradient(circle at 20% 22%, rgba(255, 183, 3, 0.28) 0px, rgba(255, 183, 3, 0) 4px),
-    radial-gradient(circle at 78% 18%, rgba(255, 107, 139, 0.30) 0px, rgba(255, 107, 139, 0) 4px),
-    radial-gradient(circle at 38% 72%, rgba(255, 182, 193, 0.28) 0px, rgba(255, 182, 193, 0) 4px),
-    radial-gradient(circle at 84% 76%, rgba(72, 202, 228, 0.24) 0px, rgba(72, 202, 228, 0) 4px),
-    linear-gradient(to right, rgba(255, 183, 3, 0.12) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to bottom, rgba(255, 107, 139, 0.12) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(circle at 20% 22%, rgba(244, 114, 182, 0.26) 0px, rgba(244, 114, 182, 0) 5px),
+    radial-gradient(circle at 78% 18%, rgba(255, 143, 171, 0.30) 0px, rgba(255, 143, 171, 0) 5px),
+    radial-gradient(circle at 38% 72%, rgba(251, 207, 232, 0.45) 0px, rgba(251, 207, 232, 0) 6px),
+    radial-gradient(circle at 84% 76%, rgba(244, 114, 182, 0.24) 0px, rgba(244, 114, 182, 0) 5px),
+    linear-gradient(to right, rgba(244, 114, 182, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(244, 114, 182, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
     linear-gradient(90deg,
-      rgba(255, 107, 139, 0) 0%,
-      rgba(255, 107, 139, 0.16) 15%,
-      rgba(255, 183, 3, 0.18) 25%,
-      rgba(72, 202, 228, 0.14) 35%,
-      rgba(255, 107, 139, 0) 50%,
-      rgba(255, 107, 139, 0.16) 65%,
-      rgba(255, 183, 3, 0.18) 75%,
-      rgba(72, 202, 228, 0.14) 85%,
-      rgba(255, 107, 139, 0) 100%),
-    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(255, 183, 3, 0.24), rgba(255, 183, 3, 0) 70%),
-    radial-gradient(ellipse 75% 45% at 50% 100%, rgba(255, 107, 139, 0.22), rgba(31, 17, 48, 0) 75%),
-    linear-gradient(180deg, #1b0e2a 0%, #2b193d 48%, #4a1942 100%);
+      rgba(255, 182, 193, 0) 0%,
+      rgba(255, 182, 193, 0.22) 15%,
+      rgba(255, 255, 255, 0.65) 25%,
+      rgba(251, 207, 232, 0.28) 35%,
+      rgba(255, 182, 193, 0) 50%,
+      rgba(255, 182, 193, 0.22) 65%,
+      rgba(255, 255, 255, 0.65) 75%,
+      rgba(251, 207, 232, 0.28) 85%,
+      rgba(255, 182, 193, 0) 100%),
+    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(255, 182, 193, 0.32), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 75% 45% at 50% 100%, rgba(251, 207, 232, 0.38), rgba(255, 255, 255, 0) 75%),
+    linear-gradient(180deg, #ffffff 0%, #fff7fa 52%, #ffeef5 100%);
   background-size: 160px 160px, 180px 180px, 170px 170px, 190px 190px, 96px 96px, 96px 96px, 200% 100%, auto, auto, auto;
   animation: sakuraFloorMesh 14s linear infinite;
-  box-shadow: inset 0 0 38px rgba(255, 107, 139, 0.28), inset 0 0 16px rgba(255, 183, 3, 0.2);
+  box-shadow: inset 0 0 34px rgba(244, 114, 182, 0.20), inset 0 0 14px rgba(255, 255, 255, 0.9);
 }
 html[data-skin="sakura"] .classroom-floor.snap-active {
   background-image:
-    linear-gradient(to right, rgba(255, 183, 3, 0.18) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to bottom, rgba(255, 107, 139, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to right, rgba(72, 202, 228, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to bottom, rgba(255, 183, 3, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
-    radial-gradient(circle at 20% 22%, rgba(255, 183, 3, 0.26) 0px, rgba(255, 183, 3, 0) 4px),
-    radial-gradient(circle at 78% 18%, rgba(255, 107, 139, 0.28) 0px, rgba(255, 107, 139, 0) 4px),
+    linear-gradient(to right, rgba(244, 114, 182, 0.22) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(244, 114, 182, 0.22) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to right, rgba(236, 72, 153, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(236, 72, 153, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(circle at 20% 22%, rgba(244, 114, 182, 0.26) 0px, rgba(244, 114, 182, 0) 5px),
+    radial-gradient(circle at 78% 18%, rgba(255, 143, 171, 0.28) 0px, rgba(255, 143, 171, 0) 5px),
     linear-gradient(90deg,
-      rgba(255, 107, 139, 0) 0%,
-      rgba(255, 107, 139, 0.15) 15%,
-      rgba(255, 183, 3, 0.17) 25%,
-      rgba(72, 202, 228, 0.13) 35%,
-      rgba(255, 107, 139, 0) 50%,
-      rgba(255, 107, 139, 0.15) 65%,
-      rgba(255, 183, 3, 0.17) 75%,
-      rgba(72, 202, 228, 0.13) 85%,
-      rgba(255, 107, 139, 0) 100%),
-    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(255, 183, 3, 0.24), rgba(255, 183, 3, 0) 70%),
-    radial-gradient(ellipse 75% 45% at 50% 100%, rgba(255, 107, 139, 0.22), rgba(31, 17, 48, 0) 75%),
-    linear-gradient(180deg, #1b0e2a 0%, #2b193d 48%, #4a1942 100%);
+      rgba(255, 182, 193, 0) 0%,
+      rgba(255, 182, 193, 0.22) 15%,
+      rgba(255, 255, 255, 0.65) 25%,
+      rgba(251, 207, 232, 0.28) 35%,
+      rgba(255, 182, 193, 0) 50%,
+      rgba(255, 182, 193, 0.22) 65%,
+      rgba(255, 255, 255, 0.65) 75%,
+      rgba(251, 207, 232, 0.28) 85%,
+      rgba(255, 182, 193, 0) 100%),
+    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(255, 182, 193, 0.32), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 75% 45% at 50% 100%, rgba(251, 207, 232, 0.38), rgba(255, 255, 255, 0) 75%),
+    linear-gradient(180deg, #ffffff 0%, #fff7fa 52%, #ffeef5 100%);
   background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px, 160px 160px, 180px 180px, 200% 100%, auto, auto, auto;
   animation: sakuraFloorMeshSnap 14s linear infinite;
 }
 html[data-skin="sakura"] .front-of-room {
   font-family: var(--sakura-font-display);
   letter-spacing: 0.06em;
-  background: linear-gradient(90deg, #ff6b8b, #ffb703, #48cae4);
-  border: 2px solid #ffffff;
-  color: #2b193d;
-  box-shadow: 0 4px 0 #3c1642, 0 0 18px rgba(255, 183, 3, 0.65);
+  background: linear-gradient(90deg, #ffffff, #ffd6e7, #ff8fab, #ffd6e7, #ffffff);
+  border: 2px solid #f472b6;
+  color: #831843;
+  box-shadow: 0 4px 0 #f9a8d4, 0 0 16px rgba(244, 114, 182, 0.35);
 }
 html[data-skin="sakura"] .zoom-chip,
 html[data-skin="sakura"] .zoom-chip.is-dragging {
   font-family: var(--sakura-font-ui);
-  background: #2b193d;
-  border: 2px solid #ffb703;
-  color: #fff5f7;
-  box-shadow: 0 0 0 2px #ff6b8b, 0 6px 16px rgba(20, 10, 32, 0.65);
+  background: #ffffff;
+  border: 2px solid #f472b6;
+  color: #831843;
+  box-shadow: 0 0 0 2px #ffe4ee, 0 6px 16px rgba(244, 114, 182, 0.25);
 }
 html[data-skin="sakura"] .zoom-chip-label,
 html[data-skin="sakura"] .zoom-chip-btn,
 html[data-skin="sakura"] .zoom-chip-fit {
   font-family: var(--sakura-font-ui);
-  color: #fff3b0;
+  color: #9d174d;
   font-weight: 800;
 }
 html[data-skin="sakura"] #zoomReadout {
-  color: #ff6b8b;
+  color: #db2777;
   font-family: var(--sakura-font-display);
 }
 html[data-skin="sakura"] #btnToggleSidePanels.side-panels-tab {
   font-family: var(--sakura-font-ui);
-  background: #2b193d;
-  color: #fff3b0;
-  border: 2px solid #ffb703;
-  box-shadow: 0 3px 0 #ff6b8b;
+  background: #fff0f5;
+  color: #831843;
+  border: 2px solid #f472b6;
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 
 /* =====================================================================
-   DESKS, FESTIVAL SEALS, FULL BLOOM STREAK & SAKURA PETAL BURST
+   DESKS, PASTEL BLOSSOM SEALS, FULL BLOOM STREAK & PETAL BURST
    ===================================================================== */
 html[data-skin="sakura"] .desk-team-row {
   position: relative;
 }
 html[data-skin="sakura"] .desk-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fff5f7 55%, #ffe3ec 100%);
-  border: 2px solid #ffb703;
+  background: linear-gradient(180deg, #ffffff 0%, #fff9fb 62%, #ffe4ee 100%);
+  border: 2px solid #f472b6;
   transform: translateY(-5px);
   box-shadow:
-    0 0 0 2px #ff6b8b,
-    0 7px 0 #6e2046,
-    0 12px 0 #2b193d;
+    0 0 0 2px #ffffff,
+    0 6px 0 #f9a8d4,
+    0 11px 0 #f472b6;
 }
 html[data-skin="sakura"] .desk-card:hover {
   transform: translateY(-7px);
   box-shadow:
-    0 0 0 2px #ffb703,
-    0 9px 0 #9d2246,
-    0 14px 0 #2b193d,
-    0 0 22px rgba(255, 107, 139, 0.6);
+    0 0 0 2px #ffffff,
+    0 8px 0 #f472b6,
+    0 13px 0 #ec4899,
+    0 0 20px rgba(244, 114, 182, 0.45);
 }
 html[data-skin="sakura"] .desk-card.spotlight-active {
   transform: translateY(-7px) scale(1.06);
   box-shadow:
-    0 0 0 4px #ffb703,
-    0 8px 0 #2b193d,
-    0 0 28px rgba(255, 107, 139, 0.85) !important;
+    0 0 0 4px #ec4899,
+    0 8px 0 #db2777,
+    0 0 26px rgba(244, 114, 182, 0.65) !important;
 }
 html[data-skin="sakura"] .desk-card.sakura-tier-1,
 html[data-skin="sakura"] .desk-card.sakura-tier-2,
@@ -526,28 +538,28 @@ html[data-skin="sakura"] .desk-card.sakura-tier-3 {
   z-index: 12;
 }
 html[data-skin="sakura"] .desk-card.sakura-tier-1 {
-  background: linear-gradient(180deg, #fffbeb 0%, #fff3b0 48%, #ffffff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #ffd6e7 52%, #fff0f5 100%);
   box-shadow:
-    0 0 0 3px #ffb703,
-    0 7px 0 #b45309,
-    0 12px 0 #2b193d,
-    0 0 24px rgba(255, 183, 3, 0.75);
+    0 0 0 3px #ec4899,
+    0 7px 0 #f472b6,
+    0 12px 0 #db2777,
+    0 0 22px rgba(244, 114, 182, 0.55);
 }
 html[data-skin="sakura"] .desk-card.sakura-tier-2 {
-  background: linear-gradient(180deg, #f0f9ff 0%, #caf0f8 48%, #ffffff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 52%, #fdf2f8 100%);
   box-shadow:
-    0 0 0 3px #48cae4,
-    0 7px 0 #0077b6,
-    0 12px 0 #2b193d,
-    0 0 20px rgba(72, 202, 228, 0.6);
+    0 0 0 3px #f472b6,
+    0 7px 0 #f9a8d4,
+    0 12px 0 #ec4899,
+    0 0 18px rgba(249, 168, 212, 0.55);
 }
 html[data-skin="sakura"] .desk-card.sakura-tier-3 {
-  background: linear-gradient(180deg, #fff0f3 0%, #ffccd5 48%, #ffffff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #ffe4e6 52%, #fff1f2 100%);
   box-shadow:
-    0 0 0 3px #ff6b8b,
-    0 7px 0 #9d2246,
-    0 12px 0 #2b193d,
-    0 0 20px rgba(255, 107, 139, 0.6);
+    0 0 0 3px #fb7185,
+    0 7px 0 #fda4af,
+    0 12px 0 #f43f5e,
+    0 0 18px rgba(251, 113, 133, 0.45);
 }
 html[data-skin="sakura"] .sakura-tier-badge {
   display: inline-block;
@@ -563,22 +575,22 @@ html[data-skin="sakura"] .sakura-tier-badge {
   padding: 4px 9px;
   border-radius: 999px;
   border: 2px solid #ffffff;
-  color: #2b193d;
+  color: #831843;
   letter-spacing: .02em;
-  box-shadow: 0 3px 0 #2b193d;
+  box-shadow: 0 3px 0 #db2777;
   transform: rotate(-6deg);
 }
 html[data-skin="sakura"] .sakura-tier-1 .sakura-tier-badge {
-  background: linear-gradient(145deg, #fff3b0, #ffb703);
-  color: #422006;
+  background: linear-gradient(145deg, #ffffff, #ff8fab);
+  color: #831843;
 }
 html[data-skin="sakura"] .sakura-tier-2 .sakura-tier-badge {
-  background: linear-gradient(145deg, #caf0f8, #48cae4);
-  color: #03045e;
+  background: linear-gradient(145deg, #ffffff, #fbcfe8);
+  color: #831843;
 }
 html[data-skin="sakura"] .sakura-tier-3 .sakura-tier-badge {
-  background: linear-gradient(145deg, #ffe3ec, #ff6b8b);
-  color: #ffffff;
+  background: linear-gradient(145deg, #ffffff, #fecdd3);
+  color: #881337;
 }
 html[data-skin="sakura"] .desk-action-btn,
 html[data-skin="sakura"] .desk-action-btn:hover,
@@ -587,10 +599,10 @@ html[data-skin="sakura"] .score-step:hover,
 html[data-skin="sakura"] .team-score-step,
 html[data-skin="sakura"] .team-score-step:hover {
   font-family: var(--sakura-font-ui);
-  border: 1.5px solid #9d2246;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0, #ffb703);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 1.5px solid #f472b6;
+  color: #831843;
+  background-image: linear-gradient(180deg, #ffffff, #ffe4ee);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] .desk-action-btn[data-desk-plus],
 html[data-skin="sakura"] .desk-action-btn[data-desk-plus]:hover,
@@ -603,10 +615,10 @@ html[data-skin="sakura"] .score-step[data-grp-plus]:hover,
 html[data-skin="sakura"] .team-score-step[data-grp-plus],
 html[data-skin="sakura"] .team-score-step[data-grp-plus]:hover {
   font-family: var(--sakura-font-ui);
-  border: 1.5px solid #fff3b0;
+  border: 1.5px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b, #e63966 55%, #9d2246);
-  box-shadow: 0 3px 0 #4a154b;
+  background-image: linear-gradient(135deg, #ff8fab, #f472b6 55%, #ec4899);
+  box-shadow: 0 3px 0 #db2777;
 }
 html[data-skin="sakura"] .sakura-fire.is-on {
   display: inline-flex;
@@ -624,14 +636,14 @@ html[data-skin="sakura"] .sakura-fire.is-on {
   line-height: 1;
   padding: 4px 9px;
   border-radius: 999px;
-  border: 1.5px solid #fff3b0;
+  border: 1.5px solid #ffffff;
   color: #ffffff;
-  background: linear-gradient(90deg, #e63966 0%, #ff6b8b 48%, #ffb703 100%);
+  background: linear-gradient(90deg, #ff8fab 0%, #f472b6 50%, #ec4899 100%);
   box-shadow:
-    0 0 0 2px #6e2046,
-    0 3px 0 #3c1642,
-    0 0 14px rgba(255, 107, 139, 0.85);
-  text-shadow: 0 1px 2px #3c1642;
+    0 0 0 2px #fbcfe8,
+    0 3px 0 #db2777,
+    0 0 12px rgba(244, 114, 182, 0.65);
+  text-shadow: 0 1px 2px rgba(131, 24, 67, 0.45);
   animation: sakuraPulse 0.9s ease-in-out infinite;
 }
 html[data-skin="sakura"] .sakura-flower-svg {
@@ -650,9 +662,9 @@ html[data-skin="sakura"] .sakura-burst {
   font-weight: 800;
   font-size: 1.65rem;
   z-index: 80;
-  color: #ffb703;
-  -webkit-text-stroke: 1.5px #2b193d;
-  text-shadow: 0 3px 0 #2b193d, 0 0 16px #ff6b8b;
+  color: #ec4899;
+  -webkit-text-stroke: 1.5px #ffffff;
+  text-shadow: 0 3px 0 #fbcfe8, 0 0 14px rgba(244, 114, 182, 0.65);
   animation: sakuraPopUp 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 html[data-skin="sakura"] .sakura-burst::before {
@@ -661,78 +673,79 @@ html[data-skin="sakura"] .sakura-burst::before {
 }
 
 /* =====================================================================
-   LEADERBOARD CARD
+   LEADERBOARD CARD (Soft White & Sakura Blush)
    ===================================================================== */
 html[data-skin="sakura"] #leaderboardCard {
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 55%, #591c47 100%);
-  border: 3px solid #ffb703;
-  color: #fff5f7;
-  box-shadow: 0 0 0 3px #ff6b8b, 0 12px 28px rgba(20, 10, 32, 0.65);
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 52%, #ffe4ee 100%);
+  border: 3px solid #f472b6;
+  color: #831843;
+  box-shadow: 0 0 0 3px #ffffff, 0 12px 26px rgba(244, 114, 182, 0.25);
 }
 html[data-skin="sakura"] #leaderboardCard .panel-title-bar,
 html[data-skin="sakura"] #leaderboardPanel .bg-slate-50\/70,
 html[data-skin="sakura"] #leaderboardPanel .border-b {
-  background: linear-gradient(90deg, #3c1642, #6e2046);
-  border-color: rgba(255, 183, 3, 0.45);
-  color: #fff3b0;
+  background: linear-gradient(90deg, #fff0f5, #ffe4ee);
+  border-color: #f9a8d4;
+  color: #831843;
 }
 html[data-skin="sakura"] #leaderboardCard .panel-title-bar h2 {
   font-family: var(--sakura-font-display);
   letter-spacing: 0.03em;
+  color: #831843;
 }
 html[data-skin="sakura"] #btnOpenPodiumModal,
 html[data-skin="sakura"] #btnOpenPodiumModal:hover {
   font-family: var(--sakura-font-ui);
   border: 2px solid #ffffff;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0 0%, #ffb703 100%);
-  box-shadow: 0 3px 0 #6e2046;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777;
 }
 html[data-skin="sakura"] #tabLbStudents,
 html[data-skin="sakura"] #tabLbGroups,
 html[data-skin="sakura"] #tabLbFeed {
   font-family: var(--sakura-font-ui);
-  color: #fde2e8;
+  color: #9d174d;
 }
 html[data-skin="sakura"] #tabLbStudents.shadow-sm,
 html[data-skin="sakura"] #tabLbGroups.shadow-sm,
 html[data-skin="sakura"] #tabLbFeed.shadow-sm {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #fff3b0;
-  color: #3c1642;
-  background-image: linear-gradient(135deg, #fff3b0 0%, #ffb703 50%, #ff6b8b 100%);
-  box-shadow: 0 2px 0 #6e2046;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-image: linear-gradient(135deg, #ffffff 0%, #ffd6e7 100%);
+  box-shadow: 0 2px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #lbSearchInput {
   font-family: var(--sakura-font-ui);
-  background: #1b0e2a;
-  color: #fff5f7;
-  border: 2px solid #ffb703;
+  background: #ffffff;
+  color: #831843;
+  border: 2px solid #f472b6;
 }
 html[data-skin="sakura"] #leaderboardCard h2,
 html[data-skin="sakura"] #leaderboardBody .text-slate-800,
 html[data-skin="sakura"] #leaderboardBody .text-slate-400,
 html[data-skin="sakura"] #leaderboardBody .text-slate-600 {
-  color: #fff5f7;
+  color: #831843;
 }
 html[data-skin="sakura"] #leaderboardBody > .border-slate-100,
 html[data-skin="sakura"] #leaderboardBody > .border-slate-100:hover {
-  background: #3c1642;
-  border-color: rgba(255, 183, 3, 0.25);
-  color: #fff5f7;
+  background: #ffffff;
+  border-color: #fbcfe8;
+  color: #831843;
 }
 html[data-skin="sakura"] #leaderboardBody > .sakura-tier-1 {
-  background: linear-gradient(90deg, #9a3412, #3c1642 65%);
-  box-shadow: inset 5px 0 0 #ffb703;
+  background: linear-gradient(90deg, #ffd6e7, #ffffff 70%);
+  box-shadow: inset 5px 0 0 #ec4899;
 }
 html[data-skin="sakura"] #leaderboardBody > .sakura-tier-2 {
-  background: linear-gradient(90deg, #0077b6, #3c1642 65%);
-  box-shadow: inset 5px 0 0 #48cae4;
+  background: linear-gradient(90deg, #fce7f3, #ffffff 70%);
+  box-shadow: inset 5px 0 0 #f472b6;
 }
 html[data-skin="sakura"] #leaderboardBody > .sakura-tier-3 {
-  background: linear-gradient(90deg, #9d2246, #3c1642 65%);
-  box-shadow: inset 5px 0 0 #ff6b8b;
+  background: linear-gradient(90deg, #ffe4e6, #ffffff 70%);
+  box-shadow: inset 5px 0 0 #fb7185;
 }
 html[data-skin="sakura"] .sakura-fire-mini {
   display: inline-flex;
@@ -742,319 +755,319 @@ html[data-skin="sakura"] .sakura-fire-mini {
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 999px;
-  border: 1.5px solid #fff3b0;
-  background: linear-gradient(90deg, #ff6b8b, #ffb703);
-  color: #2b193d;
+  border: 1.5px solid #ffffff;
+  background: linear-gradient(90deg, #ff8fab, #f472b6);
+  color: #ffffff;
 }
 
 /* =====================================================================
-   POP-UP WINDOWS: 1. TIMER (#timerPopover) — Solid Lacquer-Plum Shell
+   POP-UP WINDOWS: 1. TIMER (#timerPopover) — Solid Pastel Sakura Blush Shell
    ===================================================================== */
 html[data-skin="sakura"] #timerPopover {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 52%, #591c47 85%, #6e2046 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 48%, #ffe4ee 82%, #ffd6e7 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
   box-shadow:
-    0 0 0 3px #ff6b8b,
-    0 18px 38px rgba(20, 10, 32, 0.85);
+    0 0 0 3px #ffffff,
+    0 18px 36px rgba(219, 39, 119, 0.28);
 }
 html[data-skin="sakura"] #timerPopover h3 {
   font-family: var(--sakura-font-display);
   letter-spacing: 0.02em;
-  color: #fff3b0;
+  color: #831843;
 }
 html[data-skin="sakura"] #timerPopover .text-slate-400,
 html[data-skin="sakura"] #timerPopover .text-slate-800 {
-  color: #fde2e8;
+  color: #9d174d;
 }
 html[data-skin="sakura"] #timerPopover .border-b,
 html[data-skin="sakura"] #timerPopover .border-t {
-  border-color: rgba(255, 183, 3, 0.45);
+  border-color: #f9a8d4;
 }
 html[data-skin="sakura"] #btnCloseTimerPopover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  background: #1b0e2a;
-  color: #fff3b0;
+  border: 2px solid #f472b6;
+  background: #ffffff;
+  color: #831843;
 }
 html[data-skin="sakura"] #timerCardBox {
-  background-color: #1b0e2a;
+  background-color: #ffffff;
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(255, 107, 139, 0.25), rgba(255, 107, 139, 0) 55%),
-    linear-gradient(135deg, #1b0e2a 0%, #2b193d 52%, #591c47 100%);
-  border: 2px solid #ffb703;
+    radial-gradient(ellipse at 20% 0%, rgba(255, 182, 193, 0.35), rgba(255, 255, 255, 0) 58%),
+    linear-gradient(135deg, #ffffff 0%, #fff5f8 55%, #ffe4ee 100%);
+  border: 2px solid #f472b6;
   box-shadow:
-    inset 0 0 24px rgba(255, 183, 3, 0.25),
-    0 6px 16px rgba(20, 10, 32, 0.65);
+    inset 0 0 20px rgba(244, 114, 182, 0.18),
+    0 6px 14px rgba(244, 114, 182, 0.18);
 }
 html[data-skin="sakura"] #timerBigDisplay {
   font-family: var(--sakura-font-display);
-  font-size: clamp(2.85rem, 6.5vw, 3.85rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(2.45rem, 5.6vw, 3.35rem);
+  letter-spacing: 0.01em;
   line-height: 1.08;
   max-width: 100%;
   display: block;
-  color: #fff3b0;
-  text-shadow: 0 0 14px rgba(255, 183, 3, 0.8), 0 0 24px rgba(255, 107, 139, 0.55);
+  color: #db2777;
+  text-shadow: 0 2px 0 #ffffff, 0 0 14px rgba(244, 114, 182, 0.35);
 }
 html[data-skin="sakura"] #timerStatusText {
   font-family: var(--sakura-font-ui);
-  color: #ffccd5;
+  color: #9d174d;
   font-weight: 800;
 }
 html[data-skin="sakura"] #timerProgressBar {
-  background: linear-gradient(90deg, #ff6b8b, #ffb703, #48cae4);
+  background: linear-gradient(90deg, #ff8fab, #f472b6, #ec4899);
   height: 6px;
 }
 html[data-skin="sakura"] #timerPopover button,
 html[data-skin="sakura"] #timerPopover button:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  color: #3c1642;
-  background-color: #fff5f7;
-  background-image: linear-gradient(180deg, #ffffff 0%, #ffe3ec 100%);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #timerPopover #btnTimerStartPause,
 html[data-skin="sakura"] #timerPopover #btnTimerStartPause:hover {
   font-family: var(--sakura-font-display);
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #e63966 55%, #9d2246 100%);
-  box-shadow: 0 4px 0 #4a154b, 0 0 14px rgba(255, 107, 139, 0.55);
+  background-image: linear-gradient(135deg, #ff8fab 0%, #f472b6 55%, #ec4899 100%);
+  box-shadow: 0 4px 0 #db2777, 0 0 12px rgba(244, 114, 182, 0.45);
 }
 html[data-skin="sakura"] #customTimerMin,
 html[data-skin="sakura"] #customTimerSec,
 html[data-skin="sakura"] #customTimerMinInput,
 html[data-skin="sakura"] #customTimerSecInput {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  background: #1b0e2a;
-  color: #fff3b0;
+  border: 2px solid #f472b6;
+  background: #ffffff;
+  color: #831843;
 }
 
 /* =====================================================================
-   POP-UP WINDOWS: 2. RANDOM (#pickerModal) — Dim Scrim + Solid Plum Shell
+   POP-UP WINDOWS: 2. RANDOM (#pickerModal) — Soft Scrim + Pastel Blush Shell
    ===================================================================== */
 html[data-skin="sakura"] #pickerModal {
-  background-color: rgba(20, 10, 32, 0.72);
+  background-color: rgba(131, 24, 67, 0.36);
 }
 html[data-skin="sakura"] #pickerModal .picker-dialog {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 52%, #591c47 85%, #6e2046 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 48%, #ffe4ee 82%, #ffd6e7 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
   box-shadow:
-    0 0 0 3px #ff6b8b,
-    0 22px 44px rgba(20, 10, 32, 0.85);
+    0 0 0 3px #ffffff,
+    0 22px 44px rgba(219, 39, 119, 0.28);
 }
 html[data-skin="sakura"] #pickerModal .bg-gradient-to-r {
-  background-color: #1b0e2a;
-  background-image: linear-gradient(90deg, #1b0e2a 0%, #4a1942 52%, #9d2246 100%);
-  color: #fff3b0;
-  border-bottom: 3px solid #ffb703;
+  background-color: #fff0f5;
+  background-image: linear-gradient(90deg, #ffffff 0%, #fff0f5 48%, #ffd6e7 100%);
+  color: #831843;
+  border-bottom: 3px solid #f472b6;
 }
 html[data-skin="sakura"] #pickerModal .bg-gradient-to-r h2 {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
+  color: #831843;
 }
 html[data-skin="sakura"] #pickerModal #btnClosePickerModal {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  background: #1b0e2a;
-  color: #fff3b0;
+  border: 2px solid #f472b6;
+  background: #ffffff;
+  color: #831843;
 }
 html[data-skin="sakura"] #pickerModal .bg-slate-100 {
-  background: #1b0e2a;
-  border: 2px solid #ff6b8b;
+  background: #ffffff;
+  border: 2px solid #f9a8d4;
 }
 html[data-skin="sakura"] #pickerModal #btnPickerTypeStudent,
 html[data-skin="sakura"] #pickerModal #btnPickerTypeGroup {
   font-family: var(--sakura-font-ui);
-  background: #2b193d;
-  color: #fde2e8;
-  border: 1.5px solid rgba(255, 183, 3, 0.4);
+  background: #fff5f8;
+  color: #9d174d;
+  border: 1.5px solid #f9a8d4;
 }
 html[data-skin="sakura"] #pickerModal #btnPickerTypeStudent.shadow-sm,
 html[data-skin="sakura"] #pickerModal #btnPickerTypeGroup.shadow-sm {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #9d2246 100%);
-  box-shadow: 0 3px 0 #3c1642;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777;
 }
 html[data-skin="sakura"] #pickerStudentOptions {
-  background: #211130;
-  color: #fff5f7;
-  border: 2px solid #ff6b8b;
+  background: #ffffff;
+  color: #831843;
+  border: 2px solid #f9a8d4;
 }
 html[data-skin="sakura"] #pickerStudentOptions label,
 html[data-skin="sakura"] #pickerStudentOptions span {
-  color: #fde2e8;
+  color: #831843;
 }
 html[data-skin="sakura"] #pickerGroupFilter {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  background: #1b0e2a;
-  color: #fff3b0;
+  border: 2px solid #f472b6;
+  background: #ffffff;
+  color: #831843;
 }
 html[data-skin="sakura"] #pickerStageBox {
-  background-color: #1b0e2a;
+  background-color: #ffffff;
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(255, 183, 3, 0.25), rgba(255, 183, 3, 0) 55%),
-    radial-gradient(ellipse at 80% 100%, rgba(255, 107, 139, 0.25), rgba(255, 107, 139, 0) 55%),
-    linear-gradient(135deg, #1b0e2a 0%, #3c1642 55%, #6e2046 100%);
-  border: 2px solid #ffb703;
+    radial-gradient(ellipse at 20% 0%, rgba(255, 182, 193, 0.35), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(244, 114, 182, 0.22), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, #ffffff 0%, #fff5f8 55%, #ffe4ee 100%);
+  border: 2px solid #f472b6;
   box-shadow:
-    inset 0 0 28px rgba(255, 107, 139, 0.3),
-    0 8px 20px rgba(20, 10, 32, 0.65);
+    inset 0 0 22px rgba(244, 114, 182, 0.18),
+    0 8px 18px rgba(244, 114, 182, 0.18);
 }
 html[data-skin="sakura"] #pickerBadge {
   font-family: var(--sakura-font-display);
-  background: linear-gradient(180deg, #fff3b0, #ffb703);
-  color: #422006;
-  border: 2px solid #ffffff;
+  background: linear-gradient(180deg, #ffffff, #ffd6e7);
+  color: #831843;
+  border: 2px solid #f472b6;
 }
 html[data-skin="sakura"] #pickerResultTitle {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
-  text-shadow: 0 0 14px rgba(255, 183, 3, 0.75), 0 0 24px rgba(255, 107, 139, 0.6);
+  color: #db2777;
+  text-shadow: 0 2px 0 #ffffff, 0 0 14px rgba(244, 114, 182, 0.35);
 }
 html[data-skin="sakura"] #pickerResultSub {
   font-family: var(--sakura-font-ui);
-  color: #ffccd5;
+  color: #9d174d;
 }
 html[data-skin="sakura"] #pickerCurrentScorePill {
   font-family: var(--sakura-font-ui);
-  background: #1b0e2a;
-  border: 2px solid #ffb703;
-  color: #fff3b0;
+  background: #ffffff;
+  border: 2px solid #f472b6;
+  color: #831843;
 }
 html[data-skin="sakura"] #btnPickerPlusOne,
 html[data-skin="sakura"] #btnPickerPlusOne:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #9d2246 100%);
-  box-shadow: 0 3px 0 #3c1642;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777;
 }
 html[data-skin="sakura"] #btnPickerMinusOne,
 html[data-skin="sakura"] #btnPickerMinusOne:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffffff;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0 0%, #ffb703 100%);
-  box-shadow: 0 3px 0 #6e2046;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffe4ee 100%);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #pickerModal #btnTriggerRandomPick,
 html[data-skin="sakura"] #pickerModal #btnTriggerRandomPick:hover {
   font-family: var(--sakura-font-display);
   border: 2px solid #ffffff;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0 0%, #ffb703 55%, #f48c06 100%);
-  box-shadow: 0 5px 0 #9d2246, 0 0 18px rgba(255, 183, 3, 0.65);
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #f472b6 55%, #ec4899 100%);
+  box-shadow: 0 5px 0 #db2777, 0 0 16px rgba(244, 114, 182, 0.45);
 }
 
 /* =====================================================================
-   POP-UP WINDOWS: 3. BOARD (Whiteboard .wb-sheet) — Solid Lacquer-Plum Shell
+   POP-UP WINDOWS: 3. BOARD (Whiteboard .wb-sheet) — Solid Pastel Blush Shell
    ===================================================================== */
 html[data-skin="sakura"] .wb-sheet {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(145deg, #211130 0%, #3c1642 52%, #591c47 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
+  background-color: #ffe4ee;
+  background-image: linear-gradient(145deg, #ffffff 0%, #fff0f5 52%, #ffe4ee 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
 }
 html[data-skin="sakura"] .wb-bar {
-  background-color: #1b0e2a;
-  background-image: linear-gradient(90deg, #1b0e2a 0%, #4a1942 52%, #9d2246 100%);
-  color: #fff5f7;
-  border-bottom: 3px solid #ffb703;
-  box-shadow: inset 0 -2px 0 #ff6b8b, 0 4px 12px rgba(20, 10, 32, 0.65);
+  background-color: #fff0f5;
+  background-image: linear-gradient(90deg, #ffffff 0%, #fff0f5 52%, #ffd6e7 100%);
+  color: #831843;
+  border-bottom: 3px solid #f472b6;
+  box-shadow: inset 0 -2px 0 #fbcfe8, 0 4px 12px rgba(244, 114, 182, 0.18);
 }
 html[data-skin="sakura"] .wb-stage {
-  background-color: #211130;
-  background-image: linear-gradient(180deg, #211130 0%, #3c1642 100%);
+  background-color: #fff5f8;
+  background-image: linear-gradient(180deg, #fff9fb 0%, #ffe4ee 100%);
   padding: 10px;
 }
 html[data-skin="sakura"] #wbCanvas {
   background: #ffffff;
-  border: 3px solid #ffb703;
+  border: 3px solid #f472b6;
   border-radius: 14px;
-  box-shadow: 0 0 0 2px #ff6b8b, 0 10px 28px rgba(20, 10, 32, 0.65);
+  box-shadow: 0 0 0 2px #ffffff, 0 10px 24px rgba(244, 114, 182, 0.22);
 }
 html[data-skin="sakura"] .wb-title {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
+  color: #831843;
 }
 html[data-skin="sakura"] .wb-tool,
 html[data-skin="sakura"] .wb-close {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  color: #3c1642;
-  background-color: #fff5f7;
-  background-image: linear-gradient(180deg, #ffffff 0%, #ffe3ec 100%);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] .wb-tool:hover,
 html[data-skin="sakura"] .wb-close:hover {
-  background-image: linear-gradient(180deg, #fff3b0 0%, #ffb703 100%);
-  color: #422006;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffd6e7 100%);
+  color: #831843;
 }
 html[data-skin="sakura"] .wb-tool[aria-pressed="true"] {
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #9d2246 100%);
-  box-shadow: 0 3px 0 #3c1642, 0 0 12px rgba(255, 107, 139, 0.65);
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777, 0 0 12px rgba(244, 114, 182, 0.45);
 }
 html[data-skin="sakura"] .wb-swatch {
-  box-shadow: 0 0 0 2px #2b193d;
+  box-shadow: 0 0 0 2px #f472b6;
 }
 html[data-skin="sakura"] .wb-colour-pop,
 html[data-skin="sakura"] .wb-confirm-card {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 60%, #591c47 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
-  box-shadow: 0 0 0 2px #ff6b8b, 0 12px 28px rgba(20, 10, 32, 0.8);
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 60%, #ffe4ee 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
+  box-shadow: 0 0 0 2px #ffffff, 0 12px 24px rgba(219, 39, 119, 0.25);
 }
 html[data-skin="sakura"] .wb-colour-heading,
 html[data-skin="sakura"] .wb-confirm-card p {
-  color: #fff3b0;
+  color: #831843;
 }
 html[data-skin="sakura"] #wbConfirmCancel,
 html[data-skin="sakura"] #wbConfirmCancel:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  background: #fff5f7;
-  color: #3c1642;
-  box-shadow: 0 3px 0 #6e2046;
+  border: 2px solid #f472b6;
+  background: #ffffff;
+  color: #831843;
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #wbConfirmClear,
 html[data-skin="sakura"] #wbConfirmClear:hover {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #fff3b0;
-  background-image: linear-gradient(180deg, #ff6b8b 0%, #e11d48 100%);
+  border: 2px solid #ffffff;
+  background-image: linear-gradient(180deg, #ff8fab 0%, #e11d48 100%);
   color: #ffffff;
-  box-shadow: 0 3px 0 #881337;
+  box-shadow: 0 3px 0 #9f1239;
 }
 
 /* =====================================================================
-   POP-UP WINDOWS: 4. CHANCE (Twilight Festival Lantern Card)
-   - Full-screen overlay stays a dim scrim so the classroom remains visible.
-   - Inner Chance panel shell has a solid lacquer-plum fill + #ffb703 border.
-   - Darkened card face restyles the prompt text to warm lantern gold (#fff3b0).
+   POP-UP WINDOWS: 4. CHANCE (White-Pink Sakura Blossom Card)
+   - Full-screen overlay stays a soft rosy dim scrim so the classroom remains visible.
+   - Inner Chance panel shell has a solid pastel sakura blush fill (#ffe4ee) + #f472b6 border.
+   - Soft white-pink card face pairs with deep sakura-berry prompt text (#831843).
    ===================================================================== */
 html[data-skin="sakura"] #chanceSheet,
 html[data-skin="sakura"] #chanceModal,
 html[data-skin="sakura"] .chance-sheet,
 html[data-skin="sakura"] .chance-modal,
 html[data-skin="sakura"] .sakura-chance-sheet {
-  background-color: rgba(20, 10, 32, 0.72);
+  background-color: rgba(131, 24, 67, 0.36);
   background-image: none;
   border: 0;
   box-shadow: none;
@@ -1073,13 +1086,13 @@ html[data-skin="sakura"] .chance-modal > div,
 html[data-skin="sakura"] #chancePopover,
 html[data-skin="sakura"] .sakura-chance-panel:not(#chanceSheet):not(#chanceModal):not(.chance-sheet):not(.chance-modal):not(.fixed) {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 52%, #591c47 85%, #6e2046 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 48%, #ffe4ee 82%, #ffd6e7 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
   box-shadow:
-    0 0 0 3px #ff6b8b,
-    0 22px 44px rgba(20, 10, 32, 0.85);
+    0 0 0 3px #ffffff,
+    0 22px 44px rgba(219, 39, 119, 0.28);
 }
 html[data-skin="sakura"] #chanceSheet .chance-bar,
 html[data-skin="sakura"] #chanceSheet .chance-header,
@@ -1094,11 +1107,11 @@ html[data-skin="sakura"] .chance-head,
 html[data-skin="sakura"] #chanceBar,
 html[data-skin="sakura"] #chanceHeader,
 html[data-skin="sakura"] .sakura-chance-bar {
-  background-color: #1b0e2a;
-  background-image: linear-gradient(90deg, #1b0e2a 0%, #4a1942 52%, #9d2246 100%);
-  color: #fff3b0;
-  border-bottom: 3px solid #ffb703;
-  box-shadow: inset 0 -2px 0 #ff6b8b;
+  background-color: #fff0f5;
+  background-image: linear-gradient(90deg, #ffffff 0%, #fff0f5 52%, #ffd6e7 100%);
+  color: #831843;
+  border-bottom: 3px solid #f472b6;
+  box-shadow: inset 0 -2px 0 #fbcfe8;
 }
 html[data-skin="sakura"] #chanceTitle,
 html[data-skin="sakura"] #chanceSheetTitle,
@@ -1108,8 +1121,8 @@ html[data-skin="sakura"] .chance-bar h3,
 html[data-skin="sakura"] .chance-header h2,
 html[data-skin="sakura"] .chance-header h3 {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
-  text-shadow: 0 2px 6px rgba(20, 10, 32, 0.8);
+  color: #831843;
+  text-shadow: 0 1px 0 #ffffff;
 }
 html[data-skin="sakura"] #chanceCard,
 html[data-skin="sakura"] #chanceCardBox,
@@ -1122,16 +1135,16 @@ html[data-skin="sakura"] .chance-card-face,
 html[data-skin="sakura"] .chance-card-body,
 html[data-skin="sakura"] .sakura-chance-card {
   font-family: var(--sakura-font-ui);
-  background-color: #1b0e2a;
+  background-color: #ffffff;
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(255, 183, 3, 0.25), rgba(255, 183, 3, 0) 55%),
-    radial-gradient(ellipse at 80% 100%, rgba(255, 107, 139, 0.25), rgba(255, 107, 139, 0) 55%),
-    linear-gradient(135deg, #1b0e2a 0%, #3c1642 55%, #6e2046 100%);
-  color: #fff3b0;
-  border: 2px solid #ffb703;
+    radial-gradient(ellipse at 20% 0%, rgba(255, 182, 193, 0.35), rgba(255, 255, 255, 0) 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(244, 114, 182, 0.22), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(135deg, #ffffff 0%, #fff5f8 55%, #ffe4ee 100%);
+  color: #831843;
+  border: 2px solid #f472b6;
   box-shadow:
-    inset 0 0 26px rgba(255, 107, 139, 0.3),
-    0 6px 18px rgba(20, 10, 32, 0.65);
+    inset 0 0 22px rgba(244, 114, 182, 0.18),
+    0 6px 16px rgba(244, 114, 182, 0.18);
 }
 html[data-skin="sakura"] #chancePrompt,
 html[data-skin="sakura"] #chancePromptText,
@@ -1159,8 +1172,8 @@ html[data-skin="sakura"] #chanceCardBox p,
 html[data-skin="sakura"] .sakura-chance-card p,
 html[data-skin="sakura"] .sakura-chance-prompt {
   font-family: var(--sakura-font-ui);
-  color: #fff3b0;
-  text-shadow: 0 1px 3px rgba(20, 10, 32, 0.9);
+  color: #831843;
+  text-shadow: 0 1px 0 #ffffff;
 }
 html[data-skin="sakura"] #chanceBonus,
 html[data-skin="sakura"] #chanceBonusLine,
@@ -1169,12 +1182,11 @@ html[data-skin="sakura"] .chance-bonus-line,
 html[data-skin="sakura"] .chance-lucky,
 html[data-skin="sakura"] .sakura-chance-bonus {
   font-family: var(--sakura-font-ui);
-  background: linear-gradient(90deg, rgba(255, 183, 3, 0.28), rgba(255, 107, 139, 0.28));
-  color: #fff3b0;
-  border: 2px solid #ffb703;
+  background: linear-gradient(90deg, #ffffff, #ffd6e7);
+  color: #831843;
+  border: 2px solid #f472b6;
   border-radius: 999px;
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(20, 10, 32, 0.85);
 }
 html[data-skin="sakura"] #chanceSheet button,
 html[data-skin="sakura"] #chanceModal button,
@@ -1184,11 +1196,11 @@ html[data-skin="sakura"] .chance-action,
 html[data-skin="sakura"] .sakura-chance-sheet button,
 html[data-skin="sakura"] .sakura-chance-panel button {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  color: #3c1642;
-  background-color: #fff5f7;
-  background-image: linear-gradient(180deg, #ffffff 0%, #ffe3ec 100%);
-  box-shadow: 0 3px 0 #9d2246;
+  border: 2px solid #f472b6;
+  color: #831843;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+  box-shadow: 0 3px 0 #f9a8d4;
 }
 html[data-skin="sakura"] #btnChanceDraw,
 html[data-skin="sakura"] #btnChanceDraw:hover,
@@ -1209,10 +1221,10 @@ html[data-skin="sakura"] .chance-primary:hover,
 html[data-skin="sakura"] .sakura-chance-draw,
 html[data-skin="sakura"] .sakura-chance-draw:hover {
   font-family: var(--sakura-font-display);
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #e63966 55%, #9d2246 100%);
-  box-shadow: 0 4px 0 #4a154b, 0 0 16px rgba(255, 107, 139, 0.6);
+  background-image: linear-gradient(135deg, #ff8fab 0%, #f472b6 55%, #ec4899 100%);
+  box-shadow: 0 4px 0 #db2777, 0 0 14px rgba(244, 114, 182, 0.45);
 }
 html[data-skin="sakura"] #btnCloseChance,
 html[data-skin="sakura"] #btnCloseChanceSheet,
@@ -1221,10 +1233,10 @@ html[data-skin="sakura"] #chanceClose,
 html[data-skin="sakura"] .chance-close,
 html[data-skin="sakura"] .sakura-chance-close {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #ffb703;
-  background: #1b0e2a;
+  border: 2px solid #f472b6;
+  background: #ffffff;
   background-image: none;
-  color: #fff3b0;
+  color: #831843;
   box-shadow: none;
 }
 
@@ -1238,25 +1250,27 @@ html[data-skin="sakura"] #resetModal,
 html[data-skin="sakura"] #applyGridModal,
 html[data-skin="sakura"] #clearGroupsModal,
 html[data-skin="sakura"] #planSheet {
-  background-color: rgba(20, 10, 32, 0.72);
+  background-color: rgba(131, 24, 67, 0.36);
 }
 html[data-skin="sakura"] #podiumModal > .bg-gradient-to-b {
   font-family: var(--sakura-font-ui);
-  background-color: #211130;
-  background-image: linear-gradient(180deg, #1b0e2a 0%, #3c1642 52%, #6e2046 100%);
-  border: 3px solid #ffb703;
-  box-shadow: 0 0 0 3px #ff6b8b, 0 20px 44px rgba(20, 10, 32, 0.85);
+  background-color: #ffe4ee;
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff0f5 52%, #ffe4ee 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
+  box-shadow: 0 0 0 3px #ffffff, 0 20px 44px rgba(219, 39, 119, 0.28);
 }
 html[data-skin="sakura"] #podiumModal h2 {
   font-family: var(--sakura-font-display);
+  color: #831843;
 }
 html[data-skin="sakura"] #btnDonePodiumModal,
 html[data-skin="sakura"] #btnDonePodiumModal:hover {
   font-family: var(--sakura-font-ui);
   border: 2px solid #ffffff;
-  color: #422006;
-  background-image: linear-gradient(180deg, #fff3b0 0%, #ffb703 100%);
-  box-shadow: 0 3px 0 #6e2046;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777;
 }
 html[data-skin="sakura"] #planSheet .plan-panel,
 html[data-skin="sakura"] #classModal .shadow-2xl,
@@ -1265,19 +1279,19 @@ html[data-skin="sakura"] #resetModal .shadow-2xl,
 html[data-skin="sakura"] #applyGridModal .shadow-2xl,
 html[data-skin="sakura"] #clearGroupsModal .shadow-2xl {
   font-family: var(--sakura-font-ui);
-  background-color: #2b193d;
-  background-image: linear-gradient(155deg, #211130 0%, #3c1642 52%, #591c47 85%, #6e2046 100%);
-  color: #fff5f7;
-  border: 3px solid #ffb703;
-  box-shadow: 0 0 0 3px #ff6b8b, 0 18px 38px rgba(20, 10, 32, 0.85);
+  background-color: #ffe4ee;
+  background-image: linear-gradient(155deg, #ffffff 0%, #fff0f5 52%, #ffe4ee 100%);
+  color: #831843;
+  border: 3px solid #f472b6;
+  box-shadow: 0 0 0 3px #ffffff, 0 18px 36px rgba(219, 39, 119, 0.28);
 }
 html[data-skin="sakura"] #planSheet .plan-bar,
 html[data-skin="sakura"] #classModal .bg-gradient-to-r,
 html[data-skin="sakura"] #groupModal .bg-gradient-to-r {
-  background-color: #1b0e2a;
-  background-image: linear-gradient(90deg, #1b0e2a 0%, #4a1942 52%, #9d2246 100%);
-  color: #fff3b0;
-  border-bottom: 3px solid #ffb703;
+  background-color: #fff0f5;
+  background-image: linear-gradient(90deg, #ffffff 0%, #fff0f5 52%, #ffd6e7 100%);
+  color: #831843;
+  border-bottom: 3px solid #f472b6;
 }
 html[data-skin="sakura"] #planSheet .plan-bar h3,
 html[data-skin="sakura"] #classModal h2,
@@ -1286,7 +1300,7 @@ html[data-skin="sakura"] #resetModal h3,
 html[data-skin="sakura"] #applyGridModal h3,
 html[data-skin="sakura"] #clearGroupsModal h3 {
   font-family: var(--sakura-font-display);
-  color: #fff3b0;
+  color: #831843;
 }
 html[data-skin="sakura"] #planSheet .plan-action,
 html[data-skin="sakura"] #planSheet .plan-action:hover,
@@ -1294,10 +1308,10 @@ html[data-skin="sakura"] #classModal .bg-indigo-600,
 html[data-skin="sakura"] #groupModal .bg-indigo-600,
 html[data-skin="sakura"] #btnConfirmApplyGrid {
   font-family: var(--sakura-font-ui);
-  border: 2px solid #fff3b0;
+  border: 2px solid #ffffff;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #ff6b8b 0%, #9d2246 100%);
-  box-shadow: 0 3px 0 #3c1642;
+  background-image: linear-gradient(135deg, #ff8fab 0%, #ec4899 100%);
+  box-shadow: 0 3px 0 #db2777;
 }
 
 /* =====================================================================
@@ -1322,7 +1336,7 @@ html[data-skin="sakura"] #btnConfirmApplyGrid {
 }
 @keyframes sakuraPulse {
   0%, 100% { filter: brightness(1); transform: translateY(0); }
-  50%      { filter: brightness(1.18); transform: translateY(-1px); }
+  50%      { filter: brightness(1.08); transform: translateY(-1px); }
 }
 @keyframes sakuraPopUp {
   0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.7); }

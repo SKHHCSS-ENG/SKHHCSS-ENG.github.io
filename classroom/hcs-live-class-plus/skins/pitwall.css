@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Russo+One&display=swap');
 
 /* Pitwall skin pack — Grand Prix Telemetry & Papaya Carbon HUD.
-   Carbon-fibre slate #111318, McLaren papaya #ff8000, DRS telemetry teal #00d2be,
+   Carbon-fibre slate #111318, McLaren papaya #ff8000, X-Mode telemetry teal #00d2be,
    and apex kerb crimson #e11d48 / #ffffff.
    Scoped strictly under html[data-skin="pitwall"]. Desk width stays 148px. */
 .pitwall-tier-badge,
@@ -488,7 +488,7 @@ html[data-skin="pitwall"] #btnToggleSidePanels.side-panels-tab {
 }
 
 /* =====================================================================
-   DESKS, TYRE-COMPOUND TIERS, DRS ACTIVE STREAK & FASTEST LAP BURST
+   DESKS, TYRE-COMPOUND TIERS, OVERTAKE BOOST STREAK & FASTEST LAP BURST
    ===================================================================== */
 html[data-skin="pitwall"] .desk-team-row {
   position: relative;

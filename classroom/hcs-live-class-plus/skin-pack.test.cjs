@@ -220,7 +220,7 @@ test('Spark, Arcade, Pitwall, and Sakura packs note, burst, rank, and clear thro
   const pitwallChrome = sandbox.HcsSkinHost.deskChrome(st, t + 2);
   assert.match(pitwallChrome.className, /\bpitwall-tier-1\b/);
   assert.match(pitwallChrome.badge, /class="pitwall-tier-badge">P1 🏆 1st</);
-  assert.match(pitwallChrome.fire, />DRS ACTIVE</);
+  assert.match(pitwallChrome.fire, />OVERTAKE</);
 
   skin = 'sakura';
   assert.equal(sandbox.HcsSkinHost.scoreFloat(1).className, 'sakura-burst');
@@ -254,7 +254,7 @@ test('All packs keep Chance overlays as a dim scrim, use solid non-white window 
     { id: 'spark', js: sparkJs, css: sparkCss, shellBg: '#1a0a3c', shellBorder: '3px solid #00f5d4', promptColor: '#fff7ad' },
     { id: 'arcade', js: arcadeJs, css: arcadeCss, shellBg: '#fefce8', shellBorder: '3px solid #090d16', promptColor: '#fef08a' },
     { id: 'pitwall', js: pitwallJs, css: pitwallCss, shellBg: '#161922', shellBorder: '3px solid #ff8000', promptColor: '#fde68a' },
-    { id: 'sakura', js: sakuraJs, css: sakuraCss, shellBg: '#2b193d', shellBorder: '3px solid #ffb703', promptColor: '#fff3b0' }
+    { id: 'sakura', js: sakuraJs, css: sakuraCss, shellBg: '#ffe4ee', shellBorder: '3px solid #f472b6', promptColor: '#831843' }
   ].forEach(function (pack) {
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*#timerPopover\\s*\\{[\\s\\S]*?background(?:-color)?:\\s*' + pack.shellBg + ';[\\s\\S]*?border:\\s*' + pack.shellBorder + ';'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*#pickerModal\\s*\\.picker-dialog\\s*\\{[\\s\\S]*?background(?:-color)?:\\s*' + pack.shellBg + ';[\\s\\S]*?border:\\s*' + pack.shellBorder + ';'));
