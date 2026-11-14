@@ -1,16 +1,9 @@
 /**
- * HCS Live Class + skin packs.
+ * Skin pack list for HCS Live Class +.
  *
- * Default and Minimalist live on the Plus page. Every other skin is a pack:
- * add skins/<id>.css and skins/<id>.js, then push one row onto `packs`.
- * The page loads this list. It does not need a new style block or button.
- *
- * A pack row:
- *   id        data-skin value and localStorage id
- *   label     SKIN button text
- *   buttonId  DOM id (Spark keeps btnSkinSpark so Ask can click it)
- *   css       stylesheet, after the page style so it wins equal-specificity ties
- *   js        calls HcsSkinHost.register. Loaded after spark-fire.js
+ * Default and Minimalist live in index.html and stay on the original
+ * HCS Live Class page too. Packs listed here are Plus-only add-ons:
+ * each entry supplies its own stylesheet and script under skins/.
  */
 (function (root) {
   var packs = [
@@ -27,21 +20,46 @@
       buttonId: 'btnSkinArcade',
       css: 'skins/arcade.css',
       js: 'skins/arcade.js'
+    },
+    {
+      id: 'pitwall',
+      label: 'Pitwall',
+      buttonId: 'btnSkinPitwall',
+      css: 'skins/pitwall.css',
+      js: 'skins/pitwall.js'
+    },
+    {
+      id: 'sakura',
+      label: 'Sakura',
+      buttonId: 'btnSkinSakura',
+      css: 'skins/sakura.css',
+      js: 'skins/sakura.js'
     }
   ];
 
   function known(id) {
     if (!id) return false;
     for (var i = 0; i < packs.length; i++) {
-      if (packs[i] && packs[i].id === id) return true;
+      if (packs[i].id === id) return true;
     }
     return false;
   }
 
-  root.HcsSkinRegistry = {
+  function byId(id) {
+    for (var i = 0; i < packs.length; i++) {
+      if (packs[i].id === id) return packs[i];
+    }
+    return null;
+  }
+
+  var api = {
     packs: packs,
-    known: known
+    known: known,
+    byId: byId
   };
 
-  if (typeof module === 'object' && module.exports) module.exports = root.HcsSkinRegistry;
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+  root.HcsSkinRegistry = api;
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = api;
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -1,0 +1,1341 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=Russo+One&display=swap');
+
+/* Pitwall skin pack — Grand Prix Telemetry & Papaya Carbon HUD.
+   Carbon-fibre slate #111318, McLaren papaya #ff8000, DRS telemetry teal #00d2be,
+   and apex kerb crimson #e11d48 / #ffffff.
+   Scoped strictly under html[data-skin="pitwall"]. Desk width stays 148px. */
+.pitwall-tier-badge,
+.pitwall-fire,
+.pitwall-fire-mini,
+.pitwall-burst { display: none; }
+
+html[data-skin="pitwall"] {
+  --pitwall-font-display: 'Russo One', 'Chakra Petch', var(--font-display), 'Fredoka', 'Inter', sans-serif;
+  --pitwall-font-ui: 'Chakra Petch', var(--font-display), 'Fredoka', 'Inter', sans-serif;
+}
+
+html[data-skin="pitwall"] .studio-mark img.studio-mark-default {
+  display: block;
+}
+html[data-skin="pitwall"] .studio-mark img.studio-mark-day {
+  display: none;
+}
+
+/* =====================================================================
+   WHOLE PLUS PAGE BACKGROUND: Grand Prix Night-Circuit & Carbon Weave
+   ===================================================================== */
+html[data-skin="pitwall"] body {
+  background-color: #0b0d12;
+  background-image:
+    radial-gradient(ellipse 85% 42% at 15% 0%, rgba(255, 128, 0, 0.25) 0%, rgba(255, 128, 0, 0) 68%),
+    radial-gradient(ellipse 85% 42% at 85% 0%, rgba(0, 210, 190, 0.24) 0%, rgba(0, 210, 190, 0) 68%),
+    radial-gradient(ellipse 80% 40% at 50% 100%, rgba(225, 29, 72, 0.16) 0%, rgba(255, 128, 0, 0.10) 48%, rgba(11, 13, 18, 0) 75%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 8px),
+    repeating-linear-gradient(-45deg, rgba(0, 210, 190, 0.035) 0px, rgba(0, 210, 190, 0.035) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 8px),
+    linear-gradient(125deg,
+      #0b0d12 0%,
+      #141821 25%,
+      #1e1612 50%,
+      #0d2224 75%,
+      #0b0d12 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 16px 16px, 16px 16px, 220% 220%;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 50%;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+  animation: pitwallPageMesh 18s ease-in-out infinite;
+}
+html[data-skin="pitwall"] .site-version-footer,
+html[data-skin="pitwall"] .site-version-line {
+  background: rgba(17, 19, 24, 0.92);
+  border-color: #ff8000;
+  color: #cbd5e1;
+  font-family: var(--pitwall-font-ui);
+}
+
+/* =====================================================================
+   HEADER & TELEMETRY GANTRY (#studioHeader)
+   ===================================================================== */
+html[data-skin="pitwall"] #studioHeader {
+  background-color: #111318;
+  background-image: linear-gradient(180deg, #0b0d12 0%, #161922 58%, #231915 100%);
+  box-shadow:
+    0 0 0 2px #ff8000,
+    0 0 0 5px #0b0d12,
+    0 8px 0 #c2410c,
+    0 16px 32px rgba(0, 0, 0, 0.72),
+    inset 0 -4px 0 #00d2be,
+    inset 0 2px 0 rgba(255, 255, 255, 0.18);
+}
+html[data-skin="pitwall"] #studioHeader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(90deg,
+    rgba(255, 128, 0, 0) 0%,
+    rgba(255, 128, 0, 0.28) 12%,
+    rgba(0, 210, 190, 0.30) 25%,
+    rgba(255, 128, 0, 0.28) 38%,
+    rgba(255, 128, 0, 0) 50%,
+    rgba(255, 128, 0, 0.28) 62%,
+    rgba(0, 210, 190, 0.30) 75%,
+    rgba(255, 128, 0, 0.28) 88%,
+    rgba(255, 128, 0, 0) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: pitwallGantrySweep 3.8s linear infinite;
+}
+html[data-skin="pitwall"] #studioHeader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(90deg,
+    rgba(0, 210, 190, 0) 0%,
+    rgba(0, 210, 190, 0.22) 12%,
+    rgba(250, 204, 21, 0.26) 25%,
+    rgba(0, 210, 190, 0.22) 38%,
+    rgba(0, 210, 190, 0) 50%,
+    rgba(0, 210, 190, 0.22) 62%,
+    rgba(250, 204, 21, 0.26) 75%,
+    rgba(0, 210, 190, 0.22) 88%,
+    rgba(0, 210, 190, 0) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: pitwallGantrySweep 5.6s linear infinite reverse;
+  mix-blend-mode: screen;
+}
+html[data-skin="pitwall"] #studioMast,
+html[data-skin="pitwall"] #studioHeader .studio-header-bar {
+  position: relative;
+  z-index: 1;
+}
+
+/* =====================================================================
+   HEADER & UTILITY BUTTONS (including More and Chance + Pack Fonts)
+   ===================================================================== */
+html[data-skin="pitwall"] #studioHeaderCluster button,
+html[data-skin="pitwall"] #studioHeaderCluster button:hover,
+html[data-skin="pitwall"] #studioHeaderUtilities > .relative > button,
+html[data-skin="pitwall"] #studioHeaderUtilities > .relative > button:hover,
+html[data-skin="pitwall"] #studioHeaderUtilities > button,
+html[data-skin="pitwall"] #studioHeaderUtilities > button:hover,
+html[data-skin="pitwall"] #studioHeaderUtilities button,
+html[data-skin="pitwall"] #studioHeaderUtilities button:hover,
+html[data-skin="pitwall"] #studioHeaderExportPair button,
+html[data-skin="pitwall"] #studioHeaderExportPair button:hover,
+html[data-skin="pitwall"] .studio-header-pin button,
+html[data-skin="pitwall"] .studio-header-pin button:hover,
+html[data-skin="pitwall"] #btnMore,
+html[data-skin="pitwall"] #btnMore:hover,
+html[data-skin="pitwall"] #btnToggleMore,
+html[data-skin="pitwall"] #btnToggleMore:hover,
+html[data-skin="pitwall"] #btnOpenMore,
+html[data-skin="pitwall"] #btnOpenMore:hover,
+html[data-skin="pitwall"] .more-btn,
+html[data-skin="pitwall"] .more-btn:hover,
+html[data-skin="pitwall"] .pitwall-more-btn,
+html[data-skin="pitwall"] .pitwall-more-btn:hover {
+  font-family: var(--pitwall-font-ui);
+  letter-spacing: 0.02em;
+  border: 2px solid #ff8000;
+  color: #0f172a;
+  background-color: #f8fafc;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffedd5 100%);
+  box-shadow: 0 4px 0 #9a3412, inset 0 1px 0 #ffffff;
+}
+html[data-skin="pitwall"] #headerTimerDisplay {
+  font-family: var(--pitwall-font-display);
+  color: #0f172a;
+}
+html[data-skin="pitwall"] #btnToggleStudioBands.edit-switch.is-on .edit-switch-value {
+  background: #00d2be;
+  color: #042f2e;
+  border: 1.5px solid #0b0d12;
+}
+html[data-skin="pitwall"] #btnToggleStudioBands.edit-switch.is-off .edit-switch-value {
+  background: #e2e8f0;
+  color: #0b0d12;
+  border: 1.5px solid #0b0d12;
+}
+html[data-skin="pitwall"] #btnModeIndividual.shadow-sm,
+html[data-skin="pitwall"] #btnModeGroup.shadow-sm,
+html[data-skin="pitwall"] #btnModeIndividual.shadow-sm:hover,
+html[data-skin="pitwall"] #btnModeGroup.shadow-sm:hover,
+html[data-skin="pitwall"] #btnOpenClassModal,
+html[data-skin="pitwall"] #btnOpenClassModal:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ffffff;
+  color: #0b0d12;
+  background-image: linear-gradient(180deg, #ffba66 0%, #ff8000 55%, #ea580c 100%);
+  box-shadow: 0 4px 0 #7c2d12, 0 0 16px rgba(255, 128, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+html[data-skin="pitwall"] #studioHeaderUtilities > #btnOpenPickerModal,
+html[data-skin="pitwall"] #studioHeaderUtilities > #btnOpenPickerModal:hover,
+html[data-skin="pitwall"] #btnOpenPickerModal,
+html[data-skin="pitwall"] #btnOpenPickerModal:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 55%, #0d9488 100%);
+  box-shadow: 0 4px 0 #115e59, 0 0 16px rgba(0, 210, 190, 0.55), inset 0 1px 0 #ffffff;
+}
+html[data-skin="pitwall"] #btnChance,
+html[data-skin="pitwall"] #btnChance:hover,
+html[data-skin="pitwall"] #btnOpenChance,
+html[data-skin="pitwall"] #btnOpenChance:hover,
+html[data-skin="pitwall"] #btnOpenChanceModal,
+html[data-skin="pitwall"] #btnOpenChanceModal:hover,
+html[data-skin="pitwall"] #btnOpenChanceSheet,
+html[data-skin="pitwall"] #btnOpenChanceSheet:hover,
+html[data-skin="pitwall"] #btnToggleChance,
+html[data-skin="pitwall"] #btnToggleChance:hover,
+html[data-skin="pitwall"] .chance-btn,
+html[data-skin="pitwall"] .chance-btn:hover,
+html[data-skin="pitwall"] .pitwall-chance-btn,
+html[data-skin="pitwall"] .pitwall-chance-btn:hover {
+  font-family: var(--pitwall-font-ui);
+  letter-spacing: 0.02em;
+  border: 2px solid #0b0d12;
+  color: #422006;
+  background-color: #facc15;
+  background-image: linear-gradient(180deg, #fef08a 0%, #facc15 50%, #ff8000 100%);
+  box-shadow: 0 4px 0 #7c2d12, 0 0 16px rgba(255, 128, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+html[data-skin="pitwall"] #btnMore[aria-expanded="true"],
+html[data-skin="pitwall"] #btnToggleMore[aria-expanded="true"],
+html[data-skin="pitwall"] #btnOpenMore[aria-expanded="true"],
+html[data-skin="pitwall"] .more-btn[aria-expanded="true"],
+html[data-skin="pitwall"] .pitwall-more-btn[aria-expanded="true"] {
+  border: 2px solid #ffffff;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 4px 0 #115e59, 0 0 14px rgba(0, 210, 190, 0.6);
+}
+
+/* More Popover / Dropdown Menu — Solid Carbon Telemetry Shell */
+html[data-skin="pitwall"] #morePopover,
+html[data-skin="pitwall"] #moreMenu,
+html[data-skin="pitwall"] #morePanel,
+html[data-skin="pitwall"] #moreSheet,
+html[data-skin="pitwall"] .more-popover,
+html[data-skin="pitwall"] .more-menu,
+html[data-skin="pitwall"] .more-panel,
+html[data-skin="pitwall"] .more-sheet,
+html[data-skin="pitwall"] .studio-more-pop,
+html[data-skin="pitwall"] .studio-more-menu,
+html[data-skin="pitwall"] .pitwall-more-pop {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 55%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 3px #00d2be,
+    0 18px 38px rgba(0, 0, 0, 0.82);
+}
+html[data-skin="pitwall"] #morePopover button,
+html[data-skin="pitwall"] #moreMenu button,
+html[data-skin="pitwall"] #morePanel button,
+html[data-skin="pitwall"] .more-popover button,
+html[data-skin="pitwall"] .more-menu button,
+html[data-skin="pitwall"] .more-panel button,
+html[data-skin="pitwall"] .studio-more-pop button,
+html[data-skin="pitwall"] .studio-more-menu button,
+html[data-skin="pitwall"] .pitwall-more-pop button {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffedd5 100%);
+  box-shadow: 0 3px 0 #9a3412;
+}
+html[data-skin="pitwall"] #morePopover button:hover,
+html[data-skin="pitwall"] #moreMenu button:hover,
+html[data-skin="pitwall"] #morePanel button:hover,
+html[data-skin="pitwall"] .more-popover button:hover,
+html[data-skin="pitwall"] .more-menu button:hover,
+html[data-skin="pitwall"] .more-panel button:hover,
+html[data-skin="pitwall"] .studio-more-pop button:hover,
+html[data-skin="pitwall"] .studio-more-menu button:hover,
+html[data-skin="pitwall"] .pitwall-more-pop button:hover {
+  border-color: #0b0d12;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 3px 0 #115e59;
+}
+
+html[data-skin="pitwall"] #studioHeader #classSelect {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  box-shadow: 0 4px 0 #7c2d12;
+}
+html[data-skin="pitwall"] #studioHeaderCluster > div {
+  background: rgba(11, 13, 18, 0.78);
+  border-color: #ff8000;
+  box-shadow: 0 4px 0 #7c2d12;
+}
+
+/* =====================================================================
+   TOOLBAR & CONTROLS (Carbon Pit-Wall Console)
+   ===================================================================== */
+html[data-skin="pitwall"] #studioToolbar {
+  background-color: #161922;
+  background-image: linear-gradient(90deg, #111318 0%, #1c212e 50%, #231915 100%);
+  border-bottom: 3px solid #ff8000;
+  box-shadow: 0 3px 0 #00d2be, 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+html[data-skin="pitwall"] .studio-band {
+  border: 1.5px solid rgba(255, 128, 0, 0.55);
+  background: rgba(11, 13, 18, 0.72);
+}
+html[data-skin="pitwall"] .studio-band-label {
+  font-family: var(--pitwall-font-display);
+  color: #ff8000;
+  letter-spacing: 0.05em;
+}
+html[data-skin="pitwall"] .studio-grid-setup {
+  background: rgba(17, 19, 24, 0.9);
+  border-color: #00d2be;
+}
+html[data-skin="pitwall"] .studio-grid-setup span,
+html[data-skin="pitwall"] .studio-grid-setup label {
+  color: #99f6e4;
+}
+html[data-skin="pitwall"] #studioToolbarRow button,
+html[data-skin="pitwall"] #studioToolbarRow button:hover,
+html[data-skin="pitwall"] #groupBrushBar button,
+html[data-skin="pitwall"] #groupBrushBar button:hover,
+html[data-skin="pitwall"] #btnToggleTeamScoreboard,
+html[data-skin="pitwall"] #btnToggleTeamScoreboard:hover {
+  font-family: var(--pitwall-font-ui);
+  letter-spacing: 0.015em;
+  border: 2px solid #0b0d12;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  box-shadow: 0 3px 0 #0b0d12;
+}
+html[data-skin="pitwall"] #studioToolbarRow #btnAllPlusOne,
+html[data-skin="pitwall"] #studioToolbarRow #btnAllPlusOne:hover,
+html[data-skin="pitwall"] #studioToolbarRow #btnApplyCustomGrid,
+html[data-skin="pitwall"] #studioToolbarRow #btnApplyCustomGrid:hover,
+html[data-skin="pitwall"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm,
+html[data-skin="pitwall"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm:hover,
+html[data-skin="pitwall"] #studioToolbarRow .layout-preset-btn.shadow-xs,
+html[data-skin="pitwall"] #studioToolbarRow .layout-preset-btn.ring-2,
+html[data-skin="pitwall"] #studioToolbarRow .layout-preset-btn.shadow-xs:hover,
+html[data-skin="pitwall"] #studioToolbarRow .layout-preset-btn.ring-2:hover,
+html[data-skin="pitwall"] #groupBrushBar #btnClusterAfterBrush,
+html[data-skin="pitwall"] #groupBrushBar #btnClusterAfterBrush:hover {
+  border: 2px solid #0b0d12;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4, #00d2be);
+  box-shadow: 0 3px 0 #115e59;
+}
+html[data-skin="pitwall"] #studioToolbarRow #btnOpenResetModal,
+html[data-skin="pitwall"] #studioToolbarRow #btnOpenResetModal:hover,
+html[data-skin="pitwall"] #studioToolbarRow #btnToggleEditName.edit-switch.is-on,
+html[data-skin="pitwall"] #studioToolbarRow #btnToggleEditName.edit-switch.is-on:hover {
+  border: 2px solid #0b0d12;
+  color: #431407;
+  background-image: linear-gradient(180deg, #ffba66, #ff8000);
+  box-shadow: 0 3px 0 #7c2d12;
+}
+html[data-skin="pitwall"] #studioToolbarRow .skin-choice,
+html[data-skin="pitwall"] #studioToolbarRow .skin-choice:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #475569;
+  background: #0b0d12;
+  color: #f8fafc;
+  box-shadow: none;
+}
+html[data-skin="pitwall"] #studioToolbarRow #btnSkinPitwall,
+html[data-skin="pitwall"] #studioToolbarRow #btnSkinPitwall:hover,
+html[data-skin="pitwall"] #btnSkinPitwall,
+html[data-skin="pitwall"] #btnSkinPitwall:hover {
+  font-family: var(--pitwall-font-display);
+  background-image: linear-gradient(135deg, #ff8000, #facc15, #00d2be);
+  border: 2px solid #ffffff;
+  color: #0b0d12;
+  box-shadow: 0 3px 0 #7c2d12, 0 0 14px rgba(255, 128, 0, 0.65);
+}
+html[data-skin="pitwall"] #groupBrushBar {
+  font-family: var(--pitwall-font-ui);
+  background: linear-gradient(90deg, #111318, #1c212e, #231915);
+  border-color: #ff8000;
+  color: #f8fafc;
+}
+html[data-skin="pitwall"] #groupBrushBar span {
+  color: #fed7aa;
+}
+html[data-skin="pitwall"] #groupScoreDock {
+  background: linear-gradient(90deg, #111318, #1c212e);
+  border-bottom: 2px solid #ff8000;
+  color: #f8fafc;
+}
+html[data-skin="pitwall"] #groupScoreDock .group-score-dock-bar h2 {
+  font-family: var(--pitwall-font-display);
+  color: #ff8000;
+}
+
+/* =====================================================================
+   PULSE CARD & NIGHT-CIRCUIT TELEMETRY SEATING FLOOR
+   ===================================================================== */
+html[data-skin="pitwall"] #pulseCard {
+  background-color: #111318;
+  background-image: linear-gradient(135deg, #111318 0%, #1c212e 55%, #2a1810 100%);
+  border: 3px solid #ff8000;
+  box-shadow: 0 0 0 3px #00d2be, 0 10px 24px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] #pulseCard h2 {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+}
+html[data-skin="pitwall"] #pulseCard #statTotalPoints {
+  font-family: var(--pitwall-font-display);
+  color: #ff8000;
+  text-shadow: 2px 2px 0 #0b0d12, 0 0 12px rgba(255, 128, 0, 0.75);
+}
+html[data-skin="pitwall"] #studioFloorSection {
+  border: 3px solid #ff8000;
+  background: #0e1117;
+  box-shadow: 0 0 0 3px #00d2be, 0 14px 32px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] .classroom-floor {
+  background-color: #0e1117;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(225, 29, 72, 0.16) 0px, rgba(225, 29, 72, 0.16) 16px, rgba(255, 255, 255, 0.16) 16px, rgba(255, 255, 255, 0.16) 32px),
+    linear-gradient(to right, rgba(255, 128, 0, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(0, 210, 190, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(90deg,
+      rgba(255, 128, 0, 0) 0%,
+      rgba(255, 128, 0, 0.16) 15%,
+      rgba(0, 210, 190, 0.18) 25%,
+      rgba(250, 204, 21, 0.14) 35%,
+      rgba(255, 128, 0, 0) 50%,
+      rgba(255, 128, 0, 0.16) 65%,
+      rgba(0, 210, 190, 0.18) 75%,
+      rgba(250, 204, 21, 0.14) 85%,
+      rgba(255, 128, 0, 0) 100%),
+    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(255, 128, 0, 0.22), rgba(255, 128, 0, 0) 70%),
+    radial-gradient(ellipse 75% 45% at 50% 100%, rgba(0, 210, 190, 0.20), rgba(14, 17, 23, 0) 75%),
+    linear-gradient(180deg, #0b0d12 0%, #141923 50%, #1c2230 100%);
+  background-size: 100% 6px, 96px 96px, 96px 96px, 200% 100%, auto, auto, auto;
+  background-repeat: no-repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  animation: pitwallFloorMesh 12s linear infinite;
+  box-shadow: inset 0 0 36px rgba(255, 128, 0, 0.22), inset 0 0 14px rgba(0, 210, 190, 0.2);
+}
+html[data-skin="pitwall"] .classroom-floor.snap-active {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(225, 29, 72, 0.18) 0px, rgba(225, 29, 72, 0.18) 16px, rgba(255, 255, 255, 0.18) 16px, rgba(255, 255, 255, 0.18) 32px),
+    linear-gradient(to right, rgba(255, 128, 0, 0.20) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(0, 210, 190, 0.18) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to right, rgba(250, 204, 21, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(225, 29, 72, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(90deg,
+      rgba(255, 128, 0, 0) 0%,
+      rgba(255, 128, 0, 0.15) 15%,
+      rgba(0, 210, 190, 0.17) 25%,
+      rgba(250, 204, 21, 0.13) 35%,
+      rgba(255, 128, 0, 0) 50%,
+      rgba(255, 128, 0, 0.15) 65%,
+      rgba(0, 210, 190, 0.17) 75%,
+      rgba(250, 204, 21, 0.13) 85%,
+      rgba(255, 128, 0, 0) 100%),
+    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(255, 128, 0, 0.22), rgba(255, 128, 0, 0) 70%),
+    radial-gradient(ellipse 75% 45% at 50% 100%, rgba(0, 210, 190, 0.20), rgba(14, 17, 23, 0) 75%),
+    linear-gradient(180deg, #0b0d12 0%, #141923 50%, #1c2230 100%);
+  background-size: 100% 6px, 24px 24px, 24px 24px, 96px 96px, 96px 96px, 200% 100%, auto, auto, auto;
+  background-repeat: no-repeat, repeat, repeat, repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  animation: pitwallFloorMeshSnap 12s linear infinite;
+}
+html[data-skin="pitwall"] .front-of-room {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.08em;
+  background: linear-gradient(90deg, #ff8000, #facc15, #00d2be);
+  border: 2px solid #0b0d12;
+  color: #0b0d12;
+  box-shadow: 0 4px 0 #0b0d12, 0 0 18px rgba(255, 128, 0, 0.65);
+}
+html[data-skin="pitwall"] .zoom-chip,
+html[data-skin="pitwall"] .zoom-chip.is-dragging {
+  font-family: var(--pitwall-font-ui);
+  background: #161922;
+  border: 2px solid #ff8000;
+  color: #f8fafc;
+  box-shadow: 0 0 0 2px #00d2be, 0 6px 16px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] .zoom-chip-label,
+html[data-skin="pitwall"] .zoom-chip-btn,
+html[data-skin="pitwall"] .zoom-chip-fit {
+  font-family: var(--pitwall-font-ui);
+  color: #fed7aa;
+  font-weight: 800;
+}
+html[data-skin="pitwall"] #zoomReadout {
+  color: #00d2be;
+  font-family: var(--pitwall-font-display);
+}
+html[data-skin="pitwall"] #btnToggleSidePanels.side-panels-tab {
+  font-family: var(--pitwall-font-ui);
+  background: #161922;
+  color: #ff8000;
+  border: 2px solid #ff8000;
+  box-shadow: 0 3px 0 #0b0d12;
+}
+
+/* =====================================================================
+   DESKS, TYRE-COMPOUND TIERS, DRS ACTIVE STREAK & FASTEST LAP BURST
+   ===================================================================== */
+html[data-skin="pitwall"] .desk-team-row {
+  position: relative;
+}
+html[data-skin="pitwall"] .desk-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #ffedd5 100%);
+  border: 2px solid #0b0d12;
+  transform: translateY(-5px);
+  box-shadow:
+    0 0 0 2px #00d2be,
+    0 6px 0 #0b0d12,
+    0 11px 0 #334155;
+}
+html[data-skin="pitwall"] .desk-card:hover {
+  transform: translateY(-7px);
+  box-shadow:
+    0 0 0 2px #ff8000,
+    0 8px 0 #0b0d12,
+    0 13px 0 #9a3412,
+    0 0 22px rgba(255, 128, 0, 0.55);
+}
+html[data-skin="pitwall"] .desk-card.spotlight-active {
+  transform: translateY(-7px) scale(1.06);
+  box-shadow:
+    0 0 0 4px #ff8000,
+    0 8px 0 #0b0d12,
+    0 0 28px rgba(0, 210, 190, 0.85) !important;
+}
+html[data-skin="pitwall"] .desk-card.pitwall-tier-1,
+html[data-skin="pitwall"] .desk-card.pitwall-tier-2,
+html[data-skin="pitwall"] .desk-card.pitwall-tier-3 {
+  z-index: 12;
+}
+html[data-skin="pitwall"] .desk-card.pitwall-tier-1 {
+  background: linear-gradient(180deg, #fffbeb 0%, #fed7aa 48%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #ff8000,
+    0 7px 0 #9a3412,
+    0 12px 0 #0b0d12,
+    0 0 24px rgba(255, 128, 0, 0.7);
+}
+html[data-skin="pitwall"] .desk-card.pitwall-tier-2 {
+  background: linear-gradient(180deg, #f0fdfa 0%, #99f6e4 48%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #00d2be,
+    0 7px 0 #115e59,
+    0 12px 0 #0b0d12,
+    0 0 20px rgba(0, 210, 190, 0.6);
+}
+html[data-skin="pitwall"] .desk-card.pitwall-tier-3 {
+  background: linear-gradient(180deg, #fff1f2 0%, #fecdd3 48%, #ffffff 100%);
+  box-shadow:
+    0 0 0 3px #e11d48,
+    0 7px 0 #881337,
+    0 12px 0 #0b0d12,
+    0 0 20px rgba(225, 29, 72, 0.55);
+}
+html[data-skin="pitwall"] .pitwall-tier-badge {
+  display: inline-block;
+  position: absolute;
+  top: -12px;
+  left: -10px;
+  z-index: 7;
+  pointer-events: none;
+  font-family: var(--pitwall-font-display);
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1.15;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 2px solid #0b0d12;
+  color: #0b0d12;
+  letter-spacing: .03em;
+  box-shadow: 0 3px 0 #0b0d12;
+}
+html[data-skin="pitwall"] .pitwall-tier-1 .pitwall-tier-badge {
+  background: linear-gradient(180deg, #fef08a, #ff8000);
+  color: #431407;
+}
+html[data-skin="pitwall"] .pitwall-tier-2 .pitwall-tier-badge {
+  background: linear-gradient(180deg, #ccfbf1, #00d2be);
+  color: #042f2e;
+}
+html[data-skin="pitwall"] .pitwall-tier-3 .pitwall-tier-badge {
+  background: linear-gradient(180deg, #ffe4e6, #e11d48);
+  color: #ffffff;
+}
+html[data-skin="pitwall"] .desk-action-btn,
+html[data-skin="pitwall"] .desk-action-btn:hover,
+html[data-skin="pitwall"] .score-step,
+html[data-skin="pitwall"] .score-step:hover,
+html[data-skin="pitwall"] .team-score-step,
+html[data-skin="pitwall"] .team-score-step:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #431407;
+  background-image: linear-gradient(180deg, #fed7aa, #ff8000);
+  box-shadow: 0 3px 0 #0b0d12;
+}
+html[data-skin="pitwall"] .desk-action-btn[data-desk-plus],
+html[data-skin="pitwall"] .desk-action-btn[data-desk-plus]:hover,
+html[data-skin="pitwall"] .desk-action-btn[data-desk-team-plus],
+html[data-skin="pitwall"] .desk-action-btn[data-desk-team-plus]:hover,
+html[data-skin="pitwall"] .score-step[data-lb-st-plus],
+html[data-skin="pitwall"] .score-step[data-lb-st-plus]:hover,
+html[data-skin="pitwall"] .score-step[data-grp-plus],
+html[data-skin="pitwall"] .score-step[data-grp-plus]:hover,
+html[data-skin="pitwall"] .team-score-step[data-grp-plus],
+html[data-skin="pitwall"] .team-score-step[data-grp-plus]:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4, #00d2be);
+  box-shadow: 0 3px 0 #0b0d12;
+}
+html[data-skin="pitwall"] .pitwall-fire.is-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: var(--pitwall-font-ui);
+  font-size: .66rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1.5px solid #fef08a;
+  color: #ffffff;
+  background: linear-gradient(90deg, #ea580c 0%, #ff8000 45%, #00d2be 100%);
+  box-shadow:
+    0 0 0 2px #0b0d12,
+    0 3px 0 #0b0d12,
+    0 0 14px rgba(255, 128, 0, 0.85);
+  text-shadow: 0 1px 2px #0b0d12;
+  animation: pitwallPulse 0.85s ease-in-out infinite;
+}
+html[data-skin="pitwall"] .pitwall-wing-svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+html[data-skin="pitwall"] .pitwall-burst {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-family: var(--pitwall-font-display);
+  font-weight: 700;
+  font-size: 1.65rem;
+  z-index: 80;
+  color: #ff8000;
+  -webkit-text-stroke: 1.5px #0b0d12;
+  text-shadow: 0 3px 0 #0b0d12, 0 0 16px #00d2be;
+  animation: pitwallPopUp 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+html[data-skin="pitwall"] .pitwall-burst::before {
+  content: "🏁 ";
+  font-size: 0.95rem;
+}
+
+/* =====================================================================
+   LEADERBOARD CARD
+   ===================================================================== */
+html[data-skin="pitwall"] #leaderboardCard {
+  background-color: #111318;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 60%, #231915 100%);
+  border: 3px solid #ff8000;
+  color: #f8fafc;
+  box-shadow: 0 0 0 3px #00d2be, 0 12px 28px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] #leaderboardCard .panel-title-bar,
+html[data-skin="pitwall"] #leaderboardPanel .bg-slate-50\/70,
+html[data-skin="pitwall"] #leaderboardPanel .border-b {
+  background: #161922;
+  border-color: #ff8000;
+  color: #ff8000;
+}
+html[data-skin="pitwall"] #leaderboardCard .panel-title-bar h2 {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+}
+html[data-skin="pitwall"] #btnOpenPodiumModal,
+html[data-skin="pitwall"] #btnOpenPodiumModal:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #431407;
+  background-image: linear-gradient(180deg, #fef08a 0%, #ff8000 100%);
+  box-shadow: 0 3px 0 #7c2d12;
+}
+html[data-skin="pitwall"] #tabLbStudents,
+html[data-skin="pitwall"] #tabLbGroups,
+html[data-skin="pitwall"] #tabLbFeed {
+  font-family: var(--pitwall-font-ui);
+  color: #cbd5e1;
+}
+html[data-skin="pitwall"] #tabLbStudents.shadow-sm,
+html[data-skin="pitwall"] #tabLbGroups.shadow-sm,
+html[data-skin="pitwall"] #tabLbFeed.shadow-sm {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 2px 0 #115e59;
+}
+html[data-skin="pitwall"] #lbSearchInput {
+  font-family: var(--pitwall-font-ui);
+  background: #0b0d12;
+  color: #f8fafc;
+  border: 2px solid #ff8000;
+}
+html[data-skin="pitwall"] #leaderboardCard h2,
+html[data-skin="pitwall"] #leaderboardBody .text-slate-800,
+html[data-skin="pitwall"] #leaderboardBody .text-slate-400,
+html[data-skin="pitwall"] #leaderboardBody .text-slate-600 {
+  color: #f8fafc;
+}
+html[data-skin="pitwall"] #leaderboardBody > .border-slate-100,
+html[data-skin="pitwall"] #leaderboardBody > .border-slate-100:hover {
+  background: #161922;
+  border-color: rgba(255, 128, 0, 0.28);
+  color: #f8fafc;
+}
+html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-1 {
+  background: linear-gradient(90deg, #7c2d12, #161922 65%);
+  box-shadow: inset 5px 0 0 #ff8000;
+}
+html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-2 {
+  background: linear-gradient(90deg, #115e59, #161922 65%);
+  box-shadow: inset 5px 0 0 #00d2be;
+}
+html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-3 {
+  background: linear-gradient(90deg, #881337, #161922 65%);
+  box-shadow: inset 5px 0 0 #e11d48;
+}
+html[data-skin="pitwall"] .pitwall-fire-mini {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--pitwall-font-ui);
+  font-size: .62rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1.5px solid #0b0d12;
+  background: linear-gradient(90deg, #ff8000, #00d2be);
+  color: #0b0d12;
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 1. TIMER (#timerPopover) — Solid Carbon Shell + Papaya Border
+   ===================================================================== */
+html[data-skin="pitwall"] #timerPopover {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 55%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+  box-shadow:
+    0 0 0 3px #00d2be,
+    0 18px 38px rgba(0, 0, 0, 0.85);
+}
+html[data-skin="pitwall"] #timerPopover h3 {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+  color: #ff8000;
+}
+html[data-skin="pitwall"] #timerPopover .text-slate-400,
+html[data-skin="pitwall"] #timerPopover .text-slate-800 {
+  color: #99f6e4;
+}
+html[data-skin="pitwall"] #timerPopover .border-b,
+html[data-skin="pitwall"] #timerPopover .border-t {
+  border-color: rgba(255, 128, 0, 0.45);
+}
+html[data-skin="pitwall"] #btnCloseTimerPopover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  background: #0b0d12;
+  color: #ff8000;
+}
+html[data-skin="pitwall"] #timerCardBox {
+  background-color: #0b0d12;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 210, 190, 0.06) 0px, rgba(0, 210, 190, 0.06) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 6px),
+    linear-gradient(180deg, #0b0d12 0%, #141923 65%, #231915 100%);
+  border: 2px solid #00d2be;
+  box-shadow:
+    inset 0 0 22px rgba(255, 128, 0, 0.25),
+    0 6px 16px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] #timerBigDisplay {
+  font-family: var(--pitwall-font-display);
+  font-size: clamp(2.85rem, 6.5vw, 3.85rem);
+  letter-spacing: 0.02em;
+  line-height: 1.08;
+  max-width: 100%;
+  display: block;
+  color: #ff8000;
+  text-shadow: 2px 2px 0 #0b0d12, 0 0 14px rgba(255, 128, 0, 0.7);
+}
+html[data-skin="pitwall"] #timerStatusText {
+  font-family: var(--pitwall-font-ui);
+  color: #00d2be;
+  font-weight: 800;
+}
+html[data-skin="pitwall"] #timerProgressBar {
+  background: linear-gradient(90deg, #ff8000, #facc15, #00d2be);
+  height: 6px;
+}
+html[data-skin="pitwall"] #timerPopover button,
+html[data-skin="pitwall"] #timerPopover button:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffedd5 100%);
+  box-shadow: 0 3px 0 #9a3412;
+}
+html[data-skin="pitwall"] #timerPopover #btnTimerStartPause,
+html[data-skin="pitwall"] #timerPopover #btnTimerStartPause:hover {
+  font-family: var(--pitwall-font-display);
+  border: 2px solid #ffffff;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 55%, #0d9488 100%);
+  box-shadow: 0 4px 0 #115e59, 0 0 14px rgba(0, 210, 190, 0.5);
+}
+html[data-skin="pitwall"] #customTimerMin,
+html[data-skin="pitwall"] #customTimerSec,
+html[data-skin="pitwall"] #customTimerMinInput,
+html[data-skin="pitwall"] #customTimerSecInput {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  background: #0b0d12;
+  color: #fde68a;
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 2. RANDOM (#pickerModal) — Dim Scrim + Solid Carbon Shell
+   ===================================================================== */
+html[data-skin="pitwall"] #pickerModal {
+  background-color: rgba(11, 13, 18, 0.72);
+}
+html[data-skin="pitwall"] #pickerModal .picker-dialog {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 55%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+  box-shadow:
+    0 0 0 3px #00d2be,
+    0 22px 44px rgba(0, 0, 0, 0.85);
+}
+html[data-skin="pitwall"] #pickerModal .bg-gradient-to-r {
+  background-color: #0b0d12;
+  background-image: linear-gradient(90deg, #0b0d12 0%, #1c212e 50%, #431407 100%);
+  color: #ff8000;
+  border-bottom: 3px solid #00d2be;
+  box-shadow: inset 0 -2px 0 #ff8000;
+}
+html[data-skin="pitwall"] #pickerModal .bg-gradient-to-r h2 {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+  color: #fed7aa;
+}
+html[data-skin="pitwall"] #pickerModal #btnClosePickerModal {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  background: #0b0d12;
+  color: #ff8000;
+}
+html[data-skin="pitwall"] #pickerModal .bg-slate-100 {
+  background: #0b0d12;
+  border: 2px solid #ff8000;
+}
+html[data-skin="pitwall"] #pickerModal #btnPickerTypeStudent,
+html[data-skin="pitwall"] #pickerModal #btnPickerTypeGroup {
+  font-family: var(--pitwall-font-ui);
+  background: #161922;
+  color: #cbd5e1;
+  border: 1.5px solid rgba(255, 128, 0, 0.4);
+}
+html[data-skin="pitwall"] #pickerModal #btnPickerTypeStudent.shadow-sm,
+html[data-skin="pitwall"] #pickerModal #btnPickerTypeGroup.shadow-sm {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ffffff;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 3px 0 #115e59;
+}
+html[data-skin="pitwall"] #pickerStudentOptions {
+  background: #111318;
+  color: #f8fafc;
+  border: 2px solid #00d2be;
+}
+html[data-skin="pitwall"] #pickerStudentOptions label,
+html[data-skin="pitwall"] #pickerStudentOptions span {
+  color: #99f6e4;
+}
+html[data-skin="pitwall"] #pickerGroupFilter {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  background: #0b0d12;
+  color: #fde68a;
+}
+html[data-skin="pitwall"] #pickerStageBox {
+  background-color: #0b0d12;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 210, 190, 0.06) 0px, rgba(0, 210, 190, 0.06) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 6px),
+    linear-gradient(135deg, #0b0d12 0%, #141923 55%, #2a1810 100%);
+  border: 2px solid #ff8000;
+  box-shadow:
+    inset 0 0 28px rgba(0, 210, 190, 0.25),
+    0 8px 20px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] #pickerBadge {
+  font-family: var(--pitwall-font-display);
+  background: linear-gradient(180deg, #fef08a, #ff8000);
+  color: #431407;
+  border: 2px solid #0b0d12;
+}
+html[data-skin="pitwall"] #pickerResultTitle {
+  font-family: var(--pitwall-font-display);
+  color: #fde68a;
+  text-shadow: 2px 2px 0 #0b0d12, 0 0 16px rgba(255, 128, 0, 0.75);
+}
+html[data-skin="pitwall"] #pickerResultSub {
+  font-family: var(--pitwall-font-ui);
+  color: #00d2be;
+}
+html[data-skin="pitwall"] #pickerCurrentScorePill {
+  font-family: var(--pitwall-font-ui);
+  background: #111318;
+  border: 2px solid #ff8000;
+  color: #fde68a;
+}
+html[data-skin="pitwall"] #btnPickerPlusOne,
+html[data-skin="pitwall"] #btnPickerPlusOne:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 3px 0 #115e59;
+}
+html[data-skin="pitwall"] #btnPickerMinusOne,
+html[data-skin="pitwall"] #btnPickerMinusOne:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #431407;
+  background-image: linear-gradient(180deg, #fed7aa 0%, #ff8000 100%);
+  box-shadow: 0 3px 0 #7c2d12;
+}
+html[data-skin="pitwall"] #pickerModal #btnTriggerRandomPick,
+html[data-skin="pitwall"] #pickerModal #btnTriggerRandomPick:hover {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+  border: 2px solid #ffffff;
+  color: #431407;
+  background-image: linear-gradient(180deg, #fef08a 0%, #ff8000 55%, #ea580c 100%);
+  box-shadow: 0 5px 0 #7c2d12, 0 0 18px rgba(255, 128, 0, 0.65);
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 3. BOARD (Whiteboard .wb-sheet) — Solid Carbon Shell
+   ===================================================================== */
+html[data-skin="pitwall"] .wb-sheet {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(145deg, #111318 0%, #1c212e 55%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+}
+html[data-skin="pitwall"] .wb-bar {
+  background-color: #0b0d12;
+  background-image: linear-gradient(90deg, #0b0d12 0%, #1c212e 55%, #431407 100%);
+  color: #f8fafc;
+  border-bottom: 3px solid #ff8000;
+  box-shadow: inset 0 -2px 0 #00d2be, 0 4px 12px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] .wb-stage {
+  background-color: #111318;
+  background-image: linear-gradient(180deg, #111318 0%, #1c212e 100%);
+  padding: 10px;
+}
+html[data-skin="pitwall"] #wbCanvas {
+  background: #ffffff;
+  border: 3px solid #ff8000;
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px #00d2be, 0 10px 28px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] .wb-title {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+  color: #ff8000;
+}
+html[data-skin="pitwall"] .wb-tool,
+html[data-skin="pitwall"] .wb-close {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffedd5 100%);
+  box-shadow: 0 3px 0 #9a3412;
+}
+html[data-skin="pitwall"] .wb-tool:hover,
+html[data-skin="pitwall"] .wb-close:hover {
+  background-image: linear-gradient(180deg, #fed7aa 0%, #ff8000 100%);
+  color: #0b0d12;
+}
+html[data-skin="pitwall"] .wb-tool[aria-pressed="true"] {
+  border: 2px solid #ffffff;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 3px 0 #115e59, 0 0 12px rgba(0, 210, 190, 0.65);
+}
+html[data-skin="pitwall"] .wb-swatch {
+  box-shadow: 0 0 0 2px #0b0d12;
+}
+html[data-skin="pitwall"] .wb-colour-pop,
+html[data-skin="pitwall"] .wb-confirm-card {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 60%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+  box-shadow: 0 0 0 2px #00d2be, 0 12px 28px rgba(0, 0, 0, 0.8);
+}
+html[data-skin="pitwall"] .wb-colour-heading,
+html[data-skin="pitwall"] .wb-confirm-card p {
+  color: #fde68a;
+}
+html[data-skin="pitwall"] #wbConfirmCancel,
+html[data-skin="pitwall"] #wbConfirmCancel:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  background: #ffffff;
+  color: #0b0d12;
+  box-shadow: 0 3px 0 #7c2d12;
+}
+html[data-skin="pitwall"] #wbConfirmClear,
+html[data-skin="pitwall"] #wbConfirmClear:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ffffff;
+  background-image: linear-gradient(180deg, #fda4af 0%, #e11d48 100%);
+  color: #ffffff;
+  box-shadow: 0 3px 0 #881337;
+}
+
+/* =====================================================================
+   POP-UP WINDOWS: 4. CHANCE (Pit-Board Telemetry Card)
+   - Full-screen overlay stays a dim scrim so the classroom remains visible.
+   - Inner Chance panel shell has a solid carbon fill + solid #ff8000 border.
+   - Darkened card face restyles the prompt text to light gold (#fde68a).
+   ===================================================================== */
+html[data-skin="pitwall"] #chanceSheet,
+html[data-skin="pitwall"] #chanceModal,
+html[data-skin="pitwall"] .chance-sheet,
+html[data-skin="pitwall"] .chance-modal,
+html[data-skin="pitwall"] .pitwall-chance-sheet {
+  background-color: rgba(11, 13, 18, 0.72);
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+}
+html[data-skin="pitwall"] #chanceSheet .chance-panel,
+html[data-skin="pitwall"] #chanceSheet .chance-dialog,
+html[data-skin="pitwall"] #chanceSheet .plan-panel,
+html[data-skin="pitwall"] #chanceSheet > div,
+html[data-skin="pitwall"] #chanceModal .chance-panel,
+html[data-skin="pitwall"] #chanceModal .chance-dialog,
+html[data-skin="pitwall"] #chanceModal > div,
+html[data-skin="pitwall"] .chance-sheet .chance-panel,
+html[data-skin="pitwall"] .chance-sheet .chance-dialog,
+html[data-skin="pitwall"] .chance-sheet > div,
+html[data-skin="pitwall"] .chance-modal > div,
+html[data-skin="pitwall"] #chancePopover,
+html[data-skin="pitwall"] .pitwall-chance-panel:not(#chanceSheet):not(#chanceModal):not(.chance-sheet):not(.chance-modal):not(.fixed) {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 55%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+  box-shadow:
+    0 0 0 3px #00d2be,
+    0 22px 44px rgba(0, 0, 0, 0.85);
+}
+html[data-skin="pitwall"] #chanceSheet .chance-bar,
+html[data-skin="pitwall"] #chanceSheet .chance-header,
+html[data-skin="pitwall"] #chanceSheet .chance-head,
+html[data-skin="pitwall"] #chanceSheet .plan-bar,
+html[data-skin="pitwall"] #chanceModal .chance-bar,
+html[data-skin="pitwall"] #chanceModal .chance-header,
+html[data-skin="pitwall"] #chanceModal .bg-gradient-to-r,
+html[data-skin="pitwall"] .chance-bar,
+html[data-skin="pitwall"] .chance-header,
+html[data-skin="pitwall"] .chance-head,
+html[data-skin="pitwall"] #chanceBar,
+html[data-skin="pitwall"] #chanceHeader,
+html[data-skin="pitwall"] .pitwall-chance-bar {
+  background-color: #0b0d12;
+  background-image: linear-gradient(90deg, #0b0d12 0%, #1c212e 55%, #431407 100%);
+  color: #ff8000;
+  border-bottom: 3px solid #00d2be;
+  box-shadow: inset 0 -2px 0 #ff8000;
+}
+html[data-skin="pitwall"] #chanceTitle,
+html[data-skin="pitwall"] #chanceSheetTitle,
+html[data-skin="pitwall"] .chance-title,
+html[data-skin="pitwall"] .chance-bar h2,
+html[data-skin="pitwall"] .chance-bar h3,
+html[data-skin="pitwall"] .chance-header h2,
+html[data-skin="pitwall"] .chance-header h3 {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+  color: #fed7aa;
+  text-shadow: 2px 2px 0 #0b0d12;
+}
+html[data-skin="pitwall"] #chanceCard,
+html[data-skin="pitwall"] #chanceCardBox,
+html[data-skin="pitwall"] #chanceStage,
+html[data-skin="pitwall"] #chanceStageBox,
+html[data-skin="pitwall"] .chance-card,
+html[data-skin="pitwall"] .chance-stage,
+html[data-skin="pitwall"] .chance-card-box,
+html[data-skin="pitwall"] .chance-card-face,
+html[data-skin="pitwall"] .chance-card-body,
+html[data-skin="pitwall"] .pitwall-chance-card {
+  font-family: var(--pitwall-font-ui);
+  background-color: #0b0d12;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 210, 190, 0.06) 0px, rgba(0, 210, 190, 0.06) 2px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 6px),
+    linear-gradient(135deg, #0b0d12 0%, #141923 55%, #2a1810 100%);
+  color: #fde68a;
+  border: 2px solid #00d2be;
+  box-shadow:
+    inset 0 0 24px rgba(255, 128, 0, 0.25),
+    0 6px 18px rgba(0, 0, 0, 0.65);
+}
+html[data-skin="pitwall"] #chancePrompt,
+html[data-skin="pitwall"] #chancePromptText,
+html[data-skin="pitwall"] #chanceCardPrompt,
+html[data-skin="pitwall"] #chanceQuestion,
+html[data-skin="pitwall"] #chanceText,
+html[data-skin="pitwall"] #chanceCardText,
+html[data-skin="pitwall"] #chanceCardTitle,
+html[data-skin="pitwall"] #chanceResultTitle,
+html[data-skin="pitwall"] .chance-prompt,
+html[data-skin="pitwall"] .chance-prompt-text,
+html[data-skin="pitwall"] .chance-card-prompt,
+html[data-skin="pitwall"] .chance-question,
+html[data-skin="pitwall"] .chance-text,
+html[data-skin="pitwall"] .chance-card-text,
+html[data-skin="pitwall"] .chance-card-title,
+html[data-skin="pitwall"] .chance-card h2,
+html[data-skin="pitwall"] .chance-card h3,
+html[data-skin="pitwall"] .chance-card h4,
+html[data-skin="pitwall"] .chance-card p,
+html[data-skin="pitwall"] .chance-card-face p,
+html[data-skin="pitwall"] .chance-card-body p,
+html[data-skin="pitwall"] #chanceCard p,
+html[data-skin="pitwall"] #chanceCardBox p,
+html[data-skin="pitwall"] .pitwall-chance-card p,
+html[data-skin="pitwall"] .pitwall-chance-prompt {
+  font-family: var(--pitwall-font-ui);
+  color: #fde68a;
+  text-shadow: 2px 2px 0 #0b0d12;
+}
+html[data-skin="pitwall"] #chanceBonus,
+html[data-skin="pitwall"] #chanceBonusLine,
+html[data-skin="pitwall"] .chance-bonus,
+html[data-skin="pitwall"] .chance-bonus-line,
+html[data-skin="pitwall"] .chance-lucky,
+html[data-skin="pitwall"] .pitwall-chance-bonus {
+  font-family: var(--pitwall-font-ui);
+  background: linear-gradient(90deg, rgba(255, 128, 0, 0.28), rgba(0, 210, 190, 0.28));
+  color: #fde68a;
+  border: 2px solid #ff8000;
+  border-radius: 8px;
+  font-weight: 800;
+  text-shadow: 1px 1px 0 #0b0d12;
+}
+html[data-skin="pitwall"] #chanceSheet button,
+html[data-skin="pitwall"] #chanceModal button,
+html[data-skin="pitwall"] .chance-sheet button,
+html[data-skin="pitwall"] .chance-modal button,
+html[data-skin="pitwall"] .chance-action,
+html[data-skin="pitwall"] .pitwall-chance-sheet button,
+html[data-skin="pitwall"] .pitwall-chance-panel button {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  color: #0f172a;
+  background-color: #ffffff;
+  background-image: linear-gradient(180deg, #ffffff 0%, #ffedd5 100%);
+  box-shadow: 0 3px 0 #9a3412;
+}
+html[data-skin="pitwall"] #btnChanceDraw,
+html[data-skin="pitwall"] #btnChanceDraw:hover,
+html[data-skin="pitwall"] #btnDrawChance,
+html[data-skin="pitwall"] #btnDrawChance:hover,
+html[data-skin="pitwall"] #btnTriggerChance,
+html[data-skin="pitwall"] #btnTriggerChance:hover,
+html[data-skin="pitwall"] #chanceDraw,
+html[data-skin="pitwall"] #chanceDraw:hover,
+html[data-skin="pitwall"] #chanceDrawBtn,
+html[data-skin="pitwall"] #chanceDrawBtn:hover,
+html[data-skin="pitwall"] .chance-draw,
+html[data-skin="pitwall"] .chance-draw:hover,
+html[data-skin="pitwall"] .chance-draw-btn,
+html[data-skin="pitwall"] .chance-draw-btn:hover,
+html[data-skin="pitwall"] .chance-primary,
+html[data-skin="pitwall"] .chance-primary:hover,
+html[data-skin="pitwall"] .pitwall-chance-draw,
+html[data-skin="pitwall"] .pitwall-chance-draw:hover {
+  font-family: var(--pitwall-font-display);
+  letter-spacing: 0.03em;
+  border: 2px solid #ffffff;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 55%, #0d9488 100%);
+  box-shadow: 0 4px 0 #115e59, 0 0 16px rgba(0, 210, 190, 0.6);
+}
+html[data-skin="pitwall"] #btnCloseChance,
+html[data-skin="pitwall"] #btnCloseChanceSheet,
+html[data-skin="pitwall"] #btnCloseChanceModal,
+html[data-skin="pitwall"] #chanceClose,
+html[data-skin="pitwall"] .chance-close,
+html[data-skin="pitwall"] .pitwall-chance-close {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ff8000;
+  background: #0b0d12;
+  background-image: none;
+  color: #ff8000;
+  box-shadow: none;
+}
+
+/* =====================================================================
+   SUPPORTING MODALS & SHEETS (Podium, Class, Group, Plans, Confirmations)
+   ===================================================================== */
+html[data-skin="pitwall"] #podiumModal,
+html[data-skin="pitwall"] #classModal,
+html[data-skin="pitwall"] #groupModal,
+html[data-skin="pitwall"] #resetModal,
+html[data-skin="pitwall"] #applyGridModal,
+html[data-skin="pitwall"] #clearGroupsModal,
+html[data-skin="pitwall"] #planSheet {
+  background-color: rgba(11, 13, 18, 0.72);
+}
+html[data-skin="pitwall"] #podiumModal > .bg-gradient-to-b {
+  font-family: var(--pitwall-font-ui);
+  background-color: #111318;
+  background-image: linear-gradient(180deg, #0b0d12 0%, #1c212e 55%, #2a1810 100%);
+  border: 3px solid #ff8000;
+  box-shadow: 0 0 0 3px #00d2be, 0 20px 44px rgba(0, 0, 0, 0.85);
+}
+html[data-skin="pitwall"] #podiumModal h2 {
+  font-family: var(--pitwall-font-display);
+}
+html[data-skin="pitwall"] #btnDonePodiumModal,
+html[data-skin="pitwall"] #btnDonePodiumModal:hover {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #0b0d12;
+  color: #431407;
+  background-image: linear-gradient(180deg, #fef08a 0%, #ff8000 100%);
+  box-shadow: 0 3px 0 #7c2d12;
+}
+html[data-skin="pitwall"] #planSheet .plan-panel,
+html[data-skin="pitwall"] #classModal .shadow-2xl,
+html[data-skin="pitwall"] #groupModal .shadow-2xl,
+html[data-skin="pitwall"] #resetModal .shadow-2xl,
+html[data-skin="pitwall"] #applyGridModal .shadow-2xl,
+html[data-skin="pitwall"] #clearGroupsModal .shadow-2xl {
+  font-family: var(--pitwall-font-ui);
+  background-color: #161922;
+  background-image: linear-gradient(155deg, #111318 0%, #1c212e 55%, #261b18 100%);
+  color: #f8fafc;
+  border: 3px solid #ff8000;
+  box-shadow: 0 0 0 3px #00d2be, 0 18px 38px rgba(0, 0, 0, 0.85);
+}
+html[data-skin="pitwall"] #planSheet .plan-bar,
+html[data-skin="pitwall"] #classModal .bg-gradient-to-r,
+html[data-skin="pitwall"] #groupModal .bg-gradient-to-r {
+  background-color: #0b0d12;
+  background-image: linear-gradient(90deg, #0b0d12 0%, #1c212e 55%, #431407 100%);
+  color: #fed7aa;
+  border-bottom: 3px solid #00d2be;
+}
+html[data-skin="pitwall"] #planSheet .plan-bar h3,
+html[data-skin="pitwall"] #classModal h2,
+html[data-skin="pitwall"] #groupModal h2,
+html[data-skin="pitwall"] #resetModal h3,
+html[data-skin="pitwall"] #applyGridModal h3,
+html[data-skin="pitwall"] #clearGroupsModal h3 {
+  font-family: var(--pitwall-font-display);
+  color: #fed7aa;
+}
+html[data-skin="pitwall"] #planSheet .plan-action,
+html[data-skin="pitwall"] #planSheet .plan-action:hover,
+html[data-skin="pitwall"] #classModal .bg-indigo-600,
+html[data-skin="pitwall"] #groupModal .bg-indigo-600,
+html[data-skin="pitwall"] #btnConfirmApplyGrid {
+  font-family: var(--pitwall-font-ui);
+  border: 2px solid #ffffff;
+  color: #042f2e;
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00d2be 100%);
+  box-shadow: 0 3px 0 #115e59;
+}
+
+/* =====================================================================
+   KEYFRAMES & REDUCED MOTION
+   ===================================================================== */
+@keyframes pitwallPageMesh {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 50%; }
+  50%  { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 100% 50%; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 50%; }
+}
+@keyframes pitwallFloorMesh {
+  0%   { background-position: 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
+}
+@keyframes pitwallFloorMeshSnap {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
+}
+@keyframes pitwallGantrySweep {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 100% 0; }
+}
+@keyframes pitwallPulse {
+  0%, 100% { filter: brightness(1); transform: translateY(0); }
+  50%      { filter: brightness(1.22); transform: translateY(-1px); }
+}
+@keyframes pitwallPopUp {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.7); }
+  20%  { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.28); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-48px) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin="pitwall"] body,
+  html[data-skin="pitwall"] #studioHeader::before,
+  html[data-skin="pitwall"] #studioHeader::after,
+  html[data-skin="pitwall"] .classroom-floor,
+  html[data-skin="pitwall"] .classroom-floor.snap-active,
+  html[data-skin="pitwall"] .pitwall-fire.is-on {
+    animation: none !important;
+  }
+}
