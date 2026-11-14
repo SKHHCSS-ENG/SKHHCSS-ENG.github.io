@@ -700,14 +700,10 @@ html[data-skin="arcade"] #leaderboardBody > .arcade-tier-3 {
   background: linear-gradient(90deg, #831843, #111827 65%);
   box-shadow: inset 5px 0 0 #f472b6;
 }
-html[data-skin="arcade"] #leaderboardBody > .arcade-tier-1 .lb-rank {
-  color: #fef08a;
-}
-html[data-skin="arcade"] #leaderboardBody > .arcade-tier-2 .lb-rank {
-  color: #7dd3fc;
-}
+html[data-skin="arcade"] #leaderboardBody > .arcade-tier-1 .lb-rank,
+html[data-skin="arcade"] #leaderboardBody > .arcade-tier-2 .lb-rank,
 html[data-skin="arcade"] #leaderboardBody > .arcade-tier-3 .lb-rank {
-  color: #f9a8d4;
+  color: #f8fafc;
 }
 html[data-skin="arcade"] .arcade-fire-mini {
   display: inline-flex;
