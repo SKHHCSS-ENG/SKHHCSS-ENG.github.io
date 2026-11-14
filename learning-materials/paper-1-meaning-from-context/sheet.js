@@ -1,6 +1,6 @@
 /**
  * Paper 1 - Meaning from Context — skill dropdown and sample sheet.
- * Handwrite off: a chip opens part of speech, an English definition, and one sample.
+ * Handwrite off: a chip opens part of speech and one sample, same layout as Cohesion and Aspects.
  * Chinese stays on data-zh for the Tools dock 譯 toggle. It is not copied into the sheet.
  * Handwrite on: chips do not receive taps.
  * The sheet is position:fixed, so the chip list and handwriting canvas do not move.
@@ -21,10 +21,9 @@
   var sheet = document.getElementById('exampleSheet');
   var labelEl = document.getElementById('exampleSheetLabel');
   var posEl = document.getElementById('exampleSheetPos');
-  var defEl = document.getElementById('exampleSheetDef');
   var textEl = document.getElementById('exampleSheetText');
   var closeBtn = document.getElementById('exampleSheetClose');
-  if (!backdrop || !sheet || !labelEl || !posEl || !defEl || !textEl || !closeBtn) return;
+  if (!backdrop || !sheet || !labelEl || !posEl || !textEl || !closeBtn) return;
 
   var current = null;
 
@@ -76,8 +75,14 @@
     var li = btn.closest('li');
     if (li) li.classList.add('is-selected');
     labelEl.textContent = (btn.textContent || '').replace(/\s+/g, ' ').trim();
-    posEl.textContent = btn.getAttribute('data-pos') || '';
-    defEl.textContent = btn.getAttribute('data-def') || '';
+    var pos = (btn.getAttribute('data-pos') || '').replace(/\s+/g, ' ').trim();
+    if (pos) {
+      posEl.textContent = pos;
+      posEl.hidden = false;
+    } else {
+      posEl.textContent = '';
+      posEl.hidden = true;
+    }
     textEl.innerHTML = exampleHtml(example);
     place();
     backdrop.hidden = false;

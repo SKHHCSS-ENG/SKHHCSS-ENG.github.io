@@ -333,7 +333,7 @@
     var sheet = document.getElementById("exampleSheet");
     var textEl = document.getElementById("exampleSheetText");
     var inner = sheet && sheet.querySelector(".example-sheet-inner");
-    var root = document.getElementById("yearSets");
+    var root = document.getElementById("skillSets");
     if (!sheet || !textEl || !inner || !root) return;
     if (document.getElementById("exampleExplainBtn")) return;
 
