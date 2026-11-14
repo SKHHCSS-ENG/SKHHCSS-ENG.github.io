@@ -30,8 +30,19 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.entries[0].path, "/");
   assert.equal(SiteFind.entries[28].title, "Paper 1 - Meaning from Context");
   assert.equal(SiteFind.entries[28].path, "learning-materials/paper-1-meaning-from-context/");
-  assert.equal(SiteFind.entries[32].title, "What's New");
-  assert.equal(SiteFind.entries[32].path, "whats-new/");
+  assert.equal(SiteFind.entries[32].title, "Site Notes");
+  assert.equal(SiteFind.entries[32].path, "site-notes/");
+  const siteNotes = SiteFind.search("site notes");
+  assert.equal(siteNotes.length, 1);
+  assert.equal(siteNotes[0].title, "Site Notes");
+  assert.equal(siteNotes[0].path, "site-notes/");
+  const oldName = SiteFind.search("whats new");
+  assert.equal(oldName.length, 1);
+  assert.equal(oldName[0].title, "Site Notes");
+  assert.equal(oldName[0].path, "site-notes/");
+  assert.equal(paths.includes("whats-new/"), false);
+  assert.equal(fs.existsSync(new URL("./whats-new/", import.meta.url)), false);
+  assert.equal(fs.existsSync(new URL("./site-notes/index.html", import.meta.url)), true);
   assert.equal(SiteFind.entries[33].title, "Practice");
   assert.equal(SiteFind.entries[33].path, "practice/");
   assert.equal(SiteFind.entries[34].title, "Fun Projects");
@@ -205,8 +216,8 @@ test("Find and Ask jump links prefix /english/ on the school LMS", () => {
     SiteFind.hrefFor("learning-materials/useful-vocabulary/#coh-h", base),
     "/english/learning-materials/useful-vocabulary/#coh-h"
   );
-  assert.equal(SiteFind.hrefFor("/english/whats-new/", base), "/english/whats-new/");
-  assert.equal(SiteFind.hrefFor("whats-new/", "/english/"), "/english/whats-new/");
+  assert.equal(SiteFind.hrefFor("/english/site-notes/", base), "/english/site-notes/");
+  assert.equal(SiteFind.hrefFor("site-notes/", "/english/"), "/english/site-notes/");
 });
 
 test("script URL sets the base used by Find and Ask jumps", () => {
@@ -238,7 +249,7 @@ test("script URL sets the base used by Find and Ask jumps", () => {
 
   const rootPage = loadSiteFind(null, { pathname: "/learning-materials/" });
   assert.equal(rootPage.siteBase(), "");
-  assert.equal(rootPage.hrefFor("whats-new/"), "/whats-new/");
+  assert.equal(rootPage.hrefFor("site-notes/"), "/site-notes/");
 });
 
 test("Spelling Watchlist aliases jump to the new part names", () => {
@@ -350,7 +361,7 @@ test("English home cards each have one job, in order", () => {
     "Fun Projects",
     "Activities &amp; Competitions",
     "Classroom",
-    "What's New"
+    "Site Notes"
   ]);
   assert.match(home, /Exam skills, writing formats, junior grammar, and useful vocabulary\./);
   assert.match(home, /Exam-style practice, starting with Paper 1\./);
@@ -363,7 +374,7 @@ test("English home cards each have one job, in order", () => {
   assert.match(home, /href="fun-projects\/"/);
   assert.match(home, /href="activities-and-competitions\/"/);
   assert.match(home, /href="classroom\/"/);
-  assert.match(home, /href="whats-new\/"/);
+  assert.match(home, /href="site-notes\/"/);
   assert.match(home, /badge-teacher">Teacher</);
   assert.equal(home.includes("last-minute-notes"), false);
   assert.equal(home.includes("instagram"), false);
