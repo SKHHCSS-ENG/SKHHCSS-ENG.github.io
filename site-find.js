@@ -397,10 +397,12 @@
       ]
     },
     {
-      "title": "What's New",
-      "path": "whats-new/",
+      "title": "Site Notes",
+      "path": "site-notes/",
       "aliases": [
+        "site notes",
         "whats new",
+        "what's new",
         "更新",
         "最新消息"
       ]

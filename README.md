@@ -8,7 +8,7 @@ Public GitHub Pages site for the English panel.
 - **Fun Projects:** https://skhhcss-eng.github.io/fun-projects/
 - **Activities & Competitions:** https://skhhcss-eng.github.io/activities-and-competitions/
 - **Classroom:** https://skhhcss-eng.github.io/classroom/
-- **What's New:** https://skhhcss-eng.github.io/whats-new/
+- **Site Notes:** https://skhhcss-eng.github.io/site-notes/
 - **HCS Live Class:** https://skhhcss-eng.github.io/classroom/hcs-live-class/
 - **HCS Live Class +:** https://skhhcss-eng.github.io/classroom/hcs-live-class-plus/
 - **Speech Festival:** https://skhhcss-eng.github.io/speech-festival/ (project site; the Eng folder remains until that host is live)
@@ -19,7 +19,7 @@ Public GitHub Pages site for the English panel.
 
 | Path | What |
 |------|------|
-| `/` | English Department home (Learning Materials · Practice · Fun Projects · Activities & Competitions · Classroom · What's New) |
+| `/` | English Department home (Learning Materials · Practice · Fun Projects · Activities & Competitions · Classroom · Site Notes) |
 | `/learning-materials/` | Student notes (exam skills, writing formats, junior grammar, useful vocabulary). Paper 1 - Reading links across to Practice. |
 | `/practice/` | Exam-style practice. Paper 1 - Exam Practice opens on its project site. |
 | `/fun-projects/` | Fun Projects. Say It Louder opens on its project site. |
@@ -27,7 +27,7 @@ Public GitHub Pages site for the English panel.
 | `/classroom/` | Teacher tools hub |
 | `/classroom/hcs-live-class-plus/` | HCS Live Class + (same Live Class tools, plus a classroom assistant). Seating storage and saved plan names stay separate from Live Class. |
 | `/classroom/hcs-live-class/` | HCS Live Class (live scoreboard / desks / points). |
-| `/whats-new/` | Site updates (newest first) |
+| `/site-notes/` | Site updates (newest first) |
 | `/speech-festival/` | Speech Festival source copy (the Activities & Competitions card opens the project site). |
 | `/speech-festival/u41/` | U41 *Last Day* (Clare Bevan) — S3 Girls |
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |

@@ -2,7 +2,7 @@
  * English subject site — student-facing build label.
  *
  * One file for every page. The footer script reads `sha` and `date` below.
- * What's New echoes the same label (see whats-new/index.html).
+ * Site Notes echoes the same label (see site-notes/index.html).
  *
  * Nest, on each ship:
  * 1. Finish the content commit. That commit is the one Howard should revert to.
@@ -11,16 +11,16 @@
  *    short month, no leading zero: `22 Oct 2026`
  *    (`TZ=Asia/Hong_Kong date '+%-d %b %Y'` in an English locale).
  * 4. Stop there for the stamp. Set `sha` and `date` in this file only (plus
- *    What's New when that note is folded into the feature tip). Do not rewrite
+ *    Site Notes when that note is folded into the feature tip). Do not rewrite
  *    every page's `site-version.js?v=`. Pages keep `?v=sv`. Phones may need one
  *    refresh after a stamp if the old JS was cached hard. That is an acceptable
  *    tradeoff.
- * 5. What's New end-of-day: under the newest date only, keep one line
+ * 5. Site Notes end-of-day: under the newest date only, keep one line
  *    `<p class="release-version" data-site-version-echo>Site version: <span data-site-version-label>…</span></p>`
  *    and put the same `sha · date` text in the span. Move the line forward
  *    when a new day is added. It is not an Added / Changed / Fixed bullet.
  *    This script also fills `[data-site-version-label]` from `sha` and `date`,
- *    so the footer and What's New stay on the same build after the page loads.
+ *    so the footer and Site Notes stay on the same build after the page loads.
  *
  * The label is the content commit, not the tiny follow-up that writes the label
  * (a file cannot contain its own commit id). Match it on GitHub, then revert
