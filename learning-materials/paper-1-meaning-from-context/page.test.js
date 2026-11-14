@@ -744,149 +744,149 @@ const SPEC = [
     ]
   },
   {
-    "skill": "tone-and-attitude",
-    "theme": "Tone and attitude",
-    "lead": "The words around a description often show how the writer feels. Use that tone to pin down the word.",
+    "skill": "inference",
+    "theme": "Inference",
+    "lead": "Sometimes no phrase restates the word. Use the details in the sentence to infer the meaning.",
     "rows": [
       {
-        "chip": "sarcastic",
+        "chip": "grim",
         "pos": "adj.",
-        "def": "saying the opposite of what you mean, in order to mock",
-        "zh": "諷刺的",
-        "example": "When he called the 200-word essay a light warm-up, his tone was <strong>sarcastic</strong>, not kind."
+        "def": "very serious and unpleasant",
+        "zh": "嚴峻的／令人沮喪的",
+        "example": "The first paragraph painted a <strong>grim</strong> picture of the river: dead fish, a sharp smell, and no one willing to walk along the bank."
       },
       {
-        "chip": "sympathetic",
+        "chip": "strained",
         "pos": "adj.",
-        "def": "showing that you understand someone’s feelings",
-        "zh": "體諒的／有同情心的",
-        "example": "The counsellor was <strong>sympathetic</strong> when the student explained why the homework was late, and helped her make a new plan."
+        "def": "under pressure; not relaxed",
+        "zh": "緊張的",
+        "example": "After the argument, their conversation was <strong>strained</strong>; they spoke only when they had to."
       },
       {
-        "chip": "dismissive",
+        "chip": "lukewarm",
         "pos": "adj.",
-        "def": "showing that you think something is not worth attention",
-        "zh": "不屑的／輕視的",
-        "example": "The review was <strong>dismissive</strong> of the film, waving it away as just another sequel."
+        "def": "not very keen or interested",
+        "zh": "反應冷淡的",
+        "example": "The proposal received a <strong>lukewarm</strong> response: a few polite nods, but no one volunteered."
       },
       {
-        "chip": "optimistic",
+        "chip": "hasty",
         "pos": "adj.",
-        "def": "hopeful about the future",
-        "zh": "樂觀的",
-        "example": "Despite the tight deadline, the team stayed <strong>optimistic</strong> and believed the display would be ready."
+        "def": "done too quickly",
+        "zh": "倉促的",
+        "example": "It was a <strong>hasty</strong> decision to cancel the match after two drops of rain; the court was dry ten minutes later."
       },
       {
-        "chip": "sceptical",
+        "chip": "grudging",
         "pos": "adj.",
-        "def": "doubtful; not easily convinced",
-        "zh": "懷疑的",
-        "example": "Several parents were <strong>sceptical</strong> about the new app until they had seen how it actually worked."
+        "def": "given unwillingly",
+        "zh": "勉強的",
+        "example": "He offered a <strong>grudging</strong> apology, with no eye contact and a half-finished sentence."
       },
       {
-        "chip": "cynical",
+        "chip": "barren",
         "pos": "adj.",
-        "def": "believing that people are not sincere, or that a promise hides a selfish reason",
-        "zh": "憤世嫉俗的",
-        "example": "He gave a <strong>cynical</strong> smile when the leaflet promised free gifts for everyone, as if he already knew the catch."
+        "def": "bare and unable to support much life; producing little",
+        "zh": "貧瘠的／荒蕪的",
+        "example": "The hillside was <strong>barren</strong>: no trees, no shade, and only loose stone underfoot."
       },
       {
-        "chip": "enthusiastic",
+        "chip": "frantic",
         "pos": "adj.",
-        "def": "showing strong interest and excitement",
-        "zh": "熱心的／熱情的",
-        "example": "The class was <strong>enthusiastic</strong> about the outing, and several students stayed behind to help with the packing."
+        "def": "wildly hurried and anxious",
+        "zh": "忙亂的",
+        "example": "Staff were <strong>frantic</strong> before the open day, rushing from the hall to the gate with boxes still unpacked."
       },
       {
-        "chip": "indifferent",
+        "chip": "weary",
         "pos": "adj.",
-        "def": "not interested or not caring",
-        "zh": "漠不關心的",
-        "example": "She seemed <strong>indifferent</strong> to the result, shrugging and walking off before the scores were even read."
+        "def": "very tired, often after long effort",
+        "zh": "疲倦的",
+        "example": "After three periods of rehearsal, the dancers looked <strong>weary</strong>; several sat on the floor and no one spoke."
       },
       {
-        "chip": "resentful",
+        "chip": "solemn",
         "pos": "adj.",
-        "def": "feeling angry and bitter because you think you have been treated unfairly",
-        "zh": "憤憤不平的",
-        "example": "He was <strong>resentful</strong> about the new seating plan, muttering that he had not been asked for his view."
+        "def": "serious and formal, not cheerful",
+        "zh": "莊重的／嚴肅的",
+        "example": "The hall was <strong>solemn</strong> as the names were read; nobody whispered or reached for a phone."
       },
       {
-        "chip": "cautious",
+        "chip": "restless",
         "pos": "adj.",
-        "def": "careful to avoid risk or mistakes",
-        "zh": "謹慎的",
-        "example": "The librarian was <strong>cautious</strong> about the new system and tested it with one class before opening it to all."
+        "def": "unable to keep still or stay settled",
+        "zh": "坐立不安的",
+        "example": "The younger pupils grew <strong>restless</strong> during the long speech, shifting in their seats and glancing at the clock."
       },
       {
-        "chip": "hostile",
+        "chip": "brisk",
         "pos": "adj.",
-        "def": "unfriendly and aggressive",
-        "zh": "敵對的",
-        "example": "A few comments online were <strong>hostile</strong>, attacking the organiser rather than discussing the plan."
+        "def": "quick, energetic and businesslike",
+        "zh": "乾脆利落的",
+        "example": "The teacher’s tone was <strong>brisk</strong>: short instructions, no extra chat, and the class lined up at once."
       },
       {
-        "chip": "defensive",
+        "chip": "uneasy",
         "pos": "adj.",
-        "def": "quick to protect yourself from criticism",
-        "zh": "防備的／護短的",
-        "example": "She became <strong>defensive</strong> when asked about the missing props, and blamed everyone except her own team."
+        "def": "uncomfortable and a little anxious",
+        "zh": "不安的",
+        "example": "He looked <strong>uneasy</strong> at the door, checking his bag twice and not stepping in until he was called."
       },
       {
-        "chip": "frank",
+        "chip": "stark",
         "pos": "adj.",
-        "def": "open and honest in what you say",
-        "zh": "坦率的",
-        "example": "The coach was <strong>frank</strong> about the team’s weaknesses, and nobody was left wondering what to improve."
+        "def": "bare and plain, with nothing extra",
+        "zh": "空蕩蕩的／簡陋的",
+        "example": "The room was <strong>stark</strong>, with bare walls, one desk and no posters."
       },
       {
-        "chip": "complimentary",
+        "chip": "muted",
         "pos": "adj.",
-        "def": "expressing praise",
-        "zh": "讚賞的",
-        "example": "The review was <strong>complimentary</strong>, praising the clear plot and the calm performances."
+        "def": "quiet and held back; not lively or strong",
+        "zh": "低調的",
+        "example": "The celebration was <strong>muted</strong>: a short clap, then everyone went quietly back to class."
       },
       {
-        "chip": "nostalgic",
+        "chip": "cluttered",
         "pos": "adj.",
-        "def": "feeling a gentle longing for the past",
-        "zh": "懷舊的",
-        "example": "The old photo display made some alumni <strong>nostalgic</strong>, and they lingered over pictures of the old hall."
+        "def": "messy, with too many things piled together",
+        "zh": "雜亂的",
+        "example": "His desk was <strong>cluttered</strong>, with notes, cables and three empty cups covering the keyboard."
       },
       {
-        "chip": "impatient",
+        "chip": "deserted",
         "pos": "adj.",
-        "def": "annoyed at having to wait, or wanting something to happen sooner",
-        "zh": "不耐煩的",
-        "example": "The queue grew <strong>impatient</strong> when the machine jammed, and several people began to complain out loud."
+        "def": "empty of people",
+        "zh": "空無一人的",
+        "example": "The bus stop was <strong>deserted</strong> at nine, with not a single student left on the bench."
       },
       {
-        "chip": "arrogant",
+        "chip": "harsh",
         "pos": "adj.",
-        "def": "believing you are better or more important than others",
-        "zh": "傲慢的",
-        "example": "His tone was <strong>arrogant</strong>; he talked as if no other idea could possibly be as good as his."
+        "def": "unpleasantly severe or unkind",
+        "zh": "苛刻的",
+        "example": "The teacher’s comment was <strong>harsh</strong>: she listed every fault and offered no word of encouragement."
       },
       {
-        "chip": "sincere",
+        "chip": "vibrant",
         "pos": "adj.",
-        "def": "honest and truly meant",
-        "zh": "真誠的",
-        "example": "Her apology was <strong>sincere</strong>: she looked at the teammate she had interrupted and did not make the same mistake again."
+        "def": "full of life, energy and colour",
+        "zh": "充滿活力的",
+        "example": "The street market was <strong>vibrant</strong>, with bright stalls and a crowd moving in every direction."
       },
       {
-        "chip": "humble",
+        "chip": "neglected",
         "pos": "adj.",
-        "def": "not proud; not talking as if you are more important than others",
-        "zh": "謙虛的",
-        "example": "The winner was <strong>humble</strong> in her speech, giving credit to the whole team rather than to herself."
+        "def": "not given the care or attention needed",
+        "zh": "疏於打理的",
+        "example": "The noticeboard looked <strong>neglected</strong>: faded papers, a torn corner, and dates from last term still pinned up."
       },
       {
-        "chip": "gloomy",
+        "chip": "rigid",
         "pos": "adj.",
-        "def": "sad and without hope",
-        "zh": "悲觀的",
-        "example": "He was <strong>gloomy</strong> about the second half, and kept saying the team had already lost."
+        "def": "stiff and not willing to change",
+        "zh": "死板的",
+        "example": "His schedule was <strong>rigid</strong>; he would not move a single slot, even when the guest speaker arrived late."
       }
     ]
   },
@@ -1185,447 +1185,6 @@ const SPEC = [
     ]
   },
   {
-    "skill": "formal-and-informal",
-    "theme": "Formal and informal",
-    "lead": "In Paper 1, a more formal word often appears in reports, notices and official letters. Use 譯 for the everyday Chinese meaning.",
-    "rows": [
-      {
-        "chip": "commence",
-        "pos": "v.",
-        "def": "to start (formal)",
-        "zh": "開始（較正式）",
-        "example": "The briefing will <strong>commence</strong> at 8:15 a.m. sharp."
-      },
-      {
-        "chip": "obtain",
-        "pos": "v.",
-        "def": "to get (formal)",
-        "zh": "取得（較正式）",
-        "example": "Students must <strong>obtain</strong> a parent’s signature before the trip."
-      },
-      {
-        "chip": "reside",
-        "pos": "v.",
-        "def": "to live (formal)",
-        "zh": "居住（較正式）",
-        "example": "Applicants should <strong>reside</strong> in the district, or have a close family member who does."
-      },
-      {
-        "chip": "cease",
-        "pos": "v.",
-        "def": "to stop (formal)",
-        "zh": "停止（較正式）",
-        "example": "Please <strong>cease</strong> talking when the exam paper is being given out."
-      },
-      {
-        "chip": "request",
-        "pos": "v.",
-        "def": "to ask someone to do something (formal)",
-        "zh": "要求／請求（較正式）",
-        "example": "Visitors are <strong>requested</strong> to sign in at the general office."
-      },
-      {
-        "chip": "notify",
-        "pos": "v.",
-        "def": "to tell someone officially (formal)",
-        "zh": "通知（較正式）",
-        "example": "Parents will be <strong>notified</strong> by email if the match is cancelled."
-      },
-      {
-        "chip": "submit",
-        "pos": "v.",
-        "def": "to hand in (formal)",
-        "zh": "提交（較正式）",
-        "example": "Please <strong>submit</strong> the permission slip to the general office by Friday."
-      },
-      {
-        "chip": "postpone",
-        "pos": "v.",
-        "def": "to arrange for something to happen later (formal)",
-        "zh": "延期（較正式）",
-        "example": "The concert will be <strong>postponed</strong> until the hall repairs are complete."
-      },
-      {
-        "chip": "terminate",
-        "pos": "v.",
-        "def": "to bring something to an end (formal)",
-        "zh": "終止（較正式）",
-        "example": "The trial arrangement will <strong>terminate</strong> at the end of this month."
-      },
-      {
-        "chip": "allocate",
-        "pos": "v.",
-        "def": "to set something aside for a particular person or purpose (formal)",
-        "zh": "分配（較正式）",
-        "example": "The office will <strong>allocate</strong> lockers according to class number."
-      },
-      {
-        "chip": "proceed",
-        "pos": "v.",
-        "def": "to continue, or to go on to the next step (formal)",
-        "zh": "繼續進行（較正式）",
-        "example": "After the briefing, the tour will <strong>proceed</strong> to the science block."
-      },
-      {
-        "chip": "retain",
-        "pos": "v.",
-        "def": "to keep (formal)",
-        "zh": "保留（較正式）",
-        "example": "Students may <strong>retain</strong> their textbooks over the summer if they have signed the form."
-      },
-      {
-        "chip": "convene",
-        "pos": "v.",
-        "def": "to meet formally, or to call a meeting (formal)",
-        "zh": "召開（較正式）",
-        "example": "The committee will <strong>convene</strong> at 4 p.m. in the conference room."
-      },
-      {
-        "chip": "specify",
-        "pos": "v.",
-        "def": "to state clearly and exactly (formal)",
-        "zh": "指明／註明（較正式）",
-        "example": "The notice <strong>specifies</strong> the items students should bring, including a water bottle and a hat."
-      },
-      {
-        "chip": "enquire",
-        "pos": "v.",
-        "def": "to ask for information (formal)",
-        "zh": "查詢（較正式）",
-        "example": "Visitors should <strong>enquire</strong> at the general office for a visitor badge."
-      },
-      {
-        "chip": "appoint",
-        "pos": "v.",
-        "def": "to formally choose someone for a role (formal)",
-        "zh": "委任（較正式）",
-        "example": "The council will <strong>appoint</strong> a new secretary at its next meeting."
-      },
-      {
-        "chip": "ensure",
-        "pos": "v.",
-        "def": "to make certain that something happens (formal)",
-        "zh": "確保（較正式）",
-        "example": "Staff will <strong>ensure</strong> that all exits remain clear during the drill."
-      },
-      {
-        "chip": "implement",
-        "pos": "v.",
-        "def": "to put a plan or rule into action (formal)",
-        "zh": "實施（較正式）",
-        "example": "The school will <strong>implement</strong> the new timetable in January."
-      },
-      {
-        "chip": "require",
-        "pos": "v.",
-        "def": "to make something necessary (formal)",
-        "zh": "規定／必須（較正式）",
-        "example": "All participants are <strong>required</strong> to wear sports shoes on the field."
-      },
-      {
-        "chip": "acknowledge",
-        "pos": "v.",
-        "def": "to accept or show that you have noticed something (formal)",
-        "zh": "知悉／承認（較正式）",
-        "example": "The letter <strong>acknowledged</strong> the parents’ concerns and set out a new pick-up time."
-      }
-    ]
-  },
-  {
-    "skill": "words-that-go-together",
-    "theme": "Words that go together",
-    "lead": "Some verbs have typical partners. Learn the whole phrase, then use the rest of the sentence to confirm the meaning.",
-    "rows": [
-      {
-        "chip": "pose a threat",
-        "pos": "phrase",
-        "def": "to present or create a risk",
-        "zh": "構成威脅",
-        "example": "Abandoned bicycles can <strong>pose a threat</strong> to people walking through the back lane."
-      },
-      {
-        "chip": "play a role",
-        "pos": "phrase",
-        "def": "to have a part or function in something",
-        "zh": "發揮作用",
-        "example": "Parent volunteers <strong>play a key role</strong> in the reading week."
-      },
-      {
-        "chip": "raise awareness",
-        "pos": "phrase",
-        "def": "to help more people know about or notice something",
-        "zh": "提高意識",
-        "example": "The poster campaign aimed to <strong>raise awareness</strong> of heatstroke on sports day."
-      },
-      {
-        "chip": "take into account",
-        "pos": "phrase",
-        "def": "to consider something when you decide",
-        "zh": "考慮到",
-        "example": "When choosing a venue, <strong>take into account</strong> the time needed to travel back to school."
-      },
-      {
-        "chip": "reach a consensus",
-        "pos": "phrase",
-        "def": "to arrive at an agreement that everyone can accept",
-        "zh": "達成共識",
-        "example": "After a long discussion, the committee managed to <strong>reach a consensus</strong> on the theme."
-      },
-      {
-        "chip": "bear in mind",
-        "pos": "phrase",
-        "def": "to remember and consider something",
-        "zh": "緊記",
-        "example": "When you pack for the field trip, <strong>bear in mind</strong> that the trail is steep and shade is limited."
-      },
-      {
-        "chip": "pave the way",
-        "pos": "phrase",
-        "def": "to make later progress or a later change easier",
-        "zh": "為…鋪路",
-        "example": "Last year’s trial run helped <strong>pave the way</strong> for a full recycling scheme this term."
-      },
-      {
-        "chip": "shed light on",
-        "pos": "phrase",
-        "def": "to make something easier to understand",
-        "zh": "闡明／揭示",
-        "example": "The interview may <strong>shed light on</strong> why so few students signed up for the course."
-      },
-      {
-        "chip": "take pride in",
-        "pos": "phrase",
-        "def": "to feel pleased and satisfied about something you have done",
-        "zh": "以…為榮",
-        "example": "The prefects <strong>take pride in</strong> the garden they planted, and they water it every morning."
-      },
-      {
-        "chip": "draw attention to",
-        "pos": "phrase",
-        "def": "to make people notice something",
-        "zh": "使注意",
-        "example": "The article <strong>drew attention to</strong> the lack of drinking fountains on the top floor."
-      },
-      {
-        "chip": "keep pace with",
-        "pos": "phrase",
-        "def": "to go or develop as fast as someone or something else",
-        "zh": "跟上",
-        "example": "Some readers struggle to <strong>keep pace with</strong> the speaker if the recording is played only once."
-      },
-      {
-        "chip": "run the risk",
-        "pos": "phrase",
-        "def": "to do something that may lead to a bad result",
-        "zh": "冒…的風險",
-        "example": "If you leave your bag in the corridor, you <strong>run the risk</strong> of someone taking it by mistake."
-      },
-      {
-        "chip": "bring about",
-        "pos": "phrase",
-        "def": "to cause something to happen",
-        "zh": "引致／帶來",
-        "example": "A short change to the timetable can <strong>bring about</strong> longer queues at the canteen."
-      },
-      {
-        "chip": "come to terms with",
-        "pos": "phrase",
-        "def": "to accept a difficult or disappointing fact",
-        "zh": "接受（不如意的事）",
-        "example": "It took him a week to <strong>come to terms with</strong> the cancelled trip and start planning a new outing."
-      },
-      {
-        "chip": "set an example",
-        "pos": "phrase",
-        "def": "to behave in a way that others can copy",
-        "zh": "樹立榜樣",
-        "example": "Senior students are asked to <strong>set an example</strong> by lining up quietly at the gate."
-      },
-      {
-        "chip": "make a difference",
-        "pos": "phrase",
-        "def": "to have a useful effect; to improve a situation",
-        "zh": "有作用／帶來改變",
-        "example": "A few extra chairs in the corridor can <strong>make a difference</strong> when parents arrive for the concert."
-      },
-      {
-        "chip": "put emphasis on",
-        "pos": "phrase",
-        "def": "to give special importance to something",
-        "zh": "強調",
-        "example": "The coach <strong>put emphasis on</strong> safety, and every player had to wear a helmet."
-      },
-      {
-        "chip": "take advantage of",
-        "pos": "phrase",
-        "def": "to make good use of an opportunity",
-        "zh": "利用",
-        "example": "Students can <strong>take advantage of</strong> the early opening and revise in the library before assembly."
-      },
-      {
-        "chip": "hold accountable",
-        "pos": "phrase",
-        "def": "to treat someone as responsible for something",
-        "zh": "要…負責",
-        "example": "The notice <strong>held team leaders accountable</strong> for packing away the equipment."
-      },
-      {
-        "chip": "live up to",
-        "pos": "phrase",
-        "def": "to be as good as what was expected or promised",
-        "zh": "達到（期望）",
-        "example": "The sequel did not <strong>live up to</strong> the excitement promised in the trailer."
-      }
-    ]
-  },
-  {
-    "skill": "inference",
-    "theme": "Inference",
-    "lead": "Sometimes no phrase restates the word. Use the details in the sentence to infer the meaning.",
-    "rows": [
-      {
-        "chip": "grim",
-        "pos": "adj.",
-        "def": "very serious and unpleasant",
-        "zh": "嚴峻的／令人沮喪的",
-        "example": "The first paragraph painted a <strong>grim</strong> picture of the river: dead fish, a sharp smell, and no one willing to walk along the bank."
-      },
-      {
-        "chip": "strained",
-        "pos": "adj.",
-        "def": "under pressure; not relaxed",
-        "zh": "緊張的",
-        "example": "After the argument, their conversation was <strong>strained</strong>; they spoke only when they had to."
-      },
-      {
-        "chip": "lukewarm",
-        "pos": "adj.",
-        "def": "not very keen or interested",
-        "zh": "反應冷淡的",
-        "example": "The proposal received a <strong>lukewarm</strong> response: a few polite nods, but no one volunteered."
-      },
-      {
-        "chip": "hasty",
-        "pos": "adj.",
-        "def": "done too quickly",
-        "zh": "倉促的",
-        "example": "It was a <strong>hasty</strong> decision to cancel the match after two drops of rain; the court was dry ten minutes later."
-      },
-      {
-        "chip": "grudging",
-        "pos": "adj.",
-        "def": "given unwillingly",
-        "zh": "勉強的",
-        "example": "He offered a <strong>grudging</strong> apology, with no eye contact and a half-finished sentence."
-      },
-      {
-        "chip": "barren",
-        "pos": "adj.",
-        "def": "bare and unable to support much life; producing little",
-        "zh": "貧瘠的／荒蕪的",
-        "example": "The hillside was <strong>barren</strong>: no trees, no shade, and only loose stone underfoot."
-      },
-      {
-        "chip": "frantic",
-        "pos": "adj.",
-        "def": "wildly hurried and anxious",
-        "zh": "忙亂的",
-        "example": "Staff were <strong>frantic</strong> before the open day, rushing from the hall to the gate with boxes still unpacked."
-      },
-      {
-        "chip": "weary",
-        "pos": "adj.",
-        "def": "very tired, often after long effort",
-        "zh": "疲倦的",
-        "example": "After three periods of rehearsal, the dancers looked <strong>weary</strong>; several sat on the floor and no one spoke."
-      },
-      {
-        "chip": "solemn",
-        "pos": "adj.",
-        "def": "serious and formal, not cheerful",
-        "zh": "莊重的／嚴肅的",
-        "example": "The hall was <strong>solemn</strong> as the names were read; nobody whispered or reached for a phone."
-      },
-      {
-        "chip": "restless",
-        "pos": "adj.",
-        "def": "unable to keep still or stay settled",
-        "zh": "坐立不安的",
-        "example": "The younger pupils grew <strong>restless</strong> during the long speech, shifting in their seats and glancing at the clock."
-      },
-      {
-        "chip": "brisk",
-        "pos": "adj.",
-        "def": "quick, energetic and businesslike",
-        "zh": "乾脆利落的",
-        "example": "The teacher’s tone was <strong>brisk</strong>: short instructions, no extra chat, and the class lined up at once."
-      },
-      {
-        "chip": "uneasy",
-        "pos": "adj.",
-        "def": "uncomfortable and a little anxious",
-        "zh": "不安的",
-        "example": "He looked <strong>uneasy</strong> at the door, checking his bag twice and not stepping in until he was called."
-      },
-      {
-        "chip": "stark",
-        "pos": "adj.",
-        "def": "bare and plain, with nothing extra",
-        "zh": "空蕩蕩的／簡陋的",
-        "example": "The room was <strong>stark</strong>, with bare walls, one desk and no posters."
-      },
-      {
-        "chip": "muted",
-        "pos": "adj.",
-        "def": "quiet and held back; not lively or strong",
-        "zh": "低調的",
-        "example": "The celebration was <strong>muted</strong>: a short clap, then everyone went quietly back to class."
-      },
-      {
-        "chip": "cluttered",
-        "pos": "adj.",
-        "def": "messy, with too many things piled together",
-        "zh": "雜亂的",
-        "example": "His desk was <strong>cluttered</strong>, with notes, cables and three empty cups covering the keyboard."
-      },
-      {
-        "chip": "deserted",
-        "pos": "adj.",
-        "def": "empty of people",
-        "zh": "空無一人的",
-        "example": "The bus stop was <strong>deserted</strong> at nine, with not a single student left on the bench."
-      },
-      {
-        "chip": "harsh",
-        "pos": "adj.",
-        "def": "unpleasantly severe or unkind",
-        "zh": "苛刻的",
-        "example": "The teacher’s comment was <strong>harsh</strong>: she listed every fault and offered no word of encouragement."
-      },
-      {
-        "chip": "vibrant",
-        "pos": "adj.",
-        "def": "full of life, energy and colour",
-        "zh": "充滿活力的",
-        "example": "The street market was <strong>vibrant</strong>, with bright stalls and a crowd moving in every direction."
-      },
-      {
-        "chip": "neglected",
-        "pos": "adj.",
-        "def": "not given the care or attention needed",
-        "zh": "疏於打理的",
-        "example": "The noticeboard looked <strong>neglected</strong>: faded papers, a torn corner, and dates from last term still pinned up."
-      },
-      {
-        "chip": "rigid",
-        "pos": "adj.",
-        "def": "stiff and not willing to change",
-        "zh": "死板的",
-        "example": "His schedule was <strong>rigid</strong>; he would not move a single slot, even when the guest speaker arrived late."
-      }
-    ]
-  },
-  {
     "skill": "how-much-and-how-far",
     "theme": "How much, and how far",
     "lead": "These words limit or widen a statement. Read the example that follows before you settle on a meaning.",
@@ -1916,6 +1475,447 @@ const SPEC = [
         "def": "extremely good; clearly better than usual",
         "zh": "出色的",
         "example": "The choir gave an <strong>outstanding</strong> performance, with not a single late entry."
+      }
+    ]
+  },
+  {
+    "skill": "tone-and-attitude",
+    "theme": "Tone and attitude",
+    "lead": "The words around a description often show how the writer feels. Use that tone to pin down the word.",
+    "rows": [
+      {
+        "chip": "sarcastic",
+        "pos": "adj.",
+        "def": "saying the opposite of what you mean, in order to mock",
+        "zh": "諷刺的",
+        "example": "When he called the 200-word essay a light warm-up, his tone was <strong>sarcastic</strong>, not kind."
+      },
+      {
+        "chip": "sympathetic",
+        "pos": "adj.",
+        "def": "showing that you understand someone’s feelings",
+        "zh": "體諒的／有同情心的",
+        "example": "The counsellor was <strong>sympathetic</strong> when the student explained why the homework was late, and helped her make a new plan."
+      },
+      {
+        "chip": "dismissive",
+        "pos": "adj.",
+        "def": "showing that you think something is not worth attention",
+        "zh": "不屑的／輕視的",
+        "example": "The review was <strong>dismissive</strong> of the film, waving it away as just another sequel."
+      },
+      {
+        "chip": "optimistic",
+        "pos": "adj.",
+        "def": "hopeful about the future",
+        "zh": "樂觀的",
+        "example": "Despite the tight deadline, the team stayed <strong>optimistic</strong> and believed the display would be ready."
+      },
+      {
+        "chip": "sceptical",
+        "pos": "adj.",
+        "def": "doubtful; not easily convinced",
+        "zh": "懷疑的",
+        "example": "Several parents were <strong>sceptical</strong> about the new app until they had seen how it actually worked."
+      },
+      {
+        "chip": "cynical",
+        "pos": "adj.",
+        "def": "believing that people are not sincere, or that a promise hides a selfish reason",
+        "zh": "憤世嫉俗的",
+        "example": "He gave a <strong>cynical</strong> smile when the leaflet promised free gifts for everyone, as if he already knew the catch."
+      },
+      {
+        "chip": "enthusiastic",
+        "pos": "adj.",
+        "def": "showing strong interest and excitement",
+        "zh": "熱心的／熱情的",
+        "example": "The class was <strong>enthusiastic</strong> about the outing, and several students stayed behind to help with the packing."
+      },
+      {
+        "chip": "indifferent",
+        "pos": "adj.",
+        "def": "not interested or not caring",
+        "zh": "漠不關心的",
+        "example": "She seemed <strong>indifferent</strong> to the result, shrugging and walking off before the scores were even read."
+      },
+      {
+        "chip": "resentful",
+        "pos": "adj.",
+        "def": "feeling angry and bitter because you think you have been treated unfairly",
+        "zh": "憤憤不平的",
+        "example": "He was <strong>resentful</strong> about the new seating plan, muttering that he had not been asked for his view."
+      },
+      {
+        "chip": "cautious",
+        "pos": "adj.",
+        "def": "careful to avoid risk or mistakes",
+        "zh": "謹慎的",
+        "example": "The librarian was <strong>cautious</strong> about the new system and tested it with one class before opening it to all."
+      },
+      {
+        "chip": "hostile",
+        "pos": "adj.",
+        "def": "unfriendly and aggressive",
+        "zh": "敵對的",
+        "example": "A few comments online were <strong>hostile</strong>, attacking the organiser rather than discussing the plan."
+      },
+      {
+        "chip": "defensive",
+        "pos": "adj.",
+        "def": "quick to protect yourself from criticism",
+        "zh": "防備的／護短的",
+        "example": "She became <strong>defensive</strong> when asked about the missing props, and blamed everyone except her own team."
+      },
+      {
+        "chip": "frank",
+        "pos": "adj.",
+        "def": "open and honest in what you say",
+        "zh": "坦率的",
+        "example": "The coach was <strong>frank</strong> about the team’s weaknesses, and nobody was left wondering what to improve."
+      },
+      {
+        "chip": "complimentary",
+        "pos": "adj.",
+        "def": "expressing praise",
+        "zh": "讚賞的",
+        "example": "The review was <strong>complimentary</strong>, praising the clear plot and the calm performances."
+      },
+      {
+        "chip": "nostalgic",
+        "pos": "adj.",
+        "def": "feeling a gentle longing for the past",
+        "zh": "懷舊的",
+        "example": "The old photo display made some alumni <strong>nostalgic</strong>, and they lingered over pictures of the old hall."
+      },
+      {
+        "chip": "impatient",
+        "pos": "adj.",
+        "def": "annoyed at having to wait, or wanting something to happen sooner",
+        "zh": "不耐煩的",
+        "example": "The queue grew <strong>impatient</strong> when the machine jammed, and several people began to complain out loud."
+      },
+      {
+        "chip": "arrogant",
+        "pos": "adj.",
+        "def": "believing you are better or more important than others",
+        "zh": "傲慢的",
+        "example": "His tone was <strong>arrogant</strong>; he talked as if no other idea could possibly be as good as his."
+      },
+      {
+        "chip": "sincere",
+        "pos": "adj.",
+        "def": "honest and truly meant",
+        "zh": "真誠的",
+        "example": "Her apology was <strong>sincere</strong>: she looked at the teammate she had interrupted and did not make the same mistake again."
+      },
+      {
+        "chip": "humble",
+        "pos": "adj.",
+        "def": "not proud; not talking as if you are more important than others",
+        "zh": "謙虛的",
+        "example": "The winner was <strong>humble</strong> in her speech, giving credit to the whole team rather than to herself."
+      },
+      {
+        "chip": "gloomy",
+        "pos": "adj.",
+        "def": "sad and without hope",
+        "zh": "悲觀的",
+        "example": "He was <strong>gloomy</strong> about the second half, and kept saying the team had already lost."
+      }
+    ]
+  },
+  {
+    "skill": "formal-and-informal",
+    "theme": "Formal and informal",
+    "lead": "In Paper 1, a more formal word often appears in reports, notices and official letters. Use 譯 for the everyday Chinese meaning.",
+    "rows": [
+      {
+        "chip": "commence",
+        "pos": "v.",
+        "def": "to start (formal)",
+        "zh": "開始（較正式）",
+        "example": "The briefing will <strong>commence</strong> at 8:15 a.m. sharp."
+      },
+      {
+        "chip": "obtain",
+        "pos": "v.",
+        "def": "to get (formal)",
+        "zh": "取得（較正式）",
+        "example": "Students must <strong>obtain</strong> a parent’s signature before the trip."
+      },
+      {
+        "chip": "reside",
+        "pos": "v.",
+        "def": "to live (formal)",
+        "zh": "居住（較正式）",
+        "example": "Applicants should <strong>reside</strong> in the district, or have a close family member who does."
+      },
+      {
+        "chip": "cease",
+        "pos": "v.",
+        "def": "to stop (formal)",
+        "zh": "停止（較正式）",
+        "example": "Please <strong>cease</strong> talking when the exam paper is being given out."
+      },
+      {
+        "chip": "request",
+        "pos": "v.",
+        "def": "to ask someone to do something (formal)",
+        "zh": "要求／請求（較正式）",
+        "example": "Visitors are <strong>requested</strong> to sign in at the general office."
+      },
+      {
+        "chip": "notify",
+        "pos": "v.",
+        "def": "to tell someone officially (formal)",
+        "zh": "通知（較正式）",
+        "example": "Parents will be <strong>notified</strong> by email if the match is cancelled."
+      },
+      {
+        "chip": "submit",
+        "pos": "v.",
+        "def": "to hand in (formal)",
+        "zh": "提交（較正式）",
+        "example": "Please <strong>submit</strong> the permission slip to the general office by Friday."
+      },
+      {
+        "chip": "postpone",
+        "pos": "v.",
+        "def": "to arrange for something to happen later (formal)",
+        "zh": "延期（較正式）",
+        "example": "The concert will be <strong>postponed</strong> until the hall repairs are complete."
+      },
+      {
+        "chip": "terminate",
+        "pos": "v.",
+        "def": "to bring something to an end (formal)",
+        "zh": "終止（較正式）",
+        "example": "The trial arrangement will <strong>terminate</strong> at the end of this month."
+      },
+      {
+        "chip": "allocate",
+        "pos": "v.",
+        "def": "to set something aside for a particular person or purpose (formal)",
+        "zh": "分配（較正式）",
+        "example": "The office will <strong>allocate</strong> lockers according to class number."
+      },
+      {
+        "chip": "proceed",
+        "pos": "v.",
+        "def": "to continue, or to go on to the next step (formal)",
+        "zh": "繼續進行（較正式）",
+        "example": "After the briefing, the tour will <strong>proceed</strong> to the science block."
+      },
+      {
+        "chip": "retain",
+        "pos": "v.",
+        "def": "to keep (formal)",
+        "zh": "保留（較正式）",
+        "example": "Students may <strong>retain</strong> their textbooks over the summer if they have signed the form."
+      },
+      {
+        "chip": "convene",
+        "pos": "v.",
+        "def": "to meet formally, or to call a meeting (formal)",
+        "zh": "召開（較正式）",
+        "example": "The committee will <strong>convene</strong> at 4 p.m. in the conference room."
+      },
+      {
+        "chip": "specify",
+        "pos": "v.",
+        "def": "to state clearly and exactly (formal)",
+        "zh": "指明／註明（較正式）",
+        "example": "The notice <strong>specifies</strong> the items students should bring, including a water bottle and a hat."
+      },
+      {
+        "chip": "enquire",
+        "pos": "v.",
+        "def": "to ask for information (formal)",
+        "zh": "查詢（較正式）",
+        "example": "Visitors should <strong>enquire</strong> at the general office for a visitor badge."
+      },
+      {
+        "chip": "appoint",
+        "pos": "v.",
+        "def": "to formally choose someone for a role (formal)",
+        "zh": "委任（較正式）",
+        "example": "The council will <strong>appoint</strong> a new secretary at its next meeting."
+      },
+      {
+        "chip": "ensure",
+        "pos": "v.",
+        "def": "to make certain that something happens (formal)",
+        "zh": "確保（較正式）",
+        "example": "Staff will <strong>ensure</strong> that all exits remain clear during the drill."
+      },
+      {
+        "chip": "implement",
+        "pos": "v.",
+        "def": "to put a plan or rule into action (formal)",
+        "zh": "實施（較正式）",
+        "example": "The school will <strong>implement</strong> the new timetable in January."
+      },
+      {
+        "chip": "require",
+        "pos": "v.",
+        "def": "to make something necessary (formal)",
+        "zh": "規定／必須（較正式）",
+        "example": "All participants are <strong>required</strong> to wear sports shoes on the field."
+      },
+      {
+        "chip": "acknowledge",
+        "pos": "v.",
+        "def": "to accept or show that you have noticed something (formal)",
+        "zh": "知悉／承認（較正式）",
+        "example": "The letter <strong>acknowledged</strong> the parents’ concerns and set out a new pick-up time."
+      }
+    ]
+  },
+  {
+    "skill": "words-that-go-together",
+    "theme": "Words that go together",
+    "lead": "Some verbs have typical partners. Learn the whole phrase, then use the rest of the sentence to confirm the meaning.",
+    "rows": [
+      {
+        "chip": "pose a threat",
+        "pos": "phrase",
+        "def": "to present or create a risk",
+        "zh": "構成威脅",
+        "example": "Abandoned bicycles can <strong>pose a threat</strong> to people walking through the back lane."
+      },
+      {
+        "chip": "play a role",
+        "pos": "phrase",
+        "def": "to have a part or function in something",
+        "zh": "發揮作用",
+        "example": "Parent volunteers <strong>play a key role</strong> in the reading week."
+      },
+      {
+        "chip": "raise awareness",
+        "pos": "phrase",
+        "def": "to help more people know about or notice something",
+        "zh": "提高意識",
+        "example": "The poster campaign aimed to <strong>raise awareness</strong> of heatstroke on sports day."
+      },
+      {
+        "chip": "take into account",
+        "pos": "phrase",
+        "def": "to consider something when you decide",
+        "zh": "考慮到",
+        "example": "When choosing a venue, <strong>take into account</strong> the time needed to travel back to school."
+      },
+      {
+        "chip": "reach a consensus",
+        "pos": "phrase",
+        "def": "to arrive at an agreement that everyone can accept",
+        "zh": "達成共識",
+        "example": "After a long discussion, the committee managed to <strong>reach a consensus</strong> on the theme."
+      },
+      {
+        "chip": "bear in mind",
+        "pos": "phrase",
+        "def": "to remember and consider something",
+        "zh": "緊記",
+        "example": "When you pack for the field trip, <strong>bear in mind</strong> that the trail is steep and shade is limited."
+      },
+      {
+        "chip": "pave the way",
+        "pos": "phrase",
+        "def": "to make later progress or a later change easier",
+        "zh": "為…鋪路",
+        "example": "Last year’s trial run helped <strong>pave the way</strong> for a full recycling scheme this term."
+      },
+      {
+        "chip": "shed light on",
+        "pos": "phrase",
+        "def": "to make something easier to understand",
+        "zh": "闡明／揭示",
+        "example": "The interview may <strong>shed light on</strong> why so few students signed up for the course."
+      },
+      {
+        "chip": "take pride in",
+        "pos": "phrase",
+        "def": "to feel pleased and satisfied about something you have done",
+        "zh": "以…為榮",
+        "example": "The prefects <strong>take pride in</strong> the garden they planted, and they water it every morning."
+      },
+      {
+        "chip": "draw attention to",
+        "pos": "phrase",
+        "def": "to make people notice something",
+        "zh": "使注意",
+        "example": "The article <strong>drew attention to</strong> the lack of drinking fountains on the top floor."
+      },
+      {
+        "chip": "keep pace with",
+        "pos": "phrase",
+        "def": "to go or develop as fast as someone or something else",
+        "zh": "跟上",
+        "example": "Some readers struggle to <strong>keep pace with</strong> the speaker if the recording is played only once."
+      },
+      {
+        "chip": "run the risk",
+        "pos": "phrase",
+        "def": "to do something that may lead to a bad result",
+        "zh": "冒…的風險",
+        "example": "If you leave your bag in the corridor, you <strong>run the risk</strong> of someone taking it by mistake."
+      },
+      {
+        "chip": "bring about",
+        "pos": "phrase",
+        "def": "to cause something to happen",
+        "zh": "引致／帶來",
+        "example": "A short change to the timetable can <strong>bring about</strong> longer queues at the canteen."
+      },
+      {
+        "chip": "come to terms with",
+        "pos": "phrase",
+        "def": "to accept a difficult or disappointing fact",
+        "zh": "接受（不如意的事）",
+        "example": "It took him a week to <strong>come to terms with</strong> the cancelled trip and start planning a new outing."
+      },
+      {
+        "chip": "set an example",
+        "pos": "phrase",
+        "def": "to behave in a way that others can copy",
+        "zh": "樹立榜樣",
+        "example": "Senior students are asked to <strong>set an example</strong> by lining up quietly at the gate."
+      },
+      {
+        "chip": "make a difference",
+        "pos": "phrase",
+        "def": "to have a useful effect; to improve a situation",
+        "zh": "有作用／帶來改變",
+        "example": "A few extra chairs in the corridor can <strong>make a difference</strong> when parents arrive for the concert."
+      },
+      {
+        "chip": "put emphasis on",
+        "pos": "phrase",
+        "def": "to give special importance to something",
+        "zh": "強調",
+        "example": "The coach <strong>put emphasis on</strong> safety, and every player had to wear a helmet."
+      },
+      {
+        "chip": "take advantage of",
+        "pos": "phrase",
+        "def": "to make good use of an opportunity",
+        "zh": "利用",
+        "example": "Students can <strong>take advantage of</strong> the early opening and revise in the library before assembly."
+      },
+      {
+        "chip": "hold accountable",
+        "pos": "phrase",
+        "def": "to treat someone as responsible for something",
+        "zh": "要…負責",
+        "example": "The notice <strong>held team leaders accountable</strong> for packing away the equipment."
+      },
+      {
+        "chip": "live up to",
+        "pos": "phrase",
+        "def": "to be as good as what was expected or promised",
+        "zh": "達到（期望）",
+        "example": "The sequel did not <strong>live up to</strong> the excitement promised in the trailer."
       }
     ]
   },
