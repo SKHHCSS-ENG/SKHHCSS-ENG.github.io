@@ -1,7 +1,8 @@
 /**
- * Spark skin pack. Paint lives in spark.css. The On fire window and top-3
- * order live in ../spark-fire.js (window.SparkFire). This file only wires
- * that engine into HcsSkinHost.
+ * Spark skin pack — Prismatic Supernova Visual Feast.
+ * Paint lives in spark.css. The On fire window and top-3 order live in
+ * ../spark-fire.js (window.SparkFire). This file wires that engine into
+ * HcsSkinHost and syncs the extended Plus chrome (More, Chance, etc.).
  */
 (function () {
   var sparkFireTimer = 0;
@@ -21,6 +22,7 @@
     sparkBurnSeq += 1;
     var gid = 'sparkBurn' + sparkBurnSeq;
     var gidSoft = gid + 'Soft';
+    var gidPrism = gid + 'Prism';
     return '<span class="spark-burn-halo" aria-hidden="true"></span>' +
       '<span class="spark-burn-sheet" aria-hidden="true">' +
         '<svg viewBox="0 0 140 36" preserveAspectRatio="none" aria-hidden="true">' +
@@ -28,18 +30,27 @@
             '<linearGradient id="' + gid + '" x1="0" y1="1" x2="0" y2="0">' +
               '<stop offset="0%" stop-color="#dc2626"/>' +
               '<stop offset="35%" stop-color="#ff6a00"/>' +
-              '<stop offset="65%" stop-color="#ffb300"/>' +
+              '<stop offset="65%" stop-color="#fee440"/>' +
               '<stop offset="100%" stop-color="#fff7ad"/>' +
             '</linearGradient>' +
             '<linearGradient id="' + gidSoft + '" x1="0" y1="1" x2="0" y2="0">' +
-              '<stop offset="0%" stop-color="#ff2d95" stop-opacity=".85"/>' +
-              '<stop offset="45%" stop-color="#ff6a00" stop-opacity=".7"/>' +
-              '<stop offset="100%" stop-color="#fff7ad" stop-opacity=".55"/>' +
+              '<stop offset="0%" stop-color="#f15bb5" stop-opacity=".9"/>' +
+              '<stop offset="45%" stop-color="#ff6a00" stop-opacity=".75"/>' +
+              '<stop offset="100%" stop-color="#fff7ad" stop-opacity=".6"/>' +
+            '</linearGradient>' +
+            '<linearGradient id="' + gidPrism + '" x1="0" y1="1" x2="1" y2="0">' +
+              '<stop offset="0%" stop-color="#00f5d4" stop-opacity=".65"/>' +
+              '<stop offset="50%" stop-color="#9b5de5" stop-opacity=".55"/>' +
+              '<stop offset="100%" stop-color="#fee440" stop-opacity=".7"/>' +
             '</linearGradient>' +
           '</defs>' +
+          '<path class="spark-flame-wave w3" fill="url(#' + gidPrism + ')" d="M0,36 C10,36 8,4 20,10 C32,-1 38,18 50,6 C62,-4 70,16 82,4 C94,-3 102,15 114,8 C126,2 130,36 140,36 Z"/>' +
           '<path class="spark-flame-wave w2" fill="url(#' + gidSoft + ')" d="M0,36 C12,36 10,8 22,14 C34,2 40,22 52,10 C64,-2 72,20 84,8 C96,-1 104,18 116,12 C128,6 132,36 140,36 Z"/>' +
           '<path class="spark-flame-wave" fill="url(#' + gid + ')" d="M0,36 C14,36 12,14 24,18 C36,6 44,24 56,14 C68,4 76,22 88,12 C100,4 108,20 120,14 C130,10 134,36 140,36 Z"/>' +
-          '<ellipse class="spark-flame-core" cx="70" cy="30" rx="52" ry="8" fill="#ff6a00" opacity=".55"/>' +
+          '<ellipse class="spark-flame-core" cx="70" cy="30" rx="54" ry="8" fill="#ff6a00" opacity=".6"/>' +
+          '<circle class="spark-star-gleam" cx="22" cy="8" r="2.2" fill="#00f5d4"/>' +
+          '<circle class="spark-star-gleam" cx="72" cy="4" r="2.5" fill="#fff7ad"/>' +
+          '<circle class="spark-star-gleam" cx="118" cy="9" r="2.2" fill="#f15bb5"/>' +
         '</svg>' +
       '</span>' +
       '<span class="spark-fire-label">On fire</span>';

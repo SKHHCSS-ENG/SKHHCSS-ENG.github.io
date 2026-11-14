@@ -204,11 +204,16 @@ test('Spark and Arcade packs note, burst, rank, and clear through the host', fun
   sandbox.HcsSkinHost.refresh();
 });
 
-test('Spark and Arcade Chance overlays stay a dim scrim, style inner panels only, and use light gold prompt colours and pack fonts', function () {
-  assert.match(sparkCss, /--spark-font-display:\s*'Righteous',\s*'Outfit',\s*var\(--font-display\)/);
+test('Spark and Arcade Chance overlays stay a dim scrim, window shells use solid non-white fills and borders, and prompts use light gold', function () {
+  assert.match(sparkCss, /--spark-font-display:\s*'Syne',\s*'Outfit',\s*var\(--font-display\)/);
   assert.match(sparkCss, /--spark-font-ui:\s*'Outfit',\s*var\(--font-display\)/);
-  assert.match(sparkCss, /html\[data-skin="spark"\]\s*#chanceSheet[\s\S]*?background-color:\s*rgba\(15,\s*7,\s*40,\s*0\.68\)/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*#chanceSheet[\s\S]*?background-color:\s*rgba\(7,\s*3,\s*18,\s*0\.72\)/);
   assert.match(sparkCss, /html\[data-skin="spark"\]\s*\.spark-chance-prompt\s*\{[\s\S]*?color:\s*#fff7ad/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*#timerPopover\s*\{[\s\S]*?background-color:\s*#1a0a3c;[\s\S]*?border:\s*3px solid #00f5d4;/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*#pickerModal\s*\.picker-dialog\s*\{[\s\S]*?background-color:\s*#1a0a3c;[\s\S]*?border:\s*3px solid #00f5d4;/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*\.wb-sheet\s*\{[\s\S]*?background-color:\s*#1a0a3c;[\s\S]*?border:\s*3px solid #00f5d4;/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*#chanceSheet\s*\.chance-panel[\s\S]*?background-color:\s*#1a0a3c;[\s\S]*?border:\s*3px solid #00f5d4;/);
+  assert.doesNotMatch(sparkCss, /border:\s*[23]px solid transparent/);
 
   assert.match(arcadeCss, /--arcade-font-display:\s*'Orbitron',\s*'Chakra Petch',\s*var\(--font-display\)/);
   assert.match(arcadeCss, /--arcade-font-ui:\s*'Chakra Petch',\s*'Orbitron',\s*var\(--font-display\)/);
@@ -284,7 +289,7 @@ test('Spark and Arcade Chance overlays stay a dim scrim, style inner panels only
 
 test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle buttons, popups, fonts, and animated backgrounds', function () {
   [
-    { id: 'spark', css: sparkCss, js: sparkJs, pageAnim: 'sparkPageMesh', floorAnim: 'sparkFloorMesh' },
+    { id: 'spark', css: sparkCss, js: sparkJs, pageAnim: 'sparkPrismDrift', floorAnim: 'sparkFloorAurora' },
     { id: 'arcade', css: arcadeCss, js: arcadeJs, pageAnim: 'arcadePageMesh', floorAnim: 'arcadeFloorMesh' }
   ].forEach(function (pack) {
     assert.match(pack.css, new RegExp('\\.studio-mark img\\.studio-mark-default'));
