@@ -45,6 +45,23 @@
     else el.classList.remove(clsName);
   }
 
+  function isFullScreenOverlay(el) {
+    if (!el) return false;
+    var id = el.id || '';
+    if (id === 'chanceSheet' || id === 'chanceModal' || id === 'planSheet' || id === 'pickerModal') {
+      return true;
+    }
+    if (el.classList && (
+      el.classList.contains('chance-sheet') ||
+      el.classList.contains('chance-modal') ||
+      el.classList.contains('fixed') ||
+      el.classList.contains('inset-0')
+    )) {
+      return true;
+    }
+    return typeof document !== 'undefined' && el.parentNode === document.body;
+  }
+
   function syncArcadeChrome() {
     if (typeof document === 'undefined' || !document.querySelectorAll) return;
     var active = isActive();
@@ -66,6 +83,7 @@
         if (pop) toggleClass(pop, 'arcade-more-pop', !!active);
       }
     });
+
     var dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], #chanceSheet, #chanceModal, .chance-sheet, .chance-modal');
     dialogs.forEach(function (dlg) {
       var headings = dlg.querySelectorAll ? dlg.querySelectorAll('h1, h2, h3, h4, [id*="Title"], [class*="title"]') : [];
@@ -77,25 +95,46 @@
           if (!titleEl) titleEl = h;
         }
       });
-      var panel = dlg.querySelector
-        ? dlg.querySelector('.plan-panel, .chance-panel, .chance-dialog')
-        : null;
-      // The sheet node is the full-screen dimmer; paint the inner card only.
-      toggleClass(dlg, 'arcade-chance-panel', !!(active && isChanceSheet && !panel));
-      if (panel) toggleClass(panel, 'arcade-chance-panel', !!(active && isChanceSheet));
-      if (dlg.parentNode && dlg.parentNode.classList && dlg.parentNode !== document.body) {
-        toggleClass(dlg.parentNode, 'arcade-chance-sheet', !!(active && isChanceSheet));
+
+      var overlay = isFullScreenOverlay(dlg)
+        ? dlg
+        : (dlg.parentNode && dlg.parentNode !== document.body ? dlg.parentNode : null);
+      var innerPanel = isFullScreenOverlay(dlg)
+        ? ((dlg.querySelector && dlg.querySelector('.chance-panel, .chance-dialog, .plan-panel, [class*="panel"], [class*="dialog"]')) || dlg.firstElementChild)
+        : dlg;
+
+      /* Keep the full-screen overlay a dim scrim; style the inner card only. */
+      if (overlay) {
+        toggleClass(overlay, 'arcade-chance-sheet', !!(active && isChanceSheet));
+        toggleClass(overlay, 'arcade-chance-panel', false);
       }
-      if (titleEl && titleEl.parentNode && titleEl.parentNode !== dlg) {
+      if (innerPanel && innerPanel !== overlay) {
+        toggleClass(innerPanel, 'arcade-chance-panel', !!(active && isChanceSheet));
+      }
+
+      if (titleEl && titleEl.parentNode && titleEl.parentNode !== overlay && titleEl.parentNode !== innerPanel) {
         toggleClass(titleEl.parentNode, 'arcade-chance-bar', !!(active && isChanceSheet));
       }
+
       if (isChanceSheet && dlg.querySelectorAll) {
         var closeBtns = dlg.querySelectorAll('button[aria-label="Close"], .chance-close, .plan-close');
         closeBtns.forEach(function (cb) {
           toggleClass(cb, 'arcade-chance-close', !!active);
         });
+        var cards = dlg.querySelectorAll('#chanceCard, #chanceCardBox, #chanceStage, #chanceStageBox, .chance-card, .chance-stage, .chance-card-box, .chance-card-face, .chance-card-body');
+        cards.forEach(function (card) {
+          toggleClass(card, 'arcade-chance-card', !!active);
+        });
+        var prompts = dlg.querySelectorAll('#chancePrompt, #chancePromptText, #chanceCardPrompt, #chanceQuestion, #chanceText, #chanceCardText, .chance-prompt, .chance-prompt-text, .chance-card-prompt, .chance-question, .chance-text, .chance-card-text, .chance-card p, .chance-card-face p, .chance-card-body p, #chanceCard p, #chanceCardBox p');
+        prompts.forEach(function (pr) {
+          var pt = (pr.textContent || '').replace(/\s+/g, ' ').trim();
+          if (pt !== 'Lucky! Draw again — this one is a bonus turn.') {
+            toggleClass(pr, 'arcade-chance-prompt', !!active);
+          }
+        });
       }
     });
+
     var bonusNodes = document.querySelectorAll('p, div, span');
     bonusNodes.forEach(function (node) {
       var t = (node.textContent || '').replace(/\s+/g, ' ').trim();
