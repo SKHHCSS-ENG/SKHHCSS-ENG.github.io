@@ -1,7 +1,8 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
- * Tess 2026-10-29, plus the Practice, Fun Projects, and
- * Activities & Competitions hubs (36 entries). Matching uses the hub brain:
+ * Tess 2026-10-29, plus Practice, Fun Projects, Activities & Competitions,
+ * Classroom, HCS Live Class, and Paper 3 / Paper 4 exam skills (40 entries).
+ * Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
  */
@@ -29,6 +30,7 @@
         "learning materials",
         "lm",
         "學習資源",
+        "學習材料",
         "教材",
         "materials hub",
         "lm hub"
@@ -403,8 +405,11 @@
         "site notes",
         "whats new",
         "what's new",
+        "updates",
+        "site updates",
         "更新",
-        "最新消息"
+        "最新消息",
+        "網站更新"
       ]
     },
     {
@@ -427,7 +432,8 @@
         "fun projects",
         "fun project",
         "say it louder",
-        "say-it-louder"
+        "say-it-louder",
+        "有趣專題"
       ]
     },
     {
@@ -443,7 +449,54 @@
         "speak up",
         "act out",
         "roaming mic",
-        "roaming mic challenge"
+        "roaming mic challenge",
+        "活動與比賽"
+      ]
+    },
+    {
+      "title": "Paper 3 - Exam Skills",
+      "path": "learning-materials/paper-3-exam-skills/",
+      "aliases": [
+        "paper 3 exam skills",
+        "p3 exam skills",
+        "listening skills",
+        "integrated skills",
+        "聆聽技巧",
+        "綜合能力",
+        "paper 3 skills"
+      ]
+    },
+    {
+      "title": "Paper 4 - Exam Skills",
+      "path": "learning-materials/paper-4-exam-skills/",
+      "aliases": [
+        "paper 4 exam skills",
+        "p4 exam skills",
+        "speaking exam skills",
+        "說話技巧",
+        "paper 4 skills"
+      ]
+    },
+    {
+      "title": "Classroom",
+      "path": "classroom/",
+      "aliases": [
+        "classroom",
+        "teacher tools",
+        "課堂",
+        "教室"
+      ]
+    },
+    {
+      "title": "HCS Live Class",
+      "path": "classroom/hcs-live-class/",
+      "aliases": [
+        "hcs live class",
+        "live class",
+        "liveclass",
+        "desks",
+        "roster",
+        "scoreboard"
       ]
     }
   ];

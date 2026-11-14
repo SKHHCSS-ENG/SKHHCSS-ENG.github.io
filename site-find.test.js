@@ -23,9 +23,9 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 36);
+  assert.equal(SiteFind.entries.length, 40);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 36);
+  assert.equal(new Set(paths).size, 40);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
   assert.equal(SiteFind.entries[28].title, "Paper 1 - Meaning from Context");
@@ -73,6 +73,34 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.search("u41").length, 0);
   assert.equal(SiteFind.search("lost bag").length, 0);
   assert.equal(SiteFind.search("club fair").length, 0);
+
+  assert.equal(SiteFind.entries[36].title, "Paper 3 - Exam Skills");
+  assert.equal(SiteFind.entries[36].path, "learning-materials/paper-3-exam-skills/");
+  assert.equal(SiteFind.entries[37].title, "Paper 4 - Exam Skills");
+  assert.equal(SiteFind.entries[37].path, "learning-materials/paper-4-exam-skills/");
+  assert.equal(SiteFind.entries[38].title, "Classroom");
+  assert.equal(SiteFind.entries[38].path, "classroom/");
+  assert.equal(SiteFind.entries[39].title, "HCS Live Class");
+  assert.equal(SiteFind.entries[39].path, "classroom/hcs-live-class/");
+  assert.equal(SiteFind.search("paper 3 exam skills")[0].path, "learning-materials/paper-3-exam-skills/");
+  assert.equal(SiteFind.search("listening skills")[0].title, "Paper 3 - Exam Skills");
+  assert.equal(SiteFind.search("paper 4 exam skills")[0].path, "learning-materials/paper-4-exam-skills/");
+  assert.equal(SiteFind.search("paper 4")[0].title, "Paper 4 - Speaking Expressions");
+  assert.equal(SiteFind.search("classroom")[0].path, "classroom/");
+  assert.equal(SiteFind.search("課堂")[0].title, "Classroom");
+  assert.equal(SiteFind.search("hcs live class")[0].path, "classroom/hcs-live-class/");
+  assert.equal(SiteFind.search("live class")[0].title, "HCS Live Class");
+  assert.equal(paths.includes("classroom/hcs-live-class-plus/"), false);
+  assert.equal(paths.includes("learning-materials/paper-1-past-paper-vocabulary/"), false);
+  assert.equal(paths.includes("last-minute-notes/"), false);
+  for (const query of ["updates", "site updates", "更新", "最新消息", "網站更新", "whats new", "what's new"]) {
+    const hit = SiteFind.search(query);
+    assert.equal(hit[0].title, "Site Notes", query);
+    assert.equal(hit[0].path, "site-notes/", query);
+  }
+  assert.equal(SiteFind.search("學習材料")[0].path, "learning-materials/");
+  assert.equal(SiteFind.search("有趣專題")[0].path, "fun-projects/");
+  assert.equal(SiteFind.search("活動與比賽")[0].path, "activities-and-competitions/");
 });
 
 test("Find uses the hub brain: norm, exact, prefix, substring, cap 3", () => {
@@ -363,12 +391,21 @@ test("English home cards each have one job, in order", () => {
     "Classroom",
     "Site Notes"
   ]);
-  assert.match(home, /Exam skills, writing formats, junior grammar, and useful vocabulary\./);
+  assert.match(home, /Study notes, skills, glossaries, and drills\./);
   assert.match(home, /Exam-style practice, starting with Paper 1\./);
-  assert.match(home, /Say It Louder, with more fun English projects to come\./);
+  assert.match(home, /Games and creative projects, such as Say It Louder\./);
   assert.match(home, /Speech Festival, Speak Up, and challenges like Roaming Mic\./);
-  assert.match(home, /Teacher tools for live lessons — HCS Live Class \(desks, roster, live points\)\./);
-  assert.match(home, /See what was added or changed on the English subject site\./);
+  assert.match(home, /Live lesson tools — desks, roster, and points\./);
+  assert.match(home, /What was added or changed on this site\./);
+  assert.match(home, /Open Materials →/);
+  assert.match(home, /Open Practice →/);
+  assert.match(home, /Open Fun Projects →/);
+  assert.match(home, /Open Activities →/);
+  assert.match(home, /Open Classroom →/);
+  assert.match(home, /Open Site Notes →/);
+  assert.equal(home.includes("Open materials"), false);
+  assert.equal(home.includes("Open practice →"), false);
+  assert.equal(home.includes("Open activities →"), false);
   assert.match(home, /href="learning-materials\/"/);
   assert.match(home, /href="practice\/"/);
   assert.match(home, /href="fun-projects\/"/);
@@ -376,9 +413,85 @@ test("English home cards each have one job, in order", () => {
   assert.match(home, /href="classroom\/"/);
   assert.match(home, /href="site-notes\/"/);
   assert.match(home, /badge-teacher">Teacher</);
+  assert.match(home, /badge-updates">Updates</);
+  assert.match(home, /學習材料/);
+  assert.match(home, /練習/);
+  assert.match(home, /有趣專題/);
+  assert.match(home, /活動與比賽/);
+  assert.match(home, /課堂/);
+  assert.match(home, /網站更新/);
+  assert.match(home, /M12 5\.2C9\.55 4\.35 7\.05 4\.2 5\.1 4\.55/);
+  assert.match(home, /<circle cx="12" cy="12" r="8\.15"\/>/);
+  assert.match(home, /<rect x="3\.3" y="8\.15" width="17\.4" height="9\.2" rx="2\.8"\/>/);
+  assert.match(home, /M7\.6 4\.85h8\.8/);
+  assert.match(home, /<rect x="3\.85" y="4\.15" width="7\.15" height="6\.7" rx="1\.35"\/>/);
+  assert.match(home, /M7\.1 3\.85h6\.55l4\.25 4\.25/);
+  assert.equal(home.includes('aria-hidden="true"'), true);
+  assert.match(home, /color: var\(--accent-deep\)/);
+  assert.match(home, /\.card-title svg \{ width: 36px; height: 36px; \}/);
+  assert.match(home, /\.utility svg \{ width: 22px; height: 22px; margin-top: 1px; \}/);
+  const cardsAt = home.indexOf('<div class="cards">');
+  const utilityAt = home.indexOf('<div class="utility-strip">');
+  const footerAt = home.indexOf("<footer>");
+  assert.equal(cardsAt !== -1 && utilityAt > cardsAt && footerAt > utilityAt, true);
+  const hero = home.slice(cardsAt, utilityAt);
+  const strip = home.slice(utilityAt, footerAt);
+  assert.equal(hero.includes(">Classroom<"), false);
+  assert.equal(hero.includes(">Site Notes<"), false);
+  assert.equal(strip.includes(">Learning Materials<"), false);
+  assert.equal(strip.includes(">Fun Projects<"), false);
+  assert.match(strip, /badge-teacher">Teacher</);
+  assert.match(strip, /badge-updates">Updates</);
+  assert.match(home, /src="assets\/logo\.png"/);
+  assert.equal(home.includes("https://www.hcs.edu.hk/template/app/img/logo.png"), false);
+  assert.match(home, /rel="apple-touch-icon"/);
+  assert.match(home, /rel="manifest" href="site\.webmanifest"/);
   assert.equal(home.includes("last-minute-notes"), false);
   assert.equal(home.includes("instagram"), false);
   assert.equal(home.includes("Highlights"), false);
+});
+
+test("subject pages self-host the school logo and link the home-screen icon", () => {
+  const hotlink = "https://www.hcs.edu.hk/template/app/img/logo.png";
+  function walk(dir, acc) {
+    for (const name of fs.readdirSync(dir)) {
+      if (name === "node_modules" || name === ".git") continue;
+      const full = new URL(name + (fs.statSync(new URL(name, dir)).isDirectory() ? "/" : ""), dir);
+      if (fs.statSync(full).isDirectory()) walk(full, acc);
+      else if (name.endsWith(".html")) acc.push(full);
+    }
+    return acc;
+  }
+  const pages = walk(new URL("./", import.meta.url), []);
+  for (const page of pages) {
+    const html = fs.readFileSync(page, "utf8");
+    assert.equal(html.includes(hotlink), false, page.pathname);
+  }
+  const blog = fs.readFileSync(
+    new URL("./learning-materials/paper-2-writing-formats/blog/index.html", import.meta.url),
+    "utf8"
+  );
+  assert.match(blog, /src="\.\.\/\.\.\/\.\.\/assets\/logo\.png"/);
+  assert.match(blog, /href="\.\.\/\.\.\/\.\.\/apple-touch-icon\.png"/);
+  assert.match(blog, /href="\.\.\/\.\.\/\.\.\/site\.webmanifest"/);
+  assert.match(blog, /site-find\.js\?v=20261115a/);
+  const hub = fs.readFileSync(new URL("./learning-materials/index.html", import.meta.url), "utf8");
+  assert.match(hub, /src="\.\.\/assets\/logo\.png"/);
+  assert.match(hub, /site-find\.js\?v=20261115a/);
+  const manifest = fs.readFileSync(new URL("./site.webmanifest", import.meta.url), "utf8");
+  assert.match(manifest, /"short_name": "HCS English"/);
+  assert.match(manifest, /"name": "HCS English"/);
+  assert.match(manifest, /"theme_color": "#123a4d"/);
+  assert.equal(fs.existsSync(new URL("./assets/logo.png", import.meta.url)), true);
+  assert.equal(fs.existsSync(new URL("./apple-touch-icon.png", import.meta.url)), true);
+  const live = fs.readFileSync(new URL("./classroom/hcs-live-class/site.webmanifest", import.meta.url), "utf8");
+  assert.match(live, /"name": "HCS Live Class"/);
+  const plus = fs.readFileSync(new URL("./classroom/hcs-live-class-plus/site.webmanifest", import.meta.url), "utf8");
+  assert.match(plus, /"name": "HCS Live Class \+"/);
+  const notes = fs.readFileSync(new URL("./site-notes/index.html", import.meta.url), "utf8");
+  assert.match(notes, /src="\.\.\/assets\/logo\.png"/);
+  assert.match(notes, /Site version: <span data-site-version-label>/);
+  assert.equal(notes.includes("site-find.js"), false);
 });
 
 test("rectsOverlap is a soft-fail check for the Ask circle and the dock", () => {
