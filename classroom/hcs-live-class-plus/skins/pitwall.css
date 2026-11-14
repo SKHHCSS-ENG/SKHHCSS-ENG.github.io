@@ -693,6 +693,15 @@ html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-3 {
   background: linear-gradient(90deg, #881337, #161922 65%);
   box-shadow: inset 5px 0 0 #e11d48;
 }
+html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-1 .lb-rank {
+  color: #fdba74;
+}
+html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-2 .lb-rank {
+  color: #5eead4;
+}
+html[data-skin="pitwall"] #leaderboardBody > .pitwall-tier-3 .lb-rank {
+  color: #fda4af;
+}
 html[data-skin="pitwall"] .pitwall-fire-mini {
   display: inline-flex;
   align-items: center;
