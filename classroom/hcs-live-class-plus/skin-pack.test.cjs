@@ -203,17 +203,28 @@ test('Spark and Arcade packs note, burst, rank, and clear through the host', fun
   sandbox.HcsSkinHost.refresh();
 });
 
-test('All DLC stylesheets scope rules under html[data-skin="<id>"] and never override .desk-card position: absolute', function () {
+test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle buttons, popups, and animated backgrounds', function () {
   [
-    { id: 'arcade', css: arcadeCss }
+    { id: 'arcade', css: arcadeCss, js: arcadeJs }
   ].forEach(function (pack) {
     assert.match(pack.css, new RegExp('\\.studio-mark img\\.studio-mark-default'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] body'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #studioHeader'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] \\.classroom-floor'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] \\.desk-card'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #timerPopover'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #pickerModal'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] \\.wb-sheet'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #chanceSheet'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnMore'));
+    assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnChance'));
+    assert.match(pack.css, /@keyframes arcadePageMesh/);
+    assert.match(pack.css, /@keyframes arcadeFloorMesh/);
     assert.match(pack.css, new RegExp('\\.' + pack.id + '-tier-badge[\\s\\S]*?display:\\s*none;'));
     assert.doesNotMatch(pack.css, /html\[data-skin="minimalist"\]/);
     assert.doesNotMatch(pack.css, /html\[data-skin="spark"\]/);
     assert.doesNotMatch(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*\\.desk-card\\s*\\{[^}]*position\\s*:\\s*relative', 'i'));
     assert.doesNotMatch(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*\\.desk-card\\s*\\{[^}]*clip-path\\s*:', 'i'));
+    assert.doesNotMatch(pack.css + '\n' + pack.js, /monopoly/i);
   });
 });

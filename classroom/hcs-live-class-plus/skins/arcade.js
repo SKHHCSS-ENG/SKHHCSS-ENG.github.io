@@ -39,6 +39,67 @@
     return tiers[st.id] || 0;
   }
 
+  function toggleClass(el, clsName, on) {
+    if (!el || !el.classList) return;
+    if (on) el.classList.add(clsName);
+    else el.classList.remove(clsName);
+  }
+
+  function syncArcadeChrome() {
+    if (typeof document === 'undefined' || !document.querySelectorAll) return;
+    var active = isActive();
+    var buttons = document.querySelectorAll('button');
+    buttons.forEach(function (btn) {
+      var txt = (btn.textContent || '').replace(/\s+/g, ' ').trim();
+      var label = (btn.getAttribute && (btn.getAttribute('aria-label') || btn.getAttribute('title'))) || '';
+      var isMore = txt === 'More' || /^More\b/.test(txt) || label === 'More';
+      var isChanceBtn = (txt === 'Chance' || /\bChance\b/.test(txt) || label === 'Chance') &&
+        !/Draw/.test(txt);
+      var isChanceDraw = txt === 'Draw a card' || txt === 'Draw again' ||
+        /\bDraw a card\b|\bDraw again\b/.test(txt);
+      toggleClass(btn, 'arcade-more-btn', !!(active && isMore));
+      toggleClass(btn, 'arcade-chance-btn', !!(active && isChanceBtn));
+      toggleClass(btn, 'arcade-chance-draw', !!(active && isChanceDraw));
+      if (isMore && btn.getAttribute && typeof document.getElementById === 'function') {
+        var ctrlId = btn.getAttribute('aria-controls');
+        var pop = ctrlId ? document.getElementById(ctrlId) : null;
+        if (pop) toggleClass(pop, 'arcade-more-pop', !!active);
+      }
+    });
+    var dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], #chanceSheet, #chanceModal, .chance-sheet, .chance-modal');
+    dialogs.forEach(function (dlg) {
+      var headings = dlg.querySelectorAll ? dlg.querySelectorAll('h1, h2, h3, h4, [id*="Title"], [class*="title"]') : [];
+      var isChanceSheet = false;
+      var titleEl = null;
+      headings.forEach(function (h) {
+        if (((h.textContent || '').trim()) === 'Chance') {
+          isChanceSheet = true;
+          if (!titleEl) titleEl = h;
+        }
+      });
+      toggleClass(dlg, 'arcade-chance-panel', !!(active && isChanceSheet));
+      if (dlg.parentNode && dlg.parentNode.classList && dlg.parentNode !== document.body) {
+        toggleClass(dlg.parentNode, 'arcade-chance-sheet', !!(active && isChanceSheet));
+      }
+      if (titleEl && titleEl.parentNode && titleEl.parentNode !== dlg) {
+        toggleClass(titleEl.parentNode, 'arcade-chance-bar', !!(active && isChanceSheet));
+      }
+      if (isChanceSheet && dlg.querySelectorAll) {
+        var closeBtns = dlg.querySelectorAll('button[aria-label="Close"], .chance-close, .plan-close');
+        closeBtns.forEach(function (cb) {
+          toggleClass(cb, 'arcade-chance-close', !!active);
+        });
+      }
+    });
+    var bonusNodes = document.querySelectorAll('p, div, span');
+    bonusNodes.forEach(function (node) {
+      var t = (node.textContent || '').replace(/\s+/g, ' ').trim();
+      if (t === 'Lucky! Draw again — this one is a bonus turn.') {
+        toggleClass(node, 'arcade-chance-bonus', !!active);
+      }
+    });
+  }
+
   function syncArcadeSeats() {
     if (typeof document === 'undefined' || !document.querySelectorAll) return;
     var api = ctx();
@@ -86,6 +147,7 @@
         else row.setAttribute('aria-hidden', 'true');
       }
     });
+    syncArcadeChrome();
   }
 
   function scheduleArcadeTick() {
@@ -165,6 +227,12 @@
   }
 
   window.HcsSkinHost.register(packDef);
+
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('click', function () {
+      if (isActive()) syncArcadeChrome();
+    });
+  }
 
   if (typeof document !== 'undefined' && typeof MutationObserver === 'function' && document.documentElement) {
     var obs = new MutationObserver(function () {
