@@ -33,7 +33,7 @@ Public GitHub Pages site for the English panel.
 | `/speech-festival/u47/` | U47 *One Moment in Summer* (David Harmer) — S5 Girls |
 | `/speech-festival/u66/` | U66 *Late Home* (Gervase Phinn) — S3 Boys |
 | `/learning-materials/paper-1-exam-skills/` | Paper 1 - Exam Skills |
-| `/learning-materials/paper-1-past-paper-vocabulary/` | Paper 1 - Past Paper Vocabulary |
+| `/learning-materials/paper-1-meaning-from-context/` | Paper 1 - Meaning from Context |
 | `/learning-materials/paper-1-exam-practice/` | Paper 1 - Exam Practice source copy (the Practice card opens the project site). Opening `index.html` under `/learning-materials/` still redirects to the project site. |
 | `/learning-materials/paper-2-exam-skills/` | Paper 2 - Exam Skills |
 | `/learning-materials/paper-2-writing-formats/` | Paper 2 - Writing Formats (letter to the editor, formal letter, article, blog, review, proposal, report, speech) |

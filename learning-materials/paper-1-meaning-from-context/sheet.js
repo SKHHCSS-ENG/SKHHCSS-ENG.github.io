@@ -1,13 +1,13 @@
 /**
- * Paper 1 - Past Paper Vocabulary — year dropdown and sample sheet.
+ * Paper 1 - Meaning from Context — skill dropdown and sample sheet.
  * Handwrite off: a chip opens part of speech, an English definition, and one sample.
  * Chinese stays on data-zh for the Tools dock 譯 toggle. It is not copied into the sheet.
  * Handwrite on: chips do not receive taps.
  * The sheet is position:fixed, so the chip list and handwriting canvas do not move.
  */
 (function () {
-  var root = document.getElementById('yearSets');
-  var pick = document.getElementById('yearPick');
+  var root = document.getElementById('skillSets');
+  var pick = document.getElementById('skillPick');
   var dock = document.getElementById('bottomDock');
   if (!root || !pick || !dock) return;
 
@@ -56,7 +56,7 @@
 
   function closeSheet(opts) {
     var btn = current;
-    var set = btn && btn.closest('.year-set');
+    var set = btn && btn.closest('.skill-set');
     current = null;
     clearSelected();
     sheet.hidden = true;
@@ -88,7 +88,7 @@
   function chipFromEvent(e) {
     var li = e.target.closest('.vocab-chips li');
     if (!li || !root.contains(li)) return null;
-    var set = li.closest('.year-set');
+    var set = li.closest('.skill-set');
     if (!set || set.hasAttribute('hidden')) return null;
     return li.querySelector('.vocab-example[data-example]');
   }
@@ -101,13 +101,13 @@
     else openSheet(btn);
   }
 
-  function showYear(year) {
+  function showSkill(skill) {
     if (current) closeSheet();
-    var sets = root.querySelectorAll('.year-set');
+    var sets = root.querySelectorAll('.skill-set');
     var n;
     var shown = false;
     for (n = 0; n < sets.length; n++) {
-      var on = sets[n].getAttribute('data-year') === year;
+      var on = sets[n].getAttribute('data-skill') === skill;
       if (on) {
         sets[n].removeAttribute('hidden');
         shown = true;
@@ -116,7 +116,7 @@
       }
     }
     if (!shown && sets.length) sets[0].removeAttribute('hidden');
-    if (pick.value !== year && shown) pick.value = year;
+    if (pick.value !== skill && shown) pick.value = skill;
     if (typeof window.hwResize === 'function') {
       requestAnimationFrame(function () { setTimeout(window.hwResize, 50); });
     }
@@ -132,7 +132,7 @@
   });
 
   pick.addEventListener('change', function () {
-    showYear(pick.value);
+    showSkill(pick.value);
   });
 
   closeBtn.addEventListener('click', function () {
@@ -166,6 +166,6 @@
   });
   classObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-  showYear(pick.value || '2025');
+  showSkill(pick.value || 'contrast-clues');
   place();
 })();
