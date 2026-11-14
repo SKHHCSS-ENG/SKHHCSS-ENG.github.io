@@ -1,19 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Righteous&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Syne:wght@700;800&display=swap');
 
-/* Spark punch — remastered cosmic prism & neon stage skin.
-   Loud cyan #00e5ff, solar amber #ffb300, hot magenta #ff2d95,
-   plus cosmic violet and lime. Heavy 3D lives only under html[data-skin="spark"].
-   Default (no attribute) and Minimalist keep their chrome.
-   Same desk size as Default (148px; phone height stays as it is).
-   Bright mast stays. Day stays Minimalist-only.
-   Burst, tier rims, and On fire stay hidden until Spark. */
+/* Spark Visual Feast — rebuilt from scratch as a Prismatic Supernova & Concert Stage skin.
+   5-stop spectral palette: hyper-mint #00f5d4, electric cyan #00bbf9, ultraviolet #9b5de5,
+   laser magenta #f15bb5, and solar gold #fee440 over deep obsidian-indigo #070312.
+   Scoped strictly under html[data-skin="spark"].
+   Desk width stays 148px; Default and Minimalist keep their chrome. */
 .spark-tier-badge,
 .spark-fire,
 .spark-fire-mini,
 .score-burst { display: none; }
 
 html[data-skin="spark"] {
-  --spark-font-display: 'Righteous', 'Outfit', var(--font-display), 'Fredoka', 'Inter', sans-serif;
+  --spark-font-display: 'Syne', 'Outfit', var(--font-display), 'Fredoka', 'Inter', sans-serif;
   --spark-font-ui: 'Outfit', var(--font-display), 'Fredoka', 'Inter', sans-serif;
 }
 
@@ -25,54 +23,53 @@ html[data-skin="spark"] .studio-mark img.studio-mark-day {
 }
 
 /* =====================================================================
-   WHOLE PLUS PAGE BACKGROUND: Cosmic prism stage surround with
-   stardust dot pattern, aurora corner spotlights & calm motion
+   WHOLE PLUS PAGE BACKGROUND: Prismatic Supernova Concert Surround
+   Dual stage spotlights, diagonal spectral prism wash, multi-depth starfield
    ===================================================================== */
 html[data-skin="spark"] body {
-  background-color: #12092b;
+  background-color: #070312;
   background-image:
-    radial-gradient(ellipse 90% 45% at 15% 0%, rgba(0, 229, 255, 0.26) 0%, rgba(168, 85, 247, 0.14) 48%, rgba(18, 9, 43, 0) 75%),
-    radial-gradient(ellipse 90% 45% at 85% 0%, rgba(255, 45, 149, 0.25) 0%, rgba(255, 179, 0, 0.12) 48%, rgba(18, 9, 43, 0) 75%),
-    radial-gradient(circle at 10% 85%, rgba(168, 85, 247, 0.22) 0%, rgba(168, 85, 247, 0) 45%),
-    radial-gradient(ellipse 85% 42% at 80% 100%, rgba(255, 179, 0, 0.20) 0%, rgba(255, 45, 149, 0.12) 48%, rgba(18, 9, 43, 0) 75%),
-    radial-gradient(rgba(0, 229, 255, 0.15) 1px, rgba(0, 0, 0, 0) 1.6px),
-    radial-gradient(rgba(255, 45, 149, 0.13) 1px, rgba(0, 0, 0, 0) 1.6px),
-    linear-gradient(130deg,
-      #0f0728 0%,
-      #1a0a3c 24%,
-      #2e1065 48%,
-      #4a044e 72%,
-      #1e1b4b 100%);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 28px 28px, 28px 28px, 220% 220%;
-  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 0% 50%;
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
-  animation: sparkPageMesh 16s ease-in-out infinite;
+    conic-gradient(from 135deg at 10% 0%, rgba(0, 245, 212, 0.24) 0deg, rgba(0, 187, 249, 0.14) 24deg, rgba(7, 3, 18, 0) 58deg, rgba(7, 3, 18, 0) 360deg),
+    conic-gradient(from 205deg at 90% 0%, rgba(241, 91, 181, 0.24) 0deg, rgba(254, 228, 64, 0.14) 24deg, rgba(7, 3, 18, 0) 58deg, rgba(7, 3, 18, 0) 360deg),
+    radial-gradient(ellipse 80% 42% at 50% 100%, rgba(155, 93, 229, 0.28) 0%, rgba(241, 91, 181, 0.14) 45%, rgba(7, 3, 18, 0) 78%),
+    radial-gradient(rgba(254, 228, 64, 0.30) 1px, rgba(0, 0, 0, 0) 1.8px),
+    radial-gradient(rgba(0, 245, 212, 0.22) 1px, rgba(0, 0, 0, 0) 1.6px),
+    radial-gradient(rgba(241, 91, 181, 0.20) 1.2px, rgba(0, 0, 0, 0) 2px),
+    linear-gradient(125deg,
+      #070312 0%,
+      #140732 22%,
+      #270a52 45%,
+      #3b0764 68%,
+      #160c38 86%,
+      #070312 100%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 72px 72px, 36px 36px, 110px 110px, 240% 240%;
+  background-position: 0 0, 0 0, 0 0, 0 0, 18px 18px, 42px 24px, 0% 50%;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
+  animation: sparkPrismDrift 18s ease-in-out infinite;
 }
 html[data-skin="spark"] .site-version-footer,
 html[data-skin="spark"] .site-version-line {
-  background: rgba(26, 10, 60, 0.88);
-  border-color: rgba(0, 229, 255, 0.45);
+  background: rgba(14, 6, 36, 0.92);
+  border-color: #00f5d4;
   color: #e2e8f0;
   font-family: var(--spark-font-ui);
 }
 
 /* =====================================================================
-   HEADER & MAST MESH
+   FESTIVAL MAINSTAGE HEADER (#studioHeader)
    ===================================================================== */
 html[data-skin="spark"] #studioHeader {
-  background-color: #1a0a3c;
-  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 28%, #3b0764 55%, #831843 78%, #7c2d12 100%);
+  background-color: #0b0420;
+  background-image: linear-gradient(115deg, #070312 0%, #1a0a3c 25%, #4c1d95 50%, #9d174d 76%, #7c2d12 100%);
   box-shadow:
-    0 0 0 2px rgba(0, 229, 255, 0.55),
-    0 0 0 5px rgba(255, 45, 149, 0.28),
-    0 14px 36px -6px rgba(255, 45, 149, 0.65),
-    inset 0 -3px 0 rgba(255, 179, 0, 0.7),
-    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    0 0 0 2px #00f5d4,
+    0 0 0 5px rgba(241, 91, 181, 0.42),
+    0 16px 40px -6px rgba(241, 91, 181, 0.65),
+    0 6px 24px rgba(0, 187, 249, 0.35),
+    inset 0 -4px 0 #fee440,
+    inset 0 2px 0 rgba(255, 255, 255, 0.25);
 }
-/* Colour mesh, painted inside the header so a translated strip cannot
-   leave a gap. background-size 200% with position 0% → 100% shows one
-   half, then the other. Those halves are the same palindrome and
-   0% / 50% / 100% are one colour, so the join is a same-hue fade. */
+/* Colour mesh, painted inside the header so a translated strip cannot leave a gap. */
 html[data-skin="spark"] #studioHeader::before {
   content: "";
   position: absolute;
@@ -80,19 +77,19 @@ html[data-skin="spark"] #studioHeader::before {
   pointer-events: none;
   z-index: 0;
   background-image: linear-gradient(90deg,
-    rgba(255, 45, 149, 0) 0%,
-    rgba(255, 45, 149, 0.28) 8%,
-    rgba(0, 229, 255, 0.32) 16%,
-    rgba(255, 179, 0, 0.36) 25%,
-    rgba(0, 229, 255, 0.32) 34%,
-    rgba(255, 45, 149, 0.28) 42%,
-    rgba(255, 45, 149, 0) 50%,
-    rgba(255, 45, 149, 0.28) 58%,
-    rgba(0, 229, 255, 0.32) 66%,
-    rgba(255, 179, 0, 0.36) 75%,
-    rgba(0, 229, 255, 0.32) 84%,
-    rgba(255, 45, 149, 0.28) 92%,
-    rgba(255, 45, 149, 0) 100%);
+    rgba(241, 91, 181, 0) 0%,
+    rgba(241, 91, 181, 0.30) 8%,
+    rgba(0, 245, 212, 0.34) 16%,
+    rgba(254, 228, 64, 0.38) 25%,
+    rgba(0, 245, 212, 0.34) 34%,
+    rgba(241, 91, 181, 0.30) 42%,
+    rgba(241, 91, 181, 0) 50%,
+    rgba(241, 91, 181, 0.30) 58%,
+    rgba(0, 245, 212, 0.34) 66%,
+    rgba(254, 228, 64, 0.38) 75%,
+    rgba(0, 245, 212, 0.34) 84%,
+    rgba(241, 91, 181, 0.30) 92%,
+    rgba(241, 91, 181, 0) 100%);
   background-size: 200% 100%;
   background-repeat: no-repeat;
   animation: sparkMeshSlide 3.6s linear infinite;
@@ -104,24 +101,24 @@ html[data-skin="spark"] #studioHeader::after {
   pointer-events: none;
   z-index: 0;
   background-image: linear-gradient(90deg,
-    rgba(0, 229, 255, 0) 0%,
-    rgba(0, 229, 255, 0.22) 10%,
-    rgba(255, 179, 0, 0.20) 20%,
-    rgba(255, 45, 149, 0.22) 25%,
-    rgba(255, 179, 0, 0.20) 30%,
-    rgba(0, 229, 255, 0.22) 40%,
-    rgba(0, 229, 255, 0) 50%,
-    rgba(0, 229, 255, 0.22) 60%,
-    rgba(255, 179, 0, 0.20) 70%,
-    rgba(255, 45, 149, 0.22) 75%,
-    rgba(255, 179, 0, 0.20) 80%,
-    rgba(0, 229, 255, 0.22) 90%,
-    rgba(0, 229, 255, 0) 100%);
+    rgba(0, 187, 249, 0) 0%,
+    rgba(0, 187, 249, 0.26) 10%,
+    rgba(254, 228, 64, 0.24) 20%,
+    rgba(155, 93, 229, 0.28) 25%,
+    rgba(254, 228, 64, 0.24) 30%,
+    rgba(0, 187, 249, 0.26) 40%,
+    rgba(0, 187, 249, 0) 50%,
+    rgba(0, 187, 249, 0.26) 60%,
+    rgba(254, 228, 64, 0.24) 70%,
+    rgba(155, 93, 229, 0.28) 75%,
+    rgba(254, 228, 64, 0.24) 80%,
+    rgba(0, 187, 249, 0.26) 90%,
+    rgba(0, 187, 249, 0) 100%);
   background-size: 200% 100%;
   background-repeat: no-repeat;
   animation: sparkMeshSlide 5.4s linear infinite reverse;
   mix-blend-mode: screen;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 html[data-skin="spark"] #studioMast,
 html[data-skin="spark"] #studioHeader .studio-header-bar {
@@ -130,7 +127,7 @@ html[data-skin="spark"] #studioHeader .studio-header-bar {
 }
 
 /* =====================================================================
-   HEADER & UTILITY BUTTONS (including More and Chance + Pack Fonts)
+   3D PRISM STAGE BUTTONS (including More, Chance, Podium, Zoom, Toolbar)
    ===================================================================== */
 html[data-skin="spark"] #studioHeaderCluster button,
 html[data-skin="spark"] #studioHeaderCluster button:hover,
@@ -156,14 +153,14 @@ html[data-skin="spark"] .spark-more-btn,
 html[data-skin="spark"] .spark-more-btn:hover {
   font-family: var(--spark-font-ui);
   letter-spacing: 0.015em;
-  border: none;
+  border: 2px solid #00f5d4;
   color: #0f172a;
-  background-color: #fff;
-  background-image: linear-gradient(180deg, #fff 0%, #fce7f3 100%);
+  background-color: #f5d0fe;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   box-shadow:
     0 4px 0 #be185d,
-    0 8px 16px rgba(190, 24, 93, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 8px 18px rgba(241, 91, 181, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.95);
 }
 html[data-skin="spark"] #btnModeIndividual.shadow-sm,
 html[data-skin="spark"] #btnModeGroup.shadow-sm,
@@ -172,27 +169,29 @@ html[data-skin="spark"] #btnModeGroup.shadow-sm:hover,
 html[data-skin="spark"] #btnOpenClassModal,
 html[data-skin="spark"] #btnOpenClassModal:hover {
   font-family: var(--spark-font-ui);
-  color: #fff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #ff2d95 100%);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  border: 2px solid #fee440;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00f5d4 0%, #00bbf9 28%, #9b5de5 62%, #f15bb5 100%);
+  text-shadow: 0 1px 2px rgba(7, 3, 18, 0.55);
   box-shadow:
     0 4px 0 #6b21a8,
-    0 10px 18px rgba(168, 85, 247, 0.55),
-    inset 0 2px 0 rgba(255, 255, 255, 0.45),
-    0 0 18px rgba(0, 229, 255, 0.55);
+    0 10px 22px rgba(155, 93, 229, 0.65),
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    0 0 20px rgba(0, 245, 212, 0.65);
 }
 html[data-skin="spark"] #studioHeaderUtilities > #btnOpenPickerModal,
 html[data-skin="spark"] #studioHeaderUtilities > #btnOpenPickerModal:hover,
 html[data-skin="spark"] #btnOpenPickerModal,
 html[data-skin="spark"] #btnOpenPickerModal:hover {
   font-family: var(--spark-font-ui);
+  border: 2px solid #ffffff;
   color: #083344;
-  background-image: linear-gradient(180deg, #67f6ff, #00e5ff 45%, #00b8d4);
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00f5d4 45%, #00bbf9 100%);
   text-shadow: none;
   box-shadow:
     0 4px 0 #0e7490,
-    0 8px 18px rgba(0, 229, 255, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    0 8px 20px rgba(0, 245, 212, 0.65),
+    inset 0 2px 0 rgba(255, 255, 255, 0.85);
 }
 html[data-skin="spark"] #btnChance,
 html[data-skin="spark"] #btnChance:hover,
@@ -210,29 +209,31 @@ html[data-skin="spark"] .spark-chance-btn,
 html[data-skin="spark"] .spark-chance-btn:hover {
   font-family: var(--spark-font-ui);
   letter-spacing: 0.015em;
-  border: none;
+  border: 2px solid #ffffff;
   color: #422006;
-  background-color: #ffb300;
-  background-image: linear-gradient(135deg, #fff7ad 0%, #ffb300 50%, #ff2d95 100%);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  background-color: #fee440;
+  background-image: linear-gradient(135deg, #fffbeb 0%, #fee440 42%, #f15bb5 100%);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
   box-shadow:
     0 4px 0 #9d174d,
-    0 8px 18px rgba(255, 45, 149, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    0 8px 20px rgba(241, 91, 181, 0.6),
+    0 0 16px rgba(254, 228, 64, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9);
 }
 html[data-skin="spark"] #btnMore[aria-expanded="true"],
 html[data-skin="spark"] #btnToggleMore[aria-expanded="true"],
 html[data-skin="spark"] #btnOpenMore[aria-expanded="true"],
 html[data-skin="spark"] .more-btn[aria-expanded="true"],
 html[data-skin="spark"] .spark-more-btn[aria-expanded="true"] {
-  color: #fff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #ff2d95 100%);
+  border: 2px solid #fee440;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 55%, #f15bb5 100%);
   box-shadow:
     0 4px 0 #6b21a8,
-    0 0 16px rgba(0, 229, 255, 0.55);
+    0 0 18px rgba(0, 245, 212, 0.65);
 }
 
-/* More Popover / Dropdown Menu */
+/* More Popover / Dropdown Menu — solid cosmic violet shell + neon border */
 html[data-skin="spark"] #morePopover,
 html[data-skin="spark"] #moreMenu,
 html[data-skin="spark"] #morePanel,
@@ -245,15 +246,15 @@ html[data-skin="spark"] .studio-more-pop,
 html[data-skin="spark"] .studio-more-menu,
 html[data-skin="spark"] .spark-more-pop {
   font-family: var(--spark-font-ui);
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  color: #0f172a;
-  border: 3px solid transparent;
+  background-color: #1a0a3c;
+  background-image: linear-gradient(155deg, #140732 0%, #270a52 52%, #3b0764 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
   border-radius: 16px;
   box-shadow:
-    0 14px 32px rgba(168, 85, 247, 0.45),
-    0 0 20px rgba(0, 229, 255, 0.3);
+    0 0 0 3px #f15bb5,
+    0 18px 40px rgba(7, 3, 18, 0.82),
+    0 0 26px rgba(0, 245, 212, 0.45);
 }
 html[data-skin="spark"] #morePopover button,
 html[data-skin="spark"] #moreMenu button,
@@ -265,10 +266,10 @@ html[data-skin="spark"] .studio-more-pop button,
 html[data-skin="spark"] .studio-more-menu button,
 html[data-skin="spark"] .spark-more-pop button {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #00f5d4;
   color: #0f172a;
-  background-color: #ffffff;
-  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  background-color: #f5d0fe;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   box-shadow:
     0 3px 0 #be185d,
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -282,8 +283,9 @@ html[data-skin="spark"] .more-panel button:hover,
 html[data-skin="spark"] .studio-more-pop button:hover,
 html[data-skin="spark"] .studio-more-menu button:hover,
 html[data-skin="spark"] .spark-more-pop button:hover {
+  border-color: #fee440;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 55%, #ff2d95 100%);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 55%, #f15bb5 100%);
   box-shadow: 0 3px 0 #6b21a8;
 }
 
@@ -293,36 +295,47 @@ html[data-skin="spark"] #headerTimerDisplay {
 }
 html[data-skin="spark"] #studioHeader #classSelect {
   font-family: var(--spark-font-ui);
-  border: 2px solid #00e5ff;
-  box-shadow: 0 0 0 2px rgba(255, 45, 149, 0.35), 0 4px 0 #6b21a8;
+  border: 2px solid #00f5d4;
+  box-shadow: 0 0 0 2px rgba(241, 91, 181, 0.42), 0 4px 0 #6b21a8;
 }
 html[data-skin="spark"] #studioHeaderCluster > div {
-  background: rgba(15, 23, 42, 0.55);
-  border-color: rgba(0, 229, 255, 0.65);
-  box-shadow: 0 0 18px rgba(255, 45, 149, 0.28);
+  background: rgba(11, 4, 32, 0.65);
+  border-color: rgba(0, 245, 212, 0.72);
+  box-shadow: 0 0 20px rgba(241, 91, 181, 0.35);
 }
 html[data-skin="spark"] #studioHeader .text-sky-100 {
-  color: #67f6ff;
+  color: #99f6e4;
 }
 
 /* =====================================================================
-   TOOLBAR & CONTROLS
+   TOOLBAR & CONTROLS (Deep Cosmic Stage Rig)
    ===================================================================== */
 html[data-skin="spark"] #studioToolbar {
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  border-bottom: 3px solid transparent;
-  box-shadow: 0 10px 24px -12px rgba(255, 45, 149, 0.45);
+  background-color: #140732;
+  background-image: linear-gradient(90deg, #0b0420 0%, #1e1b4b 35%, #3b0764 70%, #4a044e 100%);
+  border-bottom: 3px solid #00f5d4;
+  box-shadow:
+    0 3px 0 #f15bb5,
+    0 12px 28px -8px rgba(241, 91, 181, 0.55);
 }
 html[data-skin="spark"] .studio-band {
-  border-color: rgba(168, 85, 247, 0.35);
-  background: rgba(250, 232, 255, 0.45);
+  border: 1.5px solid rgba(0, 245, 212, 0.55);
+  background: rgba(11, 4, 32, 0.68);
+  box-shadow: inset 0 0 14px rgba(155, 93, 229, 0.35);
 }
 html[data-skin="spark"] .studio-band-label {
   font-family: var(--spark-font-display);
-  color: #6b21a8;
-  letter-spacing: 0.04em;
+  color: #fee440;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(254, 228, 64, 0.55);
+}
+html[data-skin="spark"] .studio-grid-setup {
+  background: rgba(20, 7, 50, 0.85);
+  border-color: #00f5d4;
+}
+html[data-skin="spark"] .studio-grid-setup span,
+html[data-skin="spark"] .studio-grid-setup label {
+  color: #99f6e4;
 }
 html[data-skin="spark"] #studioToolbarRow button,
 html[data-skin="spark"] #studioToolbarRow button:hover,
@@ -332,14 +345,14 @@ html[data-skin="spark"] #btnToggleTeamScoreboard,
 html[data-skin="spark"] #btnToggleTeamScoreboard:hover {
   font-family: var(--spark-font-ui);
   letter-spacing: 0.015em;
-  border: none;
+  border: 1.5px solid #00f5d4;
   color: #0f172a;
-  background-color: #fff;
-  background-image: linear-gradient(180deg, #fff 0%, #fce7f3 100%);
+  background-color: #f5d0fe;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   box-shadow:
     0 3px 0 #be185d,
-    0 6px 12px rgba(190, 24, 93, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 6px 14px rgba(190, 24, 93, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 html[data-skin="spark"] #studioToolbarRow #btnAllPlusOne,
 html[data-skin="spark"] #studioToolbarRow #btnAllPlusOne:hover,
@@ -349,43 +362,46 @@ html[data-skin="spark"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm,
 html[data-skin="spark"] #studioToolbarRow #btnToggleGroupBrush.shadow-sm:hover,
 html[data-skin="spark"] #groupBrushBar #btnClusterAfterBrush,
 html[data-skin="spark"] #groupBrushBar #btnClusterAfterBrush:hover {
-  color: #fff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 55%, #ff2d95 100%);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid #fee440;
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00f5d4 0%, #00bbf9 30%, #9b5de5 65%, #f15bb5 100%);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.42);
   box-shadow:
     0 4px 0 #6b21a8,
-    0 8px 16px rgba(168, 85, 247, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 0 16px rgba(0, 229, 255, 0.45);
+    0 8px 18px rgba(155, 93, 229, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 16px rgba(0, 245, 212, 0.55);
 }
 html[data-skin="spark"] #studioToolbarRow #btnOpenResetModal,
 html[data-skin="spark"] #studioToolbarRow #btnOpenResetModal:hover,
 html[data-skin="spark"] #studioToolbarRow #btnToggleEditName.edit-switch.is-on,
 html[data-skin="spark"] #studioToolbarRow #btnToggleEditName.edit-switch.is-on:hover {
+  border: 1.5px solid #ffffff;
   color: #422006;
-  background-image: linear-gradient(180deg, #ffe566, #ffb300);
+  background-image: linear-gradient(180deg, #fef9c3, #fee440);
   text-shadow: none;
   box-shadow:
     0 3px 0 #b45309,
-    0 7px 14px rgba(245, 158, 11, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    0 7px 14px rgba(245, 158, 11, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 html[data-skin="spark"] #studioToolbarRow .layout-preset-btn.shadow-xs,
 html[data-skin="spark"] #studioToolbarRow .layout-preset-btn.ring-2,
 html[data-skin="spark"] #studioToolbarRow .layout-preset-btn.shadow-xs:hover,
 html[data-skin="spark"] #studioToolbarRow .layout-preset-btn.ring-2:hover {
+  border: 1.5px solid #ffffff;
   color: #083344;
-  background-image: linear-gradient(180deg, #67f6ff, #00e5ff);
+  background-image: linear-gradient(180deg, #99f6e4, #00f5d4);
   box-shadow:
     0 3px 0 #0e7490,
-    0 0 0 2px rgba(0, 229, 255, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    0 0 0 2px rgba(0, 245, 212, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 html[data-skin="spark"] #studioToolbarRow .skin-choice,
 html[data-skin="spark"] #studioToolbarRow .skin-choice:hover {
   font-family: var(--spark-font-ui);
-  border: 2px solid #334155;
-  background: #0f172a;
+  border: 2px solid #9b5de5;
+  background: #0b0420;
   color: #f8fafc;
   box-shadow: none;
 }
@@ -394,33 +410,44 @@ html[data-skin="spark"] #studioToolbarRow #btnSkinSpark:hover,
 html[data-skin="spark"] #btnSkinSpark,
 html[data-skin="spark"] #btnSkinSpark:hover {
   font-family: var(--spark-font-display);
-  background: linear-gradient(135deg, #00e5ff, #ff2d95);
-  background-image: linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95);
-  border-color: #fff;
+  background: linear-gradient(135deg, #00f5d4, #f15bb5);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #00bbf9 25%, #fee440 55%, #f15bb5 100%);
+  border: 2px solid #ffffff;
   color: #0f172a;
   box-shadow:
-    0 0 0 2px rgba(0, 229, 255, 0.55),
-    0 6px 16px rgba(255, 45, 149, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    0 0 0 2px rgba(0, 245, 212, 0.75),
+    0 6px 18px rgba(241, 91, 181, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 html[data-skin="spark"] #groupBrushBar {
   font-family: var(--spark-font-ui);
-  background: linear-gradient(90deg, #fdf4ff, #eef2ff, #ecfeff);
-  border-color: rgba(168, 85, 247, 0.4);
+  background: linear-gradient(90deg, #1a0a3c, #2e1065, #3b0764);
+  border-color: #00f5d4;
+  color: #f8fafc;
+}
+html[data-skin="spark"] #groupBrushBar span {
+  color: #fff7ad;
+}
+html[data-skin="spark"] #groupScoreDock {
+  background: linear-gradient(90deg, #140732, #270a52, #3b0764);
+  border-bottom: 2px solid #00f5d4;
+  color: #f8fafc;
 }
 html[data-skin="spark"] #groupScoreDock .group-score-dock-bar h2 {
   font-family: var(--spark-font-display);
+  color: #fff7ad;
 }
 
 /* =====================================================================
-   PULSE CARD & SEATING FLOOR (Richer Cosmic Aurora & Prism Stage Floor)
+   PULSE CARD & 3D STAGE LIGHT SEATING FLOOR
    ===================================================================== */
 html[data-skin="spark"] #pulseCard {
-  background-color: #3b0764;
+  background-color: #2e1065;
   background-image: linear-gradient(115deg, #083344 0%, #3b0764 42%, #831843 78%, #7c2d12 100%);
+  border: 3px solid #00f5d4;
   box-shadow:
-    0 0 0 2px rgba(0, 229, 255, 0.45),
-    0 12px 28px -8px rgba(255, 45, 149, 0.55);
+    0 0 0 3px #f15bb5,
+    0 14px 32px -8px rgba(241, 91, 181, 0.65);
 }
 html[data-skin="spark"] #pulseCard h2 {
   font-family: var(--spark-font-display);
@@ -428,140 +455,150 @@ html[data-skin="spark"] #pulseCard h2 {
 }
 html[data-skin="spark"] #pulseCard #statTotalPoints {
   font-family: var(--spark-font-display);
-  color: #ffb300;
-  text-shadow: 0 0 12px rgba(255, 179, 0, 0.75);
+  color: #fee440;
+  text-shadow: 0 0 14px rgba(254, 228, 64, 0.85), 0 0 28px rgba(241, 91, 181, 0.55);
 }
 html[data-skin="spark"] #studioFloorSection {
-  border: 2px solid transparent;
-  background:
-    linear-gradient(#1e1b4b, #1e1b4b) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95, #a855f7) border-box;
+  border: 3px solid #00f5d4;
+  background: #12092b;
   box-shadow:
-    0 0 0 1px rgba(255, 45, 149, 0.25),
-    0 18px 40px -12px rgba(168, 85, 247, 0.45);
+    0 0 0 3px #f15bb5,
+    0 20px 44px -10px rgba(155, 93, 229, 0.65);
 }
 html[data-skin="spark"] .classroom-floor {
-  background-color: #160c38;
+  background-color: #0e0624;
   background-image:
-    linear-gradient(to right, rgba(0, 229, 255, 0.10) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to bottom, rgba(255, 45, 149, 0.10) 1px, rgba(0, 0, 0, 0) 1px),
-    radial-gradient(circle at 16% 24%, rgba(0, 229, 255, 0.24) 0px, rgba(0, 229, 255, 0) 3.5px),
-    radial-gradient(circle at 82% 20%, rgba(255, 179, 0, 0.24) 0px, rgba(255, 179, 0, 0) 3.5px),
-    radial-gradient(circle at 38% 74%, rgba(255, 45, 149, 0.22) 0px, rgba(255, 45, 149, 0) 3.5px),
-    radial-gradient(circle at 78% 76%, rgba(168, 85, 247, 0.24) 0px, rgba(168, 85, 247, 0) 3.5px),
+    radial-gradient(circle at 50% 50%, rgba(0, 245, 212, 0.14) 0%, rgba(0, 245, 212, 0) 28%, rgba(241, 91, 181, 0.12) 28.5%, rgba(241, 91, 181, 0) 30%, rgba(155, 93, 229, 0.12) 48%, rgba(155, 93, 229, 0) 50%),
+    linear-gradient(to right, rgba(0, 245, 212, 0.12) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(241, 91, 181, 0.12) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(circle at 18% 22%, rgba(0, 245, 212, 0.32) 0px, rgba(0, 245, 212, 0) 3.5px),
+    radial-gradient(circle at 82% 20%, rgba(254, 228, 64, 0.30) 0px, rgba(254, 228, 64, 0) 3.5px),
+    radial-gradient(circle at 40% 76%, rgba(241, 91, 181, 0.28) 0px, rgba(241, 91, 181, 0) 3.5px),
+    radial-gradient(circle at 78% 76%, rgba(155, 93, 229, 0.30) 0px, rgba(155, 93, 229, 0) 3.5px),
     linear-gradient(90deg,
-      rgba(255, 45, 149, 0) 0%,
-      rgba(0, 229, 255, 0.15) 14%,
-      rgba(168, 85, 247, 0.18) 25%,
-      rgba(255, 179, 0, 0.14) 36%,
-      rgba(255, 45, 149, 0) 50%,
-      rgba(0, 229, 255, 0.15) 64%,
-      rgba(168, 85, 247, 0.18) 75%,
-      rgba(255, 179, 0, 0.14) 86%,
-      rgba(255, 45, 149, 0) 100%),
-    radial-gradient(ellipse at 18% 0%, rgba(0, 229, 255, 0.28), rgba(0, 229, 255, 0) 52%),
-    radial-gradient(ellipse at 82% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 50%),
-    linear-gradient(180deg, #160c38 0%, #1e1b4b 38%, #312e81 70%, #4c1d95 100%);
-  background-size: 96px 96px, 96px 96px, 170px 170px, 190px 190px, 180px 180px, 200px 200px, 200% 100%, auto, auto, auto;
-  animation: sparkFloorMesh 14s linear infinite;
-  box-shadow: inset 0 0 40px rgba(168, 85, 247, 0.35), inset 0 0 14px rgba(0, 229, 255, 0.2);
+      rgba(241, 91, 181, 0) 0%,
+      rgba(0, 245, 212, 0.18) 12%,
+      rgba(0, 187, 249, 0.18) 24%,
+      rgba(155, 93, 229, 0.20) 36%,
+      rgba(254, 228, 64, 0.16) 44%,
+      rgba(241, 91, 181, 0) 50%,
+      rgba(0, 245, 212, 0.18) 62%,
+      rgba(0, 187, 249, 0.18) 74%,
+      rgba(155, 93, 229, 0.20) 86%,
+      rgba(254, 228, 64, 0.16) 94%,
+      rgba(241, 91, 181, 0) 100%),
+    radial-gradient(ellipse at 18% 0%, rgba(0, 245, 212, 0.32), rgba(0, 245, 212, 0) 52%),
+    radial-gradient(ellipse at 82% 100%, rgba(241, 91, 181, 0.28), rgba(241, 91, 181, 0) 50%),
+    linear-gradient(180deg, #0e0624 0%, #1a0a3c 36%, #2e1065 70%, #4c1d95 100%);
+  background-size: 100% 100%, 96px 96px, 96px 96px, 160px 160px, 190px 190px, 175px 175px, 200px 200px, 200% 100%, auto, auto, auto;
+  animation: sparkFloorAurora 12s linear infinite;
+  box-shadow: inset 0 0 44px rgba(155, 93, 229, 0.42), inset 0 0 18px rgba(0, 245, 212, 0.25);
 }
 html[data-skin="spark"] .classroom-floor.snap-active {
   background-image:
-    linear-gradient(to right, rgba(0, 229, 255, 0.18) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to bottom, rgba(255, 45, 149, 0.15) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to right, rgba(255, 179, 0, 0.12) 1px, rgba(0, 0, 0, 0) 1px),
-    linear-gradient(to bottom, rgba(168, 85, 247, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
-    radial-gradient(circle at 16% 24%, rgba(0, 229, 255, 0.22) 0px, rgba(0, 229, 255, 0) 3.5px),
-    radial-gradient(circle at 82% 20%, rgba(255, 179, 0, 0.22) 0px, rgba(255, 179, 0, 0) 3.5px),
+    linear-gradient(to right, rgba(0, 245, 212, 0.20) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(241, 91, 181, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to right, rgba(254, 228, 64, 0.14) 1px, rgba(0, 0, 0, 0) 1px),
+    linear-gradient(to bottom, rgba(155, 93, 229, 0.16) 1px, rgba(0, 0, 0, 0) 1px),
+    radial-gradient(circle at 18% 22%, rgba(0, 245, 212, 0.28) 0px, rgba(0, 245, 212, 0) 3.5px),
+    radial-gradient(circle at 82% 20%, rgba(254, 228, 64, 0.26) 0px, rgba(254, 228, 64, 0) 3.5px),
     linear-gradient(90deg,
-      rgba(255, 45, 149, 0) 0%,
-      rgba(0, 229, 255, 0.14) 14%,
-      rgba(168, 85, 247, 0.16) 25%,
-      rgba(255, 179, 0, 0.13) 36%,
-      rgba(255, 45, 149, 0) 50%,
-      rgba(0, 229, 255, 0.14) 64%,
-      rgba(168, 85, 247, 0.16) 75%,
-      rgba(255, 179, 0, 0.13) 86%,
-      rgba(255, 45, 149, 0) 100%),
-    radial-gradient(ellipse at 18% 0%, rgba(0, 229, 255, 0.28), rgba(0, 229, 255, 0) 52%),
-    radial-gradient(ellipse at 82% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 50%),
-    linear-gradient(180deg, #160c38 0%, #1e1b4b 38%, #312e81 70%, #4c1d95 100%);
-  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px, 170px 170px, 190px 190px, 200% 100%, auto, auto, auto;
-  animation: sparkFloorMeshSnap 14s linear infinite;
+      rgba(241, 91, 181, 0) 0%,
+      rgba(0, 245, 212, 0.17) 14%,
+      rgba(155, 93, 229, 0.19) 25%,
+      rgba(254, 228, 64, 0.15) 36%,
+      rgba(241, 91, 181, 0) 50%,
+      rgba(0, 245, 212, 0.17) 64%,
+      rgba(155, 93, 229, 0.19) 75%,
+      rgba(254, 228, 64, 0.15) 86%,
+      rgba(241, 91, 181, 0) 100%),
+    radial-gradient(ellipse at 18% 0%, rgba(0, 245, 212, 0.32), rgba(0, 245, 212, 0) 52%),
+    radial-gradient(ellipse at 82% 100%, rgba(241, 91, 181, 0.28), rgba(241, 91, 181, 0) 50%),
+    linear-gradient(180deg, #0e0624 0%, #1a0a3c 36%, #2e1065 70%, #4c1d95 100%);
+  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px, 160px 160px, 190px 190px, 200% 100%, auto, auto, auto;
+  animation: sparkFloorAuroraSnap 12s linear infinite;
 }
 html[data-skin="spark"] .front-of-room {
   font-family: var(--spark-font-display);
   letter-spacing: 0.06em;
-  background: linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95);
-  border-color: #fff;
-  color: #0f172a;
+  background: linear-gradient(90deg, #00f5d4, #00bbf9, #fee440, #f15bb5);
+  border: 2px solid #ffffff;
+  color: #070312;
   box-shadow:
-    0 0 16px rgba(0, 229, 255, 0.75),
-    0 3px 0 rgba(0, 0, 0, 0.35);
+    0 0 20px rgba(0, 245, 212, 0.8),
+    0 0 32px rgba(241, 91, 181, 0.45),
+    0 4px 0 rgba(7, 3, 18, 0.45);
 }
 html[data-skin="spark"] .zoom-chip,
 html[data-skin="spark"] .zoom-chip.is-dragging {
   font-family: var(--spark-font-ui);
-  background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%);
-  border: 2px solid #00e5ff;
+  background: linear-gradient(135deg, #1a0a3c 0%, #3b0764 100%);
+  border: 2px solid #00f5d4;
+  color: #f8fafc;
   box-shadow:
-    0 0 0 2px rgba(255, 45, 149, 0.35),
-    0 8px 20px rgba(15, 23, 42, 0.28);
+    0 0 0 2px #f15bb5,
+    0 8px 22px rgba(7, 3, 18, 0.65);
 }
 html[data-skin="spark"] .zoom-chip-label,
 html[data-skin="spark"] .zoom-chip-btn,
 html[data-skin="spark"] .zoom-chip-fit {
   font-family: var(--spark-font-ui);
-  color: #0f172a;
+  color: #fff7ad;
   font-weight: 800;
+}
+html[data-skin="spark"] #zoomReadout {
+  color: #00f5d4;
+  font-family: var(--spark-font-display);
 }
 html[data-skin="spark"] #btnToggleSidePanels.side-panels-tab {
   font-family: var(--spark-font-ui);
-  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
-  color: #0f172a;
-  border: 2px solid #00e5ff;
-  box-shadow: 0 3px 0 #be185d;
+  background: linear-gradient(180deg, #1a0a3c 0%, #3b0764 100%);
+  color: #fff7ad;
+  border: 2px solid #00f5d4;
+  box-shadow: 0 3px 0 #f15bb5, 0 0 12px rgba(0, 245, 212, 0.45);
 }
 
 /* =====================================================================
-   DESKS, TIERS, ON FIRE & SCORE BURST (Desk metrics & name layout untouched)
+   HOLOGRAPHIC FOIL DESK CARDS, TIERS, ON FIRE & MULTI-RING SCORE BURST
+   (Desk width stays 148px; name layout & position: absolute untouched)
    ===================================================================== */
 html[data-skin="spark"] .desk-team-row {
   position: relative;
 }
 /* Lift is transform + shadow only. Width stays the 148px desk rule. */
 html[data-skin="spark"] .desk-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 55%, #fae8ff 100%);
+  border: 2px solid #00f5d4;
+  background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 52%, #f5d0fe 100%);
   transform: translateY(-6px);
   box-shadow:
-    0 2px 0 #fff,
-    0 8px 0 rgba(124, 58, 237, 0.55),
-    0 14px 0 rgba(76, 29, 149, 0.35),
-    0 22px 28px -4px rgba(0, 0, 0, 0.45),
-    0 0 24px rgba(0, 229, 255, 0.35);
+    0 0 0 2px #f15bb5,
+    0 8px 0 #6b21a8,
+    0 14px 0 #3b0764,
+    0 22px 30px -4px rgba(0, 0, 0, 0.55),
+    0 0 26px rgba(0, 245, 212, 0.45);
 }
 html[data-skin="spark"] .desk-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-9px);
+  border-color: #fee440;
   box-shadow:
-    0 2px 0 #fff,
-    0 10px 0 rgba(124, 58, 237, 0.6),
-    0 16px 0 rgba(76, 29, 149, 0.4),
-    0 26px 32px -4px rgba(0, 0, 0, 0.5),
-    0 0 28px rgba(255, 45, 149, 0.4);
+    0 0 0 2px #00f5d4,
+    0 11px 0 #6b21a8,
+    0 17px 0 #3b0764,
+    0 28px 34px -4px rgba(0, 0, 0, 0.6),
+    0 0 32px rgba(241, 91, 181, 0.6);
 }
 html[data-skin="spark"] .desk-card.dragging {
   transform: translateY(-6px) scale(1.05) rotate(1deg);
   box-shadow:
-    0 22px 36px -6px rgba(255, 45, 149, 0.45),
-    0 8px 0 rgba(124, 58, 237, 0.55);
+    0 22px 36px -6px rgba(241, 91, 181, 0.55),
+    0 8px 0 rgba(124, 58, 237, 0.6);
 }
 html[data-skin="spark"] .desk-card.spotlight-active {
   transform: translateY(-6px) scale(1.08);
   box-shadow:
-    0 0 0 4px #ff2d95,
-    0 0 28px rgba(0, 229, 255, 0.75),
-    0 16px 32px -4px rgba(255, 45, 149, 0.55) !important;
+    0 0 0 4px #f15bb5,
+    0 0 32px rgba(0, 245, 212, 0.85),
+    0 16px 34px -4px rgba(241, 91, 181, 0.65) !important;
 }
 html[data-skin="spark"] .brush-mode-active .desk-card:hover {
   transform: translateY(-9px) scale(1.03);
@@ -578,44 +615,46 @@ html[data-skin="spark"] .desk-card.spark-tier-3 {
   z-index: 12;
 }
 html[data-skin="spark"] .desk-card.spark-tier-1 {
-  border-color: #fde047;
-  background: linear-gradient(180deg, #fffbeb 0%, #fef08a 40%, #ffffff 100%);
+  border: 2.5px solid #fee440;
+  background: linear-gradient(180deg, #fffbeb 0%, #fef08a 38%, #ffffff 100%);
   box-shadow:
-    0 0 0 3px rgba(250, 204, 21, 0.85),
-    0 0 28px rgba(250, 204, 21, 0.75),
+    0 0 0 3px #f15bb5,
+    0 0 32px rgba(254, 228, 64, 0.85),
+    0 0 48px rgba(241, 91, 181, 0.45),
     0 3px 0 #fef9c3,
     0 10px 0 #ca8a04,
     0 16px 0 #854d0e,
-    0 26px 32px -4px rgba(0, 0, 0, 0.5),
-    inset 0 3px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -4px 12px rgba(234, 179, 8, 0.25);
+    0 26px 34px -4px rgba(0, 0, 0, 0.55),
+    inset 0 3px 0 rgba(255, 255, 255, 0.9);
 }
 html[data-skin="spark"] .desk-card.spark-tier-2 {
-  border-color: #e2e8f0;
-  background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 45%, #ffffff 100%);
+  border: 2.5px solid #00f5d4;
+  background: linear-gradient(180deg, #f0fdfa 0%, #cffafe 42%, #ffffff 100%);
   box-shadow:
-    0 0 0 3px rgba(148, 163, 184, 0.7),
-    0 0 20px rgba(148, 163, 184, 0.55),
-    0 3px 0 #f1f5f9,
-    0 9px 0 #64748b,
-    0 14px 0 #334155,
-    0 22px 28px -4px rgba(0, 0, 0, 0.45),
+    0 0 0 3px #00bbf9,
+    0 0 24px rgba(0, 187, 249, 0.65),
+    0 3px 0 #ecfeff,
+    0 9px 0 #0891b2,
+    0 14px 0 #155e75,
+    0 22px 28px -4px rgba(0, 0, 0, 0.48),
     inset 0 3px 0 rgba(255, 255, 255, 0.9);
 }
 html[data-skin="spark"] .desk-card.spark-tier-3 {
-  border-color: #fdba74;
-  background: linear-gradient(180deg, #fff7ed 0%, #fdba74 42%, #ffffff 100%);
+  border: 2.5px solid #f15bb5;
+  background: linear-gradient(180deg, #fdf2f8 0%, #fbcfe8 42%, #ffffff 100%);
   box-shadow:
-    0 0 0 3px rgba(249, 115, 22, 0.65),
-    0 0 22px rgba(249, 115, 22, 0.5),
-    0 3px 0 #ffedd5,
-    0 9px 0 #c2410c,
-    0 14px 0 #7c2d12,
-    0 22px 28px -4px rgba(0, 0, 0, 0.45),
+    0 0 0 3px #9b5de5,
+    0 0 24px rgba(241, 91, 181, 0.55),
+    0 3px 0 #fce7f3,
+    0 9px 0 #be185d,
+    0 14px 0 #831843,
+    0 22px 28px -4px rgba(0, 0, 0, 0.48),
     inset 0 3px 0 rgba(255, 255, 255, 0.85);
 }
 html[data-skin="spark"] .spark-tier-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   position: absolute;
   top: -12px;
   left: -10px;
@@ -623,30 +662,30 @@ html[data-skin="spark"] .spark-tier-badge {
   pointer-events: none;
   font-family: var(--spark-font-display);
   font-size: .72rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.2;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 2px solid #fff;
+  border: 2px solid #ffffff;
   color: #0f172a;
   letter-spacing: .02em;
   box-shadow:
     0 4px 0 rgba(0, 0, 0, 0.35),
-    0 8px 16px rgba(0, 0, 0, 0.3),
-    0 0 16px rgba(250, 204, 21, 0.6);
+    0 8px 16px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(254, 228, 64, 0.75);
   transform: rotate(-8deg);
 }
 html[data-skin="spark"] .spark-tier-1 .spark-tier-badge {
-  background: linear-gradient(145deg, #fff7ad, #facc15 40%, #f59e0b);
+  background: linear-gradient(145deg, #fffbeb, #fee440 42%, #f59e0b);
   color: #422006;
 }
 html[data-skin="spark"] .spark-tier-2 .spark-tier-badge {
-  background: linear-gradient(145deg, #f8fafc, #94a3b8 55%, #64748b);
-  color: #0f172a;
+  background: linear-gradient(145deg, #ecfeff, #00f5d4 45%, #00bbf9);
+  color: #083344;
 }
 html[data-skin="spark"] .spark-tier-3 .spark-tier-badge {
-  background: linear-gradient(145deg, #fed7aa, #fb923c 40%, #c2410c);
-  color: #fff;
+  background: linear-gradient(145deg, #fce7f3, #f15bb5 45%, #9b5de5);
+  color: #ffffff;
 }
 html[data-skin="spark"] .desk-action-btn,
 html[data-skin="spark"] .desk-action-btn:hover,
@@ -657,11 +696,11 @@ html[data-skin="spark"] .team-score-step:hover {
   font-family: var(--spark-font-ui);
   border: none;
   color: #422006;
-  background-color: #ffb300;
-  background-image: linear-gradient(180deg, #ffe566, #ffb300);
+  background-color: #fee440;
+  background-image: linear-gradient(180deg, #fef9c3, #fee440);
   box-shadow:
     0 3px 0 #b45309,
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 html[data-skin="spark"] .desk-action-btn[data-desk-plus],
 html[data-skin="spark"] .desk-action-btn[data-desk-plus]:hover,
@@ -674,18 +713,18 @@ html[data-skin="spark"] .score-step[data-grp-plus]:hover,
 html[data-skin="spark"] .team-score-step[data-grp-plus],
 html[data-skin="spark"] .team-score-step[data-grp-plus]:hover {
   font-family: var(--spark-font-ui);
-  color: #fff;
-  background-image: linear-gradient(135deg, #00e5ff, #a855f7 55%, #ff2d95);
+  color: #ffffff;
+  background-image: linear-gradient(135deg, #00f5d4, #00bbf9 30%, #9b5de5 65%, #f15bb5);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   box-shadow:
     0 3px 0 #6b21a8,
-    0 0 12px rgba(0, 229, 255, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    0 0 14px rgba(0, 245, 212, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 html[data-skin="spark"] .desk-score-value.text-emerald-800 {
-  background: linear-gradient(180deg, #ecfeff, #67f6ff);
+  background: linear-gradient(180deg, #ecfeff, #99f6e4);
   color: #083344;
-  box-shadow: 0 2px 0 #0891b2, 0 0 10px rgba(0, 229, 255, 0.55);
+  box-shadow: 0 2px 0 #0891b2, 0 0 12px rgba(0, 245, 212, 0.6);
 }
 /* Pinned in the name-card band (absolute) so the 148px desk does not grow. */
 html[data-skin="spark"] .spark-fire.is-on {
@@ -702,54 +741,53 @@ html[data-skin="spark"] .spark-fire.is-on {
   white-space: nowrap;
   font-family: var(--spark-font-display);
   font-size: .68rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   padding: 5px 10px 5px 8px;
   border-radius: 999px;
-  color: #fff;
+  color: #ffffff;
   background-color: #c2410c;
   background-image:
-    radial-gradient(ellipse at 30% 120%, rgba(255, 247, 173, 0.55), transparent 55%),
-    linear-gradient(90deg, #9a3412 0%, #c2410c 18%, #ea580c 40%, #ff2d95 62%, #ffb300 82%, #c2410c 100%);
+    radial-gradient(ellipse at 30% 120%, rgba(255, 247, 173, 0.6), transparent 55%),
+    linear-gradient(90deg, #9a3412 0%, #ea580c 20%, #f15bb5 45%, #fee440 70%, #00f5d4 88%, #9a3412 100%);
   background-size: 100% 100%, 240% 100%;
   box-shadow:
-    0 0 0 3px rgba(255, 107, 0, 0.65),
-    0 0 18px rgba(255, 106, 0, 0.95),
-    0 0 36px rgba(255, 45, 149, 0.75),
-    0 0 52px rgba(255, 179, 0, 0.55),
+    0 0 0 3px rgba(255, 107, 0, 0.72),
+    0 0 20px rgba(255, 106, 0, 0.95),
+    0 0 38px rgba(241, 91, 181, 0.8),
+    0 0 56px rgba(0, 245, 212, 0.55),
     0 4px 0 #7c2d12,
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -6px 10px rgba(127, 29, 29, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.55),
-    0 0 8px rgba(255, 247, 173, 0.65);
-  animation: sparkFireRush 1.15s linear infinite, emberPulse 0.9s ease-in-out infinite;
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(254, 228, 64, 0.75);
+  animation: sparkFireRush 1.1s linear infinite, emberPulse 0.85s ease-in-out infinite;
 }
 html[data-skin="spark"] .spark-fire-label {
   position: relative;
   z-index: 3;
 }
-/* One continuous burn sheet across the badge. Not five candle tips. */
+/* One continuous supernova burn sheet across the badge. */
 html[data-skin="spark"] .spark-burn-halo {
   position: absolute;
-  inset: -8px -12px -10px -12px;
+  inset: -10px -14px -12px -14px;
   border-radius: 999px;
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse at 50% 100%, rgba(255, 106, 0, 0.55) 0%, transparent 70%),
-    radial-gradient(ellipse at 20% 80%, rgba(255, 179, 0, 0.35) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(255, 45, 149, 0.3) 0%, transparent 55%);
-  filter: blur(4px);
-  opacity: 0.85;
-  animation: sparkHeatPulse 1.1s ease-in-out infinite;
+    radial-gradient(ellipse at 50% 100%, rgba(255, 106, 0, 0.65) 0%, transparent 70%),
+    radial-gradient(ellipse at 20% 80%, rgba(0, 245, 212, 0.4) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(241, 91, 181, 0.42) 0%, transparent 55%);
+  filter: blur(5px);
+  opacity: 0.92;
+  animation: sparkHeatPulse 1.05s ease-in-out infinite;
 }
 html[data-skin="spark"] .spark-burn-sheet {
   position: absolute;
-  left: -10%;
-  right: -10%;
+  left: -12%;
+  right: -12%;
   bottom: -4px;
-  height: 28px;
+  height: 30px;
   pointer-events: none;
   z-index: 1;
   overflow: visible;
@@ -762,29 +800,37 @@ html[data-skin="spark"] .spark-burn-sheet svg {
 }
 html[data-skin="spark"] .spark-burn-sheet .spark-flame-wave {
   transform-origin: 50% 100%;
-  animation: sparkBurnFlicker 0.85s ease-in-out infinite;
+  animation: sparkBurnFlicker 0.8s ease-in-out infinite;
 }
 html[data-skin="spark"] .spark-burn-sheet .spark-flame-wave.w2 {
-  animation-duration: 1.05s;
+  animation-duration: 1.0s;
   animation-delay: 0.12s;
-  opacity: 0.72;
+  opacity: 0.78;
+}
+html[data-skin="spark"] .spark-burn-sheet .spark-flame-wave.w3 {
+  animation-duration: 1.18s;
+  animation-delay: 0.24s;
+  opacity: 0.68;
 }
 html[data-skin="spark"] .spark-burn-sheet .spark-flame-core {
-  animation: sparkBurnCore 1.2s ease-in-out infinite;
+  animation: sparkBurnCore 1.1s ease-in-out infinite;
+}
+html[data-skin="spark"] .spark-burn-sheet .spark-star-gleam {
+  animation: sparkHeatPulse 0.9s ease-in-out infinite;
 }
 html[data-skin="spark"] .desk-card:has(.spark-fire.is-on)::after {
   content: "";
   position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: -16px;
-  height: 26px;
+  left: 6%;
+  right: 6%;
+  bottom: -18px;
+  height: 28px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255, 106, 0, 0.75) 0%, rgba(255, 45, 149, 0.45) 40%, transparent 72%);
-  filter: blur(6px);
+  background: radial-gradient(ellipse at center, rgba(255, 106, 0, 0.85) 0%, rgba(241, 91, 181, 0.55) 42%, rgba(0, 245, 212, 0.3) 65%, transparent 78%);
+  filter: blur(7px);
   pointer-events: none;
   z-index: -1;
-  animation: sparkHeatPulse 1.1s ease-in-out infinite;
+  animation: sparkHeatPulse 1.05s ease-in-out infinite;
 }
 html[data-skin="spark"] .score-burst {
   display: block;
@@ -794,42 +840,43 @@ html[data-skin="spark"] .score-burst {
   transform: translateX(-50%);
   pointer-events: none;
   font-family: var(--spark-font-display);
-  font-weight: 700;
-  font-size: 1.85rem;
-  letter-spacing: -0.03em;
+  font-weight: 800;
+  font-size: 1.95rem;
+  letter-spacing: -0.02em;
   z-index: 80;
-  color: #fff;
-  -webkit-text-stroke: 1.5px #0f172a;
+  color: #ffffff;
+  -webkit-text-stroke: 1.5px #070312;
   text-shadow:
-    0 0 8px #00e5ff,
-    0 0 18px #00e5ff,
-    0 0 32px #ff2d95,
-    0 0 48px #ffb300,
+    0 0 10px #00f5d4,
+    0 0 22px #00bbf9,
+    0 0 36px #f15bb5,
+    0 0 54px #fee440,
     0 4px 0 #6b21a8,
-    0 2px 0 #fff;
+    0 2px 0 #ffffff;
   animation: sparkBurst 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 html[data-skin="spark"] .score-burst::before {
-  content: "★";
+  content: "✦";
   position: absolute;
-  left: -18px;
+  left: -20px;
   top: 2px;
-  font-size: 0.9rem;
-  color: #ffb300;
+  font-size: 1rem;
+  color: #fee440;
   -webkit-text-stroke: 0;
-  text-shadow: 0 0 12px #ffb300;
-  animation: sparkStarSpin 1.2s linear infinite;
+  text-shadow: 0 0 14px #fee440, 0 0 22px #f15bb5;
+  animation: sparkStarSpin 1.1s linear infinite;
 }
 html[data-skin="spark"] .score-burst::after {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(0, 229, 255, 0.7) 25%, rgba(255, 45, 149, 0.45) 50%, transparent 72%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.98) 0%, rgba(0, 245, 212, 0.8) 24%, rgba(241, 91, 181, 0.55) 48%, rgba(254, 228, 64, 0.35) 64%, transparent 76%);
+  box-shadow: 0 0 24px rgba(0, 245, 212, 0.85), 0 0 42px rgba(241, 91, 181, 0.65);
   animation: sparkRing 1.35s ease-out forwards;
   z-index: -1;
 }
@@ -838,20 +885,22 @@ html[data-skin="spark"] .score-burst::after {
    LEADERBOARD CARD
    ===================================================================== */
 html[data-skin="spark"] #leaderboardCard {
-  background:
-    linear-gradient(#1e1b4b, #1e1b4b) padding-box,
-    linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  border: 2px solid transparent;
+  background-color: #140732;
+  background-image: linear-gradient(155deg, #140732 0%, #1a0a3c 55%, #2e1065 100%);
+  border: 3px solid #00f5d4;
   color: #f8fafc;
-  box-shadow: 0 16px 36px -14px rgba(168, 85, 247, 0.55);
+  box-shadow:
+    0 0 0 3px #f15bb5,
+    0 18px 40px -12px rgba(155, 93, 229, 0.65),
+    0 0 24px rgba(0, 245, 212, 0.32);
 }
 html[data-skin="spark"] #leaderboardCard .panel-title-bar,
 html[data-skin="spark"] #leaderboardPanel .bg-slate-50\/70,
 html[data-skin="spark"] #leaderboardPanel .border-b {
-  background: linear-gradient(90deg, #312e81, #7c3aed);
-  background-color: #312e81;
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: linear-gradient(90deg, #2e1065, #6b21a8, #831843);
+  background-color: #2e1065;
+  border-color: rgba(0, 245, 212, 0.35);
+  color: #ffffff;
 }
 html[data-skin="spark"] #leaderboardCard .panel-title-bar h2 {
   font-family: var(--spark-font-display);
@@ -860,13 +909,13 @@ html[data-skin="spark"] #leaderboardCard .panel-title-bar h2 {
 html[data-skin="spark"] #btnOpenPodiumModal,
 html[data-skin="spark"] #btnOpenPodiumModal:hover {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #ffffff;
   color: #422006;
-  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  background-image: linear-gradient(180deg, #fef9c3 0%, #fee440 100%);
   box-shadow:
     0 3px 0 #b45309,
-    0 6px 14px rgba(255, 179, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    0 6px 16px rgba(254, 228, 64, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 html[data-skin="spark"] #leaderboardCard h2,
 html[data-skin="spark"] #leaderboardBody .text-slate-800,
@@ -885,54 +934,54 @@ html[data-skin="spark"] #tabLbGroups.shadow-sm,
 html[data-skin="spark"] #tabLbFeed.shadow-sm {
   font-family: var(--spark-font-ui);
   color: #0f172a;
-  background: linear-gradient(135deg, #00e5ff, #ffb300);
+  background: linear-gradient(135deg, #00f5d4, #fee440);
   box-shadow: 0 3px 0 #0e7490;
 }
 html[data-skin="spark"] #lbSearchInput {
   font-family: var(--spark-font-ui);
-  background: #0f172a;
+  background: #0b0420;
   color: #f8fafc;
-  border-color: #00e5ff;
+  border: 2px solid #00f5d4;
 }
 html[data-skin="spark"] #leaderboardBody > .border-slate-100,
 html[data-skin="spark"] #leaderboardBody > .border-slate-100:hover {
-  background: #1e1b4b;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: #1a0a3c;
+  border-color: rgba(255, 255, 255, 0.12);
   color: #f8fafc;
 }
 html[data-skin="spark"] #leaderboardBody .text-emerald-700 {
-  color: #67f6ff;
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+  color: #99f6e4;
+  text-shadow: 0 0 12px rgba(0, 245, 212, 0.85);
 }
 html[data-skin="spark"] #leaderboardBody > .spark-tier-1 {
-  background: linear-gradient(90deg, #854d0e, #1e1b4b 55%);
-  box-shadow: inset 5px 0 0 #facc15, inset 0 0 24px rgba(250, 204, 21, 0.25);
+  background: linear-gradient(90deg, #854d0e, #1a0a3c 58%);
+  box-shadow: inset 5px 0 0 #fee440, inset 0 0 26px rgba(254, 228, 64, 0.3);
 }
 html[data-skin="spark"] #leaderboardBody > .spark-tier-1 .lb-rank {
-  background: linear-gradient(145deg, #fde047, #f59e0b);
+  background: linear-gradient(145deg, #fef9c3, #fee440, #f59e0b);
   color: #422006;
   border-radius: 8px;
-  box-shadow: 0 3px 0 #854d0e, 0 0 12px rgba(250, 204, 21, 0.7);
+  box-shadow: 0 3px 0 #854d0e, 0 0 14px rgba(254, 228, 64, 0.8);
 }
 html[data-skin="spark"] #leaderboardBody > .spark-tier-2 {
-  background: linear-gradient(90deg, #334155, #1e1b4b 55%);
-  box-shadow: inset 5px 0 0 #94a3b8;
+  background: linear-gradient(90deg, #0e7490, #1a0a3c 58%);
+  box-shadow: inset 5px 0 0 #00f5d4;
 }
 html[data-skin="spark"] #leaderboardBody > .spark-tier-2 .lb-rank {
-  background: linear-gradient(145deg, #e2e8f0, #64748b);
-  color: #0f172a;
+  background: linear-gradient(145deg, #ecfeff, #00f5d4, #00bbf9);
+  color: #083344;
   border-radius: 8px;
-  box-shadow: 0 3px 0 #334155;
+  box-shadow: 0 3px 0 #0e7490;
 }
 html[data-skin="spark"] #leaderboardBody > .spark-tier-3 {
-  background: linear-gradient(90deg, #7c2d12, #1e1b4b 55%);
-  box-shadow: inset 5px 0 0 #fb923c;
+  background: linear-gradient(90deg, #831843, #1a0a3c 58%);
+  box-shadow: inset 5px 0 0 #f15bb5;
 }
 html[data-skin="spark"] #leaderboardBody > .spark-tier-3 .lb-rank {
-  background: linear-gradient(145deg, #fdba74, #c2410c);
-  color: #fff;
+  background: linear-gradient(145deg, #fce7f3, #f15bb5, #9b5de5);
+  color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 3px 0 #7c2d12;
+  box-shadow: 0 3px 0 #831843;
 }
 html[data-skin="spark"] .spark-fire-mini {
   display: inline-flex;
@@ -944,142 +993,153 @@ html[data-skin="spark"] .spark-fire-mini {
   isolation: isolate;
   font-family: var(--spark-font-display);
   font-size: .62rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.2;
   padding: 2px 7px 2px 6px;
   border-radius: 999px;
-  color: #fff;
+  color: #ffffff;
   background-color: #c2410c;
-  background-image: linear-gradient(90deg, #c2410c, #ff6a00, #ff2d95);
-  background-size: 180% 100%;
+  background-image: linear-gradient(90deg, #c2410c, #ff6a00, #f15bb5, #fee440);
+  background-size: 200% 100%;
   box-shadow:
-    0 0 10px rgba(255, 106, 0, 0.85),
-    0 0 18px rgba(255, 45, 149, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
-  animation: sparkFireRush 1.4s linear infinite, emberPulse 0.9s ease-in-out infinite;
+    0 0 12px rgba(255, 106, 0, 0.9),
+    0 0 20px rgba(241, 91, 181, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+  animation: sparkFireRush 1.3s linear infinite, emberPulse 0.85s ease-in-out infinite;
 }
 html[data-skin="spark"] .spark-fire-mini::before {
   content: "";
   position: absolute;
   inset: -3px -5px;
   border-radius: 999px;
-  background: radial-gradient(ellipse at 50% 70%, rgba(255, 179, 0, 0.55), transparent 70%);
+  background: radial-gradient(ellipse at 50% 70%, rgba(254, 228, 64, 0.6), transparent 70%);
   filter: blur(3px);
   z-index: -1;
   pointer-events: none;
-  animation: sparkHeatPulse 1.2s ease-in-out infinite;
+  animation: sparkHeatPulse 1.1s ease-in-out infinite;
 }
 
 /* =====================================================================
    POP-UP WINDOWS: 1. TIMER (#timerPopover)
+   Solid cosmic-violet shell + solid #00f5d4 neon border (no near-white shell)
    ===================================================================== */
 html[data-skin="spark"] #timerPopover {
   font-family: var(--spark-font-ui);
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  color: #0f172a;
-  border: 3px solid transparent;
+  background-color: #1a0a3c;
+  background-image: linear-gradient(155deg, #140732 0%, #270a52 52%, #3b0764 85%, #4a044e 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
   box-shadow:
-    0 18px 38px rgba(168, 85, 247, 0.5),
-    0 0 24px rgba(0, 229, 255, 0.35);
+    0 0 0 3px #f15bb5,
+    0 20px 44px rgba(7, 3, 18, 0.85),
+    0 0 28px rgba(0, 245, 212, 0.45);
 }
 html[data-skin="spark"] #timerPopover h3 {
   font-family: var(--spark-font-display);
   letter-spacing: 0.02em;
-  color: #3b0764;
+  color: #fff7ad;
+  text-shadow: 0 2px 6px rgba(7, 3, 18, 0.8);
+}
+html[data-skin="spark"] #timerPopover .text-slate-400,
+html[data-skin="spark"] #timerPopover .text-slate-800 {
+  color: #99f6e4;
 }
 html[data-skin="spark"] #timerPopover .border-b,
 html[data-skin="spark"] #timerPopover .border-t {
-  border-color: rgba(168, 85, 247, 0.25);
+  border-color: rgba(0, 245, 212, 0.45);
 }
 html[data-skin="spark"] #btnCloseTimerPopover {
   font-family: var(--spark-font-ui);
-  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
-  color: #be185d;
-  box-shadow: 0 2px 0 #be185d;
+  border: 2px solid #00f5d4;
+  background: #0b0420;
+  color: #99f6e4;
+  box-shadow: 0 2px 0 #6b21a8;
 }
 html[data-skin="spark"] #timerCardBox {
-  background-color: #1a0a3c;
+  background-color: #0b0420;
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(0, 229, 255, 0.25), rgba(0, 229, 255, 0) 55%),
-    linear-gradient(135deg, #0b1026 0%, #1a0a3c 42%, #3b0764 76%, #831843 100%);
-  border: 2px solid rgba(0, 229, 255, 0.65);
+    radial-gradient(ellipse at 20% 0%, rgba(0, 245, 212, 0.28), rgba(0, 245, 212, 0) 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(241, 91, 181, 0.25), rgba(241, 91, 181, 0) 55%),
+    linear-gradient(135deg, #070312 0%, #1a0a3c 42%, #3b0764 76%, #831843 100%);
+  border: 2px solid #fee440;
   box-shadow:
-    inset 0 0 24px rgba(255, 45, 149, 0.3),
-    0 8px 20px rgba(59, 7, 100, 0.45);
+    inset 0 0 28px rgba(241, 91, 181, 0.35),
+    0 8px 22px rgba(7, 3, 18, 0.65);
 }
 html[data-skin="spark"] #timerBigDisplay {
   font-family: var(--spark-font-display);
   color: #fff7ad;
   text-shadow:
-    0 0 12px rgba(255, 179, 0, 0.8),
-    0 0 24px rgba(255, 45, 149, 0.55);
+    0 0 14px rgba(254, 228, 64, 0.85),
+    0 0 28px rgba(241, 91, 181, 0.65);
 }
 html[data-skin="spark"] #timerStatusText {
   font-family: var(--spark-font-ui);
-  color: #67f6ff;
+  color: #99f6e4;
   font-weight: 800;
 }
 html[data-skin="spark"] #timerProgressBar {
-  background: linear-gradient(90deg, #00e5ff, #ffb300, #ff2d95);
+  background: linear-gradient(90deg, #00f5d4, #00bbf9, #fee440, #f15bb5);
   height: 6px;
 }
 html[data-skin="spark"] #timerPopover button,
 html[data-skin="spark"] #timerPopover button:hover {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #00f5d4;
   color: #0f172a;
-  background-color: #ffffff;
-  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  background-color: #f5d0fe;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   box-shadow:
     0 3px 0 #be185d,
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 html[data-skin="spark"] #timerPopover #btnTimerStartPause,
 html[data-skin="spark"] #timerPopover #btnTimerStartPause:hover {
   font-family: var(--spark-font-display);
+  border: 2px solid #fee440;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 52%, #f15bb5 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.42);
   box-shadow:
     0 4px 0 #6b21a8,
-    0 0 16px rgba(0, 229, 255, 0.55);
+    0 0 18px rgba(0, 245, 212, 0.6);
 }
 html[data-skin="spark"] #customTimerMin,
 html[data-skin="spark"] #customTimerSec,
 html[data-skin="spark"] #customTimerMinInput,
 html[data-skin="spark"] #customTimerSecInput {
   font-family: var(--spark-font-ui);
-  border: 2px solid #a855f7;
-  background: #ffffff;
-  color: #0f172a;
+  border: 2px solid #00f5d4;
+  background: #0b0420;
+  color: #fff7ad;
 }
 
 /* =====================================================================
    POP-UP WINDOWS: 2. RANDOM (#pickerModal)
-   Full-screen overlay stays a dim scrim; inner .picker-dialog styled.
+   Full-screen overlay stays a dim scrim; inner .picker-dialog shell has
+   a solid cosmic-violet fill and solid #00f5d4 border.
    ===================================================================== */
 html[data-skin="spark"] #pickerModal {
-  background-color: rgba(15, 7, 40, 0.68);
+  background-color: rgba(7, 3, 18, 0.72);
 }
 html[data-skin="spark"] #pickerModal .picker-dialog {
   font-family: var(--spark-font-ui);
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  color: #0f172a;
-  border: 3px solid transparent;
+  background-color: #1a0a3c;
+  background-image: linear-gradient(155deg, #140732 0%, #270a52 52%, #3b0764 85%, #4a044e 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
   box-shadow:
-    0 22px 44px rgba(168, 85, 247, 0.55),
-    0 0 28px rgba(0, 229, 255, 0.35);
+    0 0 0 3px #f15bb5,
+    0 24px 48px rgba(7, 3, 18, 0.85),
+    0 0 32px rgba(0, 245, 212, 0.45);
 }
 html[data-skin="spark"] #pickerModal .bg-gradient-to-r {
-  background-color: #1a0a3c;
-  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 32%, #3b0764 62%, #831843 85%, #ff2d95 100%);
+  background-color: #0b0420;
+  background-image: linear-gradient(115deg, #070312 0%, #1a0a3c 32%, #4c1d95 62%, #9d174d 85%, #f15bb5 100%);
   color: #ffffff;
-  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+  border-bottom: 3px solid #fee440;
+  box-shadow: inset 0 -2px 0 rgba(0, 245, 212, 0.65);
 }
 html[data-skin="spark"] #pickerModal .bg-gradient-to-r h2 {
   font-family: var(--spark-font-display);
@@ -1088,106 +1148,140 @@ html[data-skin="spark"] #pickerModal .bg-gradient-to-r h2 {
 }
 html[data-skin="spark"] #pickerModal #btnClosePickerModal {
   font-family: var(--spark-font-ui);
-  border: 2px solid #00e5ff;
-  background: rgba(15, 23, 42, 0.75);
-  color: #67f6ff;
+  border: 2px solid #00f5d4;
+  background: #0b0420;
+  color: #99f6e4;
+}
+html[data-skin="spark"] #pickerModal .bg-slate-100 {
+  background: #0b0420;
+  border: 2px solid #9b5de5;
 }
 html[data-skin="spark"] #pickerModal #btnPickerTypeStudent,
 html[data-skin="spark"] #pickerModal #btnPickerTypeGroup {
   font-family: var(--spark-font-ui);
-  background: #ffffff;
-  color: #3b0764;
+  background: #140732;
+  color: #e2e8f0;
+  border: 1.5px solid rgba(0, 245, 212, 0.4);
 }
 html[data-skin="spark"] #pickerModal #btnPickerTypeStudent.shadow-sm,
 html[data-skin="spark"] #pickerModal #btnPickerTypeGroup.shadow-sm {
   font-family: var(--spark-font-ui);
+  border: 2px solid #fee440;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 52%, #f15bb5 100%);
   box-shadow: 0 3px 0 #6b21a8;
 }
 html[data-skin="spark"] #pickerStudentOptions {
-  background: #ffffff;
-  border: 2px solid rgba(168, 85, 247, 0.35);
+  background: #140732;
+  color: #f8fafc;
+  border: 2px solid #00bbf9;
+  box-shadow: inset 0 0 16px rgba(0, 187, 249, 0.2);
+}
+html[data-skin="spark"] #pickerStudentOptions label,
+html[data-skin="spark"] #pickerStudentOptions span {
+  color: #99f6e4;
 }
 html[data-skin="spark"] #pickerGroupFilter {
   font-family: var(--spark-font-ui);
-  border: 2px solid #a855f7;
-  background: #fdf4ff;
-  color: #0f172a;
+  border: 2px solid #fee440;
+  background: #0b0420;
+  color: #fff7ad;
 }
 html[data-skin="spark"] #pickerStageBox {
-  background-color: #1a0a3c;
+  background-color: #0b0420;
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(0, 229, 255, 0.26), rgba(0, 229, 255, 0) 55%),
-    radial-gradient(ellipse at 80% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 55%),
-    linear-gradient(135deg, #0b1026 0%, #1a0a3c 45%, #3b0764 78%, #831843 100%);
-  border: 2px solid rgba(0, 229, 255, 0.65);
+    conic-gradient(from 140deg at 18% 0%, rgba(0, 245, 212, 0.24) 0deg, rgba(0, 245, 212, 0) 45deg, rgba(0, 245, 212, 0) 360deg),
+    conic-gradient(from 200deg at 82% 0%, rgba(241, 91, 181, 0.24) 0deg, rgba(241, 91, 181, 0) 45deg, rgba(241, 91, 181, 0) 360deg),
+    linear-gradient(135deg, #070312 0%, #1a0a3c 45%, #3b0764 78%, #831843 100%);
+  border: 2px solid #fee440;
   box-shadow:
-    inset 0 0 28px rgba(255, 45, 149, 0.3),
-    0 8px 22px rgba(59, 7, 100, 0.45);
+    inset 0 0 32px rgba(241, 91, 181, 0.35),
+    0 8px 24px rgba(7, 3, 18, 0.65);
 }
 html[data-skin="spark"] #pickerBadge {
   font-family: var(--spark-font-display);
-  background: linear-gradient(135deg, #fff7ad, #ffb300);
+  background: linear-gradient(135deg, #fef9c3, #fee440);
   color: #422006;
+  border: 2px solid #ffffff;
   box-shadow: 0 2px 0 #b45309;
 }
 html[data-skin="spark"] #pickerResultTitle {
   font-family: var(--spark-font-display);
   color: #fff7ad;
   text-shadow:
-    0 0 12px rgba(0, 229, 255, 0.65),
-    0 0 24px rgba(255, 45, 149, 0.55);
+    0 0 14px rgba(0, 245, 212, 0.75),
+    0 0 28px rgba(241, 91, 181, 0.65);
 }
 html[data-skin="spark"] #pickerResultSub {
   font-family: var(--spark-font-ui);
-  color: #67f6ff;
+  color: #99f6e4;
 }
 html[data-skin="spark"] #pickerCurrentScorePill {
   font-family: var(--spark-font-ui);
-  background: rgba(15, 23, 42, 0.75);
-  border: 2px solid #ffb300;
+  background: rgba(11, 4, 32, 0.85);
+  border: 2px solid #fee440;
   color: #fff7ad;
 }
 html[data-skin="spark"] #btnPickerPlusOne,
 html[data-skin="spark"] #btnPickerPlusOne:hover {
   font-family: var(--spark-font-ui);
+  border: 2px solid #00f5d4;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 55%, #ff2d95 100%);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 55%, #f15bb5 100%);
   box-shadow: 0 3px 0 #6b21a8;
 }
 html[data-skin="spark"] #btnPickerMinusOne,
 html[data-skin="spark"] #btnPickerMinusOne:hover {
   font-family: var(--spark-font-ui);
+  border: 2px solid #ffffff;
   color: #422006;
-  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  background-image: linear-gradient(180deg, #fef9c3 0%, #fee440 100%);
   box-shadow: 0 3px 0 #b45309;
 }
 html[data-skin="spark"] #pickerModal #btnTriggerRandomPick,
 html[data-skin="spark"] #pickerModal #btnTriggerRandomPick:hover {
   font-family: var(--spark-font-display);
   letter-spacing: 0.02em;
+  border: 2px solid #ffffff;
   color: #083344;
-  background-image: linear-gradient(180deg, #67f6ff 0%, #00e5ff 50%, #00b8d4 100%);
+  background-image: linear-gradient(180deg, #99f6e4 0%, #00f5d4 50%, #00bbf9 100%);
   box-shadow:
     0 5px 0 #0e7490,
-    0 10px 22px rgba(0, 229, 255, 0.55);
+    0 10px 24px rgba(0, 245, 212, 0.6);
 }
 
 /* =====================================================================
    POP-UP WINDOWS: 3. BOARD (Whiteboard .wb-sheet)
+   Solid cosmic-violet shell + solid #00f5d4 border; #wbCanvas stays white.
    ===================================================================== */
 html[data-skin="spark"] .wb-sheet {
   font-family: var(--spark-font-ui);
-  background: #fdf4ff;
-  color: #0f172a;
+  background-color: #1a0a3c;
+  background-image: linear-gradient(145deg, #140732 0%, #270a52 50%, #3b0764 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
 }
 html[data-skin="spark"] .wb-bar {
-  background-color: #1a0a3c;
-  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 28%, #3b0764 55%, #831843 78%, #7c2d12 100%);
+  background-color: #0b0420;
+  background-image: linear-gradient(115deg, #070312 0%, #1a0a3c 28%, #4c1d95 55%, #9d174d 78%, #7c2d12 100%);
   color: #ffffff;
-  border-bottom: 2px solid rgba(0, 229, 255, 0.65);
-  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+  border-bottom: 3px solid #00f5d4;
+  box-shadow: inset 0 -3px 0 #fee440, 0 6px 20px rgba(7, 3, 18, 0.65);
+}
+html[data-skin="spark"] .wb-stage {
+  background-color: #140732;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 245, 212, 0.22), rgba(0, 245, 212, 0) 60%),
+    linear-gradient(180deg, #140732 0%, #270a52 55%, #3b0764 100%);
+  padding: 10px;
+}
+html[data-skin="spark"] #wbCanvas {
+  background: #ffffff;
+  border: 3px solid #00f5d4;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 2px #f15bb5,
+    0 12px 32px rgba(7, 3, 18, 0.65);
 }
 html[data-skin="spark"] .wb-title {
   font-family: var(--spark-font-display);
@@ -1197,25 +1291,27 @@ html[data-skin="spark"] .wb-title {
 html[data-skin="spark"] .wb-tool,
 html[data-skin="spark"] .wb-close {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #00f5d4;
   color: #0f172a;
-  background-color: #ffffff;
-  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  background-color: #f5d0fe;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   box-shadow:
     0 3px 0 #be185d,
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 html[data-skin="spark"] .wb-tool:hover,
 html[data-skin="spark"] .wb-close:hover {
-  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  border-color: #ffffff;
+  background-image: linear-gradient(180deg, #fef9c3 0%, #fee440 100%);
   color: #422006;
 }
 html[data-skin="spark"] .wb-tool[aria-pressed="true"] {
+  border: 2px solid #fee440;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 52%, #f15bb5 100%);
   box-shadow:
     0 3px 0 #6b21a8,
-    0 0 14px rgba(0, 229, 255, 0.65);
+    0 0 16px rgba(0, 245, 212, 0.7);
 }
 html[data-skin="spark"] .wb-swatch {
   box-shadow: 0 0 0 2px #0f172a;
@@ -1223,32 +1319,39 @@ html[data-skin="spark"] .wb-swatch {
 html[data-skin="spark"] .wb-colour-pop,
 html[data-skin="spark"] .wb-confirm-card {
   font-family: var(--spark-font-ui);
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  color: #0f172a;
-  border: 3px solid transparent;
-  box-shadow: 0 14px 32px rgba(168, 85, 247, 0.45);
+  background-color: #1a0a3c;
+  background-image: linear-gradient(155deg, #140732 0%, #270a52 55%, #3b0764 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
+  box-shadow:
+    0 0 0 3px #f15bb5,
+    0 18px 38px rgba(7, 3, 18, 0.85);
+}
+html[data-skin="spark"] .wb-colour-heading,
+html[data-skin="spark"] .wb-confirm-card p {
+  color: #fff7ad;
 }
 html[data-skin="spark"] #wbConfirmCancel,
 html[data-skin="spark"] #wbConfirmCancel:hover {
   font-family: var(--spark-font-ui);
-  background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  border: 2px solid #00f5d4;
+  background: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   color: #0f172a;
   box-shadow: 0 3px 0 #be185d;
 }
 html[data-skin="spark"] #wbConfirmClear,
 html[data-skin="spark"] #wbConfirmClear:hover {
   font-family: var(--spark-font-ui);
-  background-image: linear-gradient(135deg, #ff2d95 0%, #e11d48 100%);
+  border: 2px solid #fee440;
+  background-image: linear-gradient(135deg, #f15bb5 0%, #e11d48 100%);
   color: #ffffff;
   box-shadow: 0 3px 0 #881337;
 }
 
 /* =====================================================================
-   POP-UP WINDOWS: 4. CHANCE (Chance sheet / modal)
+   POP-UP WINDOWS: 4. CHANCE (Holographic Foil Stage Card)
    - Full-screen overlay stays a dim scrim so the classroom remains visible.
-   - Only the inner card/panel is styled as a cosmic prism card.
+   - Inner Chance panel shell has a solid cosmic-violet fill + solid #00f5d4 border.
    - Darkened card face restyles the prompt text to light solar gold (#fff7ad).
    - Locked student-facing copy stays untouched.
    ===================================================================== */
@@ -1257,7 +1360,7 @@ html[data-skin="spark"] #chanceModal,
 html[data-skin="spark"] .chance-sheet,
 html[data-skin="spark"] .chance-modal,
 html[data-skin="spark"] .spark-chance-sheet {
-  background-color: rgba(15, 7, 40, 0.68);
+  background-color: rgba(7, 3, 18, 0.72);
   background-image: none;
   border: 0;
   box-shadow: none;
@@ -1276,14 +1379,14 @@ html[data-skin="spark"] .chance-modal > div,
 html[data-skin="spark"] #chancePopover,
 html[data-skin="spark"] .spark-chance-panel:not(#chanceSheet):not(#chanceModal):not(.chance-sheet):not(.chance-modal):not(.fixed) {
   font-family: var(--spark-font-ui);
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  color: #0f172a;
-  border: 3px solid transparent;
+  background-color: #1a0a3c;
+  background-image: linear-gradient(155deg, #140732 0%, #270a52 50%, #3b0764 82%, #4a044e 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
   box-shadow:
-    0 22px 44px rgba(168, 85, 247, 0.55),
-    0 0 28px rgba(0, 229, 255, 0.35);
+    0 0 0 3px #f15bb5,
+    0 24px 48px rgba(7, 3, 18, 0.85),
+    0 0 32px rgba(0, 245, 212, 0.45);
 }
 html[data-skin="spark"] #chanceSheet .chance-bar,
 html[data-skin="spark"] #chanceSheet .chance-header,
@@ -1298,11 +1401,11 @@ html[data-skin="spark"] .chance-head,
 html[data-skin="spark"] #chanceBar,
 html[data-skin="spark"] #chanceHeader,
 html[data-skin="spark"] .spark-chance-bar {
-  background-color: #1a0a3c;
-  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 30%, #3b0764 60%, #831843 85%, #ff2d95 100%);
+  background-color: #0b0420;
+  background-image: linear-gradient(115deg, #070312 0%, #1a0a3c 30%, #4c1d95 60%, #9d174d 85%, #f15bb5 100%);
   color: #fff7ad;
-  border-bottom: 2px solid rgba(0, 229, 255, 0.65);
-  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+  border-bottom: 3px solid #fee440;
+  box-shadow: inset 0 -2px 0 rgba(0, 245, 212, 0.65);
 }
 html[data-skin="spark"] #chanceTitle,
 html[data-skin="spark"] #chanceSheetTitle,
@@ -1314,7 +1417,7 @@ html[data-skin="spark"] .chance-header h3 {
   font-family: var(--spark-font-display);
   letter-spacing: 0.02em;
   color: #fff7ad;
-  text-shadow: 0 2px 6px rgba(11, 16, 38, 0.75);
+  text-shadow: 0 2px 8px rgba(7, 3, 18, 0.8);
 }
 html[data-skin="spark"] #chanceCard,
 html[data-skin="spark"] #chanceCardBox,
@@ -1327,16 +1430,17 @@ html[data-skin="spark"] .chance-card-face,
 html[data-skin="spark"] .chance-card-body,
 html[data-skin="spark"] .spark-chance-card {
   font-family: var(--spark-font-ui);
-  background-color: #1a0a3c;
+  background-color: #0b0420;
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(0, 229, 255, 0.25), rgba(0, 229, 255, 0) 55%),
-    radial-gradient(ellipse at 80% 100%, rgba(255, 45, 149, 0.24), rgba(255, 45, 149, 0) 55%),
-    linear-gradient(135deg, #0b1026 0%, #1a0a3c 42%, #3b0764 76%, #831843 100%);
+    linear-gradient(125deg, rgba(0, 245, 212, 0) 25%, rgba(255, 255, 255, 0.08) 45%, rgba(254, 228, 64, 0.12) 50%, rgba(241, 91, 181, 0.08) 55%, rgba(0, 245, 212, 0) 75%),
+    radial-gradient(ellipse at 20% 0%, rgba(0, 245, 212, 0.28), rgba(0, 245, 212, 0) 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(241, 91, 181, 0.28), rgba(241, 91, 181, 0) 55%),
+    linear-gradient(135deg, #070312 0%, #1a0a3c 42%, #3b0764 76%, #831843 100%);
   color: #fff7ad;
-  border: 2px solid rgba(0, 229, 255, 0.65);
+  border: 2px solid #fee440;
   box-shadow:
-    inset 0 0 28px rgba(255, 45, 149, 0.3),
-    0 8px 22px rgba(59, 7, 100, 0.45);
+    inset 0 0 32px rgba(241, 91, 181, 0.35),
+    0 8px 24px rgba(7, 3, 18, 0.65);
 }
 /* Light solar-gold prompt text on the darkened Chance card face */
 html[data-skin="spark"] #chancePrompt,
@@ -1367,8 +1471,8 @@ html[data-skin="spark"] .spark-chance-prompt {
   font-family: var(--spark-font-ui);
   color: #fff7ad;
   text-shadow:
-    0 1px 3px rgba(11, 16, 38, 0.9),
-    0 0 12px rgba(0, 229, 255, 0.35);
+    0 1px 3px rgba(7, 3, 18, 0.92),
+    0 0 14px rgba(0, 245, 212, 0.4);
 }
 html[data-skin="spark"] #chanceBonus,
 html[data-skin="spark"] #chanceBonusLine,
@@ -1377,12 +1481,12 @@ html[data-skin="spark"] .chance-bonus-line,
 html[data-skin="spark"] .chance-lucky,
 html[data-skin="spark"] .spark-chance-bonus {
   font-family: var(--spark-font-ui);
-  background: linear-gradient(90deg, rgba(255, 179, 0, 0.28), rgba(255, 45, 149, 0.28), rgba(0, 229, 255, 0.24));
+  background: linear-gradient(90deg, rgba(254, 228, 64, 0.30), rgba(241, 91, 181, 0.30), rgba(0, 245, 212, 0.28));
   color: #fff7ad;
-  border: 2px solid #ffb300;
+  border: 2px solid #fee440;
   border-radius: 999px;
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(11, 16, 38, 0.85);
+  text-shadow: 0 1px 2px rgba(7, 3, 18, 0.85);
 }
 html[data-skin="spark"] #chanceSheet button,
 html[data-skin="spark"] #chanceModal button,
@@ -1392,13 +1496,13 @@ html[data-skin="spark"] .chance-action,
 html[data-skin="spark"] .spark-chance-sheet button,
 html[data-skin="spark"] .spark-chance-panel button {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #00f5d4;
   color: #0f172a;
-  background-color: #ffffff;
-  background-image: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+  background-color: #f5d0fe;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5d0fe 100%);
   box-shadow:
     0 3px 0 #be185d,
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 html[data-skin="spark"] #btnChanceDraw,
 html[data-skin="spark"] #btnChanceDraw:hover,
@@ -1420,14 +1524,14 @@ html[data-skin="spark"] .spark-chance-draw,
 html[data-skin="spark"] .spark-chance-draw:hover {
   font-family: var(--spark-font-display);
   letter-spacing: 0.02em;
-  border: none;
+  border: 2px solid #fee440;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #ff2d95 100%);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #00bbf9 28%, #9b5de5 62%, #f15bb5 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.42);
   box-shadow:
     0 4px 0 #6b21a8,
-    0 8px 18px rgba(168, 85, 247, 0.55),
-    0 0 16px rgba(0, 229, 255, 0.55);
+    0 8px 20px rgba(155, 93, 229, 0.65),
+    0 0 18px rgba(0, 245, 212, 0.65);
   font-weight: 800;
 }
 html[data-skin="spark"] #btnCloseChance,
@@ -1437,16 +1541,16 @@ html[data-skin="spark"] #chanceClose,
 html[data-skin="spark"] .chance-close,
 html[data-skin="spark"] .spark-chance-close {
   font-family: var(--spark-font-ui);
-  border: 2px solid #00e5ff;
-  background: rgba(15, 23, 42, 0.75);
+  border: 2px solid #00f5d4;
+  background: #0b0420;
   background-image: none;
-  color: #67f6ff;
+  color: #99f6e4;
   box-shadow: none;
 }
 
 /* =====================================================================
    SUPPORTING MODALS & SHEETS (Podium, Class, Group, Plans, Confirmations)
-   Full-screen overlays stay dim scrims; inner panels get prism styling.
+   Full-screen overlays stay dim scrims; inner panels have solid cosmic fills.
    ===================================================================== */
 html[data-skin="spark"] #podiumModal,
 html[data-skin="spark"] #classModal,
@@ -1455,16 +1559,16 @@ html[data-skin="spark"] #resetModal,
 html[data-skin="spark"] #applyGridModal,
 html[data-skin="spark"] #clearGroupsModal,
 html[data-skin="spark"] #planSheet {
-  background-color: rgba(15, 7, 40, 0.68);
+  background-color: rgba(7, 3, 18, 0.72);
 }
 html[data-skin="spark"] #podiumModal > .bg-gradient-to-b {
   font-family: var(--spark-font-ui);
-  background-color: #1a0a3c;
-  background-image: linear-gradient(180deg, #0b1026 0%, #1a0a3c 45%, #3b0764 80%, #831843 100%);
-  border: 2px solid #00e5ff;
+  background-color: #0b0420;
+  background-image: linear-gradient(180deg, #070312 0%, #1a0a3c 45%, #4c1d95 80%, #831843 100%);
+  border: 3px solid #00f5d4;
   box-shadow:
-    0 0 0 3px rgba(255, 45, 149, 0.45),
-    0 20px 44px rgba(168, 85, 247, 0.55);
+    0 0 0 3px #f15bb5,
+    0 22px 48px rgba(7, 3, 18, 0.85);
 }
 html[data-skin="spark"] #podiumModal h2 {
   font-family: var(--spark-font-display);
@@ -1472,9 +1576,9 @@ html[data-skin="spark"] #podiumModal h2 {
 html[data-skin="spark"] #btnDonePodiumModal,
 html[data-skin="spark"] #btnDonePodiumModal:hover {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #ffffff;
   color: #422006;
-  background-image: linear-gradient(180deg, #ffe566 0%, #ffb300 100%);
+  background-image: linear-gradient(180deg, #fef9c3 0%, #fee440 100%);
   box-shadow: 0 3px 0 #b45309;
 }
 html[data-skin="spark"] #planSheet .plan-panel,
@@ -1484,20 +1588,22 @@ html[data-skin="spark"] #resetModal .shadow-2xl,
 html[data-skin="spark"] #applyGridModal .shadow-2xl,
 html[data-skin="spark"] #clearGroupsModal .shadow-2xl {
   font-family: var(--spark-font-ui);
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fdf4ff 100%) padding-box,
-    linear-gradient(135deg, #00e5ff, #ffb300, #ff2d95) border-box;
-  color: #0f172a;
-  border: 3px solid transparent;
-  box-shadow: 0 18px 38px rgba(168, 85, 247, 0.5);
+  background-color: #1a0a3c;
+  background-image: linear-gradient(155deg, #140732 0%, #270a52 52%, #3b0764 85%, #4a044e 100%);
+  color: #f8fafc;
+  border: 3px solid #00f5d4;
+  box-shadow:
+    0 0 0 3px #f15bb5,
+    0 20px 44px rgba(7, 3, 18, 0.85);
 }
 html[data-skin="spark"] #planSheet .plan-bar,
 html[data-skin="spark"] #classModal .bg-gradient-to-r,
 html[data-skin="spark"] #groupModal .bg-gradient-to-r {
-  background-color: #1a0a3c;
-  background-image: linear-gradient(115deg, #0b1026 0%, #1a0a3c 32%, #3b0764 62%, #831843 85%, #ff2d95 100%);
+  background-color: #0b0420;
+  background-image: linear-gradient(115deg, #070312 0%, #1a0a3c 32%, #4c1d95 62%, #9d174d 85%, #f15bb5 100%);
   color: #fff7ad;
-  box-shadow: inset 0 -3px 0 rgba(255, 179, 0, 0.75);
+  border-bottom: 3px solid #fee440;
+  box-shadow: inset 0 -2px 0 rgba(0, 245, 212, 0.65);
 }
 html[data-skin="spark"] #planSheet .plan-bar h3,
 html[data-skin="spark"] #classModal h2,
@@ -1506,6 +1612,22 @@ html[data-skin="spark"] #resetModal h3,
 html[data-skin="spark"] #applyGridModal h3,
 html[data-skin="spark"] #clearGroupsModal h3 {
   font-family: var(--spark-font-display);
+  color: #fff7ad;
+}
+html[data-skin="spark"] #resetModal p,
+html[data-skin="spark"] #applyGridModal p,
+html[data-skin="spark"] #clearGroupsModal p,
+html[data-skin="spark"] #planSheet .plan-confirm,
+html[data-skin="spark"] #planSheet .plan-row-title {
+  color: #f8fafc;
+}
+html[data-skin="spark"] #planSheet .plan-row-sub {
+  color: #99f6e4;
+}
+html[data-skin="spark"] #planSheet .plan-item,
+html[data-skin="spark"] #planSheet .plan-row {
+  background: #140732;
+  border-color: rgba(0, 245, 212, 0.3);
 }
 html[data-skin="spark"] #planSheet .plan-action,
 html[data-skin="spark"] #planSheet .plan-action:hover,
@@ -1513,31 +1635,31 @@ html[data-skin="spark"] #classModal .bg-indigo-600,
 html[data-skin="spark"] #groupModal .bg-indigo-600,
 html[data-skin="spark"] #btnConfirmApplyGrid {
   font-family: var(--spark-font-ui);
-  border: none;
+  border: 2px solid #fee440;
   color: #ffffff;
-  background-image: linear-gradient(135deg, #00e5ff 0%, #a855f7 52%, #ff2d95 100%);
+  background-image: linear-gradient(135deg, #00f5d4 0%, #9b5de5 52%, #f15bb5 100%);
   box-shadow: 0 3px 0 #6b21a8;
 }
 
 /* =====================================================================
    KEYFRAMES & REDUCED MOTION
    ===================================================================== */
-@keyframes sparkPageMesh {
-  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 0% 50%; }
-  50%  { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 100% 50%; }
-  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 14px 14px, 0% 50%; }
+@keyframes sparkPrismDrift {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 18px 18px, 42px 24px, 0% 50%; }
+  50%  { background-position: 0 0, 0 0, 0 0, 0 0, 18px 18px, 42px 24px, 100% 50%; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 18px 18px, 42px 24px, 0% 50%; }
 }
-@keyframes sparkFloorMesh {
-  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
-  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
+@keyframes sparkFloorAurora {
+  0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
 }
-@keyframes sparkFloorMeshSnap {
+@keyframes sparkFloorAuroraSnap {
   0%   { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0% 0, 0 0, 0 0, 0 0; }
   100% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 100% 0, 0 0, 0 0, 0 0; }
 }
 @keyframes emberPulse {
   0%, 100% { filter: brightness(1) saturate(1.25); transform: scale(1); }
-  50% { filter: brightness(1.28) saturate(1.55); transform: scale(1.06); }
+  50% { filter: brightness(1.32) saturate(1.6); transform: scale(1.06); }
 }
 @keyframes sparkFireRush {
   0% { background-position: 0% 50%, 0% 50%; }
@@ -1545,7 +1667,7 @@ html[data-skin="spark"] #btnConfirmApplyGrid {
 }
 @keyframes sparkBurnFlicker {
   0%, 100% { transform: scaleY(1) translateY(0); filter: brightness(1); }
-  35% { transform: scaleY(1.12) translateY(-1px); filter: brightness(1.2); }
+  35% { transform: scaleY(1.14) translateY(-1px); filter: brightness(1.22); }
   70% { transform: scaleY(0.94) translateY(0.5px); filter: brightness(1.05); }
 }
 @keyframes sparkBurnCore {
@@ -1553,8 +1675,8 @@ html[data-skin="spark"] #btnConfirmApplyGrid {
   50% { opacity: 1; }
 }
 @keyframes sparkHeatPulse {
-  0%, 100% { opacity: 0.7; transform: scaleX(1); }
-  50% { opacity: 1; transform: scaleX(1.12); }
+  0%, 100% { opacity: 0.72; transform: scaleX(1); }
+  50% { opacity: 1; transform: scaleX(1.14); }
 }
 @keyframes sparkMeshSlide {
   0% { background-position: 0% 0; }
@@ -1573,17 +1695,17 @@ html[data-skin="spark"] #btnConfirmApplyGrid {
 }
 @keyframes sparkBurst {
   0%   { opacity: 0; transform: translateX(-50%) translateY(14px) scale(0.55) rotate(-8deg); }
-  15%  { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.45) rotate(4deg); }
-  45%  { opacity: 1; transform: translateX(-50%) translateY(-26px) scale(1.2) rotate(-2deg); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-52px) scale(0.9) rotate(6deg); }
+  15%  { opacity: 1; transform: translateX(-50%) translateY(-2px) scale(1.48) rotate(4deg); }
+  45%  { opacity: 1; transform: translateX(-50%) translateY(-28px) scale(1.22) rotate(-2deg); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-54px) scale(0.9) rotate(6deg); }
 }
 @keyframes sparkRing {
   0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.25); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.55); }
 }
 @keyframes sparkStarSpin {
   0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.3); }
+  50% { transform: rotate(180deg) scale(1.35); }
   100% { transform: rotate(360deg) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
