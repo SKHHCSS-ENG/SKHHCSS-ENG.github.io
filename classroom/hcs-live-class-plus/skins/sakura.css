@@ -1325,12 +1325,6 @@ html[data-skin="sakura"] #btnConfirmApplyGrid {
 html[data-skin="sakura"] body {
   position: relative;
 }
-html[data-skin="sakura"] #studioToolbar,
-html[data-skin="sakura"] #studioWorkspace,
-html[data-skin="sakura"] .site-version-footer {
-  position: relative;
-  z-index: 1;
-}
 html[data-skin="sakura"] body::before,
 html[data-skin="sakura"] body::after {
   content: "";
