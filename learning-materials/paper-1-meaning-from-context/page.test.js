@@ -1887,6 +1887,9 @@ test("sheet shows pos, then example, and keeps Chinese off the popup", () => {
 test("Explain posts this page name, and More links to the two locked pages", () => {
   assert.match(explainJs, /Paper 1 - Meaning from Context/);
   assert.match(explainJs, /body\.classList\.contains\("p1-vocab"\)/);
+  assert.match(explainJs, /getElementById\("skillSets"\)/);
+  assert.equal(explainJs.includes('getElementById("yearSets")'), false);
+  assert.match(html, /explain\.js\?v=20261114b/);
   assert.match(html, /href="\.\.\/paper-1-exam-skills\/">Paper 1 - Exam Skills →/);
   assert.match(html, /href="\.\.\/useful-vocabulary\/">Useful Vocabulary →/);
   assert.match(html, /tools-dock\.js\?v=20261022d/);
