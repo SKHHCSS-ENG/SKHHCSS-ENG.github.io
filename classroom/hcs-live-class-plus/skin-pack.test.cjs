@@ -8,6 +8,7 @@ const here = __dirname;
 const registrySrc = fs.readFileSync(path.join(here, 'skins/registry.js'), 'utf8');
 const loaderSrc = fs.readFileSync(path.join(here, 'skins/loader.js'), 'utf8');
 const sparkJs = fs.readFileSync(path.join(here, 'skins/spark.js'), 'utf8');
+const sparkCss = fs.readFileSync(path.join(here, 'skins/spark.css'), 'utf8');
 const arcadeJs = fs.readFileSync(path.join(here, 'skins/arcade.js'), 'utf8');
 const arcadeCss = fs.readFileSync(path.join(here, 'skins/arcade.css'), 'utf8');
 const sparkFireSrc = fs.readFileSync(path.join(here, 'spark-fire.js'), 'utf8');
@@ -203,77 +204,88 @@ test('Spark and Arcade packs note, burst, rank, and clear through the host', fun
   sandbox.HcsSkinHost.refresh();
 });
 
-test('Arcade Chance overlay stays a dim scrim, styles inner panel only, and uses light gold prompt colour and pack fonts', function () {
+test('Spark and Arcade Chance overlays stay a dim scrim, style inner panels only, and use light gold prompt colours and pack fonts', function () {
+  assert.match(sparkCss, /--spark-font-display:\s*'Righteous',\s*'Outfit',\s*var\(--font-display\)/);
+  assert.match(sparkCss, /--spark-font-ui:\s*'Outfit',\s*var\(--font-display\)/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*#chanceSheet[\s\S]*?background-color:\s*rgba\(15,\s*7,\s*40,\s*0\.68\)/);
+  assert.match(sparkCss, /html\[data-skin="spark"\]\s*\.spark-chance-prompt\s*\{[\s\S]*?color:\s*#fff7ad/);
+
   assert.match(arcadeCss, /--arcade-font-display:\s*'Orbitron',\s*'Chakra Petch',\s*var\(--font-display\)/);
   assert.match(arcadeCss, /--arcade-font-ui:\s*'Chakra Petch',\s*'Orbitron',\s*var\(--font-display\)/);
   assert.match(arcadeCss, /html\[data-skin="arcade"\]\s*#chanceSheet[\s\S]*?background-color:\s*rgba\(9,\s*13,\s*22,\s*0\.68\)/);
   assert.match(arcadeCss, /html\[data-skin="arcade"\]\s*\.arcade-chance-prompt\s*\{[\s\S]*?color:\s*#fef08a/);
 
-  const sandbox = freshContext();
-  let skin = 'arcade';
-  function makeClassList(initial) {
-    const set = new Set(initial || []);
-    return {
-      add: function (c) { set.add(c); },
-      remove: function (c) { set.delete(c); },
-      contains: function (c) { return set.has(c); }
+  [
+    { id: 'spark', js: sparkJs },
+    { id: 'arcade', js: arcadeJs }
+  ].forEach(function (pack) {
+    const sandbox = freshContext();
+    let skin = pack.id;
+    function makeClassList(initial) {
+      const set = new Set(initial || []);
+      return {
+        add: function (c) { set.add(c); },
+        remove: function (c) { set.delete(c); },
+        contains: function (c) { return set.has(c); }
+      };
+    }
+    const titleNode = { textContent: 'Chance', classList: makeClassList() };
+    const promptNode = { textContent: 'Speak for 20 seconds about your weekend!', classList: makeClassList() };
+    const cardNode = { classList: makeClassList(['chance-card']) };
+    const innerPanel = {
+      classList: makeClassList(['chance-panel']),
+      parentNode: null
     };
-  }
-  const titleNode = { textContent: 'Chance', classList: makeClassList() };
-  const promptNode = { textContent: 'Speak for 20 seconds about your weekend!', classList: makeClassList() };
-  const cardNode = { classList: makeClassList(['chance-card']) };
-  const innerPanel = {
-    classList: makeClassList(['chance-panel']),
-    parentNode: null
-  };
-  const overlayDialog = {
-    id: 'chanceSheet',
-    classList: makeClassList(['fixed', 'inset-0']),
-    firstElementChild: innerPanel,
-    parentNode: null,
-    querySelector: function (sel) {
-      if (/chance-panel/.test(sel)) return innerPanel;
-      return null;
-    },
-    querySelectorAll: function (sel) {
-      if (/h1, h2, h3/.test(sel)) return [titleNode];
-      if (/chancePrompt/.test(sel)) return [promptNode];
-      if (/chanceCard/.test(sel)) return [cardNode];
-      return [];
-    }
-  };
-  innerPanel.parentNode = overlayDialog;
-  titleNode.parentNode = innerPanel;
-
-  sandbox.document = {
-    body: {},
-    documentElement: {
-      getAttribute: function (name) { return name === 'data-skin' ? skin : null; }
-    },
-    querySelectorAll: function (sel) {
-      if (sel === '[role="dialog"], [role="alertdialog"], #chanceSheet, #chanceModal, .chance-sheet, .chance-modal') {
-        return [overlayDialog];
+    const overlayDialog = {
+      id: 'chanceSheet',
+      classList: makeClassList(['fixed', 'inset-0']),
+      firstElementChild: innerPanel,
+      parentNode: null,
+      querySelector: function (sel) {
+        if (/chance-panel/.test(sel)) return innerPanel;
+        return null;
+      },
+      querySelectorAll: function (sel) {
+        if (/h1, h2, h3/.test(sel)) return [titleNode];
+        if (/chancePrompt/.test(sel)) return [promptNode];
+        if (/chanceCard/.test(sel)) return [cardNode];
+        return [];
       }
-      return [];
-    }
-  };
-  overlayDialog.parentNode = sandbox.document.body;
+    };
+    innerPanel.parentNode = overlayDialog;
+    titleNode.parentNode = innerPanel;
 
-  run(sandbox, loaderSrc, 'loader.js');
-  run(sandbox, sparkFireSrc, 'spark-fire.js');
-  run(sandbox, arcadeJs, 'arcade.js');
-  sandbox.HcsSkinHost.refresh();
+    sandbox.document = {
+      body: {},
+      documentElement: {
+        getAttribute: function (name) { return name === 'data-skin' ? skin : null; }
+      },
+      querySelectorAll: function (sel) {
+        if (sel === '[role="dialog"], [role="alertdialog"], #chanceSheet, #chanceModal, .chance-sheet, .chance-modal') {
+          return [overlayDialog];
+        }
+        return [];
+      }
+    };
+    overlayDialog.parentNode = sandbox.document.body;
 
-  assert.equal(overlayDialog.classList.contains('arcade-chance-sheet'), true);
-  assert.equal(overlayDialog.classList.contains('arcade-chance-panel'), false);
-  assert.equal(innerPanel.classList.contains('arcade-chance-panel'), true);
-  assert.equal(cardNode.classList.contains('arcade-chance-card'), true);
-  assert.equal(promptNode.classList.contains('arcade-chance-prompt'), true);
+    run(sandbox, loaderSrc, 'loader.js');
+    run(sandbox, sparkFireSrc, 'spark-fire.js');
+    run(sandbox, pack.js, pack.id + '.js');
+    sandbox.HcsSkinHost.refresh();
+
+    assert.equal(overlayDialog.classList.contains(pack.id + '-chance-sheet'), true);
+    assert.equal(overlayDialog.classList.contains(pack.id + '-chance-panel'), false);
+    assert.equal(innerPanel.classList.contains(pack.id + '-chance-panel'), true);
+    assert.equal(cardNode.classList.contains(pack.id + '-chance-card'), true);
+    assert.equal(promptNode.classList.contains(pack.id + '-chance-prompt'), true);
+  });
 });
 
 test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle buttons, popups, fonts, and animated backgrounds', function () {
   [
-    { id: 'arcade', css: arcadeCss, js: arcadeJs }
+    { id: 'spark', css: sparkCss, js: sparkJs, pageAnim: 'sparkPageMesh', floorAnim: 'sparkFloorMesh' },
+    { id: 'arcade', css: arcadeCss, js: arcadeJs, pageAnim: 'arcadePageMesh', floorAnim: 'arcadeFloorMesh' }
   ].forEach(function (pack) {
     assert.match(pack.css, new RegExp('\\.studio-mark img\\.studio-mark-default'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] body'));
@@ -286,11 +298,10 @@ test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle b
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #chanceSheet'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnMore'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnChance'));
-    assert.match(pack.css, /@keyframes arcadePageMesh/);
-    assert.match(pack.css, /@keyframes arcadeFloorMesh/);
+    assert.match(pack.css, new RegExp('@keyframes ' + pack.pageAnim));
+    assert.match(pack.css, new RegExp('@keyframes ' + pack.floorAnim));
     assert.match(pack.css, new RegExp('\\.' + pack.id + '-tier-badge[\\s\\S]*?display:\\s*none;'));
     assert.doesNotMatch(pack.css, /html\[data-skin="minimalist"\]/);
-    assert.doesNotMatch(pack.css, /html\[data-skin="spark"\]/);
     assert.doesNotMatch(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*\\.desk-card\\s*\\{[^}]*position\\s*:\\s*relative', 'i'));
     assert.doesNotMatch(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\]\\s*\\.desk-card\\s*\\{[^}]*clip-path\\s*:', 'i'));
     assert.doesNotMatch(pack.css + '\n' + pack.js, /monopoly/i);
