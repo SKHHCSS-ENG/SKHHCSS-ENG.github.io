@@ -1,0 +1,29 @@
+{
+  "name": "HCS English",
+  "short_name": "HCS English",
+  "description": "English Department subject site for SKH Holy Carpenter Secondary School.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5fafc",
+  "theme_color": "#123a4d",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
