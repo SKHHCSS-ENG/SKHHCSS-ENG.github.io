@@ -1295,12 +1295,6 @@ html[data-skin="pitwall"] #btnConfirmApplyGrid {
 html[data-skin="pitwall"] body {
   position: relative;
 }
-html[data-skin="pitwall"] #studioToolbar,
-html[data-skin="pitwall"] #studioWorkspace,
-html[data-skin="pitwall"] .site-version-footer {
-  position: relative;
-  z-index: 1;
-}
 html[data-skin="pitwall"] body::before,
 html[data-skin="pitwall"] body::after {
   content: "";
