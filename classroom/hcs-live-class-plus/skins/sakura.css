@@ -1299,7 +1299,7 @@ html[data-skin="sakura"] #btnConfirmApplyGrid {
 
 /* =====================================================================
    PIXEL-ART JAPANESE STREET & SAKURA COURTYARD SCENE + MOVING CHARACTER
-   - Full pixel-art setting lives on .classroom-floor + .classroom-floor::before/::after
+   - Full pixel-art setting lives on #classroomScaleHost::before/::after (fills the zoomed and panned floor)
    - Page-level art keeps isolation: isolate on body and z-index: -1 (behind classroom)
    - No z-index on the workspace container so #studioToolbar (z-30) dropdowns stay on top
    ===================================================================== */
@@ -1329,24 +1329,25 @@ html[data-skin="sakura"] body::after {
   opacity: 0.85;
   animation: sakuraPetalDrift 14s linear infinite;
 }
-html[data-skin="sakura"] .classroom-floor::before,
-html[data-skin="sakura"] .classroom-floor::after {
+html[data-skin="sakura"] #classroomScaleHost::before,
+html[data-skin="sakura"] #classroomScaleHost::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   image-rendering: pixelated;
+  filter: blur(8px); /* 50% floor-scene blur; desks stay sharp */
 }
-html[data-skin="sakura"] .classroom-floor::before {
+html[data-skin="sakura"] #classroomScaleHost::before {
   background-image: var(--sakura-scene-f2), var(--sakura-scene-f1);
-  background-size: 100% 100%, 100% 100%;
-  background-position: 0px 0px, 0px 0px;
+  background-size: cover, cover;
+  background-position: center, center;
   background-repeat: no-repeat, no-repeat;
   opacity: 0.98;
   animation: sakuraSpriteStep 2.4s steps(2, end) infinite;
 }
-html[data-skin="sakura"] .classroom-floor::after {
+html[data-skin="sakura"] #classroomScaleHost::after {
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20180%20120%22%20preserveAspectRatio=%22none%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%2212%22%20y=%2210%22%20width=%224%22%20height=%223%22%20fill=%22#ff8fab%22/%3E%3Crect%20x=%2213%22%20y=%229%22%20width=%222%22%20height=%225%22%20fill=%22#ffd6e7%22/%3E%3Crect%20x=%2248%22%20y=%2228%22%20width=%223%22%20height=%223%22%20fill=%22#ffffff%22/%3E%3Crect%20x=%2249%22%20y=%2227%22%20width=%222%22%20height=%224%22%20fill=%22#ffb3c6%22/%3E%3Crect%20x=%2286%22%20y=%2214%22%20width=%224%22%20height=%223%22%20fill=%22#f472b6%22/%3E%3Crect%20x=%2287%22%20y=%2213%22%20width=%222%22%20height=%225%22%20fill=%22#ffd6e7%22/%3E%3Crect%20x=%22124%22%20y=%2236%22%20width=%224%22%20height=%223%22%20fill=%22#ff8fab%22/%3E%3Crect%20x=%22125%22%20y=%2235%22%20width=%222%22%20height=%225%22%20fill=%22#ffffff%22/%3E%3Crect%20x=%22158%22%20y=%2218%22%20width=%223%22%20height=%223%22%20fill=%22#ffd6e7%22/%3E%3Crect%20x=%22159%22%20y=%2217%22%20width=%222%22%20height=%224%22%20fill=%22#f472b6%22/%3E%3Crect%20x=%2224%22%20y=%2268%22%20width=%224%22%20height=%223%22%20fill=%22#ffd6e7%22/%3E%3Crect%20x=%2225%22%20y=%2267%22%20width=%222%22%20height=%225%22%20fill=%22#ff8fab%22/%3E%3Crect%20x=%2268%22%20y=%2284%22%20width=%224%22%20height=%223%22%20fill=%22#ff8fab%22/%3E%3Crect%20x=%2269%22%20y=%2283%22%20width=%222%22%20height=%225%22%20fill=%22#ffffff%22/%3E%3Crect%20x=%22108%22%20y=%2262%22%20width=%223%22%20height=%223%22%20fill=%22#f472b6%22/%3E%3Crect%20x=%22109%22%20y=%2261%22%20width=%222%22%20height=%224%22%20fill=%22#ffd6e7%22/%3E%3Crect%20x=%22144%22%20y=%2292%22%20width=%224%22%20height=%223%22%20fill=%22#ffd6e7%22/%3E%3Crect%20x=%22145%22%20y=%2291%22%20width=%222%22%20height=%225%22%20fill=%22#ff8fab%22/%3E%3Crect%20x=%22168%22%20y=%2274%22%20width=%223%22%20height=%223%22%20fill=%22#ffffff%22/%3E%3Crect%20x=%22169%22%20y=%2273%22%20width=%222%22%20height=%224%22%20fill=%22#ffb3c6%22/%3E%3C/svg%3E");
   background-size: 360px 240px;
   background-position: 0px 0px;
@@ -1357,6 +1358,8 @@ html[data-skin="sakura"] .classroom-floor::after {
 html[data-skin="sakura"] #classroomScaleHost {
   position: relative;
   z-index: 1;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 /* =====================================================================
@@ -1407,8 +1410,8 @@ html[data-skin="sakura"] #classroomScaleHost {
   html[data-skin="sakura"] #studioHeader::before,
   html[data-skin="sakura"] #studioHeader::after,
   html[data-skin="sakura"] .classroom-floor,
-  html[data-skin="sakura"] .classroom-floor::before,
-  html[data-skin="sakura"] .classroom-floor::after,
+  html[data-skin="sakura"] #classroomScaleHost::before,
+  html[data-skin="sakura"] #classroomScaleHost::after,
   html[data-skin="sakura"] .classroom-floor.snap-active,
   html[data-skin="sakura"] .sakura-fire.is-on {
     animation: none !important;
