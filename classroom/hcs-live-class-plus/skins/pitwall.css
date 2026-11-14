@@ -1266,7 +1266,7 @@ html[data-skin="pitwall"] #btnConfirmApplyGrid {
 
 /* =====================================================================
    PIXEL-ART RACE PADDOCK & PIT LANE SCENE + MOVING RACING CARS & PIT CREW
-   - Full pixel-art paddock lives on .classroom-floor + .classroom-floor::before/::after
+   - Full pixel-art paddock lives on #classroomScaleHost::before/::after (fills the zoomed and panned floor)
    - Page-level art keeps isolation: isolate on body and z-index: -1 (behind classroom)
    - No z-index on the workspace container so #studioToolbar (z-30) dropdowns stay on top
    ===================================================================== */
@@ -1297,24 +1297,25 @@ html[data-skin="pitwall"] body::after {
   opacity: 0.92;
   animation: pitwallCarsRoll 10s linear infinite;
 }
-html[data-skin="pitwall"] .classroom-floor::before,
-html[data-skin="pitwall"] .classroom-floor::after {
+html[data-skin="pitwall"] #classroomScaleHost::before,
+html[data-skin="pitwall"] #classroomScaleHost::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   image-rendering: pixelated;
+  filter: blur(8px); /* 50% floor-scene blur; desks stay sharp */
 }
-html[data-skin="pitwall"] .classroom-floor::before {
+html[data-skin="pitwall"] #classroomScaleHost::before {
   background-image: var(--pitwall-scene-f2), var(--pitwall-scene-f1);
-  background-size: 100% 100%, 100% 100%;
-  background-position: 0px 0px, 0px 0px;
+  background-size: cover, cover;
+  background-position: center, center;
   background-repeat: no-repeat, no-repeat;
   opacity: 0.98;
   animation: pitwallSpriteStep 1.8s steps(2, end) infinite;
 }
-html[data-skin="pitwall"] .classroom-floor::after {
+html[data-skin="pitwall"] #classroomScaleHost::after {
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20270%20180%22%20preserveAspectRatio=%22none%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%2216%22%20y=%2239%22%20width=%2210%22%20height=%222%22%20fill=%22#00d2be%22/%3E%3Crect%20x=%2220%22%20y=%2242%22%20width=%226%22%20height=%222%22%20fill=%22#ff8000%22/%3E%3Crect%20x=%2228%22%20y=%2233%22%20width=%226%22%20height=%2210%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%2229%22%20y=%2234%22%20width=%224%22%20height=%228%22%20fill=%22#ff8000%22/%3E%3Crect%20x=%2234%22%20y=%2237%22%20width=%2230%22%20height=%226%22%20fill=%22#ff8000%22/%3E%3Crect%20x=%2242%22%20y=%2239%22%20width=%2216%22%20height=%223%22%20fill=%22#00d2be%22/%3E%3Crect%20x=%2244%22%20y=%2233%22%20width=%227%22%20height=%225%22%20fill=%22#facc15%22/%3E%3Crect%20x=%2247%22%20y=%2234%22%20width=%224%22%20height=%223%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%2264%22%20y=%2239%22%20width=%228%22%20height=%224%22%20fill=%22#00d2be%22/%3E%3Crect%20x=%2235%22%20y=%2241%22%20width=%228%22%20height=%226%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%2237%22%20y=%2243%22%20width=%224%22%20height=%222%22%20fill=%22#e11d48%22/%3E%3Crect%20x=%2256%22%20y=%2241%22%20width=%228%22%20height=%226%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%2258%22%20y=%2243%22%20width=%224%22%20height=%222%22%20fill=%22#e11d48%22/%3E%3Crect%20x=%22126%22%20y=%22154%22%20width=%2212%22%20height=%222%22%20fill=%22#ff8000%22/%3E%3Crect%20x=%22130%22%20y=%22157%22%20width=%228%22%20height=%222%22%20fill=%22#fde047%22/%3E%3Crect%20x=%22140%22%20y=%22147%22%20width=%226%22%20height=%2211%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%22141%22%20y=%22148%22%20width=%224%22%20height=%229%22%20fill=%22#00d2be%22/%3E%3Crect%20x=%22146%22%20y=%22151%22%20width=%2232%22%20height=%227%22%20fill=%22#00d2be%22/%3E%3Crect%20x=%22154%22%20y=%22154%22%20width=%2218%22%20height=%223%22%20fill=%22#ff8000%22/%3E%3Crect%20x=%22157%22%20y=%22147%22%20width=%227%22%20height=%225%22%20fill=%22#ffffff%22/%3E%3Crect%20x=%22160%22%20y=%22148%22%20width=%224%22%20height=%223%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%22178%22%20y=%22154%22%20width=%229%22%20height=%224%22%20fill=%22#ff8000%22/%3E%3Crect%20x=%22148%22%20y=%22156%22%20width=%229%22%20height=%227%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%22150%22%20y=%22158%22%20width=%225%22%20height=%223%22%20fill=%22#facc15%22/%3E%3Crect%20x=%22170%22%20y=%22156%22%20width=%229%22%20height=%227%22%20fill=%22#0b0d12%22/%3E%3Crect%20x=%22172%22%20y=%22158%22%20width=%225%22%20height=%223%22%20fill=%22#facc15%22/%3E%3C/svg%3E");
   background-size: 540px 100%;
   background-position: 0px 0px;
@@ -1325,6 +1326,8 @@ html[data-skin="pitwall"] .classroom-floor::after {
 html[data-skin="pitwall"] #classroomScaleHost {
   position: relative;
   z-index: 1;
+  min-width: 100%;
+  min-height: 100%;
 }
 
 /* =====================================================================
@@ -1379,8 +1382,8 @@ html[data-skin="pitwall"] #classroomScaleHost {
   html[data-skin="pitwall"] #studioHeader::before,
   html[data-skin="pitwall"] #studioHeader::after,
   html[data-skin="pitwall"] .classroom-floor,
-  html[data-skin="pitwall"] .classroom-floor::before,
-  html[data-skin="pitwall"] .classroom-floor::after,
+  html[data-skin="pitwall"] #classroomScaleHost::before,
+  html[data-skin="pitwall"] #classroomScaleHost::after,
   html[data-skin="pitwall"] .classroom-floor.snap-active,
   html[data-skin="pitwall"] .pitwall-fire.is-on {
     animation: none !important;
