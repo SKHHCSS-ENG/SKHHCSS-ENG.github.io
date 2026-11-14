@@ -203,7 +203,75 @@ test('Spark and Arcade packs note, burst, rank, and clear through the host', fun
   sandbox.HcsSkinHost.refresh();
 });
 
-test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle buttons, popups, and animated backgrounds', function () {
+test('Arcade Chance overlay stays a dim scrim, styles inner panel only, and uses light gold prompt colour and pack fonts', function () {
+  assert.match(arcadeCss, /--arcade-font-display:\s*'Orbitron',\s*'Chakra Petch',\s*var\(--font-display\)/);
+  assert.match(arcadeCss, /--arcade-font-ui:\s*'Chakra Petch',\s*'Orbitron',\s*var\(--font-display\)/);
+  assert.match(arcadeCss, /html\[data-skin="arcade"\]\s*#chanceSheet[\s\S]*?background-color:\s*rgba\(9,\s*13,\s*22,\s*0\.68\)/);
+  assert.match(arcadeCss, /html\[data-skin="arcade"\]\s*\.arcade-chance-prompt\s*\{[\s\S]*?color:\s*#fef08a/);
+
+  const sandbox = freshContext();
+  let skin = 'arcade';
+  function makeClassList(initial) {
+    const set = new Set(initial || []);
+    return {
+      add: function (c) { set.add(c); },
+      remove: function (c) { set.delete(c); },
+      contains: function (c) { return set.has(c); }
+    };
+  }
+  const titleNode = { textContent: 'Chance', classList: makeClassList() };
+  const promptNode = { textContent: 'Speak for 20 seconds about your weekend!', classList: makeClassList() };
+  const cardNode = { classList: makeClassList(['chance-card']) };
+  const innerPanel = {
+    classList: makeClassList(['chance-panel']),
+    parentNode: null
+  };
+  const overlayDialog = {
+    id: 'chanceSheet',
+    classList: makeClassList(['fixed', 'inset-0']),
+    firstElementChild: innerPanel,
+    parentNode: null,
+    querySelector: function (sel) {
+      if (/chance-panel/.test(sel)) return innerPanel;
+      return null;
+    },
+    querySelectorAll: function (sel) {
+      if (/h1, h2, h3/.test(sel)) return [titleNode];
+      if (/chancePrompt/.test(sel)) return [promptNode];
+      if (/chanceCard/.test(sel)) return [cardNode];
+      return [];
+    }
+  };
+  innerPanel.parentNode = overlayDialog;
+  titleNode.parentNode = innerPanel;
+
+  sandbox.document = {
+    body: {},
+    documentElement: {
+      getAttribute: function (name) { return name === 'data-skin' ? skin : null; }
+    },
+    querySelectorAll: function (sel) {
+      if (sel === '[role="dialog"], [role="alertdialog"], #chanceSheet, #chanceModal, .chance-sheet, .chance-modal') {
+        return [overlayDialog];
+      }
+      return [];
+    }
+  };
+  overlayDialog.parentNode = sandbox.document.body;
+
+  run(sandbox, loaderSrc, 'loader.js');
+  run(sandbox, sparkFireSrc, 'spark-fire.js');
+  run(sandbox, arcadeJs, 'arcade.js');
+  sandbox.HcsSkinHost.refresh();
+
+  assert.equal(overlayDialog.classList.contains('arcade-chance-sheet'), true);
+  assert.equal(overlayDialog.classList.contains('arcade-chance-panel'), false);
+  assert.equal(innerPanel.classList.contains('arcade-chance-panel'), true);
+  assert.equal(cardNode.classList.contains('arcade-chance-card'), true);
+  assert.equal(promptNode.classList.contains('arcade-chance-prompt'), true);
+});
+
+test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle buttons, popups, fonts, and animated backgrounds', function () {
   [
     { id: 'arcade', css: arcadeCss, js: arcadeJs }
   ].forEach(function (pack) {
@@ -216,8 +284,6 @@ test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle b
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #pickerModal'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] \\.wb-sheet'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #chanceSheet'));
-    assert.match(pack.css, /#chanceSheet\.arcade-chance-panel[\s\S]{0,400}background:\s*rgba\(15,\s*23,\s*42,\s*0\.6\)/);
-    assert.match(pack.css, /#chanceSheet \.chance-card-prompt[\s\S]{0,400}color:\s*#fef08a/);
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnMore'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnChance'));
     assert.match(pack.css, /@keyframes arcadePageMesh/);
