@@ -1,0 +1,4035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Pixel Duel: Break &amp; Boost — Play Your Way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Noto+Sans+TC:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-obsidian: rgba(12, 14, 22, 0.92);
+      --bg-card: rgba(18, 21, 32, 0.95);
+      --gold-primary: #f59e0b;
+      --gold-bright: #fbbf24;
+      --gold-soft: rgba(245, 158, 11, 0.22);
+      --crimson-accent: #e11d48;
+      --amber-flame: #ea580c;
+      --teal-break: #14b8a6;
+      --lane-a: #3b82f6;
+      --lane-b: #f59e0b;
+      --lane-c: #10b981;
+      --text-cream: #fef3c7;
+      --text-white: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-brass: rgba(251, 191, 36, 0.42);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: #07080d;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+      color: var(--text-white);
+      touch-action: none;
+    }
+
+    /* Main 2D Boss Duel Arena Canvas & Hollow-Octopath Vignette */
+    #game-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      cursor: pointer;
+    }
+
+    .hd2d-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background:
+        radial-gradient(circle at 50% 52%, rgba(0,0,0,0) 58%, rgba(4, 6, 12, 0.68) 100%),
+        linear-gradient(180deg, rgba(8, 7, 15, 0.48) 0%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 84%, rgba(6, 5, 12, 0.56) 100%);
+    }
+
+    /* Break Flash Overlay */
+    #break-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+      opacity: 0;
+      transition: opacity 0.28s ease-out;
+      background: radial-gradient(circle at 55% 50%, rgba(251, 191, 36, 0.72), rgba(56, 189, 248, 0.32), transparent 76%);
+    }
+
+    /* Top Broadcast / Guild Chronicle HUD Bar */
+    #hud-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding:
+        max(8px, env(safe-area-inset-top))
+        max(10px, env(safe-area-inset-right))
+        max(8px, env(safe-area-inset-bottom))
+        max(10px, env(safe-area-inset-left));
+    }
+
+    .hud-top-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 6px;
+    }
+
+    .chronicle-bar {
+      width: 100%;
+      max-width: 1120px;
+      background: var(--bg-obsidian);
+      border: 1.5px solid var(--border-brass);
+      border-radius: 10px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      pointer-events: auto;
+      backdrop-filter: blur(8px);
+    }
+
+    .hud-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .hero-badge-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(251, 191, 36, 0.5);
+      border-radius: 7px;
+      padding: 4px 10px;
+      white-space: nowrap;
+    }
+
+    .hero-class-tag {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.76rem;
+      color: var(--gold-bright);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hero-name-tag {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #fff;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      padding: 4px 9px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .stat-chip .label {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-chip .val {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      color: var(--gold-bright);
+    }
+
+    .shields-row {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.95rem;
+    }
+
+    .hud-btn {
+      background: rgba(30, 41, 59, 0.92);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      color: var(--text-cream);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.12s, background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .hud-btn:hover {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: var(--gold-bright);
+      transform: translateY(-1px);
+    }
+
+    .hud-btn.active-accent {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #fff;
+      border-color: #fde68a;
+    }
+
+    /* Question Card + Solid Option Cards Row (Strictly Top-Docked, Hidden during Break/Dodge Play Phase) */
+    #question-hud-wrap {
+      width: 100%;
+      max-width: 880px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: auto;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    #question-hud-wrap.hidden-phase {
+      opacity: 0;
+      transform: translateY(-14px);
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .question-card {
+      background: linear-gradient(180deg, rgba(17, 20, 32, 0.96) 0%, rgba(12, 14, 22, 0.96) 100%);
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 11px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.72);
+    }
+
+    .q-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .q-mode-pill {
+      background: linear-gradient(135deg, #b45309, #78350f);
+      border: 1px solid #fcd34d;
+      color: #fef3c7;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .mcq-blank-hl {
+      display: inline-block;
+      min-width: clamp(56px, 7.5vw, 78px);
+      border-bottom: 3px solid #ff8000;
+      line-height: 1.02;
+      margin: 0 4px;
+      text-decoration: none;
+      user-select: none;
+    }
+    .mcq-seg-tag {
+      display: inline-block;
+      background: rgba(255, 128, 0, 0.22);
+      border: 1px solid rgba(255, 128, 0, 0.65);
+      color: #ffedd5;
+      border-radius: 3px;
+      padding: 0 5px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.88em;
+      margin-right: 2px;
+    }
+    .q-prompt-text {
+      font-size: clamp(0.92rem, 1.8vw, 1.15rem);
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+      overflow-wrap: break-word;
+    }
+
+    .q-prompt-sub {
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .q-right-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .q-timer-ring {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.05rem;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1.5px solid rgba(251, 191, 36, 0.55);
+      border-radius: 8px;
+      padding: 4px 10px;
+      min-width: 54px;
+      text-align: center;
+    }
+
+    /* Options Row Below Question Card - SOLID High-Contrast Highlights */
+    .options-below-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .option-card {
+      background: rgba(18, 22, 34, 0.94);
+      border: 2px solid rgba(148, 163, 184, 0.42);
+      border-radius: 10px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+      min-width: 0;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+    }
+
+    .option-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .option-card[data-lane="0"] .option-badge { background: #2563eb; }
+    .option-card[data-lane="1"] .option-badge { background: #d97706; }
+    .option-card[data-lane="2"] .option-badge { background: #059669; }
+
+    .option-text {
+      font-weight: 800;
+      color: #f8fafc;
+      font-size: 0.94rem;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Solid vivid high-contrast gradients + crisp #ffffff border when aligned */
+    .option-card.selected[data-lane="0"] {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #3b82f6 100%);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.75);
+      transform: translateY(-2px);
+    }
+    .option-card.selected[data-lane="1"] {
+      background: linear-gradient(135deg, #b45309 0%, #d97706 55%, #f59e0b 100%);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.8);
+      transform: translateY(-2px);
+    }
+    .option-card.selected[data-lane="2"] {
+      background: linear-gradient(135deg, #047857 0%, #059669 55%, #10b981 100%);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.75);
+      transform: translateY(-2px);
+    }
+    .option-card.selected .option-badge {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1.5px solid #ffffff;
+    }
+
+    /* Top-Right Corner Feedback Toasts (Never Center Screen) */
+    #toast-corner-right {
+      position: fixed;
+      top: 56px;
+      right: max(12px, env(safe-area-inset-right));
+      z-index: 32;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      pointer-events: none;
+      max-width: min(360px, 88vw);
+    }
+
+    .corner-toast {
+      background: rgba(15, 19, 28, 0.95);
+      border-left: 4px solid var(--gold-bright);
+      border-top: 1px solid rgba(251, 191, 36, 0.4);
+      border-right: 1px solid rgba(251, 191, 36, 0.4);
+      border-bottom: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 8px 12px;
+      border-radius: 9px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65);
+      animation: toastSlideIn 0.2s ease-out;
+    }
+
+    .corner-toast.good {
+      border-left-color: #22c55e;
+    }
+    .corner-toast.bad {
+      border-left-color: #ef4444;
+    }
+
+    .corner-toast-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.85rem;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .corner-toast-sub {
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      line-height: 1.3;
+    }
+
+    @keyframes toastSlideIn {
+      from { opacity: 0; transform: translateX(18px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Bottom HUD: Platformer Move/Jump/Slash Controls & Soul/Combo Meter */
+    .hud-bottom-bar {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .touch-controls-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      flex-wrap: wrap;
+    }
+
+    .lane-quick-stack {
+      display: flex;
+      gap: 6px;
+    }
+
+    .touch-action-btn {
+      background: rgba(15, 19, 28, 0.92);
+      border: 1.5px solid rgba(251, 191, 36, 0.48);
+      color: #fef3c7;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.85rem;
+      padding: 9px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+      transition: transform 0.1s, background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .touch-action-btn:active, .touch-action-btn.active-hold {
+      background: linear-gradient(135deg, #d97706, #ea580c);
+      border-color: #ffffff;
+      color: #ffffff;
+      transform: scale(0.95);
+    }
+
+    .touch-action-btn.slash-cta {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      border-color: #fde68a;
+      color: #ffffff;
+    }
+
+    .bp-orbs-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 19, 28, 0.92);
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      padding: 6px 11px;
+      border-radius: 10px;
+      pointer-events: auto;
+    }
+
+    .bp-orb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(51, 65, 85, 0.8);
+      border: 1.5px solid rgba(148, 163, 184, 0.5);
+      transition: all 0.2s ease;
+    }
+
+    .bp-orb.filled {
+      background: radial-gradient(circle at 35% 35%, #fef08a, #f59e0b 65%, #b45309 100%);
+      border-color: #ffffff;
+      box-shadow: 0 0 10px #f59e0b;
+    }
+
+    /* Circular Combat Pace / Combo Gauge (Low=Green -> Mid=Amber -> High=Red) */
+    .speedo-container {
+      width: 168px;
+      height: 168px;
+      position: relative;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+
+    #speedo-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Dedicated Full-Screen Start Menu (z-index: 45) */
+    #start-menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding:
+        max(16px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(16px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+      background: radial-gradient(circle at 50% 42%, rgba(15, 19, 28, 0.25) 0%, rgba(10, 12, 18, 0.78) 100%);
+      overflow-y: auto;
+    }
+
+    .start-header-box {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .chronicle-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 19, 28, 0.92);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      color: var(--gold-bright);
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .game-main-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(1.55rem, 4.5vw, 3.1rem);
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      text-shadow: 0 4px 22px rgba(0, 0, 0, 0.85), 0 0 28px rgba(245, 158, 11, 0.45);
+      letter-spacing: 0.01em;
+    }
+
+    .game-main-title span {
+      color: var(--gold-bright);
+    }
+
+    .start-center-card {
+      width: 100%;
+      max-width: 560px;
+      background: rgba(15, 19, 28, 0.93);
+      border: 2px solid rgba(251, 191, 36, 0.55);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.82);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .start-mode-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+      border: 2px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 16px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .start-mode-card:hover {
+      transform: translateY(-2px);
+      border-color: #ffffff;
+      box-shadow: 0 12px 28px rgba(245, 158, 11, 0.32);
+    }
+
+    .mode-card-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.32rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-card-meta {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--gold-bright);
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+
+    .mode-enter-pill {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #ffffff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      padding: 9px 16px;
+      border-radius: 9px;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.5);
+    }
+
+    .word-pool-bar {
+      background: rgba(10, 14, 23, 0.95);
+      border: 1.5px solid rgba(251, 191, 36, 0.38);
+      border-radius: 11px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pool-status-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .pool-badge-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gold-bright);
+    }
+
+    .pool-active-summary {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .btn-primary-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border: 1.5px solid #fde68a;
+      color: #0f172a;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.12s, filter 0.12s;
+      white-space: nowrap;
+    }
+
+    .btn-primary-gold:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-dark-brass {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1.5px solid rgba(251, 191, 36, 0.48);
+      color: #fef3c7;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.86rem;
+      padding: 8px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.12s;
+      white-space: nowrap;
+    }
+
+    .btn-dark-brass:hover {
+      border-color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* Modals & Tavern Setup (z-index: 65, builder z-index: 95) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 65;
+      background: rgba(6, 9, 15, 0.84);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.builder-modal {
+      z-index: 95;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .modal-window {
+      width: 100%;
+      max-width: 920px;
+      max-height: 92dvh;
+      overflow-y: auto;
+      background: linear-gradient(180deg, rgba(18, 22, 34, 0.98) 0%, rgba(11, 14, 22, 0.99) 100%);
+      border: 2px solid rgba(251, 191, 36, 0.55);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(251, 191, 36, 0.24);
+      padding-bottom: 10px;
+    }
+
+    .modal-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(1.15rem, 2.5vw, 1.5rem);
+      color: #ffffff;
+    }
+
+    /* Tavern Hero Showroom Grid */
+    .tavern-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1.25fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .turntable-box {
+      background: radial-gradient(circle at 50% 60%, rgba(245, 158, 11, 0.18), rgba(9, 12, 20, 0.95) 75%);
+      border: 1.5px solid rgba(251, 191, 36, 0.42);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 250px;
+      position: relative;
+    }
+
+    #showroom-canvas {
+      width: 100%;
+      height: 190px;
+      display: block;
+      border-radius: 8px;
+      image-rendering: pixelated;
+    }
+
+    .hero-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .hero-pick-btn {
+      background: rgba(24, 30, 46, 0.92);
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      border-radius: 8px;
+      padding: 6px 6px;
+      color: #e2e8f0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.12s;
+    }
+
+    .hero-pick-btn.active {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.92), rgba(180, 83, 9, 0.95));
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.55);
+    }
+
+    .setup-controls-col {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .field-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .text-input, .select-input, .textarea-input {
+      background: rgba(10, 14, 23, 0.95);
+      border: 1.5px solid rgba(148, 163, 184, 0.4);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      width: 100%;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .text-input:focus, .select-input:focus, .textarea-input:focus {
+      outline: none;
+      border-color: var(--gold-bright);
+    }
+
+    .pill-choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .choice-pill {
+      background: rgba(24, 31, 48, 0.95);
+      border: 1.5px solid rgba(148, 163, 184, 0.36);
+      color: #e2e8f0;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.84rem;
+      padding: 6px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .choice-pill.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+      border-color: #ffffff;
+      font-weight: 700;
+    }
+
+    .custom-laps-input {
+      width: 68px !important;
+      padding: 5px 8px !important;
+      text-align: center;
+    }
+
+    /* Emoji Tab-Stop Header Formatting & Clause-Boundary Wrapping */
+    .clause-header-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .clause-emoji-col {
+      font-size: 1.45rem;
+      line-height: 1.15;
+      flex-shrink: 0;
+    }
+
+    .clause-text-col {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .clause-kicker {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      color: var(--gold-bright);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .clause-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(1.15rem, 2.6vw, 1.6rem);
+      color: #ffffff;
+      line-height: 1.2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .nowrap-clause {
+      white-space: nowrap;
+    }
+
+    /* Scoreboard & Stacked Review Cards */
+    .score-summary-banner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .score-metric-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .score-metric-box .m-lbl {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .score-metric-box .m-val {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.35rem;
+      color: var(--gold-bright);
+      margin-top: 2px;
+    }
+
+    .standings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 165px;
+      overflow-y: auto;
+    }
+
+    .standing-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(20, 27, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 8px;
+      padding: 7px 11px;
+    }
+
+    .standing-row.current-run {
+      border-color: var(--gold-bright);
+      background: rgba(245, 158, 11, 0.16);
+    }
+
+    .standing-driver-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .standing-rank {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gold-bright);
+      width: 24px;
+      flex-shrink: 0;
+    }
+
+    .standing-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #ffffff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .pts-pill {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #fff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.82rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Review Cards: Vertically Stacked Full Width + Audio Buttons Below */
+    .review-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .review-card {
+      background: rgba(15, 21, 34, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      border-left: 4px solid #22c55e;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .review-card.missed {
+      border-left-color: #ef4444;
+    }
+
+    .review-q-line {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: #ffffff;
+    }
+
+    .review-ans-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .ans-pill-correct {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid #22c55e;
+      color: #86efac;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+
+    .ans-pill-wrong {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+
+    .review-explanation-full {
+      width: 100%;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      line-height: 1.4;
+      background: rgba(9, 13, 22, 0.75);
+      padding: 7px 10px;
+      border-radius: 7px;
+    }
+
+    .review-audio-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    /* Cutscene Banner Overlay */
+    #cutscene-banner {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      background: rgba(14, 17, 26, 0.94);
+      border: 2px solid var(--gold-bright);
+      border-radius: 12px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Responsive Mobile Adjustments */
+    @media (max-width: 768px) {
+      .tavern-grid {
+        grid-template-columns: 1fr;
+      }
+      .score-summary-banner {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .speedo-container {
+        width: 108px;
+        height: 108px;
+      }
+      .chronicle-bar {
+        padding: 5px 8px;
+      }
+      .hero-name-tag {
+        max-width: 82px;
+      }
+      .options-below-row {
+        gap: 5px;
+      }
+      .option-card {
+        padding: 5px 7px;
+        gap: 5px;
+      }
+      .option-badge {
+        width: 22px;
+        height: 22px;
+        font-size: 0.78rem;
+      }
+    }
+  </style>
+  <!-- Loads shared-words.js from Play Your Way hub with offline 3,500-word HKDSE fallback -->
+  <script src="../shared-words.js" onerror="window.__sharedWordsOfflineFallback = true;"></script>
+  <script src="https://skhhcss-eng.github.io/fun-projects/play-your-way/shared-words.js" onerror="window.__sharedWordsOfflineFallback = true;"></script>
+</head>
+<body>
+
+  <!-- High-Detail 2D Boss Duel Arena Canvas -->
+  <canvas id="game-canvas"></canvas>
+  <div class="hd2d-vignette"></div>
+  <div id="break-flash"></div>
+
+  <!-- Top-Right Corner Toast Container -->
+  <div id="toast-corner-right"></div>
+
+  <!-- In-Game HUD Layer -->
+  <div id="hud-layer" class="hidden">
+    <div class="hud-top-stack">
+      <!-- Broadcast / Chronicle Timing & Status Bar -->
+      <div class="chronicle-bar">
+        <div class="hud-cluster">
+          <div class="hero-badge-pill">
+            <span class="hero-class-tag" id="hud-hero-class">KNIGHT</span>
+            <span class="hero-name-tag" id="hud-hero-name">Olberic</span>
+          </div>
+          <div class="stat-chip">
+            <span class="label">Duel</span>
+            <span class="val" id="hud-lap-val">1 / 8</span>
+          </div>
+          <div class="stat-chip">
+            <span class="label">Score</span>
+            <span class="val" id="hud-score-val">0</span>
+          </div>
+          <div class="stat-chip">
+            <span class="label">Shields</span>
+            <div class="shields-row" id="hud-shields-row">🛡️🛡️🛡️</div>
+          </div>
+        </div>
+
+        <div class="hud-cluster">
+          <button type="button" class="hud-btn accent-cycle-btn" id="btn-hud-accent" title="Switch English Accent">🗣️ UK</button>
+          <button type="button" class="hud-btn" id="btn-hud-mute" title="Toggle Sound">🔊</button>
+          <button type="button" class="hud-btn" id="btn-hud-pause">⏸️ Camp</button>
+        </div>
+      </div>
+
+      <!-- Question Card + Solid Option Cards Row (Hidden during Boss Break / Dodge Action Phase) -->
+      <div id="question-hud-wrap" class="hidden-phase">
+        <div class="question-card">
+          <div class="q-left">
+            <span class="q-mode-pill" id="q-mode-badge">VOCAB</span>
+            <div style="min-width:0; flex:1;">
+              <div class="q-prompt-text" id="q-prompt-text">Loading chronicle challenge...</div>
+              <div class="q-prompt-sub" id="q-prompt-sub">Duel 1 of 8</div>
+            </div>
+          </div>
+          <div class="q-right-controls">
+            <button type="button" class="hud-btn" id="btn-q-speak">🔊 Listen</button>
+            <div class="q-timer-ring" id="q-timer-display">14s</div>
+          </div>
+        </div>
+
+        <div class="options-below-row" id="options-row">
+          <div class="option-card" data-lane="0" id="opt-card-0">
+            <div class="option-badge">A</div>
+            <div class="option-text" id="opt-text-0">Option A</div>
+          </div>
+          <div class="option-card selected" data-lane="1" id="opt-card-1">
+            <div class="option-badge">B</div>
+            <div class="option-text" id="opt-text-1">Option B</div>
+          </div>
+          <div class="option-card" data-lane="2" id="opt-card-2">
+            <div class="option-badge">C</div>
+            <div class="option-text" id="opt-text-2">Option C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Controls: Platformer Move Left/Right + Jump + Nail/Sword Slash + Shadow Dash / BP Boost -->
+    <div class="hud-bottom-bar">
+      <div class="touch-controls-cluster">
+        <div class="lane-quick-stack">
+          <button type="button" class="touch-action-btn" id="btn-lane-up">◀ Left</button>
+          <button type="button" class="touch-action-btn" id="btn-lane-down">Right ▶</button>
+        </div>
+        <div class="lane-quick-stack">
+          <button type="button" class="touch-action-btn" id="btn-jump-plat">⬆️ Jump</button>
+          <button type="button" class="touch-action-btn slash-cta" id="btn-action-jump">⚔️ Slash</button>
+          <button type="button" class="touch-action-btn" id="btn-action-boost">🔥 BP Boost</button>
+        </div>
+        <div class="bp-orbs-wrap" title="Boost Points (BP)">
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.75rem; color:var(--gold-bright);">BP</span>
+          <div class="bp-orb filled" id="bp-orb-0"></div>
+          <div class="bp-orb" id="bp-orb-1"></div>
+          <div class="bp-orb" id="bp-orb-2"></div>
+        </div>
+      </div>
+
+      <div class="speedo-container">
+        <canvas id="speedo-canvas" width="220" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cutscene Skip Banner -->
+  <div id="cutscene-banner" class="hidden">
+    <div>
+      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">🏁 BOSS VANQUISHED</div>
+      <div style="font-size:0.78rem; color:#cbd5e1;" id="cutscene-banner-sub">Sanctuary Restored!</div>
+    </div>
+    <button type="button" class="btn-primary-gold" id="btn-skip-cutscene">Skip ▶</button>
+  </div>
+
+  <!-- Dedicated Full-Screen Start Menu (z-index: 45) -->
+  <div id="start-menu-overlay">
+    <div class="start-header-box">
+      <div style="margin-bottom:8px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-dark-brass" id="btn-back-to-pyw-hub" style="padding:5px 12px; font-size:0.78rem;">◀ Play Your Way Hub</button>
+        <span class="chronicle-kicker" style="margin-bottom:0;">⚔️ OCTOPATH × HOLLOW KNIGHT BOSS DUEL</span>
+      </div>
+      <h1 class="game-main-title">Pixel Duel: <span>Break &amp; Boost</span></h1>
+    </div>
+
+    <div class="start-center-card">
+      <div class="start-mode-card" id="btn-open-tavern">
+        <div>
+          <div class="mode-card-title">⚔️ 1 PLAYER BOSS DUEL</div>
+          <div class="mode-card-meta">A/D RUN · W JUMP · SPACE SLASH · TAP ORB A/B/C</div>
+        </div>
+        <div class="mode-enter-pill">Enter Tavern ▶</div>
+      </div>
+
+      <div class="word-pool-bar">
+        <div class="pool-status-info">
+          <span class="pool-badge-label" id="start-pool-mode-tag">ACTIVE WORD POOL · ALL 4 MODES</span>
+          <span class="pool-active-summary" id="start-pool-summary">HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)</span>
+        </div>
+        <button type="button" class="btn-primary-gold" id="btn-open-word-builder">📚 Customise Word Pool</button>
+      </div>
+    </div>
+
+    <div style="font-size:0.76rem; color:#cbd5e1; text-align:center; background:rgba(10,14,22,0.75); padding:5px 14px; border-radius:999px; border:1px solid rgba(251,191,36,0.28);">
+      SKH Holy Carpenter Secondary School · English Department Self-Learning Hub
+    </div>
+  </div>
+
+  <!-- Campfire Tavern Setup Modal (1P Garage Equivalent, z-index: 65) -->
+  <div id="tavern-modal" class="modal-backdrop hidden">
+    <div class="modal-window">
+      <div class="modal-header-row">
+        <button type="button" class="btn-dark-brass" id="btn-back-title">◀ Start Menu</button>
+        <div class="modal-title">🔥 Sanctuary Bench &amp; Campfire Setup</div>
+        <button type="button" class="btn-dark-brass" id="btn-tavern-word-pool">📚 Word Pool</button>
+      </div>
+
+      <div class="tavern-grid">
+        <!-- Left: Live 2D HD-Pixel Hero vs Boss Sanctuary Diorama Showcase -->
+        <div class="turntable-box">
+          <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:'Fredoka',sans-serif; font-size:0.85rem; color:var(--gold-bright);" id="showroom-hero-title">OLBERIC · BLADE KNIGHT #4</span>
+            <span style="font-size:0.72rem; color:#94a3b8;">BOSS DUEL SHOWCASE</span>
+          </div>
+          <canvas id="showroom-canvas" width="380" height="210"></canvas>
+          <div class="hero-selector-grid" id="hero-selector-grid">
+            <button type="button" class="hero-pick-btn active" data-hero="0">⚔️ Olberic #4</button>
+            <button type="button" class="hero-pick-btn" data-hero="1">📖 Cyrus #16</button>
+            <button type="button" class="hero-pick-btn" data-hero="2">🗡️ Therion #33</button>
+            <button type="button" class="hero-pick-btn" data-hero="3">🏹 H'aanit #12</button>
+            <button type="button" class="hero-pick-btn" data-hero="4">💃 Primrose #14</button>
+            <button type="button" class="hero-pick-btn" data-hero="5">💎 Tressa #10</button>
+          </div>
+        </div>
+
+        <!-- Right: Traveler Name, Guild, Mode, Stages/Laps, Timer, Shields, Accent -->
+        <div class="setup-controls-col">
+          <div class="field-row-2col">
+            <div class="field-group">
+              <label class="field-label" for="input-traveler-name">Challenger Name</label>
+              <input type="text" id="input-traveler-name" class="text-input" value="Olberic" maxlength="20" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="input-guild-name">Guild / Order</label>
+              <input type="text" id="input-guild-name" class="text-input" value="Cobbleston Guard" maxlength="24" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label">📚 Challenge Mode</span>
+            <div class="pill-choice-row" id="setup-mode-pills">
+              <button type="button" class="choice-pill active" data-mode="ALL">All 4 Modes</button>
+              <button type="button" class="choice-pill" data-mode="VOCAB">Vocab</button>
+              <button type="button" class="choice-pill" data-mode="GRAMMAR">Grammar</button>
+              <button type="button" class="choice-pill" data-mode="READING">Reading</button>
+              <button type="button" class="choice-pill" data-mode="PROOFREADING">Proofreading</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label">🏁 Laps / Boss Phases</span>
+            <div class="pill-choice-row" id="setup-laps-pills">
+              <button type="button" class="choice-pill" data-laps="5">5</button>
+              <button type="button" class="choice-pill active" data-laps="8">8</button>
+              <button type="button" class="choice-pill" data-laps="12">12</button>
+              <button type="button" class="choice-pill" data-laps="ALL" id="pill-laps-all">All (48)</button>
+              <input type="number" id="input-custom-laps" class="text-input custom-laps-input" min="1" max="99" placeholder="1-99" title="Custom stage count (1-99)" />
+            </div>
+          </div>
+
+          <div class="field-row-2col">
+            <div class="field-group">
+              <span class="field-label">⏱️ Timer</span>
+              <div class="pill-choice-row" id="setup-timer-pills">
+                <button type="button" class="choice-pill" data-timer="10">10s</button>
+                <button type="button" class="choice-pill active" data-timer="14">14s</button>
+                <button type="button" class="choice-pill" data-timer="20">20s</button>
+                <button type="button" class="choice-pill" data-timer="0">Off</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <span class="field-label">🛡️ Shields (Masks)</span>
+              <div class="pill-choice-row" id="setup-shields-pills">
+                <button type="button" class="choice-pill" data-shields="2">2</button>
+                <button type="button" class="choice-pill active" data-shields="3">3</button>
+                <button type="button" class="choice-pill" data-shields="5">5</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label">🗣️ Voice Accent</span>
+            <div class="pill-choice-row" id="setup-accent-pills">
+              <button type="button" class="choice-pill active" data-accent="UK">UK</button>
+              <button type="button" class="choice-pill" data-accent="US">US</button>
+              <button type="button" class="choice-pill" data-accent="AU">AU</button>
+            </div>
+          </div>
+
+          <button type="button" class="btn-primary-gold" id="btn-launch-quest" style="padding:12px; font-size:1.05rem; margin-top:4px;">
+            ⚔️ Enter Boss Arena ▶
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Modal (Campfire Rest, z-index: 65) -->
+  <div id="pause-modal" class="modal-backdrop hidden">
+    <div class="modal-window" style="max-width:440px; text-align:center;">
+      <div class="modal-title">🔥 Sanctuary Bench — Paused</div>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
+        <button type="button" class="btn-primary-gold" id="btn-resume-quest" style="padding:11px;">▶ Resume Duel</button>
+        <button type="button" class="btn-dark-brass" id="btn-pause-restart" style="padding:10px;">🔄 Restart Duel</button>
+        <button type="button" class="btn-dark-brass" id="btn-pause-tavern" style="padding:10px;">🛡️ Challenger Setup</button>
+        <button type="button" class="btn-dark-brass" id="btn-main-menu" style="padding:10px;">🏠 Start Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- End-of-Quest Classification / DNF Scoreboard Modal (z-index: 65) -->
+  <div id="end-modal" class="modal-backdrop hidden">
+    <div class="modal-window">
+      <div class="modal-header-row">
+        <div class="clause-header-box">
+          <div class="clause-emoji-col" id="end-emoji-icon">🏆</div>
+          <div class="clause-text-col">
+            <div class="clause-kicker" id="end-kicker-line">
+              <span class="nowrap-clause">🏁 OFFICIAL GUILD CLASSIFICATION ·</span>
+              <span class="nowrap-clause">FULL DISTANCE</span>
+            </div>
+            <div class="clause-title" id="end-title-line">
+              <span class="nowrap-clause">🏆 Boss Vanquished —</span>
+              <span class="nowrap-clause">Pantheon Complete!</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn-primary-gold" id="btn-end-play-again">🔄 Duel Again</button>
+          <button type="button" class="btn-dark-brass" id="btn-end-main-menu">🏠 Start Menu</button>
+          <button type="button" class="btn-dark-brass" id="btn-end-pyw-hub">◀ Play Your Way</button>
+        </div>
+      </div>
+
+      <div class="score-summary-banner">
+        <div class="score-metric-box">
+          <div class="m-lbl">Final Score</div>
+          <div class="m-val" id="end-score-val">0 PTS</div>
+        </div>
+        <div class="score-metric-box">
+          <div class="m-lbl">Accuracy</div>
+          <div class="m-val" id="end-acc-val">100%</div>
+        </div>
+        <div class="score-metric-box">
+          <div class="m-lbl">Shield Breaks</div>
+          <div class="m-val" id="end-laps-val">8 / 8</div>
+        </div>
+        <div class="score-metric-box">
+          <div class="m-lbl">Shields Left</div>
+          <div class="m-val" id="end-shields-val">3 🛡️</div>
+        </div>
+      </div>
+
+      <!-- Classroom Hall of Fame Standings -->
+      <div>
+        <div style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright); margin-bottom:6px;">
+          👑 PANTHEON HALL OF FAME STANDINGS
+        </div>
+        <div class="standings-list" id="end-standings-list"></div>
+      </div>
+
+      <!-- Stacked Bilingual Review Cards -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px; flex-wrap:wrap;">
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright);">📜 CHRONICLE REVIEW (ENGLISH + 繁體中文)</span>
+          <div class="pill-choice-row" id="review-filter-pills">
+            <button type="button" class="choice-pill active" data-filter="ALL">All Answered</button>
+            <button type="button" class="choice-pill" data-filter="MISSED">Missed Only</button>
+          </div>
+        </div>
+        <div class="review-list-container" id="end-review-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Word Pool Builder Modal (3,500-word HKDSE Dictionary + Custom List + DeepSeek Photo Extraction, z-index: 95) -->
+  <div id="word-builder-modal" class="modal-backdrop builder-modal hidden">
+    <div class="modal-window">
+      <div class="modal-header-row">
+        <div class="modal-title">📚 Play Your Way — Word Pool Builder</div>
+        <button type="button" class="btn-primary-gold" id="btn-close-word-builder">✓ Apply &amp; Close</button>
+      </div>
+
+      <div class="field-row-2col">
+        <div class="field-group">
+          <label class="field-label" for="select-hkdse-band">1. HKDSE 3,500-Word Offline Dictionary Preset</label>
+          <select id="select-hkdse-band" class="select-input">
+            <option value="CORE_ALL">All HKDSE Core &amp; Extended Pool (3,500-Word Engine)</option>
+            <option value="S1_S3">Junior Secondary Core (S1–S3 Foundation)</option>
+            <option value="DSE_HIGH">HKDSE High-Frequency Exam Pool (S4–S6)</option>
+            <option value="CUSTOM_ONLY">Custom Teacher / Student List Only</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="input-word-search">Search / Filter Dictionary Words</label>
+          <input type="text" id="input-word-search" class="text-input" placeholder="Search word or Chinese meaning..." />
+        </div>
+      </div>
+
+      <!-- Custom Teacher/Student Word Input + Photo AI Extraction via DeepSeek -->
+      <div class="field-group" style="background:rgba(15,23,42,0.85); border:1px solid rgba(251,191,36,0.35); border-radius:10px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
+          <span class="field-label">2. Custom Words &amp; Photo AI Extraction (`skhhcss-eng-play-your-way`)</span>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <label for="input-photo-upload" class="btn-dark-brass" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+              📷 Scan Textbook / Worksheet Photo
+            </label>
+            <input type="file" id="input-photo-upload" accept="image/*,.txt,.csv" style="display:none;" />
+            <button type="button" class="btn-dark-brass" id="btn-deepseek-generate">✨ AI Generate from Topic / Text</button>
+            <button type="button" class="btn-dark-brass" id="btn-clear-custom-words">🗑️ Clear Custom</button>
+          </div>
+        </div>
+        <textarea id="textarea-custom-words" class="textarea-input" rows="3" placeholder="Enter custom words (one per line or comma-separated, e.g. resilient | 堅韌的 | Able to recover quickly from difficulties) or paste a passage for AI extraction..."></textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px; flex-wrap:wrap;">
+          <span style="font-size:0.75rem; color:#cbd5e1;" id="builder-status-msg">Ready: 48 curated 4-mode questions + 3,500-word HKDSE offline synthesizer active.</span>
+          <button type="button" class="btn-primary-gold" id="btn-parse-custom-words">+ Add Custom Words to Pool</button>
+        </div>
+      </div>
+
+      <div style="max-height:175px; overflow-y:auto; background:rgba(9,12,20,0.9); border:1px solid rgba(148,163,184,0.25); border-radius:8px; padding:8px;" id="dictionary-preview-list"></div>
+    </div>
+  </div>
+
+  <script>
+    /*************************************************************************
+     * 1. HKDSE 3,500-WORD OFFLINE ENGINE & 4-MODE BILINGUAL QUESTION BANK
+     *************************************************************************/
+    const CURATED_QUESTIONS = [
+      // VOCABULARY MODE (12)
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'resilient', zh: '堅韌的；適應力強的',
+        prompt: 'Choose the word that means "able to recover quickly from tough challenges":',
+        options: ['fragile', 'resilient', 'hesitant'], answer: 1,
+        expEn: '"Resilient" means strong and able to bounce back quickly after difficulties.',
+        expZh: '「resilient」指堅韌的、能從困難或挫折中迅速恢復過來的。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'meticulous', zh: '一絲不苟的；極為仔細的',
+        prompt: 'The artisan paid ________ attention to every tiny pixel on the shield.',
+        options: ['meticulous', 'reckless', 'casual'], answer: 0,
+        expEn: '"Meticulous" means showing great attention to detail; very careful and precise.',
+        expZh: '「meticulous」解作一絲不苟的、非常留心細節的。'
+      },
+      {
+        mode: 'VOCAB', band: 'S1_S3', word: 'embark', zh: '踏上（旅程）；開始從事',
+        prompt: 'At dawn, the fellowship will ________ on a perilous journey across the mountains.',
+        options: ['abandon', 'embark', 'hesitate'], answer: 1,
+        expEn: '"Embark on" means to begin an exciting or important journey or project.',
+        expZh: '「embark on」指踏上（旅程）或開始一項重要的計劃。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'alleviate', zh: '減輕；緩和（痛楚或問題）',
+        prompt: 'The cleric cast a healing spell to ________ the exhaustion of the travelers.',
+        options: ['aggravate', 'alleviate', 'exaggerate'], answer: 1,
+        expEn: '"Alleviate" means to make suffering, deficiency, or a problem less severe.',
+        expZh: '「alleviate」解作減輕、緩和（痛楚、壓力或問題）。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'inevitable', zh: '無可避免的；必然發生的',
+        prompt: 'With storm clouds gathering over the viaduct, heavy rain seemed ________.',
+        options: ['optional', 'avoidable', 'inevitable'], answer: 2,
+        expEn: '"Inevitable" describes something certain to happen and impossible to avoid.',
+        expZh: '「inevitable」指無可避免的、必然會發生的。'
+      },
+      {
+        mode: 'VOCAB', band: 'S1_S3', word: 'cautious', zh: '謹慎的；小心的',
+        prompt: 'Be ________ when crossing the ancient rope bridge at night.',
+        options: ['cautious', 'careless', 'arrogant'], answer: 0,
+        expEn: '"Cautious" means careful to avoid potential problems or dangers.',
+        expZh: '「cautious」指小心的、謹慎以防危險的。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'prosperous', zh: '繁榮的；興旺的',
+        prompt: 'Thanks to busy trade routes, the harbour town grew into a ________ city.',
+        options: ['barren', 'prosperous', 'destitute'], answer: 1,
+        expEn: '"Prosperous" means successful and thriving economically.',
+        expZh: '「prosperous」解作繁榮的、富裕興旺的。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'scrutinise', zh: '仔細審查；細看',
+        prompt: 'The scholar used a lantern to ________ the faded runes on the stone gate.',
+        options: ['ignore', 'scrutinise', 'overlook'], answer: 1,
+        expEn: '"Scrutinise" means to examine or inspect something closely and thoroughly.',
+        expZh: '「scrutinise」指仔細檢查、詳盡審視。'
+      },
+      {
+        mode: 'VOCAB', band: 'S1_S3', word: 'gratitude', zh: '感激；感謝之情',
+        prompt: 'The villagers expressed deep ________ to the heroes who defended their home.',
+        options: ['gratitude', 'hostility', 'envy'], answer: 0,
+        expEn: '"Gratitude" is the quality of being thankful and appreciative.',
+        expZh: '「gratitude」指感激、感恩之情。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'obsolete', zh: '過時的；被淘汰的',
+        prompt: 'Steam locomotives made old horse-drawn wagons nearly ________ on the main line.',
+        options: ['modern', 'essential', 'obsolete'], answer: 2,
+        expEn: '"Obsolete" means out of date and no longer used because something newer exists.',
+        expZh: '「obsolete」解作過時的、因有新事物取代而被淘汰的。'
+      },
+      {
+        mode: 'VOCAB', band: 'DSE_HIGH', word: 'adversity', zh: '逆境；困境',
+        prompt: 'True companions stand together and demonstrate courage in the face of ________.',
+        options: ['adversity', 'luxury', 'harmony'], answer: 0,
+        expEn: '"Adversity" refers to a difficult or unpleasant situation or misfortune.',
+        expZh: '「adversity」指逆境、厄運或重重困難。'
+      },
+      {
+        mode: 'VOCAB', band: 'S1_S3', word: 'preserve', zh: '保護；保存',
+        prompt: 'The guild works tirelessly to ________ the ancient forest sanctuary.',
+        options: ['demolish', 'preserve', 'neglect'], answer: 1,
+        expEn: '"Preserve" means to maintain and protect something in its original state.',
+        expZh: '「preserve」解作保存、保護使免受破壞。'
+      },
+
+      // GRAMMAR MODE (12)
+      {
+        mode: 'GRAMMAR', band: 'S1_S3', word: 'Despite', zh: '儘管（後接名詞或動名詞）',
+        prompt: '________ the fierce blizzard, the courier delivered the royal scroll on time.',
+        options: ['Although', 'Despite', 'Because'], answer: 1,
+        expEn: 'Use "Despite" before a noun phrase ("the fierce blizzard"). "Although" requires a subject + verb clause.',
+        expZh: '「Despite」後面直接跟名詞片語（the fierce blizzard）；而「Although」後須接完整子句。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'DSE_HIGH', word: 'Had I known', zh: '倒裝條件句（與過去事實相反）',
+        prompt: '________ about the ambush earlier, I would have taken the upper cliff path.',
+        options: ['If I know', 'Had I known', 'Have I known'], answer: 1,
+        expEn: 'Third conditional inversion: "Had I known..." equals "If I had known..." for unreal past situations.',
+        expZh: '第三類條件句倒裝用法：「Had I known...」相等於「If I had known...」，表示與過去事實相反的假設。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'S1_S3', word: 'has been training', zh: '現在完成進行式',
+        prompt: 'Olberic ________ in the courtyard since sunrise, and his blade is still glowing.',
+        options: ['trains', 'trained', 'has been training'], answer: 2,
+        expEn: 'Present perfect continuous ("has been training") shows an action that started in the past ("since sunrise") and continues now.',
+        expZh: '與「since sunrise」連用時，用現在完成進行式「has been training」表達由過去開始並持續至今的動作。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'DSE_HIGH', word: 'Hardly had', zh: '一……就……（否定副詞置首倒裝）',
+        prompt: 'Hardly ________ the gate when the stone guardian awakened.',
+        options: ['we had reached', 'had we reached', 'did we reached'], answer: 1,
+        expEn: 'When a negative adverb like "Hardly" begins a sentence, invert the auxiliary verb: "Hardly had we reached...".',
+        expZh: '否定副詞「Hardly」置於句首時須使用倒裝結構：「Hardly had + 主語 + 過去分詞... when...」。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'S1_S3', word: 'unless', zh: '除非（= if ... not）',
+        prompt: 'The rune seal will not shatter ________ you strike it with the matching element.',
+        options: ['unless', 'therefore', 'meanwhile'], answer: 0,
+        expEn: '"Unless" means "except if" ("if you do not strike it").',
+        expZh: '「unless」解作「除非」（即 if ... not），用來引出唯一例外條件。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'DSE_HIGH', word: 'Equipped with', zh: '過去分詞片語作狀語（被配備）',
+        prompt: '________ a lantern and a compass, the scholar ventured into the dark cavern.',
+        options: ['Equipping with', 'Equipped with', 'To equip with'], answer: 1,
+        expEn: 'Use the past participle phrase "Equipped with..." because the scholar is the one who was equipped.',
+        expZh: '主語「the scholar」是「被配備」裝備的人，因此句首分詞構句須用過去分詞「Equipped with...」。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'S1_S3', word: 'whose', zh: '關係代名詞所有格（……的）',
+        prompt: 'We met a merchant ________ wagon was loaded with rare crystal ores.',
+        options: ['who', 'which', 'whose'], answer: 2,
+        expEn: '"Whose" is the possessive relative pronoun showing that the wagon belongs to the merchant.',
+        expZh: '「whose」為所有格關係代名詞，用來修飾後面屬於該商人的名詞「wagon」。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'DSE_HIGH', word: 'Not only did', zh: '不但……而且……（Not only 置首倒裝）',
+        prompt: 'Not only ________ the riddle, but she also unlocked the hidden vault.',
+        options: ['she solved', 'did she solve', 'solved she'], answer: 1,
+        expEn: 'When "Not only" starts a sentence, invert the auxiliary verb: "Not only did she solve...".',
+        expZh: '「Not only」放句首時須倒裝助動詞：「Not only did + 主語 + 原形動詞...」。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'S1_S3', word: 'to breaking', zh: 'look forward to + V-ing（期待）',
+        prompt: 'The whole party looks forward to ________ the final boss record today.',
+        options: ['break', 'breaking', 'broken'], answer: 1,
+        expEn: 'In "look forward to", "to" is a preposition, so it must be followed by a gerund (-ing form: "breaking").',
+        expZh: '在「look forward to」中，「to」是介詞，後面必須接動名詞（V-ing：「breaking」）。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'DSE_HIGH', word: 'were built', zh: '被動語態（過去式複數）',
+        prompt: 'These stone viaducts ________ over three hundred years ago by master masons.',
+        options: ['built', 'were built', 'have built'], answer: 1,
+        expEn: 'Plural subject ("These stone viaducts") + past time marker ("three hundred years ago") requires passive past tense "were built".',
+        expZh: '主語「viaducts」是複數且為被建造的對象，加上過去時間「three hundred years ago」，須用過去被動式「were built」。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'S1_S3', word: 'neither ... nor', zh: '既不……也不……（動詞跟隨鄰近主語）',
+        prompt: 'Neither the scouts nor the captain ________ seen the dragon since yesterday.',
+        options: ['has', 'have', 'are'], answer: 0,
+        expEn: 'With "Neither... nor...", the verb agrees with the closer subject ("the captain" -> singular "has").',
+        expZh: '「Neither A nor B」結構中，動詞須與較近的主語一致（the captain 為單數，故用 has）。'
+      },
+      {
+        mode: 'GRAMMAR', band: 'DSE_HIGH', word: 'would rather you stayed', zh: 'would rather + 人 + 過去式動詞（寧願某人現在…）',
+        prompt: 'The storm is worsening; I would rather you ________ by the campfire tonight.',
+        options: ['stay', 'stayed', 'to stay'], answer: 1,
+        expEn: 'After "would rather + subject", use the past tense ("stayed") to express a present/future preference.',
+        expZh: '「would rather + 主語」後面須用過去式動詞（stayed）來表達對現在或將來的願望。'
+      },
+
+      // READING COMPREHENSION / INFERENCE MODE (12)
+      {
+        mode: 'READING', band: 'S1_S3', word: 'Reluctant', zh: '不情願的；猶豫的',
+        prompt: '"Therion glanced at the locked chest, sighed, and stepped back." How did he feel?',
+        options: ['Eager', 'Reluctant', 'Thrilled'], answer: 1,
+        expEn: 'Sighing and stepping back shows he was hesitant or reluctant to touch the chest.',
+        expZh: '從「嘆氣並退後一步」可推斷他感到猶豫或不情願（Reluctant）。'
+      },
+      {
+        mode: 'READING', band: 'DSE_HIGH', word: 'Renewable heritage', zh: '活化古蹟（推理主旨）',
+        prompt: '"Converting the old railway station into a student library kept its stonework alive." The tone is:',
+        options: ['Appreciative', 'Sarcastic', 'Pessimistic'], answer: 0,
+        expEn: 'Describing the project as keeping the historic stonework "alive" shows an appreciative, positive attitude.',
+        expZh: '文中形容活化工程讓古石建築「保持生命力」，反映作者持讚賞及正面（Appreciative）的態度。'
+      },
+      {
+        mode: 'READING', band: 'S1_S3', word: 'Context clue: famished', zh: '極度飢餓的（上文下理推斷）',
+        prompt: '"After marching twelve hours without a single crumb, the party was famished." "Famished" means:',
+        options: ['Exhausted from noise', 'Extremely hungry', 'Well rested'], answer: 1,
+        expEn: '"Without a single crumb" provides the context clue that "famished" means starving / extremely hungry.',
+        expZh: '從「走了十二小時連一點麵包屑都沒吃過」可推斷「famished」解作極度飢餓（Extremely hungry）。'
+      },
+      {
+        mode: 'READING', band: 'DSE_HIGH', word: 'Irony', zh: '諷刺（結果與預期相反）',
+        prompt: '"The master thief boasted his lock was unbreakable—right before a novice opened it in two seconds." This illustrates:',
+        options: ['Irony', 'Nostalgia', 'Sympathy'], answer: 0,
+        expEn: 'Situational irony occurs when the actual outcome is the sharp opposite of what was proudly claimed.',
+        expZh: '剛誇口說鎖絕對打不開，卻被新手兩秒打開，這種預期與結果的強烈反差稱為諷刺（Irony）。'
+      },
+      {
+        mode: 'READING', band: 'S1_S3', word: 'Main purpose', zh: '寫作目的',
+        prompt: '"Notice: The northern stone bridge is closed for masonry repairs until Friday. Use the river ferry." Purpose:',
+        options: ['To entertain travellers', 'To inform and redirect traffic', 'To advertise ferry tickets'], answer: 1,
+        expEn: 'The notice alerts travellers to a closure and gives an alternative route.',
+        expZh: '此通告旨在通知行人橋樑維修封閉，並指示改乘渡輪（To inform and redirect traffic）。'
+      },
+      {
+        mode: 'READING', band: 'DSE_HIGH', word: 'Concession', zh: '讓步論點（承認部分事實再轉折）',
+        prompt: '"Granted, digital maps are convenient; nevertheless, reading terrain saves lives when batteries fail." The first clause is a:',
+        options: ['Concession', 'Contradiction', 'Conclusion'], answer: 0,
+        expEn: '"Granted, ...; nevertheless, ..." acknowledges an opposing point (a concession) before presenting the main argument.',
+        expZh: '以「Granted（誠然）…；nevertheless（然而）…」先承認對方部分觀點再作轉折，屬於讓步論點（Concession）。'
+      },
+      {
+        mode: 'READING', band: 'S1_S3', word: 'Pronoun reference', zh: '代名詞指代',
+        prompt: '"When the sparks hit the dry pine needles, they ignited instantly." What does "they" refer to?',
+        options: ['The travellers', 'The dry pine needles', 'The stone walls'], answer: 1,
+        expEn: '"They" refers to the plural noun "the dry pine needles" that caught fire when hit by sparks.',
+        expZh: '「they」指代前句被火花擊中後瞬間起火的乾松針（the dry pine needles）。'
+      },
+      {
+        mode: 'READING', band: 'DSE_HIGH', word: 'Implicit meaning', zh: '隱含意思',
+        prompt: '"Cyrus closed his tome only when the last candle wick drowned in wax." This implies he studied:',
+        options: ['Until late into the night', 'For only a few minutes', 'Outside in bright daylight'], answer: 0,
+        expEn: 'A candle burning all the way down until the wick drowns in melted wax implies hours of late-night study.',
+        expZh: '蠟燭一直燃燒至燭芯淹沒在蠟液中才合上書本，隱含他挑燈夜讀至深夜（Until late into the night）。'
+      },
+      {
+        mode: 'READING', band: 'S1_S3', word: 'Cause and effect', zh: '因果關係',
+        prompt: '"Heavy autumn frost coated the rails, causing the morning express to brake early." Why did it brake early?',
+        options: ['The engine ran out of coal', 'Slippery frost covered the rails', 'A bridge was missing'], answer: 1,
+        expEn: 'The frost coating the rails reduced grip, directly causing the early braking.',
+        expZh: '秋霜覆蓋路軌導致路面濕滑，直接令早班列車需提早煞車。'
+      },
+      {
+        mode: 'READING', band: 'DSE_HIGH', word: 'Figurative language', zh: '修辭手法（擬人法）',
+        prompt: '"The ancient wind whispered secrets through the broken cathedral arches." Which device is used?',
+        options: ['Personification', 'Simile', 'Hyperbole'], answer: 0,
+        expEn: 'Giving human actions ("whispered secrets") to a non-human thing ("the wind") is personification.',
+        expZh: '賦予「風」人類「低語訴說秘密」的動作，屬於擬人法（Personification）。'
+      },
+      {
+        mode: 'READING', band: 'S1_S3', word: 'Sequence of events', zh: '事件先後次序',
+        prompt: '"Before lighting the beacon, the ranger checked the wind direction after climbing the watchtower." What happened FIRST?',
+        options: ['Lighting the beacon', 'Climbing the watchtower', 'Checking the wind direction'], answer: 1,
+        expEn: 'She climbed the watchtower first, checked the wind second, and lit the beacon third.',
+        expZh: '按時間次序：她首先爬上瞭望塔（Climbing the watchtower），然後檢查風向，最後才點燃烽火。'
+      },
+      {
+        mode: 'READING', band: 'DSE_HIGH', word: 'Author stance', zh: '作者立場',
+        prompt: '"Far from being a waste of time, cooperative role-playing sharpens teamwork and empathy." The author:',
+        options: ['Defends role-playing games', 'Criticises teamwork', 'Wants games banned'], answer: 0,
+        expEn: '"Far from being a waste of time..." refutes critics and defends the educational value of role-playing.',
+        expZh: '「Far from being a waste of time（絕非浪費時間）」表明作者正為角色扮演遊戲的教育價值辯護。'
+      },
+
+      // PROOFREADING MODE (12)
+      {
+        mode: 'PROOFREADING', band: 'S1_S3', word: 'informations -> information', zh: '不可數名詞修正',
+        prompt: 'Spot the correction: "The guild master gave us useful informations about the mountain pass."',
+        options: ['gave -> give', 'informations -> information', 'useful -> usefully'], answer: 1,
+        expEn: '"Information" is an uncountable noun in English and never takes a plural "-s".',
+        expZh: '「information」（資訊）是不可數名詞，絕不可加「-s」。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'comprise of -> comprise', zh: 'comprise 不接 of',
+        prompt: 'Spot the correction: "The fellowship comprises of eight travellers from different regions."',
+        options: ['comprises of -> comprises', 'eight -> eighth', 'different -> difference'], answer: 0,
+        expEn: '"Comprise" means "consist of" by itself—never write "comprise of" in active voice.',
+        expZh: '主動語態中「comprise」本身已解作「包含／由……組成」，後面不可加「of」（或可改用 consists of）。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'S1_S3', word: 'discussed about -> discussed', zh: '及物動詞不加介詞',
+        prompt: 'Spot the correction: "Around the campfire, we discussed about our strategy for tomorrow."',
+        options: ['Around -> In', 'discussed about -> discussed', 'strategy -> strategies'], answer: 1,
+        expEn: '"Discuss" is a transitive verb and takes a direct object without "about".',
+        expZh: '「discuss」是及物動詞，後面直接跟受詞，不須加介詞「about」。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'number of -> amount of / many', zh: '可數與不可數數量詞',
+        prompt: 'Spot the correction: "A large amount of travellers gathered at the cobblestone plaza."',
+        options: ['amount of -> number of', 'gathered -> gathering', 'at -> on'], answer: 0,
+        expEn: 'Use "a large number of" with countable plural nouns ("travellers"); "amount of" is for uncountable nouns.',
+        expZh: '「travellers」為可數複數名詞，須配用「a large number of」；「amount of」只用於不可數名詞。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'S1_S3', word: 'excited -> exciting', zh: '-ed 與 -ing 形容詞分辨',
+        prompt: 'Spot the correction: "The minecart chase through the crystal cavern was truly excited!"',
+        options: ['through -> across', 'was -> were', 'excited -> exciting'], answer: 2,
+        expEn: 'Use "-ing" adjectives ("exciting") to describe things/events that cause a feeling; "-ed" describes how people feel.',
+        expZh: '形容事物或經歷令人興奮時須用「-ing」形容詞（exciting）；「excited」用來形容人的感受。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'One of the hero -> heroes', zh: 'One of the + 複數名詞',
+        prompt: 'Spot the correction: "One of the bravest hero in the realm guards this sanctuary."',
+        options: ['bravest -> braver', 'hero -> heroes', 'guards -> guard'], answer: 1,
+        expEn: 'After "One of the + superlative", the noun must always be plural ("heroes"), while the verb stays singular ("guards").',
+        expZh: '「One of the...」（……之一）後面的可數名詞必須用複數形態（heroes）。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'S1_S3', word: 'Although ... but', zh: '連詞不可重複使用',
+        prompt: 'Spot the correction: "Although the shield was cracked, but the knight stood his ground."',
+        options: ['was -> were', 'Remove "but"', 'stood -> stand'], answer: 1,
+        expEn: 'In English, never pair "Although" with "but" in the same sentence—use one or the other.',
+        expZh: '英文句子中「Although」與「but」不可同時使用，須刪去「but」。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'used to wake -> waking', zh: 'be used to + V-ing（習慣於）',
+        prompt: 'Spot the correction: "As a forest hunter, H\'aanit is used to track beasts in the snow."',
+        options: ['As -> Like', 'track -> tracking', 'in -> on'], answer: 1,
+        expEn: '"Be used to" (meaning accustomed to) must be followed by a gerund ("tracking").',
+        expZh: '「be used to」解作「習慣於……」，當中的「to」為介詞，後須接動名詞（tracking）。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'S1_S3', word: 'equipments -> equipment', zh: '不可數名詞 equipment',
+        prompt: 'Spot the correction: "Please check all your climbing equipments before scaling the cliff."',
+        options: ['check -> checking', 'equipments -> equipment', 'scaling -> scale'], answer: 1,
+        expEn: '"Equipment" is strictly uncountable and never has a plural "-s" form.',
+        expZh: '「equipment」（裝備／器材）是不可數名詞，沒有複數「-s」形態。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'Suggested him to go -> he go', zh: 'suggest 用法修正',
+        prompt: 'Spot the correction: "The scholar suggested us to take the sunlit viaduct instead."',
+        options: ['suggested us to take -> suggested taking', 'sunlit -> sunlighting', 'instead -> instead of'], answer: 0,
+        expEn: '"Suggest" never takes "somebody to do". Use "suggested taking..." or "suggested that we (should) take...".',
+        expZh: '「suggest」後面不可用「sb to do sth」結構，應改為「suggested taking」或「suggested that we take」。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'S1_S3', word: 'arrived to -> arrived at', zh: 'arrive 介詞搭配',
+        prompt: 'Spot the correction: "The steam express arrived to the mountain station right on schedule."',
+        options: ['arrived to -> arrived at', 'mountain -> mountains', 'on -> in'], answer: 0,
+        expEn: 'Use "arrive at" for a specific building/station or "arrive in" for a city/country—never "arrive to".',
+        expZh: '「arrive」後接地點時只會用「arrive at」（車站／建築物）或「arrive in」（城市／國家），不可用「arrive to」。'
+      },
+      {
+        mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'No sooner ... than', zh: 'No sooner ... than 固定搭配',
+        prompt: 'Spot the correction: "No sooner had the boss fallen when the golden chest appeared."',
+        options: ['had -> did', 'fallen -> fell', 'when -> than'], answer: 2,
+        expEn: '"No sooner" is a comparative structure and always pairs with "than" (whereas "Hardly/Scarcely" pairs with "when").',
+        expZh: '「No sooner...」屬比較級結構，必須與「than」配搭（而 Hardly / Scarcely 則配 when）。'
+      }
+    ];
+
+    const HKDSE_LEXICON_SEEDS = [
+      ['abandon','放棄','give up completely'],['abundant','豐富的','existing in large quantities'],['accelerate','加速','increase in speed'],
+      ['accessible','易到達的','easy to reach or use'],['accommodate','容納；適應','provide space or adapt to'],['accomplish','完成；達成','achieve or complete successfully'],
+      ['accumulate','累積','gather or build up over time'],['accurate','準確的','correct in all details'],['acknowledge','承認；致謝','accept or admit the truth of'],
+      ['acquire','獲得；習得','obtain or learn a skill'],['adapt','適應','adjust to new conditions'],['adequate','足夠的','enough or satisfactory for a purpose'],
+      ['adjacent','鄰近的','next to or adjoining something else'],['advocate','提倡；擁護','publicly recommend or support'],['aesthetic','美學的','concerned with beauty and art'],
+      ['affluent','富裕的','having a great deal of money'],['allocate','分配','distribute resources for a purpose'],['ambiguous','模稜兩可的','open to more than one interpretation'],
+      ['ambitious','有抱負的','having a strong desire to succeed'],['amplify','放大；增強','increase the strength or volume of'],['anticipate','預期；期盼','expect or look ahead to'],
+      ['apparent','明顯的','clearly visible or understood'],['appreciate','欣賞；感激','recognise the full worth of'],['arbitrary','任意的；武斷的','based on random choice rather than reason'],
+      ['aspire','渴望；立志','direct one\'s hopes towards achieving'],['assess','評估','evaluate or estimate the nature of'],['authentic','真正的；道地的','genuine and original'],
+      ['beneficial','有益的','resulting in good; favourable'],['bewildered','困惑的','perplexed and very confused'],['bolster','鞏固；支持','support or strengthen'],
+      ['candid','坦率的','truthful and straightforward'],['capacity','容量；能力','maximum amount that can be contained'],['catalyst','催化劑','something that precipitates an event'],
+      ['chronicle','編年史；紀錄','a factual written account of events'],['coherent','連貫的；條理分明的','logical and consistent'],['collaborate','合作','work jointly on an activity'],
+      ['commence','開始','begin officially'],['compel','強迫；驅使','force or oblige someone to do something'],['compensate','補償；彌補','make up for a loss or weakness'],
+      ['comprehensive','全面的','complete and including nearly everything'],['concede','承認；讓步','admit that something is true after denying it'],['concise','簡潔的','giving a lot of information clearly in few words'],
+      ['conducive','有助於…的','making a certain situation likely or possible'],['confront','面對；對抗','meet a difficulty face to face'],['conscientious','盡責的；認真的','wishing to do one\'s work thoroughly'],
+      ['consensus','共識','a general agreement among a group'],['conspicuous','顯眼的','standing out so as to be clearly visible'],['contemplate','深思；考慮','think profoundly and at length'],
+      ['contend','競爭；主張','struggle to surmount a difficulty'],['controversial','具爭議性的','giving rise to public disagreement'],['conventional','傳統的；慣常的','based on what is generally done'],
+      ['credibility','可信度','the quality of being trusted and believed'],['crucial','至關重要的','decisive or critical to success'],['cultivate','培養；耕作','prepare and develop a skill or land'],
+      ['curb','抑制；控制','restrain or keep in check'],['daunting','令人畏懼的','seeming difficult to deal with in prospect'],['debris','碎片；殘骸','scattered pieces of waste or remains'],
+      ['dedicate','奉獻；致力於','devote time and effort to a task'],['deficient','不足的；缺乏的','not having enough of a specified quality'],['deliberate','故意的；深思熟慮的','done consciously and intentionally'],
+      ['deteriorate','惡化','become progressively worse'],['detrimental','有害的','tending to cause harm'],['diligent','勤奮的','having or showing care in one\'s work'],
+      ['diminish','減少；削弱','make or become less'],['discrepancy','差異；不符','an illogical difference between two facts'],['disperse','驅散；散開','distribute or spread over a wide area'],
+      ['distinct','獨特的；明顯不同的','recognisably different in nature'],['diverse','多元化的','showing a great deal of variety'],['dominant','主導的；佔優勢的','most important, powerful, or influential'],
+      ['drastic','劇烈的；極端的','likely to have a strong or far-reaching effect'],['durable','耐用的','able to withstand wear and pressure'],['elaborate','詳盡的；精心製作的','involving many carefully arranged parts'],
+      ['eloquent','雄辯的；有說服力的','fluent or persuasive in speaking or writing'],['eminent','傑出的；著名的','famous and respected within a sphere'],['empathy','同理心','the ability to understand and share feelings'],
+      ['endeavour','努力；嘗試','try hard to do or achieve something'],['enhance','提升；增強','intensify, increase, or further improve'],['enormous','巨大的','very large in size, quantity, or extent'],
+      ['eradicate','根除；消滅','destroy completely; put an end to'],['erratic','不穩定的；飄忽的','not even or regular in pattern'],['escalate','升級；加劇','increase rapidly in intensity'],
+      ['exemplify','作為…的典範','be a typical example of'],['exhaustive','徹底的；詳盡無遺的','examining all elements or aspects'],['explicit','明確的；清楚的','stated clearly and in detail'],
+      ['feasible','可行的','possible to do easily or conveniently'],['fluctuate','波動；起伏','rise and fall irregularly'],['formidable','強大的；令人敬畏的','inspiring fear or respect through being impressive'],
+      ['foster','培育；促進','encourage the development of something'],['futile','徒勞的；無用的','incapable of producing any useful result'],['genuine','真誠的；真正的','truly what something is said to be'],
+      ['hinder','阻礙','create difficulties resulting in delay'],['hypothesis','假設','a proposed explanation made as a starting point'],['imminent','迫在眉睫的','about to happen very soon'],
+      ['impartial','公正的；不偏不倚的','treating all rivals or disputants equally'],['imperative','極重要的；必須的','of vital importance; crucial'],['implement','實施；執行','put a decision or plan into effect'],
+      ['incentive','誘因；鼓勵','a thing that motivates or encourages someone'],['indispensable','不可或缺的','absolutely necessary'],['inevitable','無可避免的','certain to happen; unavoidable'],
+      ['inherent','固有的；內在的','existing in something as a permanent attribute'],['initiate','發起；開創','cause a process or action to begin'],['innovative','創新的','featuring new methods; advanced and original'],
+      ['integrity','誠信；正直','the quality of being honest and moral'],['intervene','介入；調停','come between so as to prevent or alter'],['intricate','錯綜複雜的','very complicated or detailed'],
+      ['jeopardise','危及；損害','put someone or something into danger'],['justify','證明…正當','show or prove to be right or reasonable'],['legitimate','合法的；合理的','conforming to the law or to rules'],
+      ['lucrative','利潤豐厚的','producing a great deal of profit'],['magnificent','壯麗的；宏偉的','extremely beautiful, elaborate, or impressive'],['mandatory','強制性的','required by law or mandate; compulsory'],
+      ['mitigate','減輕；緩和','make less severe, serious, or painful'],['monotonous','單調乏味的','dull, tedious, and repetitious'],['negligible','微不足道的','so small or unimportant as to be not worth considering'],
+      ['notorious','聲名狼藉的','famous or well known for something bad'],['novice','新手；初學者','a person new to and inexperienced in a field'],['nurture','養育；培植','care for and encourage the growth of'],
+      ['obscure','模糊的；鮮為人知的','not discovered or known about; uncertain'],['optimistic','樂觀的','hopeful and confident about the future'],['overwhelming','壓倒性的；難以抵擋的','very great in amount or intensity'],
+      ['paradox','悖論；自相矛盾','a seemingly absurd statement that may be true'],['perceive','察覺；理解','become aware or conscious of something'],['perpetual','永久的；持續不斷的','never ending or changing'],
+      ['perseverance','毅力；堅持不懈','persistence in doing something despite difficulty'],['plausible','似乎合理的','seeming reasonable or probable'],['pragmatic','務實的','dealing with things sensibly and realistically'],
+      ['precarious','不穩定的；危險的','not securely held in position; dangerously likely to fall'],['precedent','先例','an earlier event regarded as an example'],['predominant','佔主導地位的','present as the strongest or main element'],
+      ['preliminary','初步的；預備的','denoting an action preceding a main event'],['prevalent','普遍的；盛行的','widespread in a particular area or time'],['profound','深遠的；深刻的','very great or intense; having deep insight'],
+      ['prohibit','禁止','formally forbid something by law or rule'],['proliferate','激增；迅速繁殖','increase rapidly in numbers; multiply'],['prominent','顯著的；傑出的','important; famous; projecting from something'],
+      ['prudent','審慎的；精明的','acting with or showing care and thought for the future']
+    ];
+
+    let customQuestionPool = [];
+    let selectedBandFilter = 'CORE_ALL';
+
+    const STORAGE_KEY_PYW_ACTIVE = "skhhcss_play_your_way_active_v1";
+    const DEFAULT_PYW_WORKER_URL = "https://play-your-way.skhhcss-eng.workers.dev";
+    let hubSyncedPackTitle = "";
+
+    function formatMcqPromptHtml(rawPrompt) {
+      return String(rawPrompt || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/_{2,}/g, "<span class='mcq-blank-hl' aria-label='blank'>&nbsp;</span>")
+        .replace(/\[(A|B|C)\]/g, "<span class='mcq-seg-tag'>[$1]</span>");
+    }
+
+    function buildDictationQuestionsFromWordList(words, dmode, packTitle) {
+      const clean = (words || []).map(w => String(w || "").trim()).filter(Boolean);
+      if (clean.length === 0) return [];
+      const coreWords = (window.PYW_HKDSE_CORE_WORDS && window.PYW_HKDSE_CORE_WORDS.length > 0)
+        ? window.PYW_HKDSE_CORE_WORDS
+        : HKDSE_LEXICON_SEEDS.map(s => s[0]);
+      return clean.map((w, idx) => {
+        const poolSource = (dmode === "pool" && clean.length >= 3) ? clean : coreWords;
+        const candidates = poolSource.filter(c => String(c).toLowerCase() !== w.toLowerCase());
+        const d1 = candidates[(idx * 7 + 3) % Math.max(1, candidates.length)] || "resilient";
+        const d2 = candidates[(idx * 13 + 9) % Math.max(1, candidates.length)] || "meticulous";
+        const opts = [w, d1, d2];
+        const ans = idx % 3;
+        const rotated = [opts[(3 - ans) % 3], opts[(4 - ans) % 3], opts[(5 - ans) % 3]];
+        const correctIdx = rotated.indexOf(w);
+        return {
+          mode: "VOCAB",
+          band: "CUSTOM",
+          isDictation: true,
+          word: w,
+          zh: packTitle || "Play Your Way Pack",
+          prompt: "🔊 Listen carefully and slash the matching Rune Orb (A / B / C):",
+          options: rotated,
+          answer: correctIdx >= 0 ? correctIdx : 0,
+          expEn: `Target vocabulary word: "${w}".`,
+          expZh: `目標詞彙：「${w}」。`
+        };
+      });
+    }
+
+    function convertHubMcqQuestions(questions, modeLabel, packTitle) {
+      return (questions || []).map(q => {
+        const rawExp = String(q.explanation || "");
+        const parts = rawExp.split("||").map(s => s.trim());
+        const expEn = parts[0] || "Correct answer from your Play Your Way pack.";
+        const expZh = parts[1] || parts[0] || "來自 Play Your Way 題庫的正確答案。";
+        const ansIdx = typeof q.answerIndex === "number" ? q.answerIndex : (typeof q.answer === "number" ? q.answer : 0);
+        const opts = Array.isArray(q.options) && q.options.length >= 3 ? q.options.slice(0, 3) : ["Option A", "Option B", "Option C"];
+        return {
+          mode: String(modeLabel || "VOCAB").toUpperCase(),
+          band: "CUSTOM",
+          word: opts[ansIdx] || "",
+          zh: packTitle || "Play Your Way",
+          prompt: q.prompt || "Choose the best answer:",
+          options: opts,
+          answer: ansIdx,
+          expEn,
+          expZh
+        };
+      });
+    }
+
+    function syncFromPlayYourWayHub() {
+      try {
+        const h = window.location.hash || "";
+        if (h.startsWith("#pack=")) {
+          const decoded = JSON.parse(decodeURIComponent(h.slice(6)));
+          if (decoded && decoded.packType === "mcq" && Array.isArray(decoded.q) && decoded.q.length > 0) {
+            hubSyncedPackTitle = decoded.t || "Hub Quiz Pack";
+            customQuestionPool = convertHubMcqQuestions(decoded.q, decoded.m, hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+        }
+        if (h.startsWith("#pool=")) {
+          const decoded = JSON.parse(decodeURIComponent(h.slice(6)));
+          if (decoded && Array.isArray(decoded.w) && decoded.w.length > 0) {
+            hubSyncedPackTitle = decoded.t || "Hub Word Pool";
+            customQuestionPool = buildDictationQuestionsFromWordList(decoded.w, decoded.d || "mix", hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+        }
+        const rawActive = localStorage.getItem(STORAGE_KEY_PYW_ACTIVE);
+        if (rawActive) {
+          const pack = JSON.parse(rawActive);
+          if (pack && pack.packType === "mcq" && Array.isArray(pack.questions) && pack.questions.length > 0) {
+            hubSyncedPackTitle = pack.title || "Play Your Way Pack";
+            customQuestionPool = convertHubMcqQuestions(pack.questions, pack.mode, hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+          if (pack && Array.isArray(pack.words) && pack.words.length > 0) {
+            hubSyncedPackTitle = pack.title || "Play Your Way Words";
+            customQuestionPool = buildDictationQuestionsFromWordList(pack.words, pack.dmode || "mix", hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+
+    function getSharedWordsIfAvailable() {
+      if (window.PYW_HKDSE_CORE_WORDS && Array.isArray(window.PYW_HKDSE_CORE_WORDS) && window.PYW_HKDSE_CORE_WORDS.length > 0) {
+        return window.PYW_HKDSE_CORE_WORDS.map(w => ({ word: w, zh: 'HKDSE 核心詞彙', def: 'HKDSE core vocabulary item' }));
+      }
+      if (window.SHARED_WORDS && Array.isArray(window.SHARED_WORDS) && window.SHARED_WORDS.length > 0) {
+        return window.SHARED_WORDS;
+      }
+      return null;
+    }
+
+    function buildActiveQuestionPool(modeFilter, countNeeded) {
+      let base = [];
+      if (selectedBandFilter === 'CUSTOM_ONLY' && customQuestionPool.length > 0) {
+        base = [...customQuestionPool];
+      } else {
+        base = [...customQuestionPool, ...CURATED_QUESTIONS];
+        if (selectedBandFilter === 'S1_S3' || selectedBandFilter === 'DSE_HIGH') {
+          base = base.filter(q => q.band === selectedBandFilter || q.band === 'CUSTOM');
+        }
+      }
+
+      if (modeFilter && modeFilter !== 'ALL') {
+        const filtered = base.filter(q => q.mode === modeFilter);
+        if (filtered.length > 0) base = filtered;
+      }
+
+      const shared = getSharedWordsIfAvailable();
+      const extraSource = shared || HKDSE_LEXICON_SEEDS.map(item => ({
+        word: item[0], zh: item[1], def: item[2]
+      }));
+
+      let idx = 0;
+      while (base.length < Math.max(countNeeded, 48) && idx < extraSource.length) {
+        const entry = extraSource[idx % extraSource.length];
+        const w = (entry.word || entry[0] || 'resilient').toLowerCase();
+        const zh = entry.zh || entry.meaning || entry[1] || '核心詞彙';
+        const def = entry.def || entry.definition || entry[2] || 'a key HKDSE vocabulary expression';
+        const d1 = extraSource[(idx + 7) % extraSource.length].word || 'fragile';
+        const d2 = extraSource[(idx + 13) % extraSource.length].word || 'casual';
+        const opts = [w, d1.toLowerCase(), d2.toLowerCase()];
+        const ansLane = idx % 3;
+        const rotated = [opts[(3 - ansLane) % 3], opts[(4 - ansLane) % 3], opts[(5 - ansLane) % 3]];
+        const correctIdx = rotated.indexOf(w);
+        base.push({
+          mode: modeFilter === 'ALL' ? 'VOCAB' : modeFilter,
+          band: 'CORE_ALL',
+          word: w,
+          zh: zh,
+          prompt: `Which word means "${def}"?`,
+          options: rotated,
+          answer: correctIdx >= 0 ? correctIdx : 0,
+          expEn: `"${w}" (${zh}) means ${def}.`,
+          expZh: `「${w}」解作「${zh}」（${def}）。`
+        });
+        idx++;
+      }
+
+      const shuffled = [...base];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, countNeeded);
+    }
+
+    /*************************************************************************
+     * 2. HERO ROSTER (6 DETAILED 2D PIXEL DUELISTS)
+     *************************************************************************/
+    const HERO_ROSTER = [
+      {
+        id: 0, name: 'Olberic', guild: 'Cobbleston Guard', role: 'BLADE KNIGHT #4',
+        shortClass: 'KNIGHT #4', primary: '#e11d48', secondary: '#be123c', cloak: '#881337', cloakLight: '#f43f5e',
+        trim: '#fbbf24', hair: '#475569', hairLight: '#94a3b8', weapon: 'SWORD', helmFeather: '#fef08a', slashColor: '#38bdf8'
+      },
+      {
+        id: 1, name: 'Cyrus', guild: 'Royal Academy', role: 'ARCANE SCHOLAR #16',
+        shortClass: 'SCHOLAR #16', primary: '#2563eb', secondary: '#1d4ed8', cloak: '#1e3a8a', cloakLight: '#60a5fa',
+        trim: '#fde047', hair: '#1e293b', hairLight: '#475569', weapon: 'STAFF', helmFeather: '#38bdf8', slashColor: '#60a5fa'
+      },
+      {
+        id: 2, name: 'Therion', guild: 'Ravus Manor', role: 'SHADOW ROGUE #33',
+        shortClass: 'ROGUE #33', primary: '#7c3aed', secondary: '#5b21b6', cloak: '#3b0764', cloakLight: '#a78bfa',
+        trim: '#e2e8f0', hair: '#cbd5e1', hairLight: '#ffffff', weapon: 'DAGGER', helmFeather: '#c084fc', slashColor: '#c084fc'
+      },
+      {
+        id: 3, name: "H'aanit", guild: "S'warkii Woods", role: 'FOREST HUNTER #12',
+        shortClass: 'HUNTER #12', primary: '#059669', secondary: '#047857', cloak: '#064e3b', cloakLight: '#34d399',
+        trim: '#fcd34d', hair: '#d97706', hairLight: '#fbbf24', weapon: 'BOW', helmFeather: '#86efac', slashColor: '#34d399'
+      },
+      {
+        id: 4, name: 'Primrose', guild: 'Sunshade Noble', role: 'DUSK DANCER #14',
+        shortClass: 'DANCER #14', primary: '#db2777', secondary: '#9d174d', cloak: '#500724', cloakLight: '#f472b6',
+        trim: '#fbbf24', hair: '#0f172a', hairLight: '#334155', weapon: 'FAN', helmFeather: '#fbcfe8', slashColor: '#f472b6'
+      },
+      {
+        id: 5, name: 'Tressa', guild: 'Rippletide Coast', role: 'WIND MERCHANT #10',
+        shortClass: 'MERCHANT #10', primary: '#d97706', secondary: '#b45309', cloak: '#14532d', cloakLight: '#22c55e',
+        trim: '#fef08a', hair: '#92400e', hairLight: '#f59e0b', weapon: 'SPEAR', helmFeather: '#fde047', slashColor: '#fde047'
+      }
+    ];
+
+    /*************************************************************************
+     * 3. WEB AUDIO SYNTHESIZER & SPEECH SYNTHESIS (UK / US / AU)
+     *************************************************************************/
+    let audioCtx = null;
+    let isMuted = false;
+    let currentAccent = 'UK';
+
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+
+    function playSynthSfx(type) {
+      if (isMuted) return;
+      ensureAudioCtx();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'step' || type === 'jump') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.exponentialRampToValueAtTime(460, now + 0.08);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+        osc.start(now);
+        osc.stop(now + 0.095);
+      } else if (type === 'slash') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(640, now);
+        osc.frequency.exponentialRampToValueAtTime(160, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+        osc.start(now);
+        osc.stop(now + 0.14);
+      } else if (type === 'boost') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(330, now);
+        osc.frequency.exponentialRampToValueAtTime(660, now + 0.12);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.25);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.27);
+        osc.start(now);
+        osc.stop(now + 0.28);
+      } else if (type === 'break') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, now + idx * 0.045);
+          g.gain.setValueAtTime(0.16, now + idx * 0.045);
+          g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.045 + 0.38);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(now + idx * 0.045);
+          o.stop(now + idx * 0.045 + 0.39);
+        });
+      } else if (type === 'damage') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(165, now);
+        osc.frequency.linearRampToValueAtTime(68, now + 0.3);
+        gain.gain.setValueAtTime(0.19, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        osc.start(now);
+        osc.stop(now + 0.33);
+      } else if (type === 'fanfare') {
+        [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'square';
+          o.frequency.setValueAtTime(freq, now + idx * 0.11);
+          g.gain.setValueAtTime(0.11, now + idx * 0.11);
+          g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.42);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(now + idx * 0.11);
+          o.stop(now + idx * 0.11 + 0.44);
+        });
+      }
+    }
+
+    function speakText(text) {
+      if (isMuted || !('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        const langMap = { UK: 'en-GB', US: 'en-US', AU: 'en-AU' };
+        const targetLang = langMap[currentAccent] || 'en-GB';
+        utter.lang = targetLang;
+        const voices = window.speechSynthesis.getVoices();
+        const match = voices.find(v => v.lang && v.lang.toLowerCase().includes(targetLang.toLowerCase()));
+        if (match) utter.voice = match;
+        utter.rate = 0.96;
+        window.speechSynthesis.speak(utter);
+      } catch (e) {}
+    }
+
+    /*************************************************************************
+     * 4. HIGH-DETAIL 2D PIXEL ART SPRITES (HEROES & COLOSSAL RADIANCE BOSS)
+     *************************************************************************/
+    const spriteCache = {};
+
+    function createOffscreenSprite(w, h, drawFn) {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      drawFn(ctx, w, h);
+      return c;
+    }
+
+    function getHeroSpriteFrames(heroIdx) {
+      const key = `hero_${heroIdx}`;
+      if (spriteCache[key]) return spriteCache[key];
+
+      const hero = HERO_ROSTER[heroIdx] || HERO_ROSTER[0];
+      const frames = [];
+
+      for (let f = 0; f < 4; f++) {
+        frames.push(createOffscreenSprite(48, 48, (ctx) => {
+          const px = (x, y, w, h, col) => {
+            ctx.fillStyle = col;
+            ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+          };
+          const bob = (f === 1 || f === 3) ? -2 : 0;
+          const capeWave = f === 0 ? 0 : (f === 1 ? -2 : (f === 2 ? 1 : -1));
+
+          // Ground shadow
+          px(12, 43, 24, 3, 'rgba(0,0,0,0.45)');
+
+          // Flowing Hollow-Knight / Octopath Cloak
+          px(5, 19 + bob, 14, 18 + capeWave, '#090b10');
+          px(6, 20 + bob, 13, 16 + capeWave, hero.cloak);
+          px(7, 21 + bob, 7, 12 + capeWave, hero.cloakLight);
+          px(6, 34 + bob + capeWave, 13, 2, hero.trim);
+
+          // Stride Legs
+          const legOffsets = [
+            { lX: 17, lY: 34, rX: 25, rY: 36 },
+            { lX: 14, lY: 33, rX: 28, rY: 33 },
+            { lX: 20, lY: 36, rX: 22, rY: 34 },
+            { lX: 26, lY: 33, rX: 15, rY: 35 }
+          ][f];
+
+          px(legOffsets.lX - 1, legOffsets.lY - 1, 7, 10, '#090b10');
+          px(legOffsets.lX, legOffsets.lY, 5, 6, '#334155');
+          px(legOffsets.lX, legOffsets.lY + 5, 6, 3, '#78350f');
+
+          px(legOffsets.rX - 1, legOffsets.rY - 1, 7, 10, '#090b10');
+          px(legOffsets.rX, legOffsets.rY, 5, 6, '#475569');
+          px(legOffsets.rX, legOffsets.rY + 5, 6, 3, '#451a03');
+
+          // Brigandine Coat & Gold Trim
+          px(15, 18 + bob, 17, 17, '#090b10');
+          px(16, 19 + bob, 15, 15, hero.secondary);
+          px(17, 19 + bob, 12, 11, hero.primary);
+          px(15, 19 + bob, 6, 5, hero.trim);
+          px(21, 21 + bob, 8, 2, hero.trim);
+          px(16, 30 + bob, 15, 3, '#1e293b');
+          px(23, 30 + bob, 4, 3, '#fbbf24');
+
+          // Head & Plume
+          px(15, 6 + bob, 17, 14, '#090b10');
+          px(17, 9 + bob, 13, 10, '#fed7aa');
+          px(26, 12 + bob, 3, 4, '#0f172a');
+          px(27, 12 + bob, 1, 2, '#ffffff');
+          px(15, 6 + bob, 16, 5, hero.hair);
+          px(17, 7 + bob, 10, 2, hero.hairLight);
+          px(15, 10 + bob, 5, 7, hero.hair);
+          px(13, 4 + bob, 6, 3, hero.helmFeather);
+          px(16, 18 + bob, 15, 2, hero.trim);
+
+          // Gleaming Nail / Blade Weapon
+          px(30, 22 + bob, 5, 5, '#090b10');
+          px(31, 23 + bob, 3, 3, '#fbbf24');
+          px(33, 7 + bob, 6, 19, '#090b10');
+          px(34, 8 + bob, 4, 17, '#cbd5e1');
+          px(35, 8 + bob, 2, 16, '#ffffff');
+        }));
+      }
+
+      spriteCache[key] = frames;
+      return frames;
+    }
+
+    // Colossal 96x96 Hollow-Radiance Arch-Boss Sprite (Normal, Enraged & Stunned Break States)
+    function getBossDuelSprite(bossState, frame) {
+      const key = `duel_boss_${bossState}_${frame}`;
+      if (spriteCache[key]) return spriteCache[key];
+
+      const canvas = createOffscreenSprite(96, 96, (ctx) => {
+        const px = (x, y, w, h, col) => {
+          ctx.fillStyle = col;
+          ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        };
+        const breathe = frame % 2 === 1 ? -3 : 0;
+        const isStunned = bossState === 'STUNNED';
+        const isEnraged = bossState === 'ENRAGED';
+
+        // Ground shadow
+        px(16, 86, 64, 6, 'rgba(0,0,0,0.55)');
+
+        // Ethereal Hollow-Knight / Octopath Wings & Mantle
+        const wingCol = isStunned ? '#334155' : (isEnraged ? '#be123c' : '#4c1d95');
+        const wingGlow = isStunned ? '#64748b' : (isEnraged ? '#f43f5e' : '#7c3aed');
+        px(4, 16 + breathe, 88, 52, '#090b10');
+        px(6, 18 + breathe, 84, 48, wingCol);
+        px(12, 22 + breathe, 72, 38, wingGlow);
+
+        // Colossal Obsidian Armor Torso
+        px(24, 22 + breathe, 48, 56, '#090b10');
+        px(26, 24 + breathe, 44, 52, '#0f172a');
+        px(30, 28 + breathe, 36, 42, '#1e1b4b');
+
+        // Ornate Golden / Pale-Vessel Horned Crown & Mask
+        px(26, 4 + breathe, 44, 24, '#090b10');
+        px(28, 6 + breathe, 40, 20, '#e2e8f0'); // Pale mask
+        // Tall Curved Vessel Horns
+        px(18, 0 + breathe, 10, 16, '#f8fafc');
+        px(68, 0 + breathe, 10, 16, '#f8fafc');
+        px(38, 2 + breathe, 20, 6, '#fbbf24');
+
+        // Glowing Radiance / Void Eyes
+        const eyeCol = isStunned ? '#38bdf8' : (isEnraged ? '#ef4444' : '#fbbf24');
+        px(34, 15 + breathe, 9, 5, '#090b10');
+        px(53, 15 + breathe, 9, 5, '#090b10');
+        px(35, 16 + breathe, 7, 3, eyeCol);
+        px(54, 16 + breathe, 7, 3, eyeCol);
+
+        // Glowing Soul-Core Crystal on Chest
+        px(38, 38 + breathe, 20, 20, '#090b10');
+        px(40, 40 + breathe, 16, 16, eyeCol);
+        px(43, 43 + breathe, 10, 10, '#fef08a');
+        px(46, 46 + breathe, 4, 4, '#ffffff');
+
+        // Great-Nail / Elder Greatsword held by Boss
+        if (!isStunned) {
+          px(8, 34 + breathe, 14, 48, '#090b10');
+          px(10, 36 + breathe, 10, 44, '#cbd5e1');
+          px(12, 36 + breathe, 4, 42, '#ffffff');
+        }
+      });
+
+      spriteCache[key] = canvas;
+      return canvas;
+    }
+
+    /*************************************************************************
+     * 5. 2D BOSS DUEL ARENA & FREE-ROAM PLATFORMER ENGINE
+     *************************************************************************/
+    const LANE_LETTERS = ['A', 'B', 'C'];
+    const LANE_COLORS = ['#3b82f6', '#f59e0b', '#10b981'];
+    const GRAVITY = 1550;
+
+    let mainCanvas, mainCtx;
+    let showroomCanvas, showroomCtx;
+
+    // Keyboard Held Input Map for Free 2D Platformer Movement
+    const keysHeld = { left: false, right: false };
+
+    // Arena Combat Entities
+    let runeOrbs = [];          // 3 Floating Boss Weak-Point Orbs [A, B, C] anchored over the 3 Sanctuary Platforms
+    let bossShockwaves = [];    // Boss ground shockwaves & homing soul-bolts player can jump/dash over
+    let slashArcs = [];         // Visible Nail/Sword crescent slashes
+    let soulSparks = [];
+    let floatingTexts = [];
+    let fireflies = [];
+
+    const state = {
+      screen: 'START', // START, TAVERN, PLAY_PHASE, QUESTION_PHASE, CUTSCENE_WIN, CUTSCENE_DNF, PAUSED, END
+      selectedHeroIdx: 0,
+      travelerName: 'Olberic',
+      guildName: 'Cobbleston Guard',
+      modeFilter: 'ALL',
+      targetLaps: 8,
+      timerSeconds: 14,
+      maxShields: 3,
+
+      // Live Run Metrics
+      currentLap: 1,
+      score: 0,
+      shields: 3,
+      bp: 1,
+      isBoosting: false,
+      boostTimer: 0,
+      speedKmh: 285, // Combat Pace / Combo Meter (240..343)
+
+      // Free-Roam 2D Platformer Hero Physics
+      currentLane: 1, // Highlighted / closest Rune Orb target (0=A Left, 1=B Center-High, 2=C Right)
+      heroX: 260,
+      heroY: 500,
+      heroVx: 0,
+      heroVy: 0,
+      facing: 1, // 1 = Right, -1 = Left
+      jumpsRemaining: 2,
+      slashCooldown: 0,
+      dashTimer: 0,
+      invulnTimer: 0,
+      homingTargetOrb: null, // When player clicks/taps an Orb or double-clicks Option A/B/C, Hero auto-rushes & jump-slashes it!
+
+      // Boss Arena State
+      bossX: 780,
+      bossY: 420,
+      bossTargetX: 780,
+      bossHp: 100,
+      bossMaxHp: 100,
+      bossMode: 'GUARD', // GUARD (Question Phase), STUNNED (Break Combo Phase!), ENRAGED (Wrong Answer Dodge Phase)
+      bossAttackTimer: 1.8,
+      comboHits: 0,
+      screenShake: 0,
+
+      // Phase Timing & Question Tracking
+      phaseTimer: 0,
+      questionPool: [],
+      currentQuestion: null,
+      questionTimeLeft: 14,
+      answeredLog: [],
+      cutsceneTimer: 0
+    };
+
+    function initDuelEngine() {
+      mainCanvas = document.getElementById('game-canvas');
+      mainCtx = mainCanvas.getContext('2d');
+      showroomCanvas = document.getElementById('showroom-canvas');
+      if (showroomCanvas) showroomCtx = showroomCanvas.getContext('2d');
+
+      resizeCanvas();
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        if (state.screen === 'QUESTION_PHASE') positionRuneOrbs();
+      });
+
+      for (let i = 0; i < 65; i++) {
+        fireflies.push({
+          x: Math.random() * 1600,
+          y: Math.random() * 900,
+          size: Math.random() < 0.4 ? 4 : 3,
+          vx: (Math.random() - 0.5) * 24,
+          vy: -10 - Math.random() * 20,
+          color: Math.random() < 0.65 ? '#fef08a' : '#38bdf8'
+        });
+      }
+    }
+
+    function resizeCanvas() {
+      if (!mainCanvas) return;
+      mainCanvas.width = window.innerWidth;
+      mainCanvas.height = window.innerHeight;
+      if (mainCtx) mainCtx.imageSmoothingEnabled = false;
+    }
+
+    // Define the Cathedral Bridge Floor + 3 Sanctuary Stone Platforms (Left [A], Center-High [B], Right [C])
+    function getArenaGeometry(w, h) {
+      const floorY = Math.round(h * 0.80);
+      const platW = Math.min(200, Math.max(115, Math.round(w * 0.17)));
+      const platforms = [
+        {
+          lane: 0, letter: 'A', color: '#3b82f6',
+          x: Math.round(w * 0.20 - platW / 2),
+          y: Math.round(floorY - h * 0.17),
+          w: platW, h: 16,
+          orbX: Math.round(w * 0.20),
+          orbY: Math.round(floorY - h * 0.17 - 58)
+        },
+        {
+          lane: 1, letter: 'B', color: '#f59e0b',
+          x: Math.round(w * 0.48 - platW / 2),
+          y: Math.round(floorY - h * 0.27),
+          w: platW, h: 16,
+          orbX: Math.round(w * 0.48),
+          orbY: Math.round(floorY - h * 0.27 - 58)
+        },
+        {
+          lane: 2, letter: 'C', color: '#10b981',
+          x: Math.round(w * 0.76 - platW / 2),
+          y: Math.round(floorY - h * 0.17),
+          w: platW, h: 16,
+          orbX: Math.round(w * 0.76),
+          orbY: Math.round(floorY - h * 0.17 - 58)
+        }
+      ];
+      return { floorY, platforms };
+    }
+
+    function positionRuneOrbs() {
+      if (!mainCanvas) return;
+      const { platforms } = getArenaGeometry(mainCanvas.width, mainCanvas.height);
+      runeOrbs = platforms.map((p, idx) => ({
+        lane: idx,
+        letter: p.letter,
+        color: p.color,
+        x: p.orbX,
+        y: p.orbY,
+        radius: 30,
+        shattered: false
+      }));
+    }
+
+    /*************************************************************************
+     * 6. HERO PLATFORMER CONTROLS: JUMP, NAIL SLASH, HOMING RUSH & DASH
+     *************************************************************************/
+    function performJump() {
+      if (state.screen !== 'PLAY_PHASE' && state.screen !== 'QUESTION_PHASE') return;
+      if (state.jumpsRemaining > 0) {
+        state.heroVy = -640;
+        state.jumpsRemaining--;
+        playSynthSfx('jump');
+        spawnSoulSparks(state.heroX, state.heroY, '#e2e8f0', 8);
+      }
+    }
+
+    function performSwordSlash() {
+      if (state.screen !== 'PLAY_PHASE' && state.screen !== 'QUESTION_PHASE') return;
+      state.slashCooldown = 0.24;
+      playSynthSfx('slash');
+
+      const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
+      const slashX = state.heroX + state.facing * 42;
+      const slashY = state.heroY - 34;
+
+      slashArcs.push({
+        x: slashX,
+        y: slashY,
+        facing: state.facing,
+        color: state.isBoosting ? '#fbbf24' : hero.slashColor,
+        life: 0.18
+      });
+
+      // 1. During QUESTION_PHASE: Check if slash hits any of the 3 Floating Rune Orbs [A, B, C]
+      if (state.screen === 'QUESTION_PHASE') {
+        for (let i = 0; i < runeOrbs.length; i++) {
+          const orb = runeOrbs[i];
+          if (!orb.shattered && Math.hypot(slashX - orb.x, slashY - orb.y) < 76) {
+            orb.shattered = true;
+            state.homingTargetOrb = null;
+            resolveOrbSlash(orb.lane);
+            return;
+          }
+        }
+      }
+
+      // 2. During PLAY_PHASE (Boss Stunned BREAK! State or Shockwave Parry):
+      if (state.screen === 'PLAY_PHASE') {
+        if (Math.hypot(slashX - state.bossX, slashY - state.bossY) < 125) {
+          state.comboHits++;
+          const dmg = state.isBoosting ? 9999 : (1250 + state.comboHits * 310);
+          const pts = state.isBoosting ? 45 : 25;
+          state.score += pts;
+          state.bp = Math.min(3, state.bp + (state.comboHits % 3 === 0 ? 1 : 0));
+          state.bossHp = Math.max(5, state.bossHp - (state.isBoosting ? 8 : 4));
+          state.screenShake = 0.15;
+          // Pogo bounce if slashing in mid-air!
+          if (state.heroVy > 0) state.heroVy = -420;
+
+          playSynthSfx('break');
+          spawnSoulSparks(state.bossX + (Math.random() - 0.5) * 50, state.bossY - 20, '#fbbf24', 18);
+          spawnFloatingCombatText(
+            state.bossX + (Math.random() - 0.5) * 60,
+            state.bossY - 55,
+            `${dmg.toLocaleString()}!`,
+            state.isBoosting ? '#ef4444' : '#fef08a',
+            `+${pts} PTS · ${state.comboHits} HIT COMBO`
+          );
+          updateHudReadouts();
+        }
+
+        // Also allow slashing incoming Boss Soul-Orbs to parry them!
+        bossShockwaves.forEach(sw => {
+          if (!sw.parried && Math.hypot(slashX - sw.x, slashY - sw.y) < 62) {
+            sw.parried = true;
+            state.score += 20;
+            state.bp = Math.min(3, state.bp + 1);
+            spawnSoulSparks(sw.x, sw.y, '#38bdf8', 14);
+            spawnFloatingCombatText(sw.x, sw.y - 25, 'PARRY! +20', '#38bdf8', '+1 BP');
+            updateHudReadouts();
+          }
+        });
+      }
+    }
+
+    // Auto-Rush & Aerial Jump-Slash into a specific Rune Orb (0=A, 1=B, 2=C) when tapped or double-selected
+    function rushAndSlashOrb(laneIdx) {
+      const clamped = Math.max(0, Math.min(2, laneIdx));
+      state.currentLane = clamped;
+      updateSelectedOptionHighlight();
+
+      if (state.screen === 'QUESTION_PHASE' && runeOrbs[clamped]) {
+        state.homingTargetOrb = runeOrbs[clamped];
+        state.dashTimer = 0.35;
+        playSynthSfx('boost');
+      } else if (state.screen === 'PLAY_PHASE') {
+        // Rush toward the Stunned Boss and slash!
+        state.homingTargetOrb = { x: state.bossX - 45, y: state.bossY, isBossRush: true };
+        state.dashTimer = 0.25;
+      }
+    }
+
+    function setBoostState(active) {
+      if (active && (state.bp > 0 || state.isBoosting)) {
+        if (!state.isBoosting) {
+          state.isBoosting = true;
+          state.boostTimer = 3.8;
+          state.bp = Math.max(0, state.bp - 1);
+          state.speedKmh = 343;
+          state.dashTimer = 0.28;
+          state.invulnTimer = 0.6;
+          playSynthSfx('boost');
+          spawnSoulSparks(state.heroX, state.heroY - 30, '#fbbf24', 22);
+          updateHudReadouts();
+        }
+      } else if (!active && state.boostTimer <= 0) {
+        state.isBoosting = false;
+      }
+    }
+
+    /*************************************************************************
+     * 7. PHASE TRANSITIONS: RUNE ORB SLASH -> BOSS BREAK COMBO OR DODGE PHASE
+     *************************************************************************/
+    function startQuestionPhase() {
+      bossShockwaves = [];
+      state.homingTargetOrb = null;
+      state.bossMode = 'GUARD';
+
+      const qIdx = (state.currentLap - 1) % state.questionPool.length;
+      state.currentQuestion = state.questionPool[qIdx];
+      state.screen = 'QUESTION_PHASE';
+      state.questionTimeLeft = state.timerSeconds > 0 ? state.timerSeconds : 999;
+
+      positionRuneOrbs();
+
+      const qWrap = document.getElementById('question-hud-wrap');
+      qWrap.classList.remove('hidden-phase');
+      document.getElementById('q-mode-badge').textContent = state.currentQuestion.mode;
+      document.getElementById('q-prompt-text').innerHTML = formatMcqPromptHtml(state.currentQuestion.prompt);
+      if (state.currentQuestion.isDictation && state.currentQuestion.word) {
+        setTimeout(() => speakText(state.currentQuestion.word), 120);
+      }
+      document.getElementById('q-prompt-sub').textContent = `Duel ${state.currentLap} of ${state.targetLaps} · Jump-Slash Rune Orb A, B, or C!`;
+
+      for (let i = 0; i < 3; i++) {
+        const optEl = document.getElementById(`opt-text-${i}`);
+        const text = state.currentQuestion.options[i] || `Option ${LANE_LETTERS[i]}`;
+        optEl.textContent = text;
+        autoFitOptionText(optEl, text);
+      }
+      updateSelectedOptionHighlight();
+    }
+
+    function resolveOrbSlash(chosenLane) {
+      const q = state.currentQuestion;
+      if (!q) return;
+
+      const isCorrect = chosenLane === q.answer;
+      const chosenText = q.options[chosenLane] || '';
+      const correctText = q.options[q.answer] || '';
+      const orb = runeOrbs[chosenLane] || { x: state.heroX, y: state.heroY - 40 };
+
+      state.answeredLog.push({
+        prompt: q.prompt,
+        mode: q.mode,
+        chosenLane,
+        chosenText,
+        correctLane: q.answer,
+        correctText,
+        isCorrect,
+        expEn: q.expEn,
+        expZh: q.expZh,
+        word: q.word || correctText
+      });
+
+      if (isCorrect) {
+        const bonus = state.isBoosting ? 150 : 100;
+        state.score += bonus;
+        state.bp = Math.min(3, state.bp + 1);
+        state.bossHp = Math.max(0, state.bossHp - Math.ceil(100 / state.targetLaps));
+        state.screenShake = 0.42;
+        playSynthSfx('break');
+
+        const flash = document.getElementById('break-flash');
+        flash.style.opacity = '1';
+        setTimeout(() => { flash.style.opacity = '0'; }, 280);
+
+        spawnSoulSparks(orb.x, orb.y, '#22c55e', 34);
+        spawnFloatingCombatText(orb.x, orb.y - 35, `💥 SHIELD BREAK! +${bonus}`, '#86efac', 'BOSS STUNNED! MASH SLASH!');
+
+        showCornerToast(
+          `💥 SHIELD BREAK! +${bonus} PTS`,
+          `${correctText} — ${q.expZh}`,
+          'good'
+        );
+        speakText(q.word || correctText);
+      } else {
+        state.shields = Math.max(0, state.shields - 1);
+        state.screenShake = 0.36;
+        playSynthSfx('damage');
+
+        spawnSoulSparks(orb.x, orb.y, '#ef4444', 28);
+        spawnFloatingCombatText(orb.x, orb.y - 35, '🛡️ WRONG RUNE! SHIELD CRACKED!', '#fca5a5', `Ans: [${LANE_LETTERS[q.answer]}] ${correctText}`);
+
+        showCornerToast(
+          `🛡️ BOSS COUNTER! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`,
+          `${q.expEn} (${q.expZh})`,
+          'bad'
+        );
+      }
+
+      updateHudReadouts();
+
+      if (state.shields <= 0) {
+        startEndCutscene('DNF');
+      } else if (state.currentLap >= state.targetLaps) {
+        state.bossHp = 0;
+        startEndCutscene('WIN');
+      } else {
+        state.currentLap++;
+        updateHudReadouts();
+        startBreakOrDodgePlayPhase(isCorrect);
+      }
+    }
+
+    function startBreakOrDodgePlayPhase(wasCorrectBreak) {
+      runeOrbs = [];
+      bossShockwaves = [];
+      state.screen = 'PLAY_PHASE';
+      state.phaseTimer = 4.2;
+      state.comboHits = 0;
+      document.getElementById('question-hud-wrap').classList.add('hidden-phase');
+
+      const w = mainCanvas ? mainCanvas.width : 1000;
+      const h = mainCanvas ? mainCanvas.height : 700;
+      const { floorY } = getArenaGeometry(w, h);
+
+      if (wasCorrectBreak) {
+        // Boss crashes down onto the center-right of the bridge in a STUNNED BREAK state for free combo slashes!
+        state.bossMode = 'STUNNED';
+        state.bossTargetX = w * 0.62;
+        state.bossY = floorY - 56;
+      } else {
+        // Boss enters ENRAGED state and fires sweeping ground shockwaves to jump over / parry!
+        state.bossMode = 'ENRAGED';
+        state.bossTargetX = w * 0.78;
+        state.bossY = floorY - 115;
+        for (let i = 0; i < 3; i++) {
+          bossShockwaves.push({
+            x: w * 0.75 + i * 210,
+            y: floorY - 22,
+            vx: -290 - i * 35,
+            parried: false,
+            hitPlayer: false
+          });
+        }
+      }
+    }
+
+    function autoFitOptionText(el, text) {
+      if (!el) return;
+      const len = text.length;
+      if (len > 28) {
+        el.style.fontSize = '0.72rem';
+        el.style.whiteSpace = 'normal';
+      } else if (len > 18) {
+        el.style.fontSize = '0.8rem';
+        el.style.whiteSpace = 'nowrap';
+      } else {
+        el.style.fontSize = '0.94rem';
+        el.style.whiteSpace = 'nowrap';
+      }
+    }
+
+    function updateSelectedOptionHighlight() {
+      for (let i = 0; i < 3; i++) {
+        const card = document.getElementById(`opt-card-${i}`);
+        if (card) card.classList.toggle('selected', i === state.currentLane);
+      }
+    }
+
+    function spawnSoulSparks(x, y, color, count = 16) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 65 + Math.random() * 290;
+        soulSparks.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 45,
+          size: 4 + Math.floor(Math.random() * 5),
+          color: i % 3 === 0 ? '#ffffff' : color,
+          life: 0.4 + Math.random() * 0.3
+        });
+      }
+    }
+
+    function spawnFloatingCombatText(x, y, text, color, subText = '') {
+      floatingTexts.push({
+        x, y, text, subText, color: color || '#fef08a', life: 1.2
+      });
+    }
+
+    function showCornerToast(title, sub, kind) {
+      const container = document.getElementById('toast-corner-right');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = `corner-toast ${kind || 'good'}`;
+      el.innerHTML = `
+        <div class="corner-toast-title">${title}</div>
+        <div class="corner-toast-sub">${sub}</div>
+      `;
+      container.appendChild(el);
+      while (container.children.length > 2) {
+        container.removeChild(container.firstChild);
+      }
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 3400);
+    }
+
+    /*************************************************************************
+     * 8. GOTHIC SANCTUARY CATHEDRAL & BOSS DUEL ARENA RENDERER
+     *************************************************************************/
+    function renderDuelArena(now) {
+      if (!mainCtx || !mainCanvas) return;
+      const ctx = mainCtx;
+      const w = mainCanvas.width;
+      const h = mainCanvas.height;
+      ctx.imageSmoothingEnabled = false;
+
+      const { floorY, platforms } = getArenaGeometry(w, h);
+
+      ctx.save();
+      if (state.screenShake > 0) {
+        ctx.translate((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14);
+      }
+
+      // 1. Hollow-Knight / Octopath Sanctuary Cathedral Background Gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+      bgGrad.addColorStop(0.0, '#070913');
+      bgGrad.addColorStop(0.45, '#131629');
+      bgGrad.addColorStop(0.82, '#1e1b4b');
+      bgGrad.addColorStop(1.0, '#090b10');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Towering Gothic Stained-Glass Rose Arches & Pillars in Background
+      const archSpacing = Math.max(220, Math.round(w * 0.24));
+      for (let ax = 60; ax < w + archSpacing; ax += archSpacing) {
+        // Stone Cathedral Pillar
+        ctx.fillStyle = '#0f1322';
+        ctx.fillRect(ax - 22, 0, 44, floorY);
+        ctx.fillStyle = '#1e243b';
+        ctx.fillRect(ax - 14, 0, 28, floorY);
+
+        // Tall Lancet Window with Glowing Rose-Glass Tracery
+        const winX = ax + Math.round(archSpacing * 0.5);
+        const winY = Math.round(floorY * 0.22);
+        const winW = Math.round(archSpacing * 0.42);
+        const winH = Math.round(floorY * 0.58);
+        ctx.fillStyle = 'rgba(30, 58, 138, 0.26)';
+        ctx.fillRect(winX - winW / 2, winY, winW, winH);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(winX - winW / 2, winY, winW, winH);
+
+        // Diagonal Moonlight / Golden Sunbeam streaming from window
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.04)';
+        ctx.beginPath();
+        ctx.moveTo(winX - winW / 2, winY);
+        ctx.lineTo(winX + winW / 2, winY);
+        ctx.lineTo(winX + winW * 1.1, floorY);
+        ctx.lineTo(winX - winW * 0.1, floorY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // 3. Ancient Carved Stone Bridge Floor & Soul Lanterns
+      ctx.fillStyle = '#090b10';
+      ctx.fillRect(0, floorY, w, h - floorY);
+      ctx.fillStyle = '#27272a';
+      ctx.fillRect(0, floorY, w, 28);
+      ctx.fillStyle = '#78716c';
+      ctx.fillRect(0, floorY, w, 5);
+
+      for (let bx = 0; bx < w; bx += 64) {
+        ctx.fillStyle = 'rgba(0,0,0,0.42)';
+        ctx.fillRect(bx, floorY + 6, 3, 20);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(bx + 6, floorY + 7, 42, 3);
+      }
+
+      // 4. The 3 Floating Sanctuary Rune Platforms (Left [A], Center-High [B], Right [C])
+      platforms.forEach((p, idx) => {
+        const isSelected = idx === state.currentLane;
+        // Platform shadow & carved stone slab
+        ctx.fillStyle = '#090b10';
+        ctx.fillRect(p.x - 3, p.y - 3, p.w + 6, p.h + 6);
+        ctx.fillStyle = isSelected ? '#334155' : '#1e293b';
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = isSelected ? '#ffffff' : p.color;
+        ctx.fillRect(p.x, p.y, p.w, 4);
+
+        // Glowing Rune Pedestal Tag under Platform
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(p.orbX - 18, p.y + 4, 36, 18);
+        ctx.fillStyle = p.color;
+        ctx.font = 'bold 12px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`PLATFORM ${p.letter}`, p.orbX, p.y + 16);
+      });
+
+      // 5. Draw Colossal Hollow-Radiance Boss + Boss HP Bar
+      drawColossalBoss(ctx, w, h, floorY, now);
+
+      // 6. Draw 3 Floating Elemental Weak-Point Orbs [A, B, C] (During Question Phase)
+      if (state.screen === 'QUESTION_PHASE') {
+        drawFloatingRuneOrbs(ctx, now);
+      }
+
+      // 7. Draw Boss Shockwaves (During Play Phase)
+      bossShockwaves.forEach(sw => {
+        if (sw.parried) return;
+        ctx.fillStyle = '#f43f5e';
+        ctx.fillRect(Math.round(sw.x - 16), Math.round(sw.y - 26), 32, 42);
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(Math.round(sw.x - 8), Math.round(sw.y - 18), 16, 28);
+      });
+
+      // 8. Draw Free-Roam Platformer Hero + Nail/Sword Slash Crescent Arcs
+      drawPlatformerHero(ctx, now);
+
+      // 9. Draw Soul Sparks, Fireflies & Floating Damage Numbers
+      fireflies.forEach(f => {
+        ctx.fillStyle = f.color;
+        ctx.fillRect(Math.round(f.x), Math.round(f.y), f.size, f.size);
+      });
+
+      soulSparks.forEach(sp => {
+        ctx.fillStyle = sp.color;
+        ctx.fillRect(Math.round(sp.x), Math.round(sp.y), sp.size, sp.size);
+      });
+
+      floatingTexts.forEach(ft => {
+        ctx.save();
+        ctx.font = 'bold 23px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#090b10';
+        ctx.fillText(ft.text, ft.x + 2, ft.y + 2);
+        ctx.fillStyle = ft.color;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        if (ft.subText) {
+          ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(ft.subText, ft.x, ft.y + 19);
+        }
+        ctx.restore();
+      });
+
+      ctx.restore();
+    }
+
+    function drawColossalBoss(ctx, w, h, floorY, now) {
+      const bFrame = Math.floor(now / 220) % 2;
+      const bossSprite = getBossDuelSprite(state.bossMode, bFrame);
+      const hoverY = state.bossMode === 'STUNNED'
+        ? floorY - 64
+        : state.bossY + Math.sin(now * 0.004) * 12;
+
+      // Aura Halo behind Boss
+      const auraCol = state.bossMode === 'STUNNED'
+        ? 'rgba(56, 189, 248, 0.25)'
+        : (state.bossMode === 'ENRAGED' ? 'rgba(225, 29, 72, 0.28)' : 'rgba(139, 92, 246, 0.22)');
+      ctx.fillStyle = auraCol;
+      ctx.fillRect(Math.round(state.bossX - 78), Math.round(hoverY - 78), 156, 156);
+
+      ctx.drawImage(bossSprite, Math.round(state.bossX - 72), Math.round(hoverY - 72), 144, 144);
+
+      // Boss Status Banner & HP Bar on Sanctuary Floor
+      const barW = Math.min(420, Math.round(w * 0.44));
+      const barX = Math.round(w / 2 - barW / 2);
+      const barY = floorY + 34;
+
+      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
+      ctx.fillRect(barX - 4, barY - 4, barW + 8, 22);
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(barX - 4, barY - 4, barW + 8, 22);
+
+      const hpFrac = Math.max(0, Math.min(1, state.bossHp / state.bossMaxHp));
+      ctx.fillStyle = state.bossMode === 'STUNNED' ? '#38bdf8' : '#e11d48';
+      ctx.fillRect(barX, barY, Math.round(barW * hpFrac), 14);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Fredoka, sans-serif';
+      ctx.textAlign = 'center';
+      const statusText = state.bossMode === 'STUNNED'
+        ? '💥 BOSS STUNNED (BREAK!) — MASH SLASH OR TAP BOSS FOR COMBO!'
+        : `ARCH-GUARDIAN OF THE SANCTUARY · HP ${Math.ceil(state.bossHp)}%`;
+      ctx.fillText(statusText, Math.round(w / 2), barY + 10);
+    }
+
+    function drawFloatingRuneOrbs(ctx, now) {
+      runeOrbs.forEach((orb, idx) => {
+        if (orb.shattered) return;
+        const bob = Math.sin(now * 0.006 + idx * 1.8) * 6;
+        const ox = Math.round(orb.x);
+        const oy = Math.round(orb.y + bob);
+        const isSelected = idx === state.currentLane;
+
+        // Outer Spinning Rune Ring
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fillRect(ox - 32, oy - 32, 64, 64);
+        ctx.strokeStyle = isSelected ? '#ffffff' : orb.color;
+        ctx.lineWidth = isSelected ? 4 : 2.5;
+        ctx.strokeRect(ox - 32, oy - 32, 64, 64);
+
+        // Glowing Elemental Inner Core
+        ctx.fillStyle = orb.color;
+        ctx.fillRect(ox - 24, oy - 24, 48, 48);
+
+        // Crisp A / B / C Rune Letter
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 26px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(orb.letter, ox, oy + 1);
+      });
+    }
+
+    function drawPlatformerHero(ctx, now) {
+      const heroFrames = getHeroSpriteFrames(state.selectedHeroIdx);
+      const isMoving = Math.abs(state.heroVx) > 15;
+      const hFrame = isMoving ? (Math.floor(now / 110) % 4) : 0;
+
+      // Shadow Dash / Boost Afterimages
+      if (state.isBoosting || state.dashTimer > 0) {
+        for (let a = 1; a <= 3; a++) {
+          ctx.save();
+          ctx.globalAlpha = 0.35 - a * 0.09;
+          ctx.translate(Math.round(state.heroX - state.facing * a * 18), Math.round(state.heroY - 36));
+          ctx.scale(state.facing, 1);
+          ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
+          ctx.restore();
+        }
+      }
+
+      // Main Hero Sprite
+      ctx.save();
+      ctx.translate(Math.round(state.heroX), Math.round(state.heroY - 36));
+      ctx.scale(state.facing, 1);
+      ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
+      ctx.restore();
+
+      // Hollow-Knight Style Wide Nail / Sword Slash Crescent Arcs
+      slashArcs.forEach(arc => {
+        ctx.save();
+        ctx.translate(Math.round(arc.x), Math.round(arc.y));
+        ctx.scale(arc.facing, 1);
+        ctx.strokeStyle = arc.color;
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(0, 0, 44, -Math.PI * 0.48, Math.PI * 0.48);
+        ctx.stroke();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(4, 0, 46, -Math.PI * 0.42, Math.PI * 0.42);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    /*************************************************************************
+     * 9. SANCTUARY BENCH & BOSS SHOWCASE (TAVERN MODAL)
+     *************************************************************************/
+    function renderShowroomCampfire(now) {
+      if (!showroomCtx || !showroomCanvas) return;
+      const ctx = showroomCtx;
+      const w = showroomCanvas.width;
+      const h = showroomCanvas.height;
+      ctx.imageSmoothingEnabled = false;
+
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#070913');
+      grad.addColorStop(0.65, '#1e1b4b');
+      grad.addColorStop(1, '#27272a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#3f3f46';
+      ctx.fillRect(0, 154, w, h - 154);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(0, 154, w, 3);
+
+      // Selected Hero Sprite on Left
+      const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
+      const heroFrames = getHeroSpriteFrames(state.selectedHeroIdx);
+      const frame = Math.floor(now / 160) % 4;
+      ctx.drawImage(heroFrames[frame], 52, 68, 92, 92);
+
+      // Colossal Boss Silhouette on Right
+      const bossSprite = getBossDuelSprite('GUARD', Math.floor(now / 240) % 2);
+      ctx.drawImage(bossSprite, 218, 46, 112, 112);
+
+      const titleEl = document.getElementById('showroom-hero-title');
+      if (titleEl) titleEl.textContent = `${hero.name.toUpperCase()} · ${hero.role}`;
+    }
+
+    /*************************************************************************
+     * 10. VICTORY & DNF CUTSCENES (~3.5s Skippable) + SCOREBOARD
+     *************************************************************************/
+    function startEndCutscene(outcome) {
+      runeOrbs = [];
+      bossShockwaves = [];
+      document.getElementById('question-hud-wrap').classList.add('hidden-phase');
+
+      state.screen = outcome === 'WIN' ? 'CUTSCENE_WIN' : 'CUTSCENE_DNF';
+      state.cutsceneTimer = 3.5;
+
+      const banner = document.getElementById('cutscene-banner');
+      const title = document.getElementById('cutscene-banner-title');
+      const sub = document.getElementById('cutscene-banner-sub');
+      banner.classList.remove('hidden');
+
+      if (outcome === 'WIN') {
+        state.bossMode = 'STUNNED';
+        playSynthSfx('fanfare');
+        title.textContent = '🏆 BOSS VANQUISHED — FULL DISTANCE!';
+        sub.textContent = `${state.travelerName} (${state.guildName}) shattered all ${state.targetLaps} boss seals!`;
+      } else {
+        playSynthSfx('damage');
+        title.textContent = '🚩 GUILD CONTROL · DID NOT FINISH';
+        sub.textContent = 'Out of Shields! Resting on the sanctuary bench...';
+      }
+    }
+
+    function finishCutsceneAndShowScoreboard() {
+      const isWin = state.screen === 'CUTSCENE_WIN';
+      state.screen = 'END';
+      document.getElementById('cutscene-banner').classList.add('hidden');
+      document.getElementById('hud-layer').classList.add('hidden');
+
+      const endModal = document.getElementById('end-modal');
+      endModal.classList.remove('hidden');
+
+      const emojiEl = document.getElementById('end-emoji-icon');
+      const kickerEl = document.getElementById('end-kicker-line');
+      const titleEl = document.getElementById('end-title-line');
+
+      if (isWin) {
+        emojiEl.textContent = '🏆';
+        kickerEl.innerHTML = `<span class="nowrap-clause">🏁 OFFICIAL FIA &amp; GUILD CLASSIFICATION ·</span><span class="nowrap-clause">FULL DISTANCE</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">🏆 Chequered Flag —</span><span class="nowrap-clause">Grand Pantheon Finish!</span>`;
+      } else {
+        emojiEl.textContent = '🚩';
+        kickerEl.innerHTML = `<span class="nowrap-clause">🚩 GUILD CONTROL ·</span><span class="nowrap-clause">DID NOT FINISH</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">🚩 Duel Incomplete —</span><span class="nowrap-clause">Out of Shields!</span>`;
+      }
+
+      const totalAnswered = state.answeredLog.length;
+      const correctCount = state.answeredLog.filter(a => a.isCorrect).length;
+      const acc = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+
+      document.getElementById('end-score-val').textContent = `${state.score} PTS`;
+      document.getElementById('end-acc-val').textContent = `${acc}%`;
+      document.getElementById('end-laps-val').textContent = `${correctCount} / ${state.targetLaps}`;
+      document.getElementById('end-shields-val').textContent = `${state.shields} 🛡️`;
+
+      saveAndRenderStandings(isWin, acc);
+      renderReviewCards('ALL');
+    }
+
+    function saveAndRenderStandings(isWin, acc) {
+      let board = [
+        { name: 'Olberic · Cobbleston Guard', pts: 980, status: 'FULL' },
+        { name: 'Cyrus · Royal Academy', pts: 820, status: 'FULL' },
+        { name: "H'aanit · S'warkii Woods", pts: 690, status: 'FULL' }
+      ];
+      try {
+        const saved = localStorage.getItem('pyw_pixel_quest_standings');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) board = parsed;
+        }
+      } catch (e) {}
+
+      const entry = {
+        name: `${state.travelerName} · ${state.guildName}`,
+        pts: state.score,
+        status: isWin ? `${acc}%` : 'DNF',
+        isCurrent: true
+      };
+      board.push(entry);
+      board.sort((a, b) => b.pts - a.pts);
+      board = board.slice(0, 8);
+
+      try {
+        localStorage.setItem(
+          'pyw_pixel_quest_standings',
+          JSON.stringify(board.map(b => ({ name: b.name, pts: b.pts, status: b.status })))
+        );
+      } catch (e) {}
+
+      const listEl = document.getElementById('end-standings-list');
+      listEl.innerHTML = '';
+      board.forEach((row, idx) => {
+        const div = document.createElement('div');
+        div.className = `standing-row ${row.isCurrent ? 'current-run' : ''}`;
+        div.innerHTML = `
+          <div class="standing-driver-info">
+            <span class="standing-rank">#${idx + 1}</span>
+            <span class="standing-name">${row.name} (${row.status})</span>
+          </div>
+          <span class="pts-pill">${row.pts} PTS</span>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    function renderReviewCards(filterType) {
+      const container = document.getElementById('end-review-list');
+      container.innerHTML = '';
+
+      const items = filterType === 'MISSED'
+        ? state.answeredLog.filter(item => !item.isCorrect)
+        : state.answeredLog;
+
+      if (items.length === 0) {
+        container.innerHTML = `<div style="padding:12px; color:#94a3b8; font-size:0.86rem;">No ${filterType === 'MISSED' ? 'missed' : 'answered'} items in this chronicle!</div>`;
+        return;
+      }
+
+      items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = `review-card ${item.isCorrect ? '' : 'missed'}`;
+        card.innerHTML = `
+          <div class="review-q-line">${idx + 1}. [${item.mode}] ${item.prompt}</div>
+          <div class="review-ans-badges">
+            <span class="ans-pill-correct">✓ Correct [${LANE_LETTERS[item.correctLane]}]: ${item.correctText}</span>
+            ${!item.isCorrect ? `<span class="ans-pill-wrong">✗ Chosen [${LANE_LETTERS[item.chosenLane]}]: ${item.chosenText}</span>` : ''}
+          </div>
+          <div class="review-explanation-full">
+            <div><strong>EN:</strong> ${item.expEn}</div>
+            <div style="margin-top:3px; color:#fde68a;"><strong>繁中:</strong> ${item.expZh}</div>
+          </div>
+          <div class="review-audio-row">
+            <button type="button" class="hud-btn btn-speak-correct" data-speak="${encodeURIComponent(item.correctText)}">🔊 Correct (${item.correctText})</button>
+            ${!item.isCorrect ? `<button type="button" class="hud-btn btn-speak-wrong" data-speak="${encodeURIComponent(item.chosenText)}">🔊 Wrong Gate (${item.chosenText})</button>` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      container.querySelectorAll('[data-speak]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          speakText(decodeURIComponent(btn.getAttribute('data-speak') || ''));
+        });
+      });
+    }
+
+    /*************************************************************************
+     * 11. CIRCULAR SOUL / COMBO PACE GAUGE (Green -> Amber -> Red)
+     *************************************************************************/
+    function drawSpeedometer() {
+      const canvas = document.getElementById('speedo-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = w * 0.41;
+
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 10, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+      ctx.stroke();
+
+      const startAng = Math.PI * 0.75;
+      const endAng = Math.PI * 2.25;
+      const totalSpan = endAng - startAng;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startAng, endAng);
+      ctx.lineWidth = 12;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.55)';
+      ctx.stroke();
+
+      const norm = Math.max(0, Math.min(1, (state.speedKmh - 240) / (343 - 240)));
+      const activeEnd = startAng + totalSpan * norm;
+
+      const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+      grad.addColorStop(0.0, '#22c55e');
+      grad.addColorStop(0.55, '#f59e0b');
+      grad.addColorStop(1.0, '#e10600');
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startAng, activeEnd);
+      ctx.lineWidth = 12;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = grad;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 31px Fredoka, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(state.bossMode === 'STUNNED' ? `${state.comboHits}x` : `${Math.round(state.speedKmh)}`, cx, cy - 8);
+
+      ctx.fillStyle = state.isBoosting ? '#ef4444' : '#fbbf24';
+      ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(state.bossMode === 'STUNNED' ? '💥 BREAK COMBO' : (state.isBoosting ? '🔥 MAX BOOST' : 'SOUL PACE'), cx, cy + 20);
+
+      ctx.fillStyle = LANE_COLORS[state.currentLane];
+      ctx.font = 'bold 14px Fredoka, sans-serif';
+      ctx.fillText(`RUNE [${LANE_LETTERS[state.currentLane]}]`, cx, cy + 42);
+    }
+
+    function updateHudReadouts() {
+      const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
+      document.getElementById('hud-hero-class').textContent = hero.shortClass;
+      document.getElementById('hud-hero-name').textContent = state.travelerName;
+      document.getElementById('hud-lap-val').textContent = `${state.currentLap} / ${state.targetLaps}`;
+      document.getElementById('hud-score-val').textContent = state.score;
+      document.getElementById('hud-shields-row').textContent = '🛡️'.repeat(Math.max(0, state.shields)) || '💔';
+
+      for (let i = 0; i < 3; i++) {
+        const orb = document.getElementById(`bp-orb-${i}`);
+        if (orb) orb.classList.toggle('filled', i < state.bp);
+      }
+    }
+
+    function setAccent(acc) {
+      currentAccent = acc;
+      document.getElementById('btn-hud-accent').textContent = `🗣️ ${acc}`;
+      document.querySelectorAll('#setup-accent-pills .choice-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-accent') === acc);
+      });
+    }
+
+    /*************************************************************************
+     * 12. MAIN 60 FPS PLATFORMER PHYSICS & BOSS DUEL LOOP
+     *************************************************************************/
+    let lastTime = performance.now();
+
+    function animateLoop(now) {
+      requestAnimationFrame(animateLoop);
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      if (!document.getElementById('tavern-modal').classList.contains('hidden')) {
+        renderShowroomCampfire(now);
+      }
+
+      const w = mainCanvas ? mainCanvas.width : 1000;
+      const h = mainCanvas ? mainCanvas.height : 700;
+      const { floorY, platforms } = getArenaGeometry(w, h);
+
+      if (state.screenShake > 0) state.screenShake = Math.max(0, state.screenShake - dt);
+      if (state.slashCooldown > 0) state.slashCooldown = Math.max(0, state.slashCooldown - dt);
+      if (state.dashTimer > 0) state.dashTimer = Math.max(0, state.dashTimer - dt);
+      if (state.invulnTimer > 0) state.invulnTimer = Math.max(0, state.invulnTimer - dt);
+
+      if (state.isBoosting) {
+        state.boostTimer -= dt;
+        state.speedKmh += (343 - state.speedKmh) * Math.min(1, dt * 8);
+        if (state.boostTimer <= 0) state.isBoosting = false;
+      } else {
+        state.speedKmh += (285 - state.speedKmh) * Math.min(1, dt * 6);
+      }
+
+      // 1. Free-Roam 2D Platformer Hero Movement & Homing Orb Rush
+      if (state.screen === 'QUESTION_PHASE' || state.screen === 'PLAY_PHASE') {
+        if (state.homingTargetOrb) {
+          const tx = state.homingTargetOrb.x;
+          const ty = state.homingTargetOrb.y + 28;
+          const dx = tx - state.heroX;
+          const dy = ty - state.heroY;
+          state.facing = dx >= 0 ? 1 : -1;
+          state.heroX += dx * Math.min(1, dt * 14);
+          state.heroY += dy * Math.min(1, dt * 14);
+          state.heroVy = 0;
+
+          if (Math.hypot(dx, dy) < 42) {
+            const wasBossRush = state.homingTargetOrb.isBossRush;
+            state.homingTargetOrb = null;
+            performSwordSlash();
+            if (!wasBossRush) state.heroVy = -320;
+          }
+        } else {
+          const moveSpeed = state.isBoosting ? 460 : 340;
+          if (keysHeld.left && !keysHeld.right) {
+            state.heroVx = -moveSpeed;
+            state.facing = -1;
+          } else if (keysHeld.right && !keysHeld.left) {
+            state.heroVx = moveSpeed;
+            state.facing = 1;
+          } else {
+            state.heroVx *= Math.pow(0.001, dt);
+          }
+
+          const prevY = state.heroY;
+          state.heroX = Math.max(48, Math.min(w - 48, state.heroX + state.heroVx * dt));
+          state.heroY += state.heroVy * dt;
+          state.heroVy += GRAVITY * dt;
+
+          // Check One-Way Landing on the 3 Sanctuary Platforms
+          if (state.heroVy >= 0) {
+            platforms.forEach(p => {
+              if (
+                state.heroX >= p.x - 12 &&
+                state.heroX <= p.x + p.w + 12 &&
+                prevY <= p.y + 8 &&
+                state.heroY >= p.y
+              ) {
+                state.heroY = p.y;
+                state.heroVy = 0;
+                state.jumpsRemaining = 2;
+              }
+            });
+          }
+
+          // Check Landing on Main Cathedral Bridge Floor
+          if (state.heroY >= floorY) {
+            state.heroY = floorY;
+            state.heroVy = 0;
+            state.jumpsRemaining = 2;
+          }
+
+          // Automatically highlight whichever Rune Platform (A, B, C) the Hero is closest to horizontally
+          if (state.screen === 'QUESTION_PHASE') {
+            let closestIdx = state.currentLane;
+            let bestDist = Infinity;
+            platforms.forEach((p, idx) => {
+              const d = Math.abs(state.heroX - p.orbX);
+              if (d < bestDist) {
+                bestDist = d;
+                closestIdx = idx;
+              }
+            });
+            if (closestIdx !== state.currentLane) {
+              state.currentLane = closestIdx;
+              updateSelectedOptionHighlight();
+            }
+          }
+        }
+      }
+
+      // 2. Smooth Boss Positioning & Shockwave Updates
+      state.bossX += (state.bossTargetX - state.bossX) * Math.min(1, dt * 5);
+      if (state.screen === 'QUESTION_PHASE') {
+        state.bossTargetX = w * 0.82 + Math.sin(now * 0.0015) * 45;
+        state.bossY = floorY - 125;
+      }
+
+      for (let i = slashArcs.length - 1; i >= 0; i--) {
+        slashArcs[i].life -= dt;
+        if (slashArcs[i].life <= 0) slashArcs.splice(i, 1);
+      }
+
+      for (let i = soulSparks.length - 1; i >= 0; i--) {
+        const sp = soulSparks[i];
+        sp.x += sp.vx * dt;
+        sp.y += sp.vy * dt;
+        sp.vy += 380 * dt;
+        sp.life -= dt;
+        if (sp.life <= 0) soulSparks.splice(i, 1);
+      }
+
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y -= dt * 42;
+        ft.life -= dt;
+        if (ft.life <= 0) floatingTexts.splice(i, 1);
+      }
+
+      fireflies.forEach(f => {
+        f.x += f.vx * dt;
+        f.y += f.vy * dt;
+        if (f.y < 0) f.y = h;
+        if (f.x < 0) f.x = w;
+        if (f.x > w) f.x = 0;
+      });
+
+      // 3. Phase Timers
+      if (state.screen === 'PLAY_PHASE') {
+        state.phaseTimer -= dt;
+        bossShockwaves.forEach(sw => {
+          if (sw.parried) return;
+          sw.x += sw.vx * dt;
+          if (!sw.hitPlayer && state.invulnTimer <= 0 && Math.abs(sw.x - state.heroX) < 28 && Math.abs(sw.y - (state.heroY - 20)) < 34) {
+            sw.hitPlayer = true;
+            state.speedKmh = 245;
+            playSynthSfx('step');
+            spawnFloatingCombatText(state.heroX, state.heroY - 60, 'JUMP / DASH!', '#fca5a5');
+          }
+        });
+        if (state.phaseTimer <= 0) {
+          startQuestionPhase();
+        }
+        drawSpeedometer();
+      } else if (state.screen === 'QUESTION_PHASE') {
+        if (state.timerSeconds > 0) {
+          state.questionTimeLeft -= dt;
+          document.getElementById('q-timer-display').textContent = `${Math.max(0, Math.ceil(state.questionTimeLeft))}s`;
+          if (state.questionTimeLeft <= 0) {
+            resolveOrbSlash(state.currentLane);
+          }
+        } else {
+          document.getElementById('q-timer-display').textContent = '∞';
+        }
+        drawSpeedometer();
+      } else if (state.screen === 'CUTSCENE_WIN' || state.screen === 'CUTSCENE_DNF') {
+        state.cutsceneTimer -= dt;
+        if (state.screen === 'CUTSCENE_WIN' && Math.random() < 0.3) {
+          spawnSoulSparks(state.bossX + (Math.random() - 0.5) * 180, state.bossY - Math.random() * 90, '#fbbf24', 12);
+        }
+        if (state.cutsceneTimer <= 0) {
+          finishCutsceneAndShowScoreboard();
+        }
+      }
+
+      renderDuelArena(now);
+    }
+
+    /*************************************************************************
+     * 13. LAUNCH & RESTART DUEL FLOW
+     *************************************************************************/
+    function startNewQuest() {
+      ensureAudioCtx();
+      state.travelerName = (document.getElementById('input-traveler-name').value || 'Olberic').trim();
+      state.guildName = (document.getElementById('input-guild-name').value || 'Cobbleston Guard').trim();
+
+      const customLapsVal = parseInt(document.getElementById('input-custom-laps').value, 10);
+      if (!isNaN(customLapsVal) && customLapsVal >= 1 && customLapsVal <= 99) {
+        state.targetLaps = customLapsVal;
+      }
+
+      const w = mainCanvas ? mainCanvas.width : 1000;
+      const h = mainCanvas ? mainCanvas.height : 700;
+      const { floorY } = getArenaGeometry(w, h);
+
+      state.questionPool = buildActiveQuestionPool(state.modeFilter, state.targetLaps);
+      state.currentLap = 1;
+      state.score = 0;
+      state.shields = state.maxShields;
+      state.bp = 1;
+      state.isBoosting = false;
+      state.currentLane = 1;
+      state.heroX = w * 0.24;
+      state.heroY = floorY;
+      state.heroVx = 0;
+      state.heroVy = 0;
+      state.bossX = w * 0.80;
+      state.bossY = floorY - 120;
+      state.bossHp = 100;
+      state.bossMaxHp = 100;
+      state.answeredLog = [];
+
+      updateHudReadouts();
+
+      document.getElementById('start-menu-overlay').classList.add('hidden');
+      document.getElementById('tavern-modal').classList.add('hidden');
+      document.getElementById('pause-modal').classList.add('hidden');
+      document.getElementById('end-modal').classList.add('hidden');
+      document.getElementById('cutscene-banner').classList.add('hidden');
+      document.getElementById('hud-layer').classList.remove('hidden');
+
+      startQuestionPhase();
+    }
+
+    function returnToStartMenu() {
+      runeOrbs = [];
+      bossShockwaves = [];
+      state.screen = 'START';
+      document.getElementById('hud-layer').classList.add('hidden');
+      document.getElementById('tavern-modal').classList.add('hidden');
+      document.getElementById('pause-modal').classList.add('hidden');
+      document.getElementById('end-modal').classList.add('hidden');
+      document.getElementById('cutscene-banner').classList.add('hidden');
+      document.getElementById('start-menu-overlay').classList.remove('hidden');
+    }
+
+    /*************************************************************************
+     * 14. KEYBOARD, MOUSE & MOBILE TOUCH CONTROLS
+     *************************************************************************/
+    window.addEventListener('keydown', (e) => {
+      if (state.screen !== 'PLAY_PHASE' && state.screen !== 'QUESTION_PHASE') return;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'a' || key === 'arrowleft') {
+        keysHeld.left = true;
+      } else if (key === 'd' || key === 'arrowright') {
+        keysHeld.right = true;
+      } else if (key === 'w' || key === 'arrowup') {
+        e.preventDefault();
+        performJump();
+      } else if (key === ' ' || key === 'enter') {
+        e.preventDefault();
+        performSwordSlash();
+      } else if (key === 's' || key === 'arrowdown' || key === 'shift') {
+        e.preventDefault();
+        setBoostState(true);
+      } else if (key === '1') {
+        rushAndSlashOrb(0);
+      } else if (key === '2') {
+        rushAndSlashOrb(1);
+      } else if (key === '3') {
+        rushAndSlashOrb(2);
+      } else if (key === 'escape') {
+        togglePauseModal();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+      if (key === 'a' || key === 'arrowleft') keysHeld.left = false;
+      if (key === 'd' || key === 'arrowright') keysHeld.right = false;
+    });
+
+    // Direct Canvas Tap / Click: Tap any Floating Rune Orb [A, B, C] to auto-rush & jump-slash it, or tap Boss during BREAK to combo-slash!
+    const gameCanvasEl = document.getElementById('game-canvas');
+    gameCanvasEl.addEventListener('pointerdown', (e) => {
+      if (state.screen === 'QUESTION_PHASE') {
+        for (let i = 0; i < runeOrbs.length; i++) {
+          const orb = runeOrbs[i];
+          if (!orb.shattered && Math.hypot(e.clientX - orb.x, e.clientY - orb.y) < 58) {
+            rushAndSlashOrb(i);
+            return;
+          }
+        }
+        // Otherwise jump towards pointer X and slash
+        state.facing = e.clientX >= state.heroX ? 1 : -1;
+        if (e.clientY < state.heroY - 60) performJump();
+        performSwordSlash();
+      } else if (state.screen === 'PLAY_PHASE') {
+        if (Math.hypot(e.clientX - state.bossX, e.clientY - state.bossY) < 120) {
+          rushAndSlashOrb(1);
+        } else {
+          if (e.clientY < state.heroY - 60) performJump();
+          performSwordSlash();
+        }
+      }
+    });
+
+    function togglePauseModal() {
+      const pauseModal = document.getElementById('pause-modal');
+      if (state.screen === 'PLAY_PHASE' || state.screen === 'QUESTION_PHASE') {
+        state.prevScreen = state.screen;
+        state.screen = 'PAUSED';
+        pauseModal.classList.remove('hidden');
+      } else if (state.screen === 'PAUSED') {
+        state.screen = state.prevScreen || 'QUESTION_PHASE';
+        pauseModal.classList.add('hidden');
+      }
+    }
+
+    /*************************************************************************
+     * 15. WORD POOL BUILDER & DEEPSEEK PHOTO/TEXT AI EXTRACTION
+     *************************************************************************/
+    function renderDictionaryPreview(filterText = '') {
+      const box = document.getElementById('dictionary-preview-list');
+      if (!box) return;
+      const q = filterText.trim().toLowerCase();
+      const combined = [
+        ...customQuestionPool.map(c => ({ word: c.word, zh: c.zh, def: c.prompt, tag: 'CUSTOM' })),
+        ...HKDSE_LEXICON_SEEDS.map(s => ({ word: s[0], zh: s[1], def: s[2], tag: 'HKDSE' }))
+      ].filter(item => !q || item.word.toLowerCase().includes(q) || item.zh.includes(q) || item.def.toLowerCase().includes(q));
+
+      box.innerHTML = combined.slice(0, 45).map(item => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 8px; border-bottom:1px solid rgba(148,163,184,0.15); font-size:0.8rem;">
+          <div>
+            <strong style="color:#fbbf24;">${item.word}</strong>
+            <span style="color:#cbd5e1; margin-left:6px;">${item.zh}</span>
+            <span style="color:#94a3b8; margin-left:6px;">— ${item.def}</span>
+          </div>
+          <span style="font-size:0.68rem; background:rgba(245,158,11,0.2); color:#fde68a; padding:2px 6px; border-radius:4px;">${item.tag}</span>
+        </div>
+      `).join('');
+    }
+
+    function parseCustomWordsInput() {
+      const raw = document.getElementById('textarea-custom-words').value.trim();
+      const statusEl = document.getElementById('builder-status-msg');
+      if (!raw) {
+        statusEl.textContent = 'Please type or paste words first.';
+        return;
+      }
+
+      const lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      let added = 0;
+
+      lines.forEach((line, idx) => {
+        const parts = line.split('|').map(p => p.trim());
+        const word = parts[0] || `term-${idx + 1}`;
+        const zh = parts[1] || '自訂詞彙';
+        const def = parts[2] || `Select the matching term for "${zh}"`;
+        const d1 = HKDSE_LEXICON_SEEDS[(idx * 3 + 2) % HKDSE_LEXICON_SEEDS.length][0];
+        const d2 = HKDSE_LEXICON_SEEDS[(idx * 5 + 7) % HKDSE_LEXICON_SEEDS.length][0];
+        const opts = [word, d1, d2];
+        const ans = idx % 3;
+        const rotated = [opts[(3 - ans) % 3], opts[(4 - ans) % 3], opts[(5 - ans) % 3]];
+        const correctIdx = rotated.indexOf(word);
+
+        customQuestionPool.push({
+          mode: 'VOCAB',
+          band: 'CUSTOM',
+          word,
+          zh,
+          prompt: `${def} (${zh}):`,
+          options: rotated,
+          answer: correctIdx >= 0 ? correctIdx : 0,
+          expEn: `"${word}" matches "${def}".`,
+          expZh: `「${word}」解作「${zh}」。`
+        });
+        added++;
+      });
+
+      updateWordPoolSummaryLabels();
+      renderDictionaryPreview();
+      statusEl.textContent = `Added ${added} custom items! Total custom pool: ${customQuestionPool.length}.`;
+    }
+
+    async function extractVocabularyWithDeepSeek(sourceText) {
+      const statusEl = document.getElementById('builder-status-msg');
+      statusEl.textContent = '✨ Extracting HKDSE vocabulary via skhhcss-eng-play-your-way...';
+
+      try {
+        const endpoint = DEFAULT_PYW_WORKER_URL + '/api/extract';
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Play-Your-Way-Key': 'skhhcss-eng-play-your-way'
+          },
+          body: JSON.stringify({ prompt: sourceText })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && Array.isArray(data.words)) {
+            const formatted = data.words.map(w => `${w.word} | ${w.zh} | ${w.def}`).join('\n');
+            document.getElementById('textarea-custom-words').value = formatted;
+            parseCustomWordsInput();
+            return;
+          }
+        }
+      } catch (err) {}
+
+      const tokens = sourceText.match(/[A-Za-z]{5,}/g) || ['resilient', 'meticulous', 'prosperous', 'alleviate'];
+      const unique = [...new Set(tokens.map(t => t.toLowerCase()))].slice(0, 8);
+      const synthesizedLines = unique.map(w => {
+        const match = HKDSE_LEXICON_SEEDS.find(s => s[0].toLowerCase() === w);
+        if (match) return `${match[0]} | ${match[1]} | ${match[2]}`;
+        return `${w} | 核心提取詞彙 | Key vocabulary extracted from your worksheet (${w})`;
+      });
+      document.getElementById('textarea-custom-words').value = synthesizedLines.join('\n');
+      parseCustomWordsInput();
+    }
+
+    function updateWordPoolSummaryLabels() {
+      const totalAvail = CURATED_QUESTIONS.length + customQuestionPool.length;
+      document.getElementById('pill-laps-all').textContent = `All (${totalAvail})`;
+      const summaryEl = document.getElementById('start-pool-summary');
+      if (customQuestionPool.length > 0) {
+        summaryEl.textContent = hubSyncedPackTitle
+          ? `${hubSyncedPackTitle} (${customQuestionPool.length} items synced from Play Your Way Hub)`
+          : `Custom + HKDSE Pool (${customQuestionPool.length} custom + 3,500-Word HKDSE Dictionary)`;
+      } else {
+        summaryEl.textContent = `HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)`;
+      }
+    }
+
+    /*************************************************************************
+     * 16. WIRE UP ALL UI CONTROLS & LISTENERS
+     *************************************************************************/
+    function bindAllEvents() {
+      document.getElementById('btn-open-tavern').addEventListener('click', () => {
+        ensureAudioCtx();
+        playSynthSfx('step');
+        state.screen = 'TAVERN';
+        document.getElementById('tavern-modal').classList.remove('hidden');
+      });
+
+      const openBuilder = () => {
+        renderDictionaryPreview();
+        document.getElementById('word-builder-modal').classList.remove('hidden');
+      };
+      document.getElementById('btn-open-word-builder').addEventListener('click', openBuilder);
+      document.getElementById('btn-tavern-word-pool').addEventListener('click', openBuilder);
+      document.getElementById('btn-close-word-builder').addEventListener('click', () => {
+        document.getElementById('word-builder-modal').classList.add('hidden');
+      });
+
+      document.getElementById('btn-back-title').addEventListener('click', returnToStartMenu);
+
+      document.querySelectorAll('#hero-selector-grid .hero-pick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#hero-selector-grid .hero-pick-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.selectedHeroIdx = parseInt(btn.getAttribute('data-hero'), 10) || 0;
+          const h = HERO_ROSTER[state.selectedHeroIdx];
+          document.getElementById('input-traveler-name').value = h.name;
+          document.getElementById('input-guild-name').value = h.guild;
+          playSynthSfx('step');
+        });
+      });
+
+      document.querySelectorAll('#setup-mode-pills .choice-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#setup-mode-pills .choice-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.modeFilter = btn.getAttribute('data-mode') || 'ALL';
+          document.getElementById('start-pool-mode-tag').textContent = `ACTIVE WORD POOL · ${state.modeFilter}`;
+        });
+      });
+
+      document.querySelectorAll('#setup-laps-pills .choice-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#setup-laps-pills .choice-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('input-custom-laps').value = '';
+          const raw = btn.getAttribute('data-laps');
+          state.targetLaps = raw === 'ALL' ? (CURATED_QUESTIONS.length + customQuestionPool.length) : (parseInt(raw, 10) || 8);
+        });
+      });
+
+      document.querySelectorAll('#setup-timer-pills .choice-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#setup-timer-pills .choice-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.timerSeconds = parseInt(btn.getAttribute('data-timer'), 10) || 0;
+        });
+      });
+
+      document.querySelectorAll('#setup-shields-pills .choice-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#setup-shields-pills .choice-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.maxShields = parseInt(btn.getAttribute('data-shields'), 10) || 3;
+        });
+      });
+
+      document.querySelectorAll('#setup-accent-pills .choice-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setAccent(btn.getAttribute('data-accent') || 'UK');
+        });
+      });
+
+      document.getElementById('btn-hud-accent').addEventListener('click', () => {
+        const order = ['UK', 'US', 'AU'];
+        const next = order[(order.indexOf(currentAccent) + 1) % order.length];
+        setAccent(next);
+      });
+
+      document.getElementById('btn-hud-mute').addEventListener('click', (e) => {
+        isMuted = !isMuted;
+        e.currentTarget.textContent = isMuted ? '🔇' : '🔊';
+      });
+
+      document.getElementById('btn-hud-pause').addEventListener('click', togglePauseModal);
+
+      document.getElementById('btn-q-speak').addEventListener('click', () => {
+        if (state.currentQuestion) {
+          if (state.currentQuestion.isDictation && state.currentQuestion.word) {
+            speakText(state.currentQuestion.word);
+          } else {
+            const spoken = String(state.currentQuestion.prompt || '').replace(/_{2,}/g, ' blank ');
+            speakText(spoken);
+          }
+        }
+      });
+
+      // Clicking Option Card A/B/C auto-rushes and jump-slashes that Rune Orb!
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`opt-card-${i}`).addEventListener('click', () => {
+          if (state.currentQuestion) {
+            speakText(state.currentQuestion.options[i]);
+          }
+          rushAndSlashOrb(i);
+        });
+      }
+
+      // Bottom Platformer Touch Hold / Click Controls
+      const btnLeft = document.getElementById('btn-lane-up');
+      const btnRight = document.getElementById('btn-lane-down');
+      btnLeft.addEventListener('pointerdown', () => { keysHeld.left = true; });
+      btnLeft.addEventListener('pointerup', () => { keysHeld.left = false; });
+      btnLeft.addEventListener('pointerleave', () => { keysHeld.left = false; });
+      btnRight.addEventListener('pointerdown', () => { keysHeld.right = true; });
+      btnRight.addEventListener('pointerup', () => { keysHeld.right = false; });
+      btnRight.addEventListener('pointerleave', () => { keysHeld.right = false; });
+
+      document.getElementById('btn-jump-plat').addEventListener('click', performJump);
+      document.getElementById('btn-action-jump').addEventListener('click', performSwordSlash);
+      document.getElementById('btn-action-boost').addEventListener('click', () => setBoostState(true));
+
+      document.getElementById('btn-launch-quest').addEventListener('click', startNewQuest);
+
+      document.getElementById('btn-resume-quest').addEventListener('click', togglePauseModal);
+      document.getElementById('btn-pause-restart').addEventListener('click', startNewQuest);
+      document.getElementById('btn-pause-tavern').addEventListener('click', () => {
+        document.getElementById('pause-modal').classList.add('hidden');
+        document.getElementById('hud-layer').classList.add('hidden');
+        state.screen = 'TAVERN';
+        document.getElementById('tavern-modal').classList.remove('hidden');
+      });
+      document.getElementById('btn-main-menu').addEventListener('click', returnToStartMenu);
+
+      document.getElementById('btn-skip-cutscene').addEventListener('click', finishCutsceneAndShowScoreboard);
+      document.getElementById('btn-end-play-again').addEventListener('click', startNewQuest);
+      document.getElementById('btn-end-main-menu').addEventListener('click', returnToStartMenu);
+
+      document.querySelectorAll('#review-filter-pills .choice-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#review-filter-pills .choice-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderReviewCards(btn.getAttribute('data-filter') || 'ALL');
+        });
+      });
+
+      document.getElementById('select-hkdse-band').addEventListener('change', (e) => {
+        selectedBandFilter = e.target.value;
+      });
+      document.getElementById('input-word-search').addEventListener('input', (e) => {
+        renderDictionaryPreview(e.target.value);
+      });
+      document.getElementById('btn-parse-custom-words').addEventListener('click', parseCustomWordsInput);
+      document.getElementById('btn-clear-custom-words').addEventListener('click', () => {
+        customQuestionPool = [];
+        document.getElementById('textarea-custom-words').value = '';
+        updateWordPoolSummaryLabels();
+        renderDictionaryPreview();
+        document.getElementById('builder-status-msg').textContent = 'Cleared custom word list.';
+      });
+      document.getElementById('btn-deepseek-generate').addEventListener('click', () => {
+        const raw = document.getElementById('textarea-custom-words').value.trim() || 'resilient meticulous alleviate prosperous embark scrutinise';
+        extractVocabularyWithDeepSeek(raw);
+      });
+      document.getElementById('input-photo-upload').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          extractVocabularyWithDeepSeek(file.name + ' ' + String(reader.result || '').slice(0, 400));
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    window.onload = () => {
+      initDuelEngine();
+      positionRuneOrbs();
+      bindAllEvents();
+      const goHub = () => { window.location.href = "../index.html"; };
+      const b1 = document.getElementById("btn-back-to-pyw-hub");
+      const b2 = document.getElementById("btn-end-pyw-hub");
+      if (b1) b1.addEventListener("click", goHub);
+      if (b2) b2.addEventListener("click", goHub);
+      syncFromPlayYourWayHub();
+      updateWordPoolSummaryLabels();
+      drawSpeedometer();
+      requestAnimationFrame(animateLoop);
+    };
+  </script>
+</body>
+</html>
