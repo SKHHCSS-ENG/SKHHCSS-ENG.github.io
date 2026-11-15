@@ -933,6 +933,44 @@
       box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
     }
 
+    #modal-camera {
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: none;
+      padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .camera-modal-box {
+      max-width: 520px;
+      background: #0f172a;
+      border-top-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .camera-modal-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.08rem;
+      color: #ffffff;
+    }
+
+    .camera-preview {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      max-height: min(68vh, 640px);
+      background: #020617;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .camera-modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
     .toast-banner {
       position: fixed;
       top: 66px;
@@ -1476,6 +1514,20 @@
       <div style="display:flex; gap:8px; justify-content:flex-end;">
         <button class="mini-btn" id="btn-reset-worker-url" type="button">Reset Default</button>
         <button class="scan-btn" id="btn-save-worker-url" type="button" style="padding:8px 14px;">Save & Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modal-camera">
+    <div class="modal-box camera-modal-box">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <span class="camera-modal-title">📷 Camera</span>
+        <button class="mini-btn" id="btn-close-camera-modal" type="button">✖ Close</button>
+      </div>
+      <video id="camera-preview" class="camera-preview" playsinline webkit-playsinline autoplay muted></video>
+      <div class="camera-modal-actions">
+        <button class="mini-btn" id="btn-camera-flip" type="button">Flip Camera</button>
+        <button class="scan-btn" id="btn-camera-capture" type="button" style="padding:8px 14px;">Snap Photo</button>
       </div>
     </div>
   </div>
@@ -2826,8 +2878,120 @@
       }
     });
 
+    function isIosOrIpad() {
+      const ua = navigator.userAgent || "";
+      return /iP(hone|od|ad)/.test(ua) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
+        (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    }
+
+    function isIosSafari() {
+      const ua = navigator.userAgent || "";
+      return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|Chrome\//.test(ua);
+    }
+
+    function needsInPageCamera() {
+      return isIosOrIpad() && !isIosSafari() && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    }
+
+    let cameraStream = null;
+    let cameraFacing = "environment";
+
+    function stopCameraStream() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      const video = document.getElementById("camera-preview");
+      if (video) video.srcObject = null;
+    }
+
+    function closeCameraModal() {
+      stopCameraStream();
+      document.getElementById("modal-camera").classList.add("hidden");
+    }
+
+    async function startCameraPreview() {
+      const video = document.getElementById("camera-preview");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+      video.muted = true;
+      video.setAttribute("autoplay", "");
+      const previous = cameraStream;
+      cameraStream = null;
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: { ideal: cameraFacing } }
+        });
+      } catch (err) {
+        if (cameraFacing === "environment") {
+          cameraFacing = "user";
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: { facingMode: { ideal: "user" } }
+          });
+        } else {
+          if (previous) previous.getTracks().forEach(track => track.stop());
+          throw err;
+        }
+      }
+      if (previous) previous.getTracks().forEach(track => track.stop());
+      video.srcObject = cameraStream;
+      try { await video.play(); } catch (err) {}
+    }
+
+    async function openInPageCamera() {
+      cameraFacing = "environment";
+      document.getElementById("modal-camera").classList.remove("hidden");
+      try {
+        await startCameraPreview();
+      } catch (err) {
+        closeCameraModal();
+        showToast("Camera needs permission — trying the device picker");
+        document.getElementById("photo-file-input").click();
+      }
+    }
+
+    async function captureCameraFrame() {
+      const video = document.getElementById("camera-preview");
+      if (!video || !video.videoWidth) {
+        showToast("Camera is still starting — try again");
+        return;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d").drawImage(video, 0, 0);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.92));
+      if (!blob) {
+        showToast("Could not capture the photo — please try again");
+        return;
+      }
+      const file = new File([blob], "worksheet.jpg", { type: "image/jpeg" });
+      closeCameraModal();
+      await handlePhotoFile(file);
+    }
+
     document.getElementById("btn-scan-photo").addEventListener("click", () => {
-      document.getElementById("photo-file-input").click();
+      if (needsInPageCamera()) openInPageCamera();
+      else document.getElementById("photo-file-input").click();
+    });
+
+    document.getElementById("btn-close-camera-modal").addEventListener("click", closeCameraModal);
+    document.getElementById("modal-camera").addEventListener("click", e => {
+      if (e.target.id === "modal-camera") closeCameraModal();
+    });
+    document.getElementById("btn-camera-flip").addEventListener("click", async () => {
+      cameraFacing = cameraFacing === "environment" ? "user" : "environment";
+      try {
+        await startCameraPreview();
+      } catch (err) {
+        showToast("Could not switch the camera");
+      }
+    });
+    document.getElementById("btn-camera-capture").addEventListener("click", () => {
+      captureCameraFrame();
     });
 
     document.getElementById("btn-upload-gallery").addEventListener("click", () => {
