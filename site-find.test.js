@@ -23,9 +23,9 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 40);
+  assert.equal(SiteFind.entries.length, 41);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 40);
+  assert.equal(new Set(paths).size, 41);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
   assert.equal(SiteFind.entries[28].title, "Paper 1 - Meaning from Context");
@@ -82,6 +82,13 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.entries[38].path, "classroom/");
   assert.equal(SiteFind.entries[39].title, "HCS Live Class");
   assert.equal(SiteFind.entries[39].path, "classroom/hcs-live-class/");
+  assert.equal(SiteFind.entries[40].title, "Play Your Way");
+  assert.equal(SiteFind.entries[40].path, "fun-projects/play-your-way/");
+  const playYourWay = SiteFind.entries.filter((entry) => entry.title === "Play Your Way");
+  assert.equal(playYourWay.length, 1);
+  assert.ok(SiteFind.search("play your way").some((entry) => entry.path === "fun-projects/play-your-way/"));
+  assert.ok(SiteFind.search("f1 grand prix").some((entry) => entry.path === "fun-projects/play-your-way/"));
+  assert.ok(SiteFind.search("自訂遊戲").some((entry) => entry.path === "fun-projects/play-your-way/"));
   assert.equal(SiteFind.search("paper 3 exam skills")[0].path, "learning-materials/paper-3-exam-skills/");
   assert.equal(SiteFind.search("listening skills")[0].title, "Paper 3 - Exam Skills");
   assert.equal(SiteFind.search("paper 4 exam skills")[0].path, "learning-materials/paper-4-exam-skills/");
@@ -475,10 +482,10 @@ test("subject pages self-host the school logo and link the home-screen icon", ()
   assert.match(blog, /src="\.\.\/\.\.\/\.\.\/assets\/logo\.png"/);
   assert.match(blog, /href="\.\.\/\.\.\/\.\.\/apple-touch-icon\.png"/);
   assert.match(blog, /href="\.\.\/\.\.\/\.\.\/site\.webmanifest"/);
-  assert.match(blog, /site-find\.js\?v=20261115a/);
+  assert.match(blog, /site-find\.js\?v=20261115b/);
   const hub = fs.readFileSync(new URL("./learning-materials/index.html", import.meta.url), "utf8");
   assert.match(hub, /src="\.\.\/assets\/logo\.png"/);
-  assert.match(hub, /site-find\.js\?v=20261115a/);
+  assert.match(hub, /site-find\.js\?v=20261115b/);
   const manifest = fs.readFileSync(new URL("./site.webmanifest", import.meta.url), "utf8");
   assert.match(manifest, /"short_name": "HCS English"/);
   assert.match(manifest, /"name": "HCS English"/);

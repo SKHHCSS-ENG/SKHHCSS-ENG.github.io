@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Play Your Way — Custom English Game Studio · SKH Holy Carpenter Secondary School</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5fafc;
+      --card: #ffffff;
+      --panel-alt: #f8fafc;
+      --border: #d3e8ef;
+      --border-strong: #b6d8e4;
+      --navy: #123a4d;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #5bbad5;
+      --accent-deep: #2a8fad;
+      --accent-ink: #0c5a70;
+      --accent-soft: #e8f7fb;
+      --f1-red: #e10600;
+      --f1-papaya: #ff8000;
+      --ok: #16a34a;
+      --ok-soft: #dcfce7;
+      --warn: #eab308;
+      --danger: #dc2626;
+      --radius: 16px;
+      --shadow: 0 6px 22px rgba(18, 58, 77, 0.08);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100dvh;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1.5px solid var(--border);
+      padding: max(10px, env(safe-area-inset-top)) 18px 10px;
+      box-shadow: 0 2px 10px rgba(18, 58, 77, 0.05);
+    }
+
+    .top-bar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .back-pill {
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s ease;
+    }
+
+    .back-pill:hover {
+      background: #d5eff7;
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy), var(--accent-deep));
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      box-shadow: 0 3px 10px rgba(18, 58, 77, 0.18);
+    }
+
+    .brand-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.28rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.01em;
+    }
+
+    .worker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--navy);
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+
+    .worker-pill:hover {
+      border-color: var(--accent-deep);
+    }
+
+    .worker-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--warn);
+      box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.25);
+      flex-shrink: 0;
+    }
+
+    .worker-dot.checking {
+      background: var(--warn);
+      animation: dotPulse 1.1s infinite ease-in-out;
+    }
+
+    .worker-dot.online {
+      background: var(--ok);
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25), 0 0 6px rgba(22, 163, 74, 0.65);
+    }
+
+    .worker-dot.offline {
+      background: var(--danger);
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.22);
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.88); }
+    }
+
+    .studio-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 16px calc(44px + env(safe-area-inset-bottom));
+    }
+
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.92fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .studio-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid #eef6f9;
+    }
+
+    .step-title-group {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent-deep);
+      color: #ffffff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.14rem;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    /* 4-SKILL MODE TABS (Vocabulary, Grammar, Reading, Proofreading) */
+    .skill-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .skill-tab {
+      background: var(--panel-alt);
+      color: var(--navy);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 8px 6px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.14s ease;
+      white-space: nowrap;
+    }
+
+    .skill-tab:hover {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+    }
+
+    .skill-tab.active {
+      background: var(--navy);
+      color: #ffffff;
+      border-color: var(--navy);
+      box-shadow: 0 4px 12px rgba(18, 58, 77, 0.18);
+    }
+
+    /* CAMERA / AI TOPIC BAR */
+    .scan-dropzone {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e8f7fb 100%);
+      border: 2px dashed var(--accent-deep);
+      border-radius: 14px;
+      padding: 13px 15px;
+      margin-bottom: 12px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .scan-dropzone.dragover {
+      background: #dcfce7;
+      border-color: var(--ok);
+    }
+
+    .scan-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .scan-info {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 190px;
+      flex: 1;
+    }
+
+    .scan-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .scan-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .scan-headline {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--navy);
+    }
+
+    .scan-sub {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .scan-btn {
+      background: linear-gradient(135deg, var(--navy), var(--accent-deep));
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 15px;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(18, 58, 77, 0.2);
+      transition: transform 0.14s ease;
+      white-space: nowrap;
+    }
+
+    .scan-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .scan-btn:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .ai-topic-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(42, 143, 173, 0.2);
+    }
+
+    .ai-topic-row.hidden {
+      display: none;
+    }
+
+    /* DROPDOWN & CONTROLS */
+    .pool-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--navy);
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .pool-select {
+      flex: 1;
+      min-width: 190px;
+      background: #1e293b;
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.26);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .pool-select option,
+    .pool-select optgroup {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .mini-btn {
+      background: #ffffff;
+      color: var(--navy);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.14s ease;
+    }
+
+    .mini-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent-deep);
+    }
+
+    .mini-btn.dark-btn {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .mini-btn.dark-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: #ffffff;
+    }
+
+    .mini-btn.danger-btn {
+      background: rgba(220, 38, 38, 0.2);
+      color: #fecaca;
+      border-color: rgba(248, 113, 113, 0.45);
+    }
+
+    .mini-btn.hidden {
+      display: none;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .meta-grid.single-col {
+      grid-template-columns: 1fr;
+    }
+
+    .field-box {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent-deep);
+      border-radius: 10px;
+      padding: 8px 11px;
+    }
+
+    .field-box.hidden {
+      display: none;
+    }
+
+    .field-label {
+      display: block;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.82rem;
+      color: var(--navy);
+      margin-bottom: 5px;
+    }
+
+    .text-input {
+      width: 100%;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 6px 9px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      background: #ffffff;
+      outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent-deep);
+    }
+
+    .seg-row {
+      display: flex;
+      gap: 5px;
+    }
+
+    .seg-btn {
+      flex: 1;
+      min-width: 44px;
+      background: #ffffff;
+      color: var(--ink);
+      border: 1.5px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 6px 10px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.14s ease;
+      text-align: center;
+    }
+
+    .seg-btn.selected {
+      background: var(--accent-deep);
+      color: #ffffff;
+      border-color: var(--accent-ink);
+    }
+
+    .format-hint {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-ink);
+      background: var(--accent-soft);
+      border-radius: 6px;
+      padding: 5px 9px;
+      margin-bottom: 7px;
+    }
+
+    .format-hint.hidden {
+      display: none;
+    }
+
+    .words-textarea {
+      width: 100%;
+      min-height: 122px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      background: #ffffff;
+      resize: vertical;
+      outline: none;
+      line-height: 1.45;
+    }
+
+    .words-textarea:focus {
+      border-color: var(--accent-deep);
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 12px;
+    }
+
+    .count-badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--ok-soft);
+      color: #15803d;
+      border-left: 3px solid var(--ok);
+    }
+
+    .count-badge.err {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-left-color: var(--danger);
+    }
+
+    /* PREVIEW PANEL (Audio Word Chips OR 3-Choice Question Cards) */
+    .chips-preview-wrap {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 195px;
+      overflow-y: auto;
+    }
+
+    .chips-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .word-chip {
+      background: #ffffff;
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--accent-deep);
+      border-radius: 7px;
+      padding: 4px 9px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+
+    .word-chip:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+    }
+
+    .mcq-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      width: 100%;
+    }
+
+    .mcq-preview-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-deep);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+    }
+
+    .mcq-preview-q {
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .mcq-preview-opts {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mcq-opt-tag {
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .mcq-opt-tag.correct {
+      background: var(--ok-soft);
+      color: #15803d;
+      font-weight: 800;
+    }
+
+    /* RIGHT COLUMN: GAME LAUNCHER */
+    .f1-game-card {
+      background: linear-gradient(150deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      border-top: 6px solid var(--f1-red);
+      border-bottom: 2px solid var(--f1-papaya);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.24);
+      margin-bottom: 14px;
+    }
+
+    .f1-kicker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .f1-kicker {
+      background: var(--f1-red);
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      font-style: italic;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 3px;
+    }
+
+    .f1-mode-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .f1-tag {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .f1-card-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.38rem;
+      margin: 4px 0 6px;
+      color: #ffffff;
+    }
+
+    .f1-card-desc {
+      font-size: 0.84rem;
+      color: #cbd5e1;
+      margin: 0 0 12px;
+    }
+
+    .f1-active-pack-box {
+      background: rgba(255, 255, 255, 0.08);
+      border-left: 4px solid var(--f1-papaya);
+      border-radius: 6px;
+      padding: 8px 11px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .launch-f1-btn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--f1-red), var(--f1-papaya));
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      border-radius: 9px;
+      padding: 13px 18px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.08rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 22px rgba(225, 6, 0, 0.36);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .launch-f1-btn:hover {
+      transform: translateY(-2px);
+      border-color: #ffffff;
+      box-shadow: 0 12px 28px rgba(225, 6, 0, 0.48);
+    }
+
+    .upcoming-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .upcoming-card {
+      background: var(--panel-alt);
+      border: 1.5px dashed var(--border-strong);
+      border-radius: 12px;
+      padding: 12px;
+      opacity: 0.82;
+    }
+
+    .upcoming-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+
+    .upcoming-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.94rem;
+      color: var(--navy);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.hidden {
+      display: none;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-top: 5px solid var(--accent-deep);
+      border-radius: 14px;
+      max-width: 480px;
+      width: 100%;
+      padding: 18px 20px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3);
+    }
+
+    .toast-banner {
+      position: fixed;
+      top: 66px;
+      right: 18px;
+      z-index: 90;
+      background: var(--navy);
+      color: #ffffff;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 9px 15px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.28);
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: all 0.18s ease;
+    }
+
+    .toast-banner.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 880px) {
+      .studio-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .skill-tabs { grid-template-columns: repeat(2, 1fr); }
+      .meta-grid { grid-template-columns: 1fr; }
+      .upcoming-grid { grid-template-columns: 1fr; }
+      .ai-topic-row { flex-direction: column; }
+      .text-input, .words-textarea, .pool-select { font-size: 16px; }
+      .studio-card { padding: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-cluster">
+        <button class="back-pill" id="btn-back-portal" type="button">← Fun Projects</button>
+        <div class="brand-title-wrap">
+          <span class="brand-icon">🎮</span>
+          <span class="brand-title">Play Your Way</span>
+        </div>
+      </div>
+
+      <button class="worker-pill" id="btn-worker-settings" type="button" title="Configure AI Photo Scanner Worker">
+        <span class="worker-dot checking" id="worker-dot"></span>
+        <span id="worker-status-label">Checking Scanner…</span>
+        <span>⚙️</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN 2-STEP STUDIO -->
+  <main class="studio-wrap">
+    <div class="studio-grid">
+
+      <!-- STEP 1: MULTI-SKILL CONTENT BUILDER -->
+      <section class="studio-card">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="step-num">1</span>
+            <h2 class="step-title">Choose Skill & Build Your Pack</h2>
+          </div>
+          <div class="seg-row" id="accent-row">
+            <button class="seg-btn selected" data-lang="en-GB" type="button">UK</button>
+            <button class="seg-btn" data-lang="en-US" type="button">US</button>
+            <button class="seg-btn" data-lang="en-AU" type="button">AU</button>
+          </div>
+        </div>
+
+        <!-- 4 Skill Mode Tabs -->
+        <div class="skill-tabs" id="skill-tabs">
+          <button class="skill-tab active" data-mode="vocab" type="button">🎧 Vocabulary</button>
+          <button class="skill-tab" data-mode="grammar" type="button">🧩 Grammar</button>
+          <button class="skill-tab" data-mode="reading" type="button">📖 Reading</button>
+          <button class="skill-tab" data-mode="proofread" type="button">✏️ Proofreading</button>
+        </div>
+
+        <!-- Photo / AI Topic Scanner -->
+        <div class="scan-dropzone" id="scan-dropzone">
+          <div class="scan-top-row">
+            <div class="scan-info">
+              <div class="scan-thumb" id="scan-thumb">📷</div>
+              <div>
+                <div class="scan-headline" id="scan-headline">Snap a Vocabulary List or Worksheet</div>
+                <div class="scan-sub" id="scan-subtext">AI strips numbers, Chinese meanings & example sentences automatically</div>
+              </div>
+            </div>
+            <input type="file" id="photo-file-input" accept="image/*" capture="environment" style="display:none;" />
+            <button class="scan-btn" id="btn-scan-photo" type="button">📷 Take / Upload Photo</button>
+          </div>
+
+          <div class="ai-topic-row hidden" id="ai-topic-row">
+            <input class="text-input" id="ai-topic-input" type="text" placeholder="Or type a grammar topic / paste a short passage for AI to generate questions..." />
+            <button class="scan-btn" id="btn-ai-topic-gen" type="button" style="padding:8px 14px;">✨ AI Generate</button>
+          </div>
+        </div>
+
+        <!-- Preset & Saved Packs Dropdown -->
+        <div class="pool-bar">
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.86rem; color:#7dd3fc; white-space:nowrap;">📚 Pack</span>
+          <select class="pool-select" id="pool-select"></select>
+          <button class="mini-btn dark-btn" id="btn-new-set" type="button">➕ New</button>
+          <button class="mini-btn danger-btn hidden" id="btn-delete-set" type="button">🗑 Delete</button>
+        </div>
+
+        <!-- Title & Wrong-Gate Option (Wrong-Gate toggle only needed in Vocab mode) -->
+        <div class="meta-grid" id="meta-grid">
+          <div class="field-box">
+            <label class="field-label" for="input-set-title">🏷️ Pack Name</label>
+            <input class="text-input" id="input-set-title" type="text" maxlength="32" value="S2 Social Media" />
+          </div>
+          <div class="field-box" id="dmode-field-box">
+            <span class="field-label">🎯 Wrong-Gate Words</span>
+            <div class="seg-row" id="dmode-row">
+              <button class="seg-btn selected" data-dmode="mix" type="button">Close Words</button>
+              <button class="seg-btn" data-dmode="pool" type="button">My Words Only</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="format-hint hidden" id="mcq-format-hint">
+          One question per line: <code>Prompt | Correct Answer | Wrong 1 | Wrong 2 | Optional Explanation</code>
+        </div>
+
+        <!-- Editable Content Box -->
+        <textarea class="words-textarea" id="input-words" placeholder="Type or paste words (comma or new line, min 3)..."></textarea>
+
+        <div class="status-row">
+          <span class="count-badge" id="word-count-badge">18 words ready</span>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="mini-btn hidden" id="btn-add-sample-q" type="button">➕ Sample Row</button>
+            <button class="mini-btn" id="btn-save-custom" type="button">💾 Save Pack</button>
+            <button class="mini-btn" id="btn-copy-share" type="button">🔗 Copy Share Link</button>
+          </div>
+        </div>
+
+        <!-- Live Preview (Word Audio Chips OR 3-Choice Question Cards) -->
+        <div class="chips-preview-wrap">
+          <div class="chips-header">
+            <span id="preview-header-label">🎧 Tap any word to test pronunciation</span>
+            <span id="chips-count-note">18 items</span>
+          </div>
+          <div class="chips-grid" id="chips-grid"></div>
+        </div>
+      </section>
+
+      <!-- STEP 2: PICK A GAME & LAUNCH -->
+      <section class="studio-card">
+        <div class="step-header">
+          <div class="step-title-group">
+            <span class="step-num">2</span>
+            <h2 class="step-title">Choose a Game & Play</h2>
+          </div>
+          <span style="font-size:0.76rem; font-weight:800; color:var(--accent-deep);">Vocab · Grammar · Reading · Proofread</span>
+        </div>
+
+        <!-- Featured Game #1: F1 Grand Prix -->
+        <div class="f1-game-card">
+          <div class="f1-kicker-row">
+            <span class="f1-kicker">FEATURED 3D GAME</span>
+            <div class="f1-mode-tags">
+              <span class="f1-tag">📱 1P Mobile & PC</span>
+              <span class="f1-tag">⚡ 2P Split Screen</span>
+              <span class="f1-tag">All 4 Skills</span>
+            </div>
+          </div>
+          <h3 class="f1-card-title">🏎️ F1 Grand Prix: Team Radio Race</h3>
+          <p class="f1-card-desc" id="f1-dynamic-desc">Plays Team Radio audio for Vocabulary packs, or displays sentence & passage prompts in the top broadcast bar for Grammar, Reading, and Proofreading packs.</p>
+
+          <div class="f1-active-pack-box">
+            <span>📚 Active Pack: <strong id="launch-pool-summary" style="color:#ff8000;">S2 Social Media (18 words)</strong></span>
+            <span id="launch-mode-summary" style="color:#94a3b8; font-size:0.74rem;">Vocabulary · Close Words</span>
+          </div>
+
+          <button class="launch-f1-btn" id="btn-launch-f1" type="button">
+            🚦 Launch F1 Grand Prix →
+          </button>
+        </div>
+
+        <!-- Expansion Slots -->
+        <div style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--muted); margin: 14px 0 8px;">More Games Joining Soon</div>
+        <div class="upcoming-grid">
+          <div class="upcoming-card">
+            <span class="upcoming-badge">Next Up · 3D Runner</span>
+            <div class="upcoming-title">🪂 Sky Glider 3-Lane</div>
+          </div>
+          <div class="upcoming-card">
+            <span class="upcoming-badge">Next Up · Arcade</span>
+            <div class="upcoming-title">👾 Arena Survivor</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- WORKER SETTINGS MODAL -->
+  <div class="modal-backdrop hidden" id="modal-worker">
+    <div class="modal-box">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+        <span style="font-family:'Fredoka',sans-serif; font-size:1.08rem; color:var(--navy);">⚙️ AI Scanner & Generator Endpoint</span>
+        <button class="mini-btn" id="btn-close-worker-modal" type="button">✖ Close</button>
+      </div>
+      <label class="field-label" for="worker-url-input">Cloudflare Worker URL</label>
+      <input class="text-input" id="worker-url-input" type="url" value="https://play-your-way.skhhcss-eng.workers.dev" style="margin-bottom:12px;" />
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button class="mini-btn" id="btn-reset-worker-url" type="button">Reset Default</button>
+        <button class="scan-btn" id="btn-save-worker-url" type="button" style="padding:8px 14px;">Save & Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-banner" id="toast-banner">Saved!</div>
+
+  <script>
+    const DEFAULT_WORKER_URL = "https://play-your-way.skhhcss-eng.workers.dev";
+    const STORAGE_KEY_POOLS = "f1_gp_custom_word_pools_v1";
+    const STORAGE_KEY_PYW_ACTIVE = "skhhcss_play_your_way_active_v1";
+    const STORAGE_KEY_WORKER_URL = "skhhcss_pyw_worker_url";
+
+    const ALL_PRESET_PACKS = [
+      {
+        id: "__preset_s2_media__",
+        mode: "vocab",
+        packType: "vocab",
+        title: "S2 Social Media",
+        words: [
+          "blog", "magazine", "podcast", "television", "discussion forum", "newspaper",
+          "social network", "vlog", "comment", "emoji", "filter", "hashtag",
+          "influencer", "like", "meme", "post", "share", "subscribe"
+        ]
+      },
+      {
+        id: "__preset_confusables__",
+        mode: "vocab",
+        packType: "vocab",
+        title: "Secondary Sound-Alikes & Confusables",
+        words: [
+          "accept", "except", "expect", "quiet", "quite", "quit",
+          "advice", "advise", "weather", "whether", "breath", "breathe",
+          "loose", "lose", "desert", "dessert", "affect", "effect"
+        ]
+      },
+      {
+        id: "__preset_dse_env__",
+        mode: "vocab",
+        packType: "vocab",
+        title: "HKDSE Environment & Green Living",
+        words: [
+          "pollution", "population", "sustainable", "renewable", "emissions", "conservation",
+          "recycling", "biodiversity", "consumption", "legislation", "awareness", "ecosystem",
+          "drought", "habitat", "disposable", "climate", "wildlife", "shortage"
+        ]
+      },
+      {
+        id: "__preset_dse_tech__",
+        mode: "vocab",
+        packType: "vocab",
+        title: "HKDSE Technology & Digital Life",
+        words: [
+          "algorithm", "artificial", "automation", "innovation", "privacy", "virtual",
+          "addiction", "authentic", "broadcast", "digital", "device", "efficient",
+          "accurate", "reliable", "network", "security", "platform", "database"
+        ]
+      },
+      ...[
+      {
+            "id": "__preset_gram_connectives__",
+            "mode": "grammar",
+            "packType": "mcq",
+            "title": "S2 Connectives (because / so / although / but)",
+            "questions": [
+                  {
+                        "prompt": "I love watching short Reels _______ they are funny and relaxing.",
+                        "options": [
+                              "because",
+                              "so",
+                              "although"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Use 'because' to introduce a reason."
+                  },
+                  {
+                        "prompt": "My phone battery was very low, _______ I plugged in my charger.",
+                        "options": [
+                              "because",
+                              "so",
+                              "although"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Use 'so' to show the result."
+                  },
+                  {
+                        "prompt": "_______ mobile games are exciting, I do not play late at night.",
+                        "options": [
+                              "Because",
+                              "So",
+                              "Although"
+                        ],
+                        "answerIndex": 2,
+                        "explanation": "Use 'Although' to show contrast between two ideas."
+                  },
+                  {
+                        "prompt": "Ken wanted to upload his vlog, _______ the school Wi-Fi was down.",
+                        "options": [
+                              "because",
+                              "but",
+                              "although"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Use 'but' after a comma to join two contrasting clauses."
+                  },
+                  {
+                        "prompt": "We created a class group chat _______ we can share homework reminders.",
+                        "options": [
+                              "so",
+                              "although",
+                              "but"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Use 'so' to express purpose or result."
+                  },
+                  {
+                        "prompt": "_______ Leo was tired after basketball, he finished his English essay.",
+                        "options": [
+                              "So",
+                              "Although",
+                              "Because"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'Although' contrasts being tired with finishing his work."
+                  },
+                  {
+                        "prompt": "Mandy muted her notifications _______ she needed to focus on revision.",
+                        "options": [
+                              "so",
+                              "but",
+                              "because"
+                        ],
+                        "answerIndex": 2,
+                        "explanation": "Needing to focus is the reason she muted notifications."
+                  },
+                  {
+                        "prompt": "The cafe was crowded, _______ we ordered takeaway bubble tea instead.",
+                        "options": [
+                              "so",
+                              "because",
+                              "although"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "'so' introduces what we did as a result."
+                  },
+                  {
+                        "prompt": "I follow this science channel _______ the experiments are easy to understand.",
+                        "options": [
+                              "although",
+                              "because",
+                              "so"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'because' explains why I follow the channel."
+                  },
+                  {
+                        "prompt": "_______ the new tablet is expensive, many designers still buy it.",
+                        "options": [
+                              "Because",
+                              "So",
+                              "Although"
+                        ],
+                        "answerIndex": 2,
+                        "explanation": "'Although' contrasts the high price with people still buying it."
+                  },
+                  {
+                        "prompt": "Jason forgot his umbrella, _______ he got wet in the heavy rain.",
+                        "options": [
+                              "so",
+                              "because",
+                              "although"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Getting wet is the result of forgetting his umbrella."
+                  },
+                  {
+                        "prompt": "I like reading online news, _______ my grandfather prefers printed newspapers.",
+                        "options": [
+                              "because",
+                              "but",
+                              "so"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'but' contrasts my habit with my grandfather's preference."
+                  }
+            ]
+      },
+      {
+            "id": "__preset_gram_cond1__",
+            "mode": "grammar",
+            "packType": "mcq",
+            "title": "S2 Conditional Sentences Type 1",
+            "questions": [
+                  {
+                        "prompt": "If it _______ tomorrow, we will move our basketball match indoors.",
+                        "options": [
+                              "rains",
+                              "will rain",
+                              "rained"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "In Type 1 conditionals, use Simple Present ('rains') after 'If'."
+                  },
+                  {
+                        "prompt": "If you sleep early tonight, you _______ fresh for tomorrow's quiz.",
+                        "options": [
+                              "feel",
+                              "will feel",
+                              "felt"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Use 'will + base verb' in the main result clause."
+                  },
+                  {
+                        "prompt": "She will miss the school bus if she _______ up right now.",
+                        "options": [
+                              "does not get",
+                              "will not get",
+                              "did not get"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "After 'if', use Simple Present ('does not get'), never 'will'."
+                  },
+                  {
+                        "prompt": "If we _______ reusable bottles, we will cut down plastic waste.",
+                        "options": [
+                              "will bring",
+                              "brought",
+                              "bring"
+                        ],
+                        "answerIndex": 2,
+                        "explanation": "'we' takes the base Simple Present verb 'bring' in the if-clause."
+                  },
+                  {
+                        "prompt": "Tom _______ better marks if he checks his verb tenses carefully.",
+                        "options": [
+                              "gets",
+                              "will get",
+                              "got"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "The result clause uses 'will get'."
+                  },
+                  {
+                        "prompt": "If my cat _______ hungry, she meows beside her food bowl.",
+                        "options": [
+                              "will be",
+                              "were",
+                              "is"
+                        ],
+                        "answerIndex": 2,
+                        "explanation": "Singular subject 'my cat' takes 'is' in the if-clause."
+                  },
+                  {
+                        "prompt": "What _______ you do if the library is full after school?",
+                        "options": [
+                              "will",
+                              "do",
+                              "did"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Questions about a future Type 1 result use 'What will you do...?'"
+                  },
+                  {
+                        "prompt": "If Leo practises speaking every day, his fluency _______ quickly.",
+                        "options": [
+                              "improves",
+                              "will improve",
+                              "improved"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Use 'will + base verb' ('will improve') for the likely future result."
+                  },
+                  {
+                        "prompt": "We will call you immediately if the ferry schedule _______.",
+                        "options": [
+                              "changes",
+                              "will change",
+                              "change"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Singular 'schedule' needs 'changes' in the if-clause."
+                  },
+                  {
+                        "prompt": "If you _______ the link carefully, you will avoid phishing scams.",
+                        "options": [
+                              "will check",
+                              "check",
+                              "checked"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Use Simple Present 'check' after 'If you'."
+                  },
+                  {
+                        "prompt": "The teacher _______ pleased if everyone submits the project on time.",
+                        "options": [
+                              "is",
+                              "was",
+                              "will be"
+                        ],
+                        "answerIndex": 2,
+                        "explanation": "Use 'will be' in the result clause."
+                  },
+                  {
+                        "prompt": "If they _______ the MTR now, they will arrive at Kai Tak before six.",
+                        "options": [
+                              "take",
+                              "takes",
+                              "will take"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "'they' takes base verb 'take' in the if-clause."
+                  }
+            ]
+      },
+      {
+            "id": "__preset_read_screen__",
+            "mode": "reading",
+            "packType": "mcq",
+            "title": "Reading Check: Smart Screen Habits",
+            "questions": [
+                  {
+                        "prompt": "'Many teens scroll through videos late at night. This habit harms their sleep.' What does 'This habit' refer to?",
+                        "options": [
+                              "Scrolling late at night",
+                              "Waking up early",
+                              "Doing sports"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "'This habit' points back to scrolling through videos late at night."
+                  },
+                  {
+                        "prompt": "'Blue light from phone screens suppresses melatonin, making it harder to fall asleep.' Here, 'suppresses' is closest in meaning to:",
+                        "options": [
+                              "reduces",
+                              "celebrates",
+                              "brightens"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "If it makes sleeping harder, phone light 'reduces' or blocks melatonin."
+                  },
+                  {
+                        "prompt": "'Instead of banning phones completely, Dr Chan recommends a 30-minute digital sunset before bed.' What is Dr Chan's attitude?",
+                        "options": [
+                              "Balanced and practical",
+                              "Angry and strict",
+                              "Careless"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Recommending a realistic 30-minute break rather than a total ban is balanced."
+                  },
+                  {
+                        "prompt": "'Students who Charge their phones outside the bedroom report deeper rest.' Why put the phone outside?",
+                        "options": [
+                              "To avoid late-night checking",
+                              "To charge the battery faster",
+                              "To wake the neighbours"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Keeping the phone out of reach prevents tempting late-night notifications."
+                  },
+                  {
+                        "prompt": "'Short study breaks away from screens refresh tired eyes. They also boost memory.' What does 'They' refer to?",
+                        "options": [
+                              "Tired eyes",
+                              "Short screen-free breaks",
+                              "Phone screens"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'They' refers to 'Short study breaks away from screens'."
+                  },
+                  {
+                        "prompt": "'Even silent notifications can fracture a student's concentration during revision.' Here, 'fracture' means:",
+                        "options": [
+                              "break",
+                              "strengthen",
+                              "measure"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "'fracture' means to break or interrupt focus."
+                  },
+                  {
+                        "prompt": "'Turning off autoplay stops one five-minute clip from turning into two hours.' What problem does autoplay cause?",
+                        "options": [
+                              "Unplanned binge-watching",
+                              "Broken headphones",
+                              "Slower Wi-Fi"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Turning 5 minutes into 2 hours describes unintended binge-watching."
+                  },
+                  {
+                        "prompt": "'Audio podcasts let commuters rest their eyes while still learning something new.' What is the main benefit mentioned?",
+                        "options": [
+                              "Eye-free learning on the go",
+                              "Cheaper train tickets",
+                              "Faster typing speed"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Listeners can rest their eyes and learn during transit."
+                  },
+                  {
+                        "prompt": "'Apps compete fiercely for teenagers' attention—the most valuable resource online.' What is called 'the most valuable resource'?",
+                        "options": [
+                              "Teenagers' attention",
+                              "Mobile data plans",
+                              "Phone cases"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "The dash directly defines 'teenagers' attention' as that resource."
+                  },
+                  {
+                        "prompt": "'Setting a daily app timer gives users a gentle nudge when time is up.' A 'gentle nudge' means:",
+                        "options": [
+                              "A polite reminder",
+                              "A loud punishment",
+                              "A broken screen"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "A 'gentle nudge' is a soft, helpful reminder."
+                  },
+                  {
+                        "prompt": "'Face-to-face meals build stronger family bonds than eating silently beside glowing screens.' What is the writer suggesting?",
+                        "options": [
+                              "Put phones away at mealtimes",
+                              "Eat dinner alone",
+                              "Buy brighter screens"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "The contrast supports screen-free family meals."
+                  },
+                  {
+                        "prompt": "'Digital balance is not about quitting technology; it is about staying in the driver's seat.' 'In the driver's seat' means:",
+                        "options": [
+                              "In control",
+                              "Inside a bus",
+                              "Running late"
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Idiomatically, being 'in the driver's seat' means being in control."
+                  }
+            ]
+      },
+      {
+            "id": "__preset_proof_hk__",
+            "mode": "proofread",
+            "packType": "mcq",
+            "title": "Proofreading: Common HK Student Traps",
+            "questions": [
+                  {
+                        "prompt": "Spot the mistake: [A] Last night, [B] Jason go to [C] Mong Kok with his cousins.",
+                        "options": [
+                              "[A] Last night,",
+                              "[B] Jason go to",
+                              "[C] Mong Kok with his cousins."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'Last night' requires Simple Past: change 'go' to 'went'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] One of my classmates [B] have won [C] the inter-school speech prize.",
+                        "options": [
+                              "[A] One of my classmates",
+                              "[B] have won",
+                              "[C] the inter-school speech prize."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "The subject is 'One' (singular), so 'have won' should be 'has won'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] Although it rained heavily, [B] but the runners [C] finished the race.",
+                        "options": [
+                              "[A] Although it rained heavily,",
+                              "[B] but the runners",
+                              "[C] finished the race."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Never use 'Although' and 'but' together in the same sentence—remove 'but'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] My teacher gave me [B] many useful advices [C] before the oral exam.",
+                        "options": [
+                              "[A] My teacher gave me",
+                              "[B] many useful advices",
+                              "[C] before the oral exam."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'Advice' is uncountable—use 'much useful advice' or 'useful pieces of advice'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] Students should listen [B] on their groupmates [C] patiently during discussions.",
+                        "options": [
+                              "[A] Students should listen",
+                              "[B] on their groupmates",
+                              "[C] patiently during discussions."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "The verb 'listen' takes the preposition 'to' ('listen to'), not 'on'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] Everybody in the hall [B] were clapping [C] for the band.",
+                        "options": [
+                              "[A] Everybody in the hall",
+                              "[B] were clapping",
+                              "[C] for the band."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'Everybody' is grammatically singular—change 'were' to 'was'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] We look forward [B] to visit [C] the science museum next Friday.",
+                        "options": [
+                              "[A] We look forward",
+                              "[B] to visit",
+                              "[C] the science museum next Friday."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "'look forward to' is followed by a gerund (-ing): 'to visiting'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] Chloe is very [B] interesting in [C] wildlife photography.",
+                        "options": [
+                              "[A] Chloe is very",
+                              "[B] interesting in",
+                              "[C] wildlife photography."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Use '-ed' for a person's feeling: 'interested in', not 'interesting in'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] Because the MTR was delayed, [B] so I arrived [C] ten minutes late.",
+                        "options": [
+                              "[A] Because the MTR was delayed,",
+                              "[B] so I arrived",
+                              "[C] ten minutes late."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Do not pair 'Because' and 'so' in one sentence—remove 'so'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] Can you tell me [B] where is [C] the nearest post office?",
+                        "options": [
+                              "[A] Can you tell me",
+                              "[B] where is",
+                              "[C] the nearest post office?"
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "Embedded questions use statement word order: 'where the nearest post office is'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] My younger brother [B] enjoys to play [C] basketball after school.",
+                        "options": [
+                              "[A] My younger brother",
+                              "[B] enjoys to play",
+                              "[C] basketball after school."
+                        ],
+                        "answerIndex": 1,
+                        "explanation": "The verb 'enjoy' takes an -ing verb: 'enjoys playing'."
+                  },
+                  {
+                        "prompt": "Spot the mistake: [A] There have [B] three new cafes [C] near our school.",
+                        "options": [
+                              "[A] There have",
+                              "[B] three new cafes",
+                              "[C] near our school."
+                        ],
+                        "answerIndex": 0,
+                        "explanation": "Existential sentences use 'There are', never 'There have'."
+                  }
+            ]
+      }
+]
+    ];
+
+    const MODE_CONFIG = {
+      vocab: {
+        label: "Vocabulary",
+        headline: "Snap a Vocabulary List or Worksheet",
+        sub: "AI strips item numbers, Chinese meanings & example sentences automatically",
+        placeholder: "Type or paste target words (comma or new line, min 3)..."
+      },
+      grammar: {
+        label: "Grammar",
+        headline: "Snap a Grammar Exercise or Notes Page",
+        sub: "AI generates 3-choice (A/B/C) fill-in-the-blank sentences from your photo or topic",
+        topicPlaceholder: "Or type a grammar focus (e.g. S2 Past Continuous vs Simple Past)...",
+        placeholder: "Prompt with _______ | Correct Answer | Wrong 1 | Wrong 2 | Optional Explanation"
+      },
+      reading: {
+        label: "Reading",
+        headline: "Snap a Textbook Passage or Article",
+        sub: "AI builds 3-choice comprehension, vocab-in-context & reference questions",
+        topicPlaceholder: "Or paste a short paragraph here to generate reading questions...",
+        placeholder: "Reading Question | Correct Answer | Wrong 1 | Wrong 2 | Optional Explanation"
+      },
+      proofread: {
+        label: "Proofreading",
+        headline: "Snap a Student Writing Draft or Exercise",
+        sub: "AI builds [A] / [B] / [C] error-spotting sentences for racing gates",
+        topicPlaceholder: "Or type common errors to target (e.g. Subject-verb agreement & tenses)...",
+        placeholder: "Spot the mistake: [A] ... [B] ... [C] ... | Error Segment (e.g. [B] ...) | Correct Segment 1 | Correct Segment 2 | Fix Note"
+      }
+    };
+
+    let savedCustomPacks = [];
+    let currentMode = "vocab";
+    let selectedId = ALL_PRESET_PACKS[0].id;
+    let distractorMode = "mix";
+    let speechLang = "en-GB";
+    let workerUrl = DEFAULT_WORKER_URL;
+    let toastTimer = null;
+
+    function showToast(msg) {
+      const el = document.getElementById("toast-banner");
+      el.textContent = msg;
+      el.classList.add("show");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove("show"), 2300);
+    }
+
+    function parseWords(raw) {
+      const parts = String(raw || "").split(/[\n,;|]+/);
+      const seen = new Set();
+      const out = [];
+      parts.forEach(p => {
+        const clean = p.trim().replace(/\s+/g, " ");
+        if (clean.length > 0 && clean.length <= 40) {
+          const k = clean.toLowerCase();
+          if (!seen.has(k)) {
+            seen.add(k);
+            out.push(clean);
+          }
+        }
+      });
+      return out;
+    }
+
+    function parseMcqLines(raw, modeName) {
+      const lines = String(raw || "").split(/\n+/);
+      const out = [];
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.includes("|")) return;
+        const cols = trimmed.split("|").map(c => c.trim()).filter(Boolean);
+        if (cols.length >= 4) {
+          const prompt = cols[0];
+          const right = cols[1];
+          const w1 = cols[2];
+          const w2 = cols[3];
+          const explanation = cols[4] || ("Answer: " + right);
+          let options = [right, w1, w2];
+          let answerIndex = 0;
+          if (/\[A\]/.test(prompt)) {
+            const sorted = [right, w1, w2].slice().sort((a, b) => a.localeCompare(b));
+            options = sorted;
+            answerIndex = Math.max(0, sorted.indexOf(right));
+          }
+          out.push({ prompt, options, answerIndex, explanation, mode: modeName });
+        }
+      });
+      return out;
+    }
+
+    function formatMcqLines(questions) {
+      return (questions || []).map(q => {
+        const right = q.options[q.answerIndex];
+        const wrongs = q.options.filter((_, idx) => idx !== q.answerIndex);
+        return [q.prompt, right, wrongs[0] || "Option B", wrongs[1] || "Option C", q.explanation || ""].filter(Boolean).join(" | ");
+      }).join("\n");
+    }
+
+    function findPreset(id) {
+      return ALL_PRESET_PACKS.find(p => p.id === id) || null;
+    }
+
+    function loadStorage() {
+      try {
+        const w = localStorage.getItem(STORAGE_KEY_WORKER_URL);
+        if (w && w.startsWith("https://")) workerUrl = w.replace(/\/+$/, "");
+      } catch (e) {}
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_POOLS);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) savedCustomPacks = parsed;
+        }
+      } catch (e) {}
+    }
+
+    function saveCustomPacksToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_POOLS, JSON.stringify(savedCustomPacks.slice(0, 20)));
+      } catch (e) {}
+    }
+
+    function speakText(text) {
+      if (!("speechSynthesis" in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text.replace(/_{2,}/g, " blank "));
+        u.lang = speechLang;
+        u.rate = 0.92;
+        const voices = window.speechSynthesis.getVoices() || [];
+        const match = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(speechLang.toLowerCase())) ||
+                      voices.find(v => v.lang && v.lang.toLowerCase().startsWith("en"));
+        if (match) u.voice = match;
+        window.speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+
+    function buildCurrentPackObject() {
+      const title = (document.getElementById("input-set-title").value || "Custom Pack").trim() || "Custom Pack";
+      const preset = findPreset(selectedId);
+      const raw = document.getElementById("input-words").value;
+
+      if (currentMode === "vocab") {
+        const words = parseWords(raw);
+        if (words.length < 3) return null;
+        return {
+          id: preset ? null : (selectedId === "new" ? "pyw_hub_vocab" : selectedId),
+          presetId: preset && words.join("|") === (preset.words || []).join("|") ? preset.id : null,
+          packType: "vocab",
+          mode: "vocab",
+          title,
+          words,
+          dmode: distractorMode,
+          updatedAt: Date.now()
+        };
+      } else {
+        const questions = parseMcqLines(raw, currentMode);
+        if (questions.length < 1) return null;
+        return {
+          id: preset ? null : (selectedId === "new" ? "pyw_hub_mcq" : selectedId),
+          presetId: preset && formatMcqLines(preset.questions) === formatMcqLines(questions) ? preset.id : null,
+          packType: "mcq",
+          mode: currentMode,
+          title,
+          questions,
+          updatedAt: Date.now()
+        };
+      }
+    }
+
+    function persistActivePack() {
+      const pack = buildCurrentPackObject();
+      if (pack) {
+        try { localStorage.setItem(STORAGE_KEY_PYW_ACTIVE, JSON.stringify(pack)); } catch (e) {}
+      }
+      return pack;
+    }
+
+    function syncModeUI() {
+      const cfg = MODE_CONFIG[currentMode] || MODE_CONFIG.vocab;
+      document.querySelectorAll("#skill-tabs .skill-tab").forEach(t => {
+        t.classList.toggle("active", t.getAttribute("data-mode") === currentMode);
+      });
+
+      document.getElementById("scan-headline").textContent = cfg.headline;
+      document.getElementById("scan-subtext").textContent = cfg.sub;
+      document.getElementById("input-words").placeholder = cfg.placeholder;
+
+      const isVocab = currentMode === "vocab";
+      document.getElementById("dmode-field-box").classList.toggle("hidden", !isVocab);
+      document.getElementById("meta-grid").classList.toggle("single-col", !isVocab);
+      document.getElementById("mcq-format-hint").classList.toggle("hidden", isVocab);
+      document.getElementById("btn-add-sample-q").classList.toggle("hidden", isVocab);
+
+      const topicRow = document.getElementById("ai-topic-row");
+      topicRow.classList.toggle("hidden", isVocab);
+      if (!isVocab) {
+        document.getElementById("ai-topic-input").placeholder = cfg.topicPlaceholder;
+      }
+    }
+
+    function renderDropdown() {
+      const sel = document.getElementById("pool-select");
+      sel.innerHTML = "";
+
+      const modePresets = ALL_PRESET_PACKS.filter(p => p.mode === currentMode);
+      if (modePresets.length > 0) {
+        const g1 = document.createElement("optgroup");
+        g1.label = "📌 Built-in " + MODE_CONFIG[currentMode].label + " Presets";
+        modePresets.forEach(p => {
+          const o = document.createElement("option");
+          o.value = p.id;
+          const unit = p.packType === "mcq" ? (p.questions.length + " Qs") : (p.words.length + " words");
+          o.textContent = p.title + " (" + unit + ")";
+          g1.appendChild(o);
+        });
+        sel.appendChild(g1);
+      }
+
+      const modeCustom = savedCustomPacks.filter(cp => (cp.mode || (cp.packType === "mcq" ? "grammar" : "vocab")) === currentMode);
+      if (modeCustom.length > 0) {
+        const g2 = document.createElement("optgroup");
+        g2.label = "⭐ Saved Custom " + MODE_CONFIG[currentMode].label + " Packs";
+        modeCustom.forEach(cp => {
+          const o = document.createElement("option");
+          o.value = cp.id;
+          const unit = cp.packType === "mcq" ? ((cp.questions || []).length + " Qs") : ((cp.words || []).length + " words");
+          o.textContent = cp.title + " (" + unit + ")";
+          g2.appendChild(o);
+        });
+        sel.appendChild(g2);
+      }
+
+      const newOpt = document.createElement("option");
+      newOpt.value = "new";
+      newOpt.textContent = "➕ Create New " + MODE_CONFIG[currentMode].label + " Pack...";
+      sel.appendChild(newOpt);
+
+      sel.value = selectedId;
+      if (sel.value !== selectedId) {
+        selectedId = modePresets.length > 0 ? modePresets[0].id : "new";
+        sel.value = selectedId;
+      }
+
+      const isSavedCustom = !findPreset(selectedId) && selectedId !== "new";
+      document.getElementById("btn-delete-set").classList.toggle("hidden", !isSavedCustom);
+    }
+
+    function renderPreviewAndLaunchSummary() {
+      const badge = document.getElementById("word-count-badge");
+      const title = (document.getElementById("input-set-title").value || "Custom Pack").trim() || "Custom Pack";
+      const grid = document.getElementById("chips-grid");
+      grid.innerHTML = "";
+
+      if (currentMode === "vocab") {
+        const words = parseWords(document.getElementById("input-words").value);
+        document.getElementById("preview-header-label").textContent = "🎧 Tap any word to test pronunciation";
+        document.getElementById("chips-count-note").textContent = words.length + " words";
+
+        if (words.length < 3) {
+          badge.textContent = words.length + " / 3 minimum words needed";
+          badge.classList.add("err");
+        } else {
+          badge.textContent = words.length + " words ready";
+          badge.classList.remove("err");
+        }
+
+        words.forEach(w => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "word-chip";
+          chip.innerHTML = "<span>" + w.replace(/</g, "&lt;") + "</span><span>🔊</span>";
+          chip.addEventListener("click", () => speakText(w));
+          grid.appendChild(chip);
+        });
+
+        document.getElementById("launch-pool-summary").textContent = title + " (" + words.length + " words)";
+        document.getElementById("launch-mode-summary").textContent =
+          "Vocabulary · " + (distractorMode === "pool" ? "My Words Only" : "Close Words");
+      } else {
+        const questions = parseMcqLines(document.getElementById("input-words").value, currentMode);
+        document.getElementById("preview-header-label").textContent = "🎯 3-Choice Gate Preview (Tap 🔊 to hear)";
+        document.getElementById("chips-count-note").textContent = questions.length + " Qs";
+
+        if (questions.length < 1) {
+          badge.textContent = "Add at least 1 question line (Prompt | Correct | Wrong 1 | Wrong 2)";
+          badge.classList.add("err");
+        } else {
+          badge.textContent = questions.length + " " + MODE_CONFIG[currentMode].label.toLowerCase() + " questions ready";
+          badge.classList.remove("err");
+        }
+
+        const listWrap = document.createElement("div");
+        listWrap.className = "mcq-preview-list";
+        questions.forEach((q, idx) => {
+          const card = document.createElement("div");
+          card.className = "mcq-preview-card";
+          const qTop = document.createElement("div");
+          qTop.className = "mcq-preview-q";
+          qTop.style.display = "flex";
+          qTop.style.justifyContent = "space-between";
+          qTop.style.gap = "8px";
+          qTop.innerHTML = "<span>Q" + (idx + 1) + ". " + q.prompt.replace(/</g, "&lt;") + "</span>";
+
+          const spk = document.createElement("button");
+          spk.type = "button";
+          spk.className = "mini-btn";
+          spk.style.padding = "2px 7px";
+          spk.style.fontSize = "0.72rem";
+          spk.textContent = "🔊";
+          spk.addEventListener("click", () => speakText(q.prompt));
+          qTop.appendChild(spk);
+
+          const optsRow = document.createElement("div");
+          optsRow.className = "mcq-preview-opts";
+          q.options.forEach((optStr, oIdx) => {
+            const sp = document.createElement("span");
+            sp.className = "mcq-opt-tag" + (oIdx === q.answerIndex ? " correct" : "");
+            sp.textContent = (oIdx === q.answerIndex ? "✓ " : "") + optStr;
+            optsRow.appendChild(sp);
+          });
+
+          card.appendChild(qTop);
+          card.appendChild(optsRow);
+          listWrap.appendChild(card);
+        });
+        grid.appendChild(listWrap);
+
+        document.getElementById("launch-pool-summary").textContent = title + " (" + questions.length + " Qs)";
+        document.getElementById("launch-mode-summary").textContent = MODE_CONFIG[currentMode].label + " · 3-Choice Gates";
+      }
+
+      persistActivePack();
+    }
+
+    function loadSelectionIntoEditor(id, focusBox = false) {
+      selectedId = id;
+      const preset = findPreset(id);
+      if (preset) {
+        currentMode = preset.mode;
+        syncModeUI();
+        document.getElementById("input-set-title").value = preset.title;
+        document.getElementById("input-words").value =
+          preset.packType === "mcq" ? formatMcqLines(preset.questions) : preset.words.join(", ");
+      } else if (id === "new") {
+        syncModeUI();
+        document.getElementById("input-set-title").value = "Custom " + MODE_CONFIG[currentMode].label;
+        document.getElementById("input-words").value = "";
+      } else {
+        const found = savedCustomPacks.find(x => x.id === id);
+        if (found) {
+          currentMode = found.mode || (found.packType === "mcq" ? "grammar" : "vocab");
+          syncModeUI();
+          document.getElementById("input-set-title").value = found.title;
+          if (found.packType === "mcq") {
+            document.getElementById("input-words").value = formatMcqLines(found.questions);
+          } else {
+            document.getElementById("input-words").value = (found.words || []).join(", ");
+            distractorMode = found.dmode === "pool" ? "pool" : "mix";
+            document.querySelectorAll("#dmode-row .seg-btn").forEach(b => {
+              b.classList.toggle("selected", b.getAttribute("data-dmode") === distractorMode);
+            });
+          }
+        }
+      }
+      renderDropdown();
+      renderPreviewAndLaunchSummary();
+      if (focusBox) document.getElementById("input-words").focus();
+    }
+
+    async function checkWorkerHealth() {
+      const dot = document.getElementById("worker-dot");
+      const lbl = document.getElementById("worker-status-label");
+      dot.className = "worker-dot checking";
+      lbl.textContent = "Checking Scanner…";
+      document.getElementById("worker-url-input").value = workerUrl;
+
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 4000);
+        const res = await fetch(workerUrl + "/health", { method: "GET", signal: ctrl.signal });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error("Non-200");
+        const data = await res.json();
+        if (data && data.ok && data.hasApiKey) {
+          dot.className = "worker-dot online";
+          lbl.textContent = "AI Scanner Live";
+        } else {
+          dot.className = "worker-dot offline";
+          lbl.textContent = "Worker Needs API Key";
+        }
+      } catch (e) {
+        dot.className = "worker-dot offline";
+        lbl.textContent = "Preset / Manual Mode";
+      }
+    }
+
+    function compressImageToDataUrl(file, maxDim = 1150, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Read error"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Invalid image"));
+          img.onload = () => {
+            let w = img.width || 800;
+            let h = img.height || 600;
+            if (w > maxDim || h > maxDim) {
+              const scale = maxDim / Math.max(w, h);
+              w = Math.round(w * scale);
+              h = Math.round(h * scale);
+            }
+            const cv = document.createElement("canvas");
+            cv.width = w;
+            cv.height = h;
+            cv.getContext("2d").drawImage(img, 0, 0, w, h);
+            resolve(cv.toDataURL("image/jpeg", quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function callAiExtractor({ imageDataUrl, textInput }) {
+      const btnPhoto = document.getElementById("btn-scan-photo");
+      const btnTopic = document.getElementById("btn-ai-topic-gen");
+      const sub = document.getElementById("scan-subtext");
+
+      btnPhoto.disabled = true;
+      btnTopic.disabled = true;
+      btnPhoto.textContent = "⏳ Working…";
+      sub.textContent = "Building " + MODE_CONFIG[currentMode].label + " pack with DeepSeek…";
+
+      try {
+        const res = await fetch(workerUrl + "/api/extract", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: currentMode, imageDataUrl: imageDataUrl || "", textInput: textInput || "" })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error((data && data.error) || "Worker unavailable");
+
+        const newId = "ai_" + Date.now();
+        const title = data.title || ("AI " + MODE_CONFIG[currentMode].label);
+
+        if (currentMode === "vocab") {
+          if (!Array.isArray(data.words) || data.words.length === 0) throw new Error("No words found");
+          savedCustomPacks.unshift({ id: newId, packType: "vocab", mode: "vocab", title, words: data.words, dmode: distractorMode });
+          saveCustomPacksToStorage();
+          loadSelectionIntoEditor(newId, false);
+          sub.textContent = "Extracted " + data.words.length + " words! Review below or launch F1.";
+          showToast("✅ Extracted " + data.words.length + " words!");
+        } else {
+          if (!Array.isArray(data.questions) || data.questions.length === 0) throw new Error("No questions returned");
+          savedCustomPacks.unshift({ id: newId, packType: "mcq", mode: currentMode, title, questions: data.questions });
+          saveCustomPacksToStorage();
+          loadSelectionIntoEditor(newId, false);
+          sub.textContent = "Generated " + data.questions.length + " questions! Review below or launch F1.";
+          showToast("✅ Generated " + data.questions.length + " questions!");
+        }
+      } catch (err) {
+        sub.textContent = "AI Worker not live yet — use built-in presets or enter items manually below.";
+        showToast("⚠️ Deploy worker.js with DEEPSEEK_API_KEY for live AI scan");
+      } finally {
+        btnPhoto.disabled = false;
+        btnTopic.disabled = false;
+        btnPhoto.textContent = "📷 Take / Upload Photo";
+      }
+    }
+
+    async function handlePhotoFile(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+      const imageDataUrl = await compressImageToDataUrl(file);
+      document.getElementById("scan-thumb").innerHTML = "<img alt='Preview' src='" + imageDataUrl + "' />";
+      await callAiExtractor({ imageDataUrl });
+    }
+
+    // Skill Mode Tab Switching
+    document.querySelectorAll("#skill-tabs .skill-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        currentMode = tab.getAttribute("data-mode") || "vocab";
+        const firstForMode = ALL_PRESET_PACKS.find(p => p.mode === currentMode);
+        loadSelectionIntoEditor(firstForMode ? firstForMode.id : "new", false);
+      });
+    });
+
+    document.getElementById("btn-back-portal").addEventListener("click", () => {
+      if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+        window.location.href = "../";
+      } else {
+        showToast("On GitHub Pages, this returns to /fun-projects/");
+      }
+    });
+
+    document.getElementById("pool-select").addEventListener("change", e => {
+      loadSelectionIntoEditor(e.target.value, e.target.value === "new");
+    });
+
+    document.getElementById("btn-new-set").addEventListener("click", () => {
+      loadSelectionIntoEditor("new", true);
+    });
+
+    document.getElementById("btn-add-sample-q").addEventListener("click", () => {
+      const box = document.getElementById("input-words");
+      const samples = {
+        grammar: "She _______ her homework before dinner yesterday. | finished | finishes | finishing | Past time 'yesterday' takes Simple Past.",
+        reading: "'Leo switched his phone to silent mode so he could focus.' Why did Leo mute his phone? | To concentrate better | To save screen brightness | To call his friend | 'focus' means concentrate.",
+        proofread: "Spot the mistake: [A] Every student [B] need to bring [C] a pencil tomorrow. | [B] need to bring | [A] Every student | [C] a pencil tomorrow. | Singular 'Every student' needs 'needs to bring'."
+      };
+      const row = samples[currentMode] || samples.grammar;
+      if (findPreset(selectedId)) {
+        selectedId = "new";
+        document.getElementById("input-set-title").value = "Custom " + MODE_CONFIG[currentMode].label;
+        box.value = row;
+        renderDropdown();
+      } else {
+        box.value = (box.value.trim() ? (box.value.trim() + "\n") : "") + row;
+      }
+      renderPreviewAndLaunchSummary();
+    });
+
+    document.getElementById("btn-delete-set").addEventListener("click", () => {
+      if (findPreset(selectedId) || selectedId === "new") return;
+      savedCustomPacks = savedCustomPacks.filter(x => x.id !== selectedId);
+      saveCustomPacksToStorage();
+      const fallback = ALL_PRESET_PACKS.find(p => p.mode === currentMode) || ALL_PRESET_PACKS[0];
+      loadSelectionIntoEditor(fallback.id, false);
+      showToast("🗑 Custom pack deleted");
+    });
+
+    document.getElementById("input-words").addEventListener("input", () => {
+      if (findPreset(selectedId)) {
+        selectedId = "new";
+        document.getElementById("input-set-title").value = document.getElementById("input-set-title").value + " Custom";
+        renderDropdown();
+      }
+      renderPreviewAndLaunchSummary();
+    });
+
+    document.getElementById("input-set-title").addEventListener("input", renderPreviewAndLaunchSummary);
+
+    document.querySelectorAll("#dmode-row .seg-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#dmode-row .seg-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        distractorMode = btn.getAttribute("data-dmode") || "mix";
+        renderPreviewAndLaunchSummary();
+      });
+    });
+
+    document.querySelectorAll("#accent-row .seg-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#accent-row .seg-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        speechLang = btn.getAttribute("data-lang") || "en-GB";
+      });
+    });
+
+    document.getElementById("btn-save-custom").addEventListener("click", () => {
+      const pack = buildCurrentPackObject();
+      if (!pack) {
+        showToast("⚠️ Add valid items before saving");
+        document.getElementById("input-words").focus();
+        return;
+      }
+      if (findPreset(selectedId) || selectedId === "new") {
+        const id = currentMode + "_" + Date.now();
+        const entry = Object.assign({}, pack, { id, presetId: null });
+        savedCustomPacks.unshift(entry);
+        selectedId = id;
+      } else {
+        const cur = savedCustomPacks.find(x => x.id === selectedId);
+        if (cur) {
+          Object.assign(cur, pack, { id: selectedId, presetId: null });
+        }
+      }
+      saveCustomPacksToStorage();
+      renderDropdown();
+      renderPreviewAndLaunchSummary();
+      showToast("✅ Saved '" + pack.title + "'");
+    });
+
+    document.getElementById("btn-copy-share").addEventListener("click", () => {
+      const pack = buildCurrentPackObject();
+      if (!pack) {
+        showToast("⚠️ Add valid items before sharing");
+        return;
+      }
+      const base = window.location.href.split("#")[0].replace(/index\.html$/, "");
+      let hashPart = "";
+      if (pack.packType === "mcq") {
+        hashPart = "#pack=" + encodeURIComponent(JSON.stringify({ packType: "mcq", m: pack.mode, t: pack.title, q: pack.questions }));
+      } else {
+        hashPart = "#pool=" + encodeURIComponent(JSON.stringify({ t: pack.title, d: pack.dmode, w: pack.words }));
+      }
+      const shareUrl = base + "games/f1-grand-prix.html" + hashPart;
+
+      const done = () => showToast("🔗 Share link copied!");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(done).catch(() => {
+          const ta = document.createElement("textarea");
+          ta.value = shareUrl;
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); done(); } catch (e) {}
+          document.body.removeChild(ta);
+        });
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = shareUrl;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+
+    document.getElementById("btn-scan-photo").addEventListener("click", () => {
+      document.getElementById("photo-file-input").click();
+    });
+
+    document.getElementById("photo-file-input").addEventListener("change", e => {
+      const f = e.target.files && e.target.files[0];
+      e.target.value = "";
+      if (f) handlePhotoFile(f);
+    });
+
+    document.getElementById("btn-ai-topic-gen").addEventListener("click", () => {
+      const txt = (document.getElementById("ai-topic-input").value || "").trim();
+      if (!txt) {
+        showToast("Type a grammar topic or paste a passage first");
+        document.getElementById("ai-topic-input").focus();
+        return;
+      }
+      callAiExtractor({ textInput: txt });
+    });
+
+    const dz = document.getElementById("scan-dropzone");
+    dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("dragover"); });
+    dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+    dz.addEventListener("drop", e => {
+      e.preventDefault();
+      dz.classList.remove("dragover");
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) handlePhotoFile(f);
+    });
+
+    document.getElementById("btn-launch-f1").addEventListener("click", () => {
+      const pack = persistActivePack();
+      if (!pack) {
+        showToast("⚠️ Please complete your pack items before launching");
+        document.getElementById("input-words").focus();
+        return;
+      }
+      const hashPart = pack.packType === "mcq"
+        ? ("#pack=" + encodeURIComponent(JSON.stringify({ packType: "mcq", m: pack.mode, t: pack.title, q: pack.questions })))
+        : ("#pool=" + encodeURIComponent(JSON.stringify({ t: pack.title, d: pack.dmode, w: pack.words })));
+
+      const isHostedSite =
+        (window.location.protocol === "http:" || window.location.protocol === "https:") &&
+        !window.location.hostname.includes("googleusercontent.com");
+
+      if (isHostedSite) {
+        window.location.href = "./games/f1-grand-prix.html" + hashPart;
+      } else {
+        showToast("🚦 Pack saved! On GitHub Pages this launches F1 Grand Prix with '" + pack.title + "'.");
+      }
+    });
+
+    // Worker Settings Modal
+    document.getElementById("btn-worker-settings").addEventListener("click", () => {
+      document.getElementById("worker-url-input").value = workerUrl;
+      document.getElementById("modal-worker").classList.remove("hidden");
+    });
+
+    document.getElementById("btn-close-worker-modal").addEventListener("click", () => {
+      document.getElementById("modal-worker").classList.add("hidden");
+    });
+
+    document.getElementById("btn-reset-worker-url").addEventListener("click", () => {
+      workerUrl = DEFAULT_WORKER_URL;
+      try { localStorage.removeItem(STORAGE_KEY_WORKER_URL); } catch (e) {}
+      document.getElementById("worker-url-input").value = workerUrl;
+    });
+
+    document.getElementById("btn-save-worker-url").addEventListener("click", () => {
+      const val = (document.getElementById("worker-url-input").value || "").trim().replace(/\/+$/, "");
+      if (val.startsWith("https://")) {
+        workerUrl = val;
+        try { localStorage.setItem(STORAGE_KEY_WORKER_URL, workerUrl); } catch (e) {}
+      }
+      document.getElementById("modal-worker").classList.add("hidden");
+      checkWorkerHealth();
+    });
+
+    function checkHubUrlHash() {
+      try {
+        const hash = window.location.hash || "";
+        if (hash.startsWith("#pack=")) {
+          const d = JSON.parse(decodeURIComponent(hash.slice(6)));
+          if (d && d.packType === "mcq" && Array.isArray(d.q) && d.q.length >= 1) {
+            const id = "shared_" + Date.now();
+            currentMode = d.m || "grammar";
+            savedCustomPacks.unshift({ id, packType: "mcq", mode: currentMode, title: String(d.t || "Shared Pack").slice(0, 32), questions: d.q });
+            saveCustomPacksToStorage();
+            selectedId = id;
+          }
+        } else if (hash.startsWith("#pool=")) {
+          const d = JSON.parse(decodeURIComponent(hash.slice(6)));
+          if (d && Array.isArray(d.w) && d.w.length >= 3) {
+            const id = "pool_" + Date.now();
+            currentMode = "vocab";
+            savedCustomPacks.unshift({ id, packType: "vocab", mode: "vocab", title: String(d.t || "Shared Words").slice(0, 32), words: parseWords(d.w.join(",")), dmode: d.d === "pool" ? "pool" : "mix" });
+            saveCustomPacksToStorage();
+            selectedId = id;
+          }
+        }
+      } catch (e) {}
+    }
+
+    window.onload = () => {
+      loadStorage();
+      checkHubUrlHash();
+      syncModeUI();
+      loadSelectionIntoEditor(selectedId, false);
+      checkWorkerHealth();
+    };
+  </script>
+</body>
+</html>
