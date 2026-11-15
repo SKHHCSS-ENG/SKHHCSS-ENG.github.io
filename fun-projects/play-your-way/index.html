@@ -345,29 +345,13 @@
       white-space: nowrap;
     }
 
-    .scan-btn:hover:not(:disabled):not(.is-disabled) {
+    .scan-btn:hover:not(:disabled) {
       transform: translateY(-1px);
     }
 
-    .scan-btn:disabled,
-    .scan-btn.is-disabled {
+    .scan-btn:disabled {
       opacity: 0.6;
       cursor: wait;
-      pointer-events: none;
-    }
-
-    .scan-file-btn {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .scan-file-overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
     }
 
     .ai-topic-row {
@@ -1325,15 +1309,11 @@
                 <div class="scan-sub" id="scan-subtext">AI strips numbers, Chinese meanings & example sentences automatically</div>
               </div>
             </div>
+            <input type="file" id="photo-file-input" accept="image/*" capture="environment" style="display:none;" />
+            <input type="file" id="gallery-file-input" accept="image/*" style="display:none;" />
             <div class="scan-actions-group">
-              <label class="scan-btn scan-file-btn" id="btn-scan-photo">
-                <span id="btn-scan-photo-label">📷 Camera</span>
-                <input type="file" id="photo-file-input" class="scan-file-overlay" accept="image/*" capture="environment" />
-              </label>
-              <label class="scan-btn secondary-scan-btn scan-file-btn" id="btn-upload-gallery">
-                <span>🖼️ Photo Library</span>
-                <input type="file" id="gallery-file-input" class="scan-file-overlay" accept="image/*" />
-              </label>
+              <button class="scan-btn" id="btn-scan-photo" type="button">📷 Camera</button>
+              <button class="scan-btn secondary-scan-btn" id="btn-upload-gallery" type="button">🖼️ Photo Library</button>
             </div>
           </div>
 
@@ -2575,23 +2555,6 @@
       });
     }
 
-    function setPhotoPickersBusy(busy, cameraLabel) {
-      const btnPhoto = document.getElementById("btn-scan-photo");
-      const btnGal = document.getElementById("btn-upload-gallery");
-      const photoInput = document.getElementById("photo-file-input");
-      const galleryInput = document.getElementById("gallery-file-input");
-      const photoLabel = document.getElementById("btn-scan-photo-label");
-      btnPhoto.classList.toggle("is-disabled", busy);
-      btnPhoto.setAttribute("aria-disabled", busy ? "true" : "false");
-      if (btnGal) {
-        btnGal.classList.toggle("is-disabled", busy);
-        btnGal.setAttribute("aria-disabled", busy ? "true" : "false");
-      }
-      if (photoInput) photoInput.disabled = !!busy;
-      if (galleryInput) galleryInput.disabled = !!busy;
-      if (photoLabel && cameraLabel) photoLabel.textContent = cameraLabel;
-    }
-
     async function callAiExtractor({ imageDataUrl, textInput, customTitle }) {
       const btnPhoto = document.getElementById("btn-scan-photo");
       const btnTopic = document.getElementById("btn-ai-topic-gen");
@@ -2599,11 +2562,15 @@
       const sub = document.getElementById("scan-subtext");
       const origGenLabel = btnTopic.textContent;
 
-      setPhotoPickersBusy(true, imageDataUrl ? "⏳ Scanning…" : "");
+      btnPhoto.disabled = true;
       btnTopic.disabled = true;
       if (btnInline) btnInline.disabled = true;
+      const btnGalStart = document.getElementById("btn-upload-gallery");
+      if (btnGalStart) btnGalStart.disabled = true;
 
-      if (!imageDataUrl) {
+      if (imageDataUrl) {
+        btnPhoto.textContent = "⏳ Scanning…";
+      } else {
         btnTopic.textContent = "⏳ Generating…";
         if (btnInline) btnInline.textContent = "⏳ Generating…";
       }
@@ -2647,13 +2614,16 @@
         showToast("⚠️ AI Worker unavailable: " + (err && err.message ? err.message : "check connection"));
         return false;
       } finally {
-        setPhotoPickersBusy(false, "📷 Camera");
+        btnPhoto.disabled = false;
         btnTopic.disabled = false;
+        btnPhoto.textContent = "📷 Camera";
         btnTopic.textContent = currentMode === "vocab_cloze" ? "✨ Generate Sentences" : origGenLabel;
         if (btnInline) {
           btnInline.disabled = false;
           btnInline.textContent = "✨ Generate Sentences";
         }
+        const btnGal = document.getElementById("btn-upload-gallery");
+        if (btnGal) btnGal.disabled = false;
       }
     }
 
@@ -2856,25 +2826,13 @@
       }
     });
 
-    function isIosOrIpad() {
-      const ua = navigator.userAgent || "";
-      return /iP(hone|od|ad)/.test(ua) ||
-        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
-        (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-    }
+    document.getElementById("btn-scan-photo").addEventListener("click", () => {
+      document.getElementById("photo-file-input").click();
+    });
 
-    function isIosSafari() {
-      const ua = navigator.userAgent || "";
-      return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|Chrome\//.test(ua);
-    }
-
-    // Chrome on iPad often shows a black preview if we force the rear-camera shortcut,
-    // and its in-page camera permission usually fails. Leave capture on Safari/Android;
-    // on iPad Chrome let the system offer Take Photo instead.
-    if (isIosOrIpad() && !isIosSafari()) {
-      const photoInput = document.getElementById("photo-file-input");
-      if (photoInput) photoInput.removeAttribute("capture");
-    }
+    document.getElementById("btn-upload-gallery").addEventListener("click", () => {
+      document.getElementById("gallery-file-input").click();
+    });
 
     document.getElementById("photo-file-input").addEventListener("change", e => {
       const f = e.target.files && e.target.files[0];
