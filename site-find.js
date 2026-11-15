@@ -1,7 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
  * Tess 2026-10-29, plus Practice, Fun Projects, Activities & Competitions,
- * Classroom, HCS Live Class, and Paper 3 / Paper 4 exam skills (40 entries).
+ * Classroom, HCS Live Class, and Paper 3 / Paper 4 exam skills (41 entries).
  * Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
@@ -497,6 +497,19 @@
         "desks",
         "roster",
         "scoreboard"
+      ]
+    },
+    {
+      "title": "Play Your Way",
+      "path": "fun-projects/play-your-way/",
+      "aliases": [
+        "play your way",
+        "game builder",
+        "custom game",
+        "photo game",
+        "f1 grand prix",
+        "team radio race",
+        "自訂遊戲"
       ]
     }
   ];
