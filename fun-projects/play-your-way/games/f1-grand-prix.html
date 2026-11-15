@@ -6767,7 +6767,7 @@
       if (!session) return;
       const rawDx = e.clientX - session.startX;
       const rawDy = e.clientY - session.startY;
-      const deadzonePx = session.isTouch ? 11 : 6;
+      const deadzonePx = session.isTouch ? 8 : 6;
       if (!session.movedEnough && Math.hypot(rawDx, rawDy) < deadzonePx) return;
       if (!session.movedEnough) {
         session.movedEnough = true;
@@ -6778,17 +6778,23 @@
       if (session.player.retired) return;
 
       const dx = e.clientX - session.originX;
-      // Calmer, wider touch span mapped across playable lanes (-4.1 .. +4.1) instead of flinging into barriers
+      // Balanced 1-thumb phone touch sensitivity (~64% screen width across full 3-lane span, linear response, zero edge dead-travel)
       const span = isTwoPlayer
-        ? Math.max(195, window.innerWidth * 0.42)
+        ? Math.max(175, window.innerWidth * 0.36)
         : (session.isTouch
-            ? Math.max(255, Math.min(440, window.innerWidth * 0.86))
+            ? Math.max(195, Math.min(320, window.innerWidth * 0.64))
             : Math.max(210, Math.min(340, window.innerWidth * 0.56)));
-      const laneWorldSpan = 7.6; // -3.8 to +3.8 covers Lane A (-3.6), B (0), C (+3.6) smoothly
+      const laneWorldSpan = 7.8; // -3.9 to +3.9 covers Lane A (-3.6), B (0), C (+3.6) briskly
       const norm = dx / span;
-      const curved = Math.sign(norm) * Math.pow(Math.abs(norm), session.isTouch ? 1.12 : 1.0);
-      const nextX = session.startCarX + curved * laneWorldSpan;
+      const nextX = session.startCarX + norm * laneWorldSpan;
       const touchClamp = session.isTouch ? 4.15 : TRACK_HALF_WIDTH;
+      if (session.isTouch && nextX > touchClamp) {
+        session.startCarX = touchClamp;
+        session.originX = e.clientX;
+      } else if (session.isTouch && nextX < -touchClamp) {
+        session.startCarX = -touchClamp;
+        session.originX = e.clientX;
+      }
       session.player.targetCarX = Math.max(-touchClamp, Math.min(touchClamp, nextX));
       session.player.dragThrottle = calcThrottleRatio(e.clientY, session.originY);
     });
@@ -6947,7 +6953,7 @@
 
       if (key === "r" || key === "R" || code === "KeyR") {
         if (gameState.running && !gameState.paused && gameState.currentQuestion) {
-          speakWord(gameState.currentQuestion.word, 0.95, true);
+          speakCurrentQuestionItem(0.95, true);
         }
       }
     }
