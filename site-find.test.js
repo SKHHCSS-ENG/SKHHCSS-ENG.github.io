@@ -317,7 +317,7 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
     practicePage,
     /href="https:\/\/skhhcss-eng\.github\.io\/paper-1-exam-practice\/" target="_blank" rel="noopener noreferrer"/
   );
-  assert.match(practicePage, /Paper 1 - Reading/);
+  assert.match(practicePage, /Paper 1 -<\/span> <span class="nowrap">Reading/);
   assert.match(practicePage, /Question types, topics and past papers\./);
   assert.equal(practicePage.includes('href="paper-1-exam-practice/"'), false);
 
