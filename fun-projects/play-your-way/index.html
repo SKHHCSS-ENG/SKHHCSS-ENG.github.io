@@ -854,17 +854,276 @@
       transform: translateY(0);
     }
 
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
+    button, select, input, textarea {
+      touch-action: manipulation;
+    }
+
+    .step-header {
+      flex-wrap: wrap;
+    }
+
+    .scan-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .scan-btn.secondary-scan-btn {
+      background: #ffffff;
+      color: var(--navy);
+      border: 1.5px solid var(--accent-deep);
+      box-shadow: 0 2px 8px rgba(18, 58, 77, 0.08);
+    }
+
+    .scan-btn.secondary-scan-btn:hover:not(:disabled) {
+      background: var(--accent-soft);
+    }
+
+    .pool-actions-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* MOBILE STICKY QUICK-LAUNCH DOCK (Shown on <= 880px single-column screens so students never have to scroll 2 screens down to launch!) */
+    .mobile-launch-dock {
+      display: none;
+    }
+
     @media (max-width: 880px) {
-      .studio-grid { grid-template-columns: 1fr; }
+      .studio-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .studio-wrap {
+        padding: 12px 12px calc(92px + env(safe-area-inset-bottom));
+      }
+      .mobile-launch-dock {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 45;
+        background: rgba(15, 23, 42, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 2px solid var(--f1-red);
+        padding: 9px 14px calc(9px + env(safe-area-inset-bottom));
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        box-shadow: 0 -8px 26px rgba(15, 23, 42, 0.28);
+      }
+      .mobile-dock-info {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .mobile-dock-kicker {
+        font-size: 0.64rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+      }
+      .mobile-dock-title {
+        font-size: 0.84rem;
+        font-weight: 800;
+        color: #ff8000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mobile-dock-btn {
+        background: linear-gradient(90deg, var(--f1-red), var(--f1-papaya));
+        color: #ffffff;
+        border: 1.5px solid rgba(255, 255, 255, 0.32);
+        border-radius: 9px;
+        padding: 10px 15px;
+        min-height: 44px;
+        font-family: 'Fredoka', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        box-shadow: 0 4px 14px rgba(225, 6, 0, 0.4);
+      }
     }
 
     @media (max-width: 600px) {
-      .skill-tabs { grid-template-columns: repeat(2, 1fr); }
-      .meta-grid { grid-template-columns: 1fr; }
-      .upcoming-grid { grid-template-columns: 1fr; }
-      .ai-topic-row { flex-direction: column; }
-      .text-input, .words-textarea, .pool-select { font-size: 16px; }
-      .studio-card { padding: 15px; }
+      .top-bar {
+        padding: max(8px, env(safe-area-inset-top)) 12px 8px;
+      }
+      .top-bar-inner {
+        gap: 8px;
+      }
+      .brand-cluster {
+        gap: 7px;
+      }
+      .back-pill {
+        padding: 5px 9px;
+        font-size: 0.74rem;
+      }
+      .brand-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.98rem;
+        border-radius: 8px;
+      }
+      .brand-title {
+        font-size: 1.06rem;
+      }
+      .worker-pill {
+        padding: 5px 9px;
+        font-size: 0.7rem;
+        gap: 5px;
+      }
+      .studio-card {
+        padding: 14px 13px;
+        border-radius: 14px;
+      }
+      .step-header {
+        gap: 8px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+      }
+      .step-title {
+        font-size: 1.02rem;
+      }
+      .skill-tabs {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+      .skill-tab {
+        min-height: 42px;
+        padding: 9px 8px;
+        font-size: 0.82rem;
+      }
+      .scan-dropzone {
+        padding: 12px;
+      }
+      .scan-top-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .scan-info {
+        min-width: 0;
+      }
+      .scan-actions-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+      }
+      .scan-actions-group .scan-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 44px;
+        padding: 9px 8px;
+        font-size: 0.8rem;
+      }
+      .ai-topic-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .ai-topic-row .scan-btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 42px;
+      }
+      .pool-bar {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 8px;
+        padding: 10px;
+      }
+      .pool-select {
+        min-width: 0;
+        width: 100%;
+        min-height: 42px;
+      }
+      .pool-actions-row {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+      .pool-actions-row .mini-btn {
+        flex: 1;
+        justify-content: center;
+        min-height: 38px;
+      }
+      .meta-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .seg-btn {
+        min-height: 38px;
+      }
+      .words-textarea {
+        min-height: 96px;
+        padding: 9px 10px;
+      }
+      .status-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .status-actions-group {
+        display: flex;
+        gap: 6px;
+        width: 100%;
+      }
+      .status-actions-group .mini-btn {
+        flex: 1;
+        justify-content: center;
+        min-height: 40px;
+        padding: 7px 8px;
+      }
+      .word-chip {
+        padding: 6px 10px;
+        min-height: 34px;
+      }
+      .f1-game-card {
+        padding: 15px 14px;
+      }
+      .f1-card-title {
+        font-size: 1.2rem;
+      }
+      .launch-f1-btn {
+        min-height: 48px;
+        font-size: 1.02rem;
+      }
+      .upcoming-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .upcoming-card {
+        padding: 10px;
+      }
+      .upcoming-title {
+        font-size: 0.84rem;
+      }
+      .text-input, .words-textarea, .pool-select {
+        font-size: 16px;
+      }
+      .toast-banner {
+        top: auto;
+        bottom: calc(74px + env(safe-area-inset-bottom));
+        left: 12px;
+        right: 12px;
+        text-align: center;
+      }
+      .modal-box {
+        padding: 16px;
+      }
     }
   </style>
 </head>
@@ -926,7 +1185,11 @@
               </div>
             </div>
             <input type="file" id="photo-file-input" accept="image/*" capture="environment" style="display:none;" />
-            <button class="scan-btn" id="btn-scan-photo" type="button">📷 Take / Upload Photo</button>
+            <input type="file" id="gallery-file-input" accept="image/*" style="display:none;" />
+            <div class="scan-actions-group">
+              <button class="scan-btn" id="btn-scan-photo" type="button">📷 Camera</button>
+              <button class="scan-btn secondary-scan-btn" id="btn-upload-gallery" type="button">🖼️ Photo Library</button>
+            </div>
           </div>
 
           <div class="ai-topic-row hidden" id="ai-topic-row">
@@ -939,8 +1202,10 @@
         <div class="pool-bar">
           <span style="font-family:'Fredoka',sans-serif; font-size:0.86rem; color:#7dd3fc; white-space:nowrap;">📚 Pack</span>
           <select class="pool-select" id="pool-select"></select>
-          <button class="mini-btn dark-btn" id="btn-new-set" type="button">➕ New</button>
-          <button class="mini-btn danger-btn hidden" id="btn-delete-set" type="button">🗑 Delete</button>
+          <div class="pool-actions-row">
+            <button class="mini-btn dark-btn" id="btn-new-set" type="button">➕ New</button>
+            <button class="mini-btn danger-btn hidden" id="btn-delete-set" type="button">🗑 Delete</button>
+          </div>
         </div>
 
         <!-- Title & Wrong-Gate Option (Wrong-Gate toggle only needed in Vocab mode) -->
@@ -967,10 +1232,10 @@
 
         <div class="status-row">
           <span class="count-badge" id="word-count-badge">18 words ready</span>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="mini-btn hidden" id="btn-add-sample-q" type="button">➕ Sample Row</button>
-            <button class="mini-btn" id="btn-save-custom" type="button">💾 Save Pack</button>
-            <button class="mini-btn" id="btn-copy-share" type="button">🔗 Copy Share Link</button>
+          <div class="status-actions-group" style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="mini-btn hidden" id="btn-add-sample-q" type="button">➕ Sample</button>
+            <button class="mini-btn" id="btn-save-custom" type="button">💾 Save</button>
+            <button class="mini-btn" id="btn-copy-share" type="button">🔗 Share</button>
           </div>
         </div>
 
@@ -986,12 +1251,12 @@
 
       <!-- STEP 2: PICK A GAME & LAUNCH -->
       <section class="studio-card">
-        <div class="step-header">
+        <div class="step-header" id="games-section-anchor">
           <div class="step-title-group">
             <span class="step-num">2</span>
             <h2 class="step-title">Choose a Game & Play</h2>
           </div>
-          <span style="font-size:0.76rem; font-weight:800; color:var(--accent-deep);">Vocab · Grammar · Reading · Proofread</span>
+          <span style="font-size:0.74rem; font-weight:800; color:var(--accent-deep);">All 4 Skills Ready</span>
         </div>
 
         <!-- Featured Game #1: F1 Grand Prix -->
@@ -1033,6 +1298,15 @@
 
     </div>
   </main>
+
+  <!-- MOBILE STICKY QUICK-LAUNCH DOCK -->
+  <div class="mobile-launch-dock" id="mobile-launch-dock">
+    <div class="mobile-dock-info">
+      <span class="mobile-dock-kicker" id="mobile-dock-mode">Vocabulary · Close Words</span>
+      <span class="mobile-dock-title" id="mobile-dock-pack">S2 Social Media (18 words)</span>
+    </div>
+    <button class="mobile-dock-btn" id="btn-mobile-launch-f1" type="button">🚦 Play F1 →</button>
+  </div>
 
   <!-- WORKER SETTINGS MODAL -->
   <div class="modal-backdrop hidden" id="modal-worker">
@@ -1950,6 +2224,11 @@
         document.getElementById("launch-mode-summary").textContent = MODE_CONFIG[currentMode].label + " · 3-Choice Gates";
       }
 
+      const dockPackEl = document.getElementById("mobile-dock-pack");
+      const dockModeEl = document.getElementById("mobile-dock-mode");
+      if (dockPackEl) dockPackEl.textContent = document.getElementById("launch-pool-summary").textContent;
+      if (dockModeEl) dockModeEl.textContent = document.getElementById("launch-mode-summary").textContent;
+
       persistActivePack();
     }
 
@@ -2049,7 +2328,9 @@
 
       btnPhoto.disabled = true;
       btnTopic.disabled = true;
-      btnPhoto.textContent = "⏳ Working…";
+      const btnGalStart = document.getElementById("btn-upload-gallery");
+      if (btnGalStart) btnGalStart.disabled = true;
+      btnPhoto.textContent = "⏳ Scanning…";
       sub.textContent = "Building " + MODE_CONFIG[currentMode].label + " pack with DeepSeek…";
 
       try {
@@ -2085,7 +2366,9 @@
       } finally {
         btnPhoto.disabled = false;
         btnTopic.disabled = false;
-        btnPhoto.textContent = "📷 Take / Upload Photo";
+        btnPhoto.textContent = "📷 Camera";
+        const btnGal = document.getElementById("btn-upload-gallery");
+        if (btnGal) btnGal.disabled = false;
       }
     }
 
@@ -2240,7 +2523,17 @@
       document.getElementById("photo-file-input").click();
     });
 
+    document.getElementById("btn-upload-gallery").addEventListener("click", () => {
+      document.getElementById("gallery-file-input").click();
+    });
+
     document.getElementById("photo-file-input").addEventListener("change", e => {
+      const f = e.target.files && e.target.files[0];
+      e.target.value = "";
+      if (f) handlePhotoFile(f);
+    });
+
+    document.getElementById("gallery-file-input").addEventListener("change", e => {
       const f = e.target.files && e.target.files[0];
       e.target.value = "";
       if (f) handlePhotoFile(f);
@@ -2266,7 +2559,7 @@
       if (f) handlePhotoFile(f);
     });
 
-    document.getElementById("btn-launch-f1").addEventListener("click", () => {
+    function triggerLaunchF1Game() {
       const pack = persistActivePack();
       if (!pack) {
         showToast("⚠️ Please complete your pack items before launching");
@@ -2286,7 +2579,10 @@
       } else {
         showToast("🚦 Pack saved! On GitHub Pages this launches F1 Grand Prix with '" + pack.title + "'.");
       }
-    });
+    }
+
+    document.getElementById("btn-launch-f1").addEventListener("click", triggerLaunchF1Game);
+    document.getElementById("btn-mobile-launch-f1").addEventListener("click", triggerLaunchF1Game);
 
     // Worker Settings Modal
     document.getElementById("btn-worker-settings").addEventListener("click", () => {
