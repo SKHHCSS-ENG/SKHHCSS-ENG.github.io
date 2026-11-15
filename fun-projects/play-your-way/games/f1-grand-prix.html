@@ -572,9 +572,19 @@
     }
 
     .mcq-blank-hl {
-      color: #ff8000;
-      text-decoration: underline;
-      padding: 0 3px;
+      display: inline-block;
+      min-width: clamp(56px, 7.5vw, 78px);
+      border-bottom: 3px solid #ff8000;
+      line-height: 1.02;
+      margin: 0 4px;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .review-item .mcq-blank-hl {
+      min-width: 46px;
+      border-bottom: 2.5px solid #ff8000;
+      margin: 0 3px;
     }
 
     .mcq-seg-tag {
@@ -5420,14 +5430,14 @@
       if (q.prompt) {
         radioRow.classList.add("hidden");
         mcqRow.classList.remove("hidden");
-        const modeLabels = { grammar: "🧩 GRAMMAR GATE", reading: "📖 READING GATE", proofread: "✏️ PROOFREAD GATE" };
+        const modeLabels = {
+          vocab_cloze: "📝 VOCAB GATE",
+          grammar: "🧩 GRAMMAR GATE",
+          reading: "📖 READING GATE",
+          proofread: "✏️ PROOFREAD GATE"
+        };
         document.getElementById("phase-badge").textContent = modeLabels[q.mode] || "🎯 QUIZ GATE";
-        const safeHtml = q.prompt
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/_{3,}/g, "<span class='mcq-blank-hl'>_______</span>")
-          .replace(/\[(A|B|C)\]/g, "<span class='mcq-seg-tag'>[$1]</span>");
+        const safeHtml = formatPromptWithOrangeBlank(q.prompt);
         document.getElementById("mcq-prompt-text").innerHTML = safeHtml;
         playRadioBeep();
       } else {
@@ -6602,6 +6612,15 @@
       );
     }
 
+    function formatPromptWithOrangeBlank(rawPrompt) {
+      return String(rawPrompt || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/_{2,}/g, "<span class='mcq-blank-hl' aria-label='blank'>&nbsp;</span>")
+        .replace(/\[(A|B|C)\]/g, "<span class='mcq-seg-tag'>[$1]</span>");
+    }
+
     function renderReviewTab(mode) {
       const listEl = document.getElementById("review-list");
       document.getElementById("tab-missed").classList.toggle("active-toggle", mode === "MISSED");
@@ -6626,7 +6645,7 @@
         const left = document.createElement("div");
         left.style.width = "100%";
         if (item.prompt) {
-          const safeP = item.prompt.replace(/</g, "&lt;");
+          const safeP = formatPromptWithOrangeBlank(item.prompt);
           if (item.isCorrect) {
             left.innerHTML =
               "<div style='font-size:0.82rem;font-weight:700;color:#0f172a;margin-bottom:2px;'>" + safeP + "</div>" +
@@ -7151,17 +7170,32 @@
       const found = savedCustomPools.find(p => p.id === poolId);
       if (found && found.packType === "mcq" && Array.isArray(found.questions) && found.questions.length >= 1) {
         activePoolId = found.id;
-        QUESTIONS = found.questions.map(q => Object.assign({ mode: found.mode || "grammar" }, q));
-        VOCAB_ITEMS = found.questions.map((q, idx) => ({
-          word: "Q" + (idx + 1) + ": " + q.options[q.answerIndex],
-          ipa: "",
-          syllables: ""
-        }));
+        const packMode = found.mode || "grammar";
+        QUESTIONS = found.questions.map(q => Object.assign({ mode: packMode }, q));
+        if (packMode === "vocab_cloze") {
+          const seenAns = new Set();
+          const ansItems = [];
+          found.questions.forEach(q => {
+            const ans = String((q.options && q.options[q.answerIndex]) || "").trim();
+            if (ans && !seenAns.has(ans.toLowerCase())) {
+              seenAns.add(ans.toLowerCase());
+              ansItems.push({ word: ans, ipa: "", syllables: "" });
+            }
+          });
+          VOCAB_ITEMS = shuffleArray(ansItems);
+        } else {
+          VOCAB_ITEMS = found.questions.map((q, idx) => ({
+            word: "Q" + (idx + 1) + ": " + q.options[q.answerIndex],
+            ipa: "",
+            syllables: ""
+          }));
+        }
         rebuildVocabLookup();
         buildShuffledDeck();
         const label = found.title + " (" + QUESTIONS.length + " Qs)";
         document.getElementById("title-pool-name").textContent = label;
-        document.getElementById("garage-vocab-label").textContent = "🎯 Custom Pack — " + label;
+        document.getElementById("garage-vocab-label").textContent =
+          (packMode === "vocab_cloze" ? "📝 Vocabulary (Fill-in-the-Blank) — " : "🎯 Custom Pack — ") + label;
         populateVocabGrid("start-vocab-grid", false);
         populateVocabGrid("pause-vocab-grid", false);
         return;
@@ -7396,7 +7430,9 @@
       }
 
       const rawEditor = document.getElementById("builder-words-input").value || "";
-      const mcqList = parseMcqLinesInput(rawEditor, "grammar");
+      const prevPool = savedCustomPools.find(p => p.id === editingPoolId);
+      const inferredMode = (prevPool && prevPool.packType === "mcq" && prevPool.mode) ? prevPool.mode : "grammar";
+      const mcqList = parseMcqLinesInput(rawEditor, inferredMode);
       const title = (document.getElementById("builder-set-title").value || "Custom Pack").trim() || "Custom Pack";
 
       if (mcqList.length >= 1) {

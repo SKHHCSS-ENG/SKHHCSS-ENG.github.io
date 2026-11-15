@@ -641,6 +641,89 @@
       font-size: 0.8rem;
     }
 
+    .vocab-submode-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--accent-soft);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 11px;
+      padding: 7px 10px;
+      margin: -4px 0 12px;
+      flex-wrap: wrap;
+    }
+
+    .vocab-submode-bar.hidden {
+      display: none;
+    }
+
+    .vocab-submode-label {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.82rem;
+      color: var(--navy);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .vocab-submode-pills {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .vocab-sub-btn {
+      flex: 1;
+      background: #ffffff;
+      color: var(--navy);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.14s ease;
+      white-space: nowrap;
+    }
+
+    .vocab-sub-btn:hover {
+      border-color: var(--accent-deep);
+    }
+
+    .vocab-sub-btn.active {
+      background: var(--navy);
+      color: #ffffff;
+      border-color: var(--navy);
+      box-shadow: 0 3px 10px rgba(18, 58, 77, 0.18);
+    }
+
+    .hub-blank-line {
+      display: inline-block;
+      min-width: 48px;
+      border-bottom: 2.5px solid #ff8000;
+      line-height: 1.02;
+      margin: 0 3px;
+      text-decoration: none;
+    }
+
+    .mini-btn.ai-inline-btn {
+      background: linear-gradient(135deg, var(--navy), var(--accent-deep));
+      color: #ffffff;
+      border-color: var(--navy);
+    }
+
+    .mini-btn.ai-inline-btn:hover:not(:disabled) {
+      background: var(--accent-ink);
+    }
+
     .mcq-preview-q {
       font-weight: 800;
       color: var(--ink);
@@ -1027,6 +1110,19 @@
         padding: 9px 8px;
         font-size: 0.82rem;
       }
+      .vocab-submode-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .vocab-submode-pills {
+        min-width: 0;
+        width: 100%;
+      }
+      .vocab-sub-btn {
+        min-height: 40px;
+        font-size: 0.78rem;
+      }
       .scan-dropzone {
         padding: 12px;
       }
@@ -1194,6 +1290,15 @@
           <button class="skill-tab" data-mode="proofread" type="button">✏️ Proofreading</button>
         </div>
 
+        <!-- Vocabulary Sub-Mode Selector (Dictation vs. Fill-in-the-Blank) -->
+        <div class="vocab-submode-bar" id="vocab-submode-bar">
+          <span class="vocab-submode-label">🎯 Play Style:</span>
+          <div class="vocab-submode-pills" id="vocab-submode-pills">
+            <button class="vocab-sub-btn active" data-vsub="vocab" type="button">🎙️ Dictation</button>
+            <button class="vocab-sub-btn" data-vsub="vocab_cloze" type="button">📝 Fill-in-the-Blank</button>
+          </div>
+        </div>
+
         <!-- Photo / AI Topic Scanner -->
         <div class="scan-dropzone" id="scan-dropzone">
           <div class="scan-top-row">
@@ -1253,6 +1358,7 @@
         <div class="status-row">
           <span class="count-badge" id="word-count-badge">18 words ready</span>
           <div class="status-actions-group" style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="mini-btn ai-inline-btn hidden" id="btn-gen-sentences-from-box" type="button">✨ Generate Sentences</button>
             <button class="mini-btn hidden" id="btn-add-sample-q" type="button">➕ Sample</button>
             <button class="mini-btn" id="btn-save-custom" type="button">💾 Save</button>
             <button class="mini-btn" id="btn-copy-share" type="button">🔗 Share</button>
@@ -1900,6 +2006,13 @@
         sub: "AI strips item numbers, Chinese meanings & example sentences automatically",
         placeholder: "Type or paste target words (comma or new line, min 3)..."
       },
+      vocab_cloze: {
+        label: "Vocabulary (Fill-in-the-Blank)",
+        headline: "Import Words for Fill-in-the-Blank",
+        sub: "Snap a vocabulary photo or paste words below — AI Worker generates sample sentences automatically",
+        topicPlaceholder: "Paste or type vocabulary words (e.g. blog, podcast, influencer, subscribe)...",
+        placeholder: "Paste target words above (or here) to generate AI sample sentences, or edit: Sentence with _______ | Correct Word | Wrong 1 | Wrong 2 | Explanation"
+      },
       grammar: {
         label: "Grammar",
         headline: "Snap a Grammar Exercise or Notes Page",
@@ -1925,6 +2038,7 @@
 
     let savedCustomPacks = [];
     let currentMode = "vocab";
+    let vocabSubMode = "vocab";
     let selectedId = ALL_PRESET_PACKS[0].id;
     let distractorMode = "mix";
     let speechLang = "en-GB";
@@ -1975,6 +2089,15 @@
             const sorted = [right, w1, w2].slice().sort((a, b) => a.localeCompare(b));
             options = sorted;
             answerIndex = Math.max(0, sorted.indexOf(right));
+          } else {
+            const rot = (out.length * 2 + prompt.length) % 3;
+            if (rot === 1) {
+              options = [w1, right, w2];
+              answerIndex = 1;
+            } else if (rot === 2) {
+              options = [w1, w2, right];
+              answerIndex = 2;
+            }
           }
           out.push({ prompt, options, answerIndex, explanation, mode: modeName });
         }
@@ -2070,26 +2193,48 @@
       return pack;
     }
 
+    function formatHubPromptHTML(rawPrompt) {
+      return String(rawPrompt || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/_{2,}/g, "<span class='hub-blank-line' aria-label='blank'>&nbsp;</span>");
+    }
+
     function syncModeUI() {
       const cfg = MODE_CONFIG[currentMode] || MODE_CONFIG.vocab;
+      const isAnyVocab = currentMode === "vocab" || currentMode === "vocab_cloze";
+      if (isAnyVocab) vocabSubMode = currentMode;
+
       document.querySelectorAll("#skill-tabs .skill-tab").forEach(t => {
-        t.classList.toggle("active", t.getAttribute("data-mode") === currentMode);
+        const tabMode = t.getAttribute("data-mode");
+        const active = tabMode === "vocab" ? isAnyVocab : (tabMode === currentMode);
+        t.classList.toggle("active", active);
+      });
+
+      const subBar = document.getElementById("vocab-submode-bar");
+      subBar.classList.toggle("hidden", !isAnyVocab);
+      document.querySelectorAll("#vocab-submode-pills .vocab-sub-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-vsub") === vocabSubMode);
       });
 
       document.getElementById("scan-headline").textContent = cfg.headline;
       document.getElementById("scan-subtext").textContent = cfg.sub;
       document.getElementById("input-words").placeholder = cfg.placeholder;
 
-      const isVocab = currentMode === "vocab";
-      document.getElementById("dmode-field-box").classList.toggle("hidden", !isVocab);
-      document.getElementById("meta-grid").classList.toggle("single-col", !isVocab);
-      document.getElementById("mcq-format-hint").classList.toggle("hidden", isVocab);
-      document.getElementById("btn-add-sample-q").classList.toggle("hidden", isVocab);
+      // Only Dictation ('vocab') uses Close Words / My Words Only; Fill-in-the-Blank ('vocab_cloze') hides it cleanly
+      const isDictation = currentMode === "vocab";
+      document.getElementById("dmode-field-box").classList.toggle("hidden", !isDictation);
+      document.getElementById("meta-grid").classList.toggle("single-col", !isDictation);
+      document.getElementById("mcq-format-hint").classList.toggle("hidden", isDictation);
+      document.getElementById("btn-add-sample-q").classList.toggle("hidden", isAnyVocab);
 
       const topicRow = document.getElementById("ai-topic-row");
-      topicRow.classList.toggle("hidden", isVocab);
-      if (!isVocab) {
+      const genBtn = document.getElementById("btn-ai-topic-gen");
+      topicRow.classList.toggle("hidden", isDictation);
+      if (!isDictation) {
         document.getElementById("ai-topic-input").placeholder = cfg.topicPlaceholder;
+        genBtn.textContent = currentMode === "vocab_cloze" ? "✨ Generate Sentences" : "✨ AI Generate";
       }
     }
 
@@ -2125,6 +2270,25 @@
         sel.appendChild(g2);
       }
 
+      // In Vocabulary Fill-in-the-Blank, allow 1-click importing from any saved/built-in Dictation word list via AI Worker!
+      if (currentMode === "vocab_cloze") {
+        const importSources = [
+          ...savedCustomPacks.filter(cp => (cp.mode || (cp.packType === "mcq" ? "grammar" : "vocab")) === "vocab" && Array.isArray(cp.words) && cp.words.length >= 3),
+          ...ALL_PRESET_PACKS.filter(p => p.mode === "vocab")
+        ];
+        if (importSources.length > 0) {
+          const gImp = document.createElement("optgroup");
+          gImp.label = "📥 Import Words & Generate Sentences (AI)";
+          importSources.forEach(src => {
+            const o = document.createElement("option");
+            o.value = "import_words:" + src.id;
+            o.textContent = "✨ " + src.title + " (" + src.words.length + " words → AI Blanks)";
+            gImp.appendChild(o);
+          });
+          sel.appendChild(gImp);
+        }
+      }
+
       const newOpt = document.createElement("option");
       newOpt.value = "new";
       newOpt.textContent = "➕ Create New " + MODE_CONFIG[currentMode].label + " Pack...";
@@ -2132,21 +2296,33 @@
 
       sel.value = selectedId;
       if (sel.value !== selectedId) {
-        selectedId = modePresets.length > 0 ? modePresets[0].id : "new";
+        selectedId = modePresets.length > 0
+          ? modePresets[0].id
+          : (modeCustom.length > 0 ? modeCustom[0].id : "new");
         sel.value = selectedId;
       }
 
-      const isSavedCustom = !findPreset(selectedId) && selectedId !== "new";
+      const isSavedCustom = !findPreset(selectedId) && selectedId !== "new" && !String(selectedId).startsWith("import_words:");
       document.getElementById("btn-delete-set").classList.toggle("hidden", !isSavedCustom);
+    }
+
+    function getPlainImportedWordsInBox() {
+      if (currentMode !== "vocab_cloze") return [];
+      const raw = document.getElementById("input-words").value || "";
+      if (raw.includes("|")) return [];
+      const words = parseWords(raw);
+      return words.length >= 3 ? words : [];
     }
 
     function renderPreviewAndLaunchSummary() {
       const badge = document.getElementById("word-count-badge");
       const title = (document.getElementById("input-set-title").value || "Custom Pack").trim() || "Custom Pack";
       const grid = document.getElementById("chips-grid");
+      const inlineAiBtn = document.getElementById("btn-gen-sentences-from-box");
       grid.innerHTML = "";
 
       if (currentMode === "vocab") {
+        inlineAiBtn.classList.add("hidden");
         const words = parseWords(document.getElementById("input-words").value);
         document.getElementById("preview-header-label").textContent = "🎧 Tap any word to test pronunciation";
         document.getElementById("chips-count-note").textContent = words.length + " words";
@@ -2170,31 +2346,52 @@
 
         document.getElementById("launch-pool-summary").textContent = title + " (" + words.length + " words)";
         document.getElementById("launch-mode-summary").textContent =
-          "Vocabulary · " + (distractorMode === "pool" ? "My Words Only" : "Close Words");
+          "Vocabulary · Dictation (" + (distractorMode === "pool" ? "My Words Only" : "Close Words") + ")";
       } else {
-        const questions = parseMcqLines(document.getElementById("input-words").value, currentMode);
+        const rawText = document.getElementById("input-words").value;
+        const questions = parseMcqLines(rawText, currentMode);
+        const pendingWords = questions.length === 0 ? getPlainImportedWordsInBox() : [];
+        inlineAiBtn.classList.toggle("hidden", pendingWords.length < 3);
+
         document.getElementById("preview-header-label").textContent = "🎯 3-Choice Gate Preview (Tap 🔊 to hear)";
         document.getElementById("chips-count-note").textContent = questions.length + " Qs";
 
         if (questions.length < 1) {
-          badge.textContent = "Add at least 1 question line (Prompt | Correct | Wrong 1 | Wrong 2)";
-          badge.classList.add("err");
+          if (pendingWords.length >= 3) {
+            badge.textContent = pendingWords.length + " words imported — click ✨ Generate Sentences";
+            badge.classList.remove("err");
+            pendingWords.forEach(w => {
+              const chip = document.createElement("button");
+              chip.type = "button";
+              chip.className = "word-chip";
+              chip.innerHTML = "<span>" + w.replace(/</g, "&lt;") + "</span><span>🔊</span>";
+              chip.addEventListener("click", () => speakText(w));
+              grid.appendChild(chip);
+            });
+          } else if (currentMode === "vocab_cloze") {
+            badge.textContent = "Import 3+ words above (photo or paste) for AI to generate sentences";
+            badge.classList.add("err");
+          } else {
+            badge.textContent = "Add at least 1 question line (Prompt | Correct | Wrong 1 | Wrong 2)";
+            badge.classList.add("err");
+          }
         } else {
-          badge.textContent = questions.length + " " + MODE_CONFIG[currentMode].label.toLowerCase() + " questions ready";
+          badge.textContent = questions.length + " " + (currentMode === "vocab_cloze" ? "fill-in-the-blank" : MODE_CONFIG[currentMode].label.toLowerCase()) + " questions ready";
           badge.classList.remove("err");
         }
 
-        const listWrap = document.createElement("div");
-        listWrap.className = "mcq-preview-list";
-        questions.forEach((q, idx) => {
-          const card = document.createElement("div");
-          card.className = "mcq-preview-card";
-          const qTop = document.createElement("div");
-          qTop.className = "mcq-preview-q";
-          qTop.style.display = "flex";
-          qTop.style.justifyContent = "space-between";
-          qTop.style.gap = "8px";
-          qTop.innerHTML = "<span>Q" + (idx + 1) + ". " + q.prompt.replace(/</g, "&lt;") + "</span>";
+        if (questions.length >= 1) {
+          const listWrap = document.createElement("div");
+          listWrap.className = "mcq-preview-list";
+          questions.forEach((q, idx) => {
+            const card = document.createElement("div");
+            card.className = "mcq-preview-card";
+            const qTop = document.createElement("div");
+            qTop.className = "mcq-preview-q";
+            qTop.style.display = "flex";
+            qTop.style.justifyContent = "space-between";
+            qTop.style.gap = "8px";
+            qTop.innerHTML = "<span>Q" + (idx + 1) + ". " + formatHubPromptHTML(q.prompt) + "</span>";
 
           const spk = document.createElement("button");
           spk.type = "button";
@@ -2214,14 +2411,18 @@
             optsRow.appendChild(sp);
           });
 
-          card.appendChild(qTop);
-          card.appendChild(optsRow);
-          listWrap.appendChild(card);
-        });
-        grid.appendChild(listWrap);
+            card.appendChild(qTop);
+            card.appendChild(optsRow);
+            listWrap.appendChild(card);
+          });
+          grid.appendChild(listWrap);
+        }
 
         document.getElementById("launch-pool-summary").textContent = title + " (" + questions.length + " Qs)";
-        document.getElementById("launch-mode-summary").textContent = MODE_CONFIG[currentMode].label + " · 3-Choice Gates";
+        document.getElementById("launch-mode-summary").textContent =
+          currentMode === "vocab_cloze"
+            ? "Vocabulary · Fill-in-the-Blank"
+            : (MODE_CONFIG[currentMode].label + " · 3-Choice Gates");
       }
 
       const dockPackEl = document.getElementById("mobile-dock-pack");
@@ -2243,7 +2444,8 @@
           preset.packType === "mcq" ? formatMcqLines(preset.questions) : preset.words.join(", ");
       } else if (id === "new") {
         syncModeUI();
-        document.getElementById("input-set-title").value = "Custom " + MODE_CONFIG[currentMode].label;
+        document.getElementById("input-set-title").value =
+          currentMode === "vocab_cloze" ? "Custom Vocab Blanks" : ("Custom " + MODE_CONFIG[currentMode].label);
         document.getElementById("input-words").value = "";
       } else {
         const found = savedCustomPacks.find(x => x.id === id);
@@ -2321,17 +2523,28 @@
       });
     }
 
-    async function callAiExtractor({ imageDataUrl, textInput }) {
+    async function callAiExtractor({ imageDataUrl, textInput, customTitle }) {
       const btnPhoto = document.getElementById("btn-scan-photo");
       const btnTopic = document.getElementById("btn-ai-topic-gen");
+      const btnInline = document.getElementById("btn-gen-sentences-from-box");
       const sub = document.getElementById("scan-subtext");
+      const origGenLabel = btnTopic.textContent;
 
       btnPhoto.disabled = true;
       btnTopic.disabled = true;
+      if (btnInline) btnInline.disabled = true;
       const btnGalStart = document.getElementById("btn-upload-gallery");
       if (btnGalStart) btnGalStart.disabled = true;
-      btnPhoto.textContent = "⏳ Scanning…";
-      sub.textContent = "Building " + MODE_CONFIG[currentMode].label + " pack with DeepSeek…";
+
+      if (imageDataUrl) {
+        btnPhoto.textContent = "⏳ Scanning…";
+      } else {
+        btnTopic.textContent = "⏳ Generating…";
+        if (btnInline) btnInline.textContent = "⏳ Generating…";
+      }
+      sub.textContent = currentMode === "vocab_cloze"
+        ? "AI Worker is writing fill-in-the-blank sample sentences…"
+        : ("Building " + MODE_CONFIG[currentMode].label + " pack with DeepSeek…");
 
       try {
         const res = await fetch(workerUrl + "/api/extract", {
@@ -2343,7 +2556,7 @@
         if (!res.ok || !data.ok) throw new Error((data && data.error) || "Worker unavailable");
 
         const newId = "ai_" + Date.now();
-        const title = data.title || ("AI " + MODE_CONFIG[currentMode].label);
+        const title = (customTitle || data.title || ("AI " + MODE_CONFIG[currentMode].label)).slice(0, 32);
 
         if (currentMode === "vocab") {
           if (!Array.isArray(data.words) || data.words.length === 0) throw new Error("No words found");
@@ -2356,17 +2569,27 @@
           if (!Array.isArray(data.questions) || data.questions.length === 0) throw new Error("No questions returned");
           savedCustomPacks.unshift({ id: newId, packType: "mcq", mode: currentMode, title, questions: data.questions });
           saveCustomPacksToStorage();
+          document.getElementById("ai-topic-input").value = "";
           loadSelectionIntoEditor(newId, false);
-          sub.textContent = "Generated " + data.questions.length + " questions! Review below or launch F1.";
-          showToast("✅ Generated " + data.questions.length + " questions!");
+          sub.textContent = currentMode === "vocab_cloze"
+            ? ("Generated " + data.questions.length + " fill-in-the-blank sample sentences! Review below or launch F1.")
+            : ("Generated " + data.questions.length + " questions! Review below or launch F1.");
+          showToast("✅ Generated " + data.questions.length + " sample sentences!");
         }
+        return true;
       } catch (err) {
-        sub.textContent = "AI Worker not live yet — use built-in presets or enter items manually below.";
-        showToast("⚠️ Deploy worker.js with DEEPSEEK_API_KEY for live AI scan");
+        sub.textContent = "Could not reach AI Worker — check connection or Worker settings (⚙️).";
+        showToast("⚠️ AI Worker unavailable: " + (err && err.message ? err.message : "check connection"));
+        return false;
       } finally {
         btnPhoto.disabled = false;
         btnTopic.disabled = false;
         btnPhoto.textContent = "📷 Camera";
+        btnTopic.textContent = currentMode === "vocab_cloze" ? "✨ Generate Sentences" : origGenLabel;
+        if (btnInline) {
+          btnInline.disabled = false;
+          btnInline.textContent = "✨ Generate Sentences";
+        }
         const btnGal = document.getElementById("btn-upload-gallery");
         if (btnGal) btnGal.disabled = false;
       }
@@ -2379,12 +2602,30 @@
       await callAiExtractor({ imageDataUrl });
     }
 
+    function selectDefaultForMode(modeName) {
+      currentMode = modeName;
+      const firstPreset = ALL_PRESET_PACKS.find(p => p.mode === currentMode);
+      if (firstPreset) {
+        loadSelectionIntoEditor(firstPreset.id, false);
+        return;
+      }
+      const firstSaved = savedCustomPacks.find(cp => (cp.mode || (cp.packType === "mcq" ? "grammar" : "vocab")) === currentMode);
+      loadSelectionIntoEditor(firstSaved ? firstSaved.id : "new", false);
+    }
+
     // Skill Mode Tab Switching
     document.querySelectorAll("#skill-tabs .skill-tab").forEach(tab => {
       tab.addEventListener("click", () => {
-        currentMode = tab.getAttribute("data-mode") || "vocab";
-        const firstForMode = ALL_PRESET_PACKS.find(p => p.mode === currentMode);
-        loadSelectionIntoEditor(firstForMode ? firstForMode.id : "new", false);
+        const clicked = tab.getAttribute("data-mode") || "vocab";
+        selectDefaultForMode(clicked === "vocab" ? vocabSubMode : clicked);
+      });
+    });
+
+    // Vocabulary Sub-Mode Switching (Dictation vs. Fill-in-the-Blank)
+    document.querySelectorAll("#vocab-submode-pills .vocab-sub-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        vocabSubMode = btn.getAttribute("data-vsub") || "vocab";
+        selectDefaultForMode(vocabSubMode);
       });
     });
 
@@ -2396,8 +2637,20 @@
       }
     });
 
-    document.getElementById("pool-select").addEventListener("change", e => {
-      loadSelectionIntoEditor(e.target.value, e.target.value === "new");
+    document.getElementById("pool-select").addEventListener("change", async e => {
+      const val = e.target.value;
+      if (val && val.startsWith("import_words:")) {
+        const srcId = val.slice("import_words:".length);
+        const srcPack = findPreset(srcId) || savedCustomPacks.find(x => x.id === srcId);
+        if (srcPack && Array.isArray(srcPack.words) && srcPack.words.length >= 3) {
+          await callAiExtractor({
+            textInput: srcPack.words.join(", "),
+            customTitle: (srcPack.title + " (Blanks)").slice(0, 32)
+          });
+          return;
+        }
+      }
+      loadSelectionIntoEditor(val, val === "new");
     });
 
     document.getElementById("btn-new-set").addEventListener("click", () => {
@@ -2460,7 +2713,29 @@
       });
     });
 
-    document.getElementById("btn-save-custom").addEventListener("click", () => {
+    document.getElementById("btn-gen-sentences-from-box").addEventListener("click", async () => {
+      const words = getPlainImportedWordsInBox();
+      if (words.length < 3) {
+        showToast("⚠️ Enter at least 3 words first");
+        return;
+      }
+      const curTitle = (document.getElementById("input-set-title").value || "").trim();
+      await callAiExtractor({
+        textInput: words.join(", "),
+        customTitle: curTitle && curTitle !== "Custom Vocab Blanks" ? curTitle : ""
+      });
+    });
+
+    document.getElementById("btn-save-custom").addEventListener("click", async () => {
+      if (currentMode === "vocab_cloze" && getPlainImportedWordsInBox().length >= 3) {
+        const words = getPlainImportedWordsInBox();
+        const curTitle = (document.getElementById("input-set-title").value || "").trim();
+        await callAiExtractor({
+          textInput: words.join(", "),
+          customTitle: curTitle && curTitle !== "Custom Vocab Blanks" ? curTitle : ""
+        });
+        return;
+      }
       const pack = buildCurrentPackObject();
       if (!pack) {
         showToast("⚠️ Add valid items before saving");
@@ -2539,14 +2814,39 @@
       if (f) handlePhotoFile(f);
     });
 
-    document.getElementById("btn-ai-topic-gen").addEventListener("click", () => {
+    function triggerAiTextImport() {
       const txt = (document.getElementById("ai-topic-input").value || "").trim();
       if (!txt) {
-        showToast("Type a grammar topic or paste a passage first");
+        if (currentMode === "vocab_cloze" && getPlainImportedWordsInBox().length >= 3) {
+          document.getElementById("btn-gen-sentences-from-box").click();
+          return;
+        }
+        showToast(
+          currentMode === "vocab_cloze"
+            ? "Paste or type at least 3 vocabulary words first"
+            : "Type a grammar topic or paste a passage first"
+        );
         document.getElementById("ai-topic-input").focus();
         return;
       }
-      callAiExtractor({ textInput: txt });
+      if (currentMode === "vocab_cloze" && parseWords(txt).length < 3) {
+        showToast("⚠️ Please enter at least 3 vocabulary words (comma or newline separated)");
+        document.getElementById("ai-topic-input").focus();
+        return;
+      }
+      const curTitle = (document.getElementById("input-set-title").value || "").trim();
+      callAiExtractor({
+        textInput: txt,
+        customTitle: currentMode === "vocab_cloze" && curTitle && curTitle !== "Custom Vocab Blanks" ? curTitle : ""
+      });
+    }
+
+    document.getElementById("btn-ai-topic-gen").addEventListener("click", triggerAiTextImport);
+    document.getElementById("ai-topic-input").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        triggerAiTextImport();
+      }
     });
 
     const dz = document.getElementById("scan-dropzone");
@@ -2559,11 +2859,29 @@
       if (f) handlePhotoFile(f);
     });
 
-    function triggerLaunchF1Game() {
+    async function triggerLaunchF1Game() {
+      // If user pasted plain words in Fill-in-the-Blank or #ai-topic-input and hit Launch directly, generate AI sample sentences automatically first!
+      if (currentMode === "vocab_cloze") {
+        const topWords = parseWords(document.getElementById("ai-topic-input").value || "");
+        const boxWords = getPlainImportedWordsInBox();
+        const wordsToGen = boxWords.length >= 3 ? boxWords : (topWords.length >= 3 ? topWords : []);
+        if (wordsToGen.length >= 3 && parseMcqLines(document.getElementById("input-words").value, currentMode).length === 0) {
+          const curTitle = (document.getElementById("input-set-title").value || "").trim();
+          const ok = await callAiExtractor({
+            textInput: wordsToGen.join(", "),
+            customTitle: curTitle && curTitle !== "Custom Vocab Blanks" ? curTitle : ""
+          });
+          if (!ok) return;
+        }
+      }
       const pack = persistActivePack();
       if (!pack) {
-        showToast("⚠️ Please complete your pack items before launching");
-        document.getElementById("input-words").focus();
+        showToast(
+          currentMode === "vocab_cloze"
+            ? "⚠️ Import 3+ words (photo or paste) so AI can generate sentences first"
+            : "⚠️ Please complete your pack items before launching"
+        );
+        document.getElementById(currentMode === "vocab_cloze" ? "ai-topic-input" : "input-words").focus();
         return;
       }
       const hashPart = pack.packType === "mcq"
