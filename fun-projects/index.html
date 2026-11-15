@@ -190,6 +190,8 @@
     a.card { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
   }
+  /* Keep names and labels from wrapping mid-phrase. */
+  .nowrap { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -209,20 +211,21 @@
 
     <div class="cards">
       <a class="card" href="https://skhhcss-eng.github.io/say-it-louder/" target="_blank" rel="noopener noreferrer">
-        <p class="card-kicker"><span class="badge badge-junior">Junior</span><span class="badge badge-dse">DSE</span></p>
+        <p class="card-kicker"><span class="badge badge-junior">Junior</span></p>
         <h3>Say It Louder</h3>
         <p>Practise speaking in a short interactive story.</p>
         <span class="card-arrow">Open →</span>
       </a>
       <a class="card" href="play-your-way/">
+        <p class="card-kicker"><span class="badge badge-junior">Junior</span></p>
         <h3>Play Your Way</h3>
-        <p>Snap a worksheet photo or pick a built-in pack to play custom Vocabulary, Grammar, Reading, and Proofreading games — starting with F1 Grand Prix: Team Radio Race.</p>
+        <p>Build a simple game from a worksheet photo or a built-in pack.</p>
         <span class="card-arrow">Open →</span>
       </a>
     </div>
 
     <footer>
-      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      <span class="nowrap">聖公會聖匠中學</span> <span class="nowrap">SKH Holy Carpenter Secondary School</span> · <span class="nowrap">English Department</span><br>
       Materials for school use
     </footer>
   </div>

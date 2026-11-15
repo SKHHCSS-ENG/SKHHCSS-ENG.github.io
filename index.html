@@ -254,6 +254,8 @@
     body { background: #fff; }
     a.card, a.utility { box-shadow: none; break-inside: avoid; }
   }
+  /* Keep names and labels from wrapping mid-phrase. */
+  .nowrap { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -265,7 +267,7 @@
       </div>
       <div class="hero-body">
         <h1>English Department</h1>
-        <p class="subject">English Language · SKH Holy Carpenter Secondary School</p>
+        <p class="subject"><span class="nowrap">English Language ·</span> <span class="nowrap">SKH Holy Carpenter Secondary School</span></p>
       </div>
     </header>
 
@@ -328,7 +330,7 @@
             <path d="M8.15 19.2h7.7"/>
           </svg>
           <div class="card-name">
-            <h2>Activities &amp; Competitions</h2>
+            <h2><span class="nowrap">Activities &amp; Competitions</span></h2>
           </div>
         </div>
         <p>Speech Festival, Speak Up, and challenges like Roaming Mic.</p>
@@ -371,7 +373,7 @@
     </div>
 
     <footer>
-      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      <span class="nowrap">聖公會聖匠中學</span> <span class="nowrap">SKH Holy Carpenter Secondary School</span> · <span class="nowrap">English Department</span><br>
       Materials for school use
     </footer>
   </div>

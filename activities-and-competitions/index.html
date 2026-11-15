@@ -196,6 +196,8 @@
     a.card { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
   }
+  /* Keep names and labels from wrapping mid-phrase. */
+  .nowrap { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -224,7 +226,7 @@
         </a>
         <a class="card" href="https://nets.edb.edcity.hk/page.php?p=339" target="_blank" rel="noopener noreferrer">
           <p class="card-kicker"><span class="badge badge-competition">Competition</span></p>
-          <h3>Speak Up – Act Out Drama Competition</h3>
+          <h3><span class="nowrap">Speak Up –</span> <span class="nowrap">Act Out Drama Competition</span></h3>
           <p>NET Section drama competition for secondary schools — devise a short English drama.</p>
           <span class="card-arrow">Open →</span>
         </a>
@@ -244,7 +246,7 @@
     </section>
 
     <footer>
-      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      <span class="nowrap">聖公會聖匠中學</span> <span class="nowrap">SKH Holy Carpenter Secondary School</span> · <span class="nowrap">English Department</span><br>
       Materials for school use
     </footer>
   </div>
