@@ -87,6 +87,7 @@
       align-items: center;
       gap: 5px;
       transition: background 0.15s ease;
+      text-decoration: none;
     }
 
     .back-pill:hover {
@@ -1249,7 +1250,7 @@
   <header class="top-bar">
     <div class="top-bar-inner">
       <div class="brand-cluster">
-        <button class="back-pill" id="btn-back-portal" type="button">← Fun Projects</button>
+        <a class="back-pill" id="btn-back-portal" href="https://learning.hcs.edu.hk/english/" aria-label="Back to the English site">←</a>
         <div class="brand-title-wrap">
           <span class="brand-icon">🎮</span>
           <span class="brand-title">Play Your Way</span>
@@ -2659,14 +2660,6 @@
         vocabSubMode = btn.getAttribute("data-vsub") || "vocab";
         selectDefaultForMode(vocabSubMode);
       });
-    });
-
-    document.getElementById("btn-back-portal").addEventListener("click", () => {
-      if (window.location.protocol === "http:" || window.location.protocol === "https:") {
-        window.location.href = "../";
-      } else {
-        showToast("On GitHub Pages, this returns to /fun-projects/");
-      }
     });
 
     document.getElementById("pool-select").addEventListener("change", async e => {

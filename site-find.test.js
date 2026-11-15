@@ -323,8 +323,9 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
 
   assert.match(
     funPage,
-    /href="https:\/\/skhhcss-eng\.github\.io\/say-it-louder\/" target="_blank" rel="noopener noreferrer"/
+    /href="https:\/\/skhhcss-eng\.github\.io\/say-it-louder\/"/
   );
+  assert.equal(funPage.includes('target="_blank"'), false);
   assert.match(funPage, /<title>Fun Projects ·/);
   assert.match(funPage, /<h1>Fun Projects<\/h1>/);
   assert.match(funPage, /Practise speaking in a short interactive story\./);
