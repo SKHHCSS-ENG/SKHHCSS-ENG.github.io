@@ -6,8 +6,9 @@
   <title>F1 Grand Prix: Team Radio Race</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+TC:wght@500;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../shared-words.js"></script>
   <style>
     :root {
       --f1-dark: rgba(15, 19, 28, 0.92);
@@ -2957,11 +2958,15 @@
         </div>
 
         <div class="config-box">
-          <span class="config-label">⏱️ Timer</span>
+          <span class="config-label">⏱️ Timer (<span id="timer-active-readout">15s</span>)</span>
           <div class="seg-row" id="timer-select-row">
             <button class="seg-btn" data-timer="10" type="button">10s (Fast)</button>
             <button class="seg-btn selected" data-timer="15" type="button">15s (Standard)</button>
             <button class="seg-btn" data-timer="0" type="button">Untimed</button>
+          </div>
+          <div class="custom-laps-wrap">
+            <label class="custom-laps-tag" for="input-custom-timer">Custom:</label>
+            <input class="custom-laps-input" id="input-custom-timer" type="number" min="3" max="180" inputmode="numeric" placeholder="3 – 180 sec" />
           </div>
         </div>
 
@@ -3094,11 +3099,15 @@
 
       <div class="config-grid">
         <div class="config-box">
-          <span class="config-label">⏱️ Timer</span>
+          <span class="config-label">⏱️ Timer (<span id="pause-timer-readout">15s</span>)</span>
           <div class="seg-row" id="pause-timer-row">
             <button class="seg-btn" data-timer="10" type="button">10s (Fast)</button>
             <button class="seg-btn selected" data-timer="15" type="button">15s (Standard)</button>
             <button class="seg-btn" data-timer="0" type="button">Untimed</button>
+          </div>
+          <div class="custom-laps-wrap">
+            <label class="custom-laps-tag" for="input-pause-custom-timer">Custom:</label>
+            <input class="custom-laps-input" id="input-pause-custom-timer" type="number" min="3" max="180" inputmode="numeric" placeholder="3 – 180 sec" />
           </div>
         </div>
 
@@ -3238,64 +3247,64 @@
 
     const PRESET_QUESTIONS = [
       // --- SET 1 ---
-      { word: "blog", options: ["blog", "vlog", "block"], answerIndex: 0, explanation: "Listen for the /b/ lip-pop at the start and the voiced /g/ at the end of 'blog', unlike 'vlog' (/v/) or 'block' (/k/)." },
-      { word: "magazine", options: ["machine", "magazine", "mandarin"], answerIndex: 1, explanation: "'magazine' has 3 syllables (mag-a-ZINE) ending with a long /ziːn/ sound." },
-      { word: "podcast", options: ["broadcast", "forecast", "podcast"], answerIndex: 2, explanation: "'podcast' starts with a crisp /pɒd/ sound (pod + cast), not 'broad-' or 'fore-'." },
-      { word: "television", options: ["television", "telephone", "celebration"], answerIndex: 0, explanation: "'television' ends with '-vision' (/vɪʒ.ən/), whereas 'telephone' ends with '-phone'." },
-      { word: "discussion forum", options: ["discussion form", "discussion forum", "decision forum"], answerIndex: 1, explanation: "The second word is 'fo·rum' (2 syllables: /ˈfɔː.rəm/), not the 1-syllable word 'form'." },
-      { word: "newspaper", options: ["note paper", "wallpaper", "newspaper"], answerIndex: 2, explanation: "'newspaper' starts with 'news-' (/njuːz/) with a clear /z/ sound before 'paper'." },
-      { word: "social network", options: ["social network", "social homework", "special network"], answerIndex: 0, explanation: "Listen for 'so·cial' (/ˈsəʊ.ʃəl/) followed by 'net·work' (/ˈnet.wɜːk/)." },
-      { word: "vlog", options: ["blog", "vlog", "frog"], answerIndex: 1, explanation: "'vlog' starts with a vibrating /v/ sound (top teeth touching bottom lip), unlike 'blog' (/b/) or 'frog' (/fr/)." },
-      { word: "comment", options: ["command", "common", "comment"], answerIndex: 2, explanation: "'comment' stresses the first syllable (COM-ment) and ends with a clear /nt/ sound." },
-      { word: "emoji", options: ["emoji", "emotion", "energy"], answerIndex: 0, explanation: "'emoji' ends with the '-ji' (/dʒi/) syllable, while 'emotion' ends with '-tion' (/ʃən/)." },
-      { word: "filter", options: ["finger", "filter", "filler"], answerIndex: 1, explanation: "'filter' has a crisp /lt/ consonant blend in the middle (FIL-ter)." },
-      { word: "hashtag", options: ["cash bag", "name tag", "hashtag"], answerIndex: 2, explanation: "'hashtag' starts with 'hash-' (/hæʃ/) followed by '-tag' (/tæɡ/)." },
-      { word: "influencer", options: ["influencer", "influence", "fluency"], answerIndex: 0, explanation: "'influencer' has 4 syllables (IN-flu-en-cer) and ends with the person suffix '-cer' (/sər/)." },
-      { word: "like", options: ["live", "like", "line"], answerIndex: 1, explanation: "'like' (/laɪk/) ends with a sharp, unvoiced /k/ sound rather than /v/ or /n/." },
-      { word: "meme", options: ["theme", "mean", "meme"], answerIndex: 2, explanation: "'meme' is pronounced as 1 syllable with a long 'ee' vowel (/miːm/), starting and ending with /m/." },
-      { word: "post", options: ["post", "past", "host"], answerIndex: 0, explanation: "'post' starts with /p/ and uses the long 'oh' vowel (/pəʊst/), unlike 'past' (/ɑː/) or 'host' (/h/)." },
-      { word: "share", options: ["stare", "share", "care"], answerIndex: 1, explanation: "'share' starts with the soft 'sh' sound (/ʃeər/), not /st/ or /k/." },
-      { word: "subscribe", options: ["describe", "prescribe", "subscribe"], answerIndex: 2, explanation: "'subscribe' starts with the prefix 'sub-' (/səb/) before '-scribe' (/skraɪb/)." },
+      { word: "blog", options: ["blog", "vlog", "block"], answerIndex: 0, explanation: "Listen for the /b/ lip-pop at the start and the voiced /g/ at the end of 'blog', unlike 'vlog' (/v/) or 'block' (/k/). || 留意「blog」詞首的雙唇爆破音 /b/ 及詞尾濁音 /g/，有別於「vlog」(/v/) 或「block」(/k/)。" },
+      { word: "magazine", options: ["machine", "magazine", "mandarin"], answerIndex: 1, explanation: "'magazine' has 3 syllables (mag-a-ZINE) ending with a long /ziːn/ sound. || 「magazine」共有三個音節 (mag-a-ZINE)，詞尾讀長音 /ziːn/。" },
+      { word: "podcast", options: ["broadcast", "forecast", "podcast"], answerIndex: 2, explanation: "'podcast' starts with a crisp /pɒd/ sound (pod + cast), not 'broad-' or 'fore-'. || 「podcast」以清晰的 /pɒd/ 開首 (pod + cast)，並非「broad-」或「fore-」。" },
+      { word: "television", options: ["television", "telephone", "celebration"], answerIndex: 0, explanation: "'television' ends with '-vision' (/vɪʒ.ən/), whereas 'telephone' ends with '-phone'. || 「television」以「-vision」(/vɪʒ.ən/) 結尾，而「telephone」則以「-phone」結尾。" },
+      { word: "discussion forum", options: ["discussion form", "discussion forum", "decision forum"], answerIndex: 1, explanation: "The second word is 'fo·rum' (2 syllables: /ˈfɔː.rəm/), not the 1-syllable word 'form'. || 第二個詞是雙音節的「fo·rum」(/ˈfɔː.rəm/)，而非單音節的「form」。" },
+      { word: "newspaper", options: ["note paper", "wallpaper", "newspaper"], answerIndex: 2, explanation: "'newspaper' starts with 'news-' (/njuːz/) with a clear /z/ sound before 'paper'. || 「newspaper」以「news-」(/njuːz/) 開首，在「paper」前有清晰的 /z/ 音。" },
+      { word: "social network", options: ["social network", "social homework", "special network"], answerIndex: 0, explanation: "Listen for 'so·cial' (/ˈsəʊ.ʃəl/) followed by 'net·work' (/ˈnet.wɜːk/). || 留意開首的「so·cial」(/ˈsəʊ.ʃəl/) 緊接後面的「net·work」(/ˈnet.wɜːk/)。" },
+      { word: "vlog", options: ["blog", "vlog", "frog"], answerIndex: 1, explanation: "'vlog' starts with a vibrating /v/ sound (top teeth touching bottom lip), unlike 'blog' (/b/) or 'frog' (/fr/). || 「vlog」以唇齒摩擦濁音 /v/ 開首（上齒輕觸下唇），有別於「blog」(/b/) 或「frog」(/fr/)。" },
+      { word: "comment", options: ["command", "common", "comment"], answerIndex: 2, explanation: "'comment' stresses the first syllable (COM-ment) and ends with a clear /nt/ sound. || 「comment」重音在第一音節 (COM-ment)，並以清晰的 /nt/ 結尾。" },
+      { word: "emoji", options: ["emoji", "emotion", "energy"], answerIndex: 0, explanation: "'emoji' ends with the '-ji' (/dʒi/) syllable, while 'emotion' ends with '-tion' (/ʃən/). || 「emoji」以「-ji」(/dʒi/) 音節結尾，而「emotion」則以「-tion」(/ʃən/) 結尾。" },
+      { word: "filter", options: ["finger", "filter", "filler"], answerIndex: 1, explanation: "'filter' has a crisp /lt/ consonant blend in the middle (FIL-ter). || 「filter」中間包含清晰的 /lt/ 子音組合 (FIL-ter)。" },
+      { word: "hashtag", options: ["cash bag", "name tag", "hashtag"], answerIndex: 2, explanation: "'hashtag' starts with 'hash-' (/hæʃ/) followed by '-tag' (/tæɡ/). || 「hashtag」由「hash-」(/hæʃ/) 加上「-tag」(/tæɡ/) 組成。" },
+      { word: "influencer", options: ["influencer", "influence", "fluency"], answerIndex: 0, explanation: "'influencer' has 4 syllables (IN-flu-en-cer) and ends with the person suffix '-cer' (/sər/). || 「influencer」共有四個音節 (IN-flu-en-cer)，並以代表人物的「-cer」(/sər/) 結尾。" },
+      { word: "like", options: ["live", "like", "line"], answerIndex: 1, explanation: "'like' (/laɪk/) ends with a sharp, unvoiced /k/ sound rather than /v/ or /n/. || 「like」(/laɪk/) 詞尾是清脆的無聲子音 /k/，而非 /v/ 或 /n/。" },
+      { word: "meme", options: ["theme", "mean", "meme"], answerIndex: 2, explanation: "'meme' is pronounced as 1 syllable with a long 'ee' vowel (/miːm/), starting and ending with /m/. || 「meme」為單音節詞，讀長元音 /miːm/，詞首和詞尾均為雙唇音 /m/。" },
+      { word: "post", options: ["post", "past", "host"], answerIndex: 0, explanation: "'post' starts with /p/ and uses the long 'oh' vowel (/pəʊst/), unlike 'past' (/ɑː/) or 'host' (/h/). || 「post」以 /p/ 開首並配雙元音 /əʊ/ (/pəʊst/)，有別於「past」(/ɑː/) 或「host」(/h/)。" },
+      { word: "share", options: ["stare", "share", "care"], answerIndex: 1, explanation: "'share' starts with the soft 'sh' sound (/ʃeər/), not /st/ or /k/. || 「share」以輕柔的捲舌擦音 /ʃ/ (sh) 開首，而非 /st/ 或 /k/。" },
+      { word: "subscribe", options: ["describe", "prescribe", "subscribe"], answerIndex: 2, explanation: "'subscribe' starts with the prefix 'sub-' (/səb/) before '-scribe' (/skraɪb/). || 「subscribe」以字首「sub-」(/səb/) 開頭，後接「-scribe」(/skraɪb/)。" },
 
       // --- SET 2 ---
-      { word: "blog", options: ["post", "blog", "log"], answerIndex: 1, explanation: "'blog' starts with the /bl/ blend, adding a /b/ sound before 'log'." },
-      { word: "magazine", options: ["magazine", "newspaper", "medicine"], answerIndex: 0, explanation: "'magazine' ends with a stressed long '-zine' (/ziːn/), unlike 'medicine' (/sɪn/)." },
-      { word: "podcast", options: ["post", "podcast", "outcast"], answerIndex: 1, explanation: "'podcast' has 2 syllables (POD-cast), beginning with /pɒd/." },
-      { word: "television", options: ["division", "revision", "television"], answerIndex: 2, explanation: "'television' begins with the 2-syllable root 'tel·e-' (/ˈtel.ɪ/)." },
-      { word: "discussion forum", options: ["discussion forum", "social network", "discussion room"], answerIndex: 0, explanation: "Listen for the 2-syllable word 'fo·rum' at the end, not the 1-syllable word 'room'." },
-      { word: "newspaper", options: ["newsreader", "newspaper", "paperwork"], answerIndex: 1, explanation: "'newspaper' combines 'news' + 'paper' (/ˈnjuːzˌpeɪ.pər/)." },
-      { word: "social network", options: ["social media", "vocal network", "social network"], answerIndex: 2, explanation: "Listen for 'so·cial' (/s/) at the start and 'net·work' at the end." },
-      { word: "vlog", options: ["vlog", "like", "flock"], answerIndex: 0, explanation: "'vlog' starts with a voiced /v/ sound and ends with /g/, unlike 'flock' (/fl/ and /k/)." },
-      { word: "comment", options: ["moment", "comment", "content"], answerIndex: 1, explanation: "'comment' starts with /kɒm/ followed by '-ment' (/ˈkɒm.ent/)." },
-      { word: "emoji", options: ["image", "imagined", "emoji"], answerIndex: 2, explanation: "'emoji' stresses the middle 'MO' syllable (/ɪˈməʊ.dʒi/) and ends with /i/." },
-      { word: "filter", options: ["filter", "folder", "factor"], answerIndex: 0, explanation: "'filter' has a short 'i' vowel in the first syllable (/ˈfɪl.tər/)." },
-      { word: "hashtag", options: ["flashback", "hashtag", "halfback"], answerIndex: 1, explanation: "'hashtag' starts with /hæʃ/ and ends with /tæɡ/." },
-      { word: "influencer", options: ["announcer", "inspector", "influencer"], answerIndex: 2, explanation: "'influencer' starts with 'in·flu-' (/ˈɪn.flu.ən.sər/)." },
-      { word: "like", options: ["like", "light", "bike"], answerIndex: 0, explanation: "'like' starts with /l/ and ends with a crisp /k/ sound (unlike 'light' which ends with /t/)." },
-      { word: "meme", options: ["name", "meme", "mine"], answerIndex: 1, explanation: "'meme' uses the long 'ee' vowel (/miːm/) with both lips closing on /m/ at the start and end." },
-      { word: "post", options: ["coast", "most", "post"], answerIndex: 2, explanation: "'post' begins with the voiceless lip-pop /p/ followed by '-ost' (/pəʊst/)." },
-      { word: "share", options: ["share", "chair", "spare"], answerIndex: 0, explanation: "'share' starts with a smooth 'sh' (/ʃ/) sound, whereas 'chair' starts with a sharp 'ch' (/tʃ/)." },
-      { word: "subscribe", options: ["surprise", "subscribe", "survive"], answerIndex: 1, explanation: "'subscribe' has the /skr/ consonant cluster in the second syllable (-scribe)." },
+      { word: "blog", options: ["post", "blog", "log"], answerIndex: 1, explanation: "'blog' starts with the /bl/ blend, adding a /b/ sound before 'log'. || 「blog」以 /bl/ 子音群開首，比「log」多出詞首的 /b/ 音。" },
+      { word: "magazine", options: ["magazine", "newspaper", "medicine"], answerIndex: 0, explanation: "'magazine' ends with a stressed long '-zine' (/ziːn/), unlike 'medicine' (/sɪn/). || 「magazine」詞尾重讀長音「-zine」(/ziːn/)，有別於「medicine」(/sɪn/)。" },
+      { word: "podcast", options: ["post", "podcast", "outcast"], answerIndex: 1, explanation: "'podcast' has 2 syllables (POD-cast), beginning with /pɒd/. || 「podcast」有兩個音節 (POD-cast)，以 /pɒd/ 開首。" },
+      { word: "television", options: ["division", "revision", "television"], answerIndex: 2, explanation: "'television' begins with the 2-syllable root 'tel·e-' (/ˈtel.ɪ/). || 「television」以雙音節字根「tel·e-」(/ˈtel.ɪ/) 開首。" },
+      { word: "discussion forum", options: ["discussion forum", "social network", "discussion room"], answerIndex: 0, explanation: "Listen for the 2-syllable word 'fo·rum' at the end, not the 1-syllable word 'room'. || 留意詞尾是雙音節的「fo·rum」，而非單音節的「room」。" },
+      { word: "newspaper", options: ["newsreader", "newspaper", "paperwork"], answerIndex: 1, explanation: "'newspaper' combines 'news' + 'paper' (/ˈnjuːzˌpeɪ.pər/). || 「newspaper」由「news」與「paper」結合而成 (/ˈnjuːzˌpeɪ.pər/)。" },
+      { word: "social network", options: ["social media", "vocal network", "social network"], answerIndex: 2, explanation: "Listen for 'so·cial' (/s/) at the start and 'net·work' at the end. || 留意開首的「so·cial」(/s/) 以及結尾的「net·work」。" },
+      { word: "vlog", options: ["vlog", "like", "flock"], answerIndex: 0, explanation: "'vlog' starts with a voiced /v/ sound and ends with /g/, unlike 'flock' (/fl/ and /k/). || 「vlog」以濁音 /v/ 開首、/g/ 結尾，有別於「flock」(/fl/ 及 /k/)。" },
+      { word: "comment", options: ["moment", "comment", "content"], answerIndex: 1, explanation: "'comment' starts with /kɒm/ followed by '-ment' (/ˈkɒm.ent/). || 「comment」以 /kɒm/ 開首，後接「-ment」(/ˈkɒm.ent/)。" },
+      { word: "emoji", options: ["image", "imagined", "emoji"], answerIndex: 2, explanation: "'emoji' stresses the middle 'MO' syllable (/ɪˈməʊ.dʒi/) and ends with /i/. || 「emoji」重音落在中間的「MO」音節 (/ɪˈməʊ.dʒi/)，並以 /i/ 結尾。" },
+      { word: "filter", options: ["filter", "folder", "factor"], answerIndex: 0, explanation: "'filter' has a short 'i' vowel in the first syllable (/ˈfɪl.tər/). || 「filter」第一音節使用短元音 /ɪ/ (/ˈfɪl.tər/)。" },
+      { word: "hashtag", options: ["flashback", "hashtag", "halfback"], answerIndex: 1, explanation: "'hashtag' starts with /hæʃ/ and ends with /tæɡ/. || 「hashtag」以 /hæʃ/ 開首，並以 /tæɡ/ 結尾。" },
+      { word: "influencer", options: ["announcer", "inspector", "influencer"], answerIndex: 2, explanation: "'influencer' starts with 'in·flu-' (/ˈɪn.flu.ən.sər/). || 「influencer」以「in·flu-」開首 (/ˈɪn.flu.ən.sər/)。" },
+      { word: "like", options: ["like", "light", "bike"], answerIndex: 0, explanation: "'like' starts with /l/ and ends with a crisp /k/ sound (unlike 'light' which ends with /t/). || 「like」以 /l/ 開首並以清晰的 /k/ 結尾（而非「light」的 /t/ 尾音）。" },
+      { word: "meme", options: ["name", "meme", "mine"], answerIndex: 1, explanation: "'meme' uses the long 'ee' vowel (/miːm/) with both lips closing on /m/ at the start and end. || 「meme」讀長音 /miːm/，詞首及詞尾均須閉唇發 /m/ 音。" },
+      { word: "post", options: ["coast", "most", "post"], answerIndex: 2, explanation: "'post' begins with the voiceless lip-pop /p/ followed by '-ost' (/pəʊst/). || 「post」以無聲雙唇爆破音 /p/ 開首，後接「-ost」(/pəʊst/)。" },
+      { word: "share", options: ["share", "chair", "spare"], answerIndex: 0, explanation: "'share' starts with a smooth 'sh' (/ʃ/) sound, whereas 'chair' starts with a sharp 'ch' (/tʃ/). || 「share」以平順的「sh」(/ʃ/) 開首，而「chair」則以破擦音「ch」(/tʃ/) 開首。" },
+      { word: "subscribe", options: ["surprise", "subscribe", "survive"], answerIndex: 1, explanation: "'subscribe' has the /skr/ consonant cluster in the second syllable (-scribe). || 「subscribe」第二音節「-scribe」包含 /skr/ 三子音組合。" },
 
       // --- SET 3 ---
-      { word: "blog", options: ["plug", "flag", "blog"], answerIndex: 2, explanation: "'blog' starts with /bl/ and has a short 'o' vowel (/blɒɡ/)." },
-      { word: "magazine", options: ["magazine", "marathon", "museum"], answerIndex: 0, explanation: "'magazine' ends with the stressed '-zine' (/ziːn/) syllable." },
-      { word: "podcast", options: ["postcard", "podcast", "contrast"], answerIndex: 1, explanation: "Careful! 'podcast' is pod + cast (/ˈpɒd.kɑːst/), not 'postcard' (post + card)." },
-      { word: "television", options: ["telescope", "tradition", "television"], answerIndex: 2, explanation: "'television' has 4 syllables (tel-e-vi-sion) ending in '-vision'." },
-      { word: "discussion forum", options: ["discussion forum", "discussion floor", "percussion forum"], answerIndex: 0, explanation: "Listen for 'dis·cus·sion' at the start and 'fo·rum' at the end." },
-      { word: "newspaper", options: ["sandpaper", "newspaper", "skyscraper"], answerIndex: 1, explanation: "'newspaper' begins with 'news-' (/njuːz/)." },
-      { word: "social network", options: ["local network", "social worker", "social network"], answerIndex: 2, explanation: "'social network' ends with 'net·work', not 'worker'." },
-      { word: "vlog", options: ["vlog", "clock", "block"], answerIndex: 0, explanation: "'vlog' begins with the voiced /vl/ sound (/vlɒɡ/)." },
-      { word: "comment", options: ["comet", "comment", "commit"], answerIndex: 1, explanation: "'comment' ends with '-ment' (/mənt/) with an /n/ before the final /t/." },
-      { word: "emoji", options: ["allergy", "apology", "emoji"], answerIndex: 2, explanation: "'emoji' has 3 syllables (e-MO-ji) with a long 'oh' in the middle." },
-      { word: "filter", options: ["filter", "shelter", "winter"], answerIndex: 0, explanation: "'filter' begins with the /f/ sound followed by '-ilter' (/ˈfɪl.tər/)." },
-      { word: "hashtag", options: ["handbag", "hashtag", "ragtag"], answerIndex: 1, explanation: "'hashtag' has the 'sh' sound at the end of its first syllable (hash-tag)." },
-      { word: "influencer", options: ["professor", "producer", "influencer"], answerIndex: 2, explanation: "'influencer' has 4 syllables starting with 'in-flu-'." },
-      { word: "like", options: ["like", "lake", "lack"], answerIndex: 0, explanation: "'like' uses the long 'i' diphthong (/laɪk/), unlike 'lake' (/eɪ/) or 'lack' (/æ/)." },
-      { word: "meme", options: ["team", "meme", "mime"], answerIndex: 1, explanation: "'meme' starts with /m/ and has a long 'ee' vowel (/miːm/), unlike 'mime' (/maɪm/)." },
-      { word: "post", options: ["pose", "port", "post"], answerIndex: 2, explanation: "'post' ends with a crisp /st/ cluster (/pəʊst/), unlike 'pose' (/z/) or 'port' (/rt/)." },
-      { word: "share", options: ["share", "shore", "sure"], answerIndex: 0, explanation: "'share' rhymes with 'air' and 'care' (/ʃeər/)." },
-      { word: "subscribe", options: ["subside", "subscribe", "inscribe"], answerIndex: 1, explanation: "'subscribe' starts with 'sub-' and has the /skr/ blend in '-scribe'." }
+      { word: "blog", options: ["plug", "flag", "blog"], answerIndex: 2, explanation: "'blog' starts with /bl/ and has a short 'o' vowel (/blɒɡ/). || 「blog」以 /bl/ 開首，並配短元音 /ɒ/ (/blɒɡ/)。" },
+      { word: "magazine", options: ["magazine", "marathon", "museum"], answerIndex: 0, explanation: "'magazine' ends with the stressed '-zine' (/ziːn/) syllable. || 「magazine」以重讀音節「-zine」(/ziːn/) 結尾。" },
+      { word: "podcast", options: ["postcard", "podcast", "contrast"], answerIndex: 1, explanation: "Careful! 'podcast' is pod + cast (/ˈpɒd.kɑːst/), not 'postcard' (post + card). || 小心分辨！「podcast」是 pod + cast (/ˈpɒd.kɑːst/)，而非「postcard」(post + card)。" },
+      { word: "television", options: ["telescope", "tradition", "television"], answerIndex: 2, explanation: "'television' has 4 syllables (tel-e-vi-sion) ending in '-vision'. || 「television」共有四個音節 (tel-e-vi-sion)，以「-vision」結尾。" },
+      { word: "discussion forum", options: ["discussion forum", "discussion floor", "percussion forum"], answerIndex: 0, explanation: "Listen for 'dis·cus·sion' at the start and 'fo·rum' at the end. || 留意開首的「dis·cus·sion」與結尾的「fo·rum」。" },
+      { word: "newspaper", options: ["sandpaper", "newspaper", "skyscraper"], answerIndex: 1, explanation: "'newspaper' begins with 'news-' (/njuːz/). || 「newspaper」以「news-」(/njuːz/) 開首。" },
+      { word: "social network", options: ["local network", "social worker", "social network"], answerIndex: 2, explanation: "'social network' ends with 'net·work', not 'worker'. || 「social network」以「net·work」結尾，而非「worker」。" },
+      { word: "vlog", options: ["vlog", "clock", "block"], answerIndex: 0, explanation: "'vlog' begins with the voiced /vl/ sound (/vlɒɡ/). || 「vlog」以有聲的 /vl/ 子音組合開首 (/vlɒɡ/)。" },
+      { word: "comment", options: ["comet", "comment", "commit"], answerIndex: 1, explanation: "'comment' ends with '-ment' (/mənt/) with an /n/ before the final /t/. || 「comment」以「-ment」(/mənt/) 結尾，尾音 /t/ 前有清晰的 /n/ 音。" },
+      { word: "emoji", options: ["allergy", "apology", "emoji"], answerIndex: 2, explanation: "'emoji' has 3 syllables (e-MO-ji) with a long 'oh' in the middle. || 「emoji」有三個音節 (e-MO-ji)，中間讀雙元音 /əʊ/。" },
+      { word: "filter", options: ["filter", "shelter", "winter"], answerIndex: 0, explanation: "'filter' begins with the /f/ sound followed by '-ilter' (/ˈfɪl.tər/). || 「filter」以唇齒音 /f/ 開首，後接「-ilter」(/ˈfɪl.tər/)。" },
+      { word: "hashtag", options: ["handbag", "hashtag", "ragtag"], answerIndex: 1, explanation: "'hashtag' has the 'sh' sound at the end of its first syllable (hash-tag). || 「hashtag」第一音節結尾帶有清晰的「sh」(/ʃ/) 音 (hash-tag)。" },
+      { word: "influencer", options: ["professor", "producer", "influencer"], answerIndex: 2, explanation: "'influencer' has 4 syllables starting with 'in-flu-'. || 「influencer」共有四個音節，以「in-flu-」開首。" },
+      { word: "like", options: ["like", "lake", "lack"], answerIndex: 0, explanation: "'like' uses the long 'i' diphthong (/laɪk/), unlike 'lake' (/eɪ/) or 'lack' (/æ/). || 「like」使用雙元音 /aɪ/ (/laɪk/)，有別於「lake」(/eɪ/) 或「lack」(/æ/)。" },
+      { word: "meme", options: ["team", "meme", "mime"], answerIndex: 1, explanation: "'meme' starts with /m/ and has a long 'ee' vowel (/miːm/), unlike 'mime' (/maɪm/). || 「meme」讀長元音 /miːm/，切勿與讀 /maɪm/ 的「mime」混淆。" },
+      { word: "post", options: ["pose", "port", "post"], answerIndex: 2, explanation: "'post' ends with a crisp /st/ cluster (/pəʊst/), unlike 'pose' (/z/) or 'port' (/rt/). || 「post」以清晰的 /st/ 結尾 (/pəʊst/)，有別於「pose」(/z/) 或「port」。" },
+      { word: "share", options: ["share", "shore", "sure"], answerIndex: 0, explanation: "'share' rhymes with 'air' and 'care' (/ʃeər/). || 「share」(/ʃeər/) 與「air」及「care」押韻。" },
+      { word: "subscribe", options: ["subside", "subscribe", "inscribe"], answerIndex: 1, explanation: "'subscribe' starts with 'sub-' and has the /skr/ blend in '-scribe'. || 「subscribe」以「sub-」開首，並在「-scribe」中包含 /skr/ 音。" }
     ];
 
     // =========================================================================
@@ -3320,24 +3329,6 @@
           "loose", "lose", "desert", "dessert", "affect", "effect"
         ]
       },
-      {
-        id: "__preset_dse_env__",
-        title: "HKDSE Environment & Green Living",
-        words: [
-          "pollution", "population", "sustainable", "renewable", "emissions", "conservation",
-          "recycling", "biodiversity", "consumption", "legislation", "awareness", "ecosystem",
-          "drought", "habitat", "disposable", "climate", "wildlife", "shortage"
-        ]
-      },
-      {
-        id: "__preset_dse_tech__",
-        title: "HKDSE Technology & Digital Life",
-        words: [
-          "algorithm", "artificial", "automation", "innovation", "privacy", "virtual",
-          "addiction", "authentic", "broadcast", "digital", "device", "efficient",
-          "accurate", "reliable", "network", "security", "platform", "database"
-        ]
-      },
       ...[
       {
             "id": "__preset_gram_connectives__",
@@ -3353,7 +3344,7 @@
                               "although"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Use 'because' to introduce a reason."
+                        "explanation": "Use 'because' to introduce a reason. || 「because」用於引出原因（因為）。"
                   },
                   {
                         "prompt": "My phone battery was very low, _______ I plugged in my charger.",
@@ -3363,7 +3354,7 @@
                               "although"
                         ],
                         "answerIndex": 1,
-                        "explanation": "Use 'so' to show the result."
+                        "explanation": "Use 'so' to show the result. || 「so」用於引出結果（所以）。"
                   },
                   {
                         "prompt": "_______ mobile games are exciting, I do not play late at night.",
@@ -3373,7 +3364,7 @@
                               "Although"
                         ],
                         "answerIndex": 2,
-                        "explanation": "Use 'Although' to show contrast between two ideas."
+                        "explanation": "Use 'Although' to show contrast between two ideas. || 「Although」（雖然）用於表達兩個分句之間的轉折對比。"
                   },
                   {
                         "prompt": "Ken wanted to upload his vlog, _______ the school Wi-Fi was down.",
@@ -3383,7 +3374,7 @@
                               "although"
                         ],
                         "answerIndex": 1,
-                        "explanation": "Use 'but' after a comma to join two contrasting clauses."
+                        "explanation": "Use 'but' after a comma to join two contrasting clauses. || 逗號後使用「but」（但是）連接兩個意思相反的分句。"
                   },
                   {
                         "prompt": "We created a class group chat _______ we can share homework reminders.",
@@ -3393,7 +3384,7 @@
                               "but"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Use 'so' to express purpose or result."
+                        "explanation": "Use 'so' to express purpose or result. || 此處用「so」表達目的或結果（因此）。"
                   },
                   {
                         "prompt": "_______ Leo was tired after basketball, he finished his English essay.",
@@ -3403,7 +3394,7 @@
                               "Because"
                         ],
                         "answerIndex": 1,
-                        "explanation": "'Although' contrasts being tired with finishing his work."
+                        "explanation": "'Although' contrasts being tired with finishing his work. || 「Although」對比「感到疲倦」與「仍然完成工作」兩個情況。"
                   },
                   {
                         "prompt": "Mandy muted her notifications _______ she needed to focus on revision.",
@@ -3413,7 +3404,7 @@
                               "because"
                         ],
                         "answerIndex": 2,
-                        "explanation": "Needing to focus is the reason she muted notifications."
+                        "explanation": "Needing to focus is the reason she muted notifications. || 「需要專心溫習」是她將通知靜音的原因，故用「because」。"
                   },
                   {
                         "prompt": "The cafe was crowded, _______ we ordered takeaway bubble tea instead.",
@@ -3423,7 +3414,7 @@
                               "although"
                         ],
                         "answerIndex": 0,
-                        "explanation": "'so' introduces what we did as a result."
+                        "explanation": "'so' introduces what we did as a result. || 「so」引出因下雨而改在室內練習的結果。"
                   },
                   {
                         "prompt": "I follow this science channel _______ the experiments are easy to understand.",
@@ -3433,7 +3424,7 @@
                               "so"
                         ],
                         "answerIndex": 1,
-                        "explanation": "'because' explains why I follow the channel."
+                        "explanation": "'because' explains why I follow the channel. || 「because」解釋追蹤該頻道的原因。"
                   },
                   {
                         "prompt": "_______ the new tablet is expensive, many designers still buy it.",
@@ -3443,7 +3434,7 @@
                               "Although"
                         ],
                         "answerIndex": 2,
-                        "explanation": "'Although' contrasts the high price with people still buying it."
+                        "explanation": "'Although' contrasts the high price with people still buying it. || 「Although」對比「價錢昂貴」與「很多人仍然購買」。"
                   },
                   {
                         "prompt": "Jason forgot his umbrella, _______ he got wet in the heavy rain.",
@@ -3453,7 +3444,7 @@
                               "although"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Getting wet is the result of forgetting his umbrella."
+                        "explanation": "Getting wet is the result of forgetting his umbrella. || 「全身濕透」是忘記帶雨傘的結果，故用「so」。"
                   },
                   {
                         "prompt": "I like reading online news, _______ my grandfather prefers printed newspapers.",
@@ -3463,7 +3454,7 @@
                               "so"
                         ],
                         "answerIndex": 1,
-                        "explanation": "'but' contrasts my habit with my grandfather's preference."
+                        "explanation": "'but' contrasts my habit with my grandfather's preference. || 「but」對比我的閱讀習慣與祖父的喜好。"
                   }
             ]
       },
@@ -3481,7 +3472,7 @@
                               "rained"
                         ],
                         "answerIndex": 0,
-                        "explanation": "In Type 1 conditionals, use Simple Present ('rains') after 'If'."
+                        "explanation": "In Type 1 conditionals, use Simple Present ('rains') after 'If'. || 在第一類條件句 (Type 1 Conditional) 中，If 子句須用簡單現在式 (rains)。"
                   },
                   {
                         "prompt": "If you sleep early tonight, you _______ fresh for tomorrow's quiz.",
@@ -3491,7 +3482,7 @@
                               "felt"
                         ],
                         "answerIndex": 1,
-                        "explanation": "Use 'will + base verb' in the main result clause."
+                        "explanation": "Use 'will + base verb' in the main result clause. || 主要結果子句須使用「will + 動詞原形」。"
                   },
                   {
                         "prompt": "She will miss the school bus if she _______ up right now.",
@@ -3501,7 +3492,7 @@
                               "did not get"
                         ],
                         "answerIndex": 0,
-                        "explanation": "After 'if', use Simple Present ('does not get'), never 'will'."
+                        "explanation": "After 'if', use Simple Present ('does not get'), never 'will'. || 在「if」之後須用簡單現在式 (does not get)，切勿使用「will」。"
                   },
                   {
                         "prompt": "If we _______ reusable bottles, we will cut down plastic waste.",
@@ -3511,7 +3502,7 @@
                               "bring"
                         ],
                         "answerIndex": 2,
-                        "explanation": "'we' takes the base Simple Present verb 'bring' in the if-clause."
+                        "explanation": "'we' takes the base Simple Present verb 'bring' in the if-clause. || 主詞「we」在 If 子句中須配動詞原形「bring」。"
                   },
                   {
                         "prompt": "Tom _______ better marks if he checks his verb tenses carefully.",
@@ -3521,7 +3512,7 @@
                               "got"
                         ],
                         "answerIndex": 1,
-                        "explanation": "The result clause uses 'will get'."
+                        "explanation": "The result clause uses 'will get'. || 結果子句須用未來式「will get」。"
                   },
                   {
                         "prompt": "If my cat _______ hungry, she meows beside her food bowl.",
@@ -3531,7 +3522,7 @@
                               "is"
                         ],
                         "answerIndex": 2,
-                        "explanation": "Singular subject 'my cat' takes 'is' in the if-clause."
+                        "explanation": "Singular subject 'my cat' takes 'is' in the if-clause. || 單數主詞「my cat」在 If 子句中須配「is」。"
                   },
                   {
                         "prompt": "What _______ you do if the library is full after school?",
@@ -3541,7 +3532,7 @@
                               "did"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Questions about a future Type 1 result use 'What will you do...?'"
+                        "explanation": "Questions about a future Type 1 result use 'What will you do...?' || 詢問第一類條件句的未來結果時，須用「What will you do...?」。"
                   },
                   {
                         "prompt": "If Leo practises speaking every day, his fluency _______ quickly.",
@@ -3551,7 +3542,7 @@
                               "improved"
                         ],
                         "answerIndex": 1,
-                        "explanation": "Use 'will + base verb' ('will improve') for the likely future result."
+                        "explanation": "Use 'will + base verb' ('will improve') for the likely future result. || 表達可能發生的未來結果時，須用「will + 動詞原形」(will improve)。"
                   },
                   {
                         "prompt": "We will call you immediately if the ferry schedule _______.",
@@ -3561,7 +3552,7 @@
                               "change"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Singular 'schedule' needs 'changes' in the if-clause."
+                        "explanation": "Singular 'schedule' needs 'changes' in the if-clause. || 單數主詞「schedule」在 If 子句中須配第三人稱單數動詞「changes」。"
                   },
                   {
                         "prompt": "If you _______ the link carefully, you will avoid phishing scams.",
@@ -3571,7 +3562,7 @@
                               "checked"
                         ],
                         "answerIndex": 1,
-                        "explanation": "Use Simple Present 'check' after 'If you'."
+                        "explanation": "Use Simple Present 'check' after 'If you'. || 在「If you」之後須使用簡單現在式動詞原形「check」。"
                   },
                   {
                         "prompt": "The teacher _______ pleased if everyone submits the project on time.",
@@ -3581,7 +3572,7 @@
                               "will be"
                         ],
                         "answerIndex": 2,
-                        "explanation": "Use 'will be' in the result clause."
+                        "explanation": "Use 'will be' in the result clause. || 結果子句須使用「will be」。"
                   },
                   {
                         "prompt": "If they _______ the MTR now, they will arrive at Kai Tak before six.",
@@ -3591,7 +3582,7 @@
                               "will take"
                         ],
                         "answerIndex": 0,
-                        "explanation": "'they' takes base verb 'take' in the if-clause."
+                        "explanation": "'they' takes base verb 'take' in the if-clause. || 主詞「they」在 If 子句中須配動詞原形「take」。"
                   }
             ]
       },
@@ -3609,7 +3600,7 @@
                               "Doing sports"
                         ],
                         "answerIndex": 0,
-                        "explanation": "'This habit' points back to scrolling through videos late at night."
+                        "explanation": "'This habit' points back to scrolling through videos late at night. || 「This habit」（這個習慣）指代前文提及「深夜滑看短片」的行為。"
                   },
                   {
                         "prompt": "'Blue light from phone screens suppresses melatonin, making it harder to fall asleep.' Here, 'suppresses' is closest in meaning to:",
@@ -3619,7 +3610,7 @@
                               "brightens"
                         ],
                         "answerIndex": 0,
-                        "explanation": "If it makes sleeping harder, phone light 'reduces' or blocks melatonin."
+                        "explanation": "If it makes sleeping harder, phone light 'reduces' or blocks melatonin. || 既然藍光令入睡更困難，即代表它會「減少／抑制」(reduces) 褪黑激素。"
                   },
                   {
                         "prompt": "'Instead of banning phones completely, Dr Chan recommends a 30-minute digital sunset before bed.' What is Dr Chan's attitude?",
@@ -3629,7 +3620,7 @@
                               "Careless"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Recommending a realistic 30-minute break rather than a total ban is balanced."
+                        "explanation": "Recommending a realistic 30-minute break rather than a total ban is balanced. || 作者建議睡前停看螢幕 30 分鐘而非完全禁用手機，態度客觀持平 (balanced)。"
                   },
                   {
                         "prompt": "'Students who Charge their phones outside the bedroom report deeper rest.' Why put the phone outside?",
@@ -3639,7 +3630,7 @@
                               "To wake the neighbours"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Keeping the phone out of reach prevents tempting late-night notifications."
+                        "explanation": "Keeping the phone out of reach prevents tempting late-night notifications. || 把手機放在書桌上可避免睡前受通知吸引而繼續滑手機。"
                   },
                   {
                         "prompt": "'Short study breaks away from screens refresh tired eyes. They also boost memory.' What does 'They' refer to?",
@@ -3649,7 +3640,7 @@
                               "Phone screens"
                         ],
                         "answerIndex": 1,
-                        "explanation": "'They' refers to 'Short study breaks away from screens'."
+                        "explanation": "'They' refers to 'Short study breaks away from screens'. || 代名詞「They」指代前句的「離開螢幕的短暫小休」(Short study breaks away from screens)。"
                   },
                   {
                         "prompt": "'Even silent notifications can fracture a student's concentration during revision.' Here, 'fracture' means:",
@@ -3659,7 +3650,7 @@
                               "measure"
                         ],
                         "answerIndex": 0,
-                        "explanation": "'fracture' means to break or interrupt focus."
+                        "explanation": "'fracture' means to break or interrupt focus. || 「fracture」在此處解作「打斷／分散」專注力。"
                   },
                   {
                         "prompt": "'Turning off autoplay stops one five-minute clip from turning into two hours.' What problem does autoplay cause?",
@@ -3669,7 +3660,7 @@
                               "Slower Wi-Fi"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Turning 5 minutes into 2 hours describes unintended binge-watching."
+                        "explanation": "Turning 5 minutes into 2 hours describes unintended binge-watching. || 「原本只看 5 分鐘卻變成 2 小時」形容不知不覺地連續觀看 (unintended binge-watching)。"
                   },
                   {
                         "prompt": "'Audio podcasts let commuters rest their eyes while still learning something new.' What is the main benefit mentioned?",
@@ -3679,7 +3670,7 @@
                               "Faster typing speed"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Listeners can rest their eyes and learn during transit."
+                        "explanation": "Listeners can rest their eyes and learn during transit. || 聽眾在乘車時既能讓雙眼休息，同時亦可吸收知識。"
                   },
                   {
                         "prompt": "'Apps compete fiercely for teenagers' attention—the most valuable resource online.' What is called 'the most valuable resource'?",
@@ -3689,7 +3680,7 @@
                               "Phone cases"
                         ],
                         "answerIndex": 0,
-                        "explanation": "The dash directly defines 'teenagers' attention' as that resource."
+                        "explanation": "The dash directly defines 'teenagers' attention' as that resource. || 破折號後的內容直接說明該寶貴資源就是「青少年的專注力」。"
                   },
                   {
                         "prompt": "'Setting a daily app timer gives users a gentle nudge when time is up.' A 'gentle nudge' means:",
@@ -3699,7 +3690,7 @@
                               "A broken screen"
                         ],
                         "answerIndex": 0,
-                        "explanation": "A 'gentle nudge' is a soft, helpful reminder."
+                        "explanation": "A 'gentle nudge' is a soft, helpful reminder. || 「gentle nudge」比喻溫和而實用的提示。"
                   },
                   {
                         "prompt": "'Face-to-face meals build stronger family bonds than eating silently beside glowing screens.' What is the writer suggesting?",
@@ -3709,7 +3700,7 @@
                               "Buy brighter screens"
                         ],
                         "answerIndex": 0,
-                        "explanation": "The contrast supports screen-free family meals."
+                        "explanation": "The contrast supports screen-free family meals. || 文中透過對比鼓勵家人在用膳時放下手機、多作交流。"
                   },
                   {
                         "prompt": "'Digital balance is not about quitting technology; it is about staying in the driver's seat.' 'In the driver's seat' means:",
@@ -3719,7 +3710,7 @@
                               "Running late"
                         ],
                         "answerIndex": 0,
-                        "explanation": "Idiomatically, being 'in the driver's seat' means being in control."
+                        "explanation": "Idiomatically, being 'in the driver's seat' means being in control. || 習語「in the driver's seat」解作「掌握主導權／自我控制」。"
                   }
             ]
       },
@@ -3737,7 +3728,7 @@
                               "[C] Mong Kok with his cousins."
                         ],
                         "answerIndex": 1,
-                        "explanation": "'Last night' requires Simple Past: change 'go' to 'went'."
+                        "explanation": "'Last night' requires Simple Past: change 'go' to 'went'. || 「Last night」為過去時間，動詞須改用簡單過去式「went」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] One of my classmates [B] have won [C] the inter-school speech prize.",
@@ -3747,7 +3738,7 @@
                               "[C] the inter-school speech prize."
                         ],
                         "answerIndex": 1,
-                        "explanation": "The subject is 'One' (singular), so 'have won' should be 'has won'."
+                        "explanation": "The subject is 'One' (singular), so 'have won' should be 'has won'. || 真正主詞為單數的「One」，因此「have won」須改為「has won」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] Although it rained heavily, [B] but the runners [C] finished the race.",
@@ -3757,7 +3748,7 @@
                               "[C] finished the race."
                         ],
                         "answerIndex": 1,
-                        "explanation": "Never use 'Although' and 'but' together in the same sentence—remove 'but'."
+                        "explanation": "Never use 'Although' and 'but' together in the same sentence—remove 'but'. || 英文切勿在同一句同時使用「Although」與「but」，須刪去「but」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] My teacher gave me [B] many useful advices [C] before the oral exam.",
@@ -3767,7 +3758,7 @@
                               "[C] before the oral exam."
                         ],
                         "answerIndex": 1,
-                        "explanation": "'Advice' is uncountable—use 'much useful advice' or 'useful pieces of advice'."
+                        "explanation": "'Advice' is uncountable—use 'much useful advice' or 'useful pieces of advice'. || 「advice」（建議）屬不可數名詞，不可加「many」或「advices」，應改用「much useful advice」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] Students should listen [B] on their groupmates [C] patiently during discussions.",
@@ -3777,7 +3768,7 @@
                               "[C] patiently during discussions."
                         ],
                         "answerIndex": 1,
-                        "explanation": "The verb 'listen' takes the preposition 'to' ('listen to'), not 'on'."
+                        "explanation": "The verb 'listen' takes the preposition 'to' ('listen to'), not 'on'. || 動詞「listen」後須配介詞「to」(listen to)，而非「on」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] Everybody in the hall [B] were clapping [C] for the band.",
@@ -3787,7 +3778,7 @@
                               "[C] for the band."
                         ],
                         "answerIndex": 1,
-                        "explanation": "'Everybody' is grammatically singular—change 'were' to 'was'."
+                        "explanation": "'Everybody' is grammatically singular—change 'were' to 'was'. || 不定代名詞「Everybody」在文法上屬單數，動詞「were」須改為「was」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] We look forward [B] to visit [C] the science museum next Friday.",
@@ -3797,7 +3788,7 @@
                               "[C] the science museum next Friday."
                         ],
                         "answerIndex": 1,
-                        "explanation": "'look forward to' is followed by a gerund (-ing): 'to visiting'."
+                        "explanation": "'look forward to' is followed by a gerund (-ing): 'to visiting'. || 片語「look forward to」中的「to」為介詞，後面須接動名詞 (-ing)，即「to visiting」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] Chloe is very [B] interesting in [C] wildlife photography.",
@@ -3807,7 +3798,7 @@
                               "[C] wildlife photography."
                         ],
                         "answerIndex": 1,
-                        "explanation": "Use '-ed' for a person's feeling: 'interested in', not 'interesting in'."
+                        "explanation": "Use '-ed' for a person's feeling: 'interested in', not 'interesting in'. || 形容人的感受時須用「-ed」形容詞 (interested in)，而非形容事物的「interesting」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] Because the MTR was delayed, [B] so I arrived [C] ten minutes late.",
@@ -3817,7 +3808,7 @@
                               "[C] ten minutes late."
                         ],
                         "answerIndex": 1,
-                        "explanation": "Do not pair 'Because' and 'so' in one sentence—remove 'so'."
+                        "explanation": "Do not pair 'Because' and 'so' in one sentence—remove 'so'. || 英文不可在同一句連用「Because」與「so」，須刪去「so」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] Can you tell me [B] where is [C] the nearest post office?",
@@ -3827,7 +3818,7 @@
                               "[C] the nearest post office?"
                         ],
                         "answerIndex": 1,
-                        "explanation": "Embedded questions use statement word order: 'where the nearest post office is'."
+                        "explanation": "Embedded questions use statement word order: 'where the nearest post office is'. || 間接問句須使用陳述句語序：「where the nearest post office is」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] My younger brother [B] enjoys to play [C] basketball after school.",
@@ -3837,7 +3828,7 @@
                               "[C] basketball after school."
                         ],
                         "answerIndex": 1,
-                        "explanation": "The verb 'enjoy' takes an -ing verb: 'enjoys playing'."
+                        "explanation": "The verb 'enjoy' takes an -ing verb: 'enjoys playing'. || 動詞「enjoy」後面須接動名詞 (-ing)，即「enjoys playing」。"
                   },
                   {
                         "prompt": "Spot the mistake: [A] There have [B] three new cafes [C] near our school.",
@@ -3847,7 +3838,7 @@
                               "[C] near our school."
                         ],
                         "answerIndex": 0,
-                        "explanation": "Existential sentences use 'There are', never 'There have'."
+                        "explanation": "Existential sentences use 'There are', never 'There have'. || 表達「有⋯⋯存在」須用「There are」，切勿受中文影響誤寫「There have」。"
                   }
             ]
       }
@@ -3857,8 +3848,9 @@
     // =========================================================================
     // 1B. 3,500-WORD HKDSE & SECONDARY CORE OFFLINE DICTIONARY + CLOSE WORDS ENGINE
     // =========================================================================
-    const HKDSE_CORE_3500_RAW = "abandon ability able abroad absence absolute absorb academic accept access accident accommodate accommodation accompany accomplish account accurate accuse achieve achievement acid acknowledge acquire across action active activist activity actor actress actual adapt adaptation add addition additional address adequate adjust adjustment administration admire admission admit adolescent adopt adoption adult advance advantage adventure advertise advertisement advertising advice advise affair affect affection afford afraid agency agent aggressive agriculture ahead aid aim aircraft airline alarm album alert algorithm alien align alike allow allowance ally almost alone along alongside aloud alphabet already also alter alternative although altitude altogether always amaze amazing ambition ambitious ambulance among amount ample amuse amusing analyse analysis analyst ancient angel anger angle angry animal ankle anniversary announce announcement announcer annual another answer anticipate anxiety anxious apart apartment apologise apology apparent apparently appeal appear appearance appetite applaud apple application apply appoint appointment appreciate appreciation approach appropriate approval approve approximate architect architecture archive area argue argument arise arm army around arrange arrangement arrival arrive arrow art article artificial artist artistic ashamed aside ask asleep aspect assemble assembly assert assess assessment asset assign assignment assist assistance assistant associate association assume assumption assure astonish astronaut astronomy athlete athletic atmosphere attach attachment attack attempt attend attendance attention attitude attract attraction attractive attribute audience audio audit authentic author authority authorize automatic automation automobile autumn available average avoid awake award aware awareness away awful awkward baby back background backpack backward bacteria badge balance balanced balcony ball balloon ban band bank bar bare bargain barrier base baseball basement basic basically basis basket basketball bat batch bath bathroom battery battle beach beam bean bear beard beat beautiful beauty because become bed bedroom bee beef before beg begin beginning behalf behave behaviour behind belief believe bell belong below belt bench bend beneath benefit beside best bet better between beyond bias bicycle bid big bike bill billion bin bind biodiversity biography biological biology bird birth birthday biscuit bit bite bitter black blade blame blank blanket blind block blog blood blow blue board boat body boil bold bond bone bonus book boom boost boot border bore boring born borrow boss both bother bottle bottom bounce bound boundary bow bowl box boy brain branch brand brave bread breadth break breakfast breath breathe breed breeze brick bridge brief briefly bright brilliant bring broad broadcast brochure broken broker bronze brother brown brush bubble budget build building bullet bunch burden bureau burn burst bury bus bush business businessman busy butter button buy buyer cabin cabinet cable cafe cage cake calculate calculation calendar call calm camera camp campaign campus can canal cancel candidate candle candy canvas cap capability capable capacity capital captain capture car carbon card care career careful careless carpet carriage carrier carrot carry cart cartoon case cash cast castle cat catalog catalogue catch category cater cattle cause caution cautious cave cease ceiling celebrate celebration celebrity cell cement central centre century ceremony certain certainty certificate chain chair chairman challenge chamber champion championship chance change channel chaos chapter character characteristic charge charity charm chart chase chat cheap cheat check cheek cheer cheerful cheese chef chemical chemistry chest chew chicken chief child childhood chip chocolate choice choir choose chop chorus chose chronic church cinema circle circuit circumstance cite citizen citizenship city civic civil civilian civilisation claim clap clarify clarity clash class classic classical classification classify classroom clause clean clear clerk clever click client cliff climate climb clinic clinical clip clock close cloth clothing cloud cloudy club clue cluster coach coal coast coastal coat code coffee coin cold collapse colleague collect collection collective collector college collision colon colonial colony colour colourful column combination combine comedy comfort comfortable command commander comment commercial commission commit commitment committee common communicate communication community companion company compare comparison compete competence competent competition competitive competitor complain complaint complement complete complex complexity compliance complicated compliment component compose composer composition compound comprehensive compress comprise compromise compulsory computer concentrate concentration concept concern concerned concert conclude conclusion concrete condemn condition conductor conference confidence confident confine confirm conflict confuse confused confusing congress connect connection conscious consciousness consensus consent consequence conservation conservative consider considerable considerably consideration consist consistent constant constitute constitution construct construction consult consultant consume consumer consumption contact contain container content contest continent continue continuous contract contrast contribute contribution control controversial controversy convenience convenient convention conventional conversation convert conviction convince cook cookie cool cooperate cooperation cooperative coordinate coordinator cop cope copy core corn corner corporate corporation correct correction correlate correspond corridor cost costume cottage cotton couch cough could council counsellor count counter country countryside county couple courage course court cousin cover coverage cow crack craft crash cream create creation creative creativity creator creature credit crew crisis criteria critic critical criticise criticism crop cross crowd crowded crucial cruel cruise crush cry crystal cue cultural culture cup cupboard curb cure curiosity curious currency current curriculum curtain curve custom customer cut cute cycle cyclist cylinder dad daily damage damp dance dancer danger dangerous dare dark darkness data database date daughter dawn day dead deadline deal dealer dear debate debt decade decay decide decision decisive deck declare decline decorate decoration dedicate defeat defence defend defendant defensive deficiency deficit define definite definition degree delay delegate delete deliberate delicate delicious delighted deliver demand democracy democratic demonstrate demonstration denial dense density deny depart department departure depend dependent depict deploy deposit depth deputy descend describe description desert design desire desk desperate despite dessert destination destroy destruction detect detective detector determine determined develop developer development device devise devoted devotion diagnose diagnosis diagram dial dialogue diamond diary dictate dictionary die diet differ difference different difficult difficulty dig digital dignity dilemma dimension diminish dine dinner dinosaur dip diplomat direct direction directly director dirt dirty disappointing disc discipline disclose discover discovery discriminate discrimination discuss discussion dish disk disorder disposable dispute dissolve distance distant distinct distinction distinctive distinguish distribute distribution district disturb dive diverse diversity divide division dizzy doctor document documentary dog doll dollar domestic dominant dominate donate donation donor door dorm dose dot double doubt download downtown dozen draft drag drama dramatic dramatically draw drawer drawing dream dress drift drill drink drive driver drop drought drown drum dry dual duck due dull dump durable duration during dust duty eager ear early earn earnings earth earthquake ease easily east eastern easy eat echo ecological ecology economic economics economist economy ecosystem edge edit edition editor educate educated education educational educator effect effective effectiveness efficiency efficient effort egg eight either elbow elder elect election electric electrical electricity electronic electronics elegant element elementary elephant elevator eleven eliminate elite else elsewhere email embarrass embarrassed embarrassing embassy embrace emerge emergency emission emissions emit emoji emotion emotional emphasis emphasise empire employ employee employer employment empty enable enact encounter encourage encouragement end endanger endangered ending endless endorse enemy energy enforce enforcement engage engaged engagement engine engineer engineering enhance enjoy enjoyable enormous enough enrich enrol ensure enter enterprise entertain entertainment enthusiasm enthusiastic entire entitle entity entrance entrepreneur entry envelope environment environmental episode equal equality equation equip equipment equivalent era erase erect error escape essay essential essentially establish establishment estate estimate ethical ethics ethnic evaluate evaluation even evening event ever every everybody everyday everyone everything everywhere evidence evident evil evolution evolve exact exam examination examine examiner example exceed excellent except exception excessive exchange excite excited excitement exciting exclude exclusive excuse execute executive exercise exhibit exhibition exist existence exit exotic expand expansion expect expectation expedition expense expensive experience experienced experiment experimental expert expertise explain explanation explicit explode exploit exploration explore explosion export expose exposure express expression extend extension extensive extent external extra extract extraordinary extreme eye eyebrow fabric face facilitate facility fact factor factory faculty fade fail failure faint fair fairness faith faithful fake fall false fame familiar family famous fan fancy fantastic fantasy far fare farm farmer farming fascinating fashion fast fasten faster fate father fault favour favourite fear feather feature federal fee feed feedback feel feeling fellow female fence festival fetch fever few fiction field fierce fifteen fifth fifty fight fighter figure file fill film filter final finance financial find finding fine finger finish fire firm first fiscal fish fisherman fishing fit fitness five fix fixed flag flame flash flashback flat flavour flee fleet flesh flexible flight float flock flood floor flour flow flower flu fluctuate fluency fluent fluid fly focus fog fold folder folk follow following food foot football forbid force forecast foreign foreigner forest forever forget forgive fork form formal format formation former formula fortunate fortune forty forum forward fossil foster found foundation founder fountain four fourteen fourth fraction fragile fragment frame framework franchise frank fraud free freedom freeze frequency frequent fresh friction fridge friend friendly friendship frighten frightening frog from front frontier frost fruit frustrate frustrating frustration fuel fulfil full fully fun function fund fundamental funding funny fur furniture further furthermore future gain galaxy gallery game gap garage garbage garden gardener garment gas gate gather gaze gear gender gene general generate generation generous genetic genius gentle gentleman gently genuine geography geological gesture get ghost giant gift gifted girl girlfriend give glad glance glass glimpse global globalisation globe glory glove glow glue goal goat god gold golden golf good goods govern government governor grab grace grade graduate graduation grain grand grandfather grandmother grant graphic grasp grass grateful grave gravity great green greenhouse greet greeting grey grid grief grin grind grip grocery gross ground group grow growth guarantee guard guess guest guidance guide guideline guitar gulf guy gym habit habitat hail hair half hall halt hammer hand handbag handful handicap handle handsome hang happen happily happiness happy harbour hard hardware harm harmful harmony harvest hashtag hat hate have hazard head headache headline headquarters heal health healthy hear hearing heart heat heaven heavily heavy hedge heel height helicopter hello help helpful hence herb heritage hero hesitate hide high highlight highway hike hill hint hip hire historic historical history hit hobby hockey hold holder hole holiday hollow holy home homeland homeless homework honest honesty honey honour hook hope hopeful horizon horizontal horn horrible horror horse hospital host hostile hot hotel hour house household housing hover how however hug huge human humanity humble humorous humour hundred hunger hungry hunt hunter hurricane hurry hurt husband hybrid hypothesis ice icon idea ideal identical identify identity ideological ideology idiom ignore ill illegal illustrate illustration image imagination imagine immediate immigrant immigration impact impatient implement implementation imply import importance important impose impossible impress impressed impression impressive improve improvement impulse incentive inch incident include incorporate incur indeed index indicate indication indicator indigenous individual industrial industry inevitable inevitably infant infect infer inflation influence influencer influential informal information infrastructure ingredient inhabitant inherent inherit initial initiate initiative injure injured inner innocent innovation inquiry insert inside insight insist inspect inspection inspector install installation instance instant instead instinct institute institution institutional instruct instruction instructor instrument insurance intact integrate integration integrity intellectual intelligence intelligent intend intensity intensive intent intention interact interaction interactive interest interested interesting interface interior internal international internet interpret interpretation interrupt interval intervention interview intimate introduce introduction invade invasion invent invention inventor invest investigate investigation investigator investment investor invite involve involved involvement iron ironic irony island isolate isolation issue item ivory jacket jam jar jaw jazz jealous jeans jelly jet jewel jewellery job join joint joke journal journalism journalist journey joy judge judgement judicial juice jump junior jury just justice justify keen keep key keyboard kick kid kidney kill kilometre kind king kingdom kiss kit kitchen knee kneel knife knock knot know knowledge lab label laboratory labour lack ladder lady lake lamp land landing landlord landmark landscape lane language lap large laser last late lately latest latter laugh laughter launch laundry law lawn lawyer lay layer lazy lead leader leadership leading leaf league lean leap learn learner lease least leather leave lecture left leg legal legend legislation legitimate leisure lemon lend length lens less lesson let letter level liability liberal liberty library licence lick lid lie life lifestyle lifetime lift light lightly lightning like likelihood likely likewise limb limit limitation limited line linear link lion lip liquid list listen listener literacy literal literary literature litre litter little live lively liver living load loan lobby local locate location lock log logic logical lonely long look loop loose lose loss lost lot loud love lovely lover low lower loyal loyalty luck lucky luggage lunch lung luxury machine machinery magazine magic magical magnet magnificent maid mail main mainland mainstream maintain maintenance major majority make makeup male mall mammal man manage management manager mandate mandatory manifest manipulate manner manual manufacture manufacturer manufacturing manuscript many map marathon marble march margin marginal marine mark marker market marketing marriage married marry mask mass massive master match mate material mathematical mathematics matter mature maximise maximum may maybe mayor meal mean meaning meaningful meantime meanwhile measure measurement meat mechanic mechanical mechanism medal media medical medication medicine medium meet meeting melody melt member membership meme memorial memorise memory mental mention menu merchant mercy mere merge merit mess message messenger metal metaphor method methodology metre metropolitan mice middle midnight might mild military milk mill million mind mine mineral minimal minimise minimum minister ministry minor minority minute miracle mirror misery miss missile mission mist mistake mix mixed mixture mob mobile mode model moderate modern modest modify moisture molecule moment momentum money monitor monkey monster month monthly monument mood moon moral morality moreover morning mortgage mosquito most mother motion motivate motivated motivation motive motor mount mountain mouse mouth move movement movie much mud multiple multiply mum municipal muscle museum mushroom music musical musician must mutual mysterious mystery myth nail name narrative narrow nation national native natural nature naughty naval navigate navigation near nearby neat necessarily necessary neck need needle negative negotiate negotiation neighbour neighbourhood neither nerve nervous nest net network neutral never nevertheless new news newspaper next nice niche night nightmare nine nineteen ninety noble nobody nod noise noisy nominate none nonetheless nonsense noodle noon norm normal north northern nose notably note notebook nothing notice notion novel novelist now nowadays nowhere nuclear number numerous nurse nursery nut nutrition oak obey object objection objective obligation oblige observation observe observer obstacle obtain obvious occasion occasional occupy occur occurrence ocean odd odds off offence offend offensive offer office officer official offset often oil okay old olive omit once one ongoing onion online onto open opening opera operate operation operational operator opinion opponent opportunity oppose opposed opposite opposition opt optical optimism optimistic option optional oral orange orbit orchestra order ordinary organ organic organisation organise organism orientation origin original originate other otherwise ought outcome outdoor outfit outlet outline output outrage outside outstanding oven over overall overcome overlook overnight overtake overwhelm overwhelming owe own owner ownership oxygen pace pack package packet pad page pain painful paint painter painting pair palace pale palm pan panel paper paperwork paragraph parallel parameter parcel pardon parent park parking parliament part partial participant participate participation particle particular partly partner partnership party pass passage passenger passion passive passport past pasta paste pat patch patent path patience patient pattern pause pave pay payment peace peaceful peak pear peasant pedal peer pen penalty pencil penetrate penguin penny pension people pepper perceive percentage perception perfect perform performance performer perfume perhaps period permanent permission permit persist person personal personality personnel perspective persuade pet petrol phase phenomenon philosophy phone photo photograph photographer photography phrase physical physician physics piano pick picnic picture pie piece pig pile pill pillow pilot pin pine pink pioneer pipe pirate pitch pizza place placement plain plan plane planet planner planning plant plastic plate platform play player playground plea plead pleasant please pleased pleasure pledge plenty plot plough plug plunge pocket podcast poem poet poetry point pointed poison polar pole police policeman policy polish polite political politician politics poll pollution pond pool pop popular popularity population porch port portable portfolio portion portrait pose position positive possess possession possibility possible possibly post postage postcard poster postpone pot potato potential pound pour powder power powerful practical practice practise praise pray prayer preach precaution precede precious precise precision predict predictable prediction prefer preference premise premium preparation prepare prescribe prescription presence present presentation preserve president presidential press pressure presumably pretend pretty prevail prevent prevention previous price pride priest primarily primary prime primitive prince princess principal principle print printer prior priority privacy private privilege prize pro probability probable probably probe problem procedure proceed process processor proclaim produce producer product production productive productivity profession professional professor profit profitable profound programme progress progressive prohibit project projection prominent promise promote promotion prompt proof proper property proportion proposal prospect prosperity protect protection protective protein proud prove provide provider province provincial provision provoke psychological psychology pub public publication publicity publish publisher pull pulse pump punch pupil purchase pure purple purpose pursue pursuit push put puzzle qualification qualify quality quantity quarter queen query quest question questionnaire queue quick quiet quit quite quiz quota quote rabbit race racing rack radar radiation radical radio rage raid rail railway rain rainbow raise rally ram random range rank rapid rare rate rather rating ratio rational raw reach react reader readily reading ready real realise realistic reality realm rear reason reasonable reasonably rebel rebuild receipt receive receiver recent reception recipe recipient recognise recognition record recording recovery recruit recycle recycling red reduce reduction refer reference reflect reflection reform refrigerator refuge refugee regain regard regardless regime region regional register registration regret regular regulate regulation regulator reinforce reject rejection relate relation relationship relative relax release relevant reliability reliable relief relieve religion religious reluctant rely remain remark remarkable remedy remember reminder remote removal render renew renewable rent repair repeat report represent representative republic reputation require requirement rescue resemble reservation reserve resident residential resignation resist resistance resolution resolve respect respective respond response responsibility responsible rest restaurant restore restrain restrict restriction result resume retain retirement retrieve reveal reverse revise revision revival revive revolution revolutionary rhetoric rhythm rice rich rid ride rider ridge ridiculous right rigid ring riot rip rise risk risky rival river road roar roast rob rock rocket rod role roll romantic roof room root rope rose rough round route routine row royal rub rubber rubbish rude rug ruin rule ruler rumour run runner running rural rush sack sad safe safety sail sailor salad salary sale salt same sample sanction sand sandwich satellite satisfaction satisfactory satisfy sauce save saving say scale scan scandal scarce scare scarf scary scatter scenario scene schedule scheme scholar scholarship school science scientific scientist scope score scratch scream screen screw script sculpture sea seal search season seat second secondary secret secretary section sector secure security see seed seek seem segment seize seldom select selection selective self sell semester seminar senate senator send senior sense sensible sensitive sentence separate sequence series serious servant serve server service session set setting settle settlement seven seventeen seventy several severe sew shade shadow shake shall shallow shame shape share shareholder shark sharp shatter shed sheep sheet shelf shell shelter shift shine shiny ship shirt shock shoe shoot shop shopping shore short shortage shot should shoulder shout show shower shrink shrug shut shy sick side sidewalk sigh sight sign signal signature significance significant silence silent silk silly silver similar similarity simple simulate simulation simultaneous since sincere sing singer single sink sir sister sit site situation six sixteen sixty size skate ski skill skilled skin skip skirt sky slab slam slap sleep slice slide slight slim slip slogan slope slow small smart smash smell smile smoke smooth snake snap snow soak soap soccer social socialist society sock soft software soil solar soldier sole solely solid solution solve some somebody somehow someone something somewhat somewhere son song soon sore sorry sort soul sound soup source south southern space spacecraft span spare spark speak speaker special specialist species specific specifically specify specimen spectacle spectacular spectrum speculate speech speed spell spelling spend sphere spice spicy spider spill spin spine spirit spiritual spite split spoil spoke spoken sponsor spoon sport spot spouse spread spring squad square squeeze stability stable stack stadium staff stage stain stair stake stall stamp stand standard standing star stare stark start starve state statement station stationary stationery statistic statistical statue status stay steady steak steal steam steel steep steer stem step stereotype stick sticky stiff still stimulate stimulus stir stock stomach stone stood stop storage store storm story stove straight strain strange stranger strap strategic strategy straw streak stream street strength strengthen stress stretch strict strike string strip strive stroke strong structure struggle stubborn student studio study stuff stumble style stylish subject submit subscribe subsequent subsidy substance substantial substitute subtle suburb succeed success successful such suck sudden suffer sufficient sugar suggest suggestion suit suitable suitcase suite sum summarise summary summer summit sun sunny super superb superior supermarket supervise supervision supervisor supplement supply support supporter suppose supposed supreme sure surface surplus surprise surprised surprising surrender surround surrounding survey survival survive survivor suspect suspend suspicion suspicious sustain sustainable swallow swamp swap swear sweat sweep sweet swell swift swim swimming swing switch sword symbol sympathetic sympathy synthesis system systematic table tablet tackle tail tailor take tale talent talented talk tall tank tap tape target task taste tax taxi tea teach teacher teaching team tear technical technique technology teenager telephone television tell temperature temple temporary tempt ten tenant tend tendency tender tennis theme thorough though thought through tough tradition typical valuable vehicle virtual vlog wallpaper wealth weather whether winter";
-    const HKDSE_CORE_WORDS = HKDSE_CORE_3500_RAW.split(" ");
+    const HKDSE_CORE_WORDS = (window.PYW_HKDSE_CORE_WORDS && window.PYW_HKDSE_CORE_WORDS.length > 0)
+      ? window.PYW_HKDSE_CORE_WORDS
+      : ["accept", "except", "expect", "advice", "advise", "blog", "vlog", "block", "comment", "emoji", "filter", "hashtag", "influencer", "like", "magazine", "meme", "newspaper", "podcast", "post", "quiet", "quite", "quit", "share", "subscribe", "television", "weather", "whether"];
 
     let VOCAB_ITEMS = PRESET_VOCAB_ITEMS.slice();
     let QUESTIONS = PRESET_QUESTIONS.slice();
@@ -3870,38 +3862,9 @@
     }
     rebuildVocabLookup();
 
-    const LOOKALIKE_FAMILIES = [
-      ["blog", "vlog", "block", "log", "frog"],
-      ["magazine", "machine", "medicine", "marine"],
-      ["podcast", "broadcast", "forecast", "postcard"],
-      ["television", "telephone", "celebration", "division", "revision"],
-      ["newspaper", "wallpaper", "paperwork", "passenger"],
-      ["comment", "command", "common", "moment", "content"],
-      ["emoji", "emotion", "energy", "image"],
-      ["filter", "finger", "folder", "factor", "winter"],
-      ["hashtag", "handbag", "flashback", "feedback"],
-      ["influencer", "influence", "fluency", "announcer", "conference"],
-      ["like", "live", "line", "light", "lake"],
-      ["meme", "theme", "mean", "team", "scheme"],
-      ["post", "past", "host", "most", "coast"],
-      ["share", "stare", "care", "chair", "spare"],
-      ["subscribe", "describe", "prescribe", "surprise"],
-      ["quiet", "quite", "quit"],
-      ["accept", "except", "expect"],
-      ["affect", "effect", "effort"],
-      ["adapt", "adopt", "adjust"],
-      ["complement", "compliment", "complete"],
-      ["desert", "dessert", "depart"],
-      ["loose", "lose", "loss"],
-      ["advice", "advise", "device"],
-      ["breath", "breathe", "breadth"],
-      ["angel", "angle", "ankle"],
-      ["through", "though", "thought", "thorough"],
-      ["achieve", "believe", "receive", "relieve"],
-      ["weather", "whether", "feather"],
-      ["principal", "principle", "practical"],
-      ["stationary", "stationery", "statue"]
-    ];
+    const LOOKALIKE_FAMILIES = (window.PYW_LOOKALIKE_FAMILIES && window.PYW_LOOKALIKE_FAMILIES.length > 0)
+      ? window.PYW_LOOKALIKE_FAMILIES
+      : [["blog", "vlog", "block"], ["accept", "except", "expect"], ["quiet", "quite", "quit"]];
 
     function phoneticKey(w) {
       return w.toLowerCase()
@@ -4109,7 +4072,7 @@
             word: target,
             options: opts,
             answerIndex: opts.indexOf(target),
-            explanation: "Target word: '" + target + "' — compare the opening and ending sounds carefully."
+            explanation: "Target word: '" + target + "' — compare the opening and ending sounds carefully. || 目標詞語為「" + target + "」— 請細心對比詞首及詞尾的發音。"
           });
         });
       }
@@ -6567,6 +6530,78 @@
     }
 
 
+    function buildChineseFallbackForItem(item, enText) {
+      const low = (enText || "").toLowerCase();
+      const cw = item.correctWord || item.word || "";
+      const xw = item.chosenWord || "";
+      if (!item.prompt) {
+        return "目標詞語為「" + cw + "」— 請細心分辨詞首、元音及詞尾發音" + (xw ? ("（誤選：「" + xw + "」）") : "") + "。";
+      }
+      const tips = [];
+      if (low.includes("present participle") || (low.includes("-ing") && (low.includes("active") || low.includes("participle")))) {
+        tips.push("主動或進行中的動作須使用現在分詞 (-ing)");
+      } else if (low.includes("past participle") || low.includes("passive")) {
+        tips.push("被動語態或受事者狀態須使用過去分詞 (-ed / past participle)");
+      } else if (low.includes("gerund")) {
+        tips.push("此處動詞或介詞後須接動名詞 (-ing)");
+      } else if (low.includes("simple past") || low.includes("past tense")) {
+        tips.push("根據過去時間提示，此處須用簡單過去式 (Simple Past)");
+      } else if (low.includes("simple present") || low.includes("present tense")) {
+        tips.push("此處須使用簡單現在式 (Simple Present)");
+      } else if (low.includes("conditional")) {
+        tips.push("留意條件句 (Conditional) 的主從子句時態配搭");
+      } else if (low.includes("singular") || low.includes("plural") || low.includes("subject-verb")) {
+        tips.push("注意主詞單複數與動詞一致 (Subject-Verb Agreement)");
+      } else if (low.includes("preposition")) {
+        tips.push("留意正確的介詞搭配 (Preposition Collocation)");
+      } else if (low.includes("uncountable")) {
+        tips.push("留意不可數名詞 (Uncountable Noun) 的用法");
+      } else if (low.includes("although") || low.includes("contrast")) {
+        tips.push("留意前後分句的轉折對比關係");
+      } else if (low.includes("because") || low.includes("reason")) {
+        tips.push("留意前後分句的因果關係");
+      } else if (low.includes("refer") || low.includes("pronoun")) {
+        tips.push("請根據前文脈絡判斷代名詞指代的對象");
+      }
+      const prefix = tips.length > 0 ? (tips.join("；") + "。") : "請留意句意及文法結構。";
+      return prefix + "正確答案為「" + cw + "」" + (xw ? ("（誤選：「" + xw + "」）") : "") + "。";
+    }
+
+    function formatBilingualExplanationHTML(item) {
+      const raw = String(item.explanation || "").trim();
+      let enPart = raw;
+      let zhPart = "";
+
+      if (raw.includes("||")) {
+        const parts = raw.split("||");
+        enPart = (parts[0] || "").trim();
+        zhPart = parts.slice(1).join(" ").trim();
+      } else {
+        const zhMatch = raw.search(/[\u4e00-\u9fff]/);
+        if (zhMatch > 0) {
+          enPart = raw.slice(0, zhMatch).trim();
+          zhPart = raw.slice(zhMatch).trim();
+        } else if (zhMatch === 0) {
+          enPart = item.prompt ? ("Correct answer: '" + item.correctWord + "'.") : ("Target word: '" + item.word + "'.");
+          zhPart = raw;
+        } else {
+          if (!enPart) {
+            enPart = item.prompt
+              ? ("Correct answer: '" + item.correctWord + "'.")
+              : ("Target word: '" + item.word + "' — compare the opening and ending sounds carefully.");
+          }
+          zhPart = buildChineseFallbackForItem(item, enPart);
+        }
+      }
+
+      const safeEn = enPart.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeZh = zhPart.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return (
+        "<div style='font-size:0.79rem;font-weight:700;color:#1e293b;line-height:1.38;'>" + safeEn + "</div>" +
+        "<div style='font-family:\x27Noto Sans TC\x27,\x27Plus Jakarta Sans\x27,sans-serif;font-size:0.78rem;font-weight:600;color:#0f766e;line-height:1.42;margin-top:2px;'>" + safeZh + "</div>"
+      );
+    }
+
     function renderReviewTab(mode) {
       const listEl = document.getElementById("review-list");
       document.getElementById("tab-missed").classList.toggle("active-toggle", mode === "MISSED");
@@ -6603,7 +6638,7 @@
                 "<span style='background:#fee2e2;color:#991b1b;padding:2px 7px;border-radius:4px;font-weight:800;font-size:0.76rem;'>❌ " + item.chosenWord + "</span>" +
                 "<span style='background:#dcfce7;color:#065f46;padding:2px 7px;border-radius:4px;font-weight:800;font-size:0.8rem;'>✅ " + item.correctWord + "</span>" +
               "</div>" +
-              "<div style='font-size:0.76rem;color:#475569;'>" + item.explanation + "</div>";
+              formatBilingualExplanationHTML(item);
           }
         } else if (item.isCorrect) {
           left.innerHTML =
@@ -6616,7 +6651,7 @@
               "<span style='background:#dcfce7;color:#065f46;padding:2px 7px;border-radius:4px;font-weight:800;font-size:0.82rem;'>✅ " + item.correctWord + "</span>" +
               "<span style='color:#0284c7;font-size:0.78rem;font-weight:700;'>" + meta.ipa + "</span>" +
             "</div>" +
-            "<div style='font-size:0.78rem;color:#475569;'>" + item.explanation + "</div>";
+            formatBilingualExplanationHTML(item);
         }
 
         const btnGroup = document.createElement("div");
@@ -7888,20 +7923,83 @@
       });
     }
 
+    let presetTimerSelection = 15;
+
+    function updateTimerReadoutsAndHighlights(isCustomActive) {
+      const labelTxt = configTimerSeconds === 0 ? "Untimed" : (configTimerSeconds + "s");
+      const r1 = document.getElementById("timer-active-readout");
+      const r2 = document.getElementById("pause-timer-readout");
+      if (r1) r1.textContent = labelTxt;
+      if (r2) r2.textContent = labelTxt;
+
+      const c1 = document.getElementById("input-custom-timer");
+      const c2 = document.getElementById("input-pause-custom-timer");
+      if (c1) c1.classList.toggle("active-custom", Boolean(isCustomActive));
+      if (c2) c2.classList.toggle("active-custom", Boolean(isCustomActive));
+
+      ["#timer-select-row .seg-btn", "#pause-timer-row .seg-btn"].forEach(sel => {
+        document.querySelectorAll(sel).forEach(b => {
+          b.classList.toggle("selected", !isCustomActive && parseInt(b.getAttribute("data-timer"), 10) === configTimerSeconds);
+        });
+      });
+    }
+
+    function syncPauseTimerButtons() {
+      const c1 = document.getElementById("input-custom-timer");
+      const hasCustom = Boolean(c1 && c1.value.trim() !== "" && !isNaN(parseInt(c1.value, 10)));
+      updateTimerReadoutsAndHighlights(hasCustom);
+    }
+
     bindSegmentedGroup("timer-select-row", btn => {
-      configTimerSeconds = parseInt(btn.getAttribute("data-timer") || "15", 10);
-      syncPauseTimerButtons();
+      presetTimerSelection = parseInt(btn.getAttribute("data-timer") || "15", 10);
+      configTimerSeconds = presetTimerSelection;
+      const c1 = document.getElementById("input-custom-timer");
+      const c2 = document.getElementById("input-pause-custom-timer");
+      if (c1) c1.value = "";
+      if (c2) c2.value = "";
+      updateTimerReadoutsAndHighlights(false);
     });
 
     bindSegmentedGroup("pause-timer-row", btn => {
-      configTimerSeconds = parseInt(btn.getAttribute("data-timer") || "15", 10);
+      presetTimerSelection = parseInt(btn.getAttribute("data-timer") || "15", 10);
+      configTimerSeconds = presetTimerSelection;
+      const c1 = document.getElementById("input-custom-timer");
+      const c2 = document.getElementById("input-pause-custom-timer");
+      if (c1) c1.value = "";
+      if (c2) c2.value = "";
+      updateTimerReadoutsAndHighlights(false);
     });
 
-    function syncPauseTimerButtons() {
-      document.querySelectorAll("#pause-timer-row .seg-btn").forEach(b => {
-        b.classList.toggle("selected", parseInt(b.getAttribute("data-timer"), 10) === configTimerSeconds);
+    ["input-custom-timer", "input-pause-custom-timer"].forEach(id => {
+      const inp = document.getElementById(id);
+      if (!inp) return;
+      const otherId = id === "input-custom-timer" ? "input-pause-custom-timer" : "input-custom-timer";
+
+      const onCustomTimerEdit = () => {
+        const other = document.getElementById(otherId);
+        if (other && other.value !== inp.value) other.value = inp.value;
+        const raw = parseInt(inp.value, 10);
+        if (!isNaN(raw) && raw >= 1) {
+          configTimerSeconds = Math.max(3, Math.min(180, raw));
+          updateTimerReadoutsAndHighlights(true);
+        } else if (!inp.value.trim()) {
+          configTimerSeconds = presetTimerSelection;
+          updateTimerReadoutsAndHighlights(false);
+        }
+      };
+
+      inp.addEventListener("input", onCustomTimerEdit);
+      inp.addEventListener("change", () => {
+        const raw = parseInt(inp.value, 10);
+        if (!isNaN(raw) && raw >= 1) {
+          const clamped = String(Math.max(3, Math.min(180, raw)));
+          inp.value = clamped;
+          const other = document.getElementById(otherId);
+          if (other) other.value = clamped;
+        }
+        onCustomTimerEdit();
       });
-    }
+    });
 
     bindSegmentedGroup("lives-select-row", btn => {
       configStartLives = parseInt(btn.getAttribute("data-lives") || "3", 10);
@@ -8276,7 +8374,7 @@
               timerText.textContent = "UNTIMED";
               timerText.classList.remove("urgent");
             } else {
-              const baseGateSpeed = someoneAlreadyCrossed ? 42.0 : (98.2 / Math.max(5, gameState.phaseMaxTimer));
+              const baseGateSpeed = someoneAlreadyCrossed ? 42.0 : (98.2 / Math.max(3, gameState.phaseMaxTimer));
               const gateSpeed = baseGateSpeed + maxAccel * 52.0;
               activeGateGroup.position.z += gateSpeed * dt;
               if (configTimerSeconds > 0) {
