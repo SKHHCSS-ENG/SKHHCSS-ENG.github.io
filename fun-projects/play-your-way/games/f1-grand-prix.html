@@ -595,7 +595,8 @@
     /* 3-COLUMN F1 SECTOR TELEMETRY OPTIONS ROW */
     .options-below-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
       gap: 8px;
       width: 100%;
       pointer-events: auto;
@@ -609,17 +610,19 @@
     }
 
     .option-pill {
+      min-width: 0;
+      overflow: hidden;
       background: var(--f1-dark);
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-left: 5px solid #cbd5e1;
       border-radius: 3px;
-      padding: 7px 12px;
+      padding: 7px 10px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
       box-shadow: var(--shadow-f1);
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
       text-align: left;
     }
 
@@ -646,12 +649,17 @@
     .option-pill[data-lane="2"] .opt-badge { background: var(--opt-c); }
 
     .option-pill .opt-word {
-      font-size: clamp(0.96rem, 1.75vw, 1.24rem);
+      min-width: 0;
+      font-size: 1.12rem;
       font-weight: 800;
       color: #ffffff;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
       line-height: 1.15;
       flex: 1;
+      white-space: nowrap;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
     }
 
     .player-lane-tags {
@@ -2367,10 +2375,11 @@
       .audio-btn-main { padding: 5px 10px; font-size: 0.74rem; }
       .audio-btn-slow { padding: 4px 8px; font-size: 0.7rem; }
       .clue-pill { font-size: 0.72rem; padding: 3px 7px; }
-      .options-below-row { gap: 5px; }
-      .option-pill { padding: 6px 7px; gap: 6px; }
-      .option-pill .opt-badge { width: 22px; height: 22px; font-size: 0.8rem; }
-      .option-pill .opt-word { font-size: 0.86rem; word-break: break-word; }
+      .options-below-row { gap: 4px; }
+      .option-pill { padding: 5px 5px; gap: 4px; border-left-width: 4px; }
+      .option-pill.aligned-a, .option-pill.aligned-b, .option-pill.aligned-c { border-left-width: 4px; }
+      .option-pill .opt-badge { width: 19px; height: 19px; font-size: 0.72rem; }
+      .option-pill .opt-word { font-size: 0.88rem; letter-spacing: 0; }
       .hud-bottom-controls { padding-right: 102px; }
       .drag-steer-pad { height: 44px; padding: 0 8px; }
       .drag-lane-zone { font-size: 0.62rem; letter-spacing: 0.02em; }
@@ -5284,6 +5293,42 @@
       }
     }
 
+    function fitGateOptionWords() {
+      const vw = window.innerWidth || 800;
+      const maxPx = vw <= 420 ? 14.2 : (vw <= 600 ? 15.2 : (vw <= 900 ? 17.0 : 19.2));
+      const minReadablePx = vw <= 420 ? 10.0 : (vw <= 600 ? 10.5 : 11.5);
+
+      for (let i = 0; i < 3; i++) {
+        const el = document.getElementById("opt-word-" + i);
+        if (!el) continue;
+
+        // Phase 1: Keep on 1 single line and shrink smoothly down to minReadablePx
+        el.style.whiteSpace = "nowrap";
+        el.style.wordBreak = "normal";
+        el.style.overflowWrap = "normal";
+        el.style.lineHeight = "1.15";
+
+        let sz = maxPx;
+        el.style.fontSize = sz + "px";
+
+        const avail = el.clientWidth;
+        if (avail <= 8) continue;
+
+        while (sz > minReadablePx && el.scrollWidth > el.clientWidth + 1) {
+          sz = Math.max(minReadablePx, sz - 0.5);
+          el.style.fontSize = sz + "px";
+        }
+
+        // Phase 2: Only if STILL wider than card at minReadablePx, allow clean 2nd-row wrap!
+        if (el.scrollWidth > el.clientWidth + 1) {
+          el.style.whiteSpace = "normal";
+          el.style.lineHeight = "1.12";
+          el.style.wordBreak = "normal";
+          el.style.overflowWrap = "break-word";
+        }
+      }
+    }
+
     function updateAlignedOptionHighlight() {
       const laneP1 = getAlignedLaneIndex(p1.carX);
       const laneP2 = getAlignedLaneIndex(p2.carX);
@@ -5354,6 +5399,8 @@
       spawnQuestionGate();
       updateHudStats();
       updateAlignedOptionHighlight();
+      fitGateOptionWords();
+      requestAnimationFrame(fitGateOptionWords);
 
       if (q.prompt) {
         radioRow.classList.add("hidden");
@@ -6562,10 +6609,18 @@
       if (clientY === undefined || clientY === null) return 0;
       const isCompact = window.innerWidth <= 640 || window.innerHeight <= 520;
       const baseRefY = isCompact ? referenceY : Math.max(referenceY, window.innerHeight * 0.68);
-      const deadzone = isCompact ? 18 : 26;
+      const deadzone = isCompact ? 38 : 30;
       const upwardPx = (baseRefY - clientY) - deadzone;
       if (upwardPx <= 0) return 0;
-      return Math.max(0, Math.min(1, upwardPx / Math.max(68, window.innerHeight * 0.19)));
+      return Math.max(0, Math.min(1, upwardPx / Math.max(108, window.innerHeight * 0.22)));
+    }
+
+    function snapNearGateLane(x) {
+      if (gameState.phase !== "QUESTION") return x;
+      for (let i = 0; i < LANE_X.length; i++) {
+        if (Math.abs(x - LANE_X[i]) <= 1.05) return LANE_X[i];
+      }
+      return x;
     }
 
     container.addEventListener("pointerdown", e => {
@@ -6574,8 +6629,11 @@
       const targetPlayer = (isTwoPlayer && e.clientX >= window.innerWidth * 0.5) ? p2 : p1;
       activePointers.set(e.pointerId, {
         player: targetPlayer,
+        isTouch: e.pointerType === "touch",
         startX: e.clientX,
         startY: e.clientY,
+        originX: e.clientX,
+        originY: e.clientY,
         startCarX: targetPlayer.targetCarX,
         movedEnough: false
       });
@@ -6585,32 +6643,48 @@
     container.addEventListener("pointermove", e => {
       const session = activePointers.get(e.pointerId);
       if (!session) return;
-      const dx = e.clientX - session.startX;
-      const dy = e.clientY - session.startY;
-      if (!session.movedEnough && Math.hypot(dx, dy) < 6) return;
+      const rawDx = e.clientX - session.startX;
+      const rawDy = e.clientY - session.startY;
+      const deadzonePx = session.isTouch ? 11 : 6;
+      if (!session.movedEnough && Math.hypot(rawDx, rawDy) < deadzonePx) return;
       if (!session.movedEnough) {
         session.movedEnough = true;
+        session.originX = e.clientX;
+        session.originY = e.clientY;
         session.startCarX = session.player.targetCarX;
       }
       if (session.player.retired) return;
+
+      const dx = e.clientX - session.originX;
+      // Calmer, wider touch span mapped across playable lanes (-4.1 .. +4.1) instead of flinging into barriers
       const span = isTwoPlayer
-        ? Math.max(135, window.innerWidth * 0.28)
-        : Math.max(125, Math.min(260, window.innerWidth * 0.44));
-      session.player.targetCarX = clampCarX(session.startCarX + (dx / span) * (TRACK_HALF_WIDTH * 2));
-      session.player.dragThrottle = calcThrottleRatio(e.clientY, session.startY);
+        ? Math.max(195, window.innerWidth * 0.42)
+        : (session.isTouch
+            ? Math.max(255, Math.min(440, window.innerWidth * 0.86))
+            : Math.max(210, Math.min(340, window.innerWidth * 0.56)));
+      const laneWorldSpan = 7.6; // -3.8 to +3.8 covers Lane A (-3.6), B (0), C (+3.6) smoothly
+      const norm = dx / span;
+      const curved = Math.sign(norm) * Math.pow(Math.abs(norm), session.isTouch ? 1.12 : 1.0);
+      const nextX = session.startCarX + curved * laneWorldSpan;
+      const touchClamp = session.isTouch ? 4.15 : TRACK_HALF_WIDTH;
+      session.player.targetCarX = Math.max(-touchClamp, Math.min(touchClamp, nextX));
+      session.player.dragThrottle = calcThrottleRatio(e.clientY, session.originY);
     });
 
     function releasePointer(e) {
       const session = activePointers.get(e.pointerId);
       if (session) {
         session.player.dragThrottle = 0;
+        if (session.movedEnough && !session.player.retired) {
+          session.player.targetCarX = snapNearGateLane(session.player.targetCarX);
+        }
         activePointers.delete(e.pointerId);
       }
     }
     container.addEventListener("pointerup", releasePointer);
     container.addEventListener("pointercancel", releasePointer);
 
-    // 1P Bottom Steering Pad
+    // 1P Bottom Steering Pad (Aligned directly to Lane A = -3.6, Lane B = 0, Lane C = +3.6)
     const steerPad = document.getElementById("drag-steer-pad");
     let padDragging = false;
     let padStartY = 0;
@@ -6618,7 +6692,9 @@
     function updateFromSteerPad(clientX, clientY) {
       const rect = steerPad.getBoundingClientRect();
       const clampedRel = Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(1, rect.width)));
-      p1.targetCarX = clampCarX((clampedRel - 0.5) * (TRACK_HALF_WIDTH * 2));
+      // Map 1/6, 3/6, 5/6 (centers of Sector A, B, C zones) close to -3.6, 0, +3.6
+      const mappedX = (clampedRel - 0.5) * 8.4;
+      p1.targetCarX = Math.max(-4.15, Math.min(4.15, mappedX));
       p1.dragThrottle = calcThrottleRatio(clientY, padStartY);
     }
 
@@ -6632,7 +6708,7 @@
     steerPad.addEventListener("pointermove", e => {
       if (padDragging) updateFromSteerPad(e.clientX, e.clientY);
     });
-    steerPad.addEventListener("pointerup", () => { padDragging = false; p1.dragThrottle = 0; });
+    steerPad.addEventListener("pointerup", () => { padDragging = false; p1.dragThrottle = 0; p1.targetCarX = snapNearGateLane(p1.targetCarX); });
     steerPad.addEventListener("pointercancel", () => { padDragging = false; p1.dragThrottle = 0; });
 
     ["opt-pill-0", "opt-pill-1", "opt-pill-2"].forEach((id, i) => {
@@ -8258,6 +8334,7 @@
     window.addEventListener("resize", () => {
       resizeGaragePreviews();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      fitGateOptionWords();
     });
 
     window.onload = () => {
