@@ -2857,7 +2857,7 @@
                 </div>
                 <div class="f1-input-group">
                   <label class="f1-input-label" for="input-team-name">🏁 Team</label>
-                  <input class="f1-text-input" id="input-team-name" type="text" maxlength="24" value="McLaren Formula 1 Team" />
+                  <input class="f1-text-input" id="input-team-name" type="text" maxlength="24" value="McLaren F1 Team" />
                 </div>
               </div>
               <div class="livery-grid" id="livery-select-grid">
@@ -2908,7 +2908,7 @@
                 </div>
                 <div class="f1-input-group">
                   <label class="f1-input-label" for="input-team-name-p2">🏁 Team</label>
-                  <input class="f1-text-input" id="input-team-name-p2" type="text" maxlength="24" value="Scuderia Ferrari HP" />
+                  <input class="f1-text-input" id="input-team-name-p2" type="text" maxlength="24" value="Scuderia Ferrari" />
                 </div>
               </div>
               <div class="livery-grid" id="livery-select-grid-p2">
@@ -4693,7 +4693,7 @@
       mclaren: {
         id: "mclaren",
         shortTag: "MCLAREN",
-        defaultTeamName: "McLaren Formula 1 Team",
+        defaultTeamName: "McLaren F1 Team",
         defaultDriver: "NORRIS #4",
         hexPrimary: "#ff8000",
         body: 0xff8000,
@@ -4704,7 +4704,7 @@
       ferrari: {
         id: "ferrari",
         shortTag: "FERRARI",
-        defaultTeamName: "Scuderia Ferrari HP",
+        defaultTeamName: "Scuderia Ferrari",
         defaultDriver: "LECLERC #16",
         hexPrimary: "#e10600",
         body: 0xe10600,
@@ -4715,8 +4715,8 @@
       redbull: {
         id: "redbull",
         shortTag: "RED BULL",
-        defaultTeamName: "Oracle Red Bull Racing",
-        defaultDriver: "VERSTAPPEN #33",
+        defaultTeamName: "Red Bull Racing",
+        defaultDriver: "VERSTAPPEN #3",
         hexPrimary: "#1e3a8a",
         body: 0x172554,
         accent: 0xef4444,
@@ -4726,7 +4726,7 @@
       mercedes: {
         id: "mercedes",
         shortTag: "MERCEDES",
-        defaultTeamName: "Mercedes-AMG PETRONAS F1",
+        defaultTeamName: "Mercedes F1 Team",
         defaultDriver: "ANTONELLI #12",
         hexPrimary: "#00d2be",
         body: 0x334155,
@@ -4737,7 +4737,7 @@
       aston: {
         id: "aston",
         shortTag: "ASTON MARTIN",
-        defaultTeamName: "Aston Martin Aramco F1",
+        defaultTeamName: "Aston Martin F1 Team",
         defaultDriver: "ALONSO #14",
         hexPrimary: "#047857",
         body: 0x065f46,
@@ -4748,7 +4748,7 @@
       alpine: {
         id: "alpine",
         shortTag: "ALPINE",
-        defaultTeamName: "BWT Alpine F1 Team",
+        defaultTeamName: "Alpine F1 Team",
         defaultDriver: "GASLY #10",
         hexPrimary: "#0284c7",
         body: 0x0284c7,
@@ -7661,12 +7661,12 @@
     syncActivePackFromPlayYourWay();
 
 
-    const STORAGE_KEY_LB = "f1_team_radio_gp_leaderboard_v4";
+    const STORAGE_KEY_LB = "f1_team_radio_gp_leaderboard_v6";
     const DEFAULT_AI_STANDINGS = [
-      { driver: "NORRIS #4", team: "McLaren Formula 1 Team", color: "#ff8000", score: 1180, acc: 92, streak: 7, isCurrent: false },
-      { driver: "LECLERC #16", team: "Scuderia Ferrari HP", color: "#e10600", score: 1040, acc: 83, streak: 5, isCurrent: false },
-      { driver: "VERSTAPPEN #33", team: "Oracle Red Bull Racing", color: "#1e3a8a", score: 960, acc: 83, streak: 4, isCurrent: false },
-      { driver: "ANTONELLI #12", team: "Mercedes-AMG PETRONAS F1", color: "#00d2be", score: 860, acc: 75, streak: 4, isCurrent: false }
+      { driver: "NORRIS #4", team: "McLaren F1 Team", color: "#ff8000", score: 1180, acc: 92, streak: 7, isCurrent: false },
+      { driver: "LECLERC #16", team: "Scuderia Ferrari", color: "#e10600", score: 1040, acc: 83, streak: 5, isCurrent: false },
+      { driver: "VERSTAPPEN #3", team: "Red Bull Racing", color: "#1e3a8a", score: 960, acc: 83, streak: 4, isCurrent: false },
+      { driver: "ANTONELLI #12", team: "Mercedes F1 Team", color: "#00d2be", score: 860, acc: 75, streak: 4, isCurrent: false }
     ];
     let leaderboardEntries = [];
 
