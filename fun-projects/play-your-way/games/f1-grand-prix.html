@@ -1382,6 +1382,59 @@
       text-transform: uppercase;
     }
 
+    /* EMOJI TAB-STOP & CLAUSE-BOUNDARY WRAPPING + MOBILE LEADERBOARD & REVIEW STACK */
+    .emoji-tab-row {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .emoji-tab-icon {
+      flex-shrink: 0;
+      line-height: inherit;
+    }
+
+    .emoji-tab-text {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 5px;
+      row-gap: 1px;
+      min-width: 0;
+    }
+
+    .clause-seg {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 600px) {
+      .emoji-tab-text {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .f1-lb-row {
+        grid-template-columns: 26px minmax(0, 1fr) auto auto;
+        gap: 6px;
+        padding: 6px 8px;
+        font-size: 0.76rem;
+      }
+      .f1-team-cell {
+        display: none;
+      }
+      .f1-driver-cell {
+        min-width: 0;
+        gap: 6px;
+        font-size: 0.78rem;
+      }
+      .f1-pts-pill {
+        padding: 2px 7px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        width: fit-content;
+        justify-self: end;
+      }
+    }
+
     .f1-lb-row {
       display: grid;
       grid-template-columns: 36px 1.4fr 1.2fr 82px 88px;
@@ -2136,12 +2189,11 @@
       border: 1px solid #e2e8f0;
       border-left: 4px solid #16a34a;
       border-radius: 4px;
-      padding: 8px 11px;
+      padding: 9px 11px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 7px;
     }
 
     .review-item.missed {
@@ -6316,6 +6368,18 @@
       }
     }
 
+    function setClauseHeading(el, emoji, clause1, clause2) {
+      if (!el) return;
+      el.innerHTML =
+        "<span class='emoji-tab-row'>" +
+          "<span class='emoji-tab-icon' aria-hidden='true'>" + emoji + "</span>" +
+          "<span class='emoji-tab-text'>" +
+            "<span class='clause-seg'>" + clause1 + "</span>" +
+            "<span class='clause-seg'>" + clause2 + "</span>" +
+          "</span>" +
+        "</span>";
+    }
+
     function completeCutsceneAndShowModal() {
       const isDnf = Boolean(gameState.cutsceneIsDnf);
       cleanupCutsceneArtifacts();
@@ -6358,7 +6422,7 @@
         emblemEl.classList.add("grade-dnf");
         gradeLetterEl.textContent = "DNF";
         gradeWordEl.textContent = "NO TYRES";
-        kickerEl.textContent = "🚩 FIA RACE CONTROL · DID NOT FINISH";
+        setClauseHeading(kickerEl, "🚩", "FIA RACE CONTROL ·", "DID NOT FINISH");
         subtitleEl.style.background = "rgba(239, 68, 68, 0.22)";
         subtitleEl.style.color = "#fecaca";
         subtitleEl.textContent = "Stopped Lap " + gameState.roundAsked + " / " + QUESTIONS_PER_RACE;
@@ -6382,7 +6446,7 @@
           gradeLetterEl.textContent = "C";
           gradeWordEl.textContent = "FINISH";
         }
-        kickerEl.textContent = "🏁 OFFICIAL FIA CLASSIFICATION · FULL DISTANCE";
+        setClauseHeading(kickerEl, "🏁", "OFFICIAL FIA CLASSIFICATION ·", "FULL DISTANCE");
         subtitleEl.style.background = "rgba(34, 197, 94, 0.22)";
         subtitleEl.style.color = "#bbf7d0";
         subtitleEl.textContent = QUESTIONS_PER_RACE + " / " + QUESTIONS_PER_RACE + " Laps Complete";
@@ -6397,13 +6461,13 @@
         let p1Badge = "";
         let p2Badge = "";
         if (isDnf) {
-          document.getElementById("end-title").textContent = "🚩 Race Incomplete — Both Cars Out of Tyres!";
+          setClauseHeading(document.getElementById("end-title"), "🚩", "Race Incomplete —", "Both Cars Out of Tyres!");
           p1Badge = "🚩 DNF (0 TYRES)";
           p2Badge = "🚩 DNF (0 TYRES)";
           if (p1.score > p2.score) p1Badge = "🚩 DNF · PROVISIONAL LEAD";
           else if (p2.score > p1.score) p2Badge = "🚩 DNF · PROVISIONAL LEAD";
         } else {
-          document.getElementById("end-title").textContent = "🏆 Chequered Flag — Split-Screen Finish!";
+          setClauseHeading(document.getElementById("end-title"), "🏆", "Chequered Flag —", "Split-Screen Finish!");
           if (p1.retired && !p2.retired) {
             p2Badge = "🥇 RACE WINNER · FINISHED";
             p1Badge = "🚩 DNF · LAP " + (p1.retiredAtLap || askedP1);
@@ -6471,9 +6535,11 @@
         summary1P.style.display = "grid";
         duelBanner.classList.add("hidden");
 
-        document.getElementById("end-title").textContent = isDnf
-          ? "🚩 Race Incomplete — Out of Tyres!"
-          : "🏆 Chequered Flag — Grand Prix Finish!";
+        if (isDnf) {
+          setClauseHeading(document.getElementById("end-title"), "🚩", "Race Incomplete —", "Out of Tyres!");
+        } else {
+          setClauseHeading(document.getElementById("end-title"), "🏆", "Chequered Flag —", "Grand Prix Finish!");
+        }
 
         document.getElementById("end-score-label").textContent = isDnf ? "PROVISIONAL SCORE (DNF)" : "FINAL RACE SCORE";
         document.getElementById("end-score-sub").textContent = isDnf
@@ -6523,7 +6589,7 @@
         row.className = "review-item" + (item.isCorrect ? "" : " missed");
 
         const left = document.createElement("div");
-        left.style.flex = "1";
+        left.style.width = "100%";
         if (item.prompt) {
           const safeP = item.prompt.replace(/</g, "&lt;");
           if (item.isCorrect) {
@@ -6556,6 +6622,8 @@
         const btnGroup = document.createElement("div");
         btnGroup.style.display = "flex";
         btnGroup.style.gap = "6px";
+        btnGroup.style.flexWrap = "wrap";
+        btnGroup.style.alignItems = "center";
 
         if (!item.isCorrect && item.rawSingleWord && item.rawSingleWord !== "DNF") {
           const wrongBtn = document.createElement("button");
