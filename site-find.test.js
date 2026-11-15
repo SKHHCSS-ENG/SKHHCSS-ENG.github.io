@@ -389,7 +389,7 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
 
 test("English home cards each have one job, in order", () => {
   const home = fs.readFileSync(new URL("./index.html", import.meta.url), "utf8");
-  const titles = [...home.matchAll(/<h2>([^<]+)<\/h2>/g)].map((hit) => hit[1]);
+  const titles = [...home.matchAll(/<h2>([\s\S]*?)<\/h2>/g)].map((hit) => hit[1].replace(/<[^>]+>/g, ""));
   assert.deepEqual(titles, [
     "Learning Materials",
     "Practice",

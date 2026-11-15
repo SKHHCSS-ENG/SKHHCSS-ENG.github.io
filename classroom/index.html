@@ -179,6 +179,8 @@
     a.card { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
   }
+  /* Keep names and labels from wrapping mid-phrase. */
+  .nowrap { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -192,27 +194,27 @@
       </div>
       <div class="hero-body">
         <h1>Classroom</h1>
-        <p class="subject">Teacher tools · English Department</p>
+        <p class="subject"><span class="nowrap">Teacher tools ·</span> <span class="nowrap">English Department</span></p>
       </div>
     </header>
 
     <div class="cards">
       <a class="card" href="https://skhhcss-eng.github.io/classroom/hcs-live-class-plus/">
         <p class="card-kicker"><span class="badge badge-teacher">Teacher</span><span class="badge badge-desktop">Desktop</span></p>
-        <h2>HCS Live Class +</h2>
+        <h2><span class="nowrap">HCS Live Class +</span></h2>
         <p>Same Live Class tools, plus AI classroom help.</p>
         <span class="card-arrow">Open HCS Live Class + →</span>
       </a>
       <a class="card" href="hcs-live-class/">
         <p class="card-kicker"><span class="badge badge-teacher">Teacher</span><span class="badge badge-desktop">Desktop</span></p>
-        <h2>HCS Live Class</h2>
+        <h2><span class="nowrap">HCS Live Class</span></h2>
         <p>Lesson routine tools — seating, scoring, timer, random picker, roster, and groups.</p>
         <span class="card-arrow">Open HCS Live Class →</span>
       </a>
     </div>
 
     <footer>
-      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      <span class="nowrap">聖公會聖匠中學</span> <span class="nowrap">SKH Holy Carpenter Secondary School</span> · <span class="nowrap">English Department</span><br>
       Materials for school use
     </footer>
   </div>

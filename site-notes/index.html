@@ -186,6 +186,8 @@
     article.release { box-shadow: none; break-inside: avoid; }
     a.back { display: none; }
   }
+  /* Keep names and labels from wrapping mid-phrase. */
+  .nowrap { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -687,7 +689,7 @@
     </div>
 
     <footer>
-      聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br>
+      <span class="nowrap">聖公會聖匠中學</span> <span class="nowrap">SKH Holy Carpenter Secondary School</span> · <span class="nowrap">English Department</span><br>
       Materials for school use
     </footer>
   </div>
