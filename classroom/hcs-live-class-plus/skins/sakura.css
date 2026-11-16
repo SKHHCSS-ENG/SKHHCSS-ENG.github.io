@@ -1333,7 +1333,7 @@ html[data-skin="sakura"] #classroomScaleHost::after {
   pointer-events: none;
   z-index: 0;
   image-rendering: pixelated;
-  filter: none; /* floor scene left sharp; desks stay sharp */
+  filter: blur(1.6px); /* 10% floor-scene blur; desks stay sharp */
 }
 html[data-skin="sakura"] #classroomScaleHost::before {
   background-image: var(--sakura-scene-f2), var(--sakura-scene-f1);

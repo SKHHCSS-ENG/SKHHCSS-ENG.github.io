@@ -71,10 +71,10 @@ test('boot writes pack stylesheets and mount writes Spark, Arcade, Pitwall, and 
   run(boot, registrySrc, 'registry.js');
   run(boot, loaderSrc, 'loader.js');
   const bootHtml = written.join('');
-  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/spark\.css\?v=20261116s">/);
-  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/arcade\.css\?v=20261116s">/);
-  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/pitwall\.css\?v=20261116s">/);
-  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/sakura\.css\?v=20261116s">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/spark\.css\?v=20261116t">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/arcade\.css\?v=20261116t">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/pitwall\.css\?v=20261116t">/);
+  assert.match(bootHtml, /<link rel="stylesheet" href="skins\/sakura\.css\?v=20261116t">/);
 
   const mount = freshContext();
   const buttons = [];

@@ -1306,7 +1306,7 @@ html[data-skin="pitwall"] #classroomScaleHost::after {
   pointer-events: none;
   z-index: 0;
   image-rendering: pixelated;
-  filter: none; /* floor scene left sharp; desks stay sharp */
+  filter: blur(1.6px); /* 10% floor-scene blur; desks stay sharp */
 }
 html[data-skin="pitwall"] #classroomScaleHost::before {
   background-image: var(--pitwall-scene-f2), var(--pitwall-scene-f1);
