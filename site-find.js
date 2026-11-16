@@ -511,6 +511,17 @@
         "team radio race",
         "自訂遊戲"
       ]
+    },
+    {
+      "title": "Voice It Out",
+      "path": "fun-projects/voice-it-out/",
+      "aliases": [
+        "voice it out",
+        "speaking studio",
+        "dubbing studio",
+        "storyboard studio",
+        "blind relay"
+      ]
     }
   ];
 

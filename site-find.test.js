@@ -23,9 +23,9 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 41);
+  assert.equal(SiteFind.entries.length, 42);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 41);
+  assert.equal(new Set(paths).size, 42);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
   assert.equal(SiteFind.entries[28].title, "Paper 1 - Meaning from Context");
@@ -89,6 +89,13 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.ok(SiteFind.search("play your way").some((entry) => entry.path === "fun-projects/play-your-way/"));
   assert.ok(SiteFind.search("f1 grand prix").some((entry) => entry.path === "fun-projects/play-your-way/"));
   assert.ok(SiteFind.search("自訂遊戲").some((entry) => entry.path === "fun-projects/play-your-way/"));
+  assert.equal(SiteFind.entries[41].title, "Voice It Out");
+  assert.equal(SiteFind.entries[41].path, "fun-projects/voice-it-out/");
+  const voiceItOut = SiteFind.entries.filter((entry) => entry.title === "Voice It Out");
+  assert.equal(voiceItOut.length, 1);
+  assert.ok(SiteFind.search("voice it out").some((entry) => entry.path === "fun-projects/voice-it-out/"));
+  assert.ok(SiteFind.search("storyboard studio").some((entry) => entry.path === "fun-projects/voice-it-out/"));
+  assert.ok(SiteFind.search("blind relay").some((entry) => entry.path === "fun-projects/voice-it-out/"));
   assert.equal(SiteFind.search("paper 3 exam skills")[0].path, "learning-materials/paper-3-exam-skills/");
   assert.equal(SiteFind.search("listening skills")[0].title, "Paper 3 - Exam Skills");
   assert.equal(SiteFind.search("paper 4 exam skills")[0].path, "learning-materials/paper-4-exam-skills/");
@@ -329,6 +336,9 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
   assert.match(funPage, /<title>Fun Projects ·/);
   assert.match(funPage, /<h1>Fun Projects<\/h1>/);
   assert.match(funPage, /Practise speaking in a short interactive story\./);
+  assert.match(funPage, /href="\.\/voice-it-out\/"/);
+  assert.match(funPage, /<h3>Voice It Out<\/h3>/);
+  assert.match(funPage, /Cast characters with friends in Storyboard Studio or Blind Relay, mix live voice filters and arcade sound effects, and premiere your own 4-scene comedy movie!/);
 
   assert.match(
     activitiesPage,
