@@ -328,8 +328,8 @@ test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle b
   [
     { id: 'spark', css: sparkCss, js: sparkJs, pageAnim: 'sparkPrismDrift', floorAnim: 'sparkFloorAurora' },
     { id: 'arcade', css: arcadeCss, js: arcadeJs, pageAnim: 'arcadePageMesh', floorAnim: 'arcadeFloorMesh' },
-    { id: 'pitwall', css: pitwallCss, js: pitwallJs, pageAnim: 'pitwallPageMesh', floorAnim: 'pitwallFloorMesh' },
-    { id: 'sakura', css: sakuraCss, js: sakuraJs, pageAnim: 'sakuraPageMesh', floorAnim: 'sakuraFloorMesh' }
+    { id: 'pitwall', css: pitwallCss, js: pitwallJs, floorAnim: 'pitwallFloorMesh' },
+    { id: 'sakura', css: sakuraCss, js: sakuraJs, floorAnim: 'sakuraFloorMesh' }
   ].forEach(function (pack) {
     assert.match(pack.css, new RegExp('\\.studio-mark img\\.studio-mark-default'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] body'));
@@ -342,7 +342,11 @@ test('All DLC stylesheets scope rules under html[data-skin="<id>"] and restyle b
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #chanceSheet'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnMore'));
     assert.match(pack.css, new RegExp('html\\[data-skin="' + pack.id + '"\\] #btnChance'));
-    assert.match(pack.css, new RegExp('@keyframes ' + pack.pageAnim));
+    if (pack.pageAnim) {
+      assert.match(pack.css, new RegExp('@keyframes ' + pack.pageAnim));
+    } else {
+      assert.doesNotMatch(pack.css, /@keyframes (?:pitwall|sakura)PageMesh/);
+    }
     assert.match(pack.css, new RegExp('@keyframes ' + pack.floorAnim));
     assert.match(pack.css, new RegExp('\\.' + pack.id + '-tier-badge[\\s\\S]*?display:\\s*none;'));
     assert.doesNotMatch(pack.css, /html\[data-skin="minimalist"\]/);
