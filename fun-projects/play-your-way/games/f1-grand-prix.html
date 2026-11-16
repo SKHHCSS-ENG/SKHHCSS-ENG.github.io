@@ -6732,10 +6732,10 @@
       // Touch (phone/iPad): shorter upward swipe reaches full acceleration.
       // Left/right drag span is unchanged. Mouse/desktop keeps the previous curve.
       if (isTouch) {
-        const deadzone = 24;
+        const deadzone = 16;
         const upwardPx = (referenceY - clientY) - deadzone;
         if (upwardPx <= 0) return 0;
-        return Math.max(0, Math.min(1, upwardPx / Math.max(64, window.innerHeight * 0.11)));
+        return Math.max(0, Math.min(1, upwardPx / Math.max(36, window.innerHeight * 0.06)));
       }
       const isCompact = window.innerWidth <= 640 || window.innerHeight <= 520;
       const baseRefY = isCompact ? referenceY : Math.max(referenceY, window.innerHeight * 0.68);
