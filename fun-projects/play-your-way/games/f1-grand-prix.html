@@ -6727,8 +6727,16 @@
       return Math.max(-TRACK_HALF_WIDTH, Math.min(TRACK_HALF_WIDTH, x));
     }
 
-    function calcThrottleRatio(clientY, referenceY) {
+    function calcThrottleRatio(clientY, referenceY, isTouch) {
       if (clientY === undefined || clientY === null) return 0;
+      // Touch (phone/iPad): shorter upward swipe reaches full acceleration.
+      // Left/right drag span is unchanged. Mouse/desktop keeps the previous curve.
+      if (isTouch) {
+        const deadzone = 24;
+        const upwardPx = (referenceY - clientY) - deadzone;
+        if (upwardPx <= 0) return 0;
+        return Math.max(0, Math.min(1, upwardPx / Math.max(64, window.innerHeight * 0.11)));
+      }
       const isCompact = window.innerWidth <= 640 || window.innerHeight <= 520;
       const baseRefY = isCompact ? referenceY : Math.max(referenceY, window.innerHeight * 0.68);
       const deadzone = isCompact ? 38 : 30;
@@ -6796,7 +6804,7 @@
         session.originX = e.clientX;
       }
       session.player.targetCarX = Math.max(-touchClamp, Math.min(touchClamp, nextX));
-      session.player.dragThrottle = calcThrottleRatio(e.clientY, session.originY);
+      session.player.dragThrottle = calcThrottleRatio(e.clientY, session.originY, session.isTouch);
     });
 
     function releasePointer(e) {
@@ -6816,6 +6824,7 @@
     const steerPad = document.getElementById("drag-steer-pad");
     let padDragging = false;
     let padStartY = 0;
+    let padIsTouch = false;
 
     function updateFromSteerPad(clientX, clientY) {
       const rect = steerPad.getBoundingClientRect();
@@ -6823,12 +6832,13 @@
       // Map 1/6, 3/6, 5/6 (centers of Sector A, B, C zones) close to -3.6, 0, +3.6
       const mappedX = (clampedRel - 0.5) * 8.4;
       p1.targetCarX = Math.max(-4.15, Math.min(4.15, mappedX));
-      p1.dragThrottle = calcThrottleRatio(clientY, padStartY);
+      p1.dragThrottle = calcThrottleRatio(clientY, padStartY, padIsTouch);
     }
 
     steerPad.addEventListener("pointerdown", e => {
       ensureAudioCtx();
       padDragging = true;
+      padIsTouch = e.pointerType === "touch";
       padStartY = e.clientY;
       updateFromSteerPad(e.clientX, e.clientY);
       if (steerPad.setPointerCapture) { try { steerPad.setPointerCapture(e.pointerId); } catch (err) {} }
