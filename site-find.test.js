@@ -338,7 +338,7 @@ test("Paper 1 practice and Speech Festival hub cards open the project sites", ()
   assert.match(funPage, /Practise speaking in a short interactive story\./);
   assert.match(funPage, /href="\.\/voice-it-out\/"/);
   assert.match(funPage, /<h3>Voice It Out<\/h3>/);
-  assert.match(funPage, /Cast characters with friends in Storyboard Studio or Blind Relay, mix live voice filters and arcade sound effects, and premiere your own 4-scene comedy movie!/);
+  assert.match(funPage, /Cast characters with friends in Storyboard Studio or Blind Relay, dub a 4-scene comedy movie with live voice filters and sound effects, and get scored by the AI Film Critic./);
 
   assert.match(
     activitiesPage,
