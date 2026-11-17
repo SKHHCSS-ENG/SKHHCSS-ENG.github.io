@@ -4189,7 +4189,7 @@
       osc.stop(now + 0.15);
     }
 
-    function playChequeredFlagFanfareSfx() {
+    function playChequeredFlagFanfareSynth() {
       if (!sfxEnabled) return;
       ensureAudioCtx();
       if (!audioCtx) return;
@@ -4216,7 +4216,7 @@
       });
     }
 
-    function playDnfBreakdownSfx() {
+    function playDnfBreakdownSynth() {
       if (!sfxEnabled) return;
       ensureAudioCtx();
       if (!audioCtx) return;
@@ -4249,6 +4249,294 @@
       });
     }
 
+
+    const CUTSCENE_SFX_URLS = {
+      win: ["sfx/win-a-broadcast-fanfare.m4a", "sfx/win-a-broadcast-fanfare.wav"],
+      dnf: ["sfx/dnf-a-soft-radio.m4a", "sfx/dnf-a-soft-radio.wav"]
+    };
+    const cutsceneSfxRaw = { win: null, dnf: null };
+    const cutsceneSfxBuffers = { win: null, dnf: null };
+    const cutsceneSfxLoading = { win: false, dnf: false };
+    let cutsceneSfxNodes = [];
+    const CUTSCENE_SFX_GAIN = 0.38;
+
+    function stopCutsceneSfx(fadeSec) {
+      const fade = Math.max(0.02, fadeSec || 0.06);
+      const nodes = cutsceneSfxNodes;
+      cutsceneSfxNodes = [];
+      if (!audioCtx || !nodes.length) return;
+      const now = audioCtx.currentTime;
+      nodes.forEach(node => {
+        try {
+          if (node.gain) {
+            node.gain.gain.cancelScheduledValues(now);
+            node.gain.gain.setTargetAtTime(0.0001, now, fade / 3);
+          }
+          if (node.source) node.source.stop(now + fade);
+        } catch (e) {}
+      });
+    }
+
+    function decodeCutsceneSfx(kind) {
+      return new Promise(resolve => {
+        if (cutsceneSfxBuffers[kind]) {
+          resolve(cutsceneSfxBuffers[kind]);
+          return;
+        }
+        if (!audioCtx || !cutsceneSfxRaw[kind]) {
+          resolve(null);
+          return;
+        }
+        let settled = false;
+        const done = buf => {
+          if (settled) return;
+          settled = true;
+          if (buf) cutsceneSfxBuffers[kind] = buf;
+          resolve(buf || null);
+        };
+        try {
+          const copy = cutsceneSfxRaw[kind].slice(0);
+          const ret = audioCtx.decodeAudioData(copy, done, () => done(null));
+          if (ret && typeof ret.then === "function") {
+            ret.then(done, () => done(null));
+          }
+        } catch (e) {
+          done(null);
+        }
+      });
+    }
+
+    function preloadCutsceneSfx(kind) {
+      if (cutsceneSfxBuffers[kind]) return;
+      if (cutsceneSfxRaw[kind]) {
+        if (audioCtx) decodeCutsceneSfx(kind);
+        return;
+      }
+      if (cutsceneSfxLoading[kind]) return;
+      cutsceneSfxLoading[kind] = true;
+      const urls = CUTSCENE_SFX_URLS[kind] || [];
+      (async () => {
+        for (let i = 0; i < urls.length; i++) {
+          try {
+            const res = await fetch(new URL(urls[i], window.location.href).href);
+            if (!res.ok) continue;
+            const arr = await res.arrayBuffer();
+            if (arr && arr.byteLength) {
+              cutsceneSfxRaw[kind] = arr;
+              if (audioCtx) await decodeCutsceneSfx(kind);
+              break;
+            }
+          } catch (e) {}
+        }
+        cutsceneSfxLoading[kind] = false;
+      })();
+    }
+
+    function playCutsceneSfxClip(kind, fallbackFn) {
+      if (!sfxEnabled) return;
+      ensureAudioCtx();
+      if (!audioCtx) return;
+      preloadCutsceneSfx(kind);
+      const startClip = buf => {
+        if (!sfxEnabled || !buf) {
+          if (fallbackFn) fallbackFn();
+          return;
+        }
+        try {
+          const src = audioCtx.createBufferSource();
+          const gain = audioCtx.createGain();
+          src.buffer = buf;
+          gain.gain.setValueAtTime(CUTSCENE_SFX_GAIN, audioCtx.currentTime);
+          src.connect(gain);
+          gain.connect(audioCtx.destination);
+          const node = { source: src, gain: gain };
+          cutsceneSfxNodes.push(node);
+          src.onended = () => {
+            cutsceneSfxNodes = cutsceneSfxNodes.filter(n => n !== node);
+          };
+          src.start();
+        } catch (e) {
+          if (fallbackFn) fallbackFn();
+        }
+      };
+      if (cutsceneSfxBuffers[kind]) {
+        startClip(cutsceneSfxBuffers[kind]);
+        return;
+      }
+      if (cutsceneSfxRaw[kind]) {
+        decodeCutsceneSfx(kind).then(buf => startClip(buf));
+        return;
+      }
+      if (fallbackFn) fallbackFn();
+    }
+
+    function playChequeredFlagFanfareSfx() {
+      playCutsceneSfxClip("win", playChequeredFlagFanfareSynth);
+    }
+
+    function playDnfBreakdownSfx() {
+      playCutsceneSfxClip("dnf", playDnfBreakdownSynth);
+    }
+
+    preloadCutsceneSfx("win");
+    preloadCutsceneSfx("dnf");
+
+    let engineLoop = null;
+
+    let engineStopTimer = null;
+    let engineGen = 0;
+
+    function createEngineNoiseSource() {
+      const duration = 2;
+      const rate = audioCtx.sampleRate;
+      const buffer = audioCtx.createBuffer(1, Math.floor(rate * duration), rate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+      return src;
+    }
+
+    function stopEngineLoop(fadeSec) {
+      if (!engineLoop || !audioCtx) return;
+      const nodes = engineLoop;
+      const gen = engineGen;
+      engineLoop = null;
+      const fade = Math.max(0.04, fadeSec || 0.12);
+      const now = audioCtx.currentTime;
+      try {
+        nodes.master.gain.cancelScheduledValues(now);
+        nodes.master.gain.setValueAtTime(Math.max(0.0001, nodes.master.gain.value), now);
+        nodes.master.gain.exponentialRampToValueAtTime(0.0001, now + fade);
+      } catch (e) {}
+      if (engineStopTimer) clearTimeout(engineStopTimer);
+      engineStopTimer = setTimeout(() => {
+        if (gen !== engineGen) return;
+        try {
+          nodes.oscA.stop();
+          nodes.oscB.stop();
+          nodes.oscC.stop();
+          nodes.noise.stop();
+        } catch (e) {}
+        try {
+          nodes.oscA.disconnect();
+          nodes.oscB.disconnect();
+          nodes.oscC.disconnect();
+          nodes.noise.disconnect();
+          nodes.filter.disconnect();
+          nodes.raspFilter.disconnect();
+          nodes.oscGain.disconnect();
+          nodes.raspGain.disconnect();
+          nodes.master.disconnect();
+        } catch (e) {}
+        engineStopTimer = null;
+      }, fade * 1000 + 30);
+    }
+
+    function startEngineLoop() {
+      if (engineLoop || !sfxEnabled) return;
+      ensureAudioCtx();
+      if (!audioCtx) return;
+      if (engineStopTimer) {
+        clearTimeout(engineStopTimer);
+        engineStopTimer = null;
+      }
+      engineGen += 1;
+      const now = audioCtx.currentTime;
+      const oscA = audioCtx.createOscillator();
+      const oscB = audioCtx.createOscillator();
+      const oscC = audioCtx.createOscillator();
+      const noise = createEngineNoiseSource();
+      const filter = audioCtx.createBiquadFilter();
+      const raspFilter = audioCtx.createBiquadFilter();
+      const oscGain = audioCtx.createGain();
+      const raspGain = audioCtx.createGain();
+      const master = audioCtx.createGain();
+
+      oscA.type = "sawtooth";
+      oscB.type = "sawtooth";
+      oscC.type = "triangle";
+      oscA.frequency.value = 90;
+      oscB.frequency.value = 181;
+      oscC.frequency.value = 45;
+      oscB.detune.value = 8;
+
+      filter.type = "lowpass";
+      filter.frequency.value = 700;
+      filter.Q.value = 0.9;
+
+      raspFilter.type = "bandpass";
+      raspFilter.frequency.value = 1400;
+      raspFilter.Q.value = 1.4;
+
+      oscGain.gain.value = 1;
+      raspGain.gain.value = 0.18;
+      master.gain.value = 0.0001;
+
+      oscA.connect(filter);
+      oscB.connect(filter);
+      oscC.connect(filter);
+      filter.connect(oscGain);
+      oscGain.connect(master);
+      noise.connect(raspFilter);
+      raspFilter.connect(raspGain);
+      raspGain.connect(master);
+      master.connect(audioCtx.destination);
+
+      oscA.start(now);
+      oscB.start(now);
+      oscC.start(now);
+      noise.start(now);
+
+      engineLoop = { oscA, oscB, oscC, noise, filter, raspFilter, oscGain, raspGain, master };
+    }
+
+    function setEngineLoop(wantOn, accel) {
+      const amount = Math.max(0, Math.min(1, accel || 0));
+      if (!wantOn || !sfxEnabled) {
+        stopEngineLoop(0.1);
+        return;
+      }
+      if (!engineLoop) startEngineLoop();
+      if (!engineLoop || !audioCtx) return;
+      const now = audioCtx.currentTime;
+      const rpm = 88 + amount * 268;
+      const filterHz = 620 + amount * 1680;
+      const raspHz = 1100 + amount * 1600;
+      const vol = 0.055 + amount * 0.055;
+      const raspVol = 0.12 + amount * 0.22;
+      const lag = 0.06;
+      engineLoop.oscA.frequency.setTargetAtTime(rpm, now, lag);
+      engineLoop.oscB.frequency.setTargetAtTime(rpm * 2.01, now, lag);
+      engineLoop.oscC.frequency.setTargetAtTime(rpm * 0.5, now, lag);
+      engineLoop.filter.frequency.setTargetAtTime(filterHz, now, lag);
+      engineLoop.raspFilter.frequency.setTargetAtTime(raspHz, now, lag);
+      engineLoop.raspGain.gain.setTargetAtTime(raspVol, now, lag);
+      engineLoop.master.gain.cancelScheduledValues(now);
+      engineLoop.master.gain.setTargetAtTime(vol, now, lag);
+    }
+
+    function updateEngineFromGame() {
+      let want = false;
+      let accel = 0;
+      if (sfxEnabled && !gameState.onTitleScreen) {
+        if (gameState.cutsceneActive && !gameState.cutsceneIsDnf) {
+          want = true;
+          const t = gameState.cutsceneElapsed || 0;
+          accel = t < 1.2 ? 0.82 + Math.min(0.15, t * 0.12) : 0.9;
+        } else if (gameState.running && !gameState.paused) {
+          const a1 = p1.retired ? 0 : Math.max(0, Math.min(1, p1.throttle));
+          const a2 = (isTwoPlayer && !p2.retired) ? Math.max(0, Math.min(1, p2.throttle)) : 0;
+          const anyoneRacing = !p1.retired || (isTwoPlayer && !p2.retired);
+          if (anyoneRacing) {
+            want = true;
+            accel = isTwoPlayer ? Math.max(a1, a2) : a1;
+          }
+        }
+      }
+      setEngineLoop(want, accel);
+    }
 
     // =========================================================================
     // 3. SPEECH SYNTHESIS
@@ -5632,6 +5920,7 @@
         document.getElementById("f1-speedometer").classList.add("hidden");
       }
 
+      stopEngineLoop(0.08);
       playDnfBreakdownSfx();
 
       const liv = isP1
@@ -6122,6 +6411,7 @@
       const d2Name = (document.getElementById("input-driver-name-p2").value || liv2.defaultDriver).trim().toUpperCase();
 
       if (isDnf) {
+        stopEngineLoop(0.08);
         playDnfBreakdownSfx();
         topLabelEl.textContent = "🚩 RED FLAG // OUT OF TYRES — DNF";
         ltKickerEl.textContent = "⚠️ FIA RACE CONTROL · RETIREMENT";
@@ -7902,6 +8192,8 @@
     function returnToStartPage() {
       if (autoRepeatTimeout) clearTimeout(autoRepeatTimeout);
       try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch (e) {}
+      stopEngineLoop(0.1);
+      stopCutsceneSfx(0.08);
       cleanupCutsceneArtifacts();
       gameState.running = false;
       gameState.paused = true;
@@ -8107,6 +8399,16 @@
     document.getElementById("btn-sfx-toggle").addEventListener("click", e => {
       sfxEnabled = !sfxEnabled;
       e.currentTarget.textContent = sfxEnabled ? "🔔 SFX: ON" : "🔕 SFX: OFF";
+      updateEngineFromGame();
+      if (!sfxEnabled) stopCutsceneSfx(0.06);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopEngineLoop(0.06);
+        stopCutsceneSfx(0.06);
+      }
+      else updateEngineFromGame();
     });
 
     function openPauseModal() {
@@ -8280,6 +8582,7 @@
       requestAnimationFrame(animate);
       const dt = Math.min(0.05, (now - lastTime) / 1000);
       lastTime = now;
+      updateEngineFromGame();
 
       const w = window.innerWidth;
       const h = window.innerHeight;
