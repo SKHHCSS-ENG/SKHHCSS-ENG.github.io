@@ -4189,7 +4189,7 @@
       osc.stop(now + 0.15);
     }
 
-    function playChequeredFlagFanfareSfx() {
+    function playChequeredFlagFanfareSynth() {
       if (!sfxEnabled) return;
       ensureAudioCtx();
       if (!audioCtx) return;
@@ -4216,7 +4216,7 @@
       });
     }
 
-    function playDnfBreakdownSfx() {
+    function playDnfBreakdownSynth() {
       if (!sfxEnabled) return;
       ensureAudioCtx();
       if (!audioCtx) return;
@@ -4250,7 +4250,139 @@
     }
 
 
+    const CUTSCENE_SFX_URLS = {
+      win: ["sfx/win-a-broadcast-fanfare.m4a", "sfx/win-a-broadcast-fanfare.wav"],
+      dnf: ["sfx/dnf-a-soft-radio.m4a", "sfx/dnf-a-soft-radio.wav"]
+    };
+    const cutsceneSfxRaw = { win: null, dnf: null };
+    const cutsceneSfxBuffers = { win: null, dnf: null };
+    const cutsceneSfxLoading = { win: false, dnf: false };
+    let cutsceneSfxNodes = [];
+    const CUTSCENE_SFX_GAIN = 0.38;
+
+    function stopCutsceneSfx(fadeSec) {
+      const fade = Math.max(0.02, fadeSec || 0.06);
+      const nodes = cutsceneSfxNodes;
+      cutsceneSfxNodes = [];
+      if (!audioCtx || !nodes.length) return;
+      const now = audioCtx.currentTime;
+      nodes.forEach(node => {
+        try {
+          if (node.gain) {
+            node.gain.gain.cancelScheduledValues(now);
+            node.gain.gain.setTargetAtTime(0.0001, now, fade / 3);
+          }
+          if (node.source) node.source.stop(now + fade);
+        } catch (e) {}
+      });
+    }
+
+    function decodeCutsceneSfx(kind) {
+      return new Promise(resolve => {
+        if (cutsceneSfxBuffers[kind]) {
+          resolve(cutsceneSfxBuffers[kind]);
+          return;
+        }
+        if (!audioCtx || !cutsceneSfxRaw[kind]) {
+          resolve(null);
+          return;
+        }
+        let settled = false;
+        const done = buf => {
+          if (settled) return;
+          settled = true;
+          if (buf) cutsceneSfxBuffers[kind] = buf;
+          resolve(buf || null);
+        };
+        try {
+          const copy = cutsceneSfxRaw[kind].slice(0);
+          const ret = audioCtx.decodeAudioData(copy, done, () => done(null));
+          if (ret && typeof ret.then === "function") {
+            ret.then(done, () => done(null));
+          }
+        } catch (e) {
+          done(null);
+        }
+      });
+    }
+
+    function preloadCutsceneSfx(kind) {
+      if (cutsceneSfxBuffers[kind]) return;
+      if (cutsceneSfxRaw[kind]) {
+        if (audioCtx) decodeCutsceneSfx(kind);
+        return;
+      }
+      if (cutsceneSfxLoading[kind]) return;
+      cutsceneSfxLoading[kind] = true;
+      const urls = CUTSCENE_SFX_URLS[kind] || [];
+      (async () => {
+        for (let i = 0; i < urls.length; i++) {
+          try {
+            const res = await fetch(new URL(urls[i], window.location.href).href);
+            if (!res.ok) continue;
+            const arr = await res.arrayBuffer();
+            if (arr && arr.byteLength) {
+              cutsceneSfxRaw[kind] = arr;
+              if (audioCtx) await decodeCutsceneSfx(kind);
+              break;
+            }
+          } catch (e) {}
+        }
+        cutsceneSfxLoading[kind] = false;
+      })();
+    }
+
+    function playCutsceneSfxClip(kind, fallbackFn) {
+      if (!sfxEnabled) return;
+      ensureAudioCtx();
+      if (!audioCtx) return;
+      preloadCutsceneSfx(kind);
+      const startClip = buf => {
+        if (!sfxEnabled || !buf) {
+          if (fallbackFn) fallbackFn();
+          return;
+        }
+        try {
+          const src = audioCtx.createBufferSource();
+          const gain = audioCtx.createGain();
+          src.buffer = buf;
+          gain.gain.setValueAtTime(CUTSCENE_SFX_GAIN, audioCtx.currentTime);
+          src.connect(gain);
+          gain.connect(audioCtx.destination);
+          const node = { source: src, gain: gain };
+          cutsceneSfxNodes.push(node);
+          src.onended = () => {
+            cutsceneSfxNodes = cutsceneSfxNodes.filter(n => n !== node);
+          };
+          src.start();
+        } catch (e) {
+          if (fallbackFn) fallbackFn();
+        }
+      };
+      if (cutsceneSfxBuffers[kind]) {
+        startClip(cutsceneSfxBuffers[kind]);
+        return;
+      }
+      if (cutsceneSfxRaw[kind]) {
+        decodeCutsceneSfx(kind).then(buf => startClip(buf));
+        return;
+      }
+      if (fallbackFn) fallbackFn();
+    }
+
+    function playChequeredFlagFanfareSfx() {
+      playCutsceneSfxClip("win", playChequeredFlagFanfareSynth);
+    }
+
+    function playDnfBreakdownSfx() {
+      playCutsceneSfxClip("dnf", playDnfBreakdownSynth);
+    }
+
+    preloadCutsceneSfx("win");
+    preloadCutsceneSfx("dnf");
+
     let engineLoop = null;
+
     let engineStopTimer = null;
     let engineGen = 0;
 
@@ -8061,6 +8193,7 @@
       if (autoRepeatTimeout) clearTimeout(autoRepeatTimeout);
       try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch (e) {}
       stopEngineLoop(0.1);
+      stopCutsceneSfx(0.08);
       cleanupCutsceneArtifacts();
       gameState.running = false;
       gameState.paused = true;
@@ -8267,10 +8400,14 @@
       sfxEnabled = !sfxEnabled;
       e.currentTarget.textContent = sfxEnabled ? "🔔 SFX: ON" : "🔕 SFX: OFF";
       updateEngineFromGame();
+      if (!sfxEnabled) stopCutsceneSfx(0.06);
     });
 
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stopEngineLoop(0.06);
+      if (document.hidden) {
+        stopEngineLoop(0.06);
+        stopCutsceneSfx(0.06);
+      }
       else updateEngineFromGame();
     });
 
