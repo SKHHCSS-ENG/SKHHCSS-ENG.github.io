@@ -4258,7 +4258,7 @@
     const cutsceneSfxBuffers = { win: null, dnf: null };
     const cutsceneSfxLoading = { win: false, dnf: false };
     let cutsceneSfxNodes = [];
-    const CUTSCENE_SFX_GAIN = 0.38;
+    const CUTSCENE_SFX_GAIN = 0.19;
 
     function stopCutsceneSfx(fadeSec) {
       const fade = Math.max(0.02, fadeSec || 0.06);
@@ -4504,7 +4504,7 @@
       const rpm = 88 + amount * 268;
       const filterHz = 620 + amount * 1680;
       const raspHz = 1100 + amount * 1600;
-      const vol = 0.055 + amount * 0.055;
+      const vol = 0.028 + amount * 0.027;
       const raspVol = 0.12 + amount * 0.22;
       const lag = 0.06;
       engineLoop.oscA.frequency.setTargetAtTime(rpm, now, lag);
