@@ -1334,6 +1334,104 @@
         font-size: 0.78rem;
       }
     }
+
+    /* Tavern: keep Enter Boss Arena visible; body of the form can scroll. */
+    #tavern-modal .modal-window {
+      max-height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+    #tavern-modal .modal-header-row,
+    #tavern-modal .tavern-launch-row {
+      flex-shrink: 0;
+    }
+    #tavern-modal .tavern-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tavern-launch-row {
+      padding-top: 8px;
+      border-top: 1px solid rgba(251, 191, 36, 0.24);
+    }
+    .tavern-launch-row .btn-primary-gold {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.05rem;
+    }
+
+    /* Phone: readable question/options, unclipped HUD, room for rune orbs, Pause stays visible. */
+    @media (max-width: 600px) {
+      .chronicle-bar {
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 4px;
+        padding: 5px 6px;
+      }
+      .hud-cluster {
+        flex-wrap: wrap;
+        gap: 4px;
+        min-width: 0;
+      }
+      .hud-cluster:last-child {
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      .stat-chip {
+        padding: 3px 6px;
+        font-size: 0.72rem;
+        gap: 3px;
+      }
+      .stat-chip .label { font-size: 0.62rem; }
+      .stat-chip .val { font-size: 0.8rem; }
+      .hero-badge-pill { padding: 3px 7px; }
+      .hero-name-tag { max-width: 72px; }
+      .boss-hp-wrap { min-width: 0; }
+      .boss-hp-track { width: 56px; }
+      .hud-btn { padding: 4px 8px; font-size: 0.72rem; }
+
+      .question-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+          "badge . controls"
+          "prompt prompt prompt";
+        align-items: start;
+        column-gap: 8px;
+        row-gap: 6px;
+        padding: 8px 10px;
+      }
+      .q-left { display: contents; }
+      .q-mode-pill { grid-area: badge; align-self: center; }
+      .q-left > div { grid-area: prompt; min-width: 0; width: 100%; }
+      .q-prompt-text {
+        font-size: 0.88rem;
+        line-height: 1.3;
+        overflow-wrap: break-word;
+        word-break: normal;
+        hyphens: manual;
+      }
+      .q-right-controls {
+        grid-area: controls;
+        width: auto;
+        justify-content: flex-end;
+        align-self: center;
+      }
+      .option-text {
+        white-space: normal !important;
+        overflow: visible;
+        text-overflow: unset;
+        font-size: 0.78rem;
+        line-height: 1.25;
+      }
+      #toast-corner-right {
+        top: calc(env(safe-area-inset-top, 0px) + 118px);
+      }
+      .turntable-box { min-height: 0; }
+      #showroom-canvas { height: 140px; }
+    }
   </style>
   <!-- Loads shared-words.js from Play Your Way hub with offline 3,500-word HKDSE fallback -->
   <script src="../shared-words.js" onerror="window.__sharedWordsOfflineFallback = true;"></script>
@@ -1646,11 +1744,13 @@
               <button type="button" class="choice-pill" data-accent="AU">AU</button>
             </div>
           </div>
-
-          <button type="button" class="btn-primary-gold" id="btn-launch-quest" style="padding:12px; font-size:1.05rem; margin-top:4px;">
-            Enter Boss Arena
-          </button>
         </div>
+      </div>
+
+      <div class="tavern-launch-row">
+        <button type="button" class="btn-primary-gold" id="btn-launch-quest">
+          Enter Boss Arena
+        </button>
       </div>
     </div>
   </div>

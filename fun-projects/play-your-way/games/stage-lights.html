@@ -907,7 +907,8 @@
         if (state.hearts <= 0) {
           finishRun(false);
         } else if (state.currentRound >= state.targetRounds) {
-          finishRun(true);
+          const hits = state.answeredLog.filter((item) => item.isCorrect).length;
+          finishRun(hits > 0);
         } else {
           state.currentRound += 1;
           beginCurrentRound();
