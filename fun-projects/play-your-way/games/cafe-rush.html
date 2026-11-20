@@ -559,13 +559,33 @@
       } catch (e) {}
     }
 
+    function cycleShuffledQuestions(source, countNeeded) {
+      if (!source.length || countNeeded <= 0) return [];
+      const out = [];
+      while (out.length < countNeeded) {
+        const shuffled = source.slice();
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = shuffled[i];
+          shuffled[i] = shuffled[j];
+          shuffled[j] = tmp;
+        }
+        const remaining = countNeeded - out.length;
+        const take = Math.min(remaining, shuffled.length);
+        for (let i = 0; i < take; i++) {
+          const q = shuffled[i];
+          out.push(Object.assign({}, q, { options: q.options ? q.options.slice() : q.options }));
+        }
+      }
+      return out;
+    }
+
     function buildActiveQuestionPool(countNeeded) {
       let base = [];
       if (selectedBandFilter === "CUSTOM_ONLY" && customQuestionPool.length > 0) {
-        base = customQuestionPool.slice();
-      } else {
-        base = customQuestionPool.concat(CURATED_QUESTIONS);
+        return cycleShuffledQuestions(customQuestionPool.slice(), countNeeded);
       }
+      base = customQuestionPool.concat(CURATED_QUESTIONS);
       const core = (window.PYW_HKDSE_CORE_WORDS && window.PYW_HKDSE_CORE_WORDS.length > 0)
         ? window.PYW_HKDSE_CORE_WORDS
         : HKDSE_LEXICON_SEEDS.map((s) => s[0]);
@@ -593,14 +613,7 @@
         });
         idx++;
       }
-      const shuffled = base.slice();
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const tmp = shuffled[i];
-        shuffled[i] = shuffled[j];
-        shuffled[j] = tmp;
-      }
-      return shuffled.slice(0, countNeeded);
+      return cycleShuffledQuestions(base, countNeeded);
     }
 
     function ensureAudioCtx() {
