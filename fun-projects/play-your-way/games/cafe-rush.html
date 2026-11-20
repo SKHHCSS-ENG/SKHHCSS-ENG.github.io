@@ -39,6 +39,9 @@
     .chronicle-bar { width: 100%; max-width: 1080px; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; backdrop-filter: blur(8px); }
     .hud-cluster { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .stat-chip { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; font-weight: 700; }
+
+    .hud-prop-icon, .setup-prop-icon { width: 18px; height: 18px; object-fit: contain; vertical-align: middle; flex: 0 0 auto; }
+    #hud-hearts-row { display: inline-flex; align-items: center; gap: 2px; min-height: 18px; }
     .stat-chip .label { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
     #question-hud-wrap { width: 100%; max-width: 880px; display: flex; flex-direction: column; gap: 6px; pointer-events: auto; }
     .question-card { background: var(--card); border: 1.5px solid var(--accent); border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 10px 28px rgba(0,0,0,0.45); }
@@ -203,6 +206,11 @@
 
 <div id="muse-art-preload" hidden aria-hidden="true">
   <img data-muse-slot="portrait" src="art/cafe-rush/mira-portrait.png" alt="">
+  <img data-muse-slot="mira-taking-order" src="art/cafe-rush/mira-taking-order.png" alt="">
+  <img data-muse-slot="mira-serving" src="art/cafe-rush/mira-serving.png" alt="">
+  <img data-muse-slot="heart" src="art/cafe-rush/heart.png" alt="">
+  <img data-muse-slot="order-ticket" src="art/cafe-rush/order-ticket.png" alt="">
+  <img data-muse-slot="dish" src="art/cafe-rush/dish.png" alt="">
 </div>
 
 <div id="start-menu-overlay">
@@ -281,7 +289,7 @@
         </div>
       </div>
       <div>
-        <span class="field-label">Hearts</span>
+        <span class="field-label">Hearts <img class="setup-prop-icon" src="art/cafe-rush/heart.png" alt="" width="18" height="18"></span>
         <div class="pill-choice-row" id="setup-hearts-pills">
           <button type="button" class="choice-pill" data-hearts="2">2</button>
           <button type="button" class="choice-pill active" data-hearts="3">3</button>
@@ -489,6 +497,50 @@
       } catch (err) {}
       return null;
     }
+
+    function musePoseBox(w, h) {
+      return Math.max(180, Math.min(200, Math.round(Math.min(w || 800, h || 800) * 0.28)));
+    }
+
+    function drawMuseContained(ctx, img, x, y, box, anchor) {
+      if (!ctx || !img) return false;
+      const iw = img.naturalWidth || img.width || 0;
+      const ih = img.naturalHeight || img.height || 0;
+      if (iw < 1 || ih < 1) return false;
+      const side = box || 190;
+      const scale = Math.min(side / iw, side / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = x - dw / 2;
+      const dy = (anchor === "center") ? (y - dh / 2) : (y - dh);
+      ctx.drawImage(img, dx, dy, dw, dh);
+      return true;
+    }
+
+    function renderHudPropIcons(heartEl) {
+      if (!heartEl) return;
+      const slot = (typeof GAME !== "undefined" && GAME.hudPropSlot) || "";
+      const muse = slot ? getMuseArt(slot) : null;
+      const src = muse && (muse.currentSrc || muse.src);
+      if (!src) {
+        heartEl.textContent = ((typeof GAME !== "undefined" && GAME.heartIcon) || "❤").repeat(Math.max(0, state.hearts)) || "—";
+        return;
+      }
+      const n = Math.max(0, state.hearts);
+      if (n === 0) {
+        heartEl.textContent = "—";
+        return;
+      }
+      heartEl.textContent = "";
+      for (let i = 0; i < n; i++) {
+        const im = document.createElement("img");
+        im.src = src;
+        im.alt = "";
+        im.className = "hud-prop-icon";
+        heartEl.appendChild(im);
+      }
+    }
+
 
     function buildDictationQuestionsFromWordList(words, dmode, packTitle) {
       const clean = (words || []).map((w) => String(w || "").trim()).filter(Boolean);
@@ -758,7 +810,7 @@
       if (nameEl) nameEl.textContent = state.travelerName;
       if (roundEl) roundEl.textContent = state.currentRound + " / " + state.targetRounds;
       if (scoreEl) scoreEl.textContent = String(state.score);
-      if (heartEl) heartEl.textContent = (GAME.heartIcon || "❤").repeat(Math.max(0, state.hearts)) || "—";
+      if (heartEl) renderHudPropIcons(heartEl);
       if (comboEl) comboEl.textContent = state.combo > 1 ? (state.combo + "x") : "—";
     }
 
@@ -1210,9 +1262,10 @@
      *   backdrop, barista, customer, dishA, dishB, dishC
      * }
      * or <img hidden data-muse-slot="backdrop" src="...">.
-     * The hub cover and start-menu portrait are hooked.
-     * Action poses, backdrop, and props still wait on Muse.
-     * Procedural art is used for in-game characters until those images exist.
+     * The hub cover, start-menu portrait, mira-taking-order, mira-serving,
+     * heart, order-ticket, and dish (plated prop only) are hooked.
+     * Backdrop, customer, and per-dish option art still wait on Muse.
+     * In-game customers and option dishes stay procedural until then.
      *************************************************************************/
     const GAME = {
       musePack: "PYW_CAFE_RUSH_ART",
@@ -1220,6 +1273,7 @@
       scoreKey: "pyw_cafe_rush_scores",
       defaultName: "Mira",
       heartIcon: "❤",
+      hudPropSlot: "heart",
       roundLabel: "Order",
       correctToast: "Order up!",
       wrongToast: "Wrong dish!",
@@ -1484,15 +1538,23 @@
       const floorY = h * 0.68;
       const enterX = w * 0.28 + (1 - cafe.walkIn) * w * 0.4;
       const museCust = getMuseArt("customer");
-      const museBarista = getMuseArt("barista");
+      const serving = cafe.plated >= 0 || cafe.customerMood === "happy";
+      const museBarista = getMuseArt(serving ? "mira-serving" : "mira-taking-order") || getMuseArt("mira-taking-order") || getMuseArt("mira-serving");
       if (museCust) ctx.drawImage(museCust, enterX - 70, floorY - 200, 140, 210);
       else drawAnimePerson(ctx, enterX, floorY - 96, 1.15, palC, cafe.customerMood, now, false);
-      if (museBarista) ctx.drawImage(museBarista, w * 0.78 - 70, floorY - 210, 140, 210);
+      if (museBarista) drawMuseContained(ctx, museBarista, w * 0.78, floorY, musePoseBox(w, h), "bottom");
       else drawAnimePerson(ctx, w * 0.78, floorY - 100, 1.25, palB, "happy", now, true);
+
+      const museDish = getMuseArt("dish");
+      if (museDish && cafe.plated >= 0) {
+        drawMuseContained(ctx, museDish, w * 0.78 - 56, floorY + 36, 64, "center");
+      }
 
       // ticket: cue only (never the correct dish), kept clear of the HUD option row
       if (q && state.screen === "PLAY") {
-        const ticketW = 180, ticketH = 84;
+        const museTicket = getMuseArt("order-ticket");
+        const ticketW = museTicket ? 176 : 180;
+        const ticketH = museTicket ? 176 : 84;
         const headTop = museCust ? (floorY - 200) : (floorY - 96 - 32 * 1.15);
         const clearY = hudClearY(cafe.canvas);
         let tx = enterX + 70;
@@ -1507,30 +1569,37 @@
         }
         ty = Math.max(clearY, Math.min(h - ticketH - 8, ty));
         tx = Math.max(8, Math.min(w - ticketW - 8, tx));
-        ctx.fillStyle = "#fffbeb";
-        ctx.strokeStyle = "#d97706";
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.roundRect(tx, ty, ticketW, ticketH, 8); ctx.fill(); ctx.stroke();
+        if (museTicket) {
+          drawMuseContained(ctx, museTicket, tx + ticketW / 2, ty + ticketH, ticketW, "bottom");
+        } else {
+          ctx.fillStyle = "#fffbeb";
+          ctx.strokeStyle = "#d97706";
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.roundRect(tx, ty, ticketW, ticketH, 8); ctx.fill(); ctx.stroke();
+        }
+        const textX = tx + (museTicket ? 28 : 10);
+        const textW = ticketW - (museTicket ? 56 : 20);
+        const titleY = ty + (museTicket ? 62 : 18);
         ctx.fillStyle = "#b45309";
         ctx.font = "800 11px Plus Jakarta Sans, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
-        ctx.fillText("Next order", tx + 10, ty + 18);
+        ctx.fillText("Next order", textX, titleY);
         ctx.fillStyle = "#1f2937";
         ctx.font = "700 11px Plus Jakarta Sans, sans-serif";
         // Show the question cue, never the correct dish — that would spoil the order.
         const request = String(q.prompt || "Check the ticket above").replace(/_{2,}/g, "…");
-        const cueLines = wrapCanvasLines(ctx, request, 160).slice(0, 2);
+        const cueLines = wrapCanvasLines(ctx, request, textW).slice(0, 2);
         for (let i = 0; i < cueLines.length; i++) {
-          ctx.fillText(cueLines[i], tx + 10, ty + 36 + i * 14);
+          ctx.fillText(cueLines[i], textX, titleY + 18 + i * 14);
         }
         // patience bar
         if (state.timerSeconds > 0) {
           const frac = Math.max(0, Math.min(1, state.questionTimeLeft / state.timerSeconds));
-          const barY = ty + ticketH - 16;
-          ctx.fillStyle = "#fecaca"; ctx.fillRect(tx + 10, barY, 160, 8);
+          const barY = ty + ticketH - (museTicket ? 28 : 16);
+          ctx.fillStyle = "#fecaca"; ctx.fillRect(textX, barY, textW, 8);
           ctx.fillStyle = frac < 0.3 ? "#e11d48" : "#22c55e";
-          ctx.fillRect(tx + 10, barY, 160 * frac, 8);
+          ctx.fillRect(textX, barY, textW * frac, 8);
         }
       }
 
