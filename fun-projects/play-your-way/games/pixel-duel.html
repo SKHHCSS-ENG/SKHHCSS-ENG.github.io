@@ -1302,6 +1302,25 @@
 </head>
 <body>
 
+  <!-- Muse Pixel Duel PNG pack (hidden preload). Procedural sprites stay the fallback if a slot fails to load. -->
+  <div id="muse-art-preload" hidden aria-hidden="true">
+    <img data-muse-slot="arenaBackdrop" src="art/pixel-duel/arena-1920x1080.png" alt="">
+    <img data-muse-slot="tavernBackdrop" src="art/pixel-duel/tavern-1920x480.png" alt="">
+    <img data-muse-slot="boss-GUARD" src="art/pixel-duel/boss-normal.png" alt="">
+    <img data-muse-slot="boss-STUNNED" src="art/pixel-duel/boss-stunned.png" alt="">
+    <img data-muse-slot="boss-ENRAGED" src="art/pixel-duel/boss-enraged.png" alt="">
+    <img data-muse-slot="hero-0" src="art/pixel-duel/knight-idle.png" alt="">
+    <img data-muse-slot="hero-0-idle" src="art/pixel-duel/knight-idle.png" alt="">
+    <img data-muse-slot="hero-0-walk" src="art/pixel-duel/knight-walk.png" alt="">
+    <img data-muse-slot="hero-0-jump" src="art/pixel-duel/knight-jump.png" alt="">
+    <img data-muse-slot="hero-0-slash" src="art/pixel-duel/knight-slash.png" alt="">
+    <img data-muse-slot="hero-0-dash" src="art/pixel-duel/knight-dash.png" alt="">
+    <img data-muse-slot="orb-A" src="art/pixel-duel/rune-orb-a.png" alt="">
+    <img data-muse-slot="orb-B" src="art/pixel-duel/rune-orb-b.png" alt="">
+    <img data-muse-slot="orb-C" src="art/pixel-duel/rune-orb-c.png" alt="">
+  </div>
+
+
   <!-- High-Detail 2D Boss Duel Arena Canvas -->
   <canvas id="game-canvas"></canvas>
   <div class="hd2d-vignette"></div>
@@ -2423,39 +2442,82 @@
 
     /*************************************************************************
      * 4. HIGH-DETAIL 2D PIXEL ART SPRITES (HEROES & COLOSSAL RADIANCE BOSS)
-     * MUSE ART HOOKS (optional later swap — procedural sprites are the default)
+     * MUSE ART HOOKS — optional pack overlay; procedural sprites stay the default
+     * for any slot that is missing.
      * Set window.PYW_PIXEL_DUEL_ART = {
-     *   heroSheets: [/* 6 HTMLImageElement or URL strings * /],
+     *   heroSheets: [/* 6 HTMLImageElement or URL strings (walk-cycle strips) * /],
+     *   heroPoses: { 0: { idle, walk, jump, slash, dash } },
      *   bossSheets: { GUARD: img, STUNNED: img, ENRAGED: img },
      *   arenaBackdrop: img,
-     *   orbSheet: img
+     *   tavernBackdrop: img,
+     *   orbSheet: img,
+     *   orbs: { A: img, B: img, C: img }
      * }
-     * or drop hidden <img data-muse-slot="hero-0" src="..."> tags into this file.
-     * Do not assume Muse artwork files already exist.
+     * or drop hidden <img data-muse-slot="..."> tags into this file.
+     * Slots: hero-0 (sheet or idle fallback), hero-0-idle/walk/jump/slash/dash,
+     * boss-GUARD / boss-STUNNED / boss-ENRAGED, arenaBackdrop, tavernBackdrop,
+     * orbSheet, orb-A / orb-B / orb-C.
+     * The first Muse pack hooks Knight (hero-0) poses only; Scholar, Rogue,
+     * Hunter, Dancer, and Merchant keep procedural sprites until their PNGs arrive.
      *************************************************************************/
     const spriteCache = {};
+
+    function resolveMusePackImage(fromPack) {
+      if (typeof fromPack === 'string') {
+        const img = new Image();
+        img.src = fromPack;
+        fromPack = img;
+      }
+      return fromPack;
+    }
 
     function getMuseArt(slot) {
       try {
         const pack = window.PYW_PIXEL_DUEL_ART || {};
         let fromPack = null;
-        if (slot.indexOf('hero-') === 0 && pack.heroSheets) {
-          fromPack = pack.heroSheets[parseInt(slot.slice(5), 10)];
-        } else if (slot.indexOf('boss-') === 0 && pack.bossSheets) {
+        if (slot.indexOf('hero-') === 0 && pack.heroPoses) {
+          const poseMatch = slot.match(/^hero-(\d+)-([a-z]+)$/);
+          if (poseMatch && pack.heroPoses[parseInt(poseMatch[1], 10)]) {
+            fromPack = pack.heroPoses[parseInt(poseMatch[1], 10)][poseMatch[2]];
+          }
+        }
+        if (!fromPack && slot.indexOf('hero-') === 0 && pack.heroSheets) {
+          const rest = slot.slice(5);
+          if (/^\d+$/.test(rest)) fromPack = pack.heroSheets[parseInt(rest, 10)];
+        }
+        if (!fromPack && slot.indexOf('boss-') === 0 && pack.bossSheets) {
           fromPack = pack.bossSheets[slot.slice(5)];
-        } else if (pack[slot]) {
-          fromPack = pack[slot];
         }
-        if (typeof fromPack === 'string') {
-          const img = new Image();
-          img.src = fromPack;
-          fromPack = img;
+        if (!fromPack && slot.indexOf('orb-') === 0 && pack.orbs) {
+          fromPack = pack.orbs[slot.slice(4)];
         }
+        if (!fromPack && pack[slot]) fromPack = pack[slot];
+        fromPack = resolveMusePackImage(fromPack);
         if (fromPack && fromPack.naturalWidth > 0) return fromPack;
         const el = document.querySelector('img[data-muse-slot="' + slot + '"]');
         if (el && el.complete && el.naturalWidth > 0) return el;
       } catch (err) {}
       return null;
+    }
+
+    function bindMuseArtLoading() {
+      document.querySelectorAll('img[data-muse-slot]').forEach((el) => {
+        const kick = () => {
+          Object.keys(spriteCache).forEach((k) => { delete spriteCache[k]; });
+          if (state.screen === 'QUESTION_PHASE') positionRuneOrbs();
+        };
+        if (el.complete) return;
+        el.addEventListener('load', kick);
+        el.addEventListener('error', kick);
+      });
+    }
+
+    function getMuseHeroPose(heroIdx, pose) {
+      return getMuseArt('hero-' + heroIdx + '-' + pose) || (pose === 'idle' ? getMuseArt('hero-' + heroIdx) : null);
+    }
+
+    function hasMuseHeroPoses(heroIdx) {
+      return !!(getMuseHeroPose(heroIdx, 'idle') || getMuseArt('hero-' + heroIdx));
     }
 
     function sliceMuseSheet(img, frameCount) {
@@ -2485,6 +2547,17 @@
     }
 
     function getHeroSpriteFrames(heroIdx) {
+      const poseIdle = getMuseHeroPose(heroIdx, 'idle');
+      const poseWalk = getMuseHeroPose(heroIdx, 'walk');
+      if (poseIdle || poseWalk) {
+        const key = `hero_${heroIdx}_muse_poses`;
+        if (spriteCache[key]) return spriteCache[key];
+        const a = poseIdle || poseWalk;
+        const b = poseWalk || poseIdle;
+        spriteCache[key] = [a, b, a, b];
+        return spriteCache[key];
+      }
+
       const museHero = getMuseArt('hero-' + heroIdx);
       const key = `hero_${heroIdx}_${museHero ? 'muse' : 'proc'}`;
       if (spriteCache[key]) return spriteCache[key];
@@ -2750,6 +2823,7 @@
       mainCtx = mainCanvas.getContext('2d');
       showroomCanvas = document.getElementById('showroom-canvas');
       if (showroomCanvas) showroomCtx = showroomCanvas.getContext('2d');
+      bindMuseArtLoading();
 
       resizeCanvas();
       window.addEventListener('resize', () => {
@@ -2777,7 +2851,35 @@
     }
 
     // Define the Cathedral Bridge Floor + 3 Sanctuary Stone Platforms (Left [A], Center-High [B], Right [C])
+    // Painted Muse arena (1920x1080) walkable tops, used when arenaBackdrop is loaded.
+    const MUSE_ARENA_LAYOUT = {
+      floorY: 770 / 1080,
+      platforms: [
+        { letter: 'A', color: '#3b82f6', cx: 421 / 1920, top: 536 / 1080, w: 360 / 1920 },
+        { letter: 'B', color: '#f59e0b', cx: 961 / 1920, top: 432 / 1080, w: 330 / 1920 },
+        { letter: 'C', color: '#10b981', cx: 1494 / 1920, top: 540 / 1080, w: 360 / 1920 }
+      ]
+    };
+
     function getArenaGeometry(w, h) {
+      if (getMuseArt('arenaBackdrop')) {
+        const floorY = Math.round(h * MUSE_ARENA_LAYOUT.floorY);
+        const platforms = MUSE_ARENA_LAYOUT.platforms.map((spec, idx) => {
+          const platW = Math.round(w * spec.w);
+          const y = Math.round(h * spec.top);
+          const orbX = Math.round(w * spec.cx);
+          return {
+            lane: idx, letter: spec.letter, color: spec.color,
+            x: Math.round(orbX - platW / 2),
+            y,
+            w: platW, h: 18,
+            orbX,
+            orbY: y - 52
+          };
+        });
+        return { floorY, platforms };
+      }
+
       const floorY = Math.round(h * 0.80);
       const platW = Math.min(200, Math.max(115, Math.round(w * 0.17)));
       const platforms = [
@@ -3192,6 +3294,14 @@
         ctx.translate((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14);
       }
 
+      const museBackdrop = getMuseArt('arenaBackdrop');
+      if (museBackdrop) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        if (ctx.imageSmoothingQuality) ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(museBackdrop, 0, 0, w, h);
+        ctx.restore();
+      } else {
       // 1. Sanctuary cathedral background gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
       bgGrad.addColorStop(0.0, '#070913');
@@ -3200,14 +3310,6 @@
       bgGrad.addColorStop(1.0, '#090b10');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
-
-      const museBackdrop = getMuseArt('arenaBackdrop');
-      if (museBackdrop) {
-        ctx.save();
-        ctx.globalAlpha = 0.92;
-        ctx.drawImage(museBackdrop, 0, 0, w, h);
-        ctx.restore();
-      }
 
       // 2. Towering Gothic Stained-Glass Rose Arches & Pillars in Background
       const archSpacing = Math.max(220, Math.round(w * 0.24));
@@ -3254,9 +3356,11 @@
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
         ctx.fillRect(bx + 6, floorY + 7, 42, 3);
       }
+      } // end procedural backdrop (no Muse arena)
 
       // 4. The 3 Floating Sanctuary Rune Platforms (Left [A], Center-High [B], Right [C])
-      platforms.forEach((p, idx) => {
+      // Painted onto the Muse arena already — only draw procedural slabs as a fallback.
+      if (!museBackdrop) platforms.forEach((p, idx) => {
         const isSelected = idx === state.currentLane;
         // Platform shadow & carved stone slab
         ctx.fillStyle = '#090b10';
@@ -3348,19 +3452,23 @@
         ? floorY - 64
         : state.bossY + Math.sin(now * 0.004) * 12;
 
-      // Aura Halo behind Boss
-      const auraCol = state.bossMode === 'STUNNED'
-        ? 'rgba(56, 189, 248, 0.25)'
-        : (state.bossMode === 'ENRAGED' ? 'rgba(225, 29, 72, 0.28)' : 'rgba(139, 92, 246, 0.22)');
-      ctx.fillStyle = auraCol;
-      ctx.fillRect(Math.round(state.bossX - 78), Math.round(hoverY - 78), 156, 156);
+      const museBossArt = getMuseArt('boss-' + state.bossMode) || getMuseArt('boss');
+      const bossSize = museBossArt ? 220 : 144;
 
-      ctx.drawImage(bossSprite, Math.round(state.bossX - 72), Math.round(hoverY - 72), 144, 144);
+      if (!museBossArt) {
+        const auraCol = state.bossMode === 'STUNNED'
+          ? 'rgba(56, 189, 248, 0.25)'
+          : (state.bossMode === 'ENRAGED' ? 'rgba(225, 29, 72, 0.28)' : 'rgba(139, 92, 246, 0.22)');
+        ctx.fillStyle = auraCol;
+        ctx.fillRect(Math.round(state.bossX - 78), Math.round(hoverY - 78), 156, 156);
+      }
+
+      ctx.drawImage(bossSprite, Math.round(state.bossX - bossSize / 2), Math.round(hoverY - bossSize / 2), bossSize, bossSize);
 
       // Compact HP pip above the boss (main readout lives in the HUD, clear of the controls)
       const barW = 92;
       const barX = Math.round(state.bossX - barW / 2);
-      const barY = Math.round(hoverY - 86);
+      const barY = Math.round(hoverY - bossSize / 2 - 14);
       const hpFrac = Math.max(0, Math.min(1, state.bossHp / state.bossMaxHp));
       ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
       ctx.fillRect(barX - 2, barY - 2, barW + 4, 10);
@@ -3369,7 +3477,6 @@
     }
 
     function drawFloatingRuneOrbs(ctx, now) {
-      const museOrb = getMuseArt('orbSheet');
       runeOrbs.forEach((orb, idx) => {
         if (orb.shattered) return;
         const bob = Math.sin(now * 0.006 + idx * 1.8) * 6;
@@ -3392,8 +3499,10 @@
         ctx.arc(0, 0, 46, 0, Math.PI * 2);
         ctx.fill();
 
+        const museOrb = getMuseArt('orb-' + orb.letter) || getMuseArt('orbSheet');
         if (museOrb) {
-          ctx.drawImage(museOrb, -30, -30, 60, 60);
+          const s = isSelected ? 74 : 64;
+          ctx.drawImage(museOrb, -s / 2, -s / 2, s, s);
         } else {
           ctx.beginPath();
           ctx.arc(0, 0, 26, 0, Math.PI * 2);
@@ -3407,30 +3516,48 @@
           ctx.arc(0, 0, 18, 0, Math.PI * 2);
           ctx.fillStyle = orb.color;
           ctx.fill();
-        }
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 22px Fredoka, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(orb.letter, 0, 1);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 22px Fredoka, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(orb.letter, 0, 1);
+        }
         ctx.restore();
       });
     }
 
-    function drawPlatformerHero(ctx, now) {
-      const heroFrames = getHeroSpriteFrames(state.selectedHeroIdx);
+    function chooseHeroSprite(heroIdx, now) {
+      if (hasMuseHeroPoses(heroIdx)) {
+        let pose = 'idle';
+        if ((state.isBoosting || state.dashTimer > 0) && getMuseHeroPose(heroIdx, 'dash')) pose = 'dash';
+        else if (state.slashCooldown > 0 && getMuseHeroPose(heroIdx, 'slash')) pose = 'slash';
+        else if (Math.abs(state.heroVy) > 40 && getMuseHeroPose(heroIdx, 'jump')) pose = 'jump';
+        else if (Math.abs(state.heroVx) > 15 && getMuseHeroPose(heroIdx, 'walk')) pose = 'walk';
+        return getMuseHeroPose(heroIdx, pose) || getMuseHeroPose(heroIdx, 'idle');
+      }
+      const heroFrames = getHeroSpriteFrames(heroIdx);
       const isMoving = Math.abs(state.heroVx) > 15;
       const hFrame = isMoving ? (Math.floor(now / 110) % 4) : 0;
+      return heroFrames[hFrame];
+    }
+
+    function getHeroDrawSize(heroIdx) {
+      return hasMuseHeroPoses(heroIdx) ? 112 : 72;
+    }
+
+    function drawPlatformerHero(ctx, now) {
+      const sprite = chooseHeroSprite(state.selectedHeroIdx, now);
+      const size = getHeroDrawSize(state.selectedHeroIdx);
 
       // Shadow Dash / Boost Afterimages
       if (state.isBoosting || state.dashTimer > 0) {
         for (let a = 1; a <= 3; a++) {
           ctx.save();
           ctx.globalAlpha = 0.35 - a * 0.09;
-          ctx.translate(Math.round(state.heroX - state.facing * a * 18), Math.round(state.heroY - 36));
+          ctx.translate(Math.round(state.heroX - state.facing * a * 18), Math.round(state.heroY));
           ctx.scale(state.facing, 1);
-          ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
+          ctx.drawImage(sprite, -size / 2, -size, size, size);
           ctx.restore();
         }
       }
@@ -3438,9 +3565,9 @@
       // Main Hero Sprite (flicker while invulnerable after a hit or boost dash)
       ctx.save();
       if (state.invulnTimer > 0 && Math.floor(now / 80) % 2 === 0) ctx.globalAlpha = 0.35;
-      ctx.translate(Math.round(state.heroX), Math.round(state.heroY - 36));
+      ctx.translate(Math.round(state.heroX), Math.round(state.heroY));
       ctx.scale(state.facing, 1);
-      ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
+      ctx.drawImage(sprite, -size / 2, -size, size, size);
       ctx.restore();
 
       // Sword slash crescent arcs
@@ -3472,27 +3599,39 @@
       const h = showroomCanvas.height;
       ctx.imageSmoothingEnabled = false;
 
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, '#070913');
-      grad.addColorStop(0.65, '#1e1b4b');
-      grad.addColorStop(1, '#27272a');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      const museTavern = getMuseArt('tavernBackdrop');
+      if (museTavern) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        if (ctx.imageSmoothingQuality) ctx.imageSmoothingQuality = 'high';
+        const scale = Math.max(w / museTavern.naturalWidth, h / museTavern.naturalHeight);
+        const dw = museTavern.naturalWidth * scale;
+        const dh = museTavern.naturalHeight * scale;
+        ctx.drawImage(museTavern, (w - dw) / 2, (h - dh) / 2, dw, dh);
+        ctx.restore();
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#070913');
+        grad.addColorStop(0.65, '#1e1b4b');
+        grad.addColorStop(1, '#27272a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = '#3f3f46';
-      ctx.fillRect(0, 154, w, h - 154);
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(0, 154, w, 3);
+        ctx.fillStyle = '#3f3f46';
+        ctx.fillRect(0, 154, w, h - 154);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(0, 154, w, 3);
+      }
 
       // Selected Hero Sprite on Left
       const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
       const heroFrames = getHeroSpriteFrames(state.selectedHeroIdx);
       const frame = Math.floor(now / 160) % 4;
-      ctx.drawImage(heroFrames[frame], 52, 68, 92, 92);
+      ctx.drawImage(heroFrames[frame], 16, 78, 96, 96);
 
       // Colossal Boss Silhouette on Right
       const bossSprite = getBossDuelSprite('GUARD', Math.floor(now / 240) % 2);
-      ctx.drawImage(bossSprite, 218, 46, 112, 112);
+      ctx.drawImage(bossSprite, 250, 42, 120, 120);
 
       const titleEl = document.getElementById('showroom-hero-title');
       if (titleEl) titleEl.textContent = hero.name.toUpperCase();
