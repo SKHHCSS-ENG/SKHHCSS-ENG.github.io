@@ -4490,7 +4490,7 @@
       const q = filterText.trim().toLowerCase();
       const combined = [
         ...customQuestionPool.map(c => ({ word: c.word, zh: c.zh, def: c.prompt, tag: 'CUSTOM' })),
-        ...HKDSE_LEXICON_SEEDS.map(s => ({ word: s[0], zh: s[1], def: s[2], tag: 'HKDSE' }))
+        ...HKDSE_LEXICON_SEEDS.map(s => ({ word: s[0], zh: s[1], def: s[2], tag: 'Practice bank' }))
       ].filter(item => !q || item.word.toLowerCase().includes(q) || item.zh.includes(q) || item.def.toLowerCase().includes(q));
 
       box.innerHTML = combined.slice(0, 45).map(item => `
