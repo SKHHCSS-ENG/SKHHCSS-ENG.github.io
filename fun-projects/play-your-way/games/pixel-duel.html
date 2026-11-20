@@ -529,7 +529,7 @@
     }
 
     /* Circular Combat Pace / Combo Gauge (Low=Green -> Mid=Amber -> High=Red) */
-    .speedo-container {
+    .soul-gauge-container {
       width: 168px;
       height: 168px;
       position: relative;
@@ -537,7 +537,7 @@
       flex-shrink: 0;
     }
 
-    #speedo-canvas {
+    #soul-gauge-canvas {
       width: 100%;
       height: 100%;
       display: block;
@@ -552,6 +552,7 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      overflow-y: auto;
       padding:
         max(16px, env(safe-area-inset-top))
         max(16px, env(safe-area-inset-right))
@@ -598,7 +599,7 @@
 
     .start-center-card {
       width: 100%;
-      max-width: 560px;
+      max-width: 640px;
       background: rgba(15, 19, 28, 0.93);
       border: 2px solid rgba(251, 191, 36, 0.55);
       border-radius: 16px;
@@ -1012,7 +1013,7 @@
       background: rgba(245, 158, 11, 0.16);
     }
 
-    .standing-driver-info {
+    .standing-hero-info {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1137,6 +1138,132 @@
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
     }
 
+
+    .how-to-play-card {
+      background: rgba(9, 12, 20, 0.82);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      border-radius: 12px;
+      padding: 10px 14px 12px;
+      color: #e2e8f0;
+    }
+    .how-to-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.86rem;
+      color: var(--gold-bright);
+      margin-bottom: 6px;
+    }
+    .how-to-play-card ol {
+      margin: 0 0 8px 1.1rem;
+      padding: 0;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+    .how-to-play-card li { margin: 0 0 4px; }
+    .how-to-zh {
+      font-size: 0.74rem;
+      color: #fde68a;
+      margin-bottom: 6px;
+    }
+    .how-to-keys {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    #play-phase-banner {
+      width: 100%;
+      max-width: 880px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(17, 20, 32, 0.96) 0%, rgba(12, 14, 22, 0.96) 100%);
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 11px;
+      padding: 8px 14px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.72);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    #play-phase-banner.hidden-phase {
+      opacity: 0;
+      transform: translateY(-14px);
+      pointer-events: none;
+      visibility: hidden;
+      height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+    #play-phase-banner.break-mode { border-color: #38bdf8; }
+    #play-phase-banner.dodge-mode { border-color: #fb7185; }
+    .play-phase-copy { min-width: 0; flex: 1; }
+    .play-phase-kicker {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.78rem;
+      color: var(--gold-bright);
+      letter-spacing: 0.04em;
+    }
+    #play-phase-banner.dodge-mode .play-phase-kicker { color: #fda4af; }
+    .play-phase-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .play-phase-timer {
+      flex-shrink: 0;
+      min-width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid var(--gold-bright);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.15rem;
+      color: #fff;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .boss-hp-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 140px;
+    }
+    .boss-hp-track {
+      width: 88px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(51, 65, 85, 0.85);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      overflow: hidden;
+    }
+    #boss-hp-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #e11d48, #fb7185);
+      border-radius: inherit;
+      transition: width 0.25s ease;
+    }
+
+    /* Circular Soul / Combo Gauge */
+    .soul-gauge-container {
+      width: 168px;
+      height: 168px;
+      position: relative;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+
+    @media (max-height: 700px) {
+      .soul-gauge-container { width: 108px; height: 108px; }
+      .question-card { padding: 6px 10px; }
+      .how-to-play-card { padding: 8px 10px; }
+      .how-to-play-card ol { font-size: 0.72rem; }
+    }
+
     /* Responsive Mobile Adjustments */
     @media (max-width: 768px) {
       .tavern-grid {
@@ -1145,7 +1272,7 @@
       .score-summary-banner {
         grid-template-columns: repeat(2, 1fr);
       }
-      .speedo-container {
+      .soul-gauge-container {
         width: 108px;
         height: 108px;
       }
@@ -1205,6 +1332,11 @@
             <span class="label">Shields</span>
             <div class="shields-row" id="hud-shields-row">🛡️🛡️🛡️</div>
           </div>
+          <div class="stat-chip boss-hp-wrap" title="Boss health">
+            <span class="label">Boss</span>
+            <div class="boss-hp-track"><div id="boss-hp-fill"></div></div>
+            <span class="val" id="boss-hp-val">100%</span>
+          </div>
         </div>
 
         <div class="hud-cluster">
@@ -1245,14 +1377,22 @@
           </div>
         </div>
       </div>
+
+      <div id="play-phase-banner" class="hidden-phase">
+        <div class="play-phase-copy">
+          <div class="play-phase-kicker" id="play-phase-kicker">💥 SHIELD BREAK</div>
+          <div class="play-phase-title" id="play-phase-title">Boss stunned! Mash Slash for a combo!</div>
+        </div>
+        <div class="play-phase-timer" id="play-phase-timer">6s</div>
+      </div>
     </div>
 
     <!-- Bottom Controls: Platformer Move Left/Right + Jump + Nail/Sword Slash + Shadow Dash / BP Boost -->
     <div class="hud-bottom-bar">
       <div class="touch-controls-cluster">
         <div class="lane-quick-stack">
-          <button type="button" class="touch-action-btn" id="btn-lane-up">◀ Left</button>
-          <button type="button" class="touch-action-btn" id="btn-lane-down">Right ▶</button>
+          <button type="button" class="touch-action-btn" id="btn-move-left">◀ Left</button>
+          <button type="button" class="touch-action-btn" id="btn-move-right">Right ▶</button>
         </div>
         <div class="lane-quick-stack">
           <button type="button" class="touch-action-btn" id="btn-jump-plat">⬆️ Jump</button>
@@ -1267,8 +1407,8 @@
         </div>
       </div>
 
-      <div class="speedo-container">
-        <canvas id="speedo-canvas" width="220" height="220"></canvas>
+      <div class="soul-gauge-container">
+        <canvas id="soul-gauge-canvas" width="220" height="220"></canvas>
       </div>
     </div>
   </div>
@@ -1276,7 +1416,7 @@
   <!-- Cutscene Skip Banner -->
   <div id="cutscene-banner" class="hidden">
     <div>
-      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">🏁 BOSS VANQUISHED</div>
+      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">🏆 BOSS VANQUISHED</div>
       <div style="font-size:0.78rem; color:#cbd5e1;" id="cutscene-banner-sub">Sanctuary Restored!</div>
     </div>
     <button type="button" class="btn-primary-gold" id="btn-skip-cutscene">Skip ▶</button>
@@ -1296,7 +1436,7 @@
       <div class="start-mode-card" id="btn-open-tavern">
         <div>
           <div class="mode-card-title">⚔️ 1 PLAYER BOSS DUEL</div>
-          <div class="mode-card-meta">A/D RUN · W JUMP · SPACE SLASH · TAP ORB A/B/C</div>
+          <div class="mode-card-meta">A/D MOVE · W JUMP · SPACE SLASH · 1/2/3 ORBS · SHIFT BOOST</div>
         </div>
         <div class="mode-enter-pill">Enter Tavern ▶</div>
       </div>
@@ -1308,6 +1448,18 @@
         </div>
         <button type="button" class="btn-primary-gold" id="btn-open-word-builder">📚 Customise Word Pool</button>
       </div>
+
+      <div class="how-to-play-card">
+        <div class="how-to-title">How to play</div>
+        <ol>
+          <li>Read the question, then slash rune <strong>A</strong>, <strong>B</strong> or <strong>C</strong> — tap the orb, tap the card, or press 1 / 2 / 3.</li>
+          <li><strong>Correct:</strong> the boss is stunned. Mash ⚔️ Slash (or tap the boss) for a Break combo.</li>
+          <li><strong>Wrong or too slow:</strong> the boss attacks. Jump the shockwaves or slash to parry them.</li>
+          <li>Spend 🔥 BP Boost (Shift) for a short power dash. If all shields break, the duel ends.</li>
+        </ol>
+        <div class="how-to-zh">正確答案可擊暈魔王並連擊；答錯或逾時要跳避或格擋衝擊波。</div>
+        <div class="how-to-keys">A / D or ◀ ▶ move · W / ⬆️ jump · Space slash · Shift boost · Esc pause</div>
+      </div>
     </div>
 
     <div style="font-size:0.76rem; color:#cbd5e1; text-align:center; background:rgba(10,14,22,0.75); padding:5px 14px; border-radius:999px; border:1px solid rgba(251,191,36,0.28);">
@@ -1315,7 +1467,7 @@
     </div>
   </div>
 
-  <!-- Campfire Tavern Setup Modal (1P Garage Equivalent, z-index: 65) -->
+  <!-- Campfire Tavern Setup Modal (z-index: 65) -->
   <div id="tavern-modal" class="modal-backdrop hidden">
     <div class="modal-window">
       <div class="modal-header-row">
@@ -1342,7 +1494,7 @@
           </div>
         </div>
 
-        <!-- Right: Traveler Name, Guild, Mode, Stages/Laps, Timer, Shields, Accent -->
+        <!-- Right: Traveler Name, Guild, Mode, Duel Rounds, Timer, Shields, Accent -->
         <div class="setup-controls-col">
           <div class="field-row-2col">
             <div class="field-group">
@@ -1367,7 +1519,7 @@
           </div>
 
           <div class="field-group">
-            <span class="field-label">🏁 Laps / Boss Phases</span>
+            <span class="field-label">⚔️ Duel Rounds</span>
             <div class="pill-choice-row" id="setup-laps-pills">
               <button type="button" class="choice-pill" data-laps="5">5</button>
               <button type="button" class="choice-pill active" data-laps="8">8</button>
@@ -1389,7 +1541,7 @@
             </div>
 
             <div class="field-group">
-              <span class="field-label">🛡️ Shields (Masks)</span>
+              <span class="field-label">🛡️ Shields</span>
               <div class="pill-choice-row" id="setup-shields-pills">
                 <button type="button" class="choice-pill" data-shields="2">2</button>
                 <button type="button" class="choice-pill active" data-shields="3">3</button>
@@ -1428,7 +1580,7 @@
     </div>
   </div>
 
-  <!-- End-of-Quest Classification / DNF Scoreboard Modal (z-index: 65) -->
+  <!-- End-of-Quest Scoreboard Modal (z-index: 65) -->
   <div id="end-modal" class="modal-backdrop hidden">
     <div class="modal-window">
       <div class="modal-header-row">
@@ -1436,8 +1588,8 @@
           <div class="clause-emoji-col" id="end-emoji-icon">🏆</div>
           <div class="clause-text-col">
             <div class="clause-kicker" id="end-kicker-line">
-              <span class="nowrap-clause">🏁 OFFICIAL GUILD CLASSIFICATION ·</span>
-              <span class="nowrap-clause">FULL DISTANCE</span>
+              <span class="nowrap-clause">⚔️ SANCTUARY CHRONICLE ·</span>
+              <span class="nowrap-clause">ALL SEALS BROKEN</span>
             </div>
             <div class="clause-title" id="end-title-line">
               <span class="nowrap-clause">🏆 Boss Vanquished —</span>
@@ -1462,7 +1614,7 @@
           <div class="m-val" id="end-acc-val">100%</div>
         </div>
         <div class="score-metric-box">
-          <div class="m-lbl">Shield Breaks</div>
+          <div class="m-lbl">Seals Broken</div>
           <div class="m-val" id="end-laps-val">8 / 8</div>
         </div>
         <div class="score-metric-box">
@@ -1474,7 +1626,7 @@
       <!-- Classroom Hall of Fame Standings -->
       <div>
         <div style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright); margin-bottom:6px;">
-          👑 PANTHEON HALL OF FAME STANDINGS
+          👑 GUILD HONOUR BOARD
         </div>
         <div class="standings-list" id="end-standings-list"></div>
       </div>
@@ -1521,12 +1673,12 @@
       <!-- Custom Teacher/Student Word Input + Photo AI Extraction via DeepSeek -->
       <div class="field-group" style="background:rgba(15,23,42,0.85); border:1px solid rgba(251,191,36,0.35); border-radius:10px; padding:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
-          <span class="field-label">2. Custom Words &amp; Photo AI Extraction (`skhhcss-eng-play-your-way`)</span>
+          <span class="field-label">2. Custom Words &amp; Photo AI Extraction</span>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <label for="input-photo-upload" class="btn-dark-brass" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
               📷 Scan Textbook / Worksheet Photo
             </label>
-            <input type="file" id="input-photo-upload" accept="image/*,.txt,.csv" style="display:none;" />
+            <input type="file" id="input-photo-upload" accept="image/*,.txt,.csv" capture="environment" style="display:none;" />
             <button type="button" class="btn-dark-brass" id="btn-deepseek-generate">✨ AI Generate from Topic / Text</button>
             <button type="button" class="btn-dark-brass" id="btn-clear-custom-words">🗑️ Clear Custom</button>
           </div>
@@ -1948,6 +2100,15 @@
     const DEFAULT_PYW_WORKER_URL = "https://play-your-way.skhhcss-eng.workers.dev";
     let hubSyncedPackTitle = "";
 
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function formatMcqPromptHtml(rawPrompt) {
       return String(rawPrompt || "")
         .replace(/&/g, "&amp;")
@@ -2262,8 +2423,56 @@
 
     /*************************************************************************
      * 4. HIGH-DETAIL 2D PIXEL ART SPRITES (HEROES & COLOSSAL RADIANCE BOSS)
+     * MUSE ART HOOKS (optional later swap — procedural sprites are the default)
+     * Set window.PYW_PIXEL_DUEL_ART = {
+     *   heroSheets: [/* 6 HTMLImageElement or URL strings * /],
+     *   bossSheets: { GUARD: img, STUNNED: img, ENRAGED: img },
+     *   arenaBackdrop: img,
+     *   orbSheet: img
+     * }
+     * or drop hidden <img data-muse-slot="hero-0" src="..."> tags into this file.
+     * Do not assume Muse artwork files already exist.
      *************************************************************************/
     const spriteCache = {};
+
+    function getMuseArt(slot) {
+      try {
+        const pack = window.PYW_PIXEL_DUEL_ART || {};
+        let fromPack = null;
+        if (slot.indexOf('hero-') === 0 && pack.heroSheets) {
+          fromPack = pack.heroSheets[parseInt(slot.slice(5), 10)];
+        } else if (slot.indexOf('boss-') === 0 && pack.bossSheets) {
+          fromPack = pack.bossSheets[slot.slice(5)];
+        } else if (pack[slot]) {
+          fromPack = pack[slot];
+        }
+        if (typeof fromPack === 'string') {
+          const img = new Image();
+          img.src = fromPack;
+          fromPack = img;
+        }
+        if (fromPack && fromPack.naturalWidth > 0) return fromPack;
+        const el = document.querySelector('img[data-muse-slot="' + slot + '"]');
+        if (el && el.complete && el.naturalWidth > 0) return el;
+      } catch (err) {}
+      return null;
+    }
+
+    function sliceMuseSheet(img, frameCount) {
+      if (!img || !img.naturalWidth) return null;
+      const isStrip = img.naturalWidth >= img.naturalHeight * frameCount;
+      const fw = isStrip ? Math.round(img.naturalWidth / frameCount) : img.naturalWidth;
+      const fh = img.naturalHeight;
+      const frames = [];
+      const n = isStrip ? frameCount : 1;
+      for (let f = 0; f < frameCount; f++) {
+        const sx = n === frameCount ? fw * f : 0;
+        frames.push(createOffscreenSprite(fw, fh, (ctx) => {
+          ctx.drawImage(img, sx, 0, fw, fh, 0, 0, fw, fh);
+        }));
+      }
+      return frames;
+    }
 
     function createOffscreenSprite(w, h, drawFn) {
       const c = document.createElement('canvas');
@@ -2276,8 +2485,17 @@
     }
 
     function getHeroSpriteFrames(heroIdx) {
-      const key = `hero_${heroIdx}`;
+      const museHero = getMuseArt('hero-' + heroIdx);
+      const key = `hero_${heroIdx}_${museHero ? 'muse' : 'proc'}`;
       if (spriteCache[key]) return spriteCache[key];
+
+      if (museHero) {
+        const sliced = sliceMuseSheet(museHero, 4);
+        if (sliced) {
+          spriteCache[key] = sliced;
+          return sliced;
+        }
+      }
 
       const hero = HERO_ROSTER[heroIdx] || HERO_ROSTER[0];
       const frames = [];
@@ -2336,12 +2554,42 @@
           px(13, 4 + bob, 6, 3, hero.helmFeather);
           px(16, 18 + bob, 15, 2, hero.trim);
 
-          // Gleaming Nail / Blade Weapon
-          px(30, 22 + bob, 5, 5, '#090b10');
-          px(31, 23 + bob, 3, 3, '#fbbf24');
-          px(33, 7 + bob, 6, 19, '#090b10');
-          px(34, 8 + bob, 4, 17, '#cbd5e1');
-          px(35, 8 + bob, 2, 16, '#ffffff');
+          // Weapon silhouette (procedural; a Muse hero sheet replaces the whole sprite)
+          if (hero.weapon === 'STAFF') {
+            px(32, 6 + bob, 5, 32, '#090b10');
+            px(33, 7 + bob, 3, 30, '#fde047');
+            px(30, 4 + bob, 9, 9, '#1d4ed8');
+            px(32, 6 + bob, 5, 5, '#38bdf8');
+            px(34, 8 + bob, 2, 2, '#ffffff');
+          } else if (hero.weapon === 'DAGGER') {
+            px(30, 20 + bob, 5, 5, '#090b10');
+            px(31, 21 + bob, 3, 3, '#fbbf24');
+            px(33, 10 + bob, 5, 16, '#090b10');
+            px(34, 11 + bob, 3, 14, '#e2e8f0');
+            px(35, 11 + bob, 1, 12, '#ffffff');
+          } else if (hero.weapon === 'BOW') {
+            px(32, 10 + bob, 3, 24, '#090b10');
+            px(33, 11 + bob, 2, 22, '#92400e');
+            px(34, 12 + bob, 8, 2, '#fbbf24');
+            px(34, 30 + bob, 8, 2, '#fbbf24');
+            px(40, 14 + bob, 2, 16, '#e2e8f0');
+          } else if (hero.weapon === 'FAN') {
+            px(30, 14 + bob, 14, 10, '#090b10');
+            px(31, 15 + bob, 12, 8, '#f472b6');
+            px(33, 16 + bob, 8, 5, '#fbcfe8');
+            px(36, 20 + bob, 3, 10, '#fbbf24');
+          } else if (hero.weapon === 'SPEAR') {
+            px(34, 2 + bob, 4, 36, '#090b10');
+            px(35, 3 + bob, 2, 34, '#fde047');
+            px(32, 2 + bob, 8, 7, '#14532d');
+            px(34, 3 + bob, 4, 4, '#86efac');
+          } else {
+            px(30, 22 + bob, 5, 5, '#090b10');
+            px(31, 23 + bob, 3, 3, '#fbbf24');
+            px(33, 7 + bob, 6, 19, '#090b10');
+            px(34, 8 + bob, 4, 17, '#cbd5e1');
+            px(35, 8 + bob, 2, 16, '#ffffff');
+          }
         }));
       }
 
@@ -2351,8 +2599,18 @@
 
     // Colossal 96x96 Hollow-Radiance Arch-Boss Sprite (Normal, Enraged & Stunned Break States)
     function getBossDuelSprite(bossState, frame) {
-      const key = `duel_boss_${bossState}_${frame}`;
+      const museBoss = getMuseArt('boss-' + bossState) || getMuseArt('boss');
+      const key = `duel_boss_${bossState}_${frame}_${museBoss ? 'muse' : 'proc'}`;
       if (spriteCache[key]) return spriteCache[key];
+
+      if (museBoss) {
+        const sliced = sliceMuseSheet(museBoss, 2);
+        if (sliced) {
+          const picked = sliced[frame % sliced.length];
+          spriteCache[key] = picked;
+          return picked;
+        }
+      }
 
       const canvas = createOffscreenSprite(96, 96, (ctx) => {
         const px = (x, y, w, h, col) => {
@@ -2481,7 +2739,10 @@
       currentQuestion: null,
       questionTimeLeft: 14,
       answeredLog: [],
-      cutsceneTimer: 0
+      cutsceneTimer: 0,
+      pendingEnd: null,
+      answerLocked: false,
+      dodgeHitsThisPhase: 0
     };
 
     function initDuelEngine() {
@@ -2577,7 +2838,8 @@
 
     function performSwordSlash() {
       if (state.screen !== 'PLAY_PHASE' && state.screen !== 'QUESTION_PHASE') return;
-      state.slashCooldown = 0.24;
+      if (state.slashCooldown > 0) return;
+      state.slashCooldown = 0.22;
       playSynthSfx('slash');
 
       const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
@@ -2613,7 +2875,9 @@
           const pts = state.isBoosting ? 45 : 25;
           state.score += pts;
           state.bp = Math.min(3, state.bp + (state.comboHits % 3 === 0 ? 1 : 0));
-          state.bossHp = Math.max(5, state.bossHp - (state.isBoosting ? 8 : 4));
+          const remainingAfterThis = state.pendingEnd === 'WIN' ? 0 : Math.max(0, state.targetLaps - state.currentLap);
+          const floorHp = remainingAfterThis <= 0 ? 0 : Math.ceil(remainingAfterThis * (100 / Math.max(1, state.targetLaps)) * 0.35);
+          state.bossHp = Math.max(floorHp, state.bossHp - (state.isBoosting ? 10 : 5));
           state.screenShake = 0.15;
           // Pogo bounce if slashing in mid-air!
           if (state.heroVy > 0) state.heroVy = -420;
@@ -2686,6 +2950,9 @@
       bossShockwaves = [];
       state.homingTargetOrb = null;
       state.bossMode = 'GUARD';
+      state.answerLocked = false;
+      const playBanner = document.getElementById('play-phase-banner');
+      if (playBanner) playBanner.classList.add('hidden-phase');
 
       const qIdx = (state.currentLap - 1) % state.questionPool.length;
       state.currentQuestion = state.questionPool[qIdx];
@@ -2712,14 +2979,17 @@
       updateSelectedOptionHighlight();
     }
 
-    function resolveOrbSlash(chosenLane) {
+    function resolveOrbSlash(chosenLane, meta) {
       const q = state.currentQuestion;
-      if (!q) return;
+      if (!q || state.answerLocked || (state.screen !== 'QUESTION_PHASE')) return;
+      state.answerLocked = true;
+      meta = meta || {};
 
-      const isCorrect = chosenLane === q.answer;
-      const chosenText = q.options[chosenLane] || '';
+      const timedOut = !!meta.timedOut || chosenLane < 0;
+      const isCorrect = !timedOut && chosenLane === q.answer;
+      const chosenText = timedOut ? '(time up)' : (q.options[chosenLane] || '');
       const correctText = q.options[q.answer] || '';
-      const orb = runeOrbs[chosenLane] || { x: state.heroX, y: state.heroY - 40 };
+      const orb = (!timedOut && runeOrbs[chosenLane]) ? runeOrbs[chosenLane] : (runeOrbs[state.currentLane] || { x: state.heroX, y: state.heroY - 40 });
 
       state.answeredLog.push({
         prompt: q.prompt,
@@ -2761,10 +3031,13 @@
         playSynthSfx('damage');
 
         spawnSoulSparks(orb.x, orb.y, '#ef4444', 28);
-        spawnFloatingCombatText(orb.x, orb.y - 35, '🛡️ WRONG RUNE! SHIELD CRACKED!', '#fca5a5', `Ans: [${LANE_LETTERS[q.answer]}] ${correctText}`);
+        const failLine = timedOut ? '⏱️ TIME UP! SHIELD CRACKED!' : '🛡️ WRONG RUNE! SHIELD CRACKED!';
+        spawnFloatingCombatText(orb.x, orb.y - 35, failLine, '#fca5a5', `Ans: [${LANE_LETTERS[q.answer]}] ${correctText}`);
 
         showCornerToast(
-          `🛡️ BOSS COUNTER! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`,
+          timedOut
+            ? `⏱️ TIME UP! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`
+            : `🛡️ BOSS COUNTER! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`,
           `${q.expEn} (${q.expZh})`,
           'bad'
         );
@@ -2775,11 +3048,10 @@
       if (state.shields <= 0) {
         startEndCutscene('DNF');
       } else if (state.currentLap >= state.targetLaps) {
-        state.bossHp = 0;
-        startEndCutscene('WIN');
+        state.pendingEnd = 'WIN';
+        startBreakOrDodgePlayPhase(isCorrect);
       } else {
-        state.currentLap++;
-        updateHudReadouts();
+        state.pendingEnd = null;
         startBreakOrDodgePlayPhase(isCorrect);
       }
     }
@@ -2788,33 +3060,57 @@
       runeOrbs = [];
       bossShockwaves = [];
       state.screen = 'PLAY_PHASE';
-      state.phaseTimer = 4.2;
+      state.phaseTimer = wasCorrectBreak ? 6.8 : 6.2;
       state.comboHits = 0;
+      state.dodgeHitsThisPhase = 0;
       document.getElementById('question-hud-wrap').classList.add('hidden-phase');
+
+      const banner = document.getElementById('play-phase-banner');
+      if (banner) {
+        banner.classList.remove('hidden-phase', 'break-mode', 'dodge-mode');
+        banner.classList.add(wasCorrectBreak ? 'break-mode' : 'dodge-mode');
+      }
+      const kicker = document.getElementById('play-phase-kicker');
+      const title = document.getElementById('play-phase-title');
+      const timerEl = document.getElementById('play-phase-timer');
+      if (wasCorrectBreak) {
+        if (kicker) kicker.textContent = '💥 SHIELD BREAK';
+        if (title) title.textContent = 'Boss stunned! Mash Slash or tap the boss for a combo!';
+      } else {
+        if (kicker) kicker.textContent = '⚠️ BOSS ENRAGED';
+        if (title) title.textContent = 'Jump the shockwaves, or slash to parry them!';
+      }
+      if (timerEl) timerEl.textContent = `${Math.ceil(state.phaseTimer)}s`;
 
       const w = mainCanvas ? mainCanvas.width : 1000;
       const h = mainCanvas ? mainCanvas.height : 700;
       const { floorY } = getArenaGeometry(w, h);
 
       if (wasCorrectBreak) {
-        // Boss crashes down onto the center-right of the bridge in a STUNNED BREAK state for free combo slashes!
         state.bossMode = 'STUNNED';
         state.bossTargetX = w * 0.62;
         state.bossY = floorY - 56;
       } else {
-        // Boss enters ENRAGED state and fires sweeping ground shockwaves to jump over / parry!
         state.bossMode = 'ENRAGED';
         state.bossTargetX = w * 0.78;
         state.bossY = floorY - 115;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
           bossShockwaves.push({
-            x: w * 0.75 + i * 210,
+            x: w * 0.78 + i * 190,
             y: floorY - 22,
-            vx: -290 - i * 35,
+            vx: -300 - i * 28,
             parried: false,
             hitPlayer: false
           });
         }
+        // One mid-air soul bolt that can be jumped under or parried
+        bossShockwaves.push({
+          x: w * 0.92,
+          y: floorY - 92,
+          vx: -340,
+          parried: false,
+          hitPlayer: false
+        });
       }
     }
 
@@ -2867,8 +3163,8 @@
       const el = document.createElement('div');
       el.className = `corner-toast ${kind || 'good'}`;
       el.innerHTML = `
-        <div class="corner-toast-title">${title}</div>
-        <div class="corner-toast-sub">${sub}</div>
+        <div class="corner-toast-title">${escapeHtml(title)}</div>
+        <div class="corner-toast-sub">${escapeHtml(sub)}</div>
       `;
       container.appendChild(el);
       while (container.children.length > 2) {
@@ -2904,6 +3200,14 @@
       bgGrad.addColorStop(1.0, '#090b10');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
+
+      const museBackdrop = getMuseArt('arenaBackdrop');
+      if (museBackdrop) {
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        ctx.drawImage(museBackdrop, 0, 0, w, h);
+        ctx.restore();
+      }
 
       // 2. Towering Gothic Stained-Glass Rose Arches & Pillars in Background
       const archSpacing = Math.max(220, Math.round(w * 0.24));
@@ -3037,55 +3341,64 @@
 
       ctx.drawImage(bossSprite, Math.round(state.bossX - 72), Math.round(hoverY - 72), 144, 144);
 
-      // Boss Status Banner & HP Bar on Sanctuary Floor
-      const barW = Math.min(420, Math.round(w * 0.44));
-      const barX = Math.round(w / 2 - barW / 2);
-      const barY = floorY + 34;
-
-      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
-      ctx.fillRect(barX - 4, barY - 4, barW + 8, 22);
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(barX - 4, barY - 4, barW + 8, 22);
-
+      // Compact HP pip above the boss (main readout lives in the HUD, clear of the controls)
+      const barW = 92;
+      const barX = Math.round(state.bossX - barW / 2);
+      const barY = Math.round(hoverY - 86);
       const hpFrac = Math.max(0, Math.min(1, state.bossHp / state.bossMaxHp));
+      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
+      ctx.fillRect(barX - 2, barY - 2, barW + 4, 10);
       ctx.fillStyle = state.bossMode === 'STUNNED' ? '#38bdf8' : '#e11d48';
-      ctx.fillRect(barX, barY, Math.round(barW * hpFrac), 14);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px Fredoka, sans-serif';
-      ctx.textAlign = 'center';
-      const statusText = state.bossMode === 'STUNNED'
-        ? '💥 BOSS STUNNED (BREAK!) — MASH SLASH OR TAP BOSS FOR COMBO!'
-        : `ARCH-GUARDIAN OF THE SANCTUARY · HP ${Math.ceil(state.bossHp)}%`;
-      ctx.fillText(statusText, Math.round(w / 2), barY + 10);
+      ctx.fillRect(barX, barY, Math.round(barW * hpFrac), 6);
     }
 
     function drawFloatingRuneOrbs(ctx, now) {
+      const museOrb = getMuseArt('orbSheet');
       runeOrbs.forEach((orb, idx) => {
         if (orb.shattered) return;
         const bob = Math.sin(now * 0.006 + idx * 1.8) * 6;
         const ox = Math.round(orb.x);
         const oy = Math.round(orb.y + bob);
         const isSelected = idx === state.currentLane;
+        const pulse = 1 + Math.sin(now * 0.008 + idx) * 0.06;
 
-        // Outer Spinning Rune Ring
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-        ctx.fillRect(ox - 32, oy - 32, 64, 64);
-        ctx.strokeStyle = isSelected ? '#ffffff' : orb.color;
-        ctx.lineWidth = isSelected ? 4 : 2.5;
-        ctx.strokeRect(ox - 32, oy - 32, 64, 64);
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.scale(pulse, pulse);
 
-        // Glowing Elemental Inner Core
-        ctx.fillStyle = orb.color;
-        ctx.fillRect(ox - 24, oy - 24, 48, 48);
+        // Soft glow
+        const glow = ctx.createRadialGradient(0, 0, 6, 0, 0, isSelected ? 46 : 38);
+        glow.addColorStop(0, orb.color);
+        glow.addColorStop(0.45, orb.color + '99');
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(0, 0, 46, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Crisp A / B / C Rune Letter
+        if (museOrb) {
+          ctx.drawImage(museOrb, -30, -30, 60, 60);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, 26, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+          ctx.fill();
+          ctx.lineWidth = isSelected ? 4 : 2.5;
+          ctx.strokeStyle = isSelected ? '#ffffff' : orb.color;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(0, 0, 18, 0, Math.PI * 2);
+          ctx.fillStyle = orb.color;
+          ctx.fill();
+        }
+
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 26px Fredoka, sans-serif';
+        ctx.font = 'bold 22px Fredoka, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(orb.letter, ox, oy + 1);
+        ctx.fillText(orb.letter, 0, 1);
+        ctx.restore();
       });
     }
 
@@ -3175,6 +3488,8 @@
       runeOrbs = [];
       bossShockwaves = [];
       document.getElementById('question-hud-wrap').classList.add('hidden-phase');
+      const playBanner = document.getElementById('play-phase-banner');
+      if (playBanner) playBanner.classList.add('hidden-phase');
 
       state.screen = outcome === 'WIN' ? 'CUTSCENE_WIN' : 'CUTSCENE_DNF';
       state.cutsceneTimer = 3.5;
@@ -3187,11 +3502,11 @@
       if (outcome === 'WIN') {
         state.bossMode = 'STUNNED';
         playSynthSfx('fanfare');
-        title.textContent = '🏆 BOSS VANQUISHED — FULL DISTANCE!';
+        title.textContent = '🏆 BOSS VANQUISHED — ALL SEALS BROKEN!';
         sub.textContent = `${state.travelerName} (${state.guildName}) shattered all ${state.targetLaps} boss seals!`;
       } else {
         playSynthSfx('damage');
-        title.textContent = '🚩 GUILD CONTROL · DID NOT FINISH';
+        title.textContent = '🛡️ SHIELDS SHATTERED — RETREAT';
         sub.textContent = 'Out of Shields! Resting on the sanctuary bench...';
       }
     }
@@ -3211,11 +3526,11 @@
 
       if (isWin) {
         emojiEl.textContent = '🏆';
-        kickerEl.innerHTML = `<span class="nowrap-clause">🏁 OFFICIAL FIA &amp; GUILD CLASSIFICATION ·</span><span class="nowrap-clause">FULL DISTANCE</span>`;
-        titleEl.innerHTML = `<span class="nowrap-clause">🏆 Chequered Flag —</span><span class="nowrap-clause">Grand Pantheon Finish!</span>`;
+        kickerEl.innerHTML = `<span class="nowrap-clause">⚔️ SANCTUARY CHRONICLE ·</span><span class="nowrap-clause">ALL SEALS BROKEN</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">🏆 Boss Vanquished —</span><span class="nowrap-clause">Sanctuary Restored!</span>`;
       } else {
         emojiEl.textContent = '🚩';
-        kickerEl.innerHTML = `<span class="nowrap-clause">🚩 GUILD CONTROL ·</span><span class="nowrap-clause">DID NOT FINISH</span>`;
+        kickerEl.innerHTML = `<span class="nowrap-clause">🛡️ Shields Shattered ·</span><span class="nowrap-clause">Retreat to the Bench</span>`;
         titleEl.innerHTML = `<span class="nowrap-clause">🚩 Duel Incomplete —</span><span class="nowrap-clause">Out of Shields!</span>`;
       }
 
@@ -3249,7 +3564,7 @@
       const entry = {
         name: `${state.travelerName} · ${state.guildName}`,
         pts: state.score,
-        status: isWin ? `${acc}%` : 'DNF',
+        status: isWin ? `${acc}%` : 'Retreat',
         isCurrent: true
       };
       board.push(entry);
@@ -3269,9 +3584,9 @@
         const div = document.createElement('div');
         div.className = `standing-row ${row.isCurrent ? 'current-run' : ''}`;
         div.innerHTML = `
-          <div class="standing-driver-info">
+          <div class="standing-hero-info">
             <span class="standing-rank">#${idx + 1}</span>
-            <span class="standing-name">${row.name} (${row.status})</span>
+            <span class="standing-name">${escapeHtml(row.name)} (${escapeHtml(row.status)})</span>
           </div>
           <span class="pts-pill">${row.pts} PTS</span>
         `;
@@ -3296,18 +3611,18 @@
         const card = document.createElement('div');
         card.className = `review-card ${item.isCorrect ? '' : 'missed'}`;
         card.innerHTML = `
-          <div class="review-q-line">${idx + 1}. [${item.mode}] ${item.prompt}</div>
+          <div class="review-q-line">${idx + 1}. [${escapeHtml(item.mode)}] ${escapeHtml(item.prompt)}</div>
           <div class="review-ans-badges">
-            <span class="ans-pill-correct">✓ Correct [${LANE_LETTERS[item.correctLane]}]: ${item.correctText}</span>
-            ${!item.isCorrect ? `<span class="ans-pill-wrong">✗ Chosen [${LANE_LETTERS[item.chosenLane]}]: ${item.chosenText}</span>` : ''}
+            <span class="ans-pill-correct">✓ Correct [${LANE_LETTERS[item.correctLane]}]: ${escapeHtml(item.correctText)}</span>
+            ${!item.isCorrect ? `<span class="ans-pill-wrong">✗ Chosen [${LANE_LETTERS[item.chosenLane] || '-'}]: ${escapeHtml(item.chosenText)}</span>` : ''}
           </div>
           <div class="review-explanation-full">
-            <div><strong>EN:</strong> ${item.expEn}</div>
-            <div style="margin-top:3px; color:#fde68a;"><strong>繁中:</strong> ${item.expZh}</div>
+            <div><strong>EN:</strong> ${escapeHtml(item.expEn)}</div>
+            <div style="margin-top:3px; color:#fde68a;"><strong>繁中:</strong> ${escapeHtml(item.expZh)}</div>
           </div>
           <div class="review-audio-row">
-            <button type="button" class="hud-btn btn-speak-correct" data-speak="${encodeURIComponent(item.correctText)}">🔊 Correct (${item.correctText})</button>
-            ${!item.isCorrect ? `<button type="button" class="hud-btn btn-speak-wrong" data-speak="${encodeURIComponent(item.chosenText)}">🔊 Wrong Gate (${item.chosenText})</button>` : ''}
+            <button type="button" class="hud-btn btn-speak-correct" data-speak="${encodeURIComponent(item.correctText)}">🔊 Correct (${escapeHtml(item.correctText)})</button>
+            ${!item.isCorrect ? `<button type="button" class="hud-btn btn-speak-wrong" data-speak="${encodeURIComponent(item.chosenText)}">🔊 Your answer (${escapeHtml(item.chosenText)})</button>` : ''}
           </div>
         `;
         container.appendChild(card);
@@ -3323,8 +3638,8 @@
     /*************************************************************************
      * 11. CIRCULAR SOUL / COMBO PACE GAUGE (Green -> Amber -> Red)
      *************************************************************************/
-    function drawSpeedometer() {
-      const canvas = document.getElementById('speedo-canvas');
+    function drawSoulGauge() {
+      const canvas = document.getElementById('soul-gauge-canvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
@@ -3354,16 +3669,39 @@
       ctx.strokeStyle = 'rgba(51, 65, 85, 0.55)';
       ctx.stroke();
 
-      const norm = Math.max(0, Math.min(1, (state.speedKmh - 240) / (343 - 240)));
-      const activeEnd = startAng + totalSpan * norm;
+      let norm = 0;
+      let centerText = '—';
+      let label = 'SOUL';
+      if (state.screen === 'QUESTION_PHASE' && state.timerSeconds > 0) {
+        norm = Math.max(0, Math.min(1, state.questionTimeLeft / state.timerSeconds));
+        centerText = `${Math.max(0, Math.ceil(state.questionTimeLeft))}`;
+        label = 'ANSWER';
+      } else if (state.screen === 'PLAY_PHASE' && state.bossMode === 'STUNNED') {
+        norm = Math.max(0, Math.min(1, state.phaseTimer / 6.8));
+        centerText = `${state.comboHits}x`;
+        label = 'BREAK COMBO';
+      } else if (state.screen === 'PLAY_PHASE') {
+        norm = Math.max(0, Math.min(1, state.phaseTimer / 6.2));
+        centerText = `${Math.max(0, Math.ceil(state.phaseTimer))}`;
+        label = 'DODGE';
+      } else if (state.isBoosting) {
+        norm = Math.max(0, Math.min(1, state.boostTimer / 3.8));
+        centerText = 'MAX';
+        label = '🔥 BOOST';
+      } else {
+        norm = Math.max(0, Math.min(1, state.bp / 3));
+        centerText = `${state.bp}`;
+        label = 'BP';
+      }
 
+      const activeEnd = startAng + totalSpan * norm;
       const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
       grad.addColorStop(0.0, '#22c55e');
       grad.addColorStop(0.55, '#f59e0b');
-      grad.addColorStop(1.0, '#e10600');
+      grad.addColorStop(1.0, '#ef4444');
 
       ctx.beginPath();
-      ctx.arc(cx, cy, r, startAng, activeEnd);
+      ctx.arc(cx, cy, r, startAng, Math.max(startAng + 0.02, activeEnd));
       ctx.lineWidth = 12;
       ctx.lineCap = 'round';
       ctx.strokeStyle = grad;
@@ -3373,13 +3711,13 @@
       ctx.font = 'bold 31px Fredoka, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(state.bossMode === 'STUNNED' ? `${state.comboHits}x` : `${Math.round(state.speedKmh)}`, cx, cy - 8);
+      ctx.fillText(centerText, cx, cy - 8);
 
       ctx.fillStyle = state.isBoosting ? '#ef4444' : '#fbbf24';
-      ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
-      ctx.fillText(state.bossMode === 'STUNNED' ? '💥 BREAK COMBO' : (state.isBoosting ? '🔥 MAX BOOST' : 'SOUL PACE'), cx, cy + 20);
+      ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(label, cx, cy + 20);
 
-      ctx.fillStyle = LANE_COLORS[state.currentLane];
+      ctx.fillStyle = LANE_COLORS[state.currentLane] || '#fbbf24';
       ctx.font = 'bold 14px Fredoka, sans-serif';
       ctx.fillText(`RUNE [${LANE_LETTERS[state.currentLane]}]`, cx, cy + 42);
     }
@@ -3391,6 +3729,12 @@
       document.getElementById('hud-lap-val').textContent = `${state.currentLap} / ${state.targetLaps}`;
       document.getElementById('hud-score-val').textContent = state.score;
       document.getElementById('hud-shields-row').textContent = '🛡️'.repeat(Math.max(0, state.shields)) || '💔';
+
+      const hpFill = document.getElementById('boss-hp-fill');
+      const hpVal = document.getElementById('boss-hp-val');
+      const frac = Math.max(0, Math.min(1, state.bossHp / Math.max(1, state.bossMaxHp)));
+      if (hpFill) hpFill.style.width = `${Math.round(frac * 100)}%`;
+      if (hpVal) hpVal.textContent = `${Math.ceil(Math.max(0, state.bossHp))}%`;
 
       for (let i = 0; i < 3; i++) {
         const orb = document.getElementById(`bp-orb-${i}`);
@@ -3553,31 +3897,53 @@
       // 3. Phase Timers
       if (state.screen === 'PLAY_PHASE') {
         state.phaseTimer -= dt;
+        const playTimerEl = document.getElementById('play-phase-timer');
+        if (playTimerEl) playTimerEl.textContent = `${Math.max(0, Math.ceil(state.phaseTimer))}s`;
         bossShockwaves.forEach(sw => {
           if (sw.parried) return;
           sw.x += sw.vx * dt;
-          if (!sw.hitPlayer && state.invulnTimer <= 0 && Math.abs(sw.x - state.heroX) < 28 && Math.abs(sw.y - (state.heroY - 20)) < 34) {
+          if (!sw.hitPlayer && state.invulnTimer <= 0 && Math.abs(sw.x - state.heroX) < 30 && Math.abs(sw.y - (state.heroY - 20)) < 36) {
             sw.hitPlayer = true;
-            state.speedKmh = 245;
-            playSynthSfx('step');
-            spawnFloatingCombatText(state.heroX, state.heroY - 60, 'JUMP / DASH!', '#fca5a5');
+            state.dodgeHitsThisPhase++;
+            state.score = Math.max(0, state.score - 25);
+            state.invulnTimer = 0.85;
+            state.screenShake = 0.28;
+            state.heroX = Math.max(48, state.heroX - 30);
+            playSynthSfx('damage');
+            spawnFloatingCombatText(state.heroX, state.heroY - 60, 'HIT! −25', '#fca5a5', 'Jump or parry!');
+            if (state.dodgeHitsThisPhase >= 2) {
+              state.shields = Math.max(0, state.shields - 1);
+              spawnFloatingCombatText(state.heroX, state.heroY - 90, 'SHIELD CRACKED!', '#ef4444');
+              if (state.shields <= 0) {
+                state.pendingEnd = 'DNF';
+                state.phaseTimer = Math.min(state.phaseTimer, 0.55);
+              }
+            }
+            updateHudReadouts();
           }
         });
         if (state.phaseTimer <= 0) {
-          startQuestionPhase();
+          if (state.pendingEnd) {
+            if (state.pendingEnd === 'WIN') state.bossHp = 0;
+            startEndCutscene(state.pendingEnd);
+          } else {
+            state.currentLap++;
+            updateHudReadouts();
+            startQuestionPhase();
+          }
         }
-        drawSpeedometer();
+        drawSoulGauge();
       } else if (state.screen === 'QUESTION_PHASE') {
         if (state.timerSeconds > 0) {
           state.questionTimeLeft -= dt;
           document.getElementById('q-timer-display').textContent = `${Math.max(0, Math.ceil(state.questionTimeLeft))}s`;
           if (state.questionTimeLeft <= 0) {
-            resolveOrbSlash(state.currentLane);
+            resolveOrbSlash(-1, { timedOut: true });
           }
         } else {
           document.getElementById('q-timer-display').textContent = '∞';
         }
-        drawSpeedometer();
+        drawSoulGauge();
       } else if (state.screen === 'CUTSCENE_WIN' || state.screen === 'CUTSCENE_DNF') {
         state.cutsceneTimer -= dt;
         if (state.screen === 'CUTSCENE_WIN' && Math.random() < 0.3) {
@@ -3624,6 +3990,9 @@
       state.bossHp = 100;
       state.bossMaxHp = 100;
       state.answeredLog = [];
+      state.pendingEnd = null;
+      state.answerLocked = false;
+      state.dodgeHitsThisPhase = 0;
 
       updateHudReadouts();
 
@@ -3739,11 +4108,11 @@
       box.innerHTML = combined.slice(0, 45).map(item => `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 8px; border-bottom:1px solid rgba(148,163,184,0.15); font-size:0.8rem;">
           <div>
-            <strong style="color:#fbbf24;">${item.word}</strong>
-            <span style="color:#cbd5e1; margin-left:6px;">${item.zh}</span>
-            <span style="color:#94a3b8; margin-left:6px;">— ${item.def}</span>
+            <strong style="color:#fbbf24;">${escapeHtml(item.word)}</strong>
+            <span style="color:#cbd5e1; margin-left:6px;">${escapeHtml(item.zh)}</span>
+            <span style="color:#94a3b8; margin-left:6px;">— ${escapeHtml(item.def)}</span>
           </div>
-          <span style="font-size:0.68rem; background:rgba(245,158,11,0.2); color:#fde68a; padding:2px 6px; border-radius:4px;">${item.tag}</span>
+          <span style="font-size:0.68rem; background:rgba(245,158,11,0.2); color:#fde68a; padding:2px 6px; border-radius:4px;">${escapeHtml(item.tag)}</span>
         </div>
       `).join('');
     }
@@ -3756,7 +4125,10 @@
         return;
       }
 
-      const lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      let lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      if (lines.length === 1 && !lines[0].includes('|') && lines[0].includes(',')) {
+        lines = lines[0].split(',').map(l => l.trim()).filter(Boolean);
+      }
       let added = 0;
 
       lines.forEach((line, idx) => {
@@ -3790,33 +4162,84 @@
       statusEl.textContent = `Added ${added} custom items! Total custom pool: ${customQuestionPool.length}.`;
     }
 
-    async function extractVocabularyWithDeepSeek(sourceText) {
+    function compressPhotoFileToDataUrl(file, maxDim, quality) {
+      maxDim = maxDim || 1100;
+      quality = quality == null ? 0.82 : quality;
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Could not read image'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Invalid image'));
+          img.onload = () => {
+            let w = img.width || 800;
+            let h = img.height || 600;
+            if (w > maxDim || h > maxDim) {
+              const scale = maxDim / Math.max(w, h);
+              w = Math.round(w * scale);
+              h = Math.round(h * scale);
+            }
+            const cv = document.createElement('canvas');
+            cv.width = w;
+            cv.height = h;
+            const cx = cv.getContext('2d');
+            cx.drawImage(img, 0, 0, w, h);
+            resolve(cv.toDataURL('image/jpeg', quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function formatExtractedWords(words) {
+      return (words || []).map((w) => {
+        if (typeof w === 'string') {
+          const match = HKDSE_LEXICON_SEEDS.find(s => s[0].toLowerCase() === w.toLowerCase());
+          if (match) return `${match[0]} | ${match[1]} | ${match[2]}`;
+          return `${w} | 提取詞彙 | Vocabulary scanned from your worksheet`;
+        }
+        const word = w.word || w.term || '';
+        const zh = w.zh || w.meaning || '提取詞彙';
+        const def = w.def || w.definition || 'Vocabulary scanned from your worksheet';
+        return word ? `${word} | ${zh} | ${def}` : '';
+      }).filter(Boolean).join('\n');
+    }
+
+    async function extractVocabularyWithDeepSeek(sourceText, imageDataUrl) {
       const statusEl = document.getElementById('builder-status-msg');
-      statusEl.textContent = '✨ Extracting HKDSE vocabulary via skhhcss-eng-play-your-way...';
+      statusEl.textContent = imageDataUrl
+        ? '✨ Scanning worksheet photo...'
+        : '✨ Extracting vocabulary from your text...';
 
       try {
         const endpoint = DEFAULT_PYW_WORKER_URL + '/api/extract';
+        const body = imageDataUrl
+          ? { mode: 'vocab', imageDataUrl }
+          : { mode: 'vocab', prompt: sourceText };
         const resp = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Play-Your-Way-Key': 'skhhcss-eng-play-your-way'
-          },
-          body: JSON.stringify({ prompt: sourceText })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
         });
         if (resp.ok) {
           const data = await resp.json();
-          if (data && Array.isArray(data.words)) {
-            const formatted = data.words.map(w => `${w.word} | ${w.zh} | ${w.def}`).join('\n');
-            document.getElementById('textarea-custom-words').value = formatted;
+          const list = (data && (data.words || data.items)) || [];
+          if (Array.isArray(list) && list.length > 0) {
+            document.getElementById('textarea-custom-words').value = formatExtractedWords(list);
             parseCustomWordsInput();
             return;
           }
         }
       } catch (err) {}
 
-      const tokens = sourceText.match(/[A-Za-z]{5,}/g) || ['resilient', 'meticulous', 'prosperous', 'alleviate'];
-      const unique = [...new Set(tokens.map(t => t.toLowerCase()))].slice(0, 8);
+      if (imageDataUrl) {
+        statusEl.textContent = '⚠️ Photo scan is unavailable right now. Type or paste the words below.';
+        return;
+      }
+
+      const tokens = String(sourceText || '').match(/[A-Za-z]{5,}/g) || ['resilient', 'meticulous', 'prosperous', 'alleviate'];
+      const unique = [...new Set(tokens.map(tok => tok.toLowerCase()))].slice(0, 8);
       const synthesizedLines = unique.map(w => {
         const match = HKDSE_LEXICON_SEEDS.find(s => s[0].toLowerCase() === w);
         if (match) return `${match[0]} | ${match[1]} | ${match[2]}`;
@@ -3950,14 +4373,23 @@
       }
 
       // Bottom Platformer Touch Hold / Click Controls
-      const btnLeft = document.getElementById('btn-lane-up');
-      const btnRight = document.getElementById('btn-lane-down');
-      btnLeft.addEventListener('pointerdown', () => { keysHeld.left = true; });
-      btnLeft.addEventListener('pointerup', () => { keysHeld.left = false; });
-      btnLeft.addEventListener('pointerleave', () => { keysHeld.left = false; });
-      btnRight.addEventListener('pointerdown', () => { keysHeld.right = true; });
-      btnRight.addEventListener('pointerup', () => { keysHeld.right = false; });
-      btnRight.addEventListener('pointerleave', () => { keysHeld.right = false; });
+      const btnLeft = document.getElementById('btn-move-left');
+      const btnRight = document.getElementById('btn-move-right');
+      const bindHold = (btn, dir) => {
+        if (!btn) return;
+        const on = (ev) => {
+          if (ev.pointerId != null && btn.setPointerCapture) btn.setPointerCapture(ev.pointerId);
+          keysHeld[dir] = true;
+          ev.preventDefault();
+        };
+        const off = () => { keysHeld[dir] = false; };
+        btn.addEventListener('pointerdown', on);
+        btn.addEventListener('pointerup', off);
+        btn.addEventListener('pointercancel', off);
+        btn.addEventListener('lostpointercapture', off);
+      };
+      bindHold(btnLeft, 'left');
+      bindHold(btnRight, 'right');
 
       document.getElementById('btn-jump-plat').addEventListener('click', performJump);
       document.getElementById('btn-action-jump').addEventListener('click', performSwordSlash);
@@ -4005,12 +4437,23 @@
         const raw = document.getElementById('textarea-custom-words').value.trim() || 'resilient meticulous alleviate prosperous embark scrutinise';
         extractVocabularyWithDeepSeek(raw);
       });
-      document.getElementById('input-photo-upload').addEventListener('change', (e) => {
+      document.getElementById('input-photo-upload').addEventListener('change', async (e) => {
         const file = e.target.files && e.target.files[0];
+        e.target.value = '';
         if (!file) return;
+        const statusEl = document.getElementById('builder-status-msg');
+        if (file.type && file.type.indexOf('image/') === 0) {
+          try {
+            const imageDataUrl = await compressPhotoFileToDataUrl(file);
+            await extractVocabularyWithDeepSeek('', imageDataUrl);
+          } catch (err) {
+            if (statusEl) statusEl.textContent = 'Could not read that photo. Try another image, or type the words.';
+          }
+          return;
+        }
         const reader = new FileReader();
         reader.onload = () => {
-          extractVocabularyWithDeepSeek(file.name + ' ' + String(reader.result || '').slice(0, 400));
+          extractVocabularyWithDeepSeek(String(reader.result || ''));
         };
         reader.readAsText(file);
       });
@@ -4027,7 +4470,7 @@
       if (b2) b2.addEventListener("click", goHub);
       syncFromPlayYourWayHub();
       updateWordPoolSummaryLabels();
-      drawSpeedometer();
+      drawSoulGauge();
       requestAnimationFrame(animateLoop);
     };
   </script>
