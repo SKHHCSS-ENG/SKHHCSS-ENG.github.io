@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Stage Lights: On the Beat — Play Your Way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Noto+Sans+TC:wght@500;700&family=Orbitron:wght@500;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #111;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #f59e0b;
+      --accent-2: #fb7185;
+      --card: rgba(15, 18, 28, 0.92);
+      --border: rgba(255,255,255,0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      width: 100%; height: 100dvh; overflow: hidden;
+      font-family: var(--ui-font), "Noto Sans TC", sans-serif;
+      color: var(--text); background: #09090b;
+      touch-action: manipulation;
+    }
+    #game-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+    .vignette { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+    #toast-corner { position: fixed; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); z-index: 40; display: flex; flex-direction: column; gap: 8px; max-width: min(360px, 72vw); pointer-events: none; }
+    .corner-toast { background: var(--card); border: 1.5px solid var(--accent); border-radius: 12px; padding: 10px 12px; box-shadow: 0 10px 24px rgba(0,0,0,0.35); }
+    .corner-toast.bad { border-color: #fb7185; }
+    .corner-toast-title { font-weight: 800; font-size: 0.88rem; }
+    .corner-toast-sub { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .hidden { display: none !important; }
+    .hidden-phase { opacity: 0; visibility: hidden; pointer-events: none; height: 0; overflow: hidden; padding: 0 !important; margin: 0 !important; border: 0 !important; }
+    #hud-layer { position: fixed; inset: 0; z-index: 20; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+    .hud-top-stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .chronicle-bar, .question-card, #options-row, .hud-bottom-bar { pointer-events: auto; }
+    .chronicle-bar { width: 100%; max-width: 1080px; background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; backdrop-filter: blur(8px); }
+    .hud-cluster { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .stat-chip { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.06); border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; font-weight: 700; }
+    .stat-chip .label { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    #question-hud-wrap { width: 100%; max-width: 880px; display: flex; flex-direction: column; gap: 6px; pointer-events: auto; }
+    .question-card { background: var(--card); border: 1.5px solid var(--accent); border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 10px 28px rgba(0,0,0,0.45); }
+    .q-left { display: flex; align-items: flex-start; gap: 8px; min-width: 0; flex: 1; }
+    .q-mode-pill { flex-shrink: 0; background: var(--accent); color: #111; font-size: 0.68rem; font-weight: 800; padding: 3px 7px; border-radius: 6px; letter-spacing: 0.04em; }
+    .q-prompt-text { font-size: 0.95rem; font-weight: 700; line-height: 1.35; }
+    .q-prompt-sub { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+    .mcq-blank-hl { display: inline-block; min-width: 3.2em; border-bottom: 2px solid var(--accent); }
+    .q-right-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .q-timer-ring { min-width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; background: rgba(0,0,0,0.35); }
+    .options-below-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; }
+    .option-card.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+    .option-badge { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #111; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; }
+    .hud-bottom-bar { width: 100%; max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; pointer-events: none; }
+    .touch-controls-cluster { display: flex; gap: 8px; flex-wrap: wrap; pointer-events: auto; }
+    .touch-action-btn, .hud-btn, .btn-primary, .btn-ghost {
+      border-radius: 10px; border: 1.5px solid var(--border); background: var(--card); color: var(--text);
+      font-weight: 700; font-family: inherit; cursor: pointer; padding: 10px 14px; min-height: 44px;
+    }
+    .btn-primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #111; border-color: rgba(255,255,255,0.35); }
+    .hud-btn { padding: 5px 10px; min-height: 0; font-size: 0.78rem; }
+    #start-menu-overlay, .modal-backdrop { position: fixed; inset: 0; z-index: 50; overflow-y: auto; }
+    #start-menu-overlay { z-index: 45; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+    .start-center-card { width: 100%; max-width: 640px; background: var(--card); border: 2px solid var(--border); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.45); }
+    .game-main-title { font-family: var(--title-font), "Fredoka", sans-serif; font-size: clamp(1.6rem, 4vw, 2.3rem); text-align: center; }
+    .game-main-title span { color: var(--accent); }
+    .kicker { text-align: center; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+    .how-to-play-card { background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
+    .how-to-title { font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+    .how-to-play-card ol { margin: 0 0 8px 1.15rem; font-size: 0.8rem; line-height: 1.45; }
+    .how-to-zh { font-size: 0.76rem; color: #fde68a; margin-bottom: 6px; }
+    .how-to-keys { font-size: 0.72rem; color: var(--muted); }
+    .word-pool-bar, .mode-enter { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .start-mode-card { border: 2px solid var(--accent); border-radius: 12px; padding: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); }
+    .mode-card-title { font-weight: 800; font-size: 1.05rem; }
+    .mode-card-meta { font-size: 0.72rem; color: var(--muted); margin-top: 3px; }
+    .modal-backdrop { z-index: 65; background: rgba(6,7,12,0.62); display: flex; align-items: flex-start; justify-content: center; padding: 24px 12px 32px; }
+    .modal-window { width: min(720px, 100%); background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 20px 48px rgba(0,0,0,0.45); }
+    .modal-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .modal-title { font-family: var(--title-font), "Fredoka", sans-serif; font-size: 1.15rem; }
+    .field-label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .text-input, .textarea-input { width: 100%; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.35); color: var(--text); padding: 8px 10px; font: inherit; }
+    .pill-choice-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .choice-pill { border: 1px solid var(--border); background: rgba(255,255,255,0.06); color: var(--text); border-radius: 999px; padding: 6px 10px; font-weight: 700; cursor: pointer; }
+    .choice-pill.active { background: var(--accent); color: #111; border-color: #fff; }
+    .score-summary-banner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+    .score-metric-box { background: rgba(255,255,255,0.06); border-radius: 10px; padding: 8px; text-align: center; }
+    .m-lbl { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; }
+    .m-val { font-weight: 800; font-size: 1.05rem; }
+    .review-list-container { max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .review-card { background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; }
+    .review-card.missed { border-color: #fb7185; }
+    .review-q-line { font-weight: 700; font-size: 0.86rem; margin-bottom: 4px; }
+    .review-ans-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+    .ans-pill-correct { color: #86efac; font-size: 0.76rem; }
+    .ans-pill-wrong { color: #fda4af; font-size: 0.76rem; }
+    .ans-pill-grade { color: #fde68a; font-size: 0.76rem; }
+    .review-zh { margin-top: 3px; color: #fde68a; }
+    .standing-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .standing-row.current-run { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 5px 8px; }
+    .pts-pill { margin-left: auto; font-weight: 800; color: var(--accent); }
+    .school-footer { font-size: 0.74rem; color: var(--muted); text-align: center; background: rgba(0,0,0,0.4); padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); }
+    @media (max-width: 768px) {
+      .options-below-row { gap: 5px; }
+      .score-summary-banner { grid-template-columns: repeat(2, 1fr); }
+      .question-card { padding: 7px 10px; }
+      .q-prompt-text { font-size: 0.86rem; }
+    }
+    @media (max-height: 700px) {
+      .how-to-play-card ol { font-size: 0.72rem; }
+      .start-center-card { padding: 12px; }
+    }
+
+
+    :root {
+      --ui-font: "Plus Jakarta Sans";
+      --title-font: "Orbitron";
+      --accent: #f0abfc;
+      --accent-2: #22d3ee;
+      --card: rgba(10, 6, 24, 0.92);
+      --text: #f8fafc;
+      --muted: #e9d5ff;
+      --border: rgba(34, 211, 238, 0.4);
+    }
+    body { background: #08010f; }
+    .vignette { background:
+      radial-gradient(circle at 50% 30%, transparent 40%, rgba(8,1,15,0.55) 100%);
+    }
+    .btn-primary { color: #0f0320; }
+    #start-menu-overlay { background: linear-gradient(180deg, rgba(8,1,15,0.25), rgba(76,29,149,0.28)); }
+    .option-card[data-lane="0"].selected { box-shadow: 0 0 0 2px #22d3ee; }
+    .option-card[data-lane="1"].selected { box-shadow: 0 0 0 2px #f472b6; }
+    .option-card[data-lane="2"].selected { box-shadow: 0 0 0 2px #a3e635; }
+        
+  </style>
+  <script src="../shared-words.js" onerror="window.__sharedWordsOfflineFallback = true;"></script>
+</head>
+<body>
+<canvas id="game-canvas"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div id="toast-corner"></div>
+
+<div id="hud-layer" class="hidden">
+  <div class="hud-top-stack">
+    <div class="chronicle-bar">
+      <div class="hud-cluster">
+        <div class="stat-chip"><span class="label">Player</span><span id="hud-player-name">Student</span></div>
+        <div class="stat-chip"><span class="label" id="hud-round-label">Round</span><span class="val" id="hud-round-val">1 / 8</span></div>
+        <div class="stat-chip"><span class="label">Score</span><span class="val" id="hud-score-val">0</span></div>
+        <div class="stat-chip"><span class="label" id="hud-hearts-label">Lives</span><span id="hud-hearts-row">❤❤❤</span></div>
+        <div class="stat-chip"><span class="label">Combo</span><span id="hud-combo-val">—</span></div>
+      </div>
+      <div class="hud-cluster">
+        <button type="button" class="hud-btn" id="btn-hud-accent" title="Switch English accent">🗣️ UK</button>
+        <button type="button" class="hud-btn" id="btn-hud-mute" title="Toggle sound">🔊</button>
+        <button type="button" class="hud-btn" id="btn-hud-pause">⏸️ Pause</button>
+      </div>
+    </div>
+    <div id="question-hud-wrap">
+      <div class="question-card">
+        <div class="q-left">
+          <span class="q-mode-pill" id="q-mode-badge">VOCAB</span>
+          <div style="min-width:0;flex:1;">
+            <div class="q-prompt-text" id="q-prompt-text">Loading...</div>
+            <div class="q-prompt-sub" id="q-prompt-sub">Round 1 of 8</div>
+          </div>
+        </div>
+        <div class="q-right-controls">
+          <button type="button" class="hud-btn" id="btn-q-speak">🔊 Listen</button>
+          <div class="q-timer-ring" id="q-timer-display">14s</div>
+        </div>
+      </div>
+      <div class="options-below-row" id="options-row">
+        <div class="option-card" data-lane="0" id="opt-card-0"><div class="option-badge">A</div><div class="option-text" id="opt-text-0">Option A</div></div>
+        <div class="option-card selected" data-lane="1" id="opt-card-1"><div class="option-badge">B</div><div class="option-text" id="opt-text-1">Option B</div></div>
+        <div class="option-card" data-lane="2" id="opt-card-2"><div class="option-badge">C</div><div class="option-text" id="opt-text-2">Option C</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="hud-bottom-bar">
+    <div class="touch-controls-cluster" id="game-action-cluster">
+            <button type="button" class="btn-primary" data-lane-hit="0">A</button>
+      <button type="button" class="btn-primary" data-lane-hit="1" style="background:linear-gradient(90deg,#f472b6,#e879f9);">B</button>
+      <button type="button" class="btn-primary" data-lane-hit="2" style="background:linear-gradient(90deg,#a3e635,#22d3ee);">C</button>
+    </div>
+  </div>
+</div>
+
+<div id="start-menu-overlay">
+  <div class="start-header-box" style="text-align:center;">
+    <div style="margin-bottom:8px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+      <button type="button" class="btn-ghost" id="btn-back-to-pyw-hub">◀ Play Your Way</button>
+      <span class="kicker">🎤 LIVE RHYTHM SET</span>
+    </div>
+    <h1 class="game-main-title">Stage Lights: <span>On the Beat</span></h1>
+  </div>
+  <div class="start-center-card">
+    <div class="start-mode-card" id="btn-open-setup">
+      <div>
+        <div class="mode-card-title">🎤 Take the stage</div>
+        <div class="mode-card-meta">Read the lyric · wait for the cue · hit the correct lane on the beat</div>
+      </div>
+      <div class="btn-primary" style="min-height:auto;padding:8px 12px;">Enter ▶</div>
+    </div>
+    <div class="word-pool-bar">
+      <div>
+        <div class="kicker" style="text-align:left;" id="start-pool-mode-tag">ACTIVE WORD POOL</div>
+        <div id="start-pool-summary" style="font-size:0.8rem;color:var(--muted);">HKDSE practice bank</div>
+      </div>
+      <button type="button" class="btn-primary" id="btn-open-word-builder">📚 Customise Word Pool</button>
+    </div>
+    <div class="how-to-play-card">
+              <div class="how-to-title">How to play</div>
+        <ol>
+          <li>Each track shows a lyric, setlist line, or cue card — that is your English question.</li>
+          <li>Read it in the countdown, then watch the glowing note travel down the correct lane.</li>
+          <li>Hit lane <strong>A</strong>, <strong>B</strong> or <strong>C</strong> as it crosses the white line (tap the lane, the card, or press 1 / 2 / 3).</li>
+          <li><strong>Perfect</strong> and <strong>Good</strong> keep the combo. Misses and wrong lanes cost a mic. Lose every mic and the crowd goes quiet.</li>
+        </ol>
+        <div class="how-to-zh">先讀歌詞，再在白線上按對的軌道。時機準確可得 Perfect／Good；錯過或按錯會失去一支麥克風。</div>
+        <div class="how-to-keys">1 / 2 / 3 or A / S / D hit a lane · Esc pause</div>
+    </div>
+  </div>
+  <div class="school-footer">SKH Holy Carpenter Secondary School · English Department Self-Learning Hub</div>
+</div>
+
+<div id="setup-modal" class="modal-backdrop hidden">
+  <div class="modal-window">
+    <div class="modal-header-row">
+      <button type="button" class="btn-ghost" id="btn-setup-back">◀ Start Menu</button>
+      <div class="modal-title">🎤 Setlist & soundcheck</div>
+      <button type="button" class="btn-ghost" id="btn-setup-word-pool">📚 Word Pool</button>
+    </div>
+    <div class="field-group" style="margin-bottom:10px;">
+      <label class="field-label" for="input-player-name">Player name</label>
+      <input type="text" id="input-player-name" class="text-input" value="Nova" maxlength="20" />
+    </div>
+    <div class="field-group" style="margin-bottom:10px;">
+      <span class="field-label">Rounds</span>
+      <div class="pill-choice-row" id="setup-rounds-pills">
+        <button type="button" class="choice-pill" data-rounds="5">5</button>
+        <button type="button" class="choice-pill active" data-rounds="8">8</button>
+        <button type="button" class="choice-pill" data-rounds="12">12</button>
+        <button type="button" class="choice-pill" data-rounds="ALL">All</button>
+        <input type="number" id="input-custom-rounds" class="text-input" min="1" max="99" placeholder="1-99" style="width:76px;" title="Custom round count" />
+      </div>
+    </div>
+    <div class="field-group" style="margin-bottom:10px; display:flex; gap:16px; flex-wrap:wrap;">
+      <div>
+        <span class="field-label">Read time (then the cue drops)</span>
+        <div class="pill-choice-row" id="setup-timer-pills">
+          <button type="button" class="choice-pill" data-timer="10">10s</button>
+          <button type="button" class="choice-pill active" data-timer="8">8s</button>
+          <button type="button" class="choice-pill" data-timer="14">14s</button>
+          <button type="button" class="choice-pill" data-timer="20">20s</button>
+          <button type="button" class="choice-pill" data-timer="0">Off</button>
+        </div>
+      </div>
+      <div>
+        <span class="field-label">Mics</span>
+        <div class="pill-choice-row" id="setup-hearts-pills">
+          <button type="button" class="choice-pill" data-hearts="2">2</button>
+          <button type="button" class="choice-pill active" data-hearts="3">3</button>
+          <button type="button" class="choice-pill" data-hearts="5">5</button>
+        </div>
+      </div>
+    </div>
+    <div class="field-group" style="margin-bottom:12px;">
+      <span class="field-label">Voice accent</span>
+      <div class="pill-choice-row" id="setup-accent-pills">
+        <button type="button" class="choice-pill active" data-accent="UK">UK</button>
+        <button type="button" class="choice-pill" data-accent="US">US</button>
+        <button type="button" class="choice-pill" data-accent="AU">AU</button>
+      </div>
+    </div>
+    <button type="button" class="btn-primary" id="btn-launch-run" style="width:100%; font-size:1.05rem;">🎤 Lights up ▶</button>
+  </div>
+</div>
+
+<div id="pause-modal" class="modal-backdrop hidden">
+  <div class="modal-window" style="max-width:440px; text-align:center;">
+    <div class="modal-title">🎧 Backstage</div>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+      <button type="button" class="btn-primary" id="btn-resume">▶ Resume</button>
+      <button type="button" class="btn-ghost" id="btn-pause-restart">🔄 Restart</button>
+      <button type="button" class="btn-ghost" id="btn-pause-setup">Setup</button>
+      <button type="button" class="btn-ghost" id="btn-pause-menu">🏠 Start Menu</button>
+    </div>
+  </div>
+</div>
+
+<div id="end-modal" class="modal-backdrop hidden">
+  <div class="modal-window">
+    <div class="modal-header-row">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div id="end-emoji-icon" style="font-size:2rem;">🏆</div>
+        <div>
+          <div class="kicker" id="end-kicker-line" style="text-align:left;">COMPLETE</div>
+          <div class="modal-title" id="end-title-line">You did it!</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-primary" id="btn-end-again">🔄 Play again</button>
+        <button type="button" class="btn-ghost" id="btn-end-menu">🏠 Start Menu</button>
+        <button type="button" class="btn-ghost" id="btn-end-pyw-hub">◀ Play Your Way</button>
+      </div>
+    </div>
+    <div class="score-summary-banner">
+      <div class="score-metric-box"><div class="m-lbl">Final Score</div><div class="m-val" id="end-score-val">0 PTS</div></div>
+      <div class="score-metric-box"><div class="m-lbl">Accuracy</div><div class="m-val" id="end-acc-val">100%</div></div>
+      <div class="score-metric-box"><div class="m-lbl">Cleared</div><div class="m-val" id="end-rounds-val">8 / 8</div></div>
+      <div class="score-metric-box"><div class="m-lbl" id="end-hearts-caption">Lives left</div><div class="m-val" id="end-hearts-val">3</div></div>
+    </div>
+    <div style="font-weight:800; color:var(--accent); margin-bottom:6px;">🌟 Encore honour board</div>
+    <div id="end-standings-list"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0 6px; gap:8px; flex-wrap:wrap;">
+      <span style="font-weight:800; color:var(--accent);">📜 Review (English + 繁體中文)</span>
+      <div class="pill-choice-row" id="review-filter-pills">
+        <button type="button" class="choice-pill active" data-filter="ALL">All answered</button>
+        <button type="button" class="choice-pill" data-filter="MISSED">Missed only</button>
+      </div>
+    </div>
+    <div class="review-list-container" id="end-review-list"></div>
+  </div>
+</div>
+
+<div id="word-builder-modal" class="modal-backdrop hidden">
+  <div class="modal-window">
+    <div class="modal-header-row">
+      <div class="modal-title">📚 Word Pool</div>
+      <button type="button" class="btn-ghost" id="btn-close-word-builder">Close</button>
+    </div>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">Paste a word list, or scan a worksheet photo. The game will turn them into 3-choice questions. You can also launch from the Play Your Way hub so your pack arrives automatically.</p>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+      <label for="input-photo-upload" class="btn-ghost" style="cursor:pointer;">📷 Scan textbook / worksheet photo</label>
+      <input type="file" id="input-photo-upload" accept="image/*,.txt,.csv" capture="environment" style="display:none;" />
+      <button type="button" class="btn-ghost" id="btn-ai-generate">✨ AI generate from text</button>
+      <button type="button" class="btn-ghost" id="btn-clear-custom-words">🗑️ Clear custom</button>
+    </div>
+    <textarea id="textarea-custom-words" class="textarea-input" rows="4" placeholder="Enter words (one per line or comma-separated), e.g. resilient, meticulous, alleviate"></textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; gap:8px; flex-wrap:wrap;">
+      <span style="font-size:0.75rem; color:var(--muted);" id="builder-status-msg">Ready.</span>
+      <button type="button" class="btn-primary" id="btn-parse-custom-words">+ Add to pool</button>
+    </div>
+  </div>
+</div>
+
+
+  <script>
+
+    if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        r = Math.min(Number(r) || 0, w / 2, h / 2);
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+      };
+    }
+
+    /*************************************************************************
+     * PLAY YOUR WAY — SHARED HANDSHAKE, QUESTION BANK, REVIEW & SHELL
+     *************************************************************************/
+    const DEFAULT_PYW_WORKER_URL = "https://play-your-way.skhhcss-eng.workers.dev";
+    const STORAGE_KEY_PYW_ACTIVE = "skhhcss_play_your_way_active_v1";
+    const LANE_LETTERS = ["A", "B", "C"];
+
+    let customQuestionPool = [];
+    let hubSyncedPackTitle = "";
+    let selectedBandFilter = "CORE_ALL";
+    let isMuted = false;
+    let currentAccent = "UK";
+    let audioCtx = null;
+
+    const CURATED_QUESTIONS = [
+      { mode: "VOCAB", word: "resilient", zh: "堅韌的", prompt: "Choose the word that means \"able to recover quickly from difficulties\":", options: ["fragile", "resilient", "hesitant"], answer: 1, expEn: "\"Resilient\" means strong and able to bounce back after a setback.", expZh: "「resilient」指堅韌的、能從挫折中迅速恢復。" },
+      { mode: "VOCAB", word: "meticulous", zh: "一絲不苟的", prompt: "The baker was ________ about every layer of the cake.", options: ["meticulous", "reckless", "casual"], answer: 0, expEn: "\"Meticulous\" means very careful and precise about details.", expZh: "「meticulous」解作一絲不苟、非常注重細節。" },
+      { mode: "VOCAB", word: "alleviate", zh: "減輕；緩和", prompt: "A short break can ________ stress before a performance.", options: ["increase", "ignore", "alleviate"], answer: 2, expEn: "\"Alleviate\" means to make pain or pressure less severe.", expZh: "「alleviate」指減輕痛苦、壓力或問題。" },
+      { mode: "VOCAB", word: "prosperous", zh: "繁榮的", prompt: "The harbour became a ________ trading town.", options: ["deserted", "prosperous", "temporary"], answer: 1, expEn: "\"Prosperous\" means successful and doing well, especially with money.", expZh: "「prosperous」指繁榮、興旺的。" },
+      { mode: "VOCAB", word: "scrutinise", zh: "仔細檢查", prompt: "Detectives must ________ every clue before they decide.", options: ["scrutinise", "abandon", "invent"], answer: 0, expEn: "\"Scrutinise\" means to examine something very carefully.", expZh: "「scrutinise」指仔細檢查、審視。" },
+      { mode: "VOCAB", word: "harmonious", zh: "和諧的", prompt: "The choir sounded ________ after weeks of rehearsal.", options: ["chaotic", "harmonious", "silent"], answer: 1, expEn: "\"Harmonious\" means peaceful, balanced, and pleasant together.", expZh: "「harmonious」指和諧、協調的。" },
+      { mode: "GRAMMAR", word: "Despite", zh: "儘管（後接名詞）", prompt: "________ the heavy rain, the cafe stayed open.", options: ["Although", "Despite", "Because"], answer: 1, expEn: "Use \"Despite\" before a noun phrase. \"Although\" needs a clause with a subject and verb.", expZh: "「Despite」後面接名詞；「Although」後須接完整子句。" },
+      { mode: "GRAMMAR", word: "who", zh: "關係代名詞（人）", prompt: "The singer ________ wrote the song also played guitar.", options: ["which", "who", "where"], answer: 1, expEn: "Use \"who\" for people. \"Which\" is for things, and \"where\" is for places.", expZh: "指人時用「who」；物件用「which」，地點用「where」。" },
+      { mode: "GRAMMAR", word: "have lived", zh: "現在完成式", prompt: "She ________ in this neighbourhood since 2019.", options: ["lives", "has lived", "lived"], answer: 1, expEn: "Use the present perfect with \"since\" for something that started in the past and is still true.", expZh: "與 since 連用時，用現在完成式表示由過去持續至今。" },
+      { mode: "GRAMMAR", word: "fewer", zh: "較少（可數）", prompt: "Please use ________ plastic cups at the counter.", options: ["less", "fewer", "little"], answer: 1, expEn: "\"Fewer\" is for countable things (cups). \"Less\" is for uncountable amounts.", expZh: "可數名詞用「fewer」；不可數用「less」。" },
+      { mode: "READING", word: "inference", zh: "推論", prompt: "\"The diner put away her umbrella and smiled at the sun.\" What can we infer?", options: ["A storm is coming", "The rain has stopped", "She forgot her keys"], answer: 1, expEn: "Putting away an umbrella and smiling at the sun suggests the rain has ended.", expZh: "收起雨傘並對着陽光微笑，表示雨已經停了。" },
+      { mode: "READING", word: "purpose", zh: "寫作目的", prompt: "A poster says \"Try our new mango puff — first 50 customers get one free!\" The main purpose is to ________.", options: ["warn customers", "advertise a deal", "explain a recipe"], answer: 1, expEn: "The poster is persuading people to come by offering a free promotion.", expZh: "海報以優惠吸引顧客，屬於宣傳推廣。" },
+      { mode: "READING", word: "tone", zh: "語氣", prompt: "\"We regret to inform you that tonight's show is cancelled.\" The tone is ________.", options: ["playful", "formal and apologetic", "excited"], answer: 1, expEn: "\"We regret to inform you\" is polite, formal language used for bad news.", expZh: "「We regret to inform you」是正式而帶歉意的語氣。" },
+      { mode: "PROOFREADING", word: "their", zh: "他們的", prompt: "Choose the correct sentence:", options: ["The guests left there bags by the door.", "The guests left their bags by the door.", "The guests left they're bags by the door."], answer: 1, expEn: "\"Their\" shows possession. \"There\" is a place, and \"they're\" means \"they are\".", expZh: "所有格用「their」；「there」表地方，「they're」等於 they are。" },
+      { mode: "PROOFREADING", word: "too", zh: "太；也", prompt: "Which sentence is correct?", options: ["The tea is to hot to drink.", "The tea is two hot to drink.", "The tea is too hot to drink."], answer: 2, expEn: "\"Too\" means \"more than enough\". \"To\" is a preposition, and \"two\" is the number 2.", expZh: "表示「太」要用「too」。" },
+      { mode: "PROOFREADING", word: "received", zh: "收到（拼寫）", prompt: "Which spelling is correct?", options: ["recieved", "received", "receved"], answer: 1, expEn: "Remember: \"i before e except after c\" — received.", expZh: "這是 received 的正確拼寫（c 後面是 ei）。" },
+      { mode: "VOCAB", word: "collaborate", zh: "合作", prompt: "The two clubs will ________ on a charity concert.", options: ["collaborate", "collapse", "complain"], answer: 0, expEn: "\"Collaborate\" means to work together on a shared project.", expZh: "「collaborate」指一起合作完成工作。" },
+      { mode: "VOCAB", word: "suspicious", zh: "可疑的", prompt: "The detective thought the locked drawer looked ________.", options: ["ordinary", "suspicious", "delicious"], answer: 1, expEn: "\"Suspicious\" means it makes you think something is wrong or hidden.", expZh: "「suspicious」指令人感到可疑的。" },
+      { mode: "VOCAB", word: "enthusiastic", zh: "熱心的；熱情的", prompt: "The crowd was ________ when the band came on stage.", options: ["enthusiastic", "exhausted", "empty"], answer: 0, expEn: "\"Enthusiastic\" means showing excited interest and energy.", expZh: "「enthusiastic」指熱情、興奮投入的。" },
+      { mode: "GRAMMAR", word: "advice", zh: "建議（名詞）", prompt: "Thank you for your useful ________.", options: ["advise", "advice", "advises"], answer: 1, expEn: "\"Advice\" is a noun. \"Advise\" is the verb.", expZh: "「advice」是名詞；動詞才是「advise」。" }
+    ];
+
+    const HKDSE_LEXICON_SEEDS = [
+      ["resilient", "堅韌的", "able to recover quickly from difficulties"],
+      ["meticulous", "一絲不苟的", "very careful about details"],
+      ["alleviate", "減輕", "to make a problem less severe"],
+      ["prosperous", "繁榮的", "successful and thriving"],
+      ["scrutinise", "仔細檢查", "to examine very carefully"],
+      ["harmonious", "和諧的", "peaceful and well balanced"],
+      ["collaborate", "合作", "to work together"],
+      ["suspicious", "可疑的", "making you think something is wrong"],
+      ["enthusiastic", "熱情的", "showing excited interest"],
+      ["perseverance", "毅力", "persistence despite difficulty"],
+      ["pragmatic", "務實的", "dealing with things in a practical way"],
+      ["candid", "坦率的", "truthful and straightforward"],
+      ["embark", "開始；踏上", "to begin a journey or project"],
+      ["fragile", "脆弱的", "easily broken or damaged"],
+      ["hesitant", "猶豫的", "slow to act because of uncertainty"]
+    ];
+
+    const state = {
+      screen: "START",
+      prevScreen: "PLAY",
+      travelerName: "Student",
+      targetRounds: 8,
+      timerSeconds: 14,
+      maxHearts: 3,
+      hearts: 3,
+      currentRound: 1,
+      score: 0,
+      combo: 0,
+      questionPool: [],
+      currentQuestion: null,
+      selectedLane: 1,
+      questionTimeLeft: 14,
+      answerLocked: false,
+      answeredLog: [],
+      phaseTimer: 0
+    };
+
+    function escapeHtml(str) {
+      return String(str == null ? "" : str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatMcqPromptHtml(rawPrompt) {
+      return escapeHtml(rawPrompt)
+        .replace(/_{2,}/g, "<span class='mcq-blank-hl' aria-label='blank'>&nbsp;</span>");
+    }
+
+    function getMuseArt(slot) {
+      try {
+        const pack = window[GAME.musePack] || {};
+        let fromPack = pack[slot] || (pack.slots && pack.slots[slot]) || null;
+        if (typeof fromPack === "string") {
+          const img = new Image();
+          img.src = fromPack;
+          fromPack = img;
+        }
+        if (fromPack && fromPack.naturalWidth > 0) return fromPack;
+        const el = document.querySelector('img[data-muse-slot="' + slot + '"]');
+        if (el && el.complete && el.naturalWidth > 0) return el;
+      } catch (err) {}
+      return null;
+    }
+
+    function buildDictationQuestionsFromWordList(words, dmode, packTitle) {
+      const clean = (words || []).map((w) => String(w || "").trim()).filter(Boolean);
+      if (clean.length === 0) return [];
+      const coreWords = (window.PYW_HKDSE_CORE_WORDS && window.PYW_HKDSE_CORE_WORDS.length > 0)
+        ? window.PYW_HKDSE_CORE_WORDS
+        : HKDSE_LEXICON_SEEDS.map((s) => s[0]);
+      return clean.map((w, idx) => {
+        const poolSource = (dmode === "pool" && clean.length >= 3) ? clean : coreWords;
+        const candidates = poolSource.filter((c) => String(c).toLowerCase() !== w.toLowerCase());
+        const d1 = candidates[(idx * 7 + 3) % Math.max(1, candidates.length)] || "resilient";
+        const d2 = candidates[(idx * 13 + 9) % Math.max(1, candidates.length)] || "meticulous";
+        const opts = [w, d1, d2];
+        const ans = idx % 3;
+        const rotated = [opts[(3 - ans) % 3], opts[(4 - ans) % 3], opts[(5 - ans) % 3]];
+        const correctIdx = rotated.indexOf(w);
+        return {
+          mode: "VOCAB",
+          isDictation: true,
+          word: w,
+          zh: packTitle || "Play Your Way Pack",
+          prompt: "🔊 Listen carefully and choose the matching word:",
+          options: rotated,
+          answer: correctIdx >= 0 ? correctIdx : 0,
+          expEn: "Target vocabulary word: \"" + w + "\".",
+          expZh: "目標詞彙：「" + w + "」。"
+        };
+      });
+    }
+
+    function convertHubMcqQuestions(questions, modeLabel, packTitle) {
+      return (questions || []).map((q) => {
+        const rawExp = String(q.explanation || "");
+        const parts = rawExp.split("||").map((s) => s.trim());
+        const expEn = parts[0] || "Correct answer from your Play Your Way pack.";
+        const expZh = parts[1] || parts[0] || "來自 Play Your Way 題庫的正確答案。";
+        const ansIdx = typeof q.answerIndex === "number" ? q.answerIndex : (typeof q.answer === "number" ? q.answer : 0);
+        const opts = Array.isArray(q.options) && q.options.length >= 3 ? q.options.slice(0, 3) : ["Option A", "Option B", "Option C"];
+        return {
+          mode: String(modeLabel || "VOCAB").toUpperCase(),
+          word: opts[ansIdx] || "",
+          zh: packTitle || "Play Your Way",
+          prompt: q.prompt || "Choose the best answer:",
+          options: opts,
+          answer: ansIdx,
+          expEn,
+          expZh
+        };
+      });
+    }
+
+    function syncFromPlayYourWayHub() {
+      try {
+        const h = window.location.hash || "";
+        if (h.startsWith("#pack=")) {
+          const decoded = JSON.parse(decodeURIComponent(h.slice(6)));
+          if (decoded && decoded.packType === "mcq" && Array.isArray(decoded.q) && decoded.q.length > 0) {
+            hubSyncedPackTitle = decoded.t || "Hub Quiz Pack";
+            customQuestionPool = convertHubMcqQuestions(decoded.q, decoded.m, hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+        }
+        if (h.startsWith("#pool=")) {
+          const decoded = JSON.parse(decodeURIComponent(h.slice(6)));
+          if (decoded && Array.isArray(decoded.w) && decoded.w.length > 0) {
+            hubSyncedPackTitle = decoded.t || "Hub Word Pool";
+            customQuestionPool = buildDictationQuestionsFromWordList(decoded.w, decoded.d || "mix", hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+        }
+        const rawActive = localStorage.getItem(STORAGE_KEY_PYW_ACTIVE);
+        if (rawActive) {
+          const pack = JSON.parse(rawActive);
+          if (pack && pack.packType === "mcq" && Array.isArray(pack.questions) && pack.questions.length > 0) {
+            hubSyncedPackTitle = pack.title || "Play Your Way Pack";
+            customQuestionPool = convertHubMcqQuestions(pack.questions, pack.mode, hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+            return;
+          }
+          if (pack && Array.isArray(pack.words) && pack.words.length > 0) {
+            hubSyncedPackTitle = pack.title || "Play Your Way Words";
+            customQuestionPool = buildDictationQuestionsFromWordList(pack.words, pack.dmode || "mix", hubSyncedPackTitle);
+            selectedBandFilter = "CUSTOM_ONLY";
+            updateWordPoolSummaryLabels();
+          }
+        }
+      } catch (e) {}
+    }
+
+    function buildActiveQuestionPool(countNeeded) {
+      let base = [];
+      if (selectedBandFilter === "CUSTOM_ONLY" && customQuestionPool.length > 0) {
+        base = customQuestionPool.slice();
+      } else {
+        base = customQuestionPool.concat(CURATED_QUESTIONS);
+      }
+      const core = (window.PYW_HKDSE_CORE_WORDS && window.PYW_HKDSE_CORE_WORDS.length > 0)
+        ? window.PYW_HKDSE_CORE_WORDS
+        : HKDSE_LEXICON_SEEDS.map((s) => s[0]);
+      let idx = 0;
+      while (base.length < Math.max(countNeeded, 8) && idx < core.length) {
+        const w = String(core[idx % core.length]);
+        const seed = HKDSE_LEXICON_SEEDS.find((s) => s[0].toLowerCase() === w.toLowerCase());
+        const zh = seed ? seed[1] : "核心詞彙";
+        const def = seed ? seed[2] : "a useful English word";
+        const d1 = core[(idx + 7) % core.length] || "fragile";
+        const d2 = core[(idx + 13) % core.length] || "casual";
+        const opts = [w, d1, d2];
+        const ans = idx % 3;
+        const rotated = [opts[(3 - ans) % 3], opts[(4 - ans) % 3], opts[(5 - ans) % 3]];
+        const correctIdx = rotated.indexOf(w);
+        base.push({
+          mode: "VOCAB",
+          word: w,
+          zh,
+          prompt: "Which word means \"" + def + "\"?",
+          options: rotated,
+          answer: correctIdx >= 0 ? correctIdx : 0,
+          expEn: "\"" + w + "\" (" + zh + ") means " + def + ".",
+          expZh: "「" + w + "」解作「" + zh + "」。"
+        });
+        idx++;
+      }
+      const shuffled = base.slice();
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = shuffled[i];
+        shuffled[i] = shuffled[j];
+        shuffled[j] = tmp;
+      }
+      return shuffled.slice(0, countNeeded);
+    }
+
+    function ensureAudioCtx() {
+      if (audioCtx) return audioCtx;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+      return audioCtx;
+    }
+
+    function playSynthSfx(type) {
+      if (isMuted) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      if (ctx.state === "suspended") ctx.resume();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const theme = GAME.sfxTheme || "soft";
+      let freq = 440, dur = 0.12, wave = "sine";
+      if (type === "correct" || type === "serve" || type === "perfect") {
+        freq = theme === "neon" ? 880 : (theme === "noir" ? 392 : 659);
+        dur = 0.22;
+        wave = "triangle";
+      } else if (type === "wrong" || type === "miss") {
+        freq = 160;
+        dur = 0.28;
+        wave = "sawtooth";
+      } else if (type === "tap" || type === "step") {
+        freq = theme === "neon" ? 720 : 520;
+        dur = 0.07;
+      } else if (type === "combo" || type === "clue") {
+        freq = 784;
+        dur = 0.3;
+        wave = "square";
+      } else if (type === "fanfare") {
+        freq = 523;
+        dur = 0.45;
+        wave = "triangle";
+      }
+      osc.type = wave;
+      osc.frequency.setValueAtTime(freq, now);
+      if (type === "correct" || type === "fanfare" || type === "perfect") {
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + dur);
+      }
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.start(now);
+      osc.stop(now + dur + 0.02);
+    }
+
+    function speakText(text) {
+      if (isMuted || !("speechSynthesis" in window) || !text) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(text));
+      const langMap = { UK: "en-GB", US: "en-US", AU: "en-AU" };
+      u.lang = langMap[currentAccent] || "en-GB";
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }
+
+    function updateWordPoolSummaryLabels() {
+      const summary = document.getElementById("start-pool-summary");
+      if (!summary) return;
+      if (customQuestionPool.length > 0) {
+        summary.textContent = hubSyncedPackTitle
+          ? (hubSyncedPackTitle + " (" + customQuestionPool.length + " items synced from Play Your Way Hub)")
+          : ("Custom pack (" + customQuestionPool.length + " items)");
+      } else {
+        summary.textContent = "HKDSE practice bank + 3,500-word dictionary (Vocab · Grammar · Reading · Proofreading)";
+      }
+    }
+
+    function autoFitOptionText(el, text) {
+      if (!el) return;
+      const len = String(text || "").length;
+      el.style.fontSize = len > 42 ? "0.72rem" : (len > 24 ? "0.82rem" : "0.95rem");
+    }
+
+    function highlightSelectedLane() {
+      for (let i = 0; i < 3; i++) {
+        const card = document.getElementById("opt-card-" + i);
+        if (card) card.classList.toggle("selected", i === state.selectedLane);
+      }
+    }
+
+    function presentQuestionToHud() {
+      const q = state.currentQuestion;
+      if (!q) return;
+      const badge = document.getElementById("q-mode-badge");
+      const prompt = document.getElementById("q-prompt-text");
+      const sub = document.getElementById("q-prompt-sub");
+      if (badge) badge.textContent = q.mode || "VOCAB";
+      if (prompt) prompt.innerHTML = formatMcqPromptHtml(q.prompt);
+      if (sub) sub.textContent = GAME.roundLabel + " " + state.currentRound + " of " + state.targetRounds;
+      for (let i = 0; i < 3; i++) {
+        const el = document.getElementById("opt-text-" + i);
+        const text = q.options[i] || ("Option " + LANE_LETTERS[i]);
+        if (el) {
+          el.textContent = text;
+          autoFitOptionText(el, text);
+        }
+      }
+      highlightSelectedLane();
+      if (q.isDictation && q.word) setTimeout(() => speakText(q.word), 160);
+      const timerEl = document.getElementById("q-timer-display");
+      if (timerEl) timerEl.textContent = state.timerSeconds > 0 ? (Math.ceil(state.questionTimeLeft) + "s") : "∞";
+    }
+
+    function updateHudReadouts() {
+      const nameEl = document.getElementById("hud-player-name");
+      const roundEl = document.getElementById("hud-round-val");
+      const scoreEl = document.getElementById("hud-score-val");
+      const heartEl = document.getElementById("hud-hearts-row");
+      const comboEl = document.getElementById("hud-combo-val");
+      if (nameEl) nameEl.textContent = state.travelerName;
+      if (roundEl) roundEl.textContent = state.currentRound + " / " + state.targetRounds;
+      if (scoreEl) scoreEl.textContent = String(state.score);
+      if (heartEl) heartEl.textContent = (GAME.heartIcon || "❤").repeat(Math.max(0, state.hearts)) || "—";
+      if (comboEl) comboEl.textContent = state.combo > 1 ? (state.combo + "x") : "—";
+    }
+
+    function showToast(title, sub, kind) {
+      const box = document.getElementById("toast-corner");
+      if (!box) return;
+      const el = document.createElement("div");
+      el.className = "corner-toast " + (kind || "good");
+      el.innerHTML = "<div class='corner-toast-title'>" + escapeHtml(title) + "</div><div class='corner-toast-sub'>" + escapeHtml(sub || "") + "</div>";
+      box.appendChild(el);
+      while (box.children.length > 2) box.removeChild(box.firstChild);
+      setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3200);
+    }
+
+    function startNewRun() {
+      ensureAudioCtx();
+      const nameInput = document.getElementById("input-player-name");
+      state.travelerName = ((nameInput && nameInput.value) || GAME.defaultName || "Student").trim() || "Student";
+      const customRounds = parseInt((document.getElementById("input-custom-rounds") || {}).value, 10);
+      if (!isNaN(customRounds) && customRounds >= 1 && customRounds <= 99) state.targetRounds = customRounds;
+      state.questionPool = buildActiveQuestionPool(state.targetRounds);
+      state.currentRound = 1;
+      state.score = 0;
+      state.combo = 0;
+      state.hearts = state.maxHearts;
+      state.answeredLog = [];
+      state.answerLocked = false;
+      state.selectedLane = 1;
+      document.getElementById("start-menu-overlay").classList.add("hidden");
+      const tavern = document.getElementById("setup-modal");
+      if (tavern) tavern.classList.add("hidden");
+      document.getElementById("pause-modal").classList.add("hidden");
+      document.getElementById("end-modal").classList.add("hidden");
+      document.getElementById("hud-layer").classList.remove("hidden");
+      updateHudReadouts();
+      if (typeof GAME.onRunStart === "function") GAME.onRunStart();
+      beginCurrentRound();
+    }
+
+    function beginCurrentRound() {
+      const qIdx = (state.currentRound - 1) % Math.max(1, state.questionPool.length);
+      state.currentQuestion = state.questionPool[qIdx];
+      state.answerLocked = false;
+      state.questionTimeLeft = state.timerSeconds > 0 ? state.timerSeconds : 999;
+      state.screen = "PLAY";
+      presentQuestionToHud();
+      updateHudReadouts();
+      const qWrap = document.getElementById("question-hud-wrap");
+      if (qWrap) qWrap.classList.remove("hidden-phase");
+      if (typeof GAME.onRoundStart === "function") GAME.onRoundStart(state.currentQuestion);
+    }
+
+    function resolveChoice(chosenLane, meta) {
+      const q = state.currentQuestion;
+      if (!q || state.answerLocked || state.screen !== "PLAY") return;
+      state.answerLocked = true;
+      meta = meta || {};
+      const timedOut = !!meta.timedOut || chosenLane < 0;
+      const isCorrect = !timedOut && chosenLane === q.answer;
+      const chosenText = timedOut ? "(time up)" : (q.options[chosenLane] || "");
+      const correctText = q.options[q.answer] || "";
+      state.answeredLog.push({
+        prompt: q.prompt,
+        mode: q.mode,
+        chosenLane: timedOut ? -1 : chosenLane,
+        chosenText,
+        correctLane: q.answer,
+        correctText,
+        isCorrect,
+        expEn: q.expEn,
+        expZh: q.expZh,
+        grade: meta.grade || (isCorrect ? "Good" : "Miss")
+      });
+      if (isCorrect) {
+        const gradeBonus = meta.grade === "Perfect" ? 160 : 100;
+        const comboBonus = Math.min(80, state.combo * 10);
+        state.combo += 1;
+        state.score += gradeBonus + comboBonus;
+        playSynthSfx(meta.grade === "Perfect" ? "perfect" : "correct");
+        if (q.word) speakText(q.word);
+        showToast((GAME.correctToast || "Correct!") + " +" + (gradeBonus + comboBonus), (correctText + " — " + (q.expZh || "")), "good");
+      } else {
+        state.combo = 0;
+        state.hearts = Math.max(0, state.hearts - 1);
+        playSynthSfx("wrong");
+        const failTitle = timedOut ? (GAME.timeoutToast || "Time up!") : (GAME.wrongToast || "Not quite!");
+        showToast(failTitle, "Answer: [" + LANE_LETTERS[q.answer] + "] " + correctText, "bad");
+      }
+      updateHudReadouts();
+      if (typeof GAME.onResolved === "function") GAME.onResolved(isCorrect, meta);
+
+      const delay = GAME.resolveDelayMs || 900;
+      setTimeout(() => {
+        if (state.hearts <= 0) {
+          finishRun(false);
+        } else if (state.currentRound >= state.targetRounds) {
+          finishRun(true);
+        } else {
+          state.currentRound += 1;
+          beginCurrentRound();
+        }
+      }, delay);
+    }
+
+    function finishRun(isWin) {
+      state.screen = "END";
+      if (isWin) playSynthSfx("fanfare");
+      document.getElementById("hud-layer").classList.add("hidden");
+      document.getElementById("pause-modal").classList.add("hidden");
+      const endModal = document.getElementById("end-modal");
+      endModal.classList.remove("hidden");
+      const total = state.answeredLog.length;
+      const correctCount = state.answeredLog.filter((a) => a.isCorrect).length;
+      const acc = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+      const emojiEl = document.getElementById("end-emoji-icon");
+      const kickerEl = document.getElementById("end-kicker-line");
+      const titleEl = document.getElementById("end-title-line");
+      if (emojiEl) emojiEl.textContent = isWin ? (GAME.winEmoji || "🏆") : (GAME.loseEmoji || "💨");
+      if (kickerEl) kickerEl.textContent = isWin ? (GAME.winKicker || "COMPLETE") : (GAME.loseKicker || "TRY AGAIN");
+      if (titleEl) titleEl.textContent = isWin ? (GAME.winTitle || "You did it!") : (GAME.loseTitle || "So close!");
+      document.getElementById("end-score-val").textContent = state.score + " PTS";
+      document.getElementById("end-acc-val").textContent = acc + "%";
+      document.getElementById("end-rounds-val").textContent = correctCount + " / " + state.targetRounds;
+      document.getElementById("end-hearts-val").textContent = String(state.hearts);
+      renderReviewCards("ALL");
+      saveScoreboard(isWin, acc);
+      if (typeof GAME.onFinish === "function") GAME.onFinish(isWin, acc);
+    }
+
+    function renderReviewCards(filterType) {
+      const container = document.getElementById("end-review-list");
+      if (!container) return;
+      const items = filterType === "MISSED" ? state.answeredLog.filter((item) => !item.isCorrect) : state.answeredLog;
+      container.innerHTML = "";
+      if (items.length === 0) {
+        container.innerHTML = "<div class='empty-review'>No " + (filterType === "MISSED" ? "missed" : "answered") + " items in this run.</div>";
+        return;
+      }
+      items.forEach((item, idx) => {
+        const card = document.createElement("div");
+        card.className = "review-card" + (item.isCorrect ? "" : " missed");
+        card.innerHTML =
+          "<div class='review-q-line'>" + (idx + 1) + ". [" + escapeHtml(item.mode) + "] " + escapeHtml(item.prompt) + "</div>" +
+          "<div class='review-ans-badges'>" +
+            "<span class='ans-pill-correct'>✓ Correct [" + LANE_LETTERS[item.correctLane] + "]: " + escapeHtml(item.correctText) + "</span>" +
+            (!item.isCorrect ? "<span class='ans-pill-wrong'>✗ Yours: " + escapeHtml(item.chosenText) + "</span>" : "") +
+            (item.grade ? "<span class='ans-pill-grade'>" + escapeHtml(item.grade) + "</span>" : "") +
+          "</div>" +
+          "<div class='review-explanation-full'><div><strong>EN:</strong> " + escapeHtml(item.expEn || "") + "</div>" +
+          "<div class='review-zh'><strong>繁中:</strong> " + escapeHtml(item.expZh || "") + "</div></div>" +
+          "<div class='review-audio-row'><button type='button' class='hud-btn' data-speak='" + encodeURIComponent(item.correctText) + "'>🔊 Correct (" + escapeHtml(item.correctText) + ")</button></div>";
+        container.appendChild(card);
+      });
+      container.querySelectorAll("[data-speak]").forEach((btn) => {
+        btn.addEventListener("click", () => speakText(decodeURIComponent(btn.getAttribute("data-speak") || "")));
+      });
+    }
+
+    function saveScoreboard(isWin, acc) {
+      const key = GAME.scoreKey;
+      let board = [];
+      try {
+        const saved = localStorage.getItem(key);
+        if (saved) board = JSON.parse(saved) || [];
+      } catch (e) {}
+      board.push({ name: state.travelerName, pts: state.score, status: isWin ? (acc + "%") : "Retry", when: Date.now() });
+      board.sort((a, b) => b.pts - a.pts);
+      board = board.slice(0, 8);
+      try { localStorage.setItem(key, JSON.stringify(board)); } catch (e) {}
+      const listEl = document.getElementById("end-standings-list");
+      if (!listEl) return;
+      listEl.innerHTML = board.map((row, idx) =>
+        "<div class='standing-row" + (row.name === state.travelerName && row.pts === state.score ? " current-run" : "") + "'>" +
+        "<span class='standing-rank'>#" + (idx + 1) + "</span>" +
+        "<span class='standing-name'>" + escapeHtml(row.name) + " (" + escapeHtml(row.status) + ")</span>" +
+        "<span class='pts-pill'>" + row.pts + " PTS</span></div>"
+      ).join("");
+    }
+
+    function returnToStartMenu() {
+      state.screen = "START";
+      document.getElementById("hud-layer").classList.add("hidden");
+      document.getElementById("pause-modal").classList.add("hidden");
+      document.getElementById("end-modal").classList.add("hidden");
+      const setup = document.getElementById("setup-modal");
+      if (setup) setup.classList.add("hidden");
+      document.getElementById("start-menu-overlay").classList.remove("hidden");
+    }
+
+    function togglePauseModal() {
+      const pauseModal = document.getElementById("pause-modal");
+      if (state.screen === "PLAY") {
+        state.prevScreen = "PLAY";
+        state.screen = "PAUSED";
+        pauseModal.classList.remove("hidden");
+      } else if (state.screen === "PAUSED") {
+        state.screen = "PLAY";
+        pauseModal.classList.add("hidden");
+      }
+    }
+
+    function parseCustomWordsInput() {
+      const raw = (document.getElementById("textarea-custom-words").value || "").trim();
+      const statusEl = document.getElementById("builder-status-msg");
+      if (!raw) {
+        if (statusEl) statusEl.textContent = "Please type or paste words first.";
+        return;
+      }
+      let lines = raw.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+      if (lines.length === 1 && lines[0].indexOf("|") < 0 && lines[0].indexOf(",") >= 0) {
+        lines = lines[0].split(",").map((l) => l.trim()).filter(Boolean);
+      }
+      const words = lines.map((line) => line.split("|")[0].trim()).filter(Boolean);
+      customQuestionPool = customQuestionPool.concat(buildDictationQuestionsFromWordList(words, "mix", "Custom list"));
+      updateWordPoolSummaryLabels();
+      if (statusEl) statusEl.textContent = "Added " + words.length + " custom items. Total custom pool: " + customQuestionPool.length + ".";
+    }
+
+    function compressPhotoFileToDataUrl(file, maxDim, quality) {
+      maxDim = maxDim || 1100;
+      quality = quality == null ? 0.82 : quality;
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Could not read image"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error("Invalid image"));
+          img.onload = () => {
+            let w = img.width || 800, h = img.height || 600;
+            if (w > maxDim || h > maxDim) {
+              const scale = maxDim / Math.max(w, h);
+              w = Math.round(w * scale);
+              h = Math.round(h * scale);
+            }
+            const cv = document.createElement("canvas");
+            cv.width = w;
+            cv.height = h;
+            cv.getContext("2d").drawImage(img, 0, 0, w, h);
+            resolve(cv.toDataURL("image/jpeg", quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function extractVocabularyFromSource(sourceText, imageDataUrl) {
+      const statusEl = document.getElementById("builder-status-msg");
+      if (statusEl) statusEl.textContent = imageDataUrl ? "✨ Scanning worksheet photo..." : "✨ Extracting vocabulary...";
+      try {
+        const body = imageDataUrl ? { mode: "vocab", imageDataUrl } : { mode: "vocab", prompt: sourceText };
+        const resp = await fetch(DEFAULT_PYW_WORKER_URL + "/api/extract", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          const list = (data && (data.words || data.items)) || [];
+          if (Array.isArray(list) && list.length > 0) {
+            const formatted = list.map((w) => (typeof w === "string" ? w : (w.word || ""))).filter(Boolean).join("\n");
+            document.getElementById("textarea-custom-words").value = formatted;
+            parseCustomWordsInput();
+            return;
+          }
+        }
+      } catch (err) {}
+      if (imageDataUrl) {
+        if (statusEl) statusEl.textContent = "⚠️ Photo scan is unavailable right now. Type or paste the words below.";
+        return;
+      }
+      const tokens = String(sourceText || "").match(/[A-Za-z]{5,}/g) || ["resilient", "meticulous", "prosperous"];
+      const unique = [...new Set(tokens.map((t) => t.toLowerCase()))].slice(0, 8);
+      document.getElementById("textarea-custom-words").value = unique.join("\n");
+      parseCustomWordsInput();
+    }
+
+    function bindShellEvents() {
+      const goHub = () => { window.location.href = "../index.html"; };
+      ["btn-back-to-pyw-hub", "btn-end-pyw-hub"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("click", goHub);
+      });
+      const openBuilder = () => document.getElementById("word-builder-modal").classList.remove("hidden");
+      const b1 = document.getElementById("btn-open-word-builder");
+      const b2 = document.getElementById("btn-setup-word-pool");
+      if (b1) b1.addEventListener("click", openBuilder);
+      if (b2) b2.addEventListener("click", openBuilder);
+      document.getElementById("btn-close-word-builder").addEventListener("click", () => {
+        document.getElementById("word-builder-modal").classList.add("hidden");
+      });
+      const openSetup = () => {
+        ensureAudioCtx();
+        state.screen = "SETUP";
+        document.getElementById("setup-modal").classList.remove("hidden");
+      };
+      const playBtn = document.getElementById("btn-open-setup");
+      if (playBtn) playBtn.addEventListener("click", openSetup);
+      document.getElementById("btn-setup-back").addEventListener("click", returnToStartMenu);
+      document.getElementById("btn-launch-run").addEventListener("click", startNewRun);
+
+      document.querySelectorAll("#setup-rounds-pills .choice-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#setup-rounds-pills .choice-pill").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById("input-custom-rounds").value = "";
+          const raw = btn.getAttribute("data-rounds");
+          state.targetRounds = raw === "ALL" ? Math.max(CURATED_QUESTIONS.length, customQuestionPool.length || 8) : (parseInt(raw, 10) || 8);
+        });
+      });
+      document.querySelectorAll("#setup-timer-pills .choice-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#setup-timer-pills .choice-pill").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.timerSeconds = parseInt(btn.getAttribute("data-timer"), 10) || 0;
+        });
+      });
+      document.querySelectorAll("#setup-hearts-pills .choice-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#setup-hearts-pills .choice-pill").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.maxHearts = parseInt(btn.getAttribute("data-hearts"), 10) || 3;
+        });
+      });
+      document.querySelectorAll("#setup-accent-pills .choice-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currentAccent = btn.getAttribute("data-accent") || "UK";
+          document.querySelectorAll("#setup-accent-pills .choice-pill").forEach((b) => b.classList.toggle("active", b === btn));
+          const hudAcc = document.getElementById("btn-hud-accent");
+          if (hudAcc) hudAcc.textContent = "🗣️ " + currentAccent;
+        });
+      });
+
+      document.getElementById("btn-hud-accent").addEventListener("click", () => {
+        const order = ["UK", "US", "AU"];
+        currentAccent = order[(order.indexOf(currentAccent) + 1) % order.length];
+        document.getElementById("btn-hud-accent").textContent = "🗣️ " + currentAccent;
+      });
+      document.getElementById("btn-hud-mute").addEventListener("click", (e) => {
+        isMuted = !isMuted;
+        e.currentTarget.textContent = isMuted ? "🔇" : "🔊";
+        if (isMuted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+      });
+      document.getElementById("btn-hud-pause").addEventListener("click", togglePauseModal);
+      document.getElementById("btn-resume").addEventListener("click", togglePauseModal);
+      document.getElementById("btn-pause-restart").addEventListener("click", startNewRun);
+      document.getElementById("btn-pause-setup").addEventListener("click", () => {
+        document.getElementById("pause-modal").classList.add("hidden");
+        document.getElementById("hud-layer").classList.add("hidden");
+        state.screen = "SETUP";
+        document.getElementById("setup-modal").classList.remove("hidden");
+      });
+      document.getElementById("btn-pause-menu").addEventListener("click", returnToStartMenu);
+      document.getElementById("btn-end-again").addEventListener("click", startNewRun);
+      document.getElementById("btn-end-menu").addEventListener("click", returnToStartMenu);
+
+      document.getElementById("btn-q-speak").addEventListener("click", () => {
+        if (!state.currentQuestion) return;
+        if (state.currentQuestion.isDictation && state.currentQuestion.word) speakText(state.currentQuestion.word);
+        else speakText(String(state.currentQuestion.prompt || "").replace(/_{2,}/g, " blank "));
+      });
+
+      for (let i = 0; i < 3; i++) {
+        const card = document.getElementById("opt-card-" + i);
+        if (!card) continue;
+        card.addEventListener("click", () => {
+          if (state.screen !== "PLAY" || state.answerLocked) return;
+          state.selectedLane = i;
+          highlightSelectedLane();
+          if (state.currentQuestion) speakText(state.currentQuestion.options[i]);
+          if (typeof GAME.onOptionTap === "function") GAME.onOptionTap(i);
+        });
+      }
+
+      document.getElementById("btn-parse-custom-words").addEventListener("click", parseCustomWordsInput);
+      document.getElementById("btn-clear-custom-words").addEventListener("click", () => {
+        customQuestionPool = [];
+        hubSyncedPackTitle = "";
+        selectedBandFilter = "CORE_ALL";
+        document.getElementById("textarea-custom-words").value = "";
+        updateWordPoolSummaryLabels();
+        document.getElementById("builder-status-msg").textContent = "Cleared custom word list.";
+      });
+      document.getElementById("btn-ai-generate").addEventListener("click", () => {
+        const raw = document.getElementById("textarea-custom-words").value.trim() || "resilient meticulous alleviate prosperous embark";
+        extractVocabularyFromSource(raw);
+      });
+      document.getElementById("input-photo-upload").addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file) return;
+        if (file.type && file.type.indexOf("image/") === 0) {
+          try {
+            const imageDataUrl = await compressPhotoFileToDataUrl(file);
+            await extractVocabularyFromSource("", imageDataUrl);
+          } catch (err) {
+            document.getElementById("builder-status-msg").textContent = "Could not read that photo. Try another image, or type the words.";
+          }
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => extractVocabularyFromSource(String(reader.result || ""));
+        reader.readAsText(file);
+      });
+
+      document.querySelectorAll("#review-filter-pills .choice-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#review-filter-pills .choice-pill").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderReviewCards(btn.getAttribute("data-filter") || "ALL");
+        });
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement && document.activeElement.tagName)) return;
+        const key = e.key.toLowerCase();
+        if (key === "escape") togglePauseModal();
+        if (state.screen !== "PLAY" || state.answerLocked) return;
+        if (key === "1" || key === "2" || key === "3") {
+          const lane = parseInt(key, 10) - 1;
+          state.selectedLane = lane;
+          highlightSelectedLane();
+          if (typeof GAME.onOptionTap === "function") GAME.onOptionTap(lane);
+        } else if (typeof GAME.onKey === "function") {
+          GAME.onKey(e, key);
+        }
+      });
+    }
+
+    window.addEventListener("load", () => {
+      bindShellEvents();
+      syncFromPlayYourWayHub();
+      updateWordPoolSummaryLabels();
+      if (typeof GAME.onReady === "function") GAME.onReady();
+    });
+
+    function tickQuestionTimer(dt) {
+      if (state.screen !== "PLAY" || state.answerLocked || state.timerSeconds <= 0) return;
+      if (GAME.holdQuestionTimer) return;
+      state.questionTimeLeft -= dt;
+      const timerEl = document.getElementById("q-timer-display");
+      if (timerEl) timerEl.textContent = Math.max(0, Math.ceil(state.questionTimeLeft)) + "s";
+      if (state.questionTimeLeft <= 0) resolveChoice(-1, { timedOut: true });
+    }
+
+    /*************************************************************************
+     * STAGE LIGHTS: ON THE BEAT — concert rhythm / cue-card game
+     * MUSE ART HOOKS: set window.PYW_STAGE_LIGHTS_ART = {
+     *   backdrop, performer, crowd, note
+     * }
+     * or <img hidden data-muse-slot="backdrop" src="...">.
+     * Procedural neon concert art is used until those images exist.
+     *************************************************************************/
+    const GAME = {
+      musePack: "PYW_STAGE_LIGHTS_ART",
+      sfxTheme: "neon",
+      scoreKey: "pyw_stage_lights_scores",
+      defaultName: "Nova",
+      heartIcon: "🎙",
+      roundLabel: "Track",
+      correctToast: "On the beat!",
+      wrongToast: "Off-beat!",
+      timeoutToast: "Missed the cue!",
+      winEmoji: "🎤",
+      loseEmoji: "🌑",
+      winKicker: "ENCORE",
+      loseKicker: "CROWD GONE QUIET",
+      winTitle: "The setlist is complete. Lights out — beautifully.",
+      loseTitle: "The house lights came up early. One more rehearsal?",
+      resolveDelayMs: 700,
+      holdQuestionTimer: false
+    };
+
+    const stage = {
+      canvas: null, ctx: null, last: 0,
+      phase: "idle", // read | hit | result
+      noteY: 0,
+      noteSpeed: 0,
+      strikeY: 0,
+      sparks: [],
+      beat: 0,
+      armed: false
+    };
+
+    function resizeStage() {
+      if (!stage.canvas) return;
+      stage.canvas.width = window.innerWidth;
+      stage.canvas.height = window.innerHeight;
+      stage.strikeY = stage.canvas.height * 0.78;
+    }
+
+    function drawPerformer(ctx, w, h, t) {
+      const muse = getMuseArt("performer");
+      const x = w * 0.5, y = h * 0.42;
+      if (muse) { ctx.drawImage(muse, x - 70, y - 160, 140, 200); return; }
+      const bounce = Math.sin(t * 0.01) * 6;
+      ctx.save();
+      ctx.translate(x, y + bounce);
+      // spotlight cone already elsewhere
+      ctx.fillStyle = "#0f0320";
+      ctx.beginPath(); ctx.ellipse(0, 70, 28, 8, 0, 0, Math.PI * 2); ctx.fill();
+      // mic stand
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(22, 20); ctx.lineTo(28, 80); ctx.stroke();
+      ctx.fillStyle = "#f8fafc";
+      ctx.beginPath(); ctx.arc(20, 16, 7, 0, Math.PI * 2); ctx.fill();
+      // body
+      ctx.fillStyle = "#f472b6";
+      ctx.beginPath(); ctx.roundRect(-22, -10, 44, 70, 16); ctx.fill();
+      ctx.fillStyle = "#22d3ee";
+      ctx.fillRect(-22, 18, 44, 8);
+      // head
+      ctx.fillStyle = "#f8c4a8";
+      ctx.beginPath(); ctx.arc(0, -32, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath(); ctx.arc(-6, -34, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(6, -34, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#4c1d95";
+      ctx.beginPath(); ctx.ellipse(0, -44, 20, 12, 0, Math.PI, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(-18, -28, 6, 14, -0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(18, -28, 6, 14, 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawVenue(ctx, w, h, now) {
+      const muse = getMuseArt("backdrop");
+      if (muse) ctx.drawImage(muse, 0, 0, w, h);
+      else {
+        const bg = ctx.createLinearGradient(0, 0, 0, h);
+        bg.addColorStop(0, "#08010f");
+        bg.addColorStop(0.45, "#1e1050");
+        bg.addColorStop(1, "#0b1220");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+        // neon arch
+        ctx.strokeStyle = "#f0abfc";
+        ctx.shadowColor = "#e879f9";
+        ctx.shadowBlur = 18;
+        ctx.lineWidth = 8;
+        ctx.beginPath(); ctx.arc(w / 2, h * 0.42, Math.min(w, h) * 0.28, Math.PI, Math.PI * 2); ctx.stroke();
+        ctx.shadowBlur = 0;
+        // speakers
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(w * 0.08, h * 0.28, 54, 120);
+        ctx.fillRect(w * 0.92 - 54, h * 0.28, 54, 120);
+        ctx.fillStyle = "#22d3ee";
+        ctx.beginPath(); ctx.arc(w * 0.08 + 27, h * 0.36, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(w * 0.92 - 27, h * 0.36, 14, 0, Math.PI * 2); ctx.fill();
+      }
+      // spotlights
+      const pulse = 0.18 + Math.sin(now * 0.006) * 0.06;
+      [[w * 0.3, "#22d3ee"], [w * 0.5, "#f472b6"], [w * 0.7, "#a3e635"]].forEach((sp) => {
+        const g = ctx.createLinearGradient(sp[0], 0, sp[0], h * 0.7);
+        g.addColorStop(0, "rgba(255,255,255,0.0)");
+        g.addColorStop(0.15, sp[1] + "33");
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(sp[0] - 30, 0);
+        ctx.lineTo(sp[0] + 30, 0);
+        ctx.lineTo(sp[0] + 90, h * 0.7);
+        ctx.lineTo(sp[0] - 90, h * 0.7);
+        ctx.closePath();
+        ctx.globalAlpha = 0.55 + pulse;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+      drawPerformer(ctx, w, h, now);
+      // crowd
+      const museCrowd = getMuseArt("crowd");
+      if (museCrowd) ctx.drawImage(museCrowd, 0, h * 0.82, w, h * 0.18);
+      else {
+        for (let i = 0; i < 18; i++) {
+          const cx = (i + 0.5) * (w / 18);
+          const bob = Math.sin(now * 0.008 + i) * 8;
+          ctx.fillStyle = i % 3 === 0 ? "#1e1b4b" : (i % 3 === 1 ? "#4a044e" : "#164e63");
+          ctx.beginPath(); ctx.arc(cx, h * 0.92 + bob, 16, 0, Math.PI * 2); ctx.fill();
+          ctx.fillRect(cx - 14, h * 0.92 + bob, 28, 40);
+        }
+      }
+    }
+
+    function laneLayout(w, h) {
+      const hw = Math.min(520, w * 0.72);
+      const left = (w - hw) / 2;
+      const laneW = hw / 3;
+      return { left, laneW, hw, top: h * 0.48, bottom: h * 0.84 };
+    }
+
+    function drawHighway(ctx, w, h, now) {
+      const L = laneLayout(w, h);
+      ctx.fillStyle = "rgba(2,6,23,0.72)";
+      ctx.fillRect(L.left - 12, L.top - 8, L.hw + 24, L.bottom - L.top + 20);
+      ctx.strokeStyle = "#22d3ee";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(L.left - 12, L.top - 8, L.hw + 24, L.bottom - L.top + 20);
+      const colors = ["#22d3ee", "#f472b6", "#a3e635"];
+      for (let i = 0; i < 3; i++) {
+        const x = L.left + i * L.laneW;
+        ctx.fillStyle = "rgba(255,255,255,0.04)";
+        ctx.fillRect(x + 4, L.top, L.laneW - 8, L.bottom - L.top);
+        ctx.strokeStyle = colors[i];
+        ctx.globalAlpha = 0.5;
+        ctx.strokeRect(x + 4, L.top, L.laneW - 8, L.bottom - L.top);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = colors[i];
+        ctx.font = "800 16px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(LANE_LETTERS[i], x + L.laneW / 2, L.bottom + 18);
+      }
+      // strike line
+      ctx.strokeStyle = "#f8fafc";
+      ctx.shadowColor = "#fff";
+      ctx.shadowBlur = 12;
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(L.left, stage.strikeY); ctx.lineTo(L.left + L.hw, stage.strikeY); ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      if (stage.phase === "hit" && state.currentQuestion) {
+        const ans = state.currentQuestion.answer;
+        const museNote = getMuseArt("note");
+        const x = L.left + ans * L.laneW + L.laneW / 2;
+        const y = stage.noteY;
+        if (museNote) ctx.drawImage(museNote, x - 28, y - 28, 56, 56);
+        else {
+          ctx.fillStyle = colors[ans];
+          ctx.shadowColor = colors[ans];
+          ctx.shadowBlur = 16;
+          ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = "#0f172a";
+          ctx.shadowBlur = 0;
+          ctx.font = "800 16px Orbitron, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(LANE_LETTERS[ans], x, y + 1);
+        }
+        // dim decoy pulses on other lanes (not hittable targets)
+        for (let i = 0; i < 3; i++) {
+          if (i === ans) continue;
+          const dx = L.left + i * L.laneW + L.laneW / 2;
+          ctx.fillStyle = "rgba(148,163,184,0.18)";
+          ctx.beginPath(); ctx.arc(dx, y + 18, 10, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (stage.phase === "read") {
+        ctx.fillStyle = "#f0abfc";
+        ctx.font = "800 18px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("GET READY", w / 2, (L.top + stage.strikeY) / 2);
+      }
+
+      stage.sparks.forEach((s) => {
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = Math.max(0, s.life);
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    function spawnHitSparks(lane, color) {
+      const L = laneLayout(stage.canvas.width, stage.canvas.height);
+      const x = L.left + lane * L.laneW + L.laneW / 2;
+      for (let i = 0; i < 16; i++) {
+        stage.sparks.push({ x, y: stage.strikeY, vx: (Math.random() - 0.5) * 220, vy: -80 - Math.random() * 160, r: 2 + Math.random() * 3, color, life: 0.6 });
+      }
+    }
+
+    function beginHitPhase() {
+      GAME.holdQuestionTimer = true;
+      stage.phase = "hit";
+      const h = stage.canvas.height;
+      const L = laneLayout(stage.canvas.width, h);
+      stage.noteY = L.top + 10;
+      const travel = Math.max(0.9, Math.min(1.8, 1.45));
+      stage.noteSpeed = (stage.strikeY - stage.noteY) / travel;
+      stage.armed = true;
+    }
+
+    function attemptHit(lane) {
+      if (state.screen !== "PLAY" || state.answerLocked) return;
+      if (stage.phase === "read") {
+        state.selectedLane = lane;
+        highlightSelectedLane();
+        playSynthSfx("tap");
+        return;
+      }
+      if (stage.phase !== "hit" || !stage.armed) return;
+      const dist = Math.abs(stage.noteY - stage.strikeY);
+      let grade = "Miss";
+      if (dist <= 18) grade = "Perfect";
+      else if (dist <= 42) grade = "Good";
+      const okLane = state.currentQuestion && lane === state.currentQuestion.answer;
+      if (!okLane || grade === "Miss") {
+        spawnHitSparks(lane, "#fb7185");
+        resolveChoice(okLane ? lane : lane, { grade: "Miss", timedOut: !okLane && false });
+        // wrong lane should be incorrect even if timed well
+        if (!okLane) {
+          // resolveChoice already uses chosenLane === answer
+        }
+        stage.armed = false;
+        stage.phase = "result";
+        return;
+      }
+      spawnHitSparks(lane, grade === "Perfect" ? "#a3e635" : "#22d3ee");
+      playSynthSfx(grade === "Perfect" ? "perfect" : "correct");
+      resolveChoice(lane, { grade });
+      stage.armed = false;
+      stage.phase = "result";
+    }
+
+    GAME.onReady = function () {
+      state.timerSeconds = 8;
+      stage.canvas = document.getElementById("game-canvas");
+      stage.ctx = stage.canvas.getContext("2d");
+      resizeStage();
+      window.addEventListener("resize", resizeStage);
+      document.querySelectorAll("[data-lane-hit]").forEach((btn) => {
+        btn.addEventListener("click", () => attemptHit(parseInt(btn.getAttribute("data-lane-hit"), 10)));
+      });
+      stage.canvas.addEventListener("pointerdown", (e) => {
+        if (state.screen !== "PLAY") return;
+        const L = laneLayout(stage.canvas.width, stage.canvas.height);
+        if (e.clientY < L.top) return;
+        const lane = Math.max(0, Math.min(2, Math.floor((e.clientX - L.left) / L.laneW)));
+        attemptHit(lane);
+      });
+      stage.last = performance.now();
+      requestAnimationFrame(loop);
+    };
+
+    GAME.onRunStart = function () { stage.phase = "idle"; GAME.holdQuestionTimer = false; };
+
+    GAME.onRoundStart = function () {
+      stage.phase = "read";
+      stage.armed = false;
+      GAME.holdQuestionTimer = false;
+      if (state.timerSeconds <= 0) {
+        state.questionTimeLeft = 2.2;
+        // still use a short get-ready even if timer is Off
+        GAME.holdQuestionTimer = true;
+        // custom short read handled in loop
+        stage.customRead = 2.2;
+      } else {
+        stage.customRead = 0;
+      }
+    };
+
+    GAME.onOptionTap = function (i) { attemptHit(i); };
+
+    GAME.onKey = function (e, key) {
+      if (key === "a" || key === "arrowleft") { e.preventDefault(); attemptHit(0); }
+      if (key === "s" || key === "arrowdown") { e.preventDefault(); attemptHit(1); }
+      if (key === "d" || key === "arrowright") { e.preventDefault(); attemptHit(2); }
+    };
+
+    GAME.onResolved = function () {
+      GAME.holdQuestionTimer = true;
+      stage.phase = "result";
+    };
+
+    function loop(now) {
+      requestAnimationFrame(loop);
+      const dt = Math.min(0.05, (now - stage.last) / 1000);
+      stage.last = now;
+      if (!stage.canvas) return;
+      stage.beat += dt;
+      stage.sparks.forEach((s) => { s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 240 * dt; s.life -= dt; });
+      stage.sparks = stage.sparks.filter((s) => s.life > 0);
+
+      if (state.screen === "PLAY" && !state.answerLocked) {
+        if (stage.phase === "read") {
+          if (stage.customRead > 0) {
+            stage.customRead -= dt;
+            const timerEl = document.getElementById("q-timer-display");
+            if (timerEl) timerEl.textContent = Math.max(0, Math.ceil(stage.customRead)) + "s";
+            if (stage.customRead <= 0) beginHitPhase();
+          } else {
+            tickQuestionTimer(dt);
+            if (state.questionTimeLeft <= 0 && !state.answerLocked && stage.phase === "read") {
+              // tickQuestionTimer may have already resolved if it hit 0; if timer just ended, start hit instead of miss
+            }
+          }
+        } else if (stage.phase === "hit") {
+          stage.noteY += stage.noteSpeed * dt;
+          if (stage.noteY > stage.strikeY + 56 && stage.armed) {
+            stage.armed = false;
+            stage.phase = "result";
+            resolveChoice(-1, { timedOut: true, grade: "Miss" });
+          }
+        }
+      }
+
+      const ctx = stage.ctx, w = stage.canvas.width, h = stage.canvas.height;
+      drawVenue(ctx, w, h, now);
+      if (state.screen === "PLAY" || state.screen === "PAUSED" || state.screen === "START") drawHighway(ctx, w, h, now);
+    }
+
+    // If the shared timer hits 0 during READ, convert that into the hit phase instead of an auto-miss.
+    const _resolveChoice = resolveChoice;
+    resolveChoice = function (lane, meta) {
+      if (stage.phase === "read" && meta && meta.timedOut && !state.answerLocked) {
+        beginHitPhase();
+        return;
+      }
+      return _resolveChoice(lane, meta);
+    };
+
+  </script>
+</body>
+</html>
