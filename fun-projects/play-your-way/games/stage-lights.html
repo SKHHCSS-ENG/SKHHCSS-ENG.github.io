@@ -148,9 +148,9 @@
     <div class="chronicle-bar">
       <div class="hud-cluster">
         <div class="stat-chip"><span class="label">Player</span><span id="hud-player-name">Student</span></div>
-        <div class="stat-chip"><span class="label" id="hud-round-label">Round</span><span class="val" id="hud-round-val">1 / 8</span></div>
+        <div class="stat-chip"><span class="label" id="hud-round-label">Track</span><span class="val" id="hud-round-val">1 / 8</span></div>
         <div class="stat-chip"><span class="label">Score</span><span class="val" id="hud-score-val">0</span></div>
-        <div class="stat-chip"><span class="label" id="hud-hearts-label">Lives</span><span id="hud-hearts-row">❤❤❤</span></div>
+        <div class="stat-chip"><span class="label" id="hud-hearts-label">Mics</span><span id="hud-hearts-row">❤❤❤</span></div>
         <div class="stat-chip"><span class="label">Combo</span><span id="hud-combo-val">—</span></div>
       </div>
       <div class="hud-cluster">
@@ -164,8 +164,8 @@
         <div class="q-left">
           <span class="q-mode-pill" id="q-mode-badge">VOCAB</span>
           <div style="min-width:0;flex:1;">
-            <div class="q-prompt-text" id="q-prompt-text">Loading...</div>
-            <div class="q-prompt-sub" id="q-prompt-sub">Round 1 of 8</div>
+            <div class="q-prompt-text" id="q-prompt-text">Loading…</div>
+            <div class="q-prompt-sub" id="q-prompt-sub">Track 1 of 8</div>
           </div>
         </div>
         <div class="q-right-controls">
@@ -193,7 +193,6 @@
   <div class="start-header-box" style="text-align:center;">
     <div style="margin-bottom:8px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
       <button type="button" class="btn-ghost" id="btn-back-to-pyw-hub">◀ Play Your Way</button>
-      <span class="kicker">🎤 LIVE RHYTHM SET</span>
     </div>
     <h1 class="game-main-title">Stage Lights: <span>On the Beat</span></h1>
   </div>
@@ -201,24 +200,24 @@
     <div class="start-mode-card" id="btn-open-setup">
       <div>
         <div class="mode-card-title">🎤 Take the stage</div>
-        <div class="mode-card-meta">Read the lyric · wait for the cue · hit the correct lane on the beat</div>
+        <div class="mode-card-meta">Read the lyric · hit the lane on the beat</div>
       </div>
       <div class="btn-primary" style="min-height:auto;padding:8px 12px;">Enter ▶</div>
     </div>
     <div class="word-pool-bar">
       <div>
-        <div class="kicker" style="text-align:left;" id="start-pool-mode-tag">ACTIVE WORD POOL</div>
-        <div id="start-pool-summary" style="font-size:0.8rem;color:var(--muted);">HKDSE practice bank</div>
+        <div class="kicker" style="text-align:left;" id="start-pool-mode-tag">Active word pool · Practice bank</div>
+        <div id="start-pool-summary" style="font-size:0.8rem;color:var(--muted);">Practice bank</div>
       </div>
       <button type="button" class="btn-primary" id="btn-open-word-builder">📚 Customise Word Pool</button>
     </div>
     <div class="how-to-play-card">
               <div class="how-to-title">How to play</div>
         <ol>
-          <li>Each track shows a lyric, setlist line, or cue card — that is your English question.</li>
-          <li>Read it in the countdown, then watch the glowing note travel down the correct lane.</li>
-          <li>Hit lane <strong>A</strong>, <strong>B</strong> or <strong>C</strong> as it crosses the white line (tap the lane, the card, or press 1 / 2 / 3).</li>
-          <li><strong>Perfect</strong> and <strong>Good</strong> keep the combo. Misses and wrong lanes cost a mic. Lose every mic and the crowd goes quiet.</li>
+          <li>Each track shows a lyric, setlist line, or cue card — that is the question.</li>
+          <li>Read it in the countdown, then watch the note travel down the correct lane.</li>
+          <li>Hit lane A, B or C as it crosses the white line (tap the lane or card, or press 1 / 2 / 3).</li>
+          <li>Perfect and Good keep the combo. A miss or a wrong lane costs a mic. No mics left and the crowd goes quiet.</li>
         </ol>
         <div class="how-to-zh">先讀歌詞，再在白線上按對的軌道。時機準確可得 Perfect／Good；錯過或按錯會失去一支麥克風。</div>
         <div class="how-to-keys">1 / 2 / 3 or A / S / D hit a lane · Esc pause</div>
@@ -239,18 +238,18 @@
       <input type="text" id="input-player-name" class="text-input" value="Nova" maxlength="20" />
     </div>
     <div class="field-group" style="margin-bottom:10px;">
-      <span class="field-label">Rounds</span>
+      <span class="field-label">Tracks</span>
       <div class="pill-choice-row" id="setup-rounds-pills">
         <button type="button" class="choice-pill" data-rounds="5">5</button>
         <button type="button" class="choice-pill active" data-rounds="8">8</button>
         <button type="button" class="choice-pill" data-rounds="12">12</button>
         <button type="button" class="choice-pill" data-rounds="ALL">All</button>
-        <input type="number" id="input-custom-rounds" class="text-input" min="1" max="99" placeholder="1-99" style="width:76px;" title="Custom round count" />
+        <input type="number" id="input-custom-rounds" class="text-input" min="1" max="99" placeholder="1-99" style="width:76px;" title="Custom track count" />
       </div>
     </div>
     <div class="field-group" style="margin-bottom:10px; display:flex; gap:16px; flex-wrap:wrap;">
       <div>
-        <span class="field-label">Read time (then the cue drops)</span>
+        <span class="field-label">Read time</span>
         <div class="pill-choice-row" id="setup-timer-pills">
           <button type="button" class="choice-pill" data-timer="10">10s</button>
           <button type="button" class="choice-pill active" data-timer="8">8s</button>
@@ -298,8 +297,8 @@
       <div style="display:flex; gap:10px; align-items:center;">
         <div id="end-emoji-icon" style="font-size:2rem;">🏆</div>
         <div>
-          <div class="kicker" id="end-kicker-line" style="text-align:left;">COMPLETE</div>
-          <div class="modal-title" id="end-title-line">You did it!</div>
+          <div class="kicker" id="end-kicker-line" style="text-align:left;">Encore</div>
+          <div class="modal-title" id="end-title-line">The setlist is complete.</div>
         </div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -311,13 +310,13 @@
     <div class="score-summary-banner">
       <div class="score-metric-box"><div class="m-lbl">Final Score</div><div class="m-val" id="end-score-val">0 PTS</div></div>
       <div class="score-metric-box"><div class="m-lbl">Accuracy</div><div class="m-val" id="end-acc-val">100%</div></div>
-      <div class="score-metric-box"><div class="m-lbl">Cleared</div><div class="m-val" id="end-rounds-val">8 / 8</div></div>
-      <div class="score-metric-box"><div class="m-lbl" id="end-hearts-caption">Lives left</div><div class="m-val" id="end-hearts-val">3</div></div>
+      <div class="score-metric-box"><div class="m-lbl">Tracks cleared</div><div class="m-val" id="end-rounds-val">8 / 8</div></div>
+      <div class="score-metric-box"><div class="m-lbl" id="end-hearts-caption">Mics left</div><div class="m-val" id="end-hearts-val">3</div></div>
     </div>
     <div style="font-weight:800; color:var(--accent); margin-bottom:6px;">🌟 Encore honour board</div>
     <div id="end-standings-list"></div>
     <div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0 6px; gap:8px; flex-wrap:wrap;">
-      <span style="font-weight:800; color:var(--accent);">📜 Review (English + 繁體中文)</span>
+      <span style="font-weight:800; color:var(--accent);">Review · English / 繁體中文</span>
       <div class="pill-choice-row" id="review-filter-pills">
         <button type="button" class="choice-pill active" data-filter="ALL">All answered</button>
         <button type="button" class="choice-pill" data-filter="MISSED">Missed only</button>
@@ -688,7 +687,7 @@
           ? (hubSyncedPackTitle + " (" + customQuestionPool.length + " items synced from Play Your Way Hub)")
           : ("Custom pack (" + customQuestionPool.length + " items)");
       } else {
-        summary.textContent = "HKDSE practice bank + 3,500-word dictionary (Vocab · Grammar · Reading · Proofreading)";
+        summary.textContent = "Practice bank";
       }
     }
 
@@ -856,8 +855,8 @@
       const kickerEl = document.getElementById("end-kicker-line");
       const titleEl = document.getElementById("end-title-line");
       if (emojiEl) emojiEl.textContent = isWin ? (GAME.winEmoji || "🏆") : (GAME.loseEmoji || "💨");
-      if (kickerEl) kickerEl.textContent = isWin ? (GAME.winKicker || "COMPLETE") : (GAME.loseKicker || "TRY AGAIN");
-      if (titleEl) titleEl.textContent = isWin ? (GAME.winTitle || "You did it!") : (GAME.loseTitle || "So close!");
+      if (kickerEl) kickerEl.textContent = isWin ? (GAME.winKicker || "Complete") : (GAME.loseKicker || "Try again");
+      if (titleEl) titleEl.textContent = isWin ? (GAME.winTitle || "Well done.") : (GAME.loseTitle || "So close.");
       document.getElementById("end-score-val").textContent = state.score + " PTS";
       document.getElementById("end-acc-val").textContent = acc + "%";
       document.getElementById("end-rounds-val").textContent = correctCount + " / " + state.targetRounds;
@@ -1203,10 +1202,10 @@
       timeoutToast: "Missed the cue!",
       winEmoji: "🎤",
       loseEmoji: "🌑",
-      winKicker: "ENCORE",
-      loseKicker: "CROWD GONE QUIET",
-      winTitle: "The setlist is complete. Lights out — beautifully.",
-      loseTitle: "The house lights came up early. One more rehearsal?",
+      winKicker: "Encore",
+      loseKicker: "Crowd gone quiet",
+      winTitle: "The setlist is complete.",
+      loseTitle: "The house lights came up early.",
       resolveDelayMs: 700,
       holdQuestionTimer: false
     };
@@ -1361,7 +1360,7 @@
         ctx.fillStyle = "#fde047";
         ctx.font = "800 16px Orbitron, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("NOW", w / 2, stage.strikeY - 16);
+        ctx.fillText("Now", w / 2, stage.strikeY - 16);
       }
 
       if (stage.phase === "hit" && state.currentQuestion) {
@@ -1393,7 +1392,7 @@
         ctx.fillStyle = "#f0abfc";
         ctx.font = "800 18px Orbitron, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("GET READY", w / 2, (L.top + stage.strikeY) / 2);
+        ctx.fillText("Get ready", w / 2, (L.top + stage.strikeY) / 2);
       }
 
       stage.sparks.forEach((s) => {

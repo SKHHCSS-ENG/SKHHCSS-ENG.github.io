@@ -148,9 +148,9 @@
     <div class="chronicle-bar">
       <div class="hud-cluster">
         <div class="stat-chip"><span class="label">Player</span><span id="hud-player-name">Student</span></div>
-        <div class="stat-chip"><span class="label" id="hud-round-label">Round</span><span class="val" id="hud-round-val">1 / 8</span></div>
+        <div class="stat-chip"><span class="label" id="hud-round-label">Order</span><span class="val" id="hud-round-val">1 / 8</span></div>
         <div class="stat-chip"><span class="label">Score</span><span class="val" id="hud-score-val">0</span></div>
-        <div class="stat-chip"><span class="label" id="hud-hearts-label">Lives</span><span id="hud-hearts-row">❤❤❤</span></div>
+        <div class="stat-chip"><span class="label" id="hud-hearts-label">Hearts</span><span id="hud-hearts-row">❤❤❤</span></div>
         <div class="stat-chip"><span class="label">Combo</span><span id="hud-combo-val">—</span></div>
       </div>
       <div class="hud-cluster">
@@ -164,8 +164,8 @@
         <div class="q-left">
           <span class="q-mode-pill" id="q-mode-badge">VOCAB</span>
           <div style="min-width:0;flex:1;">
-            <div class="q-prompt-text" id="q-prompt-text">Loading...</div>
-            <div class="q-prompt-sub" id="q-prompt-sub">Round 1 of 8</div>
+            <div class="q-prompt-text" id="q-prompt-text">Loading…</div>
+            <div class="q-prompt-sub" id="q-prompt-sub">Order 1 of 8</div>
           </div>
         </div>
         <div class="q-right-controls">
@@ -191,7 +191,6 @@
   <div class="start-header-box" style="text-align:center;">
     <div style="margin-bottom:8px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
       <button type="button" class="btn-ghost" id="btn-back-to-pyw-hub">◀ Play Your Way</button>
-      <span class="kicker">☕ ANIME CAFÉ RUSH · TIME MANAGEMENT</span>
     </div>
     <h1 class="game-main-title">Café Rush: <span>Next Order</span></h1>
   </div>
@@ -199,24 +198,25 @@
     <div class="start-mode-card" id="btn-open-setup">
       <div>
         <div class="mode-card-title">☕ Open the café</div>
-        <div class="mode-card-meta">Read the ticket · plate A / B / C · Serve before they leave</div>
+        <div class="mode-card-meta">Serve before they leave</div>
+        <div class="mode-card-meta">1 / 2 / 3 plate a dish · Enter serve</div>
       </div>
       <div class="btn-primary" style="min-height:auto;padding:8px 12px;">Enter ▶</div>
     </div>
     <div class="word-pool-bar">
       <div>
-        <div class="kicker" style="text-align:left;" id="start-pool-mode-tag">ACTIVE WORD POOL</div>
-        <div id="start-pool-summary" style="font-size:0.8rem;color:var(--muted);">HKDSE practice bank</div>
+        <div class="kicker" style="text-align:left;" id="start-pool-mode-tag">Active word pool · Practice bank</div>
+        <div id="start-pool-summary" style="font-size:0.8rem;color:var(--muted);">Practice bank</div>
       </div>
       <button type="button" class="btn-primary" id="btn-open-word-builder">📚 Customise Word Pool</button>
     </div>
     <div class="how-to-play-card">
               <div class="how-to-title">How to play</div>
         <ol>
-          <li>A customer arrives with a ticket — that is your English question.</li>
-          <li>Tap the dish that matches answer <strong>A</strong>, <strong>B</strong> or <strong>C</strong> (or press 1 / 2 / 3).</li>
-          <li>Press <strong>Serve</strong> (or Enter) before the patience bar runs out.</li>
-          <li>Correct orders earn coins and combos. Wrong dishes or walk-outs cost a heart. Empty hearts end the shift.</li>
+          <li>A customer arrives with a ticket — that is the question.</li>
+          <li>Tap dish A, B or C (or press 1 / 2 / 3).</li>
+          <li>Press Serve (or Enter) before the patience bar runs out.</li>
+          <li>A correct order earns coins and combos. A wrong dish, or a walk-out, costs a heart. No hearts left ends the shift.</li>
         </ol>
         <div class="how-to-zh">顧客的點單就是題目：選對菜並在等候完結前上菜。答錯或逾時會失去一顆心。</div>
         <div class="how-to-keys">1 / 2 / 3 plate a dish · Enter serve · Esc pause</div>
@@ -237,13 +237,13 @@
       <input type="text" id="input-player-name" class="text-input" value="Mira" maxlength="20" />
     </div>
     <div class="field-group" style="margin-bottom:10px;">
-      <span class="field-label">Rounds</span>
+      <span class="field-label">Orders</span>
       <div class="pill-choice-row" id="setup-rounds-pills">
         <button type="button" class="choice-pill" data-rounds="5">5</button>
         <button type="button" class="choice-pill active" data-rounds="8">8</button>
         <button type="button" class="choice-pill" data-rounds="12">12</button>
         <button type="button" class="choice-pill" data-rounds="ALL">All</button>
-        <input type="number" id="input-custom-rounds" class="text-input" min="1" max="99" placeholder="1-99" style="width:76px;" title="Custom round count" />
+        <input type="number" id="input-custom-rounds" class="text-input" min="1" max="99" placeholder="1-99" style="width:76px;" title="Custom order count" />
       </div>
     </div>
     <div class="field-group" style="margin-bottom:10px; display:flex; gap:16px; flex-wrap:wrap;">
@@ -295,8 +295,8 @@
       <div style="display:flex; gap:10px; align-items:center;">
         <div id="end-emoji-icon" style="font-size:2rem;">🏆</div>
         <div>
-          <div class="kicker" id="end-kicker-line" style="text-align:left;">COMPLETE</div>
-          <div class="modal-title" id="end-title-line">You did it!</div>
+          <div class="kicker" id="end-kicker-line" style="text-align:left;">Rush cleared</div>
+          <div class="modal-title" id="end-title-line">Every ticket served.</div>
         </div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -308,13 +308,13 @@
     <div class="score-summary-banner">
       <div class="score-metric-box"><div class="m-lbl">Final Score</div><div class="m-val" id="end-score-val">0 PTS</div></div>
       <div class="score-metric-box"><div class="m-lbl">Accuracy</div><div class="m-val" id="end-acc-val">100%</div></div>
-      <div class="score-metric-box"><div class="m-lbl">Cleared</div><div class="m-val" id="end-rounds-val">8 / 8</div></div>
-      <div class="score-metric-box"><div class="m-lbl" id="end-hearts-caption">Lives left</div><div class="m-val" id="end-hearts-val">3</div></div>
+      <div class="score-metric-box"><div class="m-lbl">Tickets served</div><div class="m-val" id="end-rounds-val">8 / 8</div></div>
+      <div class="score-metric-box"><div class="m-lbl" id="end-hearts-caption">Hearts left</div><div class="m-val" id="end-hearts-val">3</div></div>
     </div>
     <div style="font-weight:800; color:var(--accent); margin-bottom:6px;">⭐ Regulars' honour board</div>
     <div id="end-standings-list"></div>
     <div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0 6px; gap:8px; flex-wrap:wrap;">
-      <span style="font-weight:800; color:var(--accent);">📜 Review (English + 繁體中文)</span>
+      <span style="font-weight:800; color:var(--accent);">Review · English / 繁體中文</span>
       <div class="pill-choice-row" id="review-filter-pills">
         <button type="button" class="choice-pill active" data-filter="ALL">All answered</button>
         <button type="button" class="choice-pill" data-filter="MISSED">Missed only</button>
@@ -685,7 +685,7 @@
           ? (hubSyncedPackTitle + " (" + customQuestionPool.length + " items synced from Play Your Way Hub)")
           : ("Custom pack (" + customQuestionPool.length + " items)");
       } else {
-        summary.textContent = "HKDSE practice bank + 3,500-word dictionary (Vocab · Grammar · Reading · Proofreading)";
+        summary.textContent = "Practice bank";
       }
     }
 
@@ -853,8 +853,8 @@
       const kickerEl = document.getElementById("end-kicker-line");
       const titleEl = document.getElementById("end-title-line");
       if (emojiEl) emojiEl.textContent = isWin ? (GAME.winEmoji || "🏆") : (GAME.loseEmoji || "💨");
-      if (kickerEl) kickerEl.textContent = isWin ? (GAME.winKicker || "COMPLETE") : (GAME.loseKicker || "TRY AGAIN");
-      if (titleEl) titleEl.textContent = isWin ? (GAME.winTitle || "You did it!") : (GAME.loseTitle || "So close!");
+      if (kickerEl) kickerEl.textContent = isWin ? (GAME.winKicker || "Complete") : (GAME.loseKicker || "Try again");
+      if (titleEl) titleEl.textContent = isWin ? (GAME.winTitle || "Well done.") : (GAME.loseTitle || "So close.");
       document.getElementById("end-score-val").textContent = state.score + " PTS";
       document.getElementById("end-acc-val").textContent = acc + "%";
       document.getElementById("end-rounds-val").textContent = correctCount + " / " + state.targetRounds;
@@ -1200,10 +1200,10 @@
       timeoutToast: "The customer left!",
       winEmoji: "☕",
       loseEmoji: "🥺",
-      winKicker: "RUSH CLEARED",
-      loseKicker: "KITCHEN CHAOS",
-      winTitle: "Every ticket served — what a shift!",
-      loseTitle: "The queue overflowed. Take a breath and try again.",
+      winKicker: "Rush cleared",
+      loseKicker: "Kitchen chaos",
+      winTitle: "Every ticket served.",
+      loseTitle: "The queue overflowed.",
       resolveDelayMs: 1100
     };
 
@@ -1489,7 +1489,7 @@
         ctx.font = "800 11px Plus Jakarta Sans, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
-        ctx.fillText("NEXT ORDER", tx + 10, ty + 18);
+        ctx.fillText("Next order", tx + 10, ty + 18);
         ctx.fillStyle = "#1f2937";
         ctx.font = "700 11px Plus Jakarta Sans, sans-serif";
         // Show the question cue, never the correct dish — that would spoil the order.
