@@ -52,11 +52,11 @@
     .mcq-blank-hl { display: inline-block; min-width: 3.2em; border-bottom: 2px solid var(--accent); }
     .q-right-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .q-timer-ring { min-width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; background: rgba(0,0,0,0.35); }
-    .options-below-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; }
+    .options-below-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; min-width: 0; }
     .option-card.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
     .option-badge { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #111; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; }
+    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; overflow-wrap: break-word; }
     .hud-bottom-bar { width: 100%; max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; pointer-events: none; }
     .touch-controls-cluster { display: flex; gap: 8px; flex-wrap: wrap; pointer-events: auto; }
     .touch-action-btn, .hud-btn, .btn-primary, .btn-ghost {
@@ -85,6 +85,7 @@
       .muse-portrait-display { width: 96px; height: 96px; border-radius: 18px; }
     }
     .kicker { text-align: center; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+    #end-kicker-line, #end-title-line { text-transform: none; letter-spacing: 0.02em; }
     .how-to-play-card { background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
     .how-to-title { font-weight: 800; color: var(--accent); margin-bottom: 6px; }
     .how-to-play-card ol { margin: 0 0 8px 1.15rem; font-size: 0.8rem; line-height: 1.45; }
@@ -211,6 +212,14 @@
   <img data-muse-slot="heart" src="art/cafe-rush/heart.png" alt="">
   <img data-muse-slot="order-ticket" src="art/cafe-rush/order-ticket.png" alt="">
   <img data-muse-slot="dish" src="art/cafe-rush/dish.png" alt="">
+  <img data-muse-slot="backdrop" src="art/cafe-rush/backdrop-1920x1080.png" alt="">
+  <img data-muse-slot="customer" src="art/cafe-rush/customer.png" alt="">
+  <img data-muse-slot="customer-a" src="art/cafe-rush/customer-a.png" alt="">
+  <img data-muse-slot="customer-b" src="art/cafe-rush/customer-b.png" alt="">
+  <img data-muse-slot="customer-c" src="art/cafe-rush/customer-c.png" alt="">
+  <img data-muse-slot="dishA" src="art/cafe-rush/dish-a.png" alt="">
+  <img data-muse-slot="dishB" src="art/cafe-rush/dish-b.png" alt="">
+  <img data-muse-slot="dishC" src="art/cafe-rush/dish-c.png" alt="">
 </div>
 
 <div id="start-menu-overlay">
@@ -1264,8 +1273,8 @@
      * or <img hidden data-muse-slot="backdrop" src="...">.
      * The hub cover, start-menu portrait, mira-taking-order, mira-serving,
      * heart, order-ticket, and dish (plated prop only) are hooked.
-     * Backdrop, customer, and per-dish option art still wait on Muse.
-     * In-game customers and option dishes stay procedural until then.
+     * Backdrop, rotating customer-a/b/c (customer.png = a), and dishA/B/C
+     * (latte, cake, sandwich) are also hooked. Mira is the barista only.
      *************************************************************************/
     const GAME = {
       musePack: "PYW_CAFE_RUSH_ART",
@@ -1418,6 +1427,47 @@
       return Math.max(12, (hud.bottom - box.top) * scaleY + 8);
     }
 
+    // Back edge of the wooden counter in Muse's 1920x1080 café backdrop.
+    const CAFE_COUNTER_SRC_Y = 878;
+
+    function drawCoverImage(ctx, img, w, h, ax, ay) {
+      const iw = img.naturalWidth || img.width || 1;
+      const ih = img.naturalHeight || img.height || 1;
+      const scale = Math.max(w / iw, h / ih);
+      const dw = iw * scale, dh = ih * scale;
+      const dx = (w - dw) * (ax == null ? 0.5 : ax);
+      const dy = (h - dh) * (ay == null ? 0.5 : ay);
+      ctx.drawImage(img, dx, dy, dw, dh);
+      return { scale: scale, dx: dx, dy: dy, dw: dw, dh: dh };
+    }
+
+    function cafeFloorY(h, placed) {
+      if (placed) {
+        const y = placed.dy + CAFE_COUNTER_SRC_Y * placed.scale;
+        return Math.max(h * 0.52, Math.min(h * 0.84, y));
+      }
+      return h * 0.68;
+    }
+
+    function cafeCustomerArt() {
+      const slots = ["customer-a", "customer-b", "customer-c"];
+      const idx = Math.max(0, (state.currentRound || 1) - 1) % slots.length;
+      return getMuseArt(slots[idx]) || getMuseArt("customer");
+    }
+
+    function miraLayout(w, h, floorY) {
+      const rightMargin = Math.max(14, Math.round(w * 0.05));
+      const maxBox = Math.min(
+        152,
+        Math.round(Math.min(w, h) * (w < 520 ? 0.32 : 0.24)),
+        Math.round(w * 0.38)
+      );
+      const box = Math.max(88, Math.min(maxBox, (w - rightMargin) * 0.72 - w * 0.28));
+      const x = w - rightMargin - box / 2;
+      const y = floorY + Math.round(box * 0.1);
+      return { x: x, y: y, box: box, left: x - box / 2, right: x + box / 2 };
+    }
+
     function drawDish(ctx, x, y, idx, selected, label) {
       ctx.save();
       ctx.translate(x, y);
@@ -1470,8 +1520,12 @@
     function drawCafeScene(now) {
       const ctx = cafe.ctx, w = cafe.canvas.width, h = cafe.canvas.height;
       const museBg = getMuseArt("backdrop");
+      let bgPlaced = null;
       if (museBg) {
-        ctx.drawImage(museBg, 0, 0, w, h);
+        // Keep the window in view on a tall phone; pin the counter to the bottom.
+        ctx.fillStyle = "#f3d3b5";
+        ctx.fillRect(0, 0, w, h);
+        bgPlaced = drawCoverImage(ctx, museBg, w, h, w < 700 ? 0.18 : 0.45, 1);
       } else {
         const sky = ctx.createLinearGradient(0, 0, 0, h * 0.45);
         sky.addColorStop(0, "#7dd3fc");
@@ -1535,39 +1589,46 @@
       const q = state.currentQuestion;
       const palC = cafe.palettes[(state.currentRound - 1) % cafe.palettes.length];
       const palB = { hair: "#2a1a12", skin: "#f3c7a7", shirt: "#fb7185", accent: "#fff7ed", blush: "#fda4af" };
-      const floorY = h * 0.68;
-      const enterX = w * 0.28 + (1 - cafe.walkIn) * w * 0.4;
-      const museCust = getMuseArt("customer");
+      const floorY = cafeFloorY(h, bgPlaced);
+      cafe.floorY = floorY;
+      const mira = miraLayout(w, h, floorY);
+      const clearY = hudClearY(cafe.canvas);
+      const custHeadroom = Math.max(96, floorY - clearY - 8);
+      const custBox = Math.min(200, Math.round(custHeadroom * 0.92), Math.round(w * 0.42));
+      const enterX = Math.min(w * 0.30, mira.left - 16 - custBox * 0.33) + (1 - cafe.walkIn) * w * 0.4;
+      const museCust = cafeCustomerArt();
       const serving = cafe.plated >= 0 || cafe.customerMood === "happy";
       const museBarista = getMuseArt(serving ? "mira-serving" : "mira-taking-order") || getMuseArt("mira-taking-order") || getMuseArt("mira-serving");
-      if (museCust) ctx.drawImage(museCust, enterX - 70, floorY - 200, 140, 210);
+      if (museCust) drawMuseContained(ctx, museCust, enterX, floorY + 8, custBox, "bottom");
       else drawAnimePerson(ctx, enterX, floorY - 96, 1.15, palC, cafe.customerMood, now, false);
-      if (museBarista) drawMuseContained(ctx, museBarista, w * 0.78, floorY, musePoseBox(w, h), "bottom");
-      else drawAnimePerson(ctx, w * 0.78, floorY - 100, 1.25, palB, "happy", now, true);
+      if (museBarista) drawMuseContained(ctx, museBarista, mira.x, mira.y, mira.box, "bottom");
+      else drawAnimePerson(ctx, mira.x, floorY - 100, 1.05, palB, "happy", now, true);
 
       const museDish = getMuseArt("dish");
       if (museDish && cafe.plated >= 0) {
-        drawMuseContained(ctx, museDish, w * 0.78 - 56, floorY + 36, 64, "center");
+        drawMuseContained(ctx, museDish, mira.x - Math.min(56, mira.box * 0.38), floorY + 36, 64, "center");
       }
 
-      // ticket: cue only (never the correct dish), kept clear of the HUD option row
+      // ticket: cue only (never the correct dish). Keep it off the HUD, Mira, and the customer's body.
       if (q && state.screen === "PLAY") {
         const museTicket = getMuseArt("order-ticket");
-        const ticketW = museTicket ? 176 : 180;
-        const ticketH = museTicket ? 176 : 84;
-        const headTop = museCust ? (floorY - 200) : (floorY - 96 - 32 * 1.15);
-        const clearY = hudClearY(cafe.canvas);
-        let tx = enterX + 70;
-        let ty = headTop - ticketH - 10;
-        if (ty < clearY) {
-          // Not enough room above the head — sit beside the customer, or just under the HUD.
-          ty = Math.max(clearY, Math.min(headTop - 8, floorY - ticketH - 16));
-          const rightX = enterX + 78;
-          const leftX = enterX - 78 - ticketW;
-          if (rightX + ticketW <= w - 10) tx = rightX;
-          else if (leftX >= 10) tx = leftX;
+        const ticketW = museTicket ? (w < 600 ? 112 : 132) : (w < 600 ? 150 : 180);
+        const ticketH = museTicket ? (w < 600 ? 112 : 132) : 84;
+        const custHalf = museCust ? custBox * 0.34 : 36;
+        const headTop = museCust ? (floorY + 8 - custBox) : (floorY - 96 - 32 * 1.15);
+        const overlapsMira = (x, tw) => (x < mira.right + 8 && x + tw > mira.left - 8);
+        const overlapsCust = (x, tw) => (x < enterX + custHalf && x + tw > enterX - custHalf);
+        let tx = enterX + custHalf + 8;
+        let ty = Math.max(clearY, headTop - ticketH * 0.25);
+        if (overlapsMira(tx, ticketW) || tx + ticketW > mira.left - 8 || tx + ticketW > w - 8) {
+          tx = enterX - custHalf - ticketW - 8;
         }
-        ty = Math.max(clearY, Math.min(h - ticketH - 8, ty));
+        if (tx < 8 || overlapsMira(tx, ticketW) || overlapsCust(tx, ticketW)) {
+          tx = Math.max(8, Math.min(mira.left - ticketW - 10, enterX + custHalf + 8));
+          ty = Math.max(clearY, Math.min(headTop + 4, floorY - ticketH - 20));
+        }
+        if (overlapsMira(tx, ticketW)) tx = Math.max(8, mira.left - ticketW - 10);
+        ty = Math.max(clearY, Math.min(floorY - ticketH - 12, ty));
         tx = Math.max(8, Math.min(w - ticketW - 8, tx));
         if (museTicket) {
           drawMuseContained(ctx, museTicket, tx + ticketW / 2, ty + ticketH, ticketW, "bottom");
@@ -1577,9 +1638,10 @@
           ctx.lineWidth = 2;
           ctx.beginPath(); ctx.roundRect(tx, ty, ticketW, ticketH, 8); ctx.fill(); ctx.stroke();
         }
-        const textX = tx + (museTicket ? 28 : 10);
-        const textW = ticketW - (museTicket ? 56 : 20);
-        const titleY = ty + (museTicket ? 62 : 18);
+        const padX = museTicket ? Math.round(ticketW * 0.18) : 10;
+        const textX = tx + padX;
+        const textW = ticketW - padX * 2;
+        const titleY = ty + (museTicket ? Math.round(ticketH * 0.44) : 18);
         ctx.fillStyle = "#b45309";
         ctx.font = "800 11px Plus Jakarta Sans, sans-serif";
         ctx.textAlign = "left";
@@ -1634,7 +1696,7 @@
       cafe.canvas.addEventListener("pointerdown", (e) => {
         if (state.screen !== "PLAY" || state.answerLocked) return;
         const w = cafe.canvas.width, h = cafe.canvas.height;
-        const ys = h * 0.68 + 28;
+        const ys = (cafe.floorY || h * 0.68) + 28;
         const gap = Math.min(180, w * 0.22);
         const start = w * 0.5 - gap;
         for (let i = 0; i < 3; i++) {

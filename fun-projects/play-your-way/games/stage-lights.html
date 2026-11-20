@@ -52,11 +52,11 @@
     .mcq-blank-hl { display: inline-block; min-width: 3.2em; border-bottom: 2px solid var(--accent); }
     .q-right-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .q-timer-ring { min-width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; background: rgba(0,0,0,0.35); }
-    .options-below-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; }
+    .options-below-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; min-width: 0; }
     .option-card.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
     .option-badge { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #111; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; }
+    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; overflow-wrap: break-word; }
     .hud-bottom-bar { width: 100%; max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; pointer-events: none; }
     .touch-controls-cluster { display: flex; gap: 8px; flex-wrap: wrap; pointer-events: auto; }
     .touch-action-btn, .hud-btn, .btn-primary, .btn-ghost {
@@ -85,6 +85,7 @@
       .muse-portrait-display { width: 96px; height: 96px; border-radius: 18px; }
     }
     .kicker { text-align: center; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+    #end-kicker-line, #end-title-line { text-transform: none; letter-spacing: 0.02em; }
     .how-to-play-card { background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
     .how-to-title { font-weight: 800; color: var(--accent); margin-bottom: 6px; }
     .how-to-play-card ol { margin: 0 0 8px 1.15rem; font-size: 0.8rem; line-height: 1.45; }
@@ -122,6 +123,9 @@
     .school-footer { font-size: 0.74rem; color: var(--muted); text-align: center; background: rgba(0,0,0,0.4); padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); }
     @media (max-width: 768px) {
       .options-below-row { gap: 5px; }
+      .option-card { padding: 7px 6px; gap: 5px; }
+      .option-badge { width: 22px; height: 22px; }
+      .option-text { font-size: 0.74rem; }
       .score-summary-banner { grid-template-columns: repeat(2, 1fr); }
       .question-card { padding: 7px 10px; }
       .q-prompt-text { font-size: 0.86rem; }
@@ -1306,14 +1310,28 @@
       stage.strikeY = stage.canvas.height * 0.78;
     }
 
+    function stageHudClearY(canvas) {
+      const el = document.getElementById("question-hud-wrap") || document.getElementById("options-row");
+      if (!el || !canvas) return 12;
+      const hud = el.getBoundingClientRect();
+      const box = canvas.getBoundingClientRect();
+      if (!box.height) return 12;
+      const scaleY = canvas.height / box.height;
+      return Math.max(12, (hud.bottom - box.top) * scaleY + 8);
+    }
+
     function drawPerformer(ctx, w, h, t) {
       const singing = stage.phase === "hit" || stage.phase === "result";
       const muse = getMuseArt(singing ? "nova-singing" : "nova-spotlight") || getMuseArt("nova-spotlight") || getMuseArt("nova-singing");
-      const x = w * 0.5, y = h * 0.42;
-      if (muse) { drawMuseContained(ctx, muse, x, y + 40, musePoseBox(w, h), "bottom"); return; }
+      const L = laneLayout(w, h);
+      const bandTop = stageHudClearY(stage.canvas) + 10;
+      const bandBottom = Math.max(bandTop + 72, L.top - 8);
+      const box = Math.max(72, Math.min(musePoseBox(w, h), bandBottom - bandTop, w * 0.46));
+      const x = w * 0.5, y = bandBottom;
+      if (muse) { drawMuseContained(ctx, muse, x, y, box, "bottom"); return; }
       const bounce = Math.sin(t * 0.01) * 6;
       ctx.save();
-      ctx.translate(x, y + bounce);
+      ctx.translate(x, y - 50 + bounce);
       // spotlight cone already elsewhere
       ctx.fillStyle = "#0f0320";
       ctx.beginPath(); ctx.ellipse(0, 70, 28, 8, 0, 0, Math.PI * 2); ctx.fill();

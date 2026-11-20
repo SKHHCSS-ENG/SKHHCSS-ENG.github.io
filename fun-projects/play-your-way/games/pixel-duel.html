@@ -1075,6 +1075,16 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+    }
+    @media (max-width: 480px) {
+      .standing-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        line-height: 1.25;
+      }
     }
 
     .pts-pill {
@@ -1630,7 +1640,7 @@
       <div class="word-pool-bar">
         <div class="pool-status-info">
           <span class="pool-badge-label" id="start-pool-mode-tag">Active word pool · All 4 modes</span>
-          <span class="pool-active-summary" id="start-pool-summary">HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)</span>
+          <span class="pool-active-summary" id="start-pool-summary">Practice bank</span>
         </div>
         <button type="button" class="btn-primary-gold" id="btn-open-word-builder">📚 Customise Word Pool</button>
       </div>
@@ -1644,7 +1654,6 @@
           <li>Use Boost (Shift) for a short power dash. If all shields break, the duel ends.</li>
         </ol>
         <div class="how-to-zh">正確答案可擊暈魔王並連擊；答錯或逾時要跳避或格擋衝擊波。</div>
-        <div class="how-to-keys">A / D or ◀ ▶ move · W / ⬆️ jump · Space slash · Shift boost · Esc pause</div>
       </div>
     </div>
 
@@ -4635,9 +4644,9 @@
       if (customQuestionPool.length > 0) {
         summaryEl.textContent = hubSyncedPackTitle
           ? `${hubSyncedPackTitle} (${customQuestionPool.length} items synced from Play Your Way Hub)`
-          : `Custom + HKDSE Pool (${customQuestionPool.length} custom + 3,500-Word HKDSE Dictionary)`;
+          : `Custom + Practice bank`;
       } else {
-        summaryEl.textContent = `HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)`;
+        summaryEl.textContent = `Practice bank`;
       }
     }
 
