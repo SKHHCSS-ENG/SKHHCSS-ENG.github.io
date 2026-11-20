@@ -1354,6 +1354,26 @@
     <img data-muse-slot="hero-0-jump" src="art/pixel-duel/knight-jump.png" alt="">
     <img data-muse-slot="hero-0-slash" src="art/pixel-duel/knight-slash.png" alt="">
     <img data-muse-slot="hero-0-dash" src="art/pixel-duel/knight-dash.png" alt="">
+    <img data-muse-slot="hero-1" src="art/pixel-duel/scholar-idle.png" alt="">
+    <img data-muse-slot="hero-1-idle" src="art/pixel-duel/scholar-idle.png" alt="">
+    <img data-muse-slot="hero-1-walk" src="art/pixel-duel/scholar-walk.png" alt="">
+    <img data-muse-slot="hero-1-jump" src="art/pixel-duel/scholar-jump.png" alt="">
+    <img data-muse-slot="hero-2" src="art/pixel-duel/rogue-idle.png" alt="">
+    <img data-muse-slot="hero-2-idle" src="art/pixel-duel/rogue-idle.png" alt="">
+    <img data-muse-slot="hero-2-walk" src="art/pixel-duel/rogue-walk.png" alt="">
+    <img data-muse-slot="hero-2-jump" src="art/pixel-duel/rogue-jump.png" alt="">
+    <img data-muse-slot="hero-3" src="art/pixel-duel/hunter-idle.png" alt="">
+    <img data-muse-slot="hero-3-idle" src="art/pixel-duel/hunter-idle.png" alt="">
+    <img data-muse-slot="hero-3-walk" src="art/pixel-duel/hunter-walk.png" alt="">
+    <img data-muse-slot="hero-3-jump" src="art/pixel-duel/hunter-jump.png" alt="">
+    <img data-muse-slot="hero-4" src="art/pixel-duel/dancer-idle.png" alt="">
+    <img data-muse-slot="hero-4-idle" src="art/pixel-duel/dancer-idle.png" alt="">
+    <img data-muse-slot="hero-4-walk" src="art/pixel-duel/dancer-walk.png" alt="">
+    <img data-muse-slot="hero-4-jump" src="art/pixel-duel/dancer-jump.png" alt="">
+    <img data-muse-slot="hero-5" src="art/pixel-duel/merchant-idle.png" alt="">
+    <img data-muse-slot="hero-5-idle" src="art/pixel-duel/merchant-idle.png" alt="">
+    <img data-muse-slot="hero-5-walk" src="art/pixel-duel/merchant-walk.png" alt="">
+    <img data-muse-slot="hero-5-jump" src="art/pixel-duel/merchant-jump.png" alt="">
     <img data-muse-slot="orb-A" src="art/pixel-duel/rune-orb-a.png" alt="">
     <img data-muse-slot="orb-B" src="art/pixel-duel/rune-orb-b.png" alt="">
     <img data-muse-slot="orb-C" src="art/pixel-duel/rune-orb-c.png" alt="">
@@ -2531,10 +2551,12 @@
      * }
      * or drop hidden <img data-muse-slot="..."> tags into this file.
      * Slots: hero-0 (sheet or idle fallback), hero-0-idle/walk/jump/slash/dash,
-     * boss-GUARD / boss-STUNNED / boss-ENRAGED, arenaBackdrop, tavernBackdrop,
-     * orbSheet, orb-A / orb-B / orb-C.
-     * The first Muse pack hooks Knight (hero-0) poses only; Scholar, Rogue,
-     * Hunter, Dancer, and Merchant keep procedural sprites until their PNGs arrive.
+     * hero-1..5 (idle fallback) and hero-N-idle/walk/jump for Scholar, Rogue,
+     * Hunter, Dancer, and Merchant, boss-GUARD / boss-STUNNED / boss-ENRAGED,
+     * arenaBackdrop, tavernBackdrop, orbSheet, orb-A / orb-B / orb-C.
+     * Knight (hero-0) has idle, walk, jump, slash, and dash hooked. Scholar,
+     * Rogue, Hunter, Dancer, and Merchant have idle, walk, and jump hooked;
+     * their slash and dash slots still wait on Muse (pose fallback applies).
      *************************************************************************/
     const spriteCache = {};
 
