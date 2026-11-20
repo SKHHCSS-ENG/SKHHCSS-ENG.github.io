@@ -210,6 +210,11 @@
   <img data-muse-slot="hart-notes" src="art/night-case/hart-notes.png" alt="">
   <img data-muse-slot="notebook-page" src="art/night-case/notebook-page.png" alt="">
   <img data-muse-slot="clue-pin" src="art/night-case/clue-pin.png" alt="">
+  <img data-muse-slot="scene0" src="art/night-case/scene0-rain-alley-1920x1080.png" alt="">
+  <img data-muse-slot="scene1" src="art/night-case/scene1-harbour-pier-1920x1080.png" alt="">
+  <img data-muse-slot="scene2" src="art/night-case/scene2-midnight-diner-1920x1080.png" alt="">
+  <img data-muse-slot="scene3" src="art/night-case/scene3-city-archive-1920x1080.png" alt="">
+  <img data-muse-slot="scene4" src="art/night-case/scene4-rooftop-garden-1920x1080.png" alt="">
 </div>
 
 <div id="start-menu-overlay">
@@ -1262,8 +1267,8 @@
      * or <img hidden data-muse-slot="scene0" src="...">.
      * The hub cover, start-menu portrait, hart-examining-clue, hart-notes,
      * notebook-page, and clue-pin are hooked.
-     * Scene backdrops and the case-board backdrop still wait on Muse.
-     * Those stay procedural until then.
+     * Scene backdrops (scene0–scene4) are also hooked as aspect-preserved
+     * cover art. Hart stays in the open lower-left play area.
      *************************************************************************/
     const GAME = {
       musePack: "PYW_NIGHT_CASE_ART",
@@ -1452,12 +1457,27 @@
       });
     }
 
+    function drawCoverImage(ctx, img, w, h, ax, ay) {
+      const iw = img.naturalWidth || img.width || 1;
+      const ih = img.naturalHeight || img.height || 1;
+      const scale = Math.max(w / iw, h / ih);
+      const dw = iw * scale, dh = ih * scale;
+      const dx = (w - dw) * (ax == null ? 0.5 : ax);
+      const dy = (h - dh) * (ay == null ? 0.5 : ay);
+      ctx.drawImage(img, dx, dy, dw, dh);
+      return { scale: scale, dx: dx, dy: dy, dw: dw, dh: dh };
+    }
+
     function drawNoirScene(now) {
       const ctx = noir.ctx, w = noir.canvas.width, h = noir.canvas.height;
       const sceneIdx = (state.currentRound - 1) % SCENES.length;
       const museScene = getMuseArt("scene" + sceneIdx);
-      if (museScene) ctx.drawImage(museScene, 0, 0, w, h);
-      else paintWash(ctx, w, h, sceneIdx, now);
+      if (museScene) {
+        // Keep aspect ratio and the open lower-left for Hart (left+bottom bias on a tall phone).
+        ctx.fillStyle = "#05070c";
+        ctx.fillRect(0, 0, w, h);
+        drawCoverImage(ctx, museScene, w, h, w < 700 ? 0.22 : 0.38, 1);
+      } else paintWash(ctx, w, h, sceneIdx, now);
 
       // rain
       ctx.strokeStyle = "rgba(186, 230, 253, 0.35)";
