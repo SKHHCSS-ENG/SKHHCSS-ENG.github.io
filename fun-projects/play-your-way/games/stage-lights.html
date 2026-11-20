@@ -175,7 +175,7 @@
       </div>
       <div class="options-below-row" id="options-row">
         <div class="option-card" data-lane="0" id="opt-card-0"><div class="option-badge">A</div><div class="option-text" id="opt-text-0">Option A</div></div>
-        <div class="option-card selected" data-lane="1" id="opt-card-1"><div class="option-badge">B</div><div class="option-text" id="opt-text-1">Option B</div></div>
+        <div class="option-card" data-lane="1" id="opt-card-1"><div class="option-badge">B</div><div class="option-text" id="opt-text-1">Option B</div></div>
         <div class="option-card" data-lane="2" id="opt-card-2"><div class="option-badge">C</div><div class="option-text" id="opt-text-2">Option C</div></div>
       </div>
     </div>
@@ -432,7 +432,7 @@
       combo: 0,
       questionPool: [],
       currentQuestion: null,
-      selectedLane: 1,
+      selectedLane: -1,
       questionTimeLeft: 14,
       answerLocked: false,
       answeredLog: [],
@@ -765,7 +765,7 @@
       state.hearts = state.maxHearts;
       state.answeredLog = [];
       state.answerLocked = false;
-      state.selectedLane = 1;
+      state.selectedLane = -1;
       document.getElementById("start-menu-overlay").classList.add("hidden");
       const tavern = document.getElementById("setup-modal");
       if (tavern) tavern.classList.add("hidden");

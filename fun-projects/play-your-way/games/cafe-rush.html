@@ -1308,6 +1308,36 @@
       ctx.restore();
     }
 
+    function wrapCanvasLines(ctx, text, maxWidth) {
+      const raw = String(text || "").trim();
+      if (!raw) return [""];
+      if (ctx.measureText(raw).width <= maxWidth) return [raw];
+      const words = raw.split(/\s+/);
+      const lines = [];
+      let cur = "";
+      for (let i = 0; i < words.length; i++) {
+        const trial = cur ? (cur + " " + words[i]) : words[i];
+        if (cur && ctx.measureText(trial).width > maxWidth) {
+          lines.push(cur);
+          cur = words[i];
+        } else {
+          cur = trial;
+        }
+      }
+      if (cur) lines.push(cur);
+      return lines.length ? lines : [raw];
+    }
+
+    function hudClearY(canvas) {
+      const el = document.getElementById("question-hud-wrap") || document.getElementById("options-row");
+      if (!el || !canvas) return 12;
+      const hud = el.getBoundingClientRect();
+      const box = canvas.getBoundingClientRect();
+      if (!box.height) return 12;
+      const scaleY = canvas.height / box.height;
+      return Math.max(12, (hud.bottom - box.top) * scaleY + 8);
+    }
+
     function drawDish(ctx, x, y, idx, selected, label) {
       ctx.save();
       ctx.translate(x, y);
@@ -1323,13 +1353,32 @@
         ctx.fillStyle = colors[idx % 3];
         ctx.beginPath(); ctx.ellipse(0, 6, 22, 10, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#fff7ed";
-        ctx.beginPath(); ctx.ellipse(-6, 2, 6, 3, -0.4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(-6, 2, 6, 3, -0.4, 0, 0, Math.PI * 2); ctx.fill();
       }
-      ctx.fillStyle = "#111827";
-      ctx.font = "800 11px Plus Jakarta Sans, sans-serif";
-      ctx.textAlign = "center";
       const txt = String(label || LANE_LETTERS[idx]);
-      ctx.fillText(txt.length > 16 ? txt.slice(0, 15) + "…" : txt, 0, 36);
+      const maxW = 86;
+      ctx.fillStyle = "#111827";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      let size = 11;
+      let lines = [];
+      while (size >= 8) {
+        ctx.font = "800 " + size + "px Plus Jakarta Sans, sans-serif";
+        lines = wrapCanvasLines(ctx, txt, maxW);
+        const fits = lines.length <= 2 && lines.every((ln) => ctx.measureText(ln).width <= maxW);
+        if (fits) break;
+        size -= 1;
+      }
+      if (lines.length > 2) {
+        lines = [lines[0], lines.slice(1).join(" ")];
+      }
+      const lineH = size + 3;
+      const baseY = 36;
+      const startY = baseY - ((lines.length - 1) * lineH) / 2;
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], 0, startY + i * lineH);
+      }
+      ctx.textBaseline = "alphabetic";
       if (selected) {
         ctx.strokeStyle = "#fb7185";
         ctx.lineWidth = 3;
@@ -1415,29 +1464,47 @@
       if (museBarista) ctx.drawImage(museBarista, w * 0.78 - 70, floorY - 210, 140, 210);
       else drawAnimePerson(ctx, w * 0.78, floorY - 100, 1.25, palB, "happy", now, true);
 
-      // ticket over customer
+      // ticket: cue only (never the correct dish), kept clear of the HUD option row
       if (q && state.screen === "PLAY") {
-        const tx = enterX + 70, ty = floorY - 210;
+        const ticketW = 180, ticketH = 84;
+        const headTop = museCust ? (floorY - 200) : (floorY - 96 - 32 * 1.15);
+        const clearY = hudClearY(cafe.canvas);
+        let tx = enterX + 70;
+        let ty = headTop - ticketH - 10;
+        if (ty < clearY) {
+          // Not enough room above the head — sit beside the customer, or just under the HUD.
+          ty = Math.max(clearY, Math.min(headTop - 8, floorY - ticketH - 16));
+          const rightX = enterX + 78;
+          const leftX = enterX - 78 - ticketW;
+          if (rightX + ticketW <= w - 10) tx = rightX;
+          else if (leftX >= 10) tx = leftX;
+        }
+        ty = Math.max(clearY, Math.min(h - ticketH - 8, ty));
+        tx = Math.max(8, Math.min(w - ticketW - 8, tx));
         ctx.fillStyle = "#fffbeb";
         ctx.strokeStyle = "#d97706";
         ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.roundRect(tx, ty, 180, 70, 8); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.roundRect(tx, ty, ticketW, ticketH, 8); ctx.fill(); ctx.stroke();
         ctx.fillStyle = "#b45309";
         ctx.font = "800 11px Plus Jakarta Sans, sans-serif";
         ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
         ctx.fillText("NEXT ORDER", tx + 10, ty + 18);
         ctx.fillStyle = "#1f2937";
         ctx.font = "700 11px Plus Jakarta Sans, sans-serif";
         // Show the question cue, never the correct dish — that would spoil the order.
         const request = String(q.prompt || "Check the ticket above").replace(/_{2,}/g, "…");
-        const short = request.length > 34 ? request.slice(0, 33) + "…" : request;
-        ctx.fillText(short, tx + 10, ty + 40);
+        const cueLines = wrapCanvasLines(ctx, request, 160).slice(0, 2);
+        for (let i = 0; i < cueLines.length; i++) {
+          ctx.fillText(cueLines[i], tx + 10, ty + 36 + i * 14);
+        }
         // patience bar
         if (state.timerSeconds > 0) {
           const frac = Math.max(0, Math.min(1, state.questionTimeLeft / state.timerSeconds));
-          ctx.fillStyle = "#fecaca"; ctx.fillRect(tx + 10, ty + 50, 160, 8);
+          const barY = ty + ticketH - 16;
+          ctx.fillStyle = "#fecaca"; ctx.fillRect(tx + 10, barY, 160, 8);
           ctx.fillStyle = frac < 0.3 ? "#e11d48" : "#22c55e";
-          ctx.fillRect(tx + 10, ty + 50, 160 * frac, 8);
+          ctx.fillRect(tx + 10, barY, 160 * frac, 8);
         }
       }
 

@@ -26,7 +26,7 @@
     }
     #game-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
     .vignette { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
-    #toast-corner { position: fixed; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); z-index: 40; display: flex; flex-direction: column; gap: 8px; max-width: min(360px, 72vw); pointer-events: none; }
+    #toast-corner { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 68px); right: max(10px, env(safe-area-inset-right)); z-index: 40; display: flex; flex-direction: column; gap: 8px; max-width: min(360px, 72vw); pointer-events: none; }
     .corner-toast { background: var(--card); border: 1.5px solid var(--accent); border-radius: 12px; padding: 10px 12px; box-shadow: 0 10px 24px rgba(0,0,0,0.35); }
     .corner-toast.bad { border-color: #fb7185; }
     .corner-toast-title { font-weight: 800; font-size: 0.88rem; }
@@ -1352,18 +1352,39 @@
       drawDetective(ctx, w, h, now);
       drawBoard(ctx, w, h);
 
-      // location plate
+      // location plate — wrap the flavor note so the full sentence stays visible
       const scene = SCENES[sceneIdx];
+      const plateX = w * 0.32, plateY = h * 0.58, plateW = 280, plateH = 78;
       ctx.fillStyle = "rgba(8,8,12,0.72)";
-      ctx.fillRect(w * 0.32, h * 0.58, 280, 54);
+      ctx.fillRect(plateX, plateY, plateW, plateH);
       ctx.strokeStyle = "#fbbf24";
-      ctx.strokeRect(w * 0.32, h * 0.58, 280, 54);
+      ctx.strokeRect(plateX, plateY, plateW, plateH);
       ctx.fillStyle = "#fbbf24";
       ctx.font = "800 13px Special Elite, serif";
-      ctx.fillText(scene.name.toUpperCase(), w * 0.32 + 12, h * 0.58 + 22);
+      ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillText(scene.name.toUpperCase(), plateX + 12, plateY + 22);
       ctx.fillStyle = "#e2e8f0";
       ctx.font = "italic 12px Libre Baskerville, serif";
-      ctx.fillText(noir.typeText || scene.note, w * 0.32 + 12, h * 0.58 + 42);
+      const note = noir.typeText || scene.note || "";
+      const noteMax = plateW - 24;
+      const words = String(note).split(/\s+/);
+      const noteLines = [];
+      let cur = "";
+      for (let i = 0; i < words.length; i++) {
+        const trial = cur ? (cur + " " + words[i]) : words[i];
+        if (cur && ctx.measureText(trial).width > noteMax) {
+          noteLines.push(cur);
+          cur = words[i];
+        } else {
+          cur = trial;
+        }
+      }
+      if (cur) noteLines.push(cur);
+      const shown = noteLines.slice(0, 2);
+      for (let i = 0; i < shown.length; i++) {
+        ctx.fillText(shown[i], plateX + 12, plateY + 42 + i * 16);
+      }
 
       if (noir.flash > 0) {
         ctx.fillStyle = "rgba(253, 224, 71," + (noir.flash * 0.35) + ")";
