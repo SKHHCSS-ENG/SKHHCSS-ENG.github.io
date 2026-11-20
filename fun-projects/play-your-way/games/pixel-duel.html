@@ -45,7 +45,7 @@
       touch-action: none;
     }
 
-    /* Main 2D Boss Duel Arena Canvas & Hollow-Octopath Vignette */
+    /* Main 2D Boss Duel Arena Canvas */
     #game-canvas {
       position: fixed;
       inset: 0;
@@ -1318,7 +1318,7 @@
         <div class="hud-cluster">
           <div class="hero-badge-pill">
             <span class="hero-class-tag" id="hud-hero-class">KNIGHT</span>
-            <span class="hero-name-tag" id="hud-hero-name">Olberic</span>
+            <span class="hero-name-tag" id="hud-hero-name">Knight</span>
           </div>
           <div class="stat-chip">
             <span class="label">Duel</span>
@@ -1342,7 +1342,7 @@
         <div class="hud-cluster">
           <button type="button" class="hud-btn accent-cycle-btn" id="btn-hud-accent" title="Switch English Accent">🗣️ UK</button>
           <button type="button" class="hud-btn" id="btn-hud-mute" title="Toggle Sound">🔊</button>
-          <button type="button" class="hud-btn" id="btn-hud-pause">⏸️ Camp</button>
+          <button type="button" class="hud-btn" id="btn-hud-pause">⏸️ Pause</button>
         </div>
       </div>
 
@@ -1352,7 +1352,7 @@
           <div class="q-left">
             <span class="q-mode-pill" id="q-mode-badge">VOCAB</span>
             <div style="min-width:0; flex:1;">
-              <div class="q-prompt-text" id="q-prompt-text">Loading chronicle challenge...</div>
+              <div class="q-prompt-text" id="q-prompt-text">Loading challenge…</div>
               <div class="q-prompt-sub" id="q-prompt-sub">Duel 1 of 8</div>
             </div>
           </div>
@@ -1380,14 +1380,14 @@
 
       <div id="play-phase-banner" class="hidden-phase">
         <div class="play-phase-copy">
-          <div class="play-phase-kicker" id="play-phase-kicker">💥 SHIELD BREAK</div>
-          <div class="play-phase-title" id="play-phase-title">Boss stunned! Mash Slash for a combo!</div>
+          <div class="play-phase-kicker" id="play-phase-kicker">Shield Break</div>
+          <div class="play-phase-title" id="play-phase-title">Boss stunned! Keep slashing, or tap the boss, for a combo.</div>
         </div>
         <div class="play-phase-timer" id="play-phase-timer">6s</div>
       </div>
     </div>
 
-    <!-- Bottom Controls: Platformer Move Left/Right + Jump + Nail/Sword Slash + Shadow Dash / BP Boost -->
+    <!-- Bottom Controls: Move Left/Right + Jump + Slash + Boost -->
     <div class="hud-bottom-bar">
       <div class="touch-controls-cluster">
         <div class="lane-quick-stack">
@@ -1397,10 +1397,10 @@
         <div class="lane-quick-stack">
           <button type="button" class="touch-action-btn" id="btn-jump-plat">⬆️ Jump</button>
           <button type="button" class="touch-action-btn slash-cta" id="btn-action-jump">⚔️ Slash</button>
-          <button type="button" class="touch-action-btn" id="btn-action-boost">🔥 BP Boost</button>
+          <button type="button" class="touch-action-btn" id="btn-action-boost">🔥 Boost</button>
         </div>
-        <div class="bp-orbs-wrap" title="Boost Points (BP)">
-          <span style="font-family:'Fredoka',sans-serif; font-size:0.75rem; color:var(--gold-bright);">BP</span>
+        <div class="bp-orbs-wrap" title="Boost">
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.75rem; color:var(--gold-bright);">Boost</span>
           <div class="bp-orb filled" id="bp-orb-0"></div>
           <div class="bp-orb" id="bp-orb-1"></div>
           <div class="bp-orb" id="bp-orb-2"></div>
@@ -1416,8 +1416,8 @@
   <!-- Cutscene Skip Banner -->
   <div id="cutscene-banner" class="hidden">
     <div>
-      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">🏆 BOSS VANQUISHED</div>
-      <div style="font-size:0.78rem; color:#cbd5e1;" id="cutscene-banner-sub">Sanctuary Restored!</div>
+      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">Sanctuary Chronicle · All Seals Broken</div>
+      <div style="font-size:0.78rem; color:#cbd5e1;" id="cutscene-banner-sub">Boss vanquished — sanctuary restored</div>
     </div>
     <button type="button" class="btn-primary-gold" id="btn-skip-cutscene">Skip ▶</button>
   </div>
@@ -1426,8 +1426,8 @@
   <div id="start-menu-overlay">
     <div class="start-header-box">
       <div style="margin-bottom:8px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
-        <button type="button" class="btn-dark-brass" id="btn-back-to-pyw-hub" style="padding:5px 12px; font-size:0.78rem;">◀ Play Your Way Hub</button>
-        <span class="chronicle-kicker" style="margin-bottom:0;">⚔️ OCTOPATH × HOLLOW KNIGHT BOSS DUEL</span>
+        <button type="button" class="btn-dark-brass" id="btn-back-to-pyw-hub" style="padding:5px 12px; font-size:0.78rem;">◀ Play Your Way</button>
+        <span class="chronicle-kicker" style="margin-bottom:0;">⚔️ BOSS DUEL</span>
       </div>
       <h1 class="game-main-title">Pixel Duel: <span>Break &amp; Boost</span></h1>
     </div>
@@ -1435,15 +1435,15 @@
     <div class="start-center-card">
       <div class="start-mode-card" id="btn-open-tavern">
         <div>
-          <div class="mode-card-title">⚔️ 1 PLAYER BOSS DUEL</div>
-          <div class="mode-card-meta">A/D MOVE · W JUMP · SPACE SLASH · 1/2/3 ORBS · SHIFT BOOST</div>
+          <div class="mode-card-title">⚔️ 1-player boss duel</div>
+          <div class="mode-card-meta">A / D move · W jump · Space slash · 1 / 2 / 3 orbs · Shift boost</div>
         </div>
-        <div class="mode-enter-pill">Enter Tavern ▶</div>
+        <div class="mode-enter-pill">Enter Tavern</div>
       </div>
 
       <div class="word-pool-bar">
         <div class="pool-status-info">
-          <span class="pool-badge-label" id="start-pool-mode-tag">ACTIVE WORD POOL · ALL 4 MODES</span>
+          <span class="pool-badge-label" id="start-pool-mode-tag">Active word pool · All 4 modes</span>
           <span class="pool-active-summary" id="start-pool-summary">HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)</span>
         </div>
         <button type="button" class="btn-primary-gold" id="btn-open-word-builder">📚 Customise Word Pool</button>
@@ -1452,10 +1452,10 @@
       <div class="how-to-play-card">
         <div class="how-to-title">How to play</div>
         <ol>
-          <li>Read the question, then slash rune <strong>A</strong>, <strong>B</strong> or <strong>C</strong> — tap the orb, tap the card, or press 1 / 2 / 3.</li>
-          <li><strong>Correct:</strong> the boss is stunned. Mash ⚔️ Slash (or tap the boss) for a Break combo.</li>
-          <li><strong>Wrong or too slow:</strong> the boss attacks. Jump the shockwaves or slash to parry them.</li>
-          <li>Spend 🔥 BP Boost (Shift) for a short power dash. If all shields break, the duel ends.</li>
+          <li>Read the question, then slash rune <strong>A</strong>, <strong>B</strong> or <strong>C</strong> — tap the orb or card, or press 1 / 2 / 3.</li>
+          <li><strong>Correct:</strong> the boss is stunned. Keep slashing, or tap the boss, for a Break combo.</li>
+          <li><strong>Wrong or too slow:</strong> the boss attacks. Jump the shockwaves, or slash to parry them.</li>
+          <li>Use Boost (Shift) for a short power dash. If all shields break, the duel ends.</li>
         </ol>
         <div class="how-to-zh">正確答案可擊暈魔王並連擊；答錯或逾時要跳避或格擋衝擊波。</div>
         <div class="how-to-keys">A / D or ◀ ▶ move · W / ⬆️ jump · Space slash · Shift boost · Esc pause</div>
@@ -1472,7 +1472,7 @@
     <div class="modal-window">
       <div class="modal-header-row">
         <button type="button" class="btn-dark-brass" id="btn-back-title">◀ Start Menu</button>
-        <div class="modal-title">🔥 Sanctuary Bench &amp; Campfire Setup</div>
+        <div class="modal-title">Tavern Setup</div>
         <button type="button" class="btn-dark-brass" id="btn-tavern-word-pool">📚 Word Pool</button>
       </div>
 
@@ -1480,17 +1480,17 @@
         <!-- Left: Live 2D HD-Pixel Hero vs Boss Sanctuary Diorama Showcase -->
         <div class="turntable-box">
           <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-family:'Fredoka',sans-serif; font-size:0.85rem; color:var(--gold-bright);" id="showroom-hero-title">OLBERIC · BLADE KNIGHT #4</span>
+            <span style="font-family:'Fredoka',sans-serif; font-size:0.85rem; color:var(--gold-bright);" id="showroom-hero-title">KNIGHT</span>
             <span style="font-size:0.72rem; color:#94a3b8;">BOSS DUEL SHOWCASE</span>
           </div>
           <canvas id="showroom-canvas" width="380" height="210"></canvas>
           <div class="hero-selector-grid" id="hero-selector-grid">
-            <button type="button" class="hero-pick-btn active" data-hero="0">⚔️ Olberic #4</button>
-            <button type="button" class="hero-pick-btn" data-hero="1">📖 Cyrus #16</button>
-            <button type="button" class="hero-pick-btn" data-hero="2">🗡️ Therion #33</button>
-            <button type="button" class="hero-pick-btn" data-hero="3">🏹 H'aanit #12</button>
-            <button type="button" class="hero-pick-btn" data-hero="4">💃 Primrose #14</button>
-            <button type="button" class="hero-pick-btn" data-hero="5">💎 Tressa #10</button>
+            <button type="button" class="hero-pick-btn active" data-hero="0">⚔️ Knight</button>
+            <button type="button" class="hero-pick-btn" data-hero="1">📖 Scholar</button>
+            <button type="button" class="hero-pick-btn" data-hero="2">🗡️ Rogue</button>
+            <button type="button" class="hero-pick-btn" data-hero="3">🏹 Hunter</button>
+            <button type="button" class="hero-pick-btn" data-hero="4">💃 Dancer</button>
+            <button type="button" class="hero-pick-btn" data-hero="5">💎 Merchant</button>
           </div>
         </div>
 
@@ -1499,11 +1499,11 @@
           <div class="field-row-2col">
             <div class="field-group">
               <label class="field-label" for="input-traveler-name">Challenger Name</label>
-              <input type="text" id="input-traveler-name" class="text-input" value="Olberic" maxlength="20" />
+              <input type="text" id="input-traveler-name" class="text-input" value="Knight" maxlength="20" />
             </div>
             <div class="field-group">
-              <label class="field-label" for="input-guild-name">Guild / Order</label>
-              <input type="text" id="input-guild-name" class="text-input" value="Cobbleston Guard" maxlength="24" />
+              <label class="field-label" for="input-guild-name">Guild</label>
+              <input type="text" id="input-guild-name" class="text-input" value="Ironleaf Guild" maxlength="24" />
             </div>
           </div>
 
@@ -1560,7 +1560,7 @@
           </div>
 
           <button type="button" class="btn-primary-gold" id="btn-launch-quest" style="padding:12px; font-size:1.05rem; margin-top:4px;">
-            ⚔️ Enter Boss Arena ▶
+            Enter Boss Arena
           </button>
         </div>
       </div>
@@ -1570,11 +1570,11 @@
   <!-- Pause Modal (Campfire Rest, z-index: 65) -->
   <div id="pause-modal" class="modal-backdrop hidden">
     <div class="modal-window" style="max-width:440px; text-align:center;">
-      <div class="modal-title">🔥 Sanctuary Bench — Paused</div>
+      <div class="modal-title">Paused</div>
       <div style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
         <button type="button" class="btn-primary-gold" id="btn-resume-quest" style="padding:11px;">▶ Resume Duel</button>
         <button type="button" class="btn-dark-brass" id="btn-pause-restart" style="padding:10px;">🔄 Restart Duel</button>
-        <button type="button" class="btn-dark-brass" id="btn-pause-tavern" style="padding:10px;">🛡️ Challenger Setup</button>
+        <button type="button" class="btn-dark-brass" id="btn-pause-tavern" style="padding:10px;">Tavern Setup</button>
         <button type="button" class="btn-dark-brass" id="btn-main-menu" style="padding:10px;">🏠 Start Menu</button>
       </div>
     </div>
@@ -1592,8 +1592,8 @@
               <span class="nowrap-clause">ALL SEALS BROKEN</span>
             </div>
             <div class="clause-title" id="end-title-line">
-              <span class="nowrap-clause">🏆 Boss Vanquished —</span>
-              <span class="nowrap-clause">Pantheon Complete!</span>
+              <span class="nowrap-clause">Boss vanquished —</span>
+              <span class="nowrap-clause">sanctuary restored</span>
             </div>
           </div>
         </div>
@@ -1626,7 +1626,7 @@
       <!-- Classroom Hall of Fame Standings -->
       <div>
         <div style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright); margin-bottom:6px;">
-          👑 GUILD HONOUR BOARD
+          Guild Honour Board
         </div>
         <div class="standings-list" id="end-standings-list"></div>
       </div>
@@ -1634,7 +1634,7 @@
       <!-- Stacked Bilingual Review Cards -->
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px; flex-wrap:wrap;">
-          <span style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright);">📜 CHRONICLE REVIEW (ENGLISH + 繁體中文)</span>
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright);">Chronicle Review · English / 繁體中文</span>
           <div class="pill-choice-row" id="review-filter-pills">
             <button type="button" class="choice-pill active" data-filter="ALL">All Answered</button>
             <button type="button" class="choice-pill" data-filter="MISSED">Missed Only</button>
@@ -1802,7 +1802,7 @@
       },
       {
         mode: 'GRAMMAR', band: 'S1_S3', word: 'has been training', zh: '現在完成進行式',
-        prompt: 'Olberic ________ in the courtyard since sunrise, and his blade is still glowing.',
+        prompt: 'The knight ________ in the courtyard since sunrise, and the blade is still glowing.',
         options: ['trains', 'trained', 'has been training'], answer: 2,
         expEn: 'Present perfect continuous ("has been training") shows an action that started in the past ("since sunrise") and continues now.',
         expZh: '與「since sunrise」連用時，用現在完成進行式「has been training」表達由過去開始並持續至今的動作。'
@@ -1874,7 +1874,7 @@
       // READING COMPREHENSION / INFERENCE MODE (12)
       {
         mode: 'READING', band: 'S1_S3', word: 'Reluctant', zh: '不情願的；猶豫的',
-        prompt: '"Therion glanced at the locked chest, sighed, and stepped back." How did he feel?',
+        prompt: '"The rogue glanced at the locked chest, sighed, and stepped back." How did the rogue feel?',
         options: ['Eager', 'Reluctant', 'Thrilled'], answer: 1,
         expEn: 'Sighing and stepping back shows he was hesitant or reluctant to touch the chest.',
         expZh: '從「嘆氣並退後一步」可推斷他感到猶豫或不情願（Reluctant）。'
@@ -1923,7 +1923,7 @@
       },
       {
         mode: 'READING', band: 'DSE_HIGH', word: 'Implicit meaning', zh: '隱含意思',
-        prompt: '"Cyrus closed his tome only when the last candle wick drowned in wax." This implies he studied:',
+        prompt: '"The scholar closed the tome only when the last candle wick drowned in wax." This implies the scholar studied:',
         options: ['Until late into the night', 'For only a few minutes', 'Outside in bright daylight'], answer: 0,
         expEn: 'A candle burning all the way down until the wick drowns in melted wax implies hours of late-night study.',
         expZh: '蠟燭一直燃燒至燭芯淹沒在蠟液中才合上書本，隱含他挑燈夜讀至深夜（Until late into the night）。'
@@ -2284,33 +2284,33 @@
      *************************************************************************/
     const HERO_ROSTER = [
       {
-        id: 0, name: 'Olberic', guild: 'Cobbleston Guard', role: 'BLADE KNIGHT #4',
-        shortClass: 'KNIGHT #4', primary: '#e11d48', secondary: '#be123c', cloak: '#881337', cloakLight: '#f43f5e',
+        id: 0, name: 'Knight', guild: 'Ironleaf Guild', role: 'KNIGHT',
+        shortClass: 'KNIGHT', primary: '#e11d48', secondary: '#be123c', cloak: '#881337', cloakLight: '#f43f5e',
         trim: '#fbbf24', hair: '#475569', hairLight: '#94a3b8', weapon: 'SWORD', helmFeather: '#fef08a', slashColor: '#38bdf8'
       },
       {
-        id: 1, name: 'Cyrus', guild: 'Royal Academy', role: 'ARCANE SCHOLAR #16',
-        shortClass: 'SCHOLAR #16', primary: '#2563eb', secondary: '#1d4ed8', cloak: '#1e3a8a', cloakLight: '#60a5fa',
+        id: 1, name: 'Scholar', guild: 'Lantern Library', role: 'SCHOLAR',
+        shortClass: 'SCHOLAR', primary: '#2563eb', secondary: '#1d4ed8', cloak: '#1e3a8a', cloakLight: '#60a5fa',
         trim: '#fde047', hair: '#1e293b', hairLight: '#475569', weapon: 'STAFF', helmFeather: '#38bdf8', slashColor: '#60a5fa'
       },
       {
-        id: 2, name: 'Therion', guild: 'Ravus Manor', role: 'SHADOW ROGUE #33',
-        shortClass: 'ROGUE #33', primary: '#7c3aed', secondary: '#5b21b6', cloak: '#3b0764', cloakLight: '#a78bfa',
+        id: 2, name: 'Rogue', guild: 'Nightshade Hall', role: 'ROGUE',
+        shortClass: 'ROGUE', primary: '#7c3aed', secondary: '#5b21b6', cloak: '#3b0764', cloakLight: '#a78bfa',
         trim: '#e2e8f0', hair: '#cbd5e1', hairLight: '#ffffff', weapon: 'DAGGER', helmFeather: '#c084fc', slashColor: '#c084fc'
       },
       {
-        id: 3, name: "H'aanit", guild: "S'warkii Woods", role: 'FOREST HUNTER #12',
-        shortClass: 'HUNTER #12', primary: '#059669', secondary: '#047857', cloak: '#064e3b', cloakLight: '#34d399',
+        id: 3, name: 'Hunter', guild: 'Pinewood Lodge', role: 'HUNTER',
+        shortClass: 'HUNTER', primary: '#059669', secondary: '#047857', cloak: '#064e3b', cloakLight: '#34d399',
         trim: '#fcd34d', hair: '#d97706', hairLight: '#fbbf24', weapon: 'BOW', helmFeather: '#86efac', slashColor: '#34d399'
       },
       {
-        id: 4, name: 'Primrose', guild: 'Sunshade Noble', role: 'DUSK DANCER #14',
-        shortClass: 'DANCER #14', primary: '#db2777', secondary: '#9d174d', cloak: '#500724', cloakLight: '#f472b6',
+        id: 4, name: 'Dancer', guild: 'Ember Court', role: 'DANCER',
+        shortClass: 'DANCER', primary: '#db2777', secondary: '#9d174d', cloak: '#500724', cloakLight: '#f472b6',
         trim: '#fbbf24', hair: '#0f172a', hairLight: '#334155', weapon: 'FAN', helmFeather: '#fbcfe8', slashColor: '#f472b6'
       },
       {
-        id: 5, name: 'Tressa', guild: 'Rippletide Coast', role: 'WIND MERCHANT #10',
-        shortClass: 'MERCHANT #10', primary: '#d97706', secondary: '#b45309', cloak: '#14532d', cloakLight: '#22c55e',
+        id: 5, name: 'Merchant', guild: 'Harbor Market', role: 'MERCHANT',
+        shortClass: 'MERCHANT', primary: '#d97706', secondary: '#b45309', cloak: '#14532d', cloakLight: '#22c55e',
         trim: '#fef08a', hair: '#92400e', hairLight: '#f59e0b', weapon: 'SPEAR', helmFeather: '#fde047', slashColor: '#fde047'
       }
     ];
@@ -2512,7 +2512,7 @@
           // Ground shadow
           px(12, 43, 24, 3, 'rgba(0,0,0,0.45)');
 
-          // Flowing Hollow-Knight / Octopath Cloak
+          // Flowing cloak
           px(5, 19 + bob, 14, 18 + capeWave, '#090b10');
           px(6, 20 + bob, 13, 16 + capeWave, hero.cloak);
           px(7, 21 + bob, 7, 12 + capeWave, hero.cloakLight);
@@ -2597,7 +2597,7 @@
       return frames;
     }
 
-    // Colossal 96x96 Hollow-Radiance Arch-Boss Sprite (Normal, Enraged & Stunned Break States)
+    // Colossal 96x96 arch-boss sprite (normal, enraged and stunned break states)
     function getBossDuelSprite(bossState, frame) {
       const museBoss = getMuseArt('boss-' + bossState) || getMuseArt('boss');
       const key = `duel_boss_${bossState}_${frame}_${museBoss ? 'muse' : 'proc'}`;
@@ -2624,7 +2624,7 @@
         // Ground shadow
         px(16, 86, 64, 6, 'rgba(0,0,0,0.55)');
 
-        // Ethereal Hollow-Knight / Octopath Wings & Mantle
+        // Ethereal wings and mantle
         const wingCol = isStunned ? '#334155' : (isEnraged ? '#be123c' : '#4c1d95');
         const wingGlow = isStunned ? '#64748b' : (isEnraged ? '#f43f5e' : '#7c3aed');
         px(4, 16 + breathe, 88, 52, '#090b10');
@@ -2693,8 +2693,8 @@
     const state = {
       screen: 'START', // START, TAVERN, PLAY_PHASE, QUESTION_PHASE, CUTSCENE_WIN, CUTSCENE_DNF, PAUSED, END
       selectedHeroIdx: 0,
-      travelerName: 'Olberic',
-      guildName: 'Cobbleston Guard',
+      travelerName: 'Knight',
+      guildName: 'Ironleaf Guild',
       modeFilter: 'ALL',
       targetLaps: 8,
       timerSeconds: 14,
@@ -2968,7 +2968,7 @@
       if (state.currentQuestion.isDictation && state.currentQuestion.word) {
         setTimeout(() => speakText(state.currentQuestion.word), 120);
       }
-      document.getElementById('q-prompt-sub').textContent = `Duel ${state.currentLap} of ${state.targetLaps} · Jump-Slash Rune Orb A, B, or C!`;
+      document.getElementById('q-prompt-sub').textContent = `Duel ${state.currentLap} of ${state.targetLaps} · Slash rune A, B or C`;
 
       for (let i = 0; i < 3; i++) {
         const optEl = document.getElementById(`opt-text-${i}`);
@@ -3017,7 +3017,7 @@
         setTimeout(() => { flash.style.opacity = '0'; }, 280);
 
         spawnSoulSparks(orb.x, orb.y, '#22c55e', 34);
-        spawnFloatingCombatText(orb.x, orb.y - 35, `💥 SHIELD BREAK! +${bonus}`, '#86efac', 'BOSS STUNNED! MASH SLASH!');
+        spawnFloatingCombatText(orb.x, orb.y - 35, `💥 SHIELD BREAK! +${bonus}`, '#86efac', 'BOSS STUNNED! KEEP SLASHING!');
 
         showCornerToast(
           `💥 SHIELD BREAK! +${bonus} PTS`,
@@ -3074,11 +3074,11 @@
       const title = document.getElementById('play-phase-title');
       const timerEl = document.getElementById('play-phase-timer');
       if (wasCorrectBreak) {
-        if (kicker) kicker.textContent = '💥 SHIELD BREAK';
-        if (title) title.textContent = 'Boss stunned! Mash Slash or tap the boss for a combo!';
+        if (kicker) kicker.textContent = 'Shield Break';
+        if (title) title.textContent = 'Boss stunned! Keep slashing, or tap the boss, for a combo.';
       } else {
-        if (kicker) kicker.textContent = '⚠️ BOSS ENRAGED';
-        if (title) title.textContent = 'Jump the shockwaves, or slash to parry them!';
+        if (kicker) kicker.textContent = 'Boss enraged';
+        if (title) title.textContent = 'Jump the shockwaves, or slash to parry them.';
       }
       if (timerEl) timerEl.textContent = `${Math.ceil(state.phaseTimer)}s`;
 
@@ -3192,7 +3192,7 @@
         ctx.translate((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14);
       }
 
-      // 1. Hollow-Knight / Octopath Sanctuary Cathedral Background Gradient
+      // 1. Sanctuary cathedral background gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
       bgGrad.addColorStop(0.0, '#070913');
       bgGrad.addColorStop(0.45, '#131629');
@@ -3275,7 +3275,7 @@
         ctx.fillText(`PLATFORM ${p.letter}`, p.orbX, p.y + 16);
       });
 
-      // 5. Draw Colossal Hollow-Radiance Boss + Boss HP Bar
+      // 5. Draw the boss and the small HP pip
       drawColossalBoss(ctx, w, h, floorY, now);
 
       // 6. Draw 3 Floating Elemental Weak-Point Orbs [A, B, C] (During Question Phase)
@@ -3286,13 +3286,29 @@
       // 7. Draw Boss Shockwaves (During Play Phase)
       bossShockwaves.forEach(sw => {
         if (sw.parried) return;
-        ctx.fillStyle = '#f43f5e';
-        ctx.fillRect(Math.round(sw.x - 16), Math.round(sw.y - 26), 32, 42);
+        const pulse = 0.55 + Math.sin(now * 0.02 + sw.x) * 0.25;
+        const grd = ctx.createRadialGradient(sw.x, sw.y, 4, sw.x, sw.y, 42);
+        grd.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+        grd.addColorStop(1, 'rgba(244, 63, 94, 0)');
+        ctx.save();
+        ctx.globalAlpha = pulse;
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, 42, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fb7185';
+        ctx.beginPath();
+        ctx.ellipse(sw.x, sw.y, 30, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.fillStyle = '#fef08a';
-        ctx.fillRect(Math.round(sw.x - 8), Math.round(sw.y - 18), 16, 28);
+        ctx.beginPath();
+        ctx.ellipse(sw.x, sw.y, 14, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       });
 
-      // 8. Draw Free-Roam Platformer Hero + Nail/Sword Slash Crescent Arcs
+      // 8. Draw the hero and slash arcs
       drawPlatformerHero(ctx, now);
 
       // 9. Draw Soul Sparks, Fireflies & Floating Damage Numbers
@@ -3419,14 +3435,15 @@
         }
       }
 
-      // Main Hero Sprite
+      // Main Hero Sprite (flicker while invulnerable after a hit or boost dash)
       ctx.save();
+      if (state.invulnTimer > 0 && Math.floor(now / 80) % 2 === 0) ctx.globalAlpha = 0.35;
       ctx.translate(Math.round(state.heroX), Math.round(state.heroY - 36));
       ctx.scale(state.facing, 1);
       ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
       ctx.restore();
 
-      // Hollow-Knight Style Wide Nail / Sword Slash Crescent Arcs
+      // Sword slash crescent arcs
       slashArcs.forEach(arc => {
         ctx.save();
         ctx.translate(Math.round(arc.x), Math.round(arc.y));
@@ -3478,11 +3495,11 @@
       ctx.drawImage(bossSprite, 218, 46, 112, 112);
 
       const titleEl = document.getElementById('showroom-hero-title');
-      if (titleEl) titleEl.textContent = `${hero.name.toUpperCase()} · ${hero.role}`;
+      if (titleEl) titleEl.textContent = hero.name.toUpperCase();
     }
 
     /*************************************************************************
-     * 10. VICTORY & DNF CUTSCENES (~3.5s Skippable) + SCOREBOARD
+     * 10. VICTORY AND RETREAT CUTSCENES (~3.5s Skippable) + SCOREBOARD
      *************************************************************************/
     function startEndCutscene(outcome) {
       runeOrbs = [];
@@ -3502,12 +3519,12 @@
       if (outcome === 'WIN') {
         state.bossMode = 'STUNNED';
         playSynthSfx('fanfare');
-        title.textContent = '🏆 BOSS VANQUISHED — ALL SEALS BROKEN!';
-        sub.textContent = `${state.travelerName} (${state.guildName}) shattered all ${state.targetLaps} boss seals!`;
+        title.textContent = 'Sanctuary Chronicle · All Seals Broken';
+        sub.textContent = 'Boss vanquished — sanctuary restored';
       } else {
         playSynthSfx('damage');
-        title.textContent = '🛡️ SHIELDS SHATTERED — RETREAT';
-        sub.textContent = 'Out of Shields! Resting on the sanctuary bench...';
+        title.textContent = 'Shields shattered — Retreat';
+        sub.textContent = 'Out of shields';
       }
     }
 
@@ -3526,12 +3543,12 @@
 
       if (isWin) {
         emojiEl.textContent = '🏆';
-        kickerEl.innerHTML = `<span class="nowrap-clause">⚔️ SANCTUARY CHRONICLE ·</span><span class="nowrap-clause">ALL SEALS BROKEN</span>`;
-        titleEl.innerHTML = `<span class="nowrap-clause">🏆 Boss Vanquished —</span><span class="nowrap-clause">Sanctuary Restored!</span>`;
+        kickerEl.innerHTML = `<span class="nowrap-clause">Sanctuary Chronicle ·</span><span class="nowrap-clause">All Seals Broken</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">Boss vanquished —</span><span class="nowrap-clause">sanctuary restored</span>`;
       } else {
-        emojiEl.textContent = '🚩';
-        kickerEl.innerHTML = `<span class="nowrap-clause">🛡️ Shields Shattered ·</span><span class="nowrap-clause">Retreat to the Bench</span>`;
-        titleEl.innerHTML = `<span class="nowrap-clause">🚩 Duel Incomplete —</span><span class="nowrap-clause">Out of Shields!</span>`;
+        emojiEl.textContent = '🛡️';
+        kickerEl.innerHTML = `<span class="nowrap-clause">Shields shattered —</span><span class="nowrap-clause">Retreat</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">Out of shields</span>`;
       }
 
       const totalAnswered = state.answeredLog.length;
@@ -3549,15 +3566,31 @@
 
     function saveAndRenderStandings(isWin, acc) {
       let board = [
-        { name: 'Olberic · Cobbleston Guard', pts: 980, status: 'FULL' },
-        { name: 'Cyrus · Royal Academy', pts: 820, status: 'FULL' },
-        { name: "H'aanit · S'warkii Woods", pts: 690, status: 'FULL' }
+        { name: 'Knight · Ironleaf Guild', pts: 980, status: 'Clear' },
+        { name: 'Scholar · Lantern Library', pts: 820, status: 'Clear' },
+        { name: 'Hunter · Pinewood Lodge', pts: 690, status: 'Clear' }
       ];
       try {
         const saved = localStorage.getItem('pyw_pixel_quest_standings');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) board = parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) board = parsed.map((row) => {
+            let name = String(row.name || '');
+            const rename = [
+              ['Olberic · Cobbleston Guard', 'Knight · Ironleaf Guild'],
+              ['Cyrus · Royal Academy', 'Scholar · Lantern Library'],
+              ["H'aanit · S'warkii Woods", 'Hunter · Pinewood Lodge'],
+              ['Olberic', 'Knight'],
+              ['Cyrus', 'Scholar'],
+              ['Therion', 'Rogue'],
+              ["H'aanit", 'Hunter'],
+              ['Primrose', 'Dancer'],
+              ['Tressa', 'Merchant']
+            ];
+            rename.forEach((pair) => { name = name.replace(pair[0], pair[1]); });
+            const status = row.status === 'FULL' || row.status === 'DNF' ? (row.status === 'FULL' ? 'Clear' : 'Retreat') : row.status;
+            return Object.assign({}, row, { name, status });
+          });
         }
       } catch (e) {}
 
@@ -3617,8 +3650,8 @@
             ${!item.isCorrect ? `<span class="ans-pill-wrong">✗ Chosen [${LANE_LETTERS[item.chosenLane] || '-'}]: ${escapeHtml(item.chosenText)}</span>` : ''}
           </div>
           <div class="review-explanation-full">
-            <div><strong>EN:</strong> ${escapeHtml(item.expEn)}</div>
-            <div style="margin-top:3px; color:#fde68a;"><strong>繁中:</strong> ${escapeHtml(item.expZh)}</div>
+            <div><strong>English:</strong> ${escapeHtml(item.expEn)}</div>
+            <div style="margin-top:3px; color:#fde68a;"><strong>繁體中文:</strong> ${escapeHtml(item.expZh)}</div>
           </div>
           <div class="review-audio-row">
             <button type="button" class="hud-btn btn-speak-correct" data-speak="${encodeURIComponent(item.correctText)}">🔊 Correct (${escapeHtml(item.correctText)})</button>
@@ -3962,8 +3995,8 @@
      *************************************************************************/
     function startNewQuest() {
       ensureAudioCtx();
-      state.travelerName = (document.getElementById('input-traveler-name').value || 'Olberic').trim();
-      state.guildName = (document.getElementById('input-guild-name').value || 'Cobbleston Guard').trim();
+      state.travelerName = (document.getElementById('input-traveler-name').value || 'Knight').trim();
+      state.guildName = (document.getElementById('input-guild-name').value || 'Ironleaf Guild').trim();
 
       const customLapsVal = parseInt(document.getElementById('input-custom-laps').value, 10);
       if (!isNaN(customLapsVal) && customLapsVal >= 1 && customLapsVal <= 99) {
@@ -4302,7 +4335,7 @@
           document.querySelectorAll('#setup-mode-pills .choice-pill').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           state.modeFilter = btn.getAttribute('data-mode') || 'ALL';
-          document.getElementById('start-pool-mode-tag').textContent = `ACTIVE WORD POOL · ${state.modeFilter}`;
+          document.getElementById('start-pool-mode-tag').textContent = 'Active word pool · ' + (state.modeFilter === 'ALL' ? 'All 4 modes' : (state.modeFilter.charAt(0) + state.modeFilter.slice(1).toLowerCase()));
         });
       });
 

@@ -1336,13 +1336,20 @@
         ctx.textAlign = "center";
         ctx.fillText(LANE_LETTERS[i], x + L.laneW / 2, L.bottom + 18);
       }
-      // strike line
-      ctx.strokeStyle = "#f8fafc";
-      ctx.shadowColor = "#fff";
-      ctx.shadowBlur = 12;
-      ctx.lineWidth = 4;
+      // strike line — brighten when the cue is in the hit window
+      const inWindow = stage.phase === "hit" && Math.abs(stage.noteY - stage.strikeY) <= 56;
+      ctx.strokeStyle = inWindow ? "#fde047" : "#f8fafc";
+      ctx.shadowColor = inWindow ? "#fde047" : "#fff";
+      ctx.shadowBlur = inWindow ? 22 : 12;
+      ctx.lineWidth = inWindow ? 6 : 4;
       ctx.beginPath(); ctx.moveTo(L.left, stage.strikeY); ctx.lineTo(L.left + L.hw, stage.strikeY); ctx.stroke();
       ctx.shadowBlur = 0;
+      if (inWindow) {
+        ctx.fillStyle = "#fde047";
+        ctx.font = "800 16px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("NOW", w / 2, stage.strikeY - 16);
+      }
 
       if (stage.phase === "hit" && state.currentQuestion) {
         const ans = state.currentQuestion.answer;
@@ -1414,8 +1421,8 @@
       if (stage.phase !== "hit" || !stage.armed) return;
       const dist = Math.abs(stage.noteY - stage.strikeY);
       let grade = "Miss";
-      if (dist <= 18) grade = "Perfect";
-      else if (dist <= 42) grade = "Good";
+      if (dist <= 28) grade = "Perfect";
+      else if (dist <= 56) grade = "Good";
       const okLane = state.currentQuestion && lane === state.currentQuestion.answer;
       if (!okLane || grade === "Miss") {
         spawnHitSparks(lane, "#fb7185");

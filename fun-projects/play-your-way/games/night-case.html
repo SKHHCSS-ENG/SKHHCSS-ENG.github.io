@@ -1314,8 +1314,11 @@
         ctx.beginPath(); ctx.arc(cx + 6, cy + 6, 4, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#1f2937";
         ctx.font = "700 10px Libre Baskerville, serif";
-        const line = String(clue).slice(0, 28);
-        ctx.fillText(line, cx + 12, cy + 28);
+        const raw = String(clue);
+        const line1 = raw.slice(0, 16);
+        const line2 = raw.length > 16 ? raw.slice(16, 30) : "";
+        ctx.fillText(line1, cx + 12, cy + 24);
+        if (line2) ctx.fillText(line2, cx + 12, cy + 38);
       });
     }
 

@@ -1415,8 +1415,10 @@
         ctx.fillText("NEXT ORDER", tx + 10, ty + 18);
         ctx.fillStyle = "#1f2937";
         ctx.font = "700 11px Plus Jakarta Sans, sans-serif";
-        const request = String(q.options[q.answer] || "Special");
-        ctx.fillText((request.length > 22 ? request.slice(0, 21) + "…" : request) + "?", tx + 10, ty + 40);
+        // Show the question cue, never the correct dish — that would spoil the order.
+        const request = String(q.prompt || "Check the ticket above").replace(/_{2,}/g, "…");
+        const short = request.length > 34 ? request.slice(0, 33) + "…" : request;
+        ctx.fillText(short, tx + 10, ty + 40);
         // patience bar
         if (state.timerSeconds > 0) {
           const frac = Math.max(0, Math.min(1, state.questionTimeLeft / state.timerSeconds));
