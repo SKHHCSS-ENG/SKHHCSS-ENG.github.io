@@ -45,7 +45,7 @@
       touch-action: none;
     }
 
-    /* Main 2D Boss Duel Arena Canvas & Hollow-Octopath Vignette */
+    /* Main 2D Boss Duel Arena Canvas */
     #game-canvas {
       position: fixed;
       inset: 0;
@@ -529,7 +529,7 @@
     }
 
     /* Circular Combat Pace / Combo Gauge (Low=Green -> Mid=Amber -> High=Red) */
-    .speedo-container {
+    .soul-gauge-container {
       width: 168px;
       height: 168px;
       position: relative;
@@ -537,7 +537,7 @@
       flex-shrink: 0;
     }
 
-    #speedo-canvas {
+    #soul-gauge-canvas {
       width: 100%;
       height: 100%;
       display: block;
@@ -552,13 +552,33 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
       padding:
         max(16px, env(safe-area-inset-top))
         max(16px, env(safe-area-inset-right))
         max(16px, env(safe-area-inset-bottom))
         max(16px, env(safe-area-inset-left));
       background: radial-gradient(circle at 50% 42%, rgba(15, 19, 28, 0.25) 0%, rgba(10, 12, 18, 0.78) 100%);
+      overflow-x: hidden;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      max-height: 100%;
+    }
+
+    #start-menu-overlay .start-header-box,
+    #start-menu-overlay > :last-child {
+      flex-shrink: 0;
+    }
+
+    #start-menu-overlay .start-center-card {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
     }
 
     .start-header-box {
@@ -598,7 +618,7 @@
 
     .start-center-card {
       width: 100%;
-      max-width: 560px;
+      max-width: 640px;
       background: rgba(15, 19, 28, 0.93);
       border: 2px solid rgba(251, 191, 36, 0.55);
       border-radius: 16px;
@@ -748,6 +768,26 @@
       z-index: 95;
     }
 
+    #end-modal {
+      align-items: flex-start;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+    }
+
+    #end-modal .modal-window {
+      margin-top: auto;
+      margin-bottom: auto;
+      max-height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -849,6 +889,16 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+    }
+    @media (max-width: 600px) {
+      #word-builder-modal .field-row-2col {
+        grid-template-columns: 1fr;
+      }
+      #select-hkdse-band {
+        min-width: 0;
+        width: 100%;
+        text-overflow: clip;
+      }
     }
 
     .field-group {
@@ -1012,7 +1062,7 @@
       background: rgba(245, 158, 11, 0.16);
     }
 
-    .standing-driver-info {
+    .standing-hero-info {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1035,6 +1085,16 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+    }
+    @media (max-width: 480px) {
+      .standing-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        line-height: 1.25;
+      }
     }
 
     .pts-pill {
@@ -1137,6 +1197,132 @@
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
     }
 
+
+    .how-to-play-card {
+      background: rgba(9, 12, 20, 0.82);
+      border: 1px solid rgba(251, 191, 36, 0.28);
+      border-radius: 12px;
+      padding: 10px 14px 12px;
+      color: #e2e8f0;
+    }
+    .how-to-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.86rem;
+      color: var(--gold-bright);
+      margin-bottom: 6px;
+    }
+    .how-to-play-card ol {
+      margin: 0 0 8px 1.1rem;
+      padding: 0;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+    .how-to-play-card li { margin: 0 0 4px; }
+    .how-to-zh {
+      font-size: 0.74rem;
+      color: #fde68a;
+      margin-bottom: 6px;
+    }
+    .how-to-keys {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    #play-phase-banner {
+      width: 100%;
+      max-width: 880px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(17, 20, 32, 0.96) 0%, rgba(12, 14, 22, 0.96) 100%);
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 11px;
+      padding: 8px 14px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.72);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    #play-phase-banner.hidden-phase {
+      opacity: 0;
+      transform: translateY(-14px);
+      pointer-events: none;
+      visibility: hidden;
+      height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+    #play-phase-banner.break-mode { border-color: #38bdf8; }
+    #play-phase-banner.dodge-mode { border-color: #fb7185; }
+    .play-phase-copy { min-width: 0; flex: 1; }
+    .play-phase-kicker {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.78rem;
+      color: var(--gold-bright);
+      letter-spacing: 0.04em;
+    }
+    #play-phase-banner.dodge-mode .play-phase-kicker { color: #fda4af; }
+    .play-phase-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .play-phase-timer {
+      flex-shrink: 0;
+      min-width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid var(--gold-bright);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.15rem;
+      color: #fff;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .boss-hp-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 140px;
+    }
+    .boss-hp-track {
+      width: 88px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(51, 65, 85, 0.85);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      overflow: hidden;
+    }
+    #boss-hp-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #e11d48, #fb7185);
+      border-radius: inherit;
+      transition: width 0.25s ease;
+    }
+
+    /* Circular Soul / Combo Gauge */
+    .soul-gauge-container {
+      width: 168px;
+      height: 168px;
+      position: relative;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+
+    @media (max-height: 700px) {
+      .soul-gauge-container { width: 108px; height: 108px; }
+      .question-card { padding: 6px 10px; }
+      .how-to-play-card { padding: 8px 10px; }
+      .how-to-play-card ol { font-size: 0.72rem; }
+    }
+
     /* Responsive Mobile Adjustments */
     @media (max-width: 768px) {
       .tavern-grid {
@@ -1145,7 +1331,7 @@
       .score-summary-banner {
         grid-template-columns: repeat(2, 1fr);
       }
-      .speedo-container {
+      .soul-gauge-container {
         width: 108px;
         height: 108px;
       }
@@ -1156,17 +1342,118 @@
         max-width: 82px;
       }
       .options-below-row {
-        gap: 5px;
+        gap: 4px;
       }
       .option-card {
-        padding: 5px 7px;
-        gap: 5px;
+        padding: 5px 5px;
+        gap: 4px;
       }
       .option-badge {
-        width: 22px;
-        height: 22px;
-        font-size: 0.78rem;
+        width: 20px;
+        height: 20px;
+        font-size: 0.74rem;
       }
+    }
+
+    /* Tavern: keep Enter Boss Arena visible; body of the form can scroll. */
+    #tavern-modal .modal-window {
+      max-height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+    #tavern-modal .modal-header-row,
+    #tavern-modal .tavern-launch-row {
+      flex-shrink: 0;
+    }
+    #tavern-modal .tavern-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tavern-launch-row {
+      padding-top: 8px;
+      border-top: 1px solid rgba(251, 191, 36, 0.24);
+    }
+    .tavern-launch-row .btn-primary-gold {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.05rem;
+    }
+
+    /* Phone: readable question/options, unclipped HUD, room for rune orbs, Pause stays visible. */
+    @media (max-width: 600px) {
+      .chronicle-bar {
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 4px;
+        padding: 5px 6px;
+      }
+      .hud-cluster {
+        flex-wrap: wrap;
+        gap: 4px;
+        min-width: 0;
+      }
+      .hud-cluster:last-child {
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+      .stat-chip {
+        padding: 3px 6px;
+        font-size: 0.72rem;
+        gap: 3px;
+      }
+      .stat-chip .label { font-size: 0.62rem; }
+      .stat-chip .val { font-size: 0.8rem; }
+      .hero-badge-pill { padding: 3px 7px; }
+      .hero-name-tag { max-width: 72px; }
+      .boss-hp-wrap { min-width: 0; }
+      .boss-hp-track { width: 56px; }
+      .hud-btn { padding: 4px 8px; font-size: 0.72rem; }
+
+      .question-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+          "badge . controls"
+          "prompt prompt prompt";
+        align-items: start;
+        column-gap: 8px;
+        row-gap: 6px;
+        padding: 8px 10px;
+      }
+      .q-left { display: contents; }
+      .q-mode-pill { grid-area: badge; align-self: center; }
+      .q-left > div { grid-area: prompt; min-width: 0; width: 100%; }
+      .q-prompt-text {
+        font-size: 0.88rem;
+        line-height: 1.3;
+        overflow-wrap: break-word;
+        word-break: normal;
+        hyphens: manual;
+      }
+      .q-right-controls {
+        grid-area: controls;
+        width: auto;
+        justify-content: flex-end;
+        align-self: center;
+      }
+      .option-text {
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        font-size: 0.78rem;
+        line-height: 1.25;
+        word-break: normal;
+        overflow-wrap: normal;
+        hyphens: none;
+      }
+      #toast-corner-right {
+        top: calc(env(safe-area-inset-top, 0px) + 118px);
+      }
+      .turntable-box { min-height: 0; }
+      #showroom-canvas { height: 140px; }
     }
   </style>
   <!-- Loads shared-words.js from Play Your Way hub with offline 3,500-word HKDSE fallback -->
@@ -1174,6 +1461,55 @@
   <script src="https://skhhcss-eng.github.io/fun-projects/play-your-way/shared-words.js" onerror="window.__sharedWordsOfflineFallback = true;"></script>
 </head>
 <body>
+
+  <!-- Muse Pixel Duel PNG pack (hidden preload). Procedural sprites stay the fallback if a slot fails to load. -->
+  <div id="muse-art-preload" hidden aria-hidden="true">
+    <img data-muse-slot="arenaBackdrop" src="art/pixel-duel/arena-1920x1080.png" alt="">
+    <img data-muse-slot="tavernBackdrop" src="art/pixel-duel/tavern-1920x480.png" alt="">
+    <img data-muse-slot="boss-GUARD" src="art/pixel-duel/boss-normal.png" alt="">
+    <img data-muse-slot="boss-STUNNED" src="art/pixel-duel/boss-stunned.png" alt="">
+    <img data-muse-slot="boss-ENRAGED" src="art/pixel-duel/boss-enraged.png" alt="">
+    <img data-muse-slot="hero-0" src="art/pixel-duel/knight-idle.png" alt="">
+    <img data-muse-slot="hero-0-idle" src="art/pixel-duel/knight-idle.png" alt="">
+    <img data-muse-slot="hero-0-walk" src="art/pixel-duel/knight-walk.png" alt="">
+    <img data-muse-slot="hero-0-jump" src="art/pixel-duel/knight-jump.png" alt="">
+    <img data-muse-slot="hero-0-slash" src="art/pixel-duel/knight-slash.png" alt="">
+    <img data-muse-slot="hero-0-dash" src="art/pixel-duel/knight-dash.png" alt="">
+    <img data-muse-slot="hero-1" src="art/pixel-duel/scholar-idle.png" alt="">
+    <img data-muse-slot="hero-1-idle" src="art/pixel-duel/scholar-idle.png" alt="">
+    <img data-muse-slot="hero-1-walk" src="art/pixel-duel/scholar-walk.png" alt="">
+    <img data-muse-slot="hero-1-jump" src="art/pixel-duel/scholar-jump.png" alt="">
+    <img data-muse-slot="hero-1-slash" src="art/pixel-duel/scholar-slash.png" alt="">
+    <img data-muse-slot="hero-1-dash" src="art/pixel-duel/scholar-dash.png" alt="">
+    <img data-muse-slot="hero-2" src="art/pixel-duel/rogue-idle.png" alt="">
+    <img data-muse-slot="hero-2-idle" src="art/pixel-duel/rogue-idle.png" alt="">
+    <img data-muse-slot="hero-2-walk" src="art/pixel-duel/rogue-walk.png" alt="">
+    <img data-muse-slot="hero-2-jump" src="art/pixel-duel/rogue-jump.png" alt="">
+    <img data-muse-slot="hero-2-slash" src="art/pixel-duel/rogue-slash.png" alt="">
+    <img data-muse-slot="hero-2-dash" src="art/pixel-duel/rogue-dash.png" alt="">
+    <img data-muse-slot="hero-3" src="art/pixel-duel/hunter-idle.png" alt="">
+    <img data-muse-slot="hero-3-idle" src="art/pixel-duel/hunter-idle.png" alt="">
+    <img data-muse-slot="hero-3-walk" src="art/pixel-duel/hunter-walk.png" alt="">
+    <img data-muse-slot="hero-3-jump" src="art/pixel-duel/hunter-jump.png" alt="">
+    <img data-muse-slot="hero-3-slash" src="art/pixel-duel/hunter-slash.png" alt="">
+    <img data-muse-slot="hero-3-dash" src="art/pixel-duel/hunter-dash.png" alt="">
+    <img data-muse-slot="hero-4" src="art/pixel-duel/dancer-idle.png" alt="">
+    <img data-muse-slot="hero-4-idle" src="art/pixel-duel/dancer-idle.png" alt="">
+    <img data-muse-slot="hero-4-walk" src="art/pixel-duel/dancer-walk.png" alt="">
+    <img data-muse-slot="hero-4-jump" src="art/pixel-duel/dancer-jump.png" alt="">
+    <img data-muse-slot="hero-4-slash" src="art/pixel-duel/dancer-slash.png" alt="">
+    <img data-muse-slot="hero-4-dash" src="art/pixel-duel/dancer-dash.png" alt="">
+    <img data-muse-slot="hero-5" src="art/pixel-duel/merchant-idle.png" alt="">
+    <img data-muse-slot="hero-5-idle" src="art/pixel-duel/merchant-idle.png" alt="">
+    <img data-muse-slot="hero-5-walk" src="art/pixel-duel/merchant-walk.png" alt="">
+    <img data-muse-slot="hero-5-jump" src="art/pixel-duel/merchant-jump.png" alt="">
+    <img data-muse-slot="hero-5-slash" src="art/pixel-duel/merchant-slash.png" alt="">
+    <img data-muse-slot="hero-5-dash" src="art/pixel-duel/merchant-dash.png" alt="">
+    <img data-muse-slot="orb-A" src="art/pixel-duel/rune-orb-a.png" alt="">
+    <img data-muse-slot="orb-B" src="art/pixel-duel/rune-orb-b.png" alt="">
+    <img data-muse-slot="orb-C" src="art/pixel-duel/rune-orb-c.png" alt="">
+  </div>
+
 
   <!-- High-Detail 2D Boss Duel Arena Canvas -->
   <canvas id="game-canvas"></canvas>
@@ -1191,7 +1527,7 @@
         <div class="hud-cluster">
           <div class="hero-badge-pill">
             <span class="hero-class-tag" id="hud-hero-class">KNIGHT</span>
-            <span class="hero-name-tag" id="hud-hero-name">Olberic</span>
+            <span class="hero-name-tag" id="hud-hero-name">Knight</span>
           </div>
           <div class="stat-chip">
             <span class="label">Duel</span>
@@ -1205,12 +1541,17 @@
             <span class="label">Shields</span>
             <div class="shields-row" id="hud-shields-row">🛡️🛡️🛡️</div>
           </div>
+          <div class="stat-chip boss-hp-wrap" title="Boss health">
+            <span class="label">Boss</span>
+            <div class="boss-hp-track"><div id="boss-hp-fill"></div></div>
+            <span class="val" id="boss-hp-val">100%</span>
+          </div>
         </div>
 
         <div class="hud-cluster">
           <button type="button" class="hud-btn accent-cycle-btn" id="btn-hud-accent" title="Switch English Accent">🗣️ UK</button>
           <button type="button" class="hud-btn" id="btn-hud-mute" title="Toggle Sound">🔊</button>
-          <button type="button" class="hud-btn" id="btn-hud-pause">⏸️ Camp</button>
+          <button type="button" class="hud-btn" id="btn-hud-pause">⏸️ Pause</button>
         </div>
       </div>
 
@@ -1220,7 +1561,7 @@
           <div class="q-left">
             <span class="q-mode-pill" id="q-mode-badge">VOCAB</span>
             <div style="min-width:0; flex:1;">
-              <div class="q-prompt-text" id="q-prompt-text">Loading chronicle challenge...</div>
+              <div class="q-prompt-text" id="q-prompt-text">Loading challenge…</div>
               <div class="q-prompt-sub" id="q-prompt-sub">Duel 1 of 8</div>
             </div>
           </div>
@@ -1245,30 +1586,38 @@
           </div>
         </div>
       </div>
+
+      <div id="play-phase-banner" class="hidden-phase">
+        <div class="play-phase-copy">
+          <div class="play-phase-kicker" id="play-phase-kicker">Shield Break</div>
+          <div class="play-phase-title" id="play-phase-title">Boss stunned! Keep slashing, or tap the boss, for a combo.</div>
+        </div>
+        <div class="play-phase-timer" id="play-phase-timer">6s</div>
+      </div>
     </div>
 
-    <!-- Bottom Controls: Platformer Move Left/Right + Jump + Nail/Sword Slash + Shadow Dash / BP Boost -->
+    <!-- Bottom Controls: Move Left/Right + Jump + Slash + Boost -->
     <div class="hud-bottom-bar">
       <div class="touch-controls-cluster">
         <div class="lane-quick-stack">
-          <button type="button" class="touch-action-btn" id="btn-lane-up">◀ Left</button>
-          <button type="button" class="touch-action-btn" id="btn-lane-down">Right ▶</button>
+          <button type="button" class="touch-action-btn" id="btn-move-left">◀ Left</button>
+          <button type="button" class="touch-action-btn" id="btn-move-right">Right ▶</button>
         </div>
         <div class="lane-quick-stack">
           <button type="button" class="touch-action-btn" id="btn-jump-plat">⬆️ Jump</button>
           <button type="button" class="touch-action-btn slash-cta" id="btn-action-jump">⚔️ Slash</button>
-          <button type="button" class="touch-action-btn" id="btn-action-boost">🔥 BP Boost</button>
+          <button type="button" class="touch-action-btn" id="btn-action-boost">🔥 Boost</button>
         </div>
-        <div class="bp-orbs-wrap" title="Boost Points (BP)">
-          <span style="font-family:'Fredoka',sans-serif; font-size:0.75rem; color:var(--gold-bright);">BP</span>
+        <div class="bp-orbs-wrap" title="Boost">
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.75rem; color:var(--gold-bright);">Boost</span>
           <div class="bp-orb filled" id="bp-orb-0"></div>
           <div class="bp-orb" id="bp-orb-1"></div>
           <div class="bp-orb" id="bp-orb-2"></div>
         </div>
       </div>
 
-      <div class="speedo-container">
-        <canvas id="speedo-canvas" width="220" height="220"></canvas>
+      <div class="soul-gauge-container">
+        <canvas id="soul-gauge-canvas" width="220" height="220"></canvas>
       </div>
     </div>
   </div>
@@ -1276,8 +1625,8 @@
   <!-- Cutscene Skip Banner -->
   <div id="cutscene-banner" class="hidden">
     <div>
-      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">🏁 BOSS VANQUISHED</div>
-      <div style="font-size:0.78rem; color:#cbd5e1;" id="cutscene-banner-sub">Sanctuary Restored!</div>
+      <div style="font-family:'Fredoka',sans-serif; font-size:0.95rem; color:var(--gold-bright);" id="cutscene-banner-title">Sanctuary Chronicle · All Seals Broken</div>
+      <div style="font-size:0.78rem; color:#cbd5e1;" id="cutscene-banner-sub">Boss vanquished — sanctuary restored</div>
     </div>
     <button type="button" class="btn-primary-gold" id="btn-skip-cutscene">Skip ▶</button>
   </div>
@@ -1286,8 +1635,8 @@
   <div id="start-menu-overlay">
     <div class="start-header-box">
       <div style="margin-bottom:8px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
-        <button type="button" class="btn-dark-brass" id="btn-back-to-pyw-hub" style="padding:5px 12px; font-size:0.78rem;">◀ Play Your Way Hub</button>
-        <span class="chronicle-kicker" style="margin-bottom:0;">⚔️ OCTOPATH × HOLLOW KNIGHT BOSS DUEL</span>
+        <button type="button" class="btn-dark-brass" id="btn-back-to-pyw-hub" style="padding:5px 12px; font-size:0.78rem;">◀ Play Your Way</button>
+        <span class="chronicle-kicker" style="margin-bottom:0;">⚔️ BOSS DUEL</span>
       </div>
       <h1 class="game-main-title">Pixel Duel: <span>Break &amp; Boost</span></h1>
     </div>
@@ -1295,18 +1644,29 @@
     <div class="start-center-card">
       <div class="start-mode-card" id="btn-open-tavern">
         <div>
-          <div class="mode-card-title">⚔️ 1 PLAYER BOSS DUEL</div>
-          <div class="mode-card-meta">A/D RUN · W JUMP · SPACE SLASH · TAP ORB A/B/C</div>
+          <div class="mode-card-title">⚔️ 1-player boss duel</div>
+          <div class="mode-card-meta">A / D move · W jump · Space slash · 1 / 2 / 3 orbs · Shift boost</div>
         </div>
-        <div class="mode-enter-pill">Enter Tavern ▶</div>
+        <div class="mode-enter-pill">Enter Tavern</div>
       </div>
 
       <div class="word-pool-bar">
         <div class="pool-status-info">
-          <span class="pool-badge-label" id="start-pool-mode-tag">ACTIVE WORD POOL · ALL 4 MODES</span>
-          <span class="pool-active-summary" id="start-pool-summary">HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)</span>
+          <span class="pool-badge-label" id="start-pool-mode-tag">Active word pool · All 4 modes</span>
+          <span class="pool-active-summary" id="start-pool-summary">Practice bank</span>
         </div>
         <button type="button" class="btn-primary-gold" id="btn-open-word-builder">📚 Customise Word Pool</button>
+      </div>
+
+      <div class="how-to-play-card">
+        <div class="how-to-title">How to play</div>
+        <ol>
+          <li>Read the question, then slash rune <strong>A</strong>, <strong>B</strong> or <strong>C</strong> — tap the orb or card, or press 1 / 2 / 3.</li>
+          <li><strong>Correct:</strong> the boss is stunned. Keep slashing, or tap the boss, for a Break combo.</li>
+          <li><strong>Wrong or too slow:</strong> the boss attacks. Jump the shockwaves, or slash to parry them.</li>
+          <li>Use Boost (Shift) for a short power dash. If all shields break, the duel ends.</li>
+        </ol>
+        <div class="how-to-zh">正確答案可擊暈魔王並連擊；答錯或逾時要跳避或格擋衝擊波。</div>
       </div>
     </div>
 
@@ -1315,12 +1675,12 @@
     </div>
   </div>
 
-  <!-- Campfire Tavern Setup Modal (1P Garage Equivalent, z-index: 65) -->
+  <!-- Campfire Tavern Setup Modal (z-index: 65) -->
   <div id="tavern-modal" class="modal-backdrop hidden">
     <div class="modal-window">
       <div class="modal-header-row">
         <button type="button" class="btn-dark-brass" id="btn-back-title">◀ Start Menu</button>
-        <div class="modal-title">🔥 Sanctuary Bench &amp; Campfire Setup</div>
+        <div class="modal-title">Tavern Setup</div>
         <button type="button" class="btn-dark-brass" id="btn-tavern-word-pool">📚 Word Pool</button>
       </div>
 
@@ -1328,30 +1688,30 @@
         <!-- Left: Live 2D HD-Pixel Hero vs Boss Sanctuary Diorama Showcase -->
         <div class="turntable-box">
           <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-family:'Fredoka',sans-serif; font-size:0.85rem; color:var(--gold-bright);" id="showroom-hero-title">OLBERIC · BLADE KNIGHT #4</span>
+            <span style="font-family:'Fredoka',sans-serif; font-size:0.85rem; color:var(--gold-bright);" id="showroom-hero-title">KNIGHT</span>
             <span style="font-size:0.72rem; color:#94a3b8;">BOSS DUEL SHOWCASE</span>
           </div>
           <canvas id="showroom-canvas" width="380" height="210"></canvas>
           <div class="hero-selector-grid" id="hero-selector-grid">
-            <button type="button" class="hero-pick-btn active" data-hero="0">⚔️ Olberic #4</button>
-            <button type="button" class="hero-pick-btn" data-hero="1">📖 Cyrus #16</button>
-            <button type="button" class="hero-pick-btn" data-hero="2">🗡️ Therion #33</button>
-            <button type="button" class="hero-pick-btn" data-hero="3">🏹 H'aanit #12</button>
-            <button type="button" class="hero-pick-btn" data-hero="4">💃 Primrose #14</button>
-            <button type="button" class="hero-pick-btn" data-hero="5">💎 Tressa #10</button>
+            <button type="button" class="hero-pick-btn active" data-hero="0">⚔️ Knight</button>
+            <button type="button" class="hero-pick-btn" data-hero="1">📖 Scholar</button>
+            <button type="button" class="hero-pick-btn" data-hero="2">🗡️ Rogue</button>
+            <button type="button" class="hero-pick-btn" data-hero="3">🏹 Hunter</button>
+            <button type="button" class="hero-pick-btn" data-hero="4">💃 Dancer</button>
+            <button type="button" class="hero-pick-btn" data-hero="5">💎 Merchant</button>
           </div>
         </div>
 
-        <!-- Right: Traveler Name, Guild, Mode, Stages/Laps, Timer, Shields, Accent -->
+        <!-- Right: Traveler Name, Guild, Mode, Duel Rounds, Timer, Shields, Accent -->
         <div class="setup-controls-col">
           <div class="field-row-2col">
             <div class="field-group">
               <label class="field-label" for="input-traveler-name">Challenger Name</label>
-              <input type="text" id="input-traveler-name" class="text-input" value="Olberic" maxlength="20" />
+              <input type="text" id="input-traveler-name" class="text-input" value="Knight" maxlength="20" />
             </div>
             <div class="field-group">
-              <label class="field-label" for="input-guild-name">Guild / Order</label>
-              <input type="text" id="input-guild-name" class="text-input" value="Cobbleston Guard" maxlength="24" />
+              <label class="field-label" for="input-guild-name">Guild</label>
+              <input type="text" id="input-guild-name" class="text-input" value="Ironleaf Guild" maxlength="24" />
             </div>
           </div>
 
@@ -1367,7 +1727,7 @@
           </div>
 
           <div class="field-group">
-            <span class="field-label">🏁 Laps / Boss Phases</span>
+            <span class="field-label">⚔️ Duel Rounds</span>
             <div class="pill-choice-row" id="setup-laps-pills">
               <button type="button" class="choice-pill" data-laps="5">5</button>
               <button type="button" class="choice-pill active" data-laps="8">8</button>
@@ -1389,7 +1749,7 @@
             </div>
 
             <div class="field-group">
-              <span class="field-label">🛡️ Shields (Masks)</span>
+              <span class="field-label">🛡️ Shields</span>
               <div class="pill-choice-row" id="setup-shields-pills">
                 <button type="button" class="choice-pill" data-shields="2">2</button>
                 <button type="button" class="choice-pill active" data-shields="3">3</button>
@@ -1406,11 +1766,13 @@
               <button type="button" class="choice-pill" data-accent="AU">AU</button>
             </div>
           </div>
-
-          <button type="button" class="btn-primary-gold" id="btn-launch-quest" style="padding:12px; font-size:1.05rem; margin-top:4px;">
-            ⚔️ Enter Boss Arena ▶
-          </button>
         </div>
+      </div>
+
+      <div class="tavern-launch-row">
+        <button type="button" class="btn-primary-gold" id="btn-launch-quest">
+          Enter Boss Arena
+        </button>
       </div>
     </div>
   </div>
@@ -1418,17 +1780,17 @@
   <!-- Pause Modal (Campfire Rest, z-index: 65) -->
   <div id="pause-modal" class="modal-backdrop hidden">
     <div class="modal-window" style="max-width:440px; text-align:center;">
-      <div class="modal-title">🔥 Sanctuary Bench — Paused</div>
+      <div class="modal-title">Paused</div>
       <div style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
         <button type="button" class="btn-primary-gold" id="btn-resume-quest" style="padding:11px;">▶ Resume Duel</button>
         <button type="button" class="btn-dark-brass" id="btn-pause-restart" style="padding:10px;">🔄 Restart Duel</button>
-        <button type="button" class="btn-dark-brass" id="btn-pause-tavern" style="padding:10px;">🛡️ Challenger Setup</button>
+        <button type="button" class="btn-dark-brass" id="btn-pause-tavern" style="padding:10px;">Tavern Setup</button>
         <button type="button" class="btn-dark-brass" id="btn-main-menu" style="padding:10px;">🏠 Start Menu</button>
       </div>
     </div>
   </div>
 
-  <!-- End-of-Quest Classification / DNF Scoreboard Modal (z-index: 65) -->
+  <!-- End-of-Quest Scoreboard Modal (z-index: 65) -->
   <div id="end-modal" class="modal-backdrop hidden">
     <div class="modal-window">
       <div class="modal-header-row">
@@ -1436,12 +1798,12 @@
           <div class="clause-emoji-col" id="end-emoji-icon">🏆</div>
           <div class="clause-text-col">
             <div class="clause-kicker" id="end-kicker-line">
-              <span class="nowrap-clause">🏁 OFFICIAL GUILD CLASSIFICATION ·</span>
-              <span class="nowrap-clause">FULL DISTANCE</span>
+              <span class="nowrap-clause">⚔️ SANCTUARY CHRONICLE ·</span>
+              <span class="nowrap-clause">ALL SEALS BROKEN</span>
             </div>
             <div class="clause-title" id="end-title-line">
-              <span class="nowrap-clause">🏆 Boss Vanquished —</span>
-              <span class="nowrap-clause">Pantheon Complete!</span>
+              <span class="nowrap-clause">Boss vanquished —</span>
+              <span class="nowrap-clause">sanctuary restored</span>
             </div>
           </div>
         </div>
@@ -1462,7 +1824,7 @@
           <div class="m-val" id="end-acc-val">100%</div>
         </div>
         <div class="score-metric-box">
-          <div class="m-lbl">Shield Breaks</div>
+          <div class="m-lbl">Seals Broken</div>
           <div class="m-val" id="end-laps-val">8 / 8</div>
         </div>
         <div class="score-metric-box">
@@ -1474,7 +1836,7 @@
       <!-- Classroom Hall of Fame Standings -->
       <div>
         <div style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright); margin-bottom:6px;">
-          👑 PANTHEON HALL OF FAME STANDINGS
+          Guild Honour Board
         </div>
         <div class="standings-list" id="end-standings-list"></div>
       </div>
@@ -1482,7 +1844,7 @@
       <!-- Stacked Bilingual Review Cards -->
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px; flex-wrap:wrap;">
-          <span style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright);">📜 CHRONICLE REVIEW (ENGLISH + 繁體中文)</span>
+          <span style="font-family:'Fredoka',sans-serif; font-size:0.88rem; color:var(--gold-bright);">Chronicle Review · English / 繁體中文</span>
           <div class="pill-choice-row" id="review-filter-pills">
             <button type="button" class="choice-pill active" data-filter="ALL">All Answered</button>
             <button type="button" class="choice-pill" data-filter="MISSED">Missed Only</button>
@@ -1503,11 +1865,11 @@
 
       <div class="field-row-2col">
         <div class="field-group">
-          <label class="field-label" for="select-hkdse-band">1. HKDSE 3,500-Word Offline Dictionary Preset</label>
+          <label class="field-label" for="select-hkdse-band">1. Practice bank</label>
           <select id="select-hkdse-band" class="select-input">
-            <option value="CORE_ALL">All HKDSE Core &amp; Extended Pool (3,500-Word Engine)</option>
+            <option value="CORE_ALL">All practice bank</option>
             <option value="S1_S3">Junior Secondary Core (S1–S3 Foundation)</option>
-            <option value="DSE_HIGH">HKDSE High-Frequency Exam Pool (S4–S6)</option>
+            <option value="DSE_HIGH">S4–S6 practice pool</option>
             <option value="CUSTOM_ONLY">Custom Teacher / Student List Only</option>
           </select>
         </div>
@@ -1521,19 +1883,19 @@
       <!-- Custom Teacher/Student Word Input + Photo AI Extraction via DeepSeek -->
       <div class="field-group" style="background:rgba(15,23,42,0.85); border:1px solid rgba(251,191,36,0.35); border-radius:10px; padding:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
-          <span class="field-label">2. Custom Words &amp; Photo AI Extraction (`skhhcss-eng-play-your-way`)</span>
+          <span class="field-label">2. Custom Words &amp; Photo AI Extraction</span>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <label for="input-photo-upload" class="btn-dark-brass" style="cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
               📷 Scan Textbook / Worksheet Photo
             </label>
-            <input type="file" id="input-photo-upload" accept="image/*,.txt,.csv" style="display:none;" />
+            <input type="file" id="input-photo-upload" accept="image/*,.txt,.csv" capture="environment" style="display:none;" />
             <button type="button" class="btn-dark-brass" id="btn-deepseek-generate">✨ AI Generate from Topic / Text</button>
             <button type="button" class="btn-dark-brass" id="btn-clear-custom-words">🗑️ Clear Custom</button>
           </div>
         </div>
         <textarea id="textarea-custom-words" class="textarea-input" rows="3" placeholder="Enter custom words (one per line or comma-separated, e.g. resilient | 堅韌的 | Able to recover quickly from difficulties) or paste a passage for AI extraction..."></textarea>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; gap:8px; flex-wrap:wrap;">
-          <span style="font-size:0.75rem; color:#cbd5e1;" id="builder-status-msg">Ready: 48 curated 4-mode questions + 3,500-word HKDSE offline synthesizer active.</span>
+          <span style="font-size:0.75rem; color:#cbd5e1;" id="builder-status-msg">Ready: 48 curated 4-mode questions + practice bank.</span>
           <button type="button" class="btn-primary-gold" id="btn-parse-custom-words">+ Add Custom Words to Pool</button>
         </div>
       </div>
@@ -1650,7 +2012,7 @@
       },
       {
         mode: 'GRAMMAR', band: 'S1_S3', word: 'has been training', zh: '現在完成進行式',
-        prompt: 'Olberic ________ in the courtyard since sunrise, and his blade is still glowing.',
+        prompt: 'The knight ________ in the courtyard since sunrise, and the blade is still glowing.',
         options: ['trains', 'trained', 'has been training'], answer: 2,
         expEn: 'Present perfect continuous ("has been training") shows an action that started in the past ("since sunrise") and continues now.',
         expZh: '與「since sunrise」連用時，用現在完成進行式「has been training」表達由過去開始並持續至今的動作。'
@@ -1722,7 +2084,7 @@
       // READING COMPREHENSION / INFERENCE MODE (12)
       {
         mode: 'READING', band: 'S1_S3', word: 'Reluctant', zh: '不情願的；猶豫的',
-        prompt: '"Therion glanced at the locked chest, sighed, and stepped back." How did he feel?',
+        prompt: '"The rogue glanced at the locked chest, sighed, and stepped back." How did the rogue feel?',
         options: ['Eager', 'Reluctant', 'Thrilled'], answer: 1,
         expEn: 'Sighing and stepping back shows he was hesitant or reluctant to touch the chest.',
         expZh: '從「嘆氣並退後一步」可推斷他感到猶豫或不情願（Reluctant）。'
@@ -1771,7 +2133,7 @@
       },
       {
         mode: 'READING', band: 'DSE_HIGH', word: 'Implicit meaning', zh: '隱含意思',
-        prompt: '"Cyrus closed his tome only when the last candle wick drowned in wax." This implies he studied:',
+        prompt: '"The scholar closed the tome only when the last candle wick drowned in wax." This implies the scholar studied:',
         options: ['Until late into the night', 'For only a few minutes', 'Outside in bright daylight'], answer: 0,
         expEn: 'A candle burning all the way down until the wick drowns in melted wax implies hours of late-night study.',
         expZh: '蠟燭一直燃燒至燭芯淹沒在蠟液中才合上書本，隱含他挑燈夜讀至深夜（Until late into the night）。'
@@ -1857,7 +2219,7 @@
       },
       {
         mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'used to wake -> waking', zh: 'be used to + V-ing（習慣於）',
-        prompt: 'Spot the correction: "As a forest hunter, H\'aanit is used to track beasts in the snow."',
+        prompt: 'Spot the correction: "As a forest hunter, she is used to track beasts in the snow."',
         options: ['As -> Like', 'track -> tracking', 'in -> on'], answer: 1,
         expEn: '"Be used to" (meaning accustomed to) must be followed by a gerund ("tracking").',
         expZh: '「be used to」解作「習慣於……」，當中的「to」為介詞，後須接動名詞（tracking）。'
@@ -1947,6 +2309,15 @@
     const STORAGE_KEY_PYW_ACTIVE = "skhhcss_play_your_way_active_v1";
     const DEFAULT_PYW_WORKER_URL = "https://play-your-way.skhhcss-eng.workers.dev";
     let hubSyncedPackTitle = "";
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     function formatMcqPromptHtml(rawPrompt) {
       return String(rawPrompt || "")
@@ -2053,9 +2424,26 @@
       } catch (e) {}
     }
 
+    function lookupLexiconSeed(word) {
+      const needle = String(word || '').toLowerCase();
+      for (let i = 0; i < HKDSE_LEXICON_SEEDS.length; i++) {
+        if (String(HKDSE_LEXICON_SEEDS[i][0] || '').toLowerCase() === needle) {
+          return HKDSE_LEXICON_SEEDS[i];
+        }
+      }
+      return null;
+    }
+
     function getSharedWordsIfAvailable() {
       if (window.PYW_HKDSE_CORE_WORDS && Array.isArray(window.PYW_HKDSE_CORE_WORDS) && window.PYW_HKDSE_CORE_WORDS.length > 0) {
-        return window.PYW_HKDSE_CORE_WORDS.map(w => ({ word: w, zh: 'HKDSE 核心詞彙', def: 'HKDSE core vocabulary item' }));
+        return window.PYW_HKDSE_CORE_WORDS.map((w) => {
+          const seed = lookupLexiconSeed(w);
+          return {
+            word: w,
+            zh: seed ? seed[1] : '核心詞彙',
+            def: seed ? seed[2] : 'a useful English word'
+          };
+        });
       }
       if (window.SHARED_WORDS && Array.isArray(window.SHARED_WORDS) && window.SHARED_WORDS.length > 0) {
         return window.SHARED_WORDS;
@@ -2063,12 +2451,34 @@
       return null;
     }
 
+    function cycleShuffledQuestions(source, countNeeded) {
+      if (!source.length || countNeeded <= 0) return [];
+      const out = [];
+      while (out.length < countNeeded) {
+        const shuffled = source.slice();
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = shuffled[i];
+          shuffled[i] = shuffled[j];
+          shuffled[j] = tmp;
+        }
+        const remaining = countNeeded - out.length;
+        const take = Math.min(remaining, shuffled.length);
+        for (let i = 0; i < take; i++) {
+          const q = shuffled[i];
+          out.push(Object.assign({}, q, { options: q.options ? q.options.slice() : q.options }));
+        }
+      }
+      return out;
+    }
+
     function buildActiveQuestionPool(modeFilter, countNeeded) {
       let base = [];
-      if (selectedBandFilter === 'CUSTOM_ONLY' && customQuestionPool.length > 0) {
-        base = [...customQuestionPool];
+      const packOnly = selectedBandFilter === 'CUSTOM_ONLY' && customQuestionPool.length > 0;
+      if (packOnly) {
+        base = customQuestionPool.slice();
       } else {
-        base = [...customQuestionPool, ...CURATED_QUESTIONS];
+        base = customQuestionPool.concat(CURATED_QUESTIONS);
         if (selectedBandFilter === 'S1_S3' || selectedBandFilter === 'DSE_HIGH') {
           base = base.filter(q => q.band === selectedBandFilter || q.band === 'CUSTOM');
         }
@@ -2079,20 +2489,23 @@
         if (filtered.length > 0) base = filtered;
       }
 
-      const shared = getSharedWordsIfAvailable();
-      const extraSource = shared || HKDSE_LEXICON_SEEDS.map(item => ({
-        word: item[0], zh: item[1], def: item[2]
-      }));
+      if (packOnly) {
+        return cycleShuffledQuestions(base, countNeeded);
+      }
+
+      const core = (window.PYW_HKDSE_CORE_WORDS && window.PYW_HKDSE_CORE_WORDS.length > 0)
+        ? window.PYW_HKDSE_CORE_WORDS
+        : HKDSE_LEXICON_SEEDS.map((s) => s[0]);
 
       let idx = 0;
-      while (base.length < Math.max(countNeeded, 48) && idx < extraSource.length) {
-        const entry = extraSource[idx % extraSource.length];
-        const w = (entry.word || entry[0] || 'resilient').toLowerCase();
-        const zh = entry.zh || entry.meaning || entry[1] || '核心詞彙';
-        const def = entry.def || entry.definition || entry[2] || 'a key HKDSE vocabulary expression';
-        const d1 = extraSource[(idx + 7) % extraSource.length].word || 'fragile';
-        const d2 = extraSource[(idx + 13) % extraSource.length].word || 'casual';
-        const opts = [w, d1.toLowerCase(), d2.toLowerCase()];
+      while (base.length < Math.max(countNeeded, 48) && idx < core.length) {
+        const w = String(core[idx % core.length]).toLowerCase();
+        const seed = lookupLexiconSeed(w);
+        const zh = seed ? seed[1] : '核心詞彙';
+        const def = seed ? seed[2] : 'a useful English word';
+        const d1 = String(core[(idx + 7) % core.length] || 'fragile').toLowerCase();
+        const d2 = String(core[(idx + 13) % core.length] || 'casual').toLowerCase();
+        const opts = [w, d1, d2];
         const ansLane = idx % 3;
         const rotated = [opts[(3 - ansLane) % 3], opts[(4 - ansLane) % 3], opts[(5 - ansLane) % 3]];
         const correctIdx = rotated.indexOf(w);
@@ -2110,12 +2523,7 @@
         idx++;
       }
 
-      const shuffled = [...base];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled.slice(0, countNeeded);
+      return cycleShuffledQuestions(base, countNeeded);
     }
 
     /*************************************************************************
@@ -2123,33 +2531,33 @@
      *************************************************************************/
     const HERO_ROSTER = [
       {
-        id: 0, name: 'Olberic', guild: 'Cobbleston Guard', role: 'BLADE KNIGHT #4',
-        shortClass: 'KNIGHT #4', primary: '#e11d48', secondary: '#be123c', cloak: '#881337', cloakLight: '#f43f5e',
+        id: 0, name: 'Knight', guild: 'Ironleaf Guild', role: 'KNIGHT',
+        shortClass: 'KNIGHT', primary: '#e11d48', secondary: '#be123c', cloak: '#881337', cloakLight: '#f43f5e',
         trim: '#fbbf24', hair: '#475569', hairLight: '#94a3b8', weapon: 'SWORD', helmFeather: '#fef08a', slashColor: '#38bdf8'
       },
       {
-        id: 1, name: 'Cyrus', guild: 'Royal Academy', role: 'ARCANE SCHOLAR #16',
-        shortClass: 'SCHOLAR #16', primary: '#2563eb', secondary: '#1d4ed8', cloak: '#1e3a8a', cloakLight: '#60a5fa',
+        id: 1, name: 'Scholar', guild: 'Lantern Library', role: 'SCHOLAR',
+        shortClass: 'SCHOLAR', primary: '#2563eb', secondary: '#1d4ed8', cloak: '#1e3a8a', cloakLight: '#60a5fa',
         trim: '#fde047', hair: '#1e293b', hairLight: '#475569', weapon: 'STAFF', helmFeather: '#38bdf8', slashColor: '#60a5fa'
       },
       {
-        id: 2, name: 'Therion', guild: 'Ravus Manor', role: 'SHADOW ROGUE #33',
-        shortClass: 'ROGUE #33', primary: '#7c3aed', secondary: '#5b21b6', cloak: '#3b0764', cloakLight: '#a78bfa',
+        id: 2, name: 'Rogue', guild: 'Nightshade Hall', role: 'ROGUE',
+        shortClass: 'ROGUE', primary: '#7c3aed', secondary: '#5b21b6', cloak: '#3b0764', cloakLight: '#a78bfa',
         trim: '#e2e8f0', hair: '#cbd5e1', hairLight: '#ffffff', weapon: 'DAGGER', helmFeather: '#c084fc', slashColor: '#c084fc'
       },
       {
-        id: 3, name: "H'aanit", guild: "S'warkii Woods", role: 'FOREST HUNTER #12',
-        shortClass: 'HUNTER #12', primary: '#059669', secondary: '#047857', cloak: '#064e3b', cloakLight: '#34d399',
+        id: 3, name: 'Hunter', guild: 'Pinewood Lodge', role: 'HUNTER',
+        shortClass: 'HUNTER', primary: '#059669', secondary: '#047857', cloak: '#064e3b', cloakLight: '#34d399',
         trim: '#fcd34d', hair: '#d97706', hairLight: '#fbbf24', weapon: 'BOW', helmFeather: '#86efac', slashColor: '#34d399'
       },
       {
-        id: 4, name: 'Primrose', guild: 'Sunshade Noble', role: 'DUSK DANCER #14',
-        shortClass: 'DANCER #14', primary: '#db2777', secondary: '#9d174d', cloak: '#500724', cloakLight: '#f472b6',
+        id: 4, name: 'Dancer', guild: 'Ember Court', role: 'DANCER',
+        shortClass: 'DANCER', primary: '#db2777', secondary: '#9d174d', cloak: '#500724', cloakLight: '#f472b6',
         trim: '#fbbf24', hair: '#0f172a', hairLight: '#334155', weapon: 'FAN', helmFeather: '#fbcfe8', slashColor: '#f472b6'
       },
       {
-        id: 5, name: 'Tressa', guild: 'Rippletide Coast', role: 'WIND MERCHANT #10',
-        shortClass: 'MERCHANT #10', primary: '#d97706', secondary: '#b45309', cloak: '#14532d', cloakLight: '#22c55e',
+        id: 5, name: 'Merchant', guild: 'Harbour Market', role: 'MERCHANT',
+        shortClass: 'MERCHANT', primary: '#d97706', secondary: '#b45309', cloak: '#14532d', cloakLight: '#22c55e',
         trim: '#fef08a', hair: '#92400e', hairLight: '#f59e0b', weapon: 'SPEAR', helmFeather: '#fde047', slashColor: '#fde047'
       }
     ];
@@ -2262,8 +2670,100 @@
 
     /*************************************************************************
      * 4. HIGH-DETAIL 2D PIXEL ART SPRITES (HEROES & COLOSSAL RADIANCE BOSS)
+     * MUSE ART HOOKS — optional pack overlay; procedural sprites stay the default
+     * for any slot that is missing.
+     * Set window.PYW_PIXEL_DUEL_ART = {
+     *   heroSheets: [/* 6 HTMLImageElement or URL strings (walk-cycle strips) * /],
+     *   heroPoses: { 0: { idle, walk, jump, slash, dash } },
+     *   bossSheets: { GUARD: img, STUNNED: img, ENRAGED: img },
+     *   arenaBackdrop: img,
+     *   tavernBackdrop: img,
+     *   orbSheet: img,
+     *   orbs: { A: img, B: img, C: img }
+     * }
+     * or drop hidden <img data-muse-slot="..."> tags into this file.
+     * Slots: hero-0 (sheet or idle fallback), hero-0-idle/walk/jump/slash/dash,
+     * hero-1..5 (idle fallback) and hero-N-idle/walk/jump/slash/dash for Scholar, Rogue,
+     * Hunter, Dancer, and Merchant, boss-GUARD / boss-STUNNED / boss-ENRAGED,
+     * arenaBackdrop, tavernBackdrop, orbSheet, orb-A / orb-B / orb-C.
+     * Knight (hero-0) and Scholar, Rogue, Hunter, Dancer, and Merchant all have
+     * the full idle, walk, jump, slash, and dash set hooked.
      *************************************************************************/
     const spriteCache = {};
+
+    function resolveMusePackImage(fromPack) {
+      if (typeof fromPack === 'string') {
+        const img = new Image();
+        img.src = fromPack;
+        fromPack = img;
+      }
+      return fromPack;
+    }
+
+    function getMuseArt(slot) {
+      try {
+        const pack = window.PYW_PIXEL_DUEL_ART || {};
+        let fromPack = null;
+        if (slot.indexOf('hero-') === 0 && pack.heroPoses) {
+          const poseMatch = slot.match(/^hero-(\d+)-([a-z]+)$/);
+          if (poseMatch && pack.heroPoses[parseInt(poseMatch[1], 10)]) {
+            fromPack = pack.heroPoses[parseInt(poseMatch[1], 10)][poseMatch[2]];
+          }
+        }
+        if (!fromPack && slot.indexOf('hero-') === 0 && pack.heroSheets) {
+          const rest = slot.slice(5);
+          if (/^\d+$/.test(rest)) fromPack = pack.heroSheets[parseInt(rest, 10)];
+        }
+        if (!fromPack && slot.indexOf('boss-') === 0 && pack.bossSheets) {
+          fromPack = pack.bossSheets[slot.slice(5)];
+        }
+        if (!fromPack && slot.indexOf('orb-') === 0 && pack.orbs) {
+          fromPack = pack.orbs[slot.slice(4)];
+        }
+        if (!fromPack && pack[slot]) fromPack = pack[slot];
+        fromPack = resolveMusePackImage(fromPack);
+        if (fromPack && fromPack.naturalWidth > 0) return fromPack;
+        const el = document.querySelector('img[data-muse-slot="' + slot + '"]');
+        if (el && el.complete && el.naturalWidth > 0) return el;
+      } catch (err) {}
+      return null;
+    }
+
+    function bindMuseArtLoading() {
+      document.querySelectorAll('img[data-muse-slot]').forEach((el) => {
+        const kick = () => {
+          Object.keys(spriteCache).forEach((k) => { delete spriteCache[k]; });
+          if (state.screen === 'QUESTION_PHASE') positionRuneOrbs();
+        };
+        if (el.complete) return;
+        el.addEventListener('load', kick);
+        el.addEventListener('error', kick);
+      });
+    }
+
+    function getMuseHeroPose(heroIdx, pose) {
+      return getMuseArt('hero-' + heroIdx + '-' + pose) || (pose === 'idle' ? getMuseArt('hero-' + heroIdx) : null);
+    }
+
+    function hasMuseHeroPoses(heroIdx) {
+      return !!(getMuseHeroPose(heroIdx, 'idle') || getMuseArt('hero-' + heroIdx));
+    }
+
+    function sliceMuseSheet(img, frameCount) {
+      if (!img || !img.naturalWidth) return null;
+      const isStrip = img.naturalWidth >= img.naturalHeight * frameCount;
+      const fw = isStrip ? Math.round(img.naturalWidth / frameCount) : img.naturalWidth;
+      const fh = img.naturalHeight;
+      const frames = [];
+      const n = isStrip ? frameCount : 1;
+      for (let f = 0; f < frameCount; f++) {
+        const sx = n === frameCount ? fw * f : 0;
+        frames.push(createOffscreenSprite(fw, fh, (ctx) => {
+          ctx.drawImage(img, sx, 0, fw, fh, 0, 0, fw, fh);
+        }));
+      }
+      return frames;
+    }
 
     function createOffscreenSprite(w, h, drawFn) {
       const c = document.createElement('canvas');
@@ -2276,8 +2776,28 @@
     }
 
     function getHeroSpriteFrames(heroIdx) {
-      const key = `hero_${heroIdx}`;
+      const poseIdle = getMuseHeroPose(heroIdx, 'idle');
+      const poseWalk = getMuseHeroPose(heroIdx, 'walk');
+      if (poseIdle || poseWalk) {
+        const key = `hero_${heroIdx}_muse_poses`;
+        if (spriteCache[key]) return spriteCache[key];
+        const a = poseIdle || poseWalk;
+        const b = poseWalk || poseIdle;
+        spriteCache[key] = [a, b, a, b];
+        return spriteCache[key];
+      }
+
+      const museHero = getMuseArt('hero-' + heroIdx);
+      const key = `hero_${heroIdx}_${museHero ? 'muse' : 'proc'}`;
       if (spriteCache[key]) return spriteCache[key];
+
+      if (museHero) {
+        const sliced = sliceMuseSheet(museHero, 4);
+        if (sliced) {
+          spriteCache[key] = sliced;
+          return sliced;
+        }
+      }
 
       const hero = HERO_ROSTER[heroIdx] || HERO_ROSTER[0];
       const frames = [];
@@ -2294,7 +2814,7 @@
           // Ground shadow
           px(12, 43, 24, 3, 'rgba(0,0,0,0.45)');
 
-          // Flowing Hollow-Knight / Octopath Cloak
+          // Flowing cloak
           px(5, 19 + bob, 14, 18 + capeWave, '#090b10');
           px(6, 20 + bob, 13, 16 + capeWave, hero.cloak);
           px(7, 21 + bob, 7, 12 + capeWave, hero.cloakLight);
@@ -2336,12 +2856,42 @@
           px(13, 4 + bob, 6, 3, hero.helmFeather);
           px(16, 18 + bob, 15, 2, hero.trim);
 
-          // Gleaming Nail / Blade Weapon
-          px(30, 22 + bob, 5, 5, '#090b10');
-          px(31, 23 + bob, 3, 3, '#fbbf24');
-          px(33, 7 + bob, 6, 19, '#090b10');
-          px(34, 8 + bob, 4, 17, '#cbd5e1');
-          px(35, 8 + bob, 2, 16, '#ffffff');
+          // Weapon silhouette (procedural; a Muse hero sheet replaces the whole sprite)
+          if (hero.weapon === 'STAFF') {
+            px(32, 6 + bob, 5, 32, '#090b10');
+            px(33, 7 + bob, 3, 30, '#fde047');
+            px(30, 4 + bob, 9, 9, '#1d4ed8');
+            px(32, 6 + bob, 5, 5, '#38bdf8');
+            px(34, 8 + bob, 2, 2, '#ffffff');
+          } else if (hero.weapon === 'DAGGER') {
+            px(30, 20 + bob, 5, 5, '#090b10');
+            px(31, 21 + bob, 3, 3, '#fbbf24');
+            px(33, 10 + bob, 5, 16, '#090b10');
+            px(34, 11 + bob, 3, 14, '#e2e8f0');
+            px(35, 11 + bob, 1, 12, '#ffffff');
+          } else if (hero.weapon === 'BOW') {
+            px(32, 10 + bob, 3, 24, '#090b10');
+            px(33, 11 + bob, 2, 22, '#92400e');
+            px(34, 12 + bob, 8, 2, '#fbbf24');
+            px(34, 30 + bob, 8, 2, '#fbbf24');
+            px(40, 14 + bob, 2, 16, '#e2e8f0');
+          } else if (hero.weapon === 'FAN') {
+            px(30, 14 + bob, 14, 10, '#090b10');
+            px(31, 15 + bob, 12, 8, '#f472b6');
+            px(33, 16 + bob, 8, 5, '#fbcfe8');
+            px(36, 20 + bob, 3, 10, '#fbbf24');
+          } else if (hero.weapon === 'SPEAR') {
+            px(34, 2 + bob, 4, 36, '#090b10');
+            px(35, 3 + bob, 2, 34, '#fde047');
+            px(32, 2 + bob, 8, 7, '#14532d');
+            px(34, 3 + bob, 4, 4, '#86efac');
+          } else {
+            px(30, 22 + bob, 5, 5, '#090b10');
+            px(31, 23 + bob, 3, 3, '#fbbf24');
+            px(33, 7 + bob, 6, 19, '#090b10');
+            px(34, 8 + bob, 4, 17, '#cbd5e1');
+            px(35, 8 + bob, 2, 16, '#ffffff');
+          }
         }));
       }
 
@@ -2349,10 +2899,20 @@
       return frames;
     }
 
-    // Colossal 96x96 Hollow-Radiance Arch-Boss Sprite (Normal, Enraged & Stunned Break States)
+    // Colossal 96x96 arch-boss sprite (normal, enraged and stunned break states)
     function getBossDuelSprite(bossState, frame) {
-      const key = `duel_boss_${bossState}_${frame}`;
+      const museBoss = getMuseArt('boss-' + bossState) || getMuseArt('boss');
+      const key = `duel_boss_${bossState}_${frame}_${museBoss ? 'muse' : 'proc'}`;
       if (spriteCache[key]) return spriteCache[key];
+
+      if (museBoss) {
+        const sliced = sliceMuseSheet(museBoss, 2);
+        if (sliced) {
+          const picked = sliced[frame % sliced.length];
+          spriteCache[key] = picked;
+          return picked;
+        }
+      }
 
       const canvas = createOffscreenSprite(96, 96, (ctx) => {
         const px = (x, y, w, h, col) => {
@@ -2366,7 +2926,7 @@
         // Ground shadow
         px(16, 86, 64, 6, 'rgba(0,0,0,0.55)');
 
-        // Ethereal Hollow-Knight / Octopath Wings & Mantle
+        // Ethereal wings and mantle
         const wingCol = isStunned ? '#334155' : (isEnraged ? '#be123c' : '#4c1d95');
         const wingGlow = isStunned ? '#64748b' : (isEnraged ? '#f43f5e' : '#7c3aed');
         px(4, 16 + breathe, 88, 52, '#090b10');
@@ -2435,8 +2995,8 @@
     const state = {
       screen: 'START', // START, TAVERN, PLAY_PHASE, QUESTION_PHASE, CUTSCENE_WIN, CUTSCENE_DNF, PAUSED, END
       selectedHeroIdx: 0,
-      travelerName: 'Olberic',
-      guildName: 'Cobbleston Guard',
+      travelerName: 'Knight',
+      guildName: 'Ironleaf Guild',
       modeFilter: 'ALL',
       targetLaps: 8,
       timerSeconds: 14,
@@ -2481,7 +3041,10 @@
       currentQuestion: null,
       questionTimeLeft: 14,
       answeredLog: [],
-      cutsceneTimer: 0
+      cutsceneTimer: 0,
+      pendingEnd: null,
+      answerLocked: false,
+      dodgeHitsThisPhase: 0
     };
 
     function initDuelEngine() {
@@ -2489,6 +3052,7 @@
       mainCtx = mainCanvas.getContext('2d');
       showroomCanvas = document.getElementById('showroom-canvas');
       if (showroomCanvas) showroomCtx = showroomCanvas.getContext('2d');
+      bindMuseArtLoading();
 
       resizeCanvas();
       window.addEventListener('resize', () => {
@@ -2516,7 +3080,35 @@
     }
 
     // Define the Cathedral Bridge Floor + 3 Sanctuary Stone Platforms (Left [A], Center-High [B], Right [C])
+    // Painted Muse arena (1920x1080) walkable tops, used when arenaBackdrop is loaded.
+    const MUSE_ARENA_LAYOUT = {
+      floorY: 770 / 1080,
+      platforms: [
+        { letter: 'A', color: '#3b82f6', cx: 421 / 1920, top: 536 / 1080, w: 360 / 1920 },
+        { letter: 'B', color: '#f59e0b', cx: 961 / 1920, top: 432 / 1080, w: 330 / 1920 },
+        { letter: 'C', color: '#10b981', cx: 1494 / 1920, top: 540 / 1080, w: 360 / 1920 }
+      ]
+    };
+
     function getArenaGeometry(w, h) {
+      if (getMuseArt('arenaBackdrop')) {
+        const floorY = Math.round(h * MUSE_ARENA_LAYOUT.floorY);
+        const platforms = MUSE_ARENA_LAYOUT.platforms.map((spec, idx) => {
+          const platW = Math.round(w * spec.w);
+          const y = Math.round(h * spec.top);
+          const orbX = Math.round(w * spec.cx);
+          return {
+            lane: idx, letter: spec.letter, color: spec.color,
+            x: Math.round(orbX - platW / 2),
+            y,
+            w: platW, h: 18,
+            orbX,
+            orbY: y - 52
+          };
+        });
+        return { floorY, platforms };
+      }
+
       const floorY = Math.round(h * 0.80);
       const platW = Math.min(200, Math.max(115, Math.round(w * 0.17)));
       const platforms = [
@@ -2577,7 +3169,8 @@
 
     function performSwordSlash() {
       if (state.screen !== 'PLAY_PHASE' && state.screen !== 'QUESTION_PHASE') return;
-      state.slashCooldown = 0.24;
+      if (state.slashCooldown > 0) return;
+      state.slashCooldown = 0.22;
       playSynthSfx('slash');
 
       const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
@@ -2613,7 +3206,9 @@
           const pts = state.isBoosting ? 45 : 25;
           state.score += pts;
           state.bp = Math.min(3, state.bp + (state.comboHits % 3 === 0 ? 1 : 0));
-          state.bossHp = Math.max(5, state.bossHp - (state.isBoosting ? 8 : 4));
+          const remainingAfterThis = state.pendingEnd === 'WIN' ? 0 : Math.max(0, state.targetLaps - state.currentLap);
+          const floorHp = remainingAfterThis <= 0 ? 0 : Math.ceil(remainingAfterThis * (100 / Math.max(1, state.targetLaps)) * 0.35);
+          state.bossHp = Math.max(floorHp, state.bossHp - (state.isBoosting ? 10 : 5));
           state.screenShake = 0.15;
           // Pogo bounce if slashing in mid-air!
           if (state.heroVy > 0) state.heroVy = -420;
@@ -2686,6 +3281,9 @@
       bossShockwaves = [];
       state.homingTargetOrb = null;
       state.bossMode = 'GUARD';
+      state.answerLocked = false;
+      const playBanner = document.getElementById('play-phase-banner');
+      if (playBanner) playBanner.classList.add('hidden-phase');
 
       const qIdx = (state.currentLap - 1) % state.questionPool.length;
       state.currentQuestion = state.questionPool[qIdx];
@@ -2701,7 +3299,7 @@
       if (state.currentQuestion.isDictation && state.currentQuestion.word) {
         setTimeout(() => speakText(state.currentQuestion.word), 120);
       }
-      document.getElementById('q-prompt-sub').textContent = `Duel ${state.currentLap} of ${state.targetLaps} · Jump-Slash Rune Orb A, B, or C!`;
+      document.getElementById('q-prompt-sub').textContent = `Duel ${state.currentLap} of ${state.targetLaps} · Slash rune A, B or C`;
 
       for (let i = 0; i < 3; i++) {
         const optEl = document.getElementById(`opt-text-${i}`);
@@ -2712,14 +3310,17 @@
       updateSelectedOptionHighlight();
     }
 
-    function resolveOrbSlash(chosenLane) {
+    function resolveOrbSlash(chosenLane, meta) {
       const q = state.currentQuestion;
-      if (!q) return;
+      if (!q || state.answerLocked || (state.screen !== 'QUESTION_PHASE')) return;
+      state.answerLocked = true;
+      meta = meta || {};
 
-      const isCorrect = chosenLane === q.answer;
-      const chosenText = q.options[chosenLane] || '';
+      const timedOut = !!meta.timedOut || chosenLane < 0;
+      const isCorrect = !timedOut && chosenLane === q.answer;
+      const chosenText = timedOut ? '(time up)' : (q.options[chosenLane] || '');
       const correctText = q.options[q.answer] || '';
-      const orb = runeOrbs[chosenLane] || { x: state.heroX, y: state.heroY - 40 };
+      const orb = (!timedOut && runeOrbs[chosenLane]) ? runeOrbs[chosenLane] : (runeOrbs[state.currentLane] || { x: state.heroX, y: state.heroY - 40 });
 
       state.answeredLog.push({
         prompt: q.prompt,
@@ -2747,7 +3348,7 @@
         setTimeout(() => { flash.style.opacity = '0'; }, 280);
 
         spawnSoulSparks(orb.x, orb.y, '#22c55e', 34);
-        spawnFloatingCombatText(orb.x, orb.y - 35, `💥 SHIELD BREAK! +${bonus}`, '#86efac', 'BOSS STUNNED! MASH SLASH!');
+        spawnFloatingCombatText(orb.x, orb.y - 35, `💥 SHIELD BREAK! +${bonus}`, '#86efac', 'BOSS STUNNED! KEEP SLASHING!');
 
         showCornerToast(
           `💥 SHIELD BREAK! +${bonus} PTS`,
@@ -2761,10 +3362,13 @@
         playSynthSfx('damage');
 
         spawnSoulSparks(orb.x, orb.y, '#ef4444', 28);
-        spawnFloatingCombatText(orb.x, orb.y - 35, '🛡️ WRONG RUNE! SHIELD CRACKED!', '#fca5a5', `Ans: [${LANE_LETTERS[q.answer]}] ${correctText}`);
+        const failLine = timedOut ? '⏱️ TIME UP! SHIELD CRACKED!' : '🛡️ WRONG RUNE! SHIELD CRACKED!';
+        spawnFloatingCombatText(orb.x, orb.y - 35, failLine, '#fca5a5', `Ans: [${LANE_LETTERS[q.answer]}] ${correctText}`);
 
         showCornerToast(
-          `🛡️ BOSS COUNTER! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`,
+          timedOut
+            ? `⏱️ TIME UP! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`
+            : `🛡️ BOSS COUNTER! Correct: [${LANE_LETTERS[q.answer]}] ${correctText}`,
           `${q.expEn} (${q.expZh})`,
           'bad'
         );
@@ -2775,11 +3379,10 @@
       if (state.shields <= 0) {
         startEndCutscene('DNF');
       } else if (state.currentLap >= state.targetLaps) {
-        state.bossHp = 0;
-        startEndCutscene('WIN');
+        state.pendingEnd = 'WIN';
+        startBreakOrDodgePlayPhase(isCorrect);
       } else {
-        state.currentLap++;
-        updateHudReadouts();
+        state.pendingEnd = null;
         startBreakOrDodgePlayPhase(isCorrect);
       }
     }
@@ -2788,49 +3391,103 @@
       runeOrbs = [];
       bossShockwaves = [];
       state.screen = 'PLAY_PHASE';
-      state.phaseTimer = 4.2;
+      state.phaseTimer = wasCorrectBreak ? 6.8 : 6.2;
       state.comboHits = 0;
+      state.dodgeHitsThisPhase = 0;
       document.getElementById('question-hud-wrap').classList.add('hidden-phase');
+
+      const banner = document.getElementById('play-phase-banner');
+      if (banner) {
+        banner.classList.remove('hidden-phase', 'break-mode', 'dodge-mode');
+        banner.classList.add(wasCorrectBreak ? 'break-mode' : 'dodge-mode');
+      }
+      const kicker = document.getElementById('play-phase-kicker');
+      const title = document.getElementById('play-phase-title');
+      const timerEl = document.getElementById('play-phase-timer');
+      if (wasCorrectBreak) {
+        if (kicker) kicker.textContent = 'Shield Break';
+        if (title) title.textContent = 'Boss stunned! Keep slashing, or tap the boss, for a combo.';
+      } else {
+        if (kicker) kicker.textContent = 'Boss enraged';
+        if (title) title.textContent = 'Jump the shockwaves, or slash to parry them.';
+      }
+      if (timerEl) timerEl.textContent = `${Math.ceil(state.phaseTimer)}s`;
 
       const w = mainCanvas ? mainCanvas.width : 1000;
       const h = mainCanvas ? mainCanvas.height : 700;
       const { floorY } = getArenaGeometry(w, h);
 
       if (wasCorrectBreak) {
-        // Boss crashes down onto the center-right of the bridge in a STUNNED BREAK state for free combo slashes!
         state.bossMode = 'STUNNED';
         state.bossTargetX = w * 0.62;
         state.bossY = floorY - 56;
       } else {
-        // Boss enters ENRAGED state and fires sweeping ground shockwaves to jump over / parry!
         state.bossMode = 'ENRAGED';
         state.bossTargetX = w * 0.78;
         state.bossY = floorY - 115;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
           bossShockwaves.push({
-            x: w * 0.75 + i * 210,
+            x: w * 0.78 + i * 190,
             y: floorY - 22,
-            vx: -290 - i * 35,
+            vx: -300 - i * 28,
             parried: false,
             hitPlayer: false
           });
         }
+        // One mid-air soul bolt that can be jumped under or parried
+        bossShockwaves.push({
+          x: w * 0.92,
+          y: floorY - 92,
+          vx: -340,
+          parried: false,
+          hitPlayer: false
+        });
       }
     }
 
     function autoFitOptionText(el, text) {
       if (!el) return;
-      const len = text.length;
-      if (len > 28) {
-        el.style.fontSize = '0.72rem';
-        el.style.whiteSpace = 'normal';
-      } else if (len > 18) {
-        el.style.fontSize = '0.8rem';
-        el.style.whiteSpace = 'nowrap';
-      } else {
-        el.style.fontSize = '0.94rem';
-        el.style.whiteSpace = 'nowrap';
+      const raw = String(text || '');
+      const words = raw.split(/\s+/).filter(Boolean);
+      const longest = words.reduce(function (best, word) {
+        return word.length > best.length ? word : best;
+      }, '');
+      const len = raw.length;
+      el.style.textOverflow = 'clip';
+      el.style.overflow = 'visible';
+      el.style.overflowWrap = 'normal';
+      el.style.wordBreak = 'normal';
+      el.style.hyphens = 'none';
+      // Measure against one line so a long single word is never mid-wrapped.
+      el.style.whiteSpace = 'nowrap';
+      el.style.fontSize = len > 28 ? '0.72rem' : (len > 18 ? '0.8rem' : '0.94rem');
+      if (!longest) return;
+      const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const minPx = 0.62 * rootPx;
+      const cs = getComputedStyle(el);
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:' + cs.font + ';letter-spacing:' + cs.letterSpacing + ';font-weight:' + cs.fontWeight + ';';
+      probe.textContent = longest;
+      document.body.appendChild(probe);
+      let px = parseFloat(cs.fontSize) || rootPx;
+      const available = el.clientWidth;
+      const slack = 2;
+      if (available > 0) {
+        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available - slack) {
+          px -= 0.25;
+          probe.style.fontSize = px + 'px';
+        }
+        el.style.fontSize = (px / rootPx) + 'rem';
+        probe.style.fontSize = px + 'px';
+        // If the floor is still too wide, keep the word on one line anyway
+        // (chips are slightly wider on a phone; avoid mid-word wrap).
+        if (probe.getBoundingClientRect().width > available - slack && px <= minPx + 0.1) {
+          el.style.fontSize = (minPx / rootPx) + 'rem';
+        }
       }
+      probe.remove();
+      // Multi-word chips may wrap on spaces only; a single long word stays on one line.
+      el.style.whiteSpace = words.length > 1 ? 'normal' : 'nowrap';
     }
 
     function updateSelectedOptionHighlight() {
@@ -2867,8 +3524,8 @@
       const el = document.createElement('div');
       el.className = `corner-toast ${kind || 'good'}`;
       el.innerHTML = `
-        <div class="corner-toast-title">${title}</div>
-        <div class="corner-toast-sub">${sub}</div>
+        <div class="corner-toast-title">${escapeHtml(title)}</div>
+        <div class="corner-toast-sub">${escapeHtml(sub)}</div>
       `;
       container.appendChild(el);
       while (container.children.length > 2) {
@@ -2896,7 +3553,15 @@
         ctx.translate((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14);
       }
 
-      // 1. Hollow-Knight / Octopath Sanctuary Cathedral Background Gradient
+      const museBackdrop = getMuseArt('arenaBackdrop');
+      if (museBackdrop) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        if (ctx.imageSmoothingQuality) ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(museBackdrop, 0, 0, w, h);
+        ctx.restore();
+      } else {
+      // 1. Sanctuary cathedral background gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
       bgGrad.addColorStop(0.0, '#070913');
       bgGrad.addColorStop(0.45, '#131629');
@@ -2950,9 +3615,11 @@
         ctx.fillStyle = 'rgba(255,255,255,0.1)';
         ctx.fillRect(bx + 6, floorY + 7, 42, 3);
       }
+      } // end procedural backdrop (no Muse arena)
 
       // 4. The 3 Floating Sanctuary Rune Platforms (Left [A], Center-High [B], Right [C])
-      platforms.forEach((p, idx) => {
+      // Painted onto the Muse arena already — only draw procedural slabs as a fallback.
+      if (!museBackdrop) platforms.forEach((p, idx) => {
         const isSelected = idx === state.currentLane;
         // Platform shadow & carved stone slab
         ctx.fillStyle = '#090b10';
@@ -2971,7 +3638,7 @@
         ctx.fillText(`PLATFORM ${p.letter}`, p.orbX, p.y + 16);
       });
 
-      // 5. Draw Colossal Hollow-Radiance Boss + Boss HP Bar
+      // 5. Draw the boss and the small HP pip
       drawColossalBoss(ctx, w, h, floorY, now);
 
       // 6. Draw 3 Floating Elemental Weak-Point Orbs [A, B, C] (During Question Phase)
@@ -2982,13 +3649,29 @@
       // 7. Draw Boss Shockwaves (During Play Phase)
       bossShockwaves.forEach(sw => {
         if (sw.parried) return;
-        ctx.fillStyle = '#f43f5e';
-        ctx.fillRect(Math.round(sw.x - 16), Math.round(sw.y - 26), 32, 42);
+        const pulse = 0.55 + Math.sin(now * 0.02 + sw.x) * 0.25;
+        const grd = ctx.createRadialGradient(sw.x, sw.y, 4, sw.x, sw.y, 42);
+        grd.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+        grd.addColorStop(1, 'rgba(244, 63, 94, 0)');
+        ctx.save();
+        ctx.globalAlpha = pulse;
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, 42, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fb7185';
+        ctx.beginPath();
+        ctx.ellipse(sw.x, sw.y, 30, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.fillStyle = '#fef08a';
-        ctx.fillRect(Math.round(sw.x - 8), Math.round(sw.y - 18), 16, 28);
+        ctx.beginPath();
+        ctx.ellipse(sw.x, sw.y, 14, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       });
 
-      // 8. Draw Free-Roam Platformer Hero + Nail/Sword Slash Crescent Arcs
+      // 8. Draw the hero and slash arcs
       drawPlatformerHero(ctx, now);
 
       // 9. Draw Soul Sparks, Fireflies & Floating Damage Numbers
@@ -3028,37 +3711,28 @@
         ? floorY - 64
         : state.bossY + Math.sin(now * 0.004) * 12;
 
-      // Aura Halo behind Boss
-      const auraCol = state.bossMode === 'STUNNED'
-        ? 'rgba(56, 189, 248, 0.25)'
-        : (state.bossMode === 'ENRAGED' ? 'rgba(225, 29, 72, 0.28)' : 'rgba(139, 92, 246, 0.22)');
-      ctx.fillStyle = auraCol;
-      ctx.fillRect(Math.round(state.bossX - 78), Math.round(hoverY - 78), 156, 156);
+      const museBossArt = getMuseArt('boss-' + state.bossMode) || getMuseArt('boss');
+      const bossSize = museBossArt ? 220 : 144;
 
-      ctx.drawImage(bossSprite, Math.round(state.bossX - 72), Math.round(hoverY - 72), 144, 144);
+      if (!museBossArt) {
+        const auraCol = state.bossMode === 'STUNNED'
+          ? 'rgba(56, 189, 248, 0.25)'
+          : (state.bossMode === 'ENRAGED' ? 'rgba(225, 29, 72, 0.28)' : 'rgba(139, 92, 246, 0.22)');
+        ctx.fillStyle = auraCol;
+        ctx.fillRect(Math.round(state.bossX - 78), Math.round(hoverY - 78), 156, 156);
+      }
 
-      // Boss Status Banner & HP Bar on Sanctuary Floor
-      const barW = Math.min(420, Math.round(w * 0.44));
-      const barX = Math.round(w / 2 - barW / 2);
-      const barY = floorY + 34;
+      ctx.drawImage(bossSprite, Math.round(state.bossX - bossSize / 2), Math.round(hoverY - bossSize / 2), bossSize, bossSize);
 
-      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
-      ctx.fillRect(barX - 4, barY - 4, barW + 8, 22);
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(barX - 4, barY - 4, barW + 8, 22);
-
+      // Compact HP pip above the boss (main readout lives in the HUD, clear of the controls)
+      const barW = 92;
+      const barX = Math.round(state.bossX - barW / 2);
+      const barY = Math.round(hoverY - bossSize / 2 - 14);
       const hpFrac = Math.max(0, Math.min(1, state.bossHp / state.bossMaxHp));
+      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
+      ctx.fillRect(barX - 2, barY - 2, barW + 4, 10);
       ctx.fillStyle = state.bossMode === 'STUNNED' ? '#38bdf8' : '#e11d48';
-      ctx.fillRect(barX, barY, Math.round(barW * hpFrac), 14);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px Fredoka, sans-serif';
-      ctx.textAlign = 'center';
-      const statusText = state.bossMode === 'STUNNED'
-        ? '💥 BOSS STUNNED (BREAK!) — MASH SLASH OR TAP BOSS FOR COMBO!'
-        : `ARCH-GUARDIAN OF THE SANCTUARY · HP ${Math.ceil(state.bossHp)}%`;
-      ctx.fillText(statusText, Math.round(w / 2), barY + 10);
+      ctx.fillRect(barX, barY, Math.round(barW * hpFrac), 6);
     }
 
     function drawFloatingRuneOrbs(ctx, now) {
@@ -3068,52 +3742,94 @@
         const ox = Math.round(orb.x);
         const oy = Math.round(orb.y + bob);
         const isSelected = idx === state.currentLane;
+        const pulse = 1 + Math.sin(now * 0.008 + idx) * 0.06;
 
-        // Outer Spinning Rune Ring
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-        ctx.fillRect(ox - 32, oy - 32, 64, 64);
-        ctx.strokeStyle = isSelected ? '#ffffff' : orb.color;
-        ctx.lineWidth = isSelected ? 4 : 2.5;
-        ctx.strokeRect(ox - 32, oy - 32, 64, 64);
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.scale(pulse, pulse);
 
-        // Glowing Elemental Inner Core
-        ctx.fillStyle = orb.color;
-        ctx.fillRect(ox - 24, oy - 24, 48, 48);
+        // Soft glow
+        const glow = ctx.createRadialGradient(0, 0, 6, 0, 0, isSelected ? 46 : 38);
+        glow.addColorStop(0, orb.color);
+        glow.addColorStop(0.45, orb.color + '99');
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(0, 0, 46, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Crisp A / B / C Rune Letter
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 26px Fredoka, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(orb.letter, ox, oy + 1);
+        const museOrb = getMuseArt('orb-' + orb.letter) || getMuseArt('orbSheet');
+        if (museOrb) {
+          const s = isSelected ? 74 : 64;
+          ctx.drawImage(museOrb, -s / 2, -s / 2, s, s);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, 26, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+          ctx.fill();
+          ctx.lineWidth = isSelected ? 4 : 2.5;
+          ctx.strokeStyle = isSelected ? '#ffffff' : orb.color;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(0, 0, 18, 0, Math.PI * 2);
+          ctx.fillStyle = orb.color;
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 22px Fredoka, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(orb.letter, 0, 1);
+        }
+        ctx.restore();
       });
     }
 
-    function drawPlatformerHero(ctx, now) {
-      const heroFrames = getHeroSpriteFrames(state.selectedHeroIdx);
+    function chooseHeroSprite(heroIdx, now) {
+      if (hasMuseHeroPoses(heroIdx)) {
+        let pose = 'idle';
+        if ((state.isBoosting || state.dashTimer > 0) && getMuseHeroPose(heroIdx, 'dash')) pose = 'dash';
+        else if (state.slashCooldown > 0 && getMuseHeroPose(heroIdx, 'slash')) pose = 'slash';
+        else if (Math.abs(state.heroVy) > 40 && getMuseHeroPose(heroIdx, 'jump')) pose = 'jump';
+        else if (Math.abs(state.heroVx) > 15 && getMuseHeroPose(heroIdx, 'walk')) pose = 'walk';
+        return getMuseHeroPose(heroIdx, pose) || getMuseHeroPose(heroIdx, 'idle');
+      }
+      const heroFrames = getHeroSpriteFrames(heroIdx);
       const isMoving = Math.abs(state.heroVx) > 15;
       const hFrame = isMoving ? (Math.floor(now / 110) % 4) : 0;
+      return heroFrames[hFrame];
+    }
+
+    function getHeroDrawSize(heroIdx) {
+      return hasMuseHeroPoses(heroIdx) ? 112 : 72;
+    }
+
+    function drawPlatformerHero(ctx, now) {
+      const sprite = chooseHeroSprite(state.selectedHeroIdx, now);
+      const size = getHeroDrawSize(state.selectedHeroIdx);
 
       // Shadow Dash / Boost Afterimages
       if (state.isBoosting || state.dashTimer > 0) {
         for (let a = 1; a <= 3; a++) {
           ctx.save();
           ctx.globalAlpha = 0.35 - a * 0.09;
-          ctx.translate(Math.round(state.heroX - state.facing * a * 18), Math.round(state.heroY - 36));
+          ctx.translate(Math.round(state.heroX - state.facing * a * 18), Math.round(state.heroY));
           ctx.scale(state.facing, 1);
-          ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
+          ctx.drawImage(sprite, -size / 2, -size, size, size);
           ctx.restore();
         }
       }
 
-      // Main Hero Sprite
+      // Main Hero Sprite (flicker while invulnerable after a hit or boost dash)
       ctx.save();
-      ctx.translate(Math.round(state.heroX), Math.round(state.heroY - 36));
+      if (state.invulnTimer > 0 && Math.floor(now / 80) % 2 === 0) ctx.globalAlpha = 0.35;
+      ctx.translate(Math.round(state.heroX), Math.round(state.heroY));
       ctx.scale(state.facing, 1);
-      ctx.drawImage(heroFrames[hFrame], -36, -36, 72, 72);
+      ctx.drawImage(sprite, -size / 2, -size, size, size);
       ctx.restore();
 
-      // Hollow-Knight Style Wide Nail / Sword Slash Crescent Arcs
+      // Sword slash crescent arcs
       slashArcs.forEach(arc => {
         ctx.save();
         ctx.translate(Math.round(arc.x), Math.round(arc.y));
@@ -3142,39 +3858,53 @@
       const h = showroomCanvas.height;
       ctx.imageSmoothingEnabled = false;
 
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, '#070913');
-      grad.addColorStop(0.65, '#1e1b4b');
-      grad.addColorStop(1, '#27272a');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      const museTavern = getMuseArt('tavernBackdrop');
+      if (museTavern) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        if (ctx.imageSmoothingQuality) ctx.imageSmoothingQuality = 'high';
+        const scale = Math.max(w / museTavern.naturalWidth, h / museTavern.naturalHeight);
+        const dw = museTavern.naturalWidth * scale;
+        const dh = museTavern.naturalHeight * scale;
+        ctx.drawImage(museTavern, (w - dw) / 2, (h - dh) / 2, dw, dh);
+        ctx.restore();
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#070913');
+        grad.addColorStop(0.65, '#1e1b4b');
+        grad.addColorStop(1, '#27272a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
 
-      ctx.fillStyle = '#3f3f46';
-      ctx.fillRect(0, 154, w, h - 154);
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(0, 154, w, 3);
+        ctx.fillStyle = '#3f3f46';
+        ctx.fillRect(0, 154, w, h - 154);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(0, 154, w, 3);
+      }
 
       // Selected Hero Sprite on Left
       const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
       const heroFrames = getHeroSpriteFrames(state.selectedHeroIdx);
       const frame = Math.floor(now / 160) % 4;
-      ctx.drawImage(heroFrames[frame], 52, 68, 92, 92);
+      ctx.drawImage(heroFrames[frame], 16, 78, 96, 96);
 
       // Colossal Boss Silhouette on Right
       const bossSprite = getBossDuelSprite('GUARD', Math.floor(now / 240) % 2);
-      ctx.drawImage(bossSprite, 218, 46, 112, 112);
+      ctx.drawImage(bossSprite, 250, 42, 120, 120);
 
       const titleEl = document.getElementById('showroom-hero-title');
-      if (titleEl) titleEl.textContent = `${hero.name.toUpperCase()} · ${hero.role}`;
+      if (titleEl) titleEl.textContent = hero.name.toUpperCase();
     }
 
     /*************************************************************************
-     * 10. VICTORY & DNF CUTSCENES (~3.5s Skippable) + SCOREBOARD
+     * 10. VICTORY AND RETREAT CUTSCENES (~3.5s Skippable) + SCOREBOARD
      *************************************************************************/
     function startEndCutscene(outcome) {
       runeOrbs = [];
       bossShockwaves = [];
       document.getElementById('question-hud-wrap').classList.add('hidden-phase');
+      const playBanner = document.getElementById('play-phase-banner');
+      if (playBanner) playBanner.classList.add('hidden-phase');
 
       state.screen = outcome === 'WIN' ? 'CUTSCENE_WIN' : 'CUTSCENE_DNF';
       state.cutsceneTimer = 3.5;
@@ -3187,12 +3917,12 @@
       if (outcome === 'WIN') {
         state.bossMode = 'STUNNED';
         playSynthSfx('fanfare');
-        title.textContent = '🏆 BOSS VANQUISHED — FULL DISTANCE!';
-        sub.textContent = `${state.travelerName} (${state.guildName}) shattered all ${state.targetLaps} boss seals!`;
+        title.textContent = 'Sanctuary Chronicle · All Seals Broken';
+        sub.textContent = 'Boss vanquished — sanctuary restored';
       } else {
         playSynthSfx('damage');
-        title.textContent = '🚩 GUILD CONTROL · DID NOT FINISH';
-        sub.textContent = 'Out of Shields! Resting on the sanctuary bench...';
+        title.textContent = 'Shields shattered — Retreat';
+        sub.textContent = 'Out of shields';
       }
     }
 
@@ -3211,12 +3941,12 @@
 
       if (isWin) {
         emojiEl.textContent = '🏆';
-        kickerEl.innerHTML = `<span class="nowrap-clause">🏁 OFFICIAL FIA &amp; GUILD CLASSIFICATION ·</span><span class="nowrap-clause">FULL DISTANCE</span>`;
-        titleEl.innerHTML = `<span class="nowrap-clause">🏆 Chequered Flag —</span><span class="nowrap-clause">Grand Pantheon Finish!</span>`;
+        kickerEl.innerHTML = `<span class="nowrap-clause">Sanctuary Chronicle ·</span><span class="nowrap-clause">All Seals Broken</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">Boss vanquished —</span><span class="nowrap-clause">sanctuary restored</span>`;
       } else {
-        emojiEl.textContent = '🚩';
-        kickerEl.innerHTML = `<span class="nowrap-clause">🚩 GUILD CONTROL ·</span><span class="nowrap-clause">DID NOT FINISH</span>`;
-        titleEl.innerHTML = `<span class="nowrap-clause">🚩 Duel Incomplete —</span><span class="nowrap-clause">Out of Shields!</span>`;
+        emojiEl.textContent = '🛡️';
+        kickerEl.innerHTML = `<span class="nowrap-clause">Shields shattered —</span><span class="nowrap-clause">Retreat</span>`;
+        titleEl.innerHTML = `<span class="nowrap-clause">Out of shields</span>`;
       }
 
       const totalAnswered = state.answeredLog.length;
@@ -3234,22 +3964,39 @@
 
     function saveAndRenderStandings(isWin, acc) {
       let board = [
-        { name: 'Olberic · Cobbleston Guard', pts: 980, status: 'FULL' },
-        { name: 'Cyrus · Royal Academy', pts: 820, status: 'FULL' },
-        { name: "H'aanit · S'warkii Woods", pts: 690, status: 'FULL' }
+        { name: 'Knight · Ironleaf Guild', pts: 980, status: 'Clear' },
+        { name: 'Scholar · Lantern Library', pts: 820, status: 'Clear' },
+        { name: 'Hunter · Pinewood Lodge', pts: 690, status: 'Clear' }
       ];
       try {
         const saved = localStorage.getItem('pyw_pixel_quest_standings');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) board = parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) board = parsed.map((row) => {
+            let name = String(row.name || '');
+            const rename = [
+              ['Olberic · Cobbleston Guard', 'Knight · Ironleaf Guild'],
+              ['Cyrus · Royal Academy', 'Scholar · Lantern Library'],
+              ["H'aanit · S'warkii Woods", 'Hunter · Pinewood Lodge'],
+              ['Olberic', 'Knight'],
+              ['Cyrus', 'Scholar'],
+              ['Therion', 'Rogue'],
+              ["H'aanit", 'Hunter'],
+              ['Primrose', 'Dancer'],
+              ['Tressa', 'Merchant'],
+              ['Harbor Market', 'Harbour Market']
+            ];
+            rename.forEach((pair) => { name = name.replace(pair[0], pair[1]); });
+            const status = row.status === 'FULL' || row.status === 'DNF' ? (row.status === 'FULL' ? 'Clear' : 'Retreat') : row.status;
+            return Object.assign({}, row, { name, status });
+          });
         }
       } catch (e) {}
 
       const entry = {
         name: `${state.travelerName} · ${state.guildName}`,
         pts: state.score,
-        status: isWin ? `${acc}%` : 'DNF',
+        status: isWin ? `${acc}%` : 'Retreat',
         isCurrent: true
       };
       board.push(entry);
@@ -3269,9 +4016,9 @@
         const div = document.createElement('div');
         div.className = `standing-row ${row.isCurrent ? 'current-run' : ''}`;
         div.innerHTML = `
-          <div class="standing-driver-info">
+          <div class="standing-hero-info">
             <span class="standing-rank">#${idx + 1}</span>
-            <span class="standing-name">${row.name} (${row.status})</span>
+            <span class="standing-name">${escapeHtml(row.name)} (${escapeHtml(row.status)})</span>
           </div>
           <span class="pts-pill">${row.pts} PTS</span>
         `;
@@ -3296,18 +4043,18 @@
         const card = document.createElement('div');
         card.className = `review-card ${item.isCorrect ? '' : 'missed'}`;
         card.innerHTML = `
-          <div class="review-q-line">${idx + 1}. [${item.mode}] ${item.prompt}</div>
+          <div class="review-q-line">${idx + 1}. [${escapeHtml(item.mode)}] ${escapeHtml(item.prompt)}</div>
           <div class="review-ans-badges">
-            <span class="ans-pill-correct">✓ Correct [${LANE_LETTERS[item.correctLane]}]: ${item.correctText}</span>
-            ${!item.isCorrect ? `<span class="ans-pill-wrong">✗ Chosen [${LANE_LETTERS[item.chosenLane]}]: ${item.chosenText}</span>` : ''}
+            <span class="ans-pill-correct">✓ Correct [${LANE_LETTERS[item.correctLane]}]: ${escapeHtml(item.correctText)}</span>
+            ${!item.isCorrect ? `<span class="ans-pill-wrong">✗ Chosen [${LANE_LETTERS[item.chosenLane] || '-'}]: ${escapeHtml(item.chosenText)}</span>` : ''}
           </div>
           <div class="review-explanation-full">
-            <div><strong>EN:</strong> ${item.expEn}</div>
-            <div style="margin-top:3px; color:#fde68a;"><strong>繁中:</strong> ${item.expZh}</div>
+            <div><strong>English:</strong> ${escapeHtml(item.expEn)}</div>
+            <div style="margin-top:3px; color:#fde68a;"><strong>繁體中文:</strong> ${escapeHtml(item.expZh)}</div>
           </div>
           <div class="review-audio-row">
-            <button type="button" class="hud-btn btn-speak-correct" data-speak="${encodeURIComponent(item.correctText)}">🔊 Correct (${item.correctText})</button>
-            ${!item.isCorrect ? `<button type="button" class="hud-btn btn-speak-wrong" data-speak="${encodeURIComponent(item.chosenText)}">🔊 Wrong Gate (${item.chosenText})</button>` : ''}
+            <button type="button" class="hud-btn btn-speak-correct" data-speak="${encodeURIComponent(item.correctText)}">🔊 Correct (${escapeHtml(item.correctText)})</button>
+            ${!item.isCorrect ? `<button type="button" class="hud-btn btn-speak-wrong" data-speak="${encodeURIComponent(item.chosenText)}">🔊 Your answer (${escapeHtml(item.chosenText)})</button>` : ''}
           </div>
         `;
         container.appendChild(card);
@@ -3323,8 +4070,8 @@
     /*************************************************************************
      * 11. CIRCULAR SOUL / COMBO PACE GAUGE (Green -> Amber -> Red)
      *************************************************************************/
-    function drawSpeedometer() {
-      const canvas = document.getElementById('speedo-canvas');
+    function drawSoulGauge() {
+      const canvas = document.getElementById('soul-gauge-canvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
@@ -3354,16 +4101,39 @@
       ctx.strokeStyle = 'rgba(51, 65, 85, 0.55)';
       ctx.stroke();
 
-      const norm = Math.max(0, Math.min(1, (state.speedKmh - 240) / (343 - 240)));
-      const activeEnd = startAng + totalSpan * norm;
+      let norm = 0;
+      let centerText = '—';
+      let label = 'SOUL';
+      if (state.screen === 'QUESTION_PHASE' && state.timerSeconds > 0) {
+        norm = Math.max(0, Math.min(1, state.questionTimeLeft / state.timerSeconds));
+        centerText = `${Math.max(0, Math.ceil(state.questionTimeLeft))}`;
+        label = 'ANSWER';
+      } else if (state.screen === 'PLAY_PHASE' && state.bossMode === 'STUNNED') {
+        norm = Math.max(0, Math.min(1, state.phaseTimer / 6.8));
+        centerText = `${state.comboHits}x`;
+        label = 'BREAK COMBO';
+      } else if (state.screen === 'PLAY_PHASE') {
+        norm = Math.max(0, Math.min(1, state.phaseTimer / 6.2));
+        centerText = `${Math.max(0, Math.ceil(state.phaseTimer))}`;
+        label = 'DODGE';
+      } else if (state.isBoosting) {
+        norm = Math.max(0, Math.min(1, state.boostTimer / 3.8));
+        centerText = 'MAX';
+        label = '🔥 BOOST';
+      } else {
+        norm = Math.max(0, Math.min(1, state.bp / 3));
+        centerText = `${state.bp}`;
+        label = 'BP';
+      }
 
+      const activeEnd = startAng + totalSpan * norm;
       const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
       grad.addColorStop(0.0, '#22c55e');
       grad.addColorStop(0.55, '#f59e0b');
-      grad.addColorStop(1.0, '#e10600');
+      grad.addColorStop(1.0, '#ef4444');
 
       ctx.beginPath();
-      ctx.arc(cx, cy, r, startAng, activeEnd);
+      ctx.arc(cx, cy, r, startAng, Math.max(startAng + 0.02, activeEnd));
       ctx.lineWidth = 12;
       ctx.lineCap = 'round';
       ctx.strokeStyle = grad;
@@ -3373,13 +4143,13 @@
       ctx.font = 'bold 31px Fredoka, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(state.bossMode === 'STUNNED' ? `${state.comboHits}x` : `${Math.round(state.speedKmh)}`, cx, cy - 8);
+      ctx.fillText(centerText, cx, cy - 8);
 
       ctx.fillStyle = state.isBoosting ? '#ef4444' : '#fbbf24';
-      ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
-      ctx.fillText(state.bossMode === 'STUNNED' ? '💥 BREAK COMBO' : (state.isBoosting ? '🔥 MAX BOOST' : 'SOUL PACE'), cx, cy + 20);
+      ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(label, cx, cy + 20);
 
-      ctx.fillStyle = LANE_COLORS[state.currentLane];
+      ctx.fillStyle = LANE_COLORS[state.currentLane] || '#fbbf24';
       ctx.font = 'bold 14px Fredoka, sans-serif';
       ctx.fillText(`RUNE [${LANE_LETTERS[state.currentLane]}]`, cx, cy + 42);
     }
@@ -3391,6 +4161,12 @@
       document.getElementById('hud-lap-val').textContent = `${state.currentLap} / ${state.targetLaps}`;
       document.getElementById('hud-score-val').textContent = state.score;
       document.getElementById('hud-shields-row').textContent = '🛡️'.repeat(Math.max(0, state.shields)) || '💔';
+
+      const hpFill = document.getElementById('boss-hp-fill');
+      const hpVal = document.getElementById('boss-hp-val');
+      const frac = Math.max(0, Math.min(1, state.bossHp / Math.max(1, state.bossMaxHp)));
+      if (hpFill) hpFill.style.width = `${Math.round(frac * 100)}%`;
+      if (hpVal) hpVal.textContent = `${Math.ceil(Math.max(0, state.bossHp))}%`;
 
       for (let i = 0; i < 3; i++) {
         const orb = document.getElementById(`bp-orb-${i}`);
@@ -3553,31 +4329,53 @@
       // 3. Phase Timers
       if (state.screen === 'PLAY_PHASE') {
         state.phaseTimer -= dt;
+        const playTimerEl = document.getElementById('play-phase-timer');
+        if (playTimerEl) playTimerEl.textContent = `${Math.max(0, Math.ceil(state.phaseTimer))}s`;
         bossShockwaves.forEach(sw => {
           if (sw.parried) return;
           sw.x += sw.vx * dt;
-          if (!sw.hitPlayer && state.invulnTimer <= 0 && Math.abs(sw.x - state.heroX) < 28 && Math.abs(sw.y - (state.heroY - 20)) < 34) {
+          if (!sw.hitPlayer && state.invulnTimer <= 0 && Math.abs(sw.x - state.heroX) < 30 && Math.abs(sw.y - (state.heroY - 20)) < 36) {
             sw.hitPlayer = true;
-            state.speedKmh = 245;
-            playSynthSfx('step');
-            spawnFloatingCombatText(state.heroX, state.heroY - 60, 'JUMP / DASH!', '#fca5a5');
+            state.dodgeHitsThisPhase++;
+            state.score = Math.max(0, state.score - 25);
+            state.invulnTimer = 0.85;
+            state.screenShake = 0.28;
+            state.heroX = Math.max(48, state.heroX - 30);
+            playSynthSfx('damage');
+            spawnFloatingCombatText(state.heroX, state.heroY - 60, 'HIT! −25', '#fca5a5', 'Jump or parry!');
+            if (state.dodgeHitsThisPhase >= 2) {
+              state.shields = Math.max(0, state.shields - 1);
+              spawnFloatingCombatText(state.heroX, state.heroY - 90, 'SHIELD CRACKED!', '#ef4444');
+              if (state.shields <= 0) {
+                state.pendingEnd = 'DNF';
+                state.phaseTimer = Math.min(state.phaseTimer, 0.55);
+              }
+            }
+            updateHudReadouts();
           }
         });
         if (state.phaseTimer <= 0) {
-          startQuestionPhase();
+          if (state.pendingEnd) {
+            if (state.pendingEnd === 'WIN') state.bossHp = 0;
+            startEndCutscene(state.pendingEnd);
+          } else {
+            state.currentLap++;
+            updateHudReadouts();
+            startQuestionPhase();
+          }
         }
-        drawSpeedometer();
+        drawSoulGauge();
       } else if (state.screen === 'QUESTION_PHASE') {
         if (state.timerSeconds > 0) {
           state.questionTimeLeft -= dt;
           document.getElementById('q-timer-display').textContent = `${Math.max(0, Math.ceil(state.questionTimeLeft))}s`;
           if (state.questionTimeLeft <= 0) {
-            resolveOrbSlash(state.currentLane);
+            resolveOrbSlash(-1, { timedOut: true });
           }
         } else {
           document.getElementById('q-timer-display').textContent = '∞';
         }
-        drawSpeedometer();
+        drawSoulGauge();
       } else if (state.screen === 'CUTSCENE_WIN' || state.screen === 'CUTSCENE_DNF') {
         state.cutsceneTimer -= dt;
         if (state.screen === 'CUTSCENE_WIN' && Math.random() < 0.3) {
@@ -3596,8 +4394,8 @@
      *************************************************************************/
     function startNewQuest() {
       ensureAudioCtx();
-      state.travelerName = (document.getElementById('input-traveler-name').value || 'Olberic').trim();
-      state.guildName = (document.getElementById('input-guild-name').value || 'Cobbleston Guard').trim();
+      state.travelerName = (document.getElementById('input-traveler-name').value || 'Knight').trim();
+      state.guildName = (document.getElementById('input-guild-name').value || 'Ironleaf Guild').trim();
 
       const customLapsVal = parseInt(document.getElementById('input-custom-laps').value, 10);
       if (!isNaN(customLapsVal) && customLapsVal >= 1 && customLapsVal <= 99) {
@@ -3624,6 +4422,9 @@
       state.bossHp = 100;
       state.bossMaxHp = 100;
       state.answeredLog = [];
+      state.pendingEnd = null;
+      state.answerLocked = false;
+      state.dodgeHitsThisPhase = 0;
 
       updateHudReadouts();
 
@@ -3733,17 +4534,17 @@
       const q = filterText.trim().toLowerCase();
       const combined = [
         ...customQuestionPool.map(c => ({ word: c.word, zh: c.zh, def: c.prompt, tag: 'CUSTOM' })),
-        ...HKDSE_LEXICON_SEEDS.map(s => ({ word: s[0], zh: s[1], def: s[2], tag: 'HKDSE' }))
+        ...HKDSE_LEXICON_SEEDS.map(s => ({ word: s[0], zh: s[1], def: s[2], tag: 'Practice bank' }))
       ].filter(item => !q || item.word.toLowerCase().includes(q) || item.zh.includes(q) || item.def.toLowerCase().includes(q));
 
       box.innerHTML = combined.slice(0, 45).map(item => `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 8px; border-bottom:1px solid rgba(148,163,184,0.15); font-size:0.8rem;">
           <div>
-            <strong style="color:#fbbf24;">${item.word}</strong>
-            <span style="color:#cbd5e1; margin-left:6px;">${item.zh}</span>
-            <span style="color:#94a3b8; margin-left:6px;">— ${item.def}</span>
+            <strong style="color:#fbbf24;">${escapeHtml(item.word)}</strong>
+            <span style="color:#cbd5e1; margin-left:6px;">${escapeHtml(item.zh)}</span>
+            <span style="color:#94a3b8; margin-left:6px;">— ${escapeHtml(item.def)}</span>
           </div>
-          <span style="font-size:0.68rem; background:rgba(245,158,11,0.2); color:#fde68a; padding:2px 6px; border-radius:4px;">${item.tag}</span>
+          <span style="font-size:0.68rem; background:rgba(245,158,11,0.2); color:#fde68a; padding:2px 6px; border-radius:4px;">${escapeHtml(item.tag)}</span>
         </div>
       `).join('');
     }
@@ -3756,7 +4557,10 @@
         return;
       }
 
-      const lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      let lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      if (lines.length === 1 && !lines[0].includes('|') && lines[0].includes(',')) {
+        lines = lines[0].split(',').map(l => l.trim()).filter(Boolean);
+      }
       let added = 0;
 
       lines.forEach((line, idx) => {
@@ -3790,33 +4594,84 @@
       statusEl.textContent = `Added ${added} custom items! Total custom pool: ${customQuestionPool.length}.`;
     }
 
-    async function extractVocabularyWithDeepSeek(sourceText) {
+    function compressPhotoFileToDataUrl(file, maxDim, quality) {
+      maxDim = maxDim || 1100;
+      quality = quality == null ? 0.82 : quality;
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Could not read image'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Invalid image'));
+          img.onload = () => {
+            let w = img.width || 800;
+            let h = img.height || 600;
+            if (w > maxDim || h > maxDim) {
+              const scale = maxDim / Math.max(w, h);
+              w = Math.round(w * scale);
+              h = Math.round(h * scale);
+            }
+            const cv = document.createElement('canvas');
+            cv.width = w;
+            cv.height = h;
+            const cx = cv.getContext('2d');
+            cx.drawImage(img, 0, 0, w, h);
+            resolve(cv.toDataURL('image/jpeg', quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function formatExtractedWords(words) {
+      return (words || []).map((w) => {
+        if (typeof w === 'string') {
+          const match = HKDSE_LEXICON_SEEDS.find(s => s[0].toLowerCase() === w.toLowerCase());
+          if (match) return `${match[0]} | ${match[1]} | ${match[2]}`;
+          return `${w} | 提取詞彙 | Vocabulary scanned from your worksheet`;
+        }
+        const word = w.word || w.term || '';
+        const zh = w.zh || w.meaning || '提取詞彙';
+        const def = w.def || w.definition || 'Vocabulary scanned from your worksheet';
+        return word ? `${word} | ${zh} | ${def}` : '';
+      }).filter(Boolean).join('\n');
+    }
+
+    async function extractVocabularyWithDeepSeek(sourceText, imageDataUrl) {
       const statusEl = document.getElementById('builder-status-msg');
-      statusEl.textContent = '✨ Extracting HKDSE vocabulary via skhhcss-eng-play-your-way...';
+      statusEl.textContent = imageDataUrl
+        ? '✨ Scanning worksheet photo...'
+        : '✨ Extracting vocabulary from your text...';
 
       try {
         const endpoint = DEFAULT_PYW_WORKER_URL + '/api/extract';
+        const body = imageDataUrl
+          ? { mode: 'vocab', imageDataUrl }
+          : { mode: 'vocab', prompt: sourceText };
         const resp = await fetch(endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Play-Your-Way-Key': 'skhhcss-eng-play-your-way'
-          },
-          body: JSON.stringify({ prompt: sourceText })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
         });
         if (resp.ok) {
           const data = await resp.json();
-          if (data && Array.isArray(data.words)) {
-            const formatted = data.words.map(w => `${w.word} | ${w.zh} | ${w.def}`).join('\n');
-            document.getElementById('textarea-custom-words').value = formatted;
+          const list = (data && (data.words || data.items)) || [];
+          if (Array.isArray(list) && list.length > 0) {
+            document.getElementById('textarea-custom-words').value = formatExtractedWords(list);
             parseCustomWordsInput();
             return;
           }
         }
       } catch (err) {}
 
-      const tokens = sourceText.match(/[A-Za-z]{5,}/g) || ['resilient', 'meticulous', 'prosperous', 'alleviate'];
-      const unique = [...new Set(tokens.map(t => t.toLowerCase()))].slice(0, 8);
+      if (imageDataUrl) {
+        statusEl.textContent = '⚠️ Photo scan is unavailable right now. Type or paste the words below.';
+        return;
+      }
+
+      const tokens = String(sourceText || '').match(/[A-Za-z]{5,}/g) || ['resilient', 'meticulous', 'prosperous', 'alleviate'];
+      const unique = [...new Set(tokens.map(tok => tok.toLowerCase()))].slice(0, 8);
       const synthesizedLines = unique.map(w => {
         const match = HKDSE_LEXICON_SEEDS.find(s => s[0].toLowerCase() === w);
         if (match) return `${match[0]} | ${match[1]} | ${match[2]}`;
@@ -3833,9 +4688,9 @@
       if (customQuestionPool.length > 0) {
         summaryEl.textContent = hubSyncedPackTitle
           ? `${hubSyncedPackTitle} (${customQuestionPool.length} items synced from Play Your Way Hub)`
-          : `Custom + HKDSE Pool (${customQuestionPool.length} custom + 3,500-Word HKDSE Dictionary)`;
+          : `Custom + Practice bank`;
       } else {
-        summaryEl.textContent = `HKDSE 3,500-Word Dictionary (Vocab · Grammar · Reading · Proofreading)`;
+        summaryEl.textContent = `Practice bank`;
       }
     }
 
@@ -3879,7 +4734,7 @@
           document.querySelectorAll('#setup-mode-pills .choice-pill').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           state.modeFilter = btn.getAttribute('data-mode') || 'ALL';
-          document.getElementById('start-pool-mode-tag').textContent = `ACTIVE WORD POOL · ${state.modeFilter}`;
+          document.getElementById('start-pool-mode-tag').textContent = 'Active word pool · ' + (state.modeFilter === 'ALL' ? 'All 4 modes' : (state.modeFilter.charAt(0) + state.modeFilter.slice(1).toLowerCase()));
         });
       });
 
@@ -3950,14 +4805,23 @@
       }
 
       // Bottom Platformer Touch Hold / Click Controls
-      const btnLeft = document.getElementById('btn-lane-up');
-      const btnRight = document.getElementById('btn-lane-down');
-      btnLeft.addEventListener('pointerdown', () => { keysHeld.left = true; });
-      btnLeft.addEventListener('pointerup', () => { keysHeld.left = false; });
-      btnLeft.addEventListener('pointerleave', () => { keysHeld.left = false; });
-      btnRight.addEventListener('pointerdown', () => { keysHeld.right = true; });
-      btnRight.addEventListener('pointerup', () => { keysHeld.right = false; });
-      btnRight.addEventListener('pointerleave', () => { keysHeld.right = false; });
+      const btnLeft = document.getElementById('btn-move-left');
+      const btnRight = document.getElementById('btn-move-right');
+      const bindHold = (btn, dir) => {
+        if (!btn) return;
+        const on = (ev) => {
+          if (ev.pointerId != null && btn.setPointerCapture) btn.setPointerCapture(ev.pointerId);
+          keysHeld[dir] = true;
+          ev.preventDefault();
+        };
+        const off = () => { keysHeld[dir] = false; };
+        btn.addEventListener('pointerdown', on);
+        btn.addEventListener('pointerup', off);
+        btn.addEventListener('pointercancel', off);
+        btn.addEventListener('lostpointercapture', off);
+      };
+      bindHold(btnLeft, 'left');
+      bindHold(btnRight, 'right');
 
       document.getElementById('btn-jump-plat').addEventListener('click', performJump);
       document.getElementById('btn-action-jump').addEventListener('click', performSwordSlash);
@@ -4005,12 +4869,23 @@
         const raw = document.getElementById('textarea-custom-words').value.trim() || 'resilient meticulous alleviate prosperous embark scrutinise';
         extractVocabularyWithDeepSeek(raw);
       });
-      document.getElementById('input-photo-upload').addEventListener('change', (e) => {
+      document.getElementById('input-photo-upload').addEventListener('change', async (e) => {
         const file = e.target.files && e.target.files[0];
+        e.target.value = '';
         if (!file) return;
+        const statusEl = document.getElementById('builder-status-msg');
+        if (file.type && file.type.indexOf('image/') === 0) {
+          try {
+            const imageDataUrl = await compressPhotoFileToDataUrl(file);
+            await extractVocabularyWithDeepSeek('', imageDataUrl);
+          } catch (err) {
+            if (statusEl) statusEl.textContent = 'Could not read that photo. Try another image, or type the words.';
+          }
+          return;
+        }
         const reader = new FileReader();
         reader.onload = () => {
-          extractVocabularyWithDeepSeek(file.name + ' ' + String(reader.result || '').slice(0, 400));
+          extractVocabularyWithDeepSeek(String(reader.result || ''));
         };
         reader.readAsText(file);
       });
@@ -4027,7 +4902,7 @@
       if (b2) b2.addEventListener("click", goHub);
       syncFromPlayYourWayHub();
       updateWordPoolSummaryLabels();
-      drawSpeedometer();
+      drawSoulGauge();
       requestAnimationFrame(animateLoop);
     };
   </script>
