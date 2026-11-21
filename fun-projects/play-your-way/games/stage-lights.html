@@ -219,6 +219,7 @@
   <img data-muse-slot="crowd" src="art/stage-lights/crowd.png" alt="">
   <img data-muse-slot="note" src="art/stage-lights/note.png" alt="">
   <img data-muse-slot="note-special" src="art/stage-lights/note-special.png" alt="">
+  <img data-muse-slot="note-special-hit" src="art/stage-lights/note-special-hit.png" alt="">
 </div>
 
 <div id="start-menu-overlay">
@@ -1292,13 +1293,14 @@
     /*************************************************************************
      * STAGE LIGHTS: ON THE BEAT — concert rhythm / cue-card game
      * MUSE ART HOOKS: set window.PYW_STAGE_LIGHTS_ART = {
-     *   backdrop, performer, crowd, note, "note-special"
+     *   backdrop, performer, crowd, note, "note-special", "note-special-hit"
      * }
      * or <img hidden data-muse-slot="backdrop" src="...">.
      * The hub cover, start-menu portrait, nova-spotlight, nova-singing, and mic are hooked.
-     * Backdrop, crowd, note, and note-special are also hooked. Backdrop uses aspect-preserved
+     * Backdrop, crowd, note, note-special, and note-special-hit are also hooked. Backdrop uses aspect-preserved
      * cover so Nova stays in the empty centre spotlight. Special notes fall back to note.png
      * with a gold outline if note-special.png has not landed yet. A / B / C are drawn in code.
+     * note-special-hit is a strike-line flash when a special answer note is hit; skip if missing.
      *************************************************************************/
     const GAME = {
       musePack: "PYW_STAGE_LIGHTS_ART",
@@ -1335,6 +1337,7 @@
       specialResolved: false,
       strikeY: 0,
       sparks: [],
+      hitFlashes: [],
       beat: 0,
       armed: false
     };
@@ -1539,6 +1542,30 @@
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 1;
       });
+      drawSpecialNoteHitFlashes(ctx);
+    }
+
+    function spawnSpecialNoteHitFlash(lane) {
+      // Skip silently if the Muse hit flash has not landed yet.
+      if (!getMuseArt("note-special-hit") || !stage.canvas) return;
+      const L = laneLayout(stage.canvas.width, stage.canvas.height);
+      const x = L.left + lane * L.laneW + L.laneW / 2;
+      stage.hitFlashes.push({ x: x, y: stage.strikeY, life: 0.42, maxLife: 0.42 });
+    }
+
+    function drawSpecialNoteHitFlashes(ctx) {
+      const img = getMuseArt("note-special-hit");
+      if (!img) return;
+      (stage.hitFlashes || []).forEach((f) => {
+        const t = 1 - f.life / f.maxLife;
+        const box = 72 + t * 40;
+        const alpha = t < 0.2 ? 1 : Math.max(0, 1 - (t - 0.2) / 0.8);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        // Preserve aspect ratio; centre the flash on the strike point.
+        drawMuseContained(ctx, img, f.x, f.y + box / 2, box, "bottom");
+        ctx.restore();
+      });
     }
 
     function noteY(note) {
@@ -1696,10 +1723,12 @@
         stage.phase = "result";
         if (!okLane || grade === "Miss") {
           spawnHitSparks(lane, "#fb7185");
+          spawnSpecialNoteHitFlash(lane);
           resolveChoice(lane, { grade: "Miss", timedOut: false });
           return;
         }
         spawnHitSparks(lane, grade === "Perfect" ? "#a3e635" : "#22d3ee");
+        spawnSpecialNoteHitFlash(lane);
         resolveChoice(lane, { grade: grade });
         return;
       }
@@ -1769,6 +1798,8 @@
       stage.beat += dt;
       stage.sparks.forEach((s) => { s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 240 * dt; s.life -= dt; });
       stage.sparks = stage.sparks.filter((s) => s.life > 0);
+      (stage.hitFlashes || []).forEach((f) => { f.life -= dt; });
+      stage.hitFlashes = (stage.hitFlashes || []).filter((f) => f.life > 0);
 
       if (state.screen === "PLAY") {
         // The song never pauses for the question — songTime keeps running through play, question, and special notes.

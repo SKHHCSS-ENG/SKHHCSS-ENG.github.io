@@ -1470,6 +1470,7 @@
     <img data-muse-slot="boss-STUNNED" src="art/pixel-duel/boss-stunned.png" alt="">
     <img data-muse-slot="boss-ENRAGED" src="art/pixel-duel/boss-enraged.png" alt="">
     <img data-muse-slot="boss-SPECIAL" src="art/pixel-duel/boss-special.png" alt="">
+    <img data-muse-slot="boss-special-burst" src="art/pixel-duel/boss-special-burst.png" alt="">
     <img data-muse-slot="hero-0" src="art/pixel-duel/knight-idle.png" alt="">
     <img data-muse-slot="hero-0-idle" src="art/pixel-duel/knight-idle.png" alt="">
     <img data-muse-slot="hero-0-walk" src="art/pixel-duel/knight-walk.png" alt="">
@@ -2686,6 +2687,7 @@
      * Slots: hero-0 (sheet or idle fallback), hero-0-idle/walk/jump/slash/dash,
      * hero-1..5 (idle fallback) and hero-N-idle/walk/jump/slash/dash for Scholar, Rogue,
      * Hunter, Dancer, and Merchant, boss-GUARD / boss-STUNNED / boss-ENRAGED / boss-SPECIAL,
+     * boss-special-burst (wrong-answer special-attack flash only),
      * arenaBackdrop, tavernBackdrop, orbSheet, orb-A / orb-B / orb-C.
      * Knight (hero-0) and Scholar, Rogue, Hunter, Dancer, and Merchant all have
      * the full idle, walk, jump, slash, and dash set hooked.
@@ -3009,6 +3011,7 @@
     let soulSparks = [];
     let floatingTexts = [];
     let fireflies = [];
+    let specialBursts = []; // Muse boss-special-burst, special-attack beat only
 
     const state = {
       screen: 'START', // START, TAVERN, PLAY_PHASE, QUESTION_PHASE, CUTSCENE_WIN, CUTSCENE_DNF, PAUSED, END
@@ -3525,7 +3528,14 @@
         state.bossTargetX = w * 0.78;
         state.bossY = floorY - 115;
         spawnBossAutoAttack('special');
+        spawnSpecialAttackBurst();
       }
+    }
+
+    function spawnSpecialAttackBurst() {
+      // Skip silently if the Muse burst has not landed yet; the special pose/aura remain.
+      if (!getMuseArt('boss-special-burst')) return;
+      specialBursts.push({ life: 0.72, maxLife: 0.72 });
     }
 
     function autoFitOptionText(el, text) {
@@ -3823,6 +3833,23 @@
       return Math.max(minCenter, Math.min(target, maxCenter));
     }
 
+    function drawSpecialAttackBursts(ctx, hoverY, bossSize) {
+      if (state.bossMode !== 'SPECIAL') return;
+      const img = getMuseArt('boss-special-burst');
+      if (!img) return;
+      specialBursts.forEach((burst) => {
+        const t = 1 - burst.life / burst.maxLife;
+        const scale = 0.75 + t * 1.15;
+        const alpha = t < 0.18 ? (t / 0.18) : Math.max(0, 1 - (t - 0.18) / 0.82);
+        const box = Math.round(Math.max(bossSize * 1.45, 180) * scale);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        // Preserve aspect ratio; centre the starburst on the boss (not stretched).
+        drawSpriteContained(ctx, img, state.bossX, hoverY + box / 2, box);
+        ctx.restore();
+      });
+    }
+
     function drawColossalBoss(ctx, w, h, floorY, now) {
       const bFrame = Math.floor(now / 220) % 2;
       const bossSprite = getBossDuelSprite(state.bossMode, bFrame);
@@ -3849,6 +3876,7 @@
         ctx.beginPath();
         ctx.arc(state.bossX, hoverY, bossSize * 0.72, 0, Math.PI * 2);
         ctx.fill();
+        drawSpecialAttackBursts(ctx, hoverY, bossSize);
       } else if (!museBossArt) {
         const auraCol = state.bossMode === 'STUNNED'
           ? 'rgba(56, 189, 248, 0.25)'
@@ -4039,6 +4067,7 @@
     function startEndCutscene(outcome) {
       runeOrbs = [];
       bossShockwaves = [];
+      specialBursts = [];
       document.getElementById('question-hud-wrap').classList.add('hidden-phase');
       const playBanner = document.getElementById('play-phase-banner');
       if (playBanner) playBanner.classList.add('hidden-phase');
@@ -4452,6 +4481,11 @@
         if (sp.life <= 0) soulSparks.splice(i, 1);
       }
 
+      for (let i = specialBursts.length - 1; i >= 0; i--) {
+        specialBursts[i].life -= dt;
+        if (specialBursts[i].life <= 0) specialBursts.splice(i, 1);
+      }
+
       for (let i = floatingTexts.length - 1; i >= 0; i--) {
         const ft = floatingTexts[i];
         ft.y -= dt * 42;
@@ -4614,6 +4648,7 @@
     function returnToStartMenu() {
       runeOrbs = [];
       bossShockwaves = [];
+      specialBursts = [];
       state.screen = 'START';
       document.getElementById('hud-layer').classList.add('hidden');
       document.getElementById('tavern-modal').classList.add('hidden');
