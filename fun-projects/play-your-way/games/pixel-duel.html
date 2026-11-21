@@ -1342,16 +1342,16 @@
         max-width: 82px;
       }
       .options-below-row {
-        gap: 5px;
+        gap: 4px;
       }
       .option-card {
-        padding: 5px 7px;
-        gap: 5px;
+        padding: 5px 5px;
+        gap: 4px;
       }
       .option-badge {
-        width: 22px;
-        height: 22px;
-        font-size: 0.78rem;
+        width: 20px;
+        height: 20px;
+        font-size: 0.74rem;
       }
     }
 
@@ -1440,13 +1440,14 @@
         align-self: center;
       }
       .option-text {
-        white-space: normal !important;
+        white-space: nowrap;
         overflow: visible;
-        text-overflow: unset;
+        text-overflow: clip;
         font-size: 0.78rem;
         line-height: 1.25;
         word-break: normal;
-        overflow-wrap: break-word;
+        overflow-wrap: normal;
+        hyphens: none;
       }
       #toast-corner-right {
         top: calc(env(safe-area-inset-top, 0px) + 118px);
@@ -3447,40 +3448,46 @@
     function autoFitOptionText(el, text) {
       if (!el) return;
       const raw = String(text || '');
+      const words = raw.split(/\s+/).filter(Boolean);
+      const longest = words.reduce(function (best, word) {
+        return word.length > best.length ? word : best;
+      }, '');
       const len = raw.length;
       el.style.textOverflow = 'clip';
       el.style.overflow = 'visible';
-      if (len > 28) {
-        el.style.fontSize = '0.72rem';
-        el.style.whiteSpace = 'normal';
-      } else if (len > 18) {
-        el.style.fontSize = '0.8rem';
-        el.style.whiteSpace = 'normal';
-      } else {
-        el.style.fontSize = '0.94rem';
-        el.style.whiteSpace = 'normal';
-      }
-      const longest = raw.split(/\s+/).reduce(function (best, word) {
-        return word.length > best.length ? word : best;
-      }, '');
+      el.style.overflowWrap = 'normal';
+      el.style.wordBreak = 'normal';
+      el.style.hyphens = 'none';
+      // Measure against one line so a long single word is never mid-wrapped.
+      el.style.whiteSpace = 'nowrap';
+      el.style.fontSize = len > 28 ? '0.72rem' : (len > 18 ? '0.8rem' : '0.94rem');
       if (!longest) return;
       const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
       const minPx = 0.62 * rootPx;
       const cs = getComputedStyle(el);
       const probe = document.createElement('span');
-      probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:' + cs.font + ';letter-spacing:' + cs.letterSpacing + ';';
+      probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:' + cs.font + ';letter-spacing:' + cs.letterSpacing + ';font-weight:' + cs.fontWeight + ';';
       probe.textContent = longest;
       document.body.appendChild(probe);
       let px = parseFloat(cs.fontSize) || rootPx;
       const available = el.clientWidth;
+      const slack = 2;
       if (available > 0) {
-        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available) {
-          px -= 0.5;
+        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available - slack) {
+          px -= 0.25;
           probe.style.fontSize = px + 'px';
         }
         el.style.fontSize = (px / rootPx) + 'rem';
+        probe.style.fontSize = px + 'px';
+        // If the floor is still too wide, keep the word on one line anyway
+        // (chips are slightly wider on a phone; avoid mid-word wrap).
+        if (probe.getBoundingClientRect().width > available - slack && px <= minPx + 0.1) {
+          el.style.fontSize = (minPx / rootPx) + 'rem';
+        }
       }
       probe.remove();
+      // Multi-word chips may wrap on spaces only; a single long word stays on one line.
+      el.style.whiteSpace = words.length > 1 ? 'normal' : 'nowrap';
     }
 
     function updateSelectedOptionHighlight() {

@@ -122,7 +122,15 @@
     .pts-pill { margin-left: auto; font-weight: 800; color: var(--accent); }
     .school-footer { font-size: 0.74rem; color: var(--muted); text-align: center; background: rgba(0,0,0,0.4); padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); }
     @media (max-width: 768px) {
-      #toast-corner { top: calc(env(safe-area-inset-top, 0px) + 118px); }
+      #toast-corner {
+        top: calc(env(safe-area-inset-top, 0px) + 280px);
+        left: 10px;
+        right: 10px;
+        max-width: none;
+      }
+      #toast-corner .corner-toast { padding: 7px 10px; }
+      #toast-corner .corner-toast-title { font-size: 0.8rem; }
+      #toast-corner .corner-toast-sub { font-size: 0.7rem; margin-top: 1px; }
       .options-below-row { gap: 5px; }
       .option-card { padding: 7px 6px; gap: 5px; }
       .option-badge { width: 22px; height: 22px; }
@@ -847,13 +855,19 @@
       if (!box) return;
       if (window.innerWidth > 768) {
         box.style.top = "";
+        box.style.left = "";
+        box.style.right = "";
         return;
       }
       const bar = document.querySelector("#hud-layer:not(.hidden) .chronicle-bar");
       const pause = document.getElementById("btn-hud-pause");
+      const question = document.querySelector("#hud-layer:not(.hidden) .question-card");
+      const options = document.getElementById("options-row");
       let bottom = 0;
       if (bar) bottom = Math.max(bottom, bar.getBoundingClientRect().bottom);
       if (pause) bottom = Math.max(bottom, pause.getBoundingClientRect().bottom);
+      if (question) bottom = Math.max(bottom, question.getBoundingClientRect().bottom);
+      if (options) bottom = Math.max(bottom, options.getBoundingClientRect().bottom);
       if (bottom > 0) box.style.top = Math.ceil(bottom + 8) + "px";
     }
 
