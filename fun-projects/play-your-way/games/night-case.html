@@ -1548,6 +1548,73 @@
       return { scale: scale, dx: dx, dy: dy, dw: dw, dh: dh };
     }
 
+
+    function rotatedStampAabb(cx, cy, sw, sh, rot) {
+      const c = Math.abs(Math.cos(rot)), s = Math.abs(Math.sin(rot));
+      const hw = (sw * c + sh * s) / 2;
+      const hh = (sh * c + sw * s) / 2;
+      return { x: cx - hw, y: cy - hh, w: hw * 2, h: hh * 2 };
+    }
+
+    function rectsOverlap(a, b, pad) {
+      if (!a || !b) return false;
+      const p = (pad == null) ? 0 : pad;
+      return !(a.x + a.w <= b.x + p || b.x + b.w <= a.x + p || a.y + a.h <= b.y + p || b.y + b.h <= a.y + p);
+    }
+
+    function placeNoirStamp(w, h, plate, board) {
+      const rot = -0.25;
+      const hudY = (w < 700 && noir.canvas) ? noirHudClearY(noir.canvas) : 12;
+      const bottomLimit = w < 700 ? (h - 170) : (h - 24);
+      const boardRect = board ? { x: board.bx, y: board.by, w: board.bw, h: board.bh } : null;
+      const hartSize = musePoseBox(w, h);
+      const hartRect = { x: w * 0.16 - hartSize / 2, y: h * 0.78 - hartSize, w: hartSize, h: hartSize };
+      const base = (w < 700) ? { sw: 200, sh: 66, font: 24, pin: 36 } : { sw: 220, sh: 72, font: 28, pin: 40 };
+      const scales = (w < 700) ? [1, 0.92, 0.84, 0.76] : [1];
+      let best = null;
+      for (let s = 0; s < scales.length; s++) {
+        const sc = scales[s];
+        const sw = base.sw * sc, sh = base.sh * sc;
+        const font = Math.round(base.font * sc);
+        const pin = Math.round(base.pin * sc);
+        const probe = rotatedStampAabb(0, 0, sw, sh, rot);
+        const hh = probe.h / 2, hx = probe.w / 2;
+        const candidates = [
+          { x: w * 0.5, y: h * 0.42 },
+          { x: w * 0.5, y: plate.y + plate.h + hh + 14 },
+          { x: w * 0.5, y: plate.y - hh - 14 },
+          { x: Math.max(hx + 8, Math.min(w * 0.42, (boardRect ? boardRect.x - 10 - hx : w * 0.42))), y: plate.y + plate.h + hh + 14 },
+          { x: w * 0.5, y: Math.min(bottomLimit - hh, Math.max(hudY + hh + 8, h * 0.55)) }
+        ];
+        for (let i = 0; i < candidates.length; i++) {
+          const x = Math.max(hx + 6, Math.min(w - hx - 6, candidates[i].x));
+          const y = Math.max(hudY + hh + 4, Math.min(bottomLimit - hh, candidates[i].y));
+          const box = rotatedStampAabb(x, y, sw, sh, rot);
+          if (box.y < hudY - 4 || box.y + box.h > bottomLimit + 10) continue;
+          if (rectsOverlap(box, plate, 8)) continue;
+          const hitsBoard = rectsOverlap(box, boardRect, 4);
+          const hitsHart = rectsOverlap(box, hartRect, 4);
+          const score = (hitsBoard ? 80 : 0) + (hitsHart ? 40 : 0) + (sc < 1 ? Math.round((1 - sc) * 25) : 0);
+          if (!best || score < best.score) {
+            best = { x: x, y: y, sw: sw, sh: sh, font: font, pin: pin, rot: rot, box: box, score: score };
+          }
+          if (score === 0) return best;
+        }
+      }
+      if (best) return best;
+      const fallbackY = Math.min(bottomLimit - 40, plate.y + plate.h + 48);
+      const sw = base.sw * 0.76, sh = base.sh * 0.76;
+      return {
+        x: w * 0.4, y: fallbackY, sw: sw, sh: sh,
+        font: Math.round(base.font * 0.76), pin: Math.round(base.pin * 0.76),
+        rot: rot, box: rotatedStampAabb(w * 0.4, fallbackY, sw, sh, rot), score: 999
+      };
+    }
+
+    function getNoirLayoutRects() {
+      return { plate: noir.plateRect || null, stamp: noir.stampBox || null, board: noir.boardRect || null };
+    }
+
     function drawNoirScene(now) {
       const ctx = noir.ctx, w = noir.canvas.width, h = noir.canvas.height;
       const sceneIdx = (state.currentRound - 1) % SCENES.length;
@@ -1587,6 +1654,8 @@
       } else if (plateX + plateW > board.bx - 10) {
         plateX = Math.max(12, board.bx - plateW - 12);
       }
+      const plateRect = { x: plateX, y: plateY, w: plateW, h: plateH };
+      noir.plateRect = plateRect;
       ctx.fillStyle = "rgba(8,8,12,0.72)";
       ctx.fillRect(plateX, plateY, plateW, plateH);
       ctx.strokeStyle = "#fbbf24";
@@ -1623,21 +1692,26 @@
         ctx.fillRect(0, 0, w, h);
       }
       if (noir.stamp > 0) {
+        const placed = placeNoirStamp(w, h, plateRect, board);
+        noir.stampBox = placed.box;
         ctx.save();
-        ctx.translate(w * 0.5, h * 0.42);
-        ctx.rotate(-0.25);
+        ctx.translate(placed.x, placed.y);
+        ctx.rotate(placed.rot);
         ctx.globalAlpha = Math.min(1, noir.stamp);
         ctx.strokeStyle = "#e11d48";
-        ctx.lineWidth = 6;
-        ctx.strokeRect(-110, -36, 220, 72);
+        ctx.lineWidth = Math.max(4, Math.round(6 * (placed.sw / 220)));
+        ctx.strokeRect(-placed.sw / 2, -placed.sh / 2, placed.sw, placed.sh);
         ctx.fillStyle = "#e11d48";
-        ctx.font = "800 28px Special Elite, serif";
+        ctx.font = "800 " + placed.font + "px Special Elite, serif";
         ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
         const pinnedOk = state.answeredLog.length && state.answeredLog[state.answeredLog.length - 1].isCorrect;
         const stampPin = pinnedOk ? getMuseArt("clue-pin") : null;
-        if (stampPin) drawMuseContained(ctx, stampPin, -132, 0, 40, "center");
-        ctx.fillText(pinnedOk ? "Clue pinned" : "Lead cold", 0, 10);
+        if (stampPin) drawMuseContained(ctx, stampPin, -placed.sw / 2 - 12, 0, placed.pin, "center");
+        ctx.fillText(pinnedOk ? "Clue pinned" : "Lead cold", 0, Math.round(placed.sh * 0.14));
         ctx.restore();
+      } else {
+        noir.stampBox = null;
       }
 
       // film grain
