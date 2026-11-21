@@ -890,6 +890,16 @@
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
+    @media (max-width: 600px) {
+      #word-builder-modal .field-row-2col {
+        grid-template-columns: 1fr;
+      }
+      #select-hkdse-band {
+        min-width: 0;
+        width: 100%;
+        text-overflow: clip;
+      }
+    }
 
     .field-group {
       display: flex;
@@ -2206,7 +2216,7 @@
       },
       {
         mode: 'PROOFREADING', band: 'DSE_HIGH', word: 'used to wake -> waking', zh: 'be used to + V-ing（習慣於）',
-        prompt: 'Spot the correction: "As a forest hunter, H\'aanit is used to track beasts in the snow."',
+        prompt: 'Spot the correction: "As a forest hunter, she is used to track beasts in the snow."',
         options: ['As -> Like', 'track -> tracking', 'in -> on'], answer: 1,
         expEn: '"Be used to" (meaning accustomed to) must be followed by a gerund ("tracking").',
         expZh: '「be used to」解作「習慣於……」，當中的「to」為介詞，後須接動名詞（tracking）。'
