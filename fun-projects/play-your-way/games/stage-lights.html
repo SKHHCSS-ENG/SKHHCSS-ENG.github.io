@@ -56,7 +56,7 @@
     .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; min-width: 0; }
     .option-card.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
     .option-badge { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #111; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; overflow-wrap: break-word; }
+    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; overflow-wrap: break-word; word-break: normal; }
     .hud-bottom-bar { width: 100%; max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; pointer-events: none; }
     .touch-controls-cluster { display: flex; gap: 8px; flex-wrap: wrap; pointer-events: auto; }
     .touch-action-btn, .hud-btn, .btn-primary, .btn-ghost {
@@ -125,7 +125,7 @@
       .options-below-row { gap: 5px; }
       .option-card { padding: 7px 6px; gap: 5px; }
       .option-badge { width: 22px; height: 22px; }
-      .option-text { font-size: 0.74rem; }
+      .option-text { font-size: 0.74rem; word-break: normal; overflow-wrap: break-word; }
       .score-summary-banner { grid-template-columns: repeat(2, 1fr); }
       .question-card { padding: 7px 10px; }
       .q-prompt-text { font-size: 0.86rem; }
@@ -776,6 +776,27 @@
       if (!el) return;
       const len = String(text || "").length;
       el.style.fontSize = len > 42 ? "0.72rem" : (len > 24 ? "0.82rem" : "0.95rem");
+      const longest = String(text || "").split(/\s+/).reduce(function (best, word) {
+        return word.length > best.length ? word : best;
+      }, "");
+      if (!longest) return;
+      const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const minPx = 0.62 * rootPx;
+      const cs = getComputedStyle(el);
+      const probe = document.createElement("span");
+      probe.style.cssText = "position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:" + cs.font + ";letter-spacing:" + cs.letterSpacing + ";";
+      probe.textContent = longest;
+      document.body.appendChild(probe);
+      let px = parseFloat(cs.fontSize) || rootPx;
+      const available = el.clientWidth;
+      if (available > 0) {
+        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available) {
+          px -= 0.5;
+          probe.style.fontSize = px + "px";
+        }
+        el.style.fontSize = (px / rootPx) + "rem";
+      }
+      probe.remove();
     }
 
     function highlightSelectedLane() {

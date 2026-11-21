@@ -122,6 +122,7 @@
     .pts-pill { margin-left: auto; font-weight: 800; color: var(--accent); }
     .school-footer { font-size: 0.74rem; color: var(--muted); text-align: center; background: rgba(0,0,0,0.4); padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); }
     @media (max-width: 768px) {
+      #toast-corner { top: calc(env(safe-area-inset-top, 0px) + 118px); }
       .options-below-row { gap: 5px; }
       .option-card { padding: 7px 6px; gap: 5px; }
       .option-badge { width: 22px; height: 22px; }
@@ -841,9 +842,25 @@
       if (comboEl) comboEl.textContent = state.combo > 1 ? (state.combo + "x") : "—";
     }
 
+    function offsetToastFromHud() {
+      const box = document.getElementById("toast-corner");
+      if (!box) return;
+      if (window.innerWidth > 768) {
+        box.style.top = "";
+        return;
+      }
+      const bar = document.querySelector("#hud-layer:not(.hidden) .chronicle-bar");
+      const pause = document.getElementById("btn-hud-pause");
+      let bottom = 0;
+      if (bar) bottom = Math.max(bottom, bar.getBoundingClientRect().bottom);
+      if (pause) bottom = Math.max(bottom, pause.getBoundingClientRect().bottom);
+      if (bottom > 0) box.style.top = Math.ceil(bottom + 8) + "px";
+    }
+
     function showToast(title, sub, kind) {
       const box = document.getElementById("toast-corner");
       if (!box) return;
+      offsetToastFromHud();
       const el = document.createElement("div");
       el.className = "corner-toast " + (kind || "good");
       el.innerHTML = "<div class='corner-toast-title'>" + escapeHtml(title) + "</div><div class='corner-toast-sub'>" + escapeHtml(sub || "") + "</div>";
@@ -1322,6 +1339,11 @@
       { name: "Rooftop Garden", note: "The city hums beneath the ivy." }
     ];
 
+    function isOutdoorNoirScene(sceneIdx) {
+      // Rain Alley, Harbour Pier, and Rooftop Garden stay wet; diner and archive do not.
+      return sceneIdx === 0 || sceneIdx === 1 || sceneIdx === 4;
+    }
+
     const noir = {
       canvas: null, ctx: null, last: 0,
       rain: [],
@@ -1503,12 +1525,14 @@
         drawCoverImage(ctx, museScene, w, h, w < 700 ? 0.22 : 0.38, 1);
       } else paintWash(ctx, w, h, sceneIdx, now);
 
-      // rain
-      ctx.strokeStyle = "rgba(186, 230, 253, 0.35)";
-      ctx.lineWidth = 1;
-      noir.rain.forEach((r) => {
-        ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x + 2, r.y + r.len); ctx.stroke();
-      });
+      // rain — outdoor scenes only
+      if (isOutdoorNoirScene(sceneIdx)) {
+        ctx.strokeStyle = "rgba(186, 230, 253, 0.35)";
+        ctx.lineWidth = 1;
+        noir.rain.forEach((r) => {
+          ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x + 2, r.y + r.len); ctx.stroke();
+        });
+      }
 
       drawDetective(ctx, w, h, now);
       drawBoard(ctx, w, h);
@@ -1641,10 +1665,13 @@
       noir.last = now;
       if (!noir.canvas) return;
       const w = noir.canvas.width, h = noir.canvas.height;
-      noir.rain.forEach((r) => {
-        r.y += r.vy * dt; r.x += 40 * dt;
-        if (r.y > h) { r.y = -20; r.x = Math.random() * w; }
-      });
+      const sceneIdx = (state.currentRound - 1) % SCENES.length;
+      if (isOutdoorNoirScene(sceneIdx)) {
+        noir.rain.forEach((r) => {
+          r.y += r.vy * dt; r.x += 40 * dt;
+          if (r.y > h) { r.y = -20; r.x = Math.random() * w; }
+        });
+      }
       if (noir.typeText.length < noir.typeTarget.length) {
         noir.typeText = noir.typeTarget.slice(0, noir.typeText.length + 1);
       }

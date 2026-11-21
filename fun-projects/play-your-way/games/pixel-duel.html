@@ -1445,6 +1445,8 @@
         text-overflow: unset;
         font-size: 0.78rem;
         line-height: 1.25;
+        word-break: normal;
+        overflow-wrap: break-word;
       }
       #toast-corner-right {
         top: calc(env(safe-area-inset-top, 0px) + 118px);
@@ -3444,17 +3446,41 @@
 
     function autoFitOptionText(el, text) {
       if (!el) return;
-      const len = text.length;
+      const raw = String(text || '');
+      const len = raw.length;
+      el.style.textOverflow = 'clip';
+      el.style.overflow = 'visible';
       if (len > 28) {
         el.style.fontSize = '0.72rem';
         el.style.whiteSpace = 'normal';
       } else if (len > 18) {
         el.style.fontSize = '0.8rem';
-        el.style.whiteSpace = 'nowrap';
+        el.style.whiteSpace = 'normal';
       } else {
         el.style.fontSize = '0.94rem';
-        el.style.whiteSpace = 'nowrap';
+        el.style.whiteSpace = 'normal';
       }
+      const longest = raw.split(/\s+/).reduce(function (best, word) {
+        return word.length > best.length ? word : best;
+      }, '');
+      if (!longest) return;
+      const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const minPx = 0.62 * rootPx;
+      const cs = getComputedStyle(el);
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:' + cs.font + ';letter-spacing:' + cs.letterSpacing + ';';
+      probe.textContent = longest;
+      document.body.appendChild(probe);
+      let px = parseFloat(cs.fontSize) || rootPx;
+      const available = el.clientWidth;
+      if (available > 0) {
+        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available) {
+          px -= 0.5;
+          probe.style.fontSize = px + 'px';
+        }
+        el.style.fontSize = (px / rootPx) + 'rem';
+      }
+      probe.remove();
     }
 
     function updateSelectedOptionHighlight() {
