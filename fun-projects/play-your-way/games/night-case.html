@@ -123,7 +123,8 @@
     .school-footer { font-size: 0.74rem; color: var(--muted); text-align: center; background: rgba(0,0,0,0.4); padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); }
     @media (max-width: 768px) {
       #toast-corner {
-        top: calc(env(safe-area-inset-top, 0px) + 280px);
+        top: auto;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
         left: 10px;
         right: 10px;
         max-width: none;
@@ -850,25 +851,42 @@
       if (comboEl) comboEl.textContent = state.combo > 1 ? (state.combo + "x") : "—";
     }
 
+    function toastOverlapsRect(toastRect, el) {
+      if (!toastRect || !el) return false;
+      const r = el.getBoundingClientRect();
+      return !(toastRect.right < r.left + 1 || toastRect.left > r.right - 1 || toastRect.bottom < r.top + 1 || toastRect.top > r.bottom - 1);
+    }
+
     function offsetToastFromHud() {
       const box = document.getElementById("toast-corner");
       if (!box) return;
       if (window.innerWidth > 768) {
         box.style.top = "";
+        box.style.bottom = "";
         box.style.left = "";
         box.style.right = "";
         return;
       }
-      const bar = document.querySelector("#hud-layer:not(.hidden) .chronicle-bar");
-      const pause = document.getElementById("btn-hud-pause");
+      // Reserved slot just above "Follow this lead" — independent of question height.
+      const action = document.getElementById("btn-game-action") || document.querySelector("#hud-layer:not(.hidden) .hud-bottom-bar");
+      if (action) {
+        const fromBottom = Math.max(8, Math.ceil(window.innerHeight - action.getBoundingClientRect().top + 8));
+        box.style.top = "auto";
+        box.style.bottom = fromBottom + "px";
+        box.style.left = "10px";
+        box.style.right = "10px";
+      }
+      const toastEl = box.querySelector(".corner-toast");
+      if (!toastEl) return;
+      const tr = toastEl.getBoundingClientRect();
       const question = document.querySelector("#hud-layer:not(.hidden) .question-card");
       const options = document.getElementById("options-row");
-      let bottom = 0;
-      if (bar) bottom = Math.max(bottom, bar.getBoundingClientRect().bottom);
-      if (pause) bottom = Math.max(bottom, pause.getBoundingClientRect().bottom);
-      if (question) bottom = Math.max(bottom, question.getBoundingClientRect().bottom);
-      if (options) bottom = Math.max(bottom, options.getBoundingClientRect().bottom);
-      if (bottom > 0) box.style.top = Math.ceil(bottom + 8) + "px";
+      const bar = document.querySelector("#hud-layer:not(.hidden) .chronicle-bar");
+      const pause = document.getElementById("btn-hud-pause");
+      const blocked = [question, options, bar, pause].some(function (el) { return toastOverlapsRect(tr, el); });
+      if (blocked) {
+        while (box.firstChild) box.removeChild(box.firstChild);
+      }
     }
 
     function showToast(title, sub, kind) {
@@ -880,6 +898,7 @@
       el.innerHTML = "<div class='corner-toast-title'>" + escapeHtml(title) + "</div><div class='corner-toast-sub'>" + escapeHtml(sub || "") + "</div>";
       box.appendChild(el);
       while (box.children.length > 2) box.removeChild(box.firstChild);
+      offsetToastFromHud();
       setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3200);
     }
 
@@ -919,6 +938,7 @@
       const qWrap = document.getElementById("question-hud-wrap");
       if (qWrap) qWrap.classList.remove("hidden-phase");
       if (typeof GAME.onRoundStart === "function") GAME.onRoundStart(state.currentQuestion);
+      offsetToastFromHud();
     }
 
     function resolveChoice(chosenLane, meta) {
