@@ -1440,6 +1440,100 @@
       return lines.length ? lines : [raw];
     }
 
+
+    // Hanging ticket typography: wrap, widen, or slightly shrink so the locked cue
+    // is fully visible. Never ellipsis-cut mid-sentence; never rewrite the copy.
+    const TICKET_PAPER = { x0: 0.13, x1: 0.87, y0: 0.36, y1: 0.83 };
+    function cafeTicketMetrics(ticketW, font, lineCount, hasTimer) {
+      const padL = Math.round(ticketW * TICKET_PAPER.x0);
+      const padR = Math.round(ticketW * (1 - TICKET_PAPER.x1));
+      const textW = Math.max(48, ticketW - padL - padR);
+      const lineH = font + 3;
+      const needPaper = 13 + 5 + lineCount * lineH + (hasTimer ? 12 : 4);
+      const squarePaper = ticketW * (TICKET_PAPER.y1 - TICKET_PAPER.y0);
+      const ticketH = (needPaper <= squarePaper + 0.5)
+        ? ticketW
+        : Math.ceil(ticketW * TICKET_PAPER.y0 + needPaper + ticketW * (1 - TICKET_PAPER.y1));
+      return { padL, textW, lineH, needPaper, squarePaper, ticketH };
+    }
+    function tryCafeTicketSize(ctx, request, ticketW, font, hasTimer, maxH) {
+      ctx.font = "700 " + font + "px Plus Jakarta Sans, sans-serif";
+      const words = String(request || "").split(/\s+/);
+      let longest = 0;
+      for (let i = 0; i < words.length; i++) longest = Math.max(longest, ctx.measureText(words[i]).width);
+      const m0 = cafeTicketMetrics(ticketW, font, 1, hasTimer);
+      if (longest > m0.textW + 0.5) return null;
+      const lines = wrapCanvasLines(ctx, request, m0.textW);
+      const m = cafeTicketMetrics(ticketW, font, lines.length, hasTimer);
+      if (m.ticketH > maxH + 0.5) return null;
+      return {
+        ticketW: ticketW,
+        ticketH: m.ticketH,
+        font: font,
+        lines: lines,
+        lineH: m.lineH,
+        textW: m.textW,
+        padL: m.padL,
+        ok: true,
+        square: m.ticketH <= ticketW + 0.5
+      };
+    }
+    function fitCafeTicket(ctx, request, maxW, preferH, hasTimer, opts) {
+      opts = opts || {};
+      const hardMaxH = Math.max(preferH, opts.hardMaxH || preferH);
+      const minPref = Math.min(maxW, preferH);
+      const minS = Math.min(minPref, opts.minS || 140);
+      const sizeList = function (maxS) {
+        const sizes = [];
+        const lo = Math.max(96, Math.min(minS, maxS));
+        for (let s = lo; s <= maxS; s += 8) sizes.push(s);
+        if (!sizes.length || sizes[sizes.length - 1] !== maxS) sizes.push(maxS);
+        return sizes;
+      };
+      // Pass 1-2: prefer a square ticket that stays in preferH, then hardMaxH.
+      const ceilings = [preferH];
+      if (hardMaxH > preferH + 1) ceilings.push(hardMaxH);
+      for (let ci = 0; ci < ceilings.length; ci++) {
+        const maxH = ceilings[ci];
+        const maxS = Math.floor(Math.min(maxW, maxH));
+        const sizes = sizeList(maxS);
+        for (let font = 11; font >= 7; font--) {
+          for (let si = 0; si < sizes.length; si++) {
+            const cand = tryCafeTicketSize(ctx, request, sizes[si], font, hasTimer, maxH);
+            if (cand && cand.square) return cand;
+          }
+        }
+        // Non-square (taller) only if a square cannot hold the lines in this ceiling.
+        for (let font = 11; font >= 7; font--) {
+          for (let si = 0; si < sizes.length; si++) {
+            const cand = tryCafeTicketSize(ctx, request, sizes[si], font, hasTimer, maxH);
+            if (cand) return cand;
+          }
+        }
+      }
+      // Last resort: largest square we can place, shrink font, may clip nothing if wrap still fits.
+      const fallbackW = Math.floor(Math.min(maxW, hardMaxH));
+      for (let font = 7; font >= 7; font--) {
+        const cand = tryCafeTicketSize(ctx, request, fallbackW, font, hasTimer, hardMaxH);
+        if (cand) return cand;
+      }
+      ctx.font = "700 7px Plus Jakarta Sans, sans-serif";
+      const m0 = cafeTicketMetrics(fallbackW, 7, 1, hasTimer);
+      const lines = wrapCanvasLines(ctx, request, m0.textW);
+      const m = cafeTicketMetrics(fallbackW, 7, lines.length, hasTimer);
+      return {
+        ticketW: fallbackW,
+        ticketH: Math.min(m.ticketH, hardMaxH),
+        font: 7,
+        lines: lines,
+        lineH: m.lineH,
+        textW: m.textW,
+        padL: m.padL,
+        ok: false,
+        square: false
+      };
+    }
+
     function hudClearY(canvas) {
       const el = document.getElementById("question-hud-wrap") || document.getElementById("options-row");
       if (!el || !canvas) return 12;
@@ -1632,60 +1726,100 @@
         drawMuseContained(ctx, museDish, mira.x - Math.min(56, mira.box * 0.38), floorY + 36, 64, "center");
       }
 
-      // ticket: cue only (never the correct dish). Keep it off the HUD, Mira, and the customer's body.
+      // ticket: cue only (never the correct dish). Keep it off the HUD, Mira, the customer, and the dishes.
       if (q && state.screen === "PLAY") {
         const museTicket = getMuseArt("order-ticket");
-        const ticketW = museTicket ? (w < 600 ? 112 : 132) : (w < 600 ? 150 : 180);
-        const ticketH = museTicket ? (w < 600 ? 112 : 132) : 84;
+        const request = String(q.prompt || "Check the ticket above").replace(/_{2,}/g, "…");
+        const hasTimer = state.timerSeconds > 0;
+        const dishTop = floorY - 8;
         const custHalf = museCust ? custBox * 0.34 : 36;
         const headTop = museCust ? (floorY + 8 - custBox) : (floorY - 96 - 32 * 1.15);
+        const maxW = Math.max(120, Math.min(w < 600 ? 228 : 280, mira.left - 18, w - 16));
+        const hardMaxH = Math.max(96, dishTop - 8 - clearY);
+        const preferH = Math.max(120, Math.min(hardMaxH, headTop - clearY - 4));
+        const fitted = fitCafeTicket(ctx, request, maxW, preferH, hasTimer, {
+          hardMaxH: hardMaxH,
+          minS: w < 600 ? 140 : 168
+        }) || {
+          ticketW: Math.min(maxW, w < 600 ? 180 : 200),
+          ticketH: Math.min(hardMaxH, w < 600 ? 180 : 200),
+          font: 9,
+          lines: wrapCanvasLines(ctx, request, 80),
+          lineH: 12,
+          textW: 80,
+          padL: 16,
+          ok: false
+        };
+        const ticketW = fitted.ticketW;
+        const ticketH = fitted.ticketH;
         const overlapsMira = (x, tw) => (x < mira.right + 8 && x + tw > mira.left - 8);
-        const overlapsCust = (x, tw) => (x < enterX + custHalf && x + tw > enterX - custHalf);
-        let tx = enterX + custHalf + 8;
-        let ty = Math.max(clearY, headTop - ticketH * 0.25);
-        if (overlapsMira(tx, ticketW) || tx + ticketW > mira.left - 8 || tx + ticketW > w - 8) {
-          tx = enterX - custHalf - ticketW - 8;
-        }
-        if (tx < 8 || overlapsMira(tx, ticketW) || overlapsCust(tx, ticketW)) {
-          tx = Math.max(8, Math.min(mira.left - ticketW - 10, enterX + custHalf + 8));
-          ty = Math.max(clearY, Math.min(headTop + 4, floorY - ticketH - 20));
+        const overlapsCustBody = (x, y, tw, th) => {
+          if (y + th <= headTop + 2) return false;
+          return x < enterX + custHalf + 8 && x + tw > enterX - custHalf - 8;
+        };
+        let tx = 8;
+        let ty = clearY + 2;
+        if (tx + ticketW > mira.left - 8) tx = Math.max(8, mira.left - ticketW - 10);
+        // Prefer the hanging slot under the HUD, above the customer's head, left of Mira.
+        if (ty + ticketH > dishTop - 8) ty = Math.max(clearY, dishTop - 8 - ticketH);
+        if (overlapsCustBody(tx, ty, ticketW, ticketH)) {
+          const rightX = enterX + custHalf + 8;
+          if (rightX + ticketW <= mira.left - 8 && rightX + ticketW <= w - 8) {
+            tx = rightX;
+          } else {
+            tx = Math.max(8, Math.min(mira.left - ticketW - 10, enterX - custHalf - ticketW - 8));
+          }
         }
         if (overlapsMira(tx, ticketW)) tx = Math.max(8, mira.left - ticketW - 10);
-        ty = Math.max(clearY, Math.min(floorY - ticketH - 12, ty));
+        ty = Math.max(clearY, Math.min(dishTop - 8 - ticketH, ty));
         tx = Math.max(8, Math.min(w - ticketW - 8, tx));
         if (museTicket) {
-          drawMuseContained(ctx, museTicket, tx + ticketW / 2, ty + ticketH, ticketW, "bottom");
+          const artSide = Math.min(ticketW, ticketH);
+          drawMuseContained(ctx, museTicket, tx + ticketW / 2, ty + artSide, artSide, "bottom");
+          if (ticketH > artSide + 2) {
+            ctx.fillStyle = "#f8e4c4";
+            ctx.beginPath();
+            ctx.roundRect(tx + ticketW * 0.12, ty + artSide - 6, ticketW * 0.76, ticketH - artSide + 4, 6);
+            ctx.fill();
+          }
         } else {
           ctx.fillStyle = "#fffbeb";
           ctx.strokeStyle = "#d97706";
           ctx.lineWidth = 2;
           ctx.beginPath(); ctx.roundRect(tx, ty, ticketW, ticketH, 8); ctx.fill(); ctx.stroke();
         }
-        const padX = museTicket ? Math.round(ticketW * 0.18) : 10;
-        const textX = tx + padX;
-        const textW = ticketW - padX * 2;
-        const titleY = ty + (museTicket ? Math.round(ticketH * 0.44) : 18);
+        const textX = tx + fitted.padL;
+        const textW = fitted.textW;
+        const artSide = Math.min(ticketW, ticketH);
+        const titleY = ty + Math.round(artSide * TICKET_PAPER.y0) + 11;
         ctx.fillStyle = "#b45309";
         ctx.font = "800 11px Plus Jakarta Sans, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
         ctx.fillText("Next order", textX, titleY);
         ctx.fillStyle = "#1f2937";
-        ctx.font = "700 11px Plus Jakarta Sans, sans-serif";
-        // Show the question cue, never the correct dish — that would spoil the order.
-        const request = String(q.prompt || "Check the ticket above").replace(/_{2,}/g, "…");
-        const cueLines = wrapCanvasLines(ctx, request, textW).slice(0, 2);
+        ctx.font = "700 " + fitted.font + "px Plus Jakarta Sans, sans-serif";
+        // Show the full question cue, never the correct dish — that would spoil the order.
+        const cueLines = fitted.lines;
         for (let i = 0; i < cueLines.length; i++) {
-          ctx.fillText(cueLines[i], textX, titleY + 18 + i * 14);
+          ctx.fillText(cueLines[i], textX, titleY + 5 + fitted.lineH + i * fitted.lineH);
         }
         // patience bar
-        if (state.timerSeconds > 0) {
+        if (hasTimer) {
           const frac = Math.max(0, Math.min(1, state.questionTimeLeft / state.timerSeconds));
-          const barY = ty + ticketH - (museTicket ? 28 : 16);
+          const lastLineY = titleY + 5 + fitted.lineH + Math.max(0, cueLines.length - 1) * fitted.lineH;
+          const barY = Math.min(ty + ticketH - 12, lastLineY + 6);
           ctx.fillStyle = "#fecaca"; ctx.fillRect(textX, barY, textW, 8);
           ctx.fillStyle = frac < 0.3 ? "#e11d48" : "#22c55e";
           ctx.fillRect(textX, barY, textW * frac, 8);
         }
+        cafe.ticketLayout = {
+          tx: tx, ty: ty, ticketW: ticketW, ticketH: ticketH,
+          request: request, lines: cueLines.slice(), font: fitted.font,
+          miraLeft: mira.left, miraRight: mira.right,
+          headTop: headTop, dishTop: dishTop, clearY: clearY, floorY: floorY,
+          enterX: enterX, custHalf: custHalf, ok: !!fitted.ok
+        };
       }
 
       // three dishes on the counter
