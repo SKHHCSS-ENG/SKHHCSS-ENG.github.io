@@ -56,7 +56,7 @@
     .option-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; min-height: 52px; min-width: 0; }
     .option-card.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
     .option-badge { width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #111; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; overflow-wrap: break-word; word-break: normal; }
+    .option-text { font-weight: 700; line-height: 1.25; min-width: 0; overflow-wrap: normal; word-break: normal; hyphens: none; overflow: visible; text-overflow: clip; }
     .hud-bottom-bar { width: 100%; max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; pointer-events: none; }
     .touch-controls-cluster { display: flex; gap: 8px; flex-wrap: wrap; pointer-events: auto; }
     .touch-action-btn, .hud-btn, .btn-primary, .btn-ghost {
@@ -123,9 +123,9 @@
     .school-footer { font-size: 0.74rem; color: var(--muted); text-align: center; background: rgba(0,0,0,0.4); padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); }
     @media (max-width: 768px) {
       .options-below-row { gap: 5px; }
-      .option-card { padding: 7px 6px; gap: 5px; }
-      .option-badge { width: 22px; height: 22px; }
-      .option-text { font-size: 0.74rem; word-break: normal; overflow-wrap: break-word; }
+      .option-card { padding: 7px 5px; gap: 4px; }
+      .option-badge { width: 20px; height: 20px; }
+      .option-text { font-size: 0.74rem; word-break: normal; overflow-wrap: normal; hyphens: none; overflow: visible; text-overflow: clip; }
       .score-summary-banner { grid-template-columns: repeat(2, 1fr); }
       .question-card { padding: 7px 10px; }
       .q-prompt-text { font-size: 0.86rem; }
@@ -776,31 +776,61 @@
       }
     }
 
+    function optionTextAvailableWidth(el) {
+      if (!el) return 0;
+      if (el.clientWidth >= 8) return el.clientWidth;
+      const parent = el.parentElement;
+      if (!parent) return 0;
+      const badge = parent.querySelector(".option-badge");
+      const csP = getComputedStyle(parent);
+      const pad = (parseFloat(csP.paddingLeft) || 0) + (parseFloat(csP.paddingRight) || 0);
+      const gap = parseFloat(csP.columnGap || csP.gap) || 0;
+      const badgeW = badge ? badge.getBoundingClientRect().width : 0;
+      return Math.max(0, parent.clientWidth - pad - gap - badgeW);
+    }
+
     function autoFitOptionText(el, text) {
       if (!el) return;
-      const len = String(text || "").length;
-      el.style.fontSize = len > 42 ? "0.72rem" : (len > 24 ? "0.82rem" : "0.95rem");
-      const longest = String(text || "").split(/\s+/).reduce(function (best, word) {
+      const raw = String(text || "");
+      const words = raw.split(/\s+/).filter(Boolean);
+      const longest = words.reduce(function (best, word) {
         return word.length > best.length ? word : best;
       }, "");
+      const len = raw.length;
+      el.style.textOverflow = "clip";
+      el.style.overflow = "visible";
+      el.style.overflowWrap = "normal";
+      el.style.wordBreak = "normal";
+      el.style.hyphens = "none";
+      // Measure against one line so a long single word is never mid-wrapped.
+      el.style.whiteSpace = "nowrap";
+      el.style.fontSize = len > 42 ? "0.72rem" : (len > 24 ? "0.82rem" : "0.95rem");
       if (!longest) return;
       const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const minPx = 0.62 * rootPx;
+      const minPx = 0.5 * rootPx;
       const cs = getComputedStyle(el);
       const probe = document.createElement("span");
-      probe.style.cssText = "position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:" + cs.font + ";letter-spacing:" + cs.letterSpacing + ";";
+      probe.style.cssText = "position:absolute;left:-9999px;top:0;white-space:nowrap;visibility:hidden;font:" + cs.font + ";letter-spacing:" + cs.letterSpacing + ";font-weight:" + cs.fontWeight + ";";
       probe.textContent = longest;
       document.body.appendChild(probe);
       let px = parseFloat(cs.fontSize) || rootPx;
-      const available = el.clientWidth;
+      const available = optionTextAvailableWidth(el);
+      const slack = 2;
       if (available > 0) {
-        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available) {
-          px -= 0.5;
+        while (px > minPx + 0.1 && probe.getBoundingClientRect().width > available - slack) {
+          px -= 0.25;
           probe.style.fontSize = px + "px";
         }
         el.style.fontSize = (px / rootPx) + "rem";
+        probe.style.fontSize = px + "px";
+        if (probe.getBoundingClientRect().width > available - slack) {
+          const fitted = Math.max(7, px * (available - slack) / Math.max(1, probe.getBoundingClientRect().width));
+          el.style.fontSize = (fitted / rootPx) + "rem";
+        }
       }
       probe.remove();
+      // Multi-word chips may wrap on spaces only; a single long word stays on one line.
+      el.style.whiteSpace = words.length > 1 ? "normal" : "nowrap";
     }
 
     function highlightSelectedLane() {
@@ -825,6 +855,7 @@
         if (el) {
           el.textContent = text;
           autoFitOptionText(el, text);
+          requestAnimationFrame(function () { autoFitOptionText(el, text); });
         }
       }
       highlightSelectedLane();

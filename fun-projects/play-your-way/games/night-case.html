@@ -1491,7 +1491,13 @@
       const bw = Math.min(page || museBoard ? 210 : 280, Math.max(132, w * 0.36));
       const bh = Math.min(page || museBoard ? 176 : 200, Math.max(120, h * 0.22));
       const bx = w - bw - Math.max(12, w * 0.04);
-      const by = Math.min(h * 0.56, h * 0.78 - bh - 12);
+      // On a narrow phone, drop the board slightly so a full-size stamp can sit
+      // in the gap below the caption, right of Hart, and still clear the board.
+      let by = Math.min(h * 0.56, h * 0.78 - bh - 12);
+      if (w < 700) {
+        const actionClear = h - 78;
+        by = Math.max(h * 0.56, Math.min(actionClear - bh, Math.round(h * 0.70)));
+      }
       noir.boardRect = { bx: bx, by: by, bw: bw, bh: bh };
       if (museBoard) {
         ctx.drawImage(museBoard, bx, by, bw, bh);
@@ -1562,15 +1568,46 @@
       return !(a.x + a.w <= b.x + p || b.x + b.w <= a.x + p || a.y + a.h <= b.y + p || b.y + b.h <= a.y + p);
     }
 
+    function hartLayoutRect(w, h) {
+      const hartSize = musePoseBox(w, h);
+      return { x: w * 0.16 - hartSize / 2, y: h * 0.78 - hartSize, w: hartSize, h: hartSize };
+    }
+
+    function stampCollisionBox(cx, cy, sw, sh, rot, pin) {
+      const box = rotatedStampAabb(cx, cy, sw, sh, rot);
+      const pinR = Math.max(10, (pin || 36) / 2);
+      const localX = -sw / 2 - 12;
+      const px = cx + localX * Math.cos(rot);
+      const py = cy + localX * Math.sin(rot);
+      const x = Math.min(box.x, px - pinR);
+      const y = Math.min(box.y, py - pinR);
+      return {
+        x: x,
+        y: y,
+        w: Math.max(box.x + box.w, px + pinR) - x,
+        h: Math.max(box.y + box.h, py + pinR) - y
+      };
+    }
+
     function placeNoirStamp(w, h, plate, board) {
       const rot = -0.25;
       const hudY = (w < 700 && noir.canvas) ? noirHudClearY(noir.canvas) : 12;
       const bottomLimit = w < 700 ? (h - 170) : (h - 24);
       const boardRect = board ? { x: board.bx, y: board.by, w: board.bw, h: board.bh } : null;
-      const hartSize = musePoseBox(w, h);
-      const hartRect = { x: w * 0.16 - hartSize / 2, y: h * 0.78 - hartSize, w: hartSize, h: hartSize };
+      const hartRect = hartLayoutRect(w, h);
       const base = (w < 700) ? { sw: 200, sh: 66, font: 24, pin: 36 } : { sw: 220, sh: 72, font: 28, pin: 40 };
-      const scales = (w < 700) ? [1, 0.92, 0.84, 0.76] : [1];
+      // Desktop: keep the mid-scene slot Muse already GREENed (clear of the caption plate).
+      if (w >= 700) {
+        const sw = base.sw, sh = base.sh;
+        const x = w * 0.5, y = h * 0.42;
+        return {
+          x: x, y: y, sw: sw, sh: sh, font: base.font, pin: base.pin, rot: rot,
+          box: rotatedStampAabb(x, y, sw, sh, rot),
+          hit: stampCollisionBox(x, y, sw, sh, rot, base.pin),
+          score: 0
+        };
+      }
+      const scales = [1, 0.94, 0.88];
       let best = null;
       for (let s = 0; s < scales.length; s++) {
         const sc = scales[s];
@@ -1579,40 +1616,72 @@
         const pin = Math.round(base.pin * sc);
         const probe = rotatedStampAabb(0, 0, sw, sh, rot);
         const hh = probe.h / 2, hx = probe.w / 2;
+        const plateBottom = plate ? (plate.y + plate.h) : hudY;
+        const hartRight = hartRect.x + hartRect.w;
+        const boardTop = boardRect ? boardRect.y : bottomLimit;
+        const boardLeft = boardRect ? boardRect.x : w;
         const candidates = [
-          { x: w * 0.5, y: h * 0.42 },
-          { x: w * 0.5, y: plate.y + plate.h + hh + 14 },
-          { x: w * 0.5, y: plate.y - hh - 14 },
-          { x: Math.max(hx + 8, Math.min(w * 0.42, (boardRect ? boardRect.x - 10 - hx : w * 0.42))), y: plate.y + plate.h + hh + 14 },
-          { x: w * 0.5, y: Math.min(bottomLimit - hh, Math.max(hudY + hh + 8, h * 0.55)) }
+          { x: Math.max(hartRight + 12 + hx, w * 0.58), y: plateBottom + hh + 12 },
+          { x: (hartRight + boardLeft) / 2, y: plateBottom + hh + 12 },
+          { x: w * 0.62, y: Math.min(boardTop - hh - 10, plateBottom + hh + 16) },
+          { x: w * 0.55, y: plateBottom + hh + 14 },
+          { x: w * 0.5, y: plate.y + plate.h + hh + 14 }
         ];
+        const yMin = plateBottom + hh + 8;
+        const yMax = Math.min(bottomLimit - hh, boardTop - hh - 8);
+        const xMin = Math.max(hx + 8, hartRight + 8 + hx);
+        const xMax = w - hx - 8;
+        if (yMax >= yMin && xMax >= xMin) {
+          for (let y = yMin; y <= yMax; y += 10) {
+            for (let x = xMin; x <= xMax; x += 12) candidates.push({ x: x, y: y });
+          }
+        }
         for (let i = 0; i < candidates.length; i++) {
           const x = Math.max(hx + 6, Math.min(w - hx - 6, candidates[i].x));
           const y = Math.max(hudY + hh + 4, Math.min(bottomLimit - hh, candidates[i].y));
           const box = rotatedStampAabb(x, y, sw, sh, rot);
+          const hit = stampCollisionBox(x, y, sw, sh, rot, pin);
           if (box.y < hudY - 4 || box.y + box.h > bottomLimit + 10) continue;
-          if (rectsOverlap(box, plate, 8)) continue;
-          const hitsBoard = rectsOverlap(box, boardRect, 4);
-          const hitsHart = rectsOverlap(box, hartRect, 4);
-          const score = (hitsBoard ? 80 : 0) + (hitsHart ? 40 : 0) + (sc < 1 ? Math.round((1 - sc) * 25) : 0);
+          // Negative pad = required clearance (rectsOverlap's pad shrinks boxes).
+          if (rectsOverlap(hit, plate, -10)) continue;
+          if (rectsOverlap(hit, boardRect, -8)) continue;
+          if (rectsOverlap(hit, hartRect, -10)) continue;
+          const preferX = Math.max(hartRight + 12 + hx, w * 0.58);
+          const preferY = plateBottom + hh + 12;
+          const score = Math.round(Math.abs(x - preferX) + Math.abs(y - preferY) + (sc < 1 ? (1 - sc) * 80 : 0));
           if (!best || score < best.score) {
-            best = { x: x, y: y, sw: sw, sh: sh, font: font, pin: pin, rot: rot, box: box, score: score };
+            best = { x: x, y: y, sw: sw, sh: sh, font: font, pin: pin, rot: rot, box: box, hit: hit, score: score };
           }
-          if (score === 0) return best;
         }
+        if (best && sc === 1) return best;
       }
       if (best) return best;
-      const fallbackY = Math.min(bottomLimit - 40, plate.y + plate.h + 48);
-      const sw = base.sw * 0.76, sh = base.sh * 0.76;
+      // Last resort: keep a full-size stamp in the below-plate band, still off Hart if possible.
+      const sw = base.sw, sh = base.sh;
+      const probe = rotatedStampAabb(0, 0, sw, sh, rot);
+      const hx = probe.w / 2, hh = probe.h / 2;
+      const x = Math.max(hartRect.x + hartRect.w + 12 + hx, Math.min(w * 0.64, w - hx - 6));
+      const y = Math.min(bottomLimit - hh, Math.max(hudY + hh + 4, (plate.y + plate.h) + hh + 14));
       return {
-        x: w * 0.4, y: fallbackY, sw: sw, sh: sh,
-        font: Math.round(base.font * 0.76), pin: Math.round(base.pin * 0.76),
-        rot: rot, box: rotatedStampAabb(w * 0.4, fallbackY, sw, sh, rot), score: 999
+        x: x, y: y, sw: sw, sh: sh,
+        font: base.font, pin: base.pin,
+        rot: rot,
+        box: rotatedStampAabb(x, y, sw, sh, rot),
+        hit: stampCollisionBox(x, y, sw, sh, rot, base.pin),
+        score: 999
       };
     }
 
     function getNoirLayoutRects() {
-      return { plate: noir.plateRect || null, stamp: noir.stampBox || null, board: noir.boardRect || null };
+      const w = (noir.canvas && noir.canvas.width) || 0;
+      const h = (noir.canvas && noir.canvas.height) || 0;
+      return {
+        plate: noir.plateRect || null,
+        stamp: noir.stampBox || null,
+        stampHit: noir.stampHit || null,
+        board: noir.boardRect || null,
+        hart: (w && h) ? hartLayoutRect(w, h) : null
+      };
     }
 
     function drawNoirScene(now) {
@@ -1694,6 +1763,7 @@
       if (noir.stamp > 0) {
         const placed = placeNoirStamp(w, h, plateRect, board);
         noir.stampBox = placed.box;
+        noir.stampHit = placed.hit || placed.box;
         ctx.save();
         ctx.translate(placed.x, placed.y);
         ctx.rotate(placed.rot);
@@ -1712,6 +1782,7 @@
         ctx.restore();
       } else {
         noir.stampBox = null;
+        noir.stampHit = null;
       }
 
       // film grain
