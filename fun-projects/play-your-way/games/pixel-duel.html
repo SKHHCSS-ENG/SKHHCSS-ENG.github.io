@@ -1469,6 +1469,8 @@
     <img data-muse-slot="boss-GUARD" src="art/pixel-duel/boss-normal.png" alt="">
     <img data-muse-slot="boss-STUNNED" src="art/pixel-duel/boss-stunned.png" alt="">
     <img data-muse-slot="boss-ENRAGED" src="art/pixel-duel/boss-enraged.png" alt="">
+    <img data-muse-slot="boss-SPECIAL" src="art/pixel-duel/boss-special.png" alt="">
+    <img data-muse-slot="boss-special-burst" src="art/pixel-duel/boss-special-burst.png" alt="">
     <img data-muse-slot="hero-0" src="art/pixel-duel/knight-idle.png" alt="">
     <img data-muse-slot="hero-0-idle" src="art/pixel-duel/knight-idle.png" alt="">
     <img data-muse-slot="hero-0-walk" src="art/pixel-duel/knight-walk.png" alt="">
@@ -1661,12 +1663,12 @@
       <div class="how-to-play-card">
         <div class="how-to-title">How to play</div>
         <ol>
-          <li>Read the question, then slash rune <strong>A</strong>, <strong>B</strong> or <strong>C</strong> — tap the orb or card, or press 1 / 2 / 3.</li>
+          <li>The fight keeps running — the boss attacks on its own. When a question appears, slash rune <strong>A</strong>, <strong>B</strong> or <strong>C</strong> — tap the orb or card, or press 1 / 2 / 3.</li>
           <li><strong>Correct:</strong> the boss is stunned. Keep slashing, or tap the boss, for a Break combo.</li>
-          <li><strong>Wrong or too slow:</strong> the boss attacks. Jump the shockwaves, or slash to parry them.</li>
+          <li><strong>Wrong or too slow:</strong> the boss uses a special attack. Jump the shockwaves, or slash to parry them.</li>
           <li>Use Boost (Shift) for a short power dash. If all shields break, the duel ends.</li>
         </ol>
-        <div class="how-to-zh">正確答案可擊暈魔王並連擊；答錯或逾時要跳避或格擋衝擊波。</div>
+        <div class="how-to-zh">對決會持續進行。正確答案可擊暈魔王並連擊；答錯或逾時會觸發魔王的特殊攻擊，要跳避或格擋衝擊波。</div>
       </div>
     </div>
 
@@ -2675,7 +2677,7 @@
      * Set window.PYW_PIXEL_DUEL_ART = {
      *   heroSheets: [/* 6 HTMLImageElement or URL strings (walk-cycle strips) * /],
      *   heroPoses: { 0: { idle, walk, jump, slash, dash } },
-     *   bossSheets: { GUARD: img, STUNNED: img, ENRAGED: img },
+     *   bossSheets: { GUARD: img, STUNNED: img, ENRAGED: img, SPECIAL: img },
      *   arenaBackdrop: img,
      *   tavernBackdrop: img,
      *   orbSheet: img,
@@ -2684,7 +2686,8 @@
      * or drop hidden <img data-muse-slot="..."> tags into this file.
      * Slots: hero-0 (sheet or idle fallback), hero-0-idle/walk/jump/slash/dash,
      * hero-1..5 (idle fallback) and hero-N-idle/walk/jump/slash/dash for Scholar, Rogue,
-     * Hunter, Dancer, and Merchant, boss-GUARD / boss-STUNNED / boss-ENRAGED,
+     * Hunter, Dancer, and Merchant, boss-GUARD / boss-STUNNED / boss-ENRAGED / boss-SPECIAL,
+     * boss-special-burst (wrong-answer special-attack flash only),
      * arenaBackdrop, tavernBackdrop, orbSheet, orb-A / orb-B / orb-C.
      * Knight (hero-0) and Scholar, Rogue, Hunter, Dancer, and Merchant all have
      * the full idle, walk, jump, slash, and dash set hooked.
@@ -2773,6 +2776,20 @@
       ctx.imageSmoothingEnabled = false;
       drawFn(ctx, w, h);
       return c;
+    }
+
+    // Square (or any) sprite: preserve aspect ratio, bottom-aligned, never stretched.
+    function drawSpriteContained(ctx, img, cx, bottomY, box) {
+      if (!ctx || !img) return false;
+      const iw = img.naturalWidth || img.width || 0;
+      const ih = img.naturalHeight || img.height || 0;
+      if (iw < 1 || ih < 1) return false;
+      const side = box || 144;
+      const scale = Math.min(side / iw, side / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      ctx.drawImage(img, Math.round(cx - dw / 2), Math.round(bottomY - dh), Math.round(dw), Math.round(dh));
+      return true;
     }
 
     function getHeroSpriteFrames(heroIdx) {
@@ -2901,7 +2918,9 @@
 
     // Colossal 96x96 arch-boss sprite (normal, enraged and stunned break states)
     function getBossDuelSprite(bossState, frame) {
-      const museBoss = getMuseArt('boss-' + bossState) || getMuseArt('boss');
+      let museBoss = getMuseArt('boss-' + bossState) || getMuseArt('boss');
+      // Special-attack beat only: reuse the enraged sheet if boss-special.png has not landed yet.
+      if (!museBoss && bossState === 'SPECIAL') museBoss = getMuseArt('boss-ENRAGED');
       const key = `duel_boss_${bossState}_${frame}_${museBoss ? 'muse' : 'proc'}`;
       if (spriteCache[key]) return spriteCache[key];
 
@@ -2921,14 +2940,15 @@
         };
         const breathe = frame % 2 === 1 ? -3 : 0;
         const isStunned = bossState === 'STUNNED';
-        const isEnraged = bossState === 'ENRAGED';
+        const isEnraged = bossState === 'ENRAGED' || bossState === 'SPECIAL';
+        const isSpecial = bossState === 'SPECIAL';
 
         // Ground shadow
         px(16, 86, 64, 6, 'rgba(0,0,0,0.55)');
 
         // Ethereal wings and mantle
-        const wingCol = isStunned ? '#334155' : (isEnraged ? '#be123c' : '#4c1d95');
-        const wingGlow = isStunned ? '#64748b' : (isEnraged ? '#f43f5e' : '#7c3aed');
+        const wingCol = isStunned ? '#334155' : (isSpecial ? '#9f1239' : (isEnraged ? '#be123c' : '#4c1d95'));
+        const wingGlow = isStunned ? '#64748b' : (isSpecial ? '#fb7185' : (isEnraged ? '#f43f5e' : '#7c3aed'));
         px(4, 16 + breathe, 88, 52, '#090b10');
         px(6, 18 + breathe, 84, 48, wingCol);
         px(12, 22 + breathe, 72, 38, wingGlow);
@@ -2991,6 +3011,7 @@
     let soulSparks = [];
     let floatingTexts = [];
     let fireflies = [];
+    let specialBursts = []; // Muse boss-special-burst, special-attack beat only
 
     const state = {
       screen: 'START', // START, TAVERN, PLAY_PHASE, QUESTION_PHASE, CUTSCENE_WIN, CUTSCENE_DNF, PAUSED, END
@@ -3030,8 +3051,9 @@
       bossTargetX: 780,
       bossHp: 100,
       bossMaxHp: 100,
-      bossMode: 'GUARD', // GUARD (Question Phase), STUNNED (Break Combo Phase!), ENRAGED (Wrong Answer Dodge Phase)
+      bossMode: 'GUARD', // GUARD (running fight, with or without a question on top), STUNNED (Break combo), SPECIAL (wrong-answer special attack)
       bossAttackTimer: 1.8,
+      questionAppearTimer: 4.2,
       comboHits: 0,
       screenShake: 0,
 
@@ -3198,8 +3220,8 @@
         }
       }
 
-      // 2. During PLAY_PHASE (Boss Stunned BREAK! State or Shockwave Parry):
-      if (state.screen === 'PLAY_PHASE') {
+      // 2. During a Break combo (boss stunned): slash the boss for combo hits.
+      if (state.screen === 'PLAY_PHASE' && state.bossMode === 'STUNNED') {
         if (Math.hypot(slashX - state.bossX, slashY - state.bossY) < 125) {
           state.comboHits++;
           const dmg = state.isBoosting ? 9999 : (1250 + state.comboHits * 310);
@@ -3224,19 +3246,19 @@
           );
           updateHudReadouts();
         }
-
-        // Also allow slashing incoming Boss Soul-Orbs to parry them!
-        bossShockwaves.forEach(sw => {
-          if (!sw.parried && Math.hypot(slashX - sw.x, slashY - sw.y) < 62) {
-            sw.parried = true;
-            state.score += 20;
-            state.bp = Math.min(3, state.bp + 1);
-            spawnSoulSparks(sw.x, sw.y, '#38bdf8', 14);
-            spawnFloatingCombatText(sw.x, sw.y - 25, 'PARRY! +20', '#38bdf8', '+1 BP');
-            updateHudReadouts();
-          }
-        });
       }
+
+      // Parry incoming auto-attacks or special-attack shockwaves during the running fight.
+      bossShockwaves.forEach(sw => {
+        if (!sw.parried && Math.hypot(slashX - sw.x, slashY - sw.y) < 62) {
+          sw.parried = true;
+          state.score += 20;
+          state.bp = Math.min(3, state.bp + 1);
+          spawnSoulSparks(sw.x, sw.y, '#38bdf8', 14);
+          spawnFloatingCombatText(sw.x, sw.y - 25, 'PARRY! +20', '#38bdf8', '+1 BP');
+          updateHudReadouts();
+        }
+      });
     }
 
     // Auto-Rush & Aerial Jump-Slash into a specific Rune Orb (0=A, 1=B, 2=C) when tapped or double-selected
@@ -3249,7 +3271,7 @@
         state.homingTargetOrb = runeOrbs[clamped];
         state.dashTimer = 0.35;
         playSynthSfx('boost');
-      } else if (state.screen === 'PLAY_PHASE') {
+      } else if (state.screen === 'PLAY_PHASE' && state.bossMode === 'STUNNED') {
         // Rush toward the Stunned Boss and slash!
         state.homingTargetOrb = { x: state.bossX - 45, y: state.bossY, isBossRush: true };
         state.dashTimer = 0.25;
@@ -3275,10 +3297,90 @@
     }
 
     /*************************************************************************
-     * 7. PHASE TRANSITIONS: RUNE ORB SLASH -> BOSS BREAK COMBO OR DODGE PHASE
+     * 7. PHASE TRANSITIONS: RUNNING FIGHT -> QUESTION ON TOP -> BREAK OR SPECIAL
      *************************************************************************/
+    function spawnBossAutoAttack(kind) {
+      if (!mainCanvas) return;
+      const w = mainCanvas.width;
+      const h = mainCanvas.height;
+      const { floorY } = getArenaGeometry(w, h);
+      const originX = state.bossX || w * 0.78;
+      if (kind === 'special') {
+        for (let i = 0; i < 5; i++) {
+          bossShockwaves.push({
+            x: originX + i * 150,
+            y: floorY - 22,
+            vx: -340 - i * 32,
+            parried: false,
+            hitPlayer: false,
+            special: true
+          });
+        }
+        bossShockwaves.push({
+          x: originX + 80,
+          y: floorY - 92,
+          vx: -380,
+          parried: false,
+          hitPlayer: false,
+          special: true
+        });
+        bossShockwaves.push({
+          x: originX + 210,
+          y: floorY - 130,
+          vx: -300,
+          parried: false,
+          hitPlayer: false,
+          special: true
+        });
+      } else {
+        bossShockwaves.push({
+          x: originX,
+          y: floorY - 22,
+          vx: -270,
+          parried: false,
+          hitPlayer: false,
+          special: false
+        });
+        if (Math.random() < 0.28) {
+          bossShockwaves.push({
+            x: originX + 36,
+            y: floorY - 88,
+            vx: -250,
+            parried: false,
+            hitPlayer: false,
+            special: false
+          });
+        }
+      }
+    }
+
+    function startRunningFight(opts) {
+      opts = opts || {};
+      runeOrbs = [];
+      if (opts.fresh) bossShockwaves = [];
+      state.homingTargetOrb = null;
+      state.bossMode = 'GUARD';
+      state.answerLocked = false;
+      state.screen = 'PLAY_PHASE';
+      state.phaseTimer = 0;
+      state.questionAppearTimer = (typeof opts.delay === 'number') ? opts.delay : 4.2;
+      if (opts.fresh) state.bossAttackTimer = 2.8;
+      else if (state.bossAttackTimer <= 0) state.bossAttackTimer = 2.0;
+      state.comboHits = 0;
+      state.dodgeHitsThisPhase = 0;
+      const playBanner = document.getElementById('play-phase-banner');
+      if (playBanner) playBanner.classList.add('hidden-phase');
+      const qWrap = document.getElementById('question-hud-wrap');
+      if (qWrap) qWrap.classList.add('hidden-phase');
+      const w = mainCanvas ? mainCanvas.width : 1000;
+      const h = mainCanvas ? mainCanvas.height : 700;
+      const { floorY } = getArenaGeometry(w, h);
+      state.bossTargetX = getBossGuardTargetX(w, h, 0);
+      state.bossY = floorY - 115;
+    }
+
     function startQuestionPhase() {
-      bossShockwaves = [];
+      // Keep any in-flight auto-attacks — the duel does not pause for the question.
       state.homingTargetOrb = null;
       state.bossMode = 'GUARD';
       state.answerLocked = false;
@@ -3408,7 +3510,7 @@
         if (kicker) kicker.textContent = 'Shield Break';
         if (title) title.textContent = 'Boss stunned! Keep slashing, or tap the boss, for a combo.';
       } else {
-        if (kicker) kicker.textContent = 'Boss enraged';
+        if (kicker) kicker.textContent = 'Special attack';
         if (title) title.textContent = 'Jump the shockwaves, or slash to parry them.';
       }
       if (timerEl) timerEl.textContent = `${Math.ceil(state.phaseTimer)}s`;
@@ -3422,27 +3524,18 @@
         state.bossTargetX = w * 0.62;
         state.bossY = floorY - 56;
       } else {
-        state.bossMode = 'ENRAGED';
+        state.bossMode = 'SPECIAL';
         state.bossTargetX = w * 0.78;
         state.bossY = floorY - 115;
-        for (let i = 0; i < 4; i++) {
-          bossShockwaves.push({
-            x: w * 0.78 + i * 190,
-            y: floorY - 22,
-            vx: -300 - i * 28,
-            parried: false,
-            hitPlayer: false
-          });
-        }
-        // One mid-air soul bolt that can be jumped under or parried
-        bossShockwaves.push({
-          x: w * 0.92,
-          y: floorY - 92,
-          vx: -340,
-          parried: false,
-          hitPlayer: false
-        });
+        spawnBossAutoAttack('special');
+        spawnSpecialAttackBurst();
       }
+    }
+
+    function spawnSpecialAttackBurst() {
+      // Skip silently if the Muse burst has not landed yet; the special pose/aura remain.
+      if (!getMuseArt('boss-special-burst')) return;
+      specialBursts.push({ life: 0.72, maxLife: 0.72 });
     }
 
     function autoFitOptionText(el, text) {
@@ -3649,24 +3742,26 @@
       // 7. Draw Boss Shockwaves (During Play Phase)
       bossShockwaves.forEach(sw => {
         if (sw.parried) return;
+        const isSpecial = !!sw.special;
         const pulse = 0.55 + Math.sin(now * 0.02 + sw.x) * 0.25;
-        const grd = ctx.createRadialGradient(sw.x, sw.y, 4, sw.x, sw.y, 42);
-        grd.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
-        grd.addColorStop(1, 'rgba(244, 63, 94, 0)');
+        const rad = isSpecial ? 54 : 42;
+        const grd = ctx.createRadialGradient(sw.x, sw.y, 4, sw.x, sw.y, rad);
+        grd.addColorStop(0, isSpecial ? 'rgba(253, 224, 71, 1)' : 'rgba(254, 240, 138, 0.95)');
+        grd.addColorStop(1, isSpecial ? 'rgba(190, 18, 60, 0)' : 'rgba(244, 63, 94, 0)');
         ctx.save();
         ctx.globalAlpha = pulse;
         ctx.fillStyle = grd;
         ctx.beginPath();
-        ctx.arc(sw.x, sw.y, 42, 0, Math.PI * 2);
+        ctx.arc(sw.x, sw.y, rad, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1;
-        ctx.fillStyle = '#fb7185';
+        ctx.fillStyle = isSpecial ? '#e11d48' : '#fb7185';
         ctx.beginPath();
-        ctx.ellipse(sw.x, sw.y, 30, 16, 0, 0, Math.PI * 2);
+        ctx.ellipse(sw.x, sw.y, isSpecial ? 38 : 30, isSpecial ? 20 : 16, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#fef08a';
+        ctx.fillStyle = isSpecial ? '#fff7ed' : '#fef08a';
         ctx.beginPath();
-        ctx.ellipse(sw.x, sw.y, 14, 8, 0, 0, Math.PI * 2);
+        ctx.ellipse(sw.x, sw.y, isSpecial ? 16 : 14, isSpecial ? 9 : 8, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       });
@@ -3704,6 +3799,57 @@
       ctx.restore();
     }
 
+    function getBossDrawSize(w, hasMuse) {
+      const full = hasMuse ? 220 : 144;
+      const narrow = hasMuse ? 124 : 96;
+      if (w >= 900) return full;
+      if (w <= 390) return narrow;
+      const t = (w - 390) / (900 - 390);
+      return Math.round(narrow + (full - narrow) * t);
+    }
+
+    function getBossGuardTargetX(w, h, now) {
+      const { floorY, platforms } = getArenaGeometry(w, h);
+      const orbC = platforms[2] || { orbX: Math.round(w * 0.76), orbY: Math.round(floorY - h * 0.17 - 58) };
+      const hasMuse = !!(getMuseArt('boss-' + state.bossMode) || getMuseArt('boss') ||
+        (state.bossMode === 'SPECIAL' && getMuseArt('boss-ENRAGED')));
+      const size = getBossDrawSize(w, hasMuse);
+      const full = hasMuse ? 220 : 144;
+      const sway = w < 560 ? 10 : 45;
+      const preferred = w * 0.82 + Math.sin((now || 0) * 0.0015) * sway;
+      const hoverY = (typeof state.bossY === 'number' && state.bossY > 0) ? state.bossY : (floorY - 125);
+      const bossBottom = hoverY + full / 2;
+      const bossTop = bossBottom - size;
+      const orbY = orbC.orbY || bossTop;
+      const verticalOverlap = (orbY + 36) > bossTop && (orbY - 36) < bossBottom;
+      let target = preferred;
+      if (verticalOverlap) {
+        // Only nudge right when the sprite would actually cover orb C.
+        target = Math.max(preferred, orbC.orbX + 62 + size / 2);
+      }
+      // Keep at least 45% of the boss on-screen (avoids a 390 clip-off).
+      const maxCenter = w - size * 0.45;
+      const minCenter = size * 0.45;
+      return Math.max(minCenter, Math.min(target, maxCenter));
+    }
+
+    function drawSpecialAttackBursts(ctx, hoverY, bossSize) {
+      if (state.bossMode !== 'SPECIAL') return;
+      const img = getMuseArt('boss-special-burst');
+      if (!img) return;
+      specialBursts.forEach((burst) => {
+        const t = 1 - burst.life / burst.maxLife;
+        const scale = 0.75 + t * 1.15;
+        const alpha = t < 0.18 ? (t / 0.18) : Math.max(0, 1 - (t - 0.18) / 0.82);
+        const box = Math.round(Math.max(bossSize * 1.45, 180) * scale);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        // Preserve aspect ratio; centre the starburst on the boss (not stretched).
+        drawSpriteContained(ctx, img, state.bossX, hoverY + box / 2, box);
+        ctx.restore();
+      });
+    }
+
     function drawColossalBoss(ctx, w, h, floorY, now) {
       const bFrame = Math.floor(now / 220) % 2;
       const bossSprite = getBossDuelSprite(state.bossMode, bFrame);
@@ -3711,23 +3857,42 @@
         ? floorY - 64
         : state.bossY + Math.sin(now * 0.004) * 12;
 
-      const museBossArt = getMuseArt('boss-' + state.bossMode) || getMuseArt('boss');
-      const bossSize = museBossArt ? 220 : 144;
+      let museBossArt = getMuseArt('boss-' + state.bossMode) || getMuseArt('boss');
+      if (!museBossArt && state.bossMode === 'SPECIAL') museBossArt = getMuseArt('boss-ENRAGED');
+      const fullSize = museBossArt ? 220 : 144;
+      const bossSize = getBossDrawSize(w, !!museBossArt);
+      // Bottom-align to the same foot line as the full-size sprite; never stretch.
+      const bossBottom = hoverY + fullSize / 2;
 
-      if (!museBossArt) {
+      // Special-attack beat gets a distinct hot aura even when falling back to the enraged sheet,
+      // so it is never mistaken for an ordinary auto-attack (GUARD art).
+      if (state.bossMode === 'SPECIAL') {
+        const pulse = 0.34 + Math.sin(now * 0.018) * 0.12;
+        const grd = ctx.createRadialGradient(state.bossX, hoverY, 18, state.bossX, hoverY, bossSize * 0.72);
+        grd.addColorStop(0, 'rgba(254, 240, 138, ' + (0.42 + pulse) + ')');
+        grd.addColorStop(0.45, 'rgba(244, 63, 94, ' + (0.32 + pulse * 0.5) + ')');
+        grd.addColorStop(1, 'rgba(127, 29, 29, 0)');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(state.bossX, hoverY, bossSize * 0.72, 0, Math.PI * 2);
+        ctx.fill();
+        drawSpecialAttackBursts(ctx, hoverY, bossSize);
+      } else if (!museBossArt) {
         const auraCol = state.bossMode === 'STUNNED'
           ? 'rgba(56, 189, 248, 0.25)'
-          : (state.bossMode === 'ENRAGED' ? 'rgba(225, 29, 72, 0.28)' : 'rgba(139, 92, 246, 0.22)');
+          : 'rgba(139, 92, 246, 0.22)';
         ctx.fillStyle = auraCol;
         ctx.fillRect(Math.round(state.bossX - 78), Math.round(hoverY - 78), 156, 156);
       }
 
-      ctx.drawImage(bossSprite, Math.round(state.bossX - bossSize / 2), Math.round(hoverY - bossSize / 2), bossSize, bossSize);
+      if (!drawSpriteContained(ctx, bossSprite, state.bossX, bossBottom, bossSize)) {
+        ctx.drawImage(bossSprite, Math.round(state.bossX - bossSize / 2), Math.round(hoverY - bossSize / 2), bossSize, bossSize);
+      }
 
       // Compact HP pip above the boss (main readout lives in the HUD, clear of the controls)
       const barW = 92;
       const barX = Math.round(state.bossX - barW / 2);
-      const barY = Math.round(hoverY - bossSize / 2 - 14);
+      const barY = Math.round(bossBottom - bossSize - 14);
       const hpFrac = Math.max(0, Math.min(1, state.bossHp / state.bossMaxHp));
       ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
       ctx.fillRect(barX - 2, barY - 2, barW + 4, 10);
@@ -3902,6 +4067,7 @@
     function startEndCutscene(outcome) {
       runeOrbs = [];
       bossShockwaves = [];
+      specialBursts = [];
       document.getElementById('question-hud-wrap').classList.add('hidden-phase');
       const playBanner = document.getElementById('play-phase-banner');
       if (playBanner) playBanner.classList.add('hidden-phase');
@@ -4112,10 +4278,14 @@
         norm = Math.max(0, Math.min(1, state.phaseTimer / 6.8));
         centerText = `${state.comboHits}x`;
         label = 'BREAK COMBO';
-      } else if (state.screen === 'PLAY_PHASE') {
+      } else if (state.screen === 'PLAY_PHASE' && state.bossMode === 'SPECIAL') {
         norm = Math.max(0, Math.min(1, state.phaseTimer / 6.2));
         centerText = `${Math.max(0, Math.ceil(state.phaseTimer))}`;
         label = 'DODGE';
+      } else if (state.screen === 'PLAY_PHASE' && state.bossMode === 'GUARD') {
+        norm = Math.max(0, Math.min(1, state.bp / 3));
+        centerText = `${state.bp}`;
+        label = 'BP';
       } else if (state.isBoosting) {
         norm = Math.max(0, Math.min(1, state.boostTimer / 3.8));
         centerText = 'MAX';
@@ -4292,8 +4462,8 @@
 
       // 2. Smooth Boss Positioning & Shockwave Updates
       state.bossX += (state.bossTargetX - state.bossX) * Math.min(1, dt * 5);
-      if (state.screen === 'QUESTION_PHASE') {
-        state.bossTargetX = w * 0.82 + Math.sin(now * 0.0015) * 45;
+      if (state.bossMode === 'GUARD' && (state.screen === 'QUESTION_PHASE' || state.screen === 'PLAY_PHASE')) {
+        state.bossTargetX = getBossGuardTargetX(w, h, now);
         state.bossY = floorY - 125;
       }
 
@@ -4311,6 +4481,11 @@
         if (sp.life <= 0) soulSparks.splice(i, 1);
       }
 
+      for (let i = specialBursts.length - 1; i >= 0; i--) {
+        specialBursts[i].life -= dt;
+        if (specialBursts[i].life <= 0) specialBursts.splice(i, 1);
+      }
+
       for (let i = floatingTexts.length - 1; i >= 0; i--) {
         const ft = floatingTexts[i];
         ft.y -= dt * 42;
@@ -4326,11 +4501,9 @@
         if (f.x > w) f.x = 0;
       });
 
-      // 3. Phase Timers
-      if (state.screen === 'PLAY_PHASE') {
-        state.phaseTimer -= dt;
-        const playTimerEl = document.getElementById('play-phase-timer');
-        if (playTimerEl) playTimerEl.textContent = `${Math.max(0, Math.ceil(state.phaseTimer))}s`;
+      // 3. Phase Timers, auto-attacks, and the running fight
+      const inDuel = state.screen === 'PLAY_PHASE' || state.screen === 'QUESTION_PHASE';
+      if (inDuel) {
         bossShockwaves.forEach(sw => {
           if (sw.parried) return;
           sw.x += sw.vx * dt;
@@ -4343,17 +4516,45 @@
             state.heroX = Math.max(48, state.heroX - 30);
             playSynthSfx('damage');
             spawnFloatingCombatText(state.heroX, state.heroY - 60, 'HIT! −25', '#fca5a5', 'Jump or parry!');
-            if (state.dodgeHitsThisPhase >= 2) {
+            // Opening grace: ordinary auto-attacks still hit, but cannot crack a
+            // shield until the first question has been answered. Later fights and
+            // special-attack hits keep the 2-hit shield crack.
+            const openingGrace = state.answeredLog.length === 0 && !sw.special;
+            if (state.dodgeHitsThisPhase >= 2 && !openingGrace) {
               state.shields = Math.max(0, state.shields - 1);
               spawnFloatingCombatText(state.heroX, state.heroY - 90, 'SHIELD CRACKED!', '#ef4444');
               if (state.shields <= 0) {
                 state.pendingEnd = 'DNF';
-                state.phaseTimer = Math.min(state.phaseTimer, 0.55);
+                if (state.bossMode === 'STUNNED' || state.bossMode === 'SPECIAL') {
+                  state.phaseTimer = Math.min(state.phaseTimer, 0.55);
+                } else {
+                  startEndCutscene('DNF');
+                }
               }
             }
             updateHudReadouts();
           }
         });
+
+        // Ordinary auto-attacks while the fight is running (including during a question).
+        // Stun pauses them; a wrong answer uses the special-attack burst instead.
+        if (state.bossMode === 'GUARD') {
+          state.bossAttackTimer -= dt;
+          if (state.bossAttackTimer <= 0) {
+            spawnBossAutoAttack('normal');
+            if (state.answeredLog.length === 0) {
+              state.bossAttackTimer = 2.6 + Math.random() * 0.5;
+            } else {
+              state.bossAttackTimer = 1.55 + Math.random() * 0.35;
+            }
+          }
+        }
+      }
+
+      if (state.screen === 'PLAY_PHASE' && (state.bossMode === 'STUNNED' || state.bossMode === 'SPECIAL')) {
+        state.phaseTimer -= dt;
+        const playTimerEl = document.getElementById('play-phase-timer');
+        if (playTimerEl) playTimerEl.textContent = `${Math.max(0, Math.ceil(state.phaseTimer))}s`;
         if (state.phaseTimer <= 0) {
           if (state.pendingEnd) {
             if (state.pendingEnd === 'WIN') state.bossHp = 0;
@@ -4361,8 +4562,14 @@
           } else {
             state.currentLap++;
             updateHudReadouts();
-            startQuestionPhase();
+            startRunningFight({ delay: 3.6 });
           }
+        }
+        drawSoulGauge();
+      } else if (state.screen === 'PLAY_PHASE' && state.bossMode === 'GUARD') {
+        state.questionAppearTimer -= dt;
+        if (state.questionAppearTimer <= 0) {
+          startQuestionPhase();
         }
         drawSoulGauge();
       } else if (state.screen === 'QUESTION_PHASE') {
@@ -4435,12 +4642,13 @@
       document.getElementById('cutscene-banner').classList.add('hidden');
       document.getElementById('hud-layer').classList.remove('hidden');
 
-      startQuestionPhase();
+      startRunningFight({ fresh: true, delay: 4.2 });
     }
 
     function returnToStartMenu() {
       runeOrbs = [];
       bossShockwaves = [];
+      specialBursts = [];
       state.screen = 'START';
       document.getElementById('hud-layer').classList.add('hidden');
       document.getElementById('tavern-modal').classList.add('hidden');
@@ -4504,7 +4712,7 @@
         if (e.clientY < state.heroY - 60) performJump();
         performSwordSlash();
       } else if (state.screen === 'PLAY_PHASE') {
-        if (Math.hypot(e.clientX - state.bossX, e.clientY - state.bossY) < 120) {
+        if (state.bossMode === 'STUNNED' && Math.hypot(e.clientX - state.bossX, e.clientY - state.bossY) < 120) {
           rushAndSlashOrb(1);
         } else {
           if (e.clientY < state.heroY - 60) performJump();

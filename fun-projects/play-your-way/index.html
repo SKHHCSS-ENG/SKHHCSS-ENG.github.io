@@ -1401,52 +1401,8 @@
           </button>
         </div>
 
-
-        <div class="f1-game-card" style="border-top-color:#fb7185; border-bottom-color:#fbbf24;">
-          <div class="f1-kicker-row">
-            <span class="f1-kicker" style="background:linear-gradient(90deg,#fb7185,#f59e0b);">NEW · ANIME CAFÉ RUSH</span>
-            <div class="f1-mode-tags">
-              <span class="f1-tag">📱 1P Mobile &amp; PC</span>
-              <span class="f1-tag">All 4 Skills</span>
-            </div>
-          </div>
-          <h3 class="f1-card-title">☕ Café Rush: Next Order</h3>
-          <div class="f1-cover-frame" id="cafe-cover-launch" title="Click to launch Café Rush: Next Order">
-            <img class="f1-cover-img" src="games/art/cafe-rush/hub-cover-1920x1080.png" alt="Café Rush: Next Order cover" />
-          </div>
-          <div class="f1-active-pack-box">
-            <span>📚 Active Pack: <strong id="launch-cafe-pool-summary" style="color:#fb7185;">S2 Social Media (18 words)</strong></span>
-            <span id="launch-cafe-mode-summary" style="color:#94a3b8; font-size:0.74rem;">Vocabulary · Close Words</span>
-          </div>
-          <button class="launch-f1-btn" id="btn-launch-cafe" type="button" style="background:linear-gradient(90deg,#fb7185,#f59e0b); box-shadow:0 8px 22px rgba(251,113,133,0.36);">
-            ☕ Launch Café Rush →
-          </button>
-        </div>
-
-        <div class="f1-game-card" style="border-top-color:#fbbf24; border-bottom-color:#1e293b;">
-          <div class="f1-kicker-row">
-            <span class="f1-kicker" style="background:linear-gradient(90deg,#0f172a,#b45309);">NEW · NOIR MYSTERY</span>
-            <div class="f1-mode-tags">
-              <span class="f1-tag">📱 1P Mobile &amp; PC</span>
-              <span class="f1-tag">All 4 Skills</span>
-            </div>
-          </div>
-          <h3 class="f1-card-title">🕵️ Night Case: Follow the Clue</h3>
-          <div class="f1-cover-frame" id="night-cover-launch" title="Click to launch Night Case: Follow the Clue">
-            <img class="f1-cover-img" src="games/art/night-case/hub-cover-1920x1080.png" alt="Night Case: Follow the Clue cover" />
-          </div>
-          <div class="f1-active-pack-box">
-            <span>📚 Active Pack: <strong id="launch-night-pool-summary" style="color:#fbbf24;">S2 Social Media (18 words)</strong></span>
-            <span id="launch-night-mode-summary" style="color:#94a3b8; font-size:0.74rem;">Vocabulary · Close Words</span>
-          </div>
-          <button class="launch-f1-btn" id="btn-launch-night" type="button" style="background:linear-gradient(90deg,#0f172a,#b45309); box-shadow:0 8px 22px rgba(15,23,42,0.36);">
-            🕵️ Launch Night Case →
-          </button>
-        </div>
-
         <div class="f1-game-card" style="border-top-color:#f0abfc; border-bottom-color:#22d3ee;">
           <div class="f1-kicker-row">
-            <span class="f1-kicker" style="background:linear-gradient(90deg,#a21caf,#0891b2);">NEW · LIVE RHYTHM</span>
             <div class="f1-mode-tags">
               <span class="f1-tag">📱 1P Mobile &amp; PC</span>
               <span class="f1-tag">All 4 Skills</span>
@@ -1479,8 +1435,6 @@
     <div class="mobile-dock-btns">
       <button class="mobile-dock-btn" id="btn-mobile-launch-f1" type="button">🚦 F1</button>
       <button class="mobile-dock-btn" id="btn-mobile-launch-duel" type="button" style="background:linear-gradient(90deg,#d97706,#0284c7);">⚔️ Duel</button>
-      <button class="mobile-dock-btn" id="btn-mobile-launch-cafe" type="button" style="background:linear-gradient(90deg,#fb7185,#f59e0b);">☕ Café</button>
-      <button class="mobile-dock-btn" id="btn-mobile-launch-night" type="button" style="background:linear-gradient(90deg,#0f172a,#b45309);">🕵️ Case</button>
       <button class="mobile-dock-btn" id="btn-mobile-launch-stage" type="button" style="background:linear-gradient(90deg,#a21caf,#0891b2);">🎤 Stage</button>
     </div>
   </div>
@@ -2482,7 +2436,7 @@
       const duelModeEl = document.getElementById("launch-duel-mode-summary");
       if (duelPackEl) duelPackEl.textContent = document.getElementById("launch-pool-summary").textContent;
       if (duelModeEl) duelModeEl.textContent = document.getElementById("launch-mode-summary").textContent;
-      ["cafe", "night", "stage"].forEach((id) => {
+      ["stage"].forEach((id) => {
         const packEl = document.getElementById("launch-" + id + "-pool-summary");
         const modeEl = document.getElementById("launch-" + id + "-mode-summary");
         if (packEl) packEl.textContent = document.getElementById("launch-pool-summary").textContent;
@@ -2946,8 +2900,6 @@
       const targetGameFile = window.__pywTargetGameFile || "f1-grand-prix.html";
       const targetGameLabel = ({
         "pixel-duel.html": "Pixel Duel: Break & Boost",
-        "cafe-rush.html": "Café Rush: Next Order",
-        "night-case.html": "Night Case: Follow the Clue",
         "stage-lights.html": "Stage Lights: On the Beat"
       })[targetGameFile] || "F1 Grand Prix";
       window.__pywTargetGameFile = "f1-grand-prix.html";
@@ -2974,12 +2926,6 @@
       window.__pywTargetGameFile = file;
       triggerLaunchF1Game();
     }
-    document.getElementById("btn-launch-cafe").addEventListener("click", () => triggerLaunchNamedGame("cafe-rush.html"));
-    document.getElementById("btn-mobile-launch-cafe").addEventListener("click", () => triggerLaunchNamedGame("cafe-rush.html"));
-    document.getElementById("cafe-cover-launch").addEventListener("click", () => triggerLaunchNamedGame("cafe-rush.html"));
-    document.getElementById("btn-launch-night").addEventListener("click", () => triggerLaunchNamedGame("night-case.html"));
-    document.getElementById("btn-mobile-launch-night").addEventListener("click", () => triggerLaunchNamedGame("night-case.html"));
-    document.getElementById("night-cover-launch").addEventListener("click", () => triggerLaunchNamedGame("night-case.html"));
     document.getElementById("btn-launch-stage").addEventListener("click", () => triggerLaunchNamedGame("stage-lights.html"));
     document.getElementById("btn-mobile-launch-stage").addEventListener("click", () => triggerLaunchNamedGame("stage-lights.html"));
     document.getElementById("stage-cover-launch").addEventListener("click", () => triggerLaunchNamedGame("stage-lights.html"));

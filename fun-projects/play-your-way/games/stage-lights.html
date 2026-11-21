@@ -218,6 +218,8 @@
   <img data-muse-slot="backdrop" src="art/stage-lights/backdrop-1920x1080.png" alt="">
   <img data-muse-slot="crowd" src="art/stage-lights/crowd.png" alt="">
   <img data-muse-slot="note" src="art/stage-lights/note.png" alt="">
+  <img data-muse-slot="note-special" src="art/stage-lights/note-special.png" alt="">
+  <img data-muse-slot="note-special-hit" src="art/stage-lights/note-special-hit.png" alt="">
 </div>
 
 <div id="start-menu-overlay">
@@ -234,7 +236,7 @@
     <div class="start-mode-card" id="btn-open-setup">
       <div>
         <div class="mode-card-title">🎤 Take the stage</div>
-        <div class="mode-card-meta">Read the lyric · hit the lane on the beat</div>
+        <div class="mode-card-meta">Hit the notes · answer on the special notes</div>
       </div>
       <div class="btn-primary" style="min-height:auto;padding:8px 12px;">Enter ▶</div>
     </div>
@@ -248,12 +250,12 @@
     <div class="how-to-play-card">
               <div class="how-to-title">How to play</div>
         <ol>
-          <li>Each track shows a lyric, setlist line, or cue card — that is the question.</li>
-          <li>Read it in the countdown, then watch the note travel down the correct lane.</li>
-          <li>Hit lane A, B or C as it crosses the white line (tap the lane or card, or press 1 / 2 / 3).</li>
-          <li>Perfect and Good keep the combo. A miss or a wrong lane costs a mic. No mics left and the crowd goes quiet.</li>
+          <li>Play a stretch of notes first, like a usual music game — hit lane A, B or C as each note crosses the white line (tap the lane or card, or press 1 / 2 / 3).</li>
+          <li>A lyric, setlist line, or cue card then appears while the song keeps going. Keep hitting notes as you read it.</li>
+          <li>Answer on the special notes — one in each lane for A, B and C. Only the correct special note scores as the answer.</li>
+          <li>Perfect and Good keep the combo. A miss or a wrong special note costs a mic. No mics left and the crowd goes quiet.</li>
         </ol>
-        <div class="how-to-zh">先讀歌詞，再在白線上按對的軌道。時機準確可得 Perfect／Good；錯過或按錯會失去一支麥克風。</div>
+        <div class="how-to-zh">先按普通音符，然後在歌曲繼續時讀題，再按特殊音符作答（每軌一個特殊音符，A／B／C）。時機準確可得 Perfect／Good；答錯或錯過特殊音符會失去一支麥克風。</div>
         <div class="how-to-keys">1 / 2 / 3 or A / S / D hit a lane · Esc pause</div>
     </div>
   </div>
@@ -824,7 +826,7 @@
         }
       }
       highlightSelectedLane();
-      if (q.isDictation && q.word) setTimeout(() => speakText(q.word), 160);
+      if (q.isDictation && q.word && !GAME.hideQuestionHudOnRoundStart) setTimeout(() => speakText(q.word), 160);
       const timerEl = document.getElementById("q-timer-display");
       if (timerEl) timerEl.textContent = state.timerSeconds > 0 ? (Math.ceil(state.questionTimeLeft) + "s") : "∞";
     }
@@ -887,7 +889,10 @@
       presentQuestionToHud();
       updateHudReadouts();
       const qWrap = document.getElementById("question-hud-wrap");
-      if (qWrap) qWrap.classList.remove("hidden-phase");
+      if (qWrap) {
+        if (GAME.hideQuestionHudOnRoundStart) qWrap.classList.add("hidden-phase");
+        else qWrap.classList.remove("hidden-phase");
+      }
       if (typeof GAME.onRoundStart === "function") GAME.onRoundStart(state.currentQuestion);
     }
 
@@ -1288,12 +1293,14 @@
     /*************************************************************************
      * STAGE LIGHTS: ON THE BEAT — concert rhythm / cue-card game
      * MUSE ART HOOKS: set window.PYW_STAGE_LIGHTS_ART = {
-     *   backdrop, performer, crowd, note
+     *   backdrop, performer, crowd, note, "note-special", "note-special-hit"
      * }
      * or <img hidden data-muse-slot="backdrop" src="...">.
      * The hub cover, start-menu portrait, nova-spotlight, nova-singing, and mic are hooked.
-     * Backdrop, crowd, and note are also hooked. Backdrop uses aspect-preserved
-     * cover so Nova stays in the empty centre spotlight.
+     * Backdrop, crowd, note, note-special, and note-special-hit are also hooked. Backdrop uses aspect-preserved
+     * cover so Nova stays in the empty centre spotlight. Special notes fall back to note.png
+     * with a gold outline if note-special.png has not landed yet. A / B / C are drawn in code.
+     * note-special-hit is a strike-line flash when a special answer note is hit; skip if missing.
      *************************************************************************/
     const GAME = {
       musePack: "PYW_STAGE_LIGHTS_ART",
@@ -1313,16 +1320,24 @@
       winTitle: "The setlist is complete.",
       loseTitle: "The house lights came up early.",
       resolveDelayMs: 700,
-      holdQuestionTimer: false
+      holdQuestionTimer: true,
+      hideQuestionHudOnRoundStart: true
     };
 
     const stage = {
       canvas: null, ctx: null, last: 0,
-      phase: "idle", // read | hit | result
-      noteY: 0,
+      phase: "idle", // play | question | special | result
+      notes: [],
+      songTime: 0,
       noteSpeed: 0,
+      travel: 1.45,
+      questionAt: null,
+      specialAt: null,
+      questionShown: false,
+      specialResolved: false,
       strikeY: 0,
       sparks: [],
+      hitFlashes: [],
       beat: 0,
       armed: false
     };
@@ -1345,13 +1360,17 @@
     }
 
     function drawPerformer(ctx, w, h, t) {
-      const singing = stage.phase === "hit" || stage.phase === "result";
+      const singing = stage.phase === "play" || stage.phase === "question" || stage.phase === "special" || stage.phase === "result";
       const muse = getMuseArt(singing ? "nova-singing" : "nova-spotlight") || getMuseArt("nova-spotlight") || getMuseArt("nova-singing");
       const L = laneLayout(w, h);
       const bandTop = stageHudClearY(stage.canvas) + 10;
-      const bandBottom = Math.max(bandTop + 72, L.top - 8);
-      const box = Math.max(72, Math.min(musePoseBox(w, h), bandBottom - bandTop, w * 0.46));
+      // Keep Nova's feet above the highway so she does not collide with notes
+      // or sit on the option chips when the question HUD is open at 390.
+      const bandBottom = L.top - 16;
+      const avail = Math.max(0, bandBottom - bandTop);
+      const box = Math.min(musePoseBox(w, h), avail, w * 0.42);
       const x = w * 0.5, y = bandBottom;
+      if (box < 40) return;
       if (muse) { drawMuseContained(ctx, muse, x, y, box, "bottom"); return; }
       const bounce = Math.sin(t * 0.01) * 6;
       ctx.save();
@@ -1495,8 +1514,8 @@
         ctx.textAlign = "center";
         ctx.fillText(LANE_LETTERS[i], x + L.laneW / 2, L.bottom + 18);
       }
-      // strike line — brighten when the cue is in the hit window
-      const inWindow = stage.phase === "hit" && Math.abs(stage.noteY - stage.strikeY) <= 56;
+      // strike line — brighten when a note is in the hit window
+      const inWindow = (stage.notes || []).some((n) => !n.judged && Math.abs(noteY(n) - stage.strikeY) <= 56);
       ctx.strokeStyle = inWindow ? "#fde047" : "#f8fafc";
       ctx.shadowColor = inWindow ? "#fde047" : "#fff";
       ctx.shadowBlur = inWindow ? 22 : 12;
@@ -1510,37 +1529,12 @@
         ctx.fillText("Now", w / 2, stage.strikeY - 16);
       }
 
-      if (stage.phase === "hit" && state.currentQuestion) {
-        const ans = state.currentQuestion.answer;
-        const museNote = getMuseArt("note");
-        const x = L.left + ans * L.laneW + L.laneW / 2;
-        const y = stage.noteY;
-        if (museNote) ctx.drawImage(museNote, x - 28, y - 28, 56, 56);
-        else {
-          ctx.fillStyle = colors[ans];
-          ctx.shadowColor = colors[ans];
-          ctx.shadowBlur = 16;
-          ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = "#0f172a";
-          ctx.shadowBlur = 0;
-          ctx.font = "800 16px Orbitron, sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(LANE_LETTERS[ans], x, y + 1);
-        }
-        // dim decoy pulses on other lanes (not hittable targets)
-        for (let i = 0; i < 3; i++) {
-          if (i === ans) continue;
-          const dx = L.left + i * L.laneW + L.laneW / 2;
-          ctx.fillStyle = "rgba(148,163,184,0.18)";
-          ctx.beginPath(); ctx.arc(dx, y + 18, 10, 0, Math.PI * 2); ctx.fill();
-        }
-      } else if (stage.phase === "read") {
-        ctx.fillStyle = "#f0abfc";
-        ctx.font = "800 18px Orbitron, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Get ready", w / 2, (L.top + stage.strikeY) / 2);
-      }
+      (stage.notes || []).forEach((n) => {
+        if (n.judged && n.hit) return;
+        const y = noteY(n);
+        if (y < L.top - 24 || y > stage.strikeY + 80) return;
+        drawChartNote(ctx, L, n, y, colors);
+      });
 
       stage.sparks.forEach((s) => {
         ctx.fillStyle = s.color;
@@ -1548,6 +1542,138 @@
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 1;
       });
+      drawSpecialNoteHitFlashes(ctx);
+    }
+
+    function spawnSpecialNoteHitFlash(lane) {
+      // Skip silently if the Muse hit flash has not landed yet.
+      if (!getMuseArt("note-special-hit") || !stage.canvas) return;
+      const L = laneLayout(stage.canvas.width, stage.canvas.height);
+      const x = L.left + lane * L.laneW + L.laneW / 2;
+      stage.hitFlashes.push({ x: x, y: stage.strikeY, life: 0.42, maxLife: 0.42 });
+    }
+
+    function drawSpecialNoteHitFlashes(ctx) {
+      const img = getMuseArt("note-special-hit");
+      if (!img) return;
+      (stage.hitFlashes || []).forEach((f) => {
+        const t = 1 - f.life / f.maxLife;
+        const box = 72 + t * 40;
+        const alpha = t < 0.2 ? 1 : Math.max(0, 1 - (t - 0.2) / 0.8);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        // Preserve aspect ratio; centre the flash on the strike point.
+        drawMuseContained(ctx, img, f.x, f.y + box / 2, box, "bottom");
+        ctx.restore();
+      });
+    }
+
+    function noteY(note) {
+      return stage.strikeY - (note.hitAt - stage.songTime) * stage.noteSpeed;
+    }
+
+    function drawChartNote(ctx, L, note, y, colors) {
+      const special = note.kind === "special";
+      const letter = note.letter || LANE_LETTERS[note.lane];
+      const x = L.left + note.lane * L.laneW + L.laneW / 2;
+      const size = special ? 64 : 56;
+      if (special) {
+        ctx.save();
+        ctx.shadowColor = "#fde047";
+        ctx.shadowBlur = 24;
+        ctx.strokeStyle = "#fde047";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      const muse = special ? (getMuseArt("note-special") || getMuseArt("note")) : getMuseArt("note");
+      if (muse) {
+        // Preserve aspect ratio, bottom-aligned in the note box, never stretched.
+        drawMuseContained(ctx, muse, x, y + size / 2, size, "bottom");
+      } else {
+        ctx.fillStyle = colors[note.lane];
+        ctx.shadowColor = colors[note.lane];
+        ctx.shadowBlur = special ? 22 : 16;
+        ctx.beginPath(); ctx.arc(x, y, special ? 26 : 22, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      // Always mark special answer notes A / B / C in code (no extra art files).
+      if (special) {
+        ctx.save();
+        ctx.font = "800 17px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "#0f172a";
+        ctx.fillStyle = "#fefce8";
+        ctx.strokeText(letter, x, y + 1);
+        ctx.fillText(letter, x, y + 1);
+        ctx.restore();
+      } else if (!muse) {
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "800 16px Orbitron, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(letter, x, y + 1);
+      }
+    }
+
+    function buildRoundChart() {
+      const notes = [];
+      let t = 1.15;
+      const travel = 1.45;
+      const round = Math.max(1, state.currentRound || 1);
+      for (let i = 0; i < 5; i++) {
+        notes.push({ hitAt: t, lane: (i + round) % 3, kind: "normal", letter: LANE_LETTERS[(i + round) % 3], judged: false, hit: false });
+        t += 0.58;
+      }
+      const questionAt = t - 0.65;
+      for (let i = 0; i < 2; i++) {
+        notes.push({ hitAt: t, lane: (i + 1 + round) % 3, kind: "normal", letter: LANE_LETTERS[(i + 1 + round) % 3], judged: false, hit: false });
+        t += 0.58;
+      }
+      t += 0.32;
+      const specialAt = t;
+      for (let lane = 0; lane < 3; lane++) {
+        notes.push({ hitAt: specialAt, lane: lane, kind: "special", letter: LANE_LETTERS[lane], judged: false, hit: false });
+      }
+      return { notes: notes, questionAt: questionAt, specialAt: specialAt, travel: travel };
+    }
+
+    function showQuestionHud() {
+      if (stage.questionShown) return;
+      stage.questionShown = true;
+      stage.phase = "question";
+      const qWrap = document.getElementById("question-hud-wrap");
+      if (qWrap) qWrap.classList.remove("hidden-phase");
+      const q = state.currentQuestion;
+      if (q && q.isDictation && q.word) setTimeout(() => speakText(q.word), 120);
+    }
+
+    function gradeWindow(dist) {
+      if (dist <= 28) return "Perfect";
+      if (dist <= 56) return "Good";
+      return "Miss";
+    }
+
+    function awardNormalHit(lane, grade) {
+      if (grade === "Miss") {
+        state.combo = 0;
+        playSynthSfx("tap");
+        spawnHitSparks(lane, "#fb7185");
+        updateHudReadouts();
+        return;
+      }
+      const bonus = grade === "Perfect" ? 40 : 20;
+      const comboBonus = Math.min(30, state.combo * 4);
+      state.combo += 1;
+      state.score += bonus + comboBonus;
+      spawnHitSparks(lane, grade === "Perfect" ? "#a3e635" : "#22d3ee");
+      playSynthSfx(grade === "Perfect" ? "perfect" : "correct");
+      updateHudReadouts();
     }
 
     function spawnHitSparks(lane, color) {
@@ -1558,47 +1684,70 @@
       }
     }
 
-    function beginHitPhase() {
+    function beginRoundChart() {
       GAME.holdQuestionTimer = true;
-      stage.phase = "hit";
-      const h = stage.canvas.height;
-      const L = laneLayout(stage.canvas.width, h);
-      stage.noteY = L.top + 10;
-      const travel = Math.max(0.9, Math.min(1.8, 1.45));
-      stage.noteSpeed = (stage.strikeY - stage.noteY) / travel;
+      const chart = buildRoundChart();
+      const h = stage.canvas ? stage.canvas.height : 700;
+      const L = laneLayout(stage.canvas ? stage.canvas.width : 1000, h);
+      stage.notes = chart.notes;
+      stage.questionAt = chart.questionAt;
+      stage.specialAt = chart.specialAt;
+      stage.travel = chart.travel;
+      stage.songTime = 0;
+      stage.questionShown = false;
+      stage.specialResolved = false;
+      stage.phase = "play";
       stage.armed = true;
+      stage.noteSpeed = (stage.strikeY - L.top) / chart.travel;
     }
 
     function attemptHit(lane) {
       if (state.screen !== "PLAY" || state.answerLocked) return;
-      if (stage.phase === "read") {
-        state.selectedLane = lane;
-        highlightSelectedLane();
-        playSynthSfx("tap");
-        return;
-      }
-      if (stage.phase !== "hit" || !stage.armed) return;
-      const dist = Math.abs(stage.noteY - stage.strikeY);
-      let grade = "Miss";
-      if (dist <= 28) grade = "Perfect";
-      else if (dist <= 56) grade = "Good";
-      const okLane = state.currentQuestion && lane === state.currentQuestion.answer;
-      if (!okLane || grade === "Miss") {
-        spawnHitSparks(lane, "#fb7185");
-        resolveChoice(okLane ? lane : lane, { grade: "Miss", timedOut: !okLane && false });
-        // wrong lane should be incorrect even if timed well
-        if (!okLane) {
-          // resolveChoice already uses chosenLane === answer
-        }
+      if (!stage.armed || stage.phase === "result" || stage.phase === "idle") return;
+      state.selectedLane = lane;
+      highlightSelectedLane();
+
+      const specials = (stage.notes || []).filter((n) => n.kind === "special" && !n.judged);
+      const specialInWindow = specials.find((n) => n.lane === lane && Math.abs(noteY(n) - stage.strikeY) <= 56);
+      const anySpecialInWindow = specials.some((n) => Math.abs(noteY(n) - stage.strikeY) <= 56);
+
+      if (specials.length && (specialInWindow || anySpecialInWindow)) {
+        if (!anySpecialInWindow && !specialInWindow) return;
+        const target = specialInWindow || specials[0];
+        const dist = Math.abs(noteY(target) - stage.strikeY);
+        const grade = specialInWindow ? gradeWindow(dist) : "Miss";
+        const okLane = state.currentQuestion && lane === state.currentQuestion.answer;
+        specials.forEach((n) => { n.judged = true; n.hit = n.lane === lane; });
+        stage.specialResolved = true;
         stage.armed = false;
         stage.phase = "result";
+        if (!okLane || grade === "Miss") {
+          spawnHitSparks(lane, "#fb7185");
+          spawnSpecialNoteHitFlash(lane);
+          resolveChoice(lane, { grade: "Miss", timedOut: false });
+          return;
+        }
+        spawnHitSparks(lane, grade === "Perfect" ? "#a3e635" : "#22d3ee");
+        spawnSpecialNoteHitFlash(lane);
+        resolveChoice(lane, { grade: grade });
         return;
       }
-      spawnHitSparks(lane, grade === "Perfect" ? "#a3e635" : "#22d3ee");
-      playSynthSfx(grade === "Perfect" ? "perfect" : "correct");
-      resolveChoice(lane, { grade });
-      stage.armed = false;
-      stage.phase = "result";
+
+      // Normal notes: hittable during the play stretch and while the question is up.
+      let best = null;
+      let bestDist = 56;
+      (stage.notes || []).forEach((n) => {
+        if (n.judged || n.kind !== "normal" || n.lane !== lane) return;
+        const dist = Math.abs(noteY(n) - stage.strikeY);
+        if (dist <= bestDist) {
+          best = n;
+          bestDist = dist;
+        }
+      });
+      if (!best) return;
+      best.judged = true;
+      best.hit = true;
+      awardNormalHit(lane, gradeWindow(bestDist));
     }
 
     GAME.onReady = function () {
@@ -1621,21 +1770,11 @@
       requestAnimationFrame(loop);
     };
 
-    GAME.onRunStart = function () { stage.phase = "idle"; GAME.holdQuestionTimer = false; };
+    GAME.onRunStart = function () { stage.phase = "idle"; stage.notes = []; GAME.holdQuestionTimer = true; };
 
     GAME.onRoundStart = function () {
-      stage.phase = "read";
-      stage.armed = false;
-      GAME.holdQuestionTimer = false;
-      if (state.timerSeconds <= 0) {
-        state.questionTimeLeft = 2.2;
-        // still use a short get-ready even if timer is Off
-        GAME.holdQuestionTimer = true;
-        // custom short read handled in loop
-        stage.customRead = 2.2;
-      } else {
-        stage.customRead = 0;
-      }
+      GAME.holdQuestionTimer = true;
+      beginRoundChart();
     };
 
     GAME.onOptionTap = function (i) { attemptHit(i); };
@@ -1659,23 +1798,37 @@
       stage.beat += dt;
       stage.sparks.forEach((s) => { s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 240 * dt; s.life -= dt; });
       stage.sparks = stage.sparks.filter((s) => s.life > 0);
+      (stage.hitFlashes || []).forEach((f) => { f.life -= dt; });
+      stage.hitFlashes = (stage.hitFlashes || []).filter((f) => f.life > 0);
 
-      if (state.screen === "PLAY" && !state.answerLocked) {
-        if (stage.phase === "read") {
-          if (stage.customRead > 0) {
-            stage.customRead -= dt;
-            const timerEl = document.getElementById("q-timer-display");
-            if (timerEl) timerEl.textContent = Math.max(0, Math.ceil(stage.customRead)) + "s";
-            if (stage.customRead <= 0) beginHitPhase();
-          } else {
-            tickQuestionTimer(dt);
-            if (state.questionTimeLeft <= 0 && !state.answerLocked && stage.phase === "read") {
-              // tickQuestionTimer may have already resolved if it hit 0; if timer just ended, start hit instead of miss
+      if (state.screen === "PLAY") {
+        // The song never pauses for the question — songTime keeps running through play, question, and special notes.
+        if (stage.phase === "play" || stage.phase === "question" || stage.phase === "special") {
+          stage.songTime += dt;
+        }
+
+        if (!stage.questionShown && stage.questionAt != null && stage.songTime >= stage.questionAt) {
+          showQuestionHud();
+        }
+        if (stage.questionShown && !stage.specialResolved && stage.specialAt != null && stage.songTime >= stage.specialAt - stage.travel * 0.85) {
+          if (stage.phase === "question") stage.phase = "special";
+        }
+
+        if (!state.answerLocked && !stage.specialResolved) {
+          // Missed normal notes (combo break only — mics are spent on special-note answers).
+          (stage.notes || []).forEach((n) => {
+            if (n.judged || n.kind !== "normal") return;
+            if (noteY(n) > stage.strikeY + 56) {
+              n.judged = true;
+              n.hit = false;
+              awardNormalHit(n.lane, "Miss");
             }
-          }
-        } else if (stage.phase === "hit") {
-          stage.noteY += stage.noteSpeed * dt;
-          if (stage.noteY > stage.strikeY + 56 && stage.armed) {
+          });
+          // Missed special notes: a wrong answer (and a mic).
+          const specials = (stage.notes || []).filter((n) => n.kind === "special" && !n.judged);
+          if (specials.length && specials.every((n) => noteY(n) > stage.strikeY + 56)) {
+            specials.forEach((n) => { n.judged = true; n.hit = false; });
+            stage.specialResolved = true;
             stage.armed = false;
             stage.phase = "result";
             resolveChoice(-1, { timedOut: true, grade: "Miss" });
@@ -1688,15 +1841,7 @@
       if (state.screen === "PLAY" || state.screen === "PAUSED" || state.screen === "START") drawHighway(ctx, w, h, now);
     }
 
-    // If the shared timer hits 0 during READ, convert that into the hit phase instead of an auto-miss.
-    const _resolveChoice = resolveChoice;
-    resolveChoice = function (lane, meta) {
-      if (stage.phase === "read" && meta && meta.timedOut && !state.answerLocked) {
-        beginHitPhase();
-        return;
-      }
-      return _resolveChoice(lane, meta);
-    };
+    // Shared question timer stays held; special notes are the answer window, not a paused countdown.
 
   </script>
 </body>
