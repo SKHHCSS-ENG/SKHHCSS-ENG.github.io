@@ -1361,9 +1361,13 @@
       const muse = getMuseArt(singing ? "nova-singing" : "nova-spotlight") || getMuseArt("nova-spotlight") || getMuseArt("nova-singing");
       const L = laneLayout(w, h);
       const bandTop = stageHudClearY(stage.canvas) + 10;
-      const bandBottom = Math.max(bandTop + 72, L.top - 8);
-      const box = Math.max(72, Math.min(musePoseBox(w, h), bandBottom - bandTop, w * 0.46));
+      // Keep Nova's feet above the highway so she does not collide with notes
+      // or sit on the option chips when the question HUD is open at 390.
+      const bandBottom = L.top - 16;
+      const avail = Math.max(0, bandBottom - bandTop);
+      const box = Math.min(musePoseBox(w, h), avail, w * 0.42);
       const x = w * 0.5, y = bandBottom;
+      if (box < 40) return;
       if (muse) { drawMuseContained(ctx, muse, x, y, box, "bottom"); return; }
       const bounce = Math.sin(t * 0.01) * 6;
       ctx.save();

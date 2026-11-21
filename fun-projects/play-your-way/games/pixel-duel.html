@@ -3361,7 +3361,8 @@
       state.screen = 'PLAY_PHASE';
       state.phaseTimer = 0;
       state.questionAppearTimer = (typeof opts.delay === 'number') ? opts.delay : 4.2;
-      if (opts.fresh || state.bossAttackTimer <= 0) state.bossAttackTimer = 1.6;
+      if (opts.fresh) state.bossAttackTimer = 2.8;
+      else if (state.bossAttackTimer <= 0) state.bossAttackTimer = 2.0;
       state.comboHits = 0;
       state.dodgeHitsThisPhase = 0;
       const playBanner = document.getElementById('play-phase-banner');
@@ -3371,7 +3372,7 @@
       const w = mainCanvas ? mainCanvas.width : 1000;
       const h = mainCanvas ? mainCanvas.height : 700;
       const { floorY } = getArenaGeometry(w, h);
-      state.bossTargetX = w * 0.78;
+      state.bossTargetX = getBossGuardTargetX(w, h, 0);
       state.bossY = floorY - 115;
     }
 
@@ -3788,6 +3789,40 @@
       ctx.restore();
     }
 
+    function getBossDrawSize(w, hasMuse) {
+      const full = hasMuse ? 220 : 144;
+      const narrow = hasMuse ? 124 : 96;
+      if (w >= 900) return full;
+      if (w <= 390) return narrow;
+      const t = (w - 390) / (900 - 390);
+      return Math.round(narrow + (full - narrow) * t);
+    }
+
+    function getBossGuardTargetX(w, h, now) {
+      const { floorY, platforms } = getArenaGeometry(w, h);
+      const orbC = platforms[2] || { orbX: Math.round(w * 0.76), orbY: Math.round(floorY - h * 0.17 - 58) };
+      const hasMuse = !!(getMuseArt('boss-' + state.bossMode) || getMuseArt('boss') ||
+        (state.bossMode === 'SPECIAL' && getMuseArt('boss-ENRAGED')));
+      const size = getBossDrawSize(w, hasMuse);
+      const full = hasMuse ? 220 : 144;
+      const sway = w < 560 ? 10 : 45;
+      const preferred = w * 0.82 + Math.sin((now || 0) * 0.0015) * sway;
+      const hoverY = (typeof state.bossY === 'number' && state.bossY > 0) ? state.bossY : (floorY - 125);
+      const bossBottom = hoverY + full / 2;
+      const bossTop = bossBottom - size;
+      const orbY = orbC.orbY || bossTop;
+      const verticalOverlap = (orbY + 36) > bossTop && (orbY - 36) < bossBottom;
+      let target = preferred;
+      if (verticalOverlap) {
+        // Only nudge right when the sprite would actually cover orb C.
+        target = Math.max(preferred, orbC.orbX + 62 + size / 2);
+      }
+      // Keep at least 45% of the boss on-screen (avoids a 390 clip-off).
+      const maxCenter = w - size * 0.45;
+      const minCenter = size * 0.45;
+      return Math.max(minCenter, Math.min(target, maxCenter));
+    }
+
     function drawColossalBoss(ctx, w, h, floorY, now) {
       const bFrame = Math.floor(now / 220) % 2;
       const bossSprite = getBossDuelSprite(state.bossMode, bFrame);
@@ -3797,8 +3832,10 @@
 
       let museBossArt = getMuseArt('boss-' + state.bossMode) || getMuseArt('boss');
       if (!museBossArt && state.bossMode === 'SPECIAL') museBossArt = getMuseArt('boss-ENRAGED');
-      const bossSize = museBossArt ? 220 : 144;
-      const bossBottom = hoverY + bossSize / 2;
+      const fullSize = museBossArt ? 220 : 144;
+      const bossSize = getBossDrawSize(w, !!museBossArt);
+      // Bottom-align to the same foot line as the full-size sprite; never stretch.
+      const bossBottom = hoverY + fullSize / 2;
 
       // Special-attack beat gets a distinct hot aura even when falling back to the enraged sheet,
       // so it is never mistaken for an ordinary auto-attack (GUARD art).
@@ -3827,7 +3864,7 @@
       // Compact HP pip above the boss (main readout lives in the HUD, clear of the controls)
       const barW = 92;
       const barX = Math.round(state.bossX - barW / 2);
-      const barY = Math.round(hoverY - bossSize / 2 - 14);
+      const barY = Math.round(bossBottom - bossSize - 14);
       const hpFrac = Math.max(0, Math.min(1, state.bossHp / state.bossMaxHp));
       ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
       ctx.fillRect(barX - 2, barY - 2, barW + 4, 10);
@@ -4397,7 +4434,7 @@
       // 2. Smooth Boss Positioning & Shockwave Updates
       state.bossX += (state.bossTargetX - state.bossX) * Math.min(1, dt * 5);
       if (state.bossMode === 'GUARD' && (state.screen === 'QUESTION_PHASE' || state.screen === 'PLAY_PHASE')) {
-        state.bossTargetX = w * 0.82 + Math.sin(now * 0.0015) * 45;
+        state.bossTargetX = getBossGuardTargetX(w, h, now);
         state.bossY = floorY - 125;
       }
 
@@ -4445,7 +4482,11 @@
             state.heroX = Math.max(48, state.heroX - 30);
             playSynthSfx('damage');
             spawnFloatingCombatText(state.heroX, state.heroY - 60, 'HIT! −25', '#fca5a5', 'Jump or parry!');
-            if (state.dodgeHitsThisPhase >= 2) {
+            // Opening grace: ordinary auto-attacks still hit, but cannot crack a
+            // shield until the first question has been answered. Later fights and
+            // special-attack hits keep the 2-hit shield crack.
+            const openingGrace = state.answeredLog.length === 0 && !sw.special;
+            if (state.dodgeHitsThisPhase >= 2 && !openingGrace) {
               state.shields = Math.max(0, state.shields - 1);
               spawnFloatingCombatText(state.heroX, state.heroY - 90, 'SHIELD CRACKED!', '#ef4444');
               if (state.shields <= 0) {
@@ -4467,7 +4508,11 @@
           state.bossAttackTimer -= dt;
           if (state.bossAttackTimer <= 0) {
             spawnBossAutoAttack('normal');
-            state.bossAttackTimer = 1.9 + Math.random() * 0.5;
+            if (state.answeredLog.length === 0) {
+              state.bossAttackTimer = 2.6 + Math.random() * 0.5;
+            } else {
+              state.bossAttackTimer = 1.55 + Math.random() * 0.35;
+            }
           }
         }
       }
