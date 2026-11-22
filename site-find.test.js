@@ -556,6 +556,8 @@ test("Self-Directed Learning hub lists Prompt Builder and stays off the Fun Proj
   const titleCss = pb.split(".app-title-group h1")[1].split(".app-subtitle")[0];
   assert.equal(titleCss.includes("text-overflow: ellipsis"), false);
   assert.equal(titleCss.includes("white-space: nowrap"), false);
+  assert.match(pb, /\.studio-preview-bar \{\s*display: none;/);
+  assert.equal((pb.match(/\.studio-preview-bar\s*\{[^}]*display:\s*flex/g) || []).length, 0);
   assert.match(redir, /location\.replace\("\.\.\/self-directed-learning\/prompt-builder\/"\+location\.search\+location\.hash\)/);
   assert.match(redir, /href="\.\.\/self-directed-learning\/prompt-builder\/"/);
 });
