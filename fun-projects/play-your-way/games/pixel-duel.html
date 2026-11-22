@@ -528,7 +528,7 @@
       box-shadow: 0 0 10px #f59e0b;
     }
 
-    /* Circular Combat Pace / Combo Gauge (Low=Green -> Mid=Amber -> High=Red) */
+    /* Circular Soul / Answer Gauge (stone rune ring, gold) */
     .soul-gauge-container {
       width: 168px;
       height: 168px;
@@ -1510,6 +1510,9 @@
     <img data-muse-slot="orb-A" src="art/pixel-duel/rune-orb-a.png" alt="">
     <img data-muse-slot="orb-B" src="art/pixel-duel/rune-orb-b.png" alt="">
     <img data-muse-slot="orb-C" src="art/pixel-duel/rune-orb-c.png" alt="">
+    <img data-muse-slot="soul-gauge-frame" src="art/pixel-duel/soul-gauge-frame.png" alt="">
+    <img data-muse-slot="boss-fireball" src="art/pixel-duel/boss-fireball.png" alt="">
+    <img data-muse-slot="boss-fireball-special" src="art/pixel-duel/boss-fireball-special.png" alt="">
   </div>
 
 
@@ -2688,7 +2691,9 @@
      * hero-1..5 (idle fallback) and hero-N-idle/walk/jump/slash/dash for Scholar, Rogue,
      * Hunter, Dancer, and Merchant, boss-GUARD / boss-STUNNED / boss-ENRAGED / boss-SPECIAL,
      * boss-special-burst (wrong-answer special-attack flash only),
-     * arenaBackdrop, tavernBackdrop, orbSheet, orb-A / orb-B / orb-C.
+     * arenaBackdrop, tavernBackdrop, orbSheet, orb-A / orb-B / orb-C,
+     * soul-gauge-frame (256×256, sits behind the gauge numbers),
+     * boss-fireball (128×128 ordinary attacks), boss-fireball-special (128×128 special attacks).
      * Knight (hero-0) and Scholar, Rogue, Hunter, Dancer, and Merchant all have
      * the full idle, walk, jump, slash, and dash set hooked.
      *************************************************************************/
@@ -3299,55 +3304,65 @@
     /*************************************************************************
      * 7. PHASE TRANSITIONS: RUNNING FIGHT -> QUESTION ON TOP -> BREAK OR SPECIAL
      *************************************************************************/
+    function getHeroAimY(floorY) {
+      const bodyY = (typeof state.heroY === 'number' ? state.heroY : floorY) - 20;
+      return Math.max(48, Math.min(floorY - 16, bodyY));
+    }
+
+    function spawnBossFireball(opts) {
+      bossShockwaves.push({
+        x: opts.x,
+        y: opts.y,
+        vx: opts.vx,
+        parried: false,
+        hitPlayer: false,
+        special: !!opts.special,
+        trail: []
+      });
+    }
+
     function spawnBossAutoAttack(kind) {
       if (!mainCanvas) return;
       const w = mainCanvas.width;
       const h = mainCanvas.height;
       const { floorY } = getArenaGeometry(w, h);
       const originX = state.bossX || w * 0.78;
+      // Aim at the hero's current body height so floor and sanctuary platforms A/B/C are all hittable.
+      // Jump still clears a shot at standing height; parry still works.
+      const aimY = getHeroAimY(floorY);
       if (kind === 'special') {
         for (let i = 0; i < 5; i++) {
-          bossShockwaves.push({
+          spawnBossFireball({
             x: originX + i * 150,
-            y: floorY - 22,
+            y: aimY,
             vx: -340 - i * 32,
-            parried: false,
-            hitPlayer: false,
             special: true
           });
         }
-        bossShockwaves.push({
+        spawnBossFireball({
           x: originX + 80,
-          y: floorY - 92,
+          y: Math.max(48, aimY - 70),
           vx: -380,
-          parried: false,
-          hitPlayer: false,
           special: true
         });
-        bossShockwaves.push({
+        spawnBossFireball({
           x: originX + 210,
-          y: floorY - 130,
+          y: Math.max(48, aimY - 108),
           vx: -300,
-          parried: false,
-          hitPlayer: false,
           special: true
         });
       } else {
-        bossShockwaves.push({
+        spawnBossFireball({
           x: originX,
-          y: floorY - 22,
+          y: aimY,
           vx: -270,
-          parried: false,
-          hitPlayer: false,
           special: false
         });
         if (Math.random() < 0.28) {
-          bossShockwaves.push({
+          spawnBossFireball({
             x: originX + 36,
-            y: floorY - 88,
+            y: Math.max(48, aimY - 66),
             vx: -250,
-            parried: false,
-            hitPlayer: false,
             special: false
           });
         }
@@ -3739,31 +3754,10 @@
         drawFloatingRuneOrbs(ctx, now);
       }
 
-      // 7. Draw Boss Shockwaves (During Play Phase)
+      // 7. Draw Boss fireballs (ordinary auto-attacks and special attacks)
       bossShockwaves.forEach(sw => {
         if (sw.parried) return;
-        const isSpecial = !!sw.special;
-        const pulse = 0.55 + Math.sin(now * 0.02 + sw.x) * 0.25;
-        const rad = isSpecial ? 54 : 42;
-        const grd = ctx.createRadialGradient(sw.x, sw.y, 4, sw.x, sw.y, rad);
-        grd.addColorStop(0, isSpecial ? 'rgba(253, 224, 71, 1)' : 'rgba(254, 240, 138, 0.95)');
-        grd.addColorStop(1, isSpecial ? 'rgba(190, 18, 60, 0)' : 'rgba(244, 63, 94, 0)');
-        ctx.save();
-        ctx.globalAlpha = pulse;
-        ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.arc(sw.x, sw.y, rad, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = isSpecial ? '#e11d48' : '#fb7185';
-        ctx.beginPath();
-        ctx.ellipse(sw.x, sw.y, isSpecial ? 38 : 30, isSpecial ? 20 : 16, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = isSpecial ? '#fff7ed' : '#fef08a';
-        ctx.beginPath();
-        ctx.ellipse(sw.x, sw.y, isSpecial ? 16 : 14, isSpecial ? 9 : 8, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        drawBossFireball(ctx, sw, now);
       });
 
       // 8. Draw the hero and slash arcs
@@ -3848,6 +3842,86 @@
         drawSpriteContained(ctx, img, state.bossX, hoverY + box / 2, box);
         ctx.restore();
       });
+    }
+
+    function drawBossFireball(ctx, sw, now) {
+      const isSpecial = !!sw.special;
+      const art = getMuseArt(isSpecial ? 'boss-fireball-special' : 'boss-fireball');
+      const trail = sw.trail || [];
+      ctx.save();
+      trail.forEach((p, idx) => {
+        const t = (idx + 1) / Math.max(1, trail.length);
+        ctx.globalAlpha = 0.1 + t * 0.38;
+        ctx.fillStyle = isSpecial
+          ? (idx % 2 === 0 ? '#fde047' : '#be123c')
+          : (idx % 2 === 0 ? '#fdba74' : '#fb7185');
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, (isSpecial ? 22 : 15) * t, (isSpecial ? 12 : 8) * t, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+
+      const pulse = 0.72 + Math.sin(now * 0.02 + sw.x * 0.04) * 0.2;
+      const glowR = isSpecial ? 58 : 44;
+      const grd = ctx.createRadialGradient(sw.x, sw.y, 3, sw.x, sw.y, glowR);
+      if (isSpecial) {
+        grd.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+        grd.addColorStop(0.35, 'rgba(251, 191, 36, 0.55)');
+        grd.addColorStop(1, 'rgba(127, 29, 29, 0)');
+      } else {
+        grd.addColorStop(0, 'rgba(255, 237, 213, 0.9)');
+        grd.addColorStop(0.4, 'rgba(251, 113, 133, 0.45)');
+        grd.addColorStop(1, 'rgba(127, 29, 29, 0)');
+      }
+      ctx.globalAlpha = pulse;
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(sw.x, sw.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      if (art) {
+        const box = isSpecial ? 86 : 70;
+        drawSpriteContained(ctx, art, sw.x, sw.y + box / 2, box);
+      } else if (isSpecial) {
+        ctx.fillStyle = '#9f1239';
+        ctx.beginPath();
+        ctx.ellipse(sw.x, sw.y, 40, 22, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fde047';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#e11d48';
+        ctx.beginPath();
+        ctx.ellipse(sw.x - 4, sw.y, 26, 14, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff7ed';
+        ctx.beginPath();
+        ctx.ellipse(sw.x - 6, sw.y - 1, 14, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.ellipse(sw.x - 8, sw.y - 2, 6, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = '#be123c';
+        ctx.beginPath();
+        ctx.ellipse(sw.x, sw.y, 30, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fb7185';
+        ctx.beginPath();
+        ctx.ellipse(sw.x - 3, sw.y, 20, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fed7aa';
+        ctx.beginPath();
+        ctx.ellipse(sw.x - 6, sw.y - 1, 11, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff7ed';
+        ctx.beginPath();
+        ctx.ellipse(sw.x - 8, sw.y - 2, 5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
     }
 
     function drawColossalBoss(ctx, w, h, floorY, now) {
@@ -4234,7 +4308,7 @@
     }
 
     /*************************************************************************
-     * 11. CIRCULAR SOUL / COMBO PACE GAUGE (Green -> Amber -> Red)
+     * 11. CIRCULAR SOUL / ANSWER GAUGE (stone rune ring, gold — not a racing speedometer)
      *************************************************************************/
     function drawSoulGauge() {
       const canvas = document.getElementById('soul-gauge-canvas');
@@ -4248,13 +4322,47 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      ctx.beginPath();
-      ctx.arc(cx, cy, r + 10, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(12, 15, 24, 0.92)';
-      ctx.fill();
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
-      ctx.stroke();
+      const frame = getMuseArt('soul-gauge-frame');
+      if (frame) {
+        // 256×256 frame sits behind the count, Answer, and rune readout.
+        ctx.drawImage(frame, 0, 0, w, h);
+        ctx.beginPath();
+        ctx.arc(cx, cy, r - 16, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(8, 10, 16, 0.42)';
+        ctx.fill();
+      } else {
+        const stone = ctx.createRadialGradient(cx - r * 0.28, cy - r * 0.32, 8, cx, cy, r + 16);
+        stone.addColorStop(0, '#57534e');
+        stone.addColorStop(0.45, '#3f3a36');
+        stone.addColorStop(1, '#1c1917');
+        ctx.beginPath();
+        ctx.arc(cx, cy, r + 14, 0, Math.PI * 2);
+        ctx.fillStyle = stone;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.88)';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r - 16, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(8, 10, 16, 0.78)';
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.35)';
+        ctx.stroke();
+
+        for (let i = 0; i < 16; i++) {
+          const ang = -Math.PI / 2 + (i / 16) * Math.PI * 2;
+          const inner = r + 1;
+          const outer = r + (i % 4 === 0 ? 10 : 6);
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * inner, cy + Math.sin(ang) * inner);
+          ctx.lineTo(cx + Math.cos(ang) * outer, cy + Math.sin(ang) * outer);
+          ctx.strokeStyle = i % 4 === 0 ? 'rgba(253, 224, 71, 0.92)' : 'rgba(168, 162, 158, 0.55)';
+          ctx.lineWidth = i % 4 === 0 ? 2.2 : 1.2;
+          ctx.stroke();
+        }
+      }
 
       const startAng = Math.PI * 0.75;
       const endAng = Math.PI * 2.25;
@@ -4264,7 +4372,7 @@
       ctx.arc(cx, cy, r, startAng, endAng);
       ctx.lineWidth = 12;
       ctx.lineCap = 'round';
-      ctx.strokeStyle = 'rgba(51, 65, 85, 0.55)';
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.7)';
       ctx.stroke();
 
       let norm = 0;
@@ -4297,17 +4405,20 @@
       }
 
       const activeEnd = startAng + totalSpan * norm;
-      const grad = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
-      grad.addColorStop(0.0, '#22c55e');
-      grad.addColorStop(0.55, '#f59e0b');
-      grad.addColorStop(1.0, '#ef4444');
+      const gold = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+      gold.addColorStop(0.0, '#b45309');
+      gold.addColorStop(0.4, '#fbbf24');
+      gold.addColorStop(1.0, '#fef3c7');
 
       ctx.beginPath();
       ctx.arc(cx, cy, r, startAng, Math.max(startAng + 0.02, activeEnd));
-      ctx.lineWidth = 12;
+      ctx.lineWidth = 11;
       ctx.lineCap = 'round';
-      ctx.strokeStyle = grad;
+      ctx.strokeStyle = gold;
+      ctx.shadowColor = 'rgba(251, 191, 36, 0.55)';
+      ctx.shadowBlur = 8;
       ctx.stroke();
+      ctx.shadowBlur = 0;
 
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 31px Fredoka, sans-serif';
@@ -4315,7 +4426,7 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(centerText, cx, cy - 8);
 
-      ctx.fillStyle = state.isBoosting ? '#ef4444' : '#fbbf24';
+      ctx.fillStyle = state.isBoosting ? '#fde047' : '#fbbf24';
       ctx.font = 'bold 11px Plus Jakarta Sans, sans-serif';
       ctx.fillText(label, cx, cy + 20);
 
@@ -4507,6 +4618,9 @@
         bossShockwaves.forEach(sw => {
           if (sw.parried) return;
           sw.x += sw.vx * dt;
+          if (!sw.trail) sw.trail = [];
+          sw.trail.push({ x: sw.x, y: sw.y });
+          if (sw.trail.length > 10) sw.trail.shift();
           if (!sw.hitPlayer && state.invulnTimer <= 0 && Math.abs(sw.x - state.heroX) < 30 && Math.abs(sw.y - (state.heroY - 20)) < 36) {
             sw.hitPlayer = true;
             state.dodgeHitsThisPhase++;

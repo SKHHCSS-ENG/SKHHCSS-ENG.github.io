@@ -191,7 +191,7 @@
         </div>
         <div class="q-right-controls">
           <button type="button" class="hud-btn" id="btn-q-speak">🔊 Listen</button>
-          <div class="q-timer-ring" id="q-timer-display">14s</div>
+          <div class="q-timer-ring" id="q-timer-display">8s</div>
         </div>
       </div>
       <div class="options-below-row" id="options-row">
@@ -251,11 +251,11 @@
               <div class="how-to-title">How to play</div>
         <ol>
           <li>Play a stretch of notes first, like a usual music game — hit lane A, B or C as each note crosses the white line (tap the lane or card, or press 1 / 2 / 3).</li>
-          <li>A lyric, setlist line, or cue card then appears while the song keeps going. Keep hitting notes as you read it.</li>
-          <li>Answer on the special notes — one in each lane for A, B and C. Only the correct special note scores as the answer.</li>
+          <li>A lyric, setlist line, or cue card then appears while the song keeps going. You have your chosen Read Time to read it, and normal notes still come — keep hitting them.</li>
+          <li>When that time is up, the special notes appear. Answer on the special notes — one in each lane for A, B and C. Only the correct special note scores as the answer.</li>
           <li>Perfect and Good keep the combo. A miss or a wrong special note costs a mic. No mics left and the crowd goes quiet.</li>
         </ol>
-        <div class="how-to-zh">先按普通音符，然後在歌曲繼續時讀題，再按特殊音符作答（每軌一個特殊音符，A／B／C）。時機準確可得 Perfect／Good；答錯或錯過特殊音符會失去一支麥克風。</div>
+        <div class="how-to-zh">先按普通音符。題目出現後，你有所選的閱讀時間讀題，其間普通音符仍會出現，需繼續擊打。時間結束後，再按特殊音符作答（每軌一個特殊音符，A／B／C）。時機準確可得 Perfect／Good；答錯或錯過特殊音符會失去一支麥克風。</div>
         <div class="how-to-keys">1 / 2 / 3 or A / S / D hit a lane · Esc pause</div>
     </div>
   </div>
@@ -290,9 +290,9 @@
       <div>
         <span class="field-label">Read time</span>
         <div class="pill-choice-row" id="setup-timer-pills">
-          <button type="button" class="choice-pill" data-timer="10">10s</button>
+          <button type="button" class="choice-pill" data-timer="5">5s</button>
           <button type="button" class="choice-pill active" data-timer="8">8s</button>
-          <button type="button" class="choice-pill" data-timer="14">14s</button>
+          <button type="button" class="choice-pill" data-timer="12">12s</button>
           <button type="button" class="choice-pill" data-timer="20">20s</button>
           <button type="button" class="choice-pill" data-timer="0">Off</button>
         </div>
@@ -462,7 +462,7 @@
       prevScreen: "PLAY",
       travelerName: "Student",
       targetRounds: 8,
-      timerSeconds: 14,
+      timerSeconds: 8,
       maxHearts: 3,
       hearts: 3,
       currentRound: 1,
@@ -471,7 +471,7 @@
       questionPool: [],
       currentQuestion: null,
       selectedLane: -1,
-      questionTimeLeft: 14,
+      questionTimeLeft: 8,
       answerLocked: false,
       answeredLog: [],
       phaseTimer: 0
@@ -1625,22 +1625,50 @@
       const notes = [];
       let t = 1.15;
       const travel = 1.45;
+      const cadence = 0.58;
+      const specialGap = 0.32;
       const round = Math.max(1, state.currentRound || 1);
-      for (let i = 0; i < 5; i++) {
-        notes.push({ hitAt: t, lane: (i + round) % 3, kind: "normal", letter: LANE_LETTERS[(i + round) % 3], judged: false, hit: false });
-        t += 0.58;
+      const openingCount = 5;
+      for (let i = 0; i < openingCount; i++) {
+        const lane = (i + round) % 3;
+        notes.push({ hitAt: t, lane: lane, kind: "normal", letter: LANE_LETTERS[lane], judged: false, hit: false });
+        t += cadence;
       }
+      // Opening stretch matches today's chart: question HUD around 3.40s.
       const questionAt = t - 0.65;
-      for (let i = 0; i < 2; i++) {
-        notes.push({ hitAt: t, lane: (i + 1 + round) % 3, kind: "normal", letter: LANE_LETTERS[(i + 1 + round) % 3], judged: false, hit: false });
-        t += 0.58;
+      const readWindow = Math.max(0, state.timerSeconds || 0);
+      // Specials spawn at the top when the reading window ends, then travel to the strike line.
+      // Off: no extra window; a tiny gap keeps the opening beat clean.
+      const specialSpawn = questionAt + readWindow + (readWindow > 0 ? 0 : specialGap);
+      const specialAt = specialSpawn + travel;
+      let i = openingCount;
+      while (t <= specialAt - specialGap + 1e-6) {
+        const lane = (i + round) % 3;
+        notes.push({ hitAt: t, lane: lane, kind: "normal", letter: LANE_LETTERS[lane], judged: false, hit: false });
+        t += cadence;
+        i += 1;
       }
-      t += 0.32;
-      const specialAt = t;
       for (let lane = 0; lane < 3; lane++) {
         notes.push({ hitAt: specialAt, lane: lane, kind: "special", letter: LANE_LETTERS[lane], judged: false, hit: false });
       }
       return { notes: notes, questionAt: questionAt, specialAt: specialAt, travel: travel };
+    }
+
+    function updateReadTimeRing() {
+      const timerEl = document.getElementById("q-timer-display");
+      if (!timerEl) return;
+      if (state.timerSeconds <= 0) {
+        timerEl.textContent = "∞";
+        return;
+      }
+      if (!stage.questionShown || stage.questionAt == null) {
+        timerEl.textContent = Math.ceil(state.timerSeconds) + "s";
+        return;
+      }
+      // Count down only after the question appears; freeze at 0 once specials spawn.
+      const left = Math.max(0, stage.questionAt + state.timerSeconds - stage.songTime);
+      state.questionTimeLeft = left;
+      timerEl.textContent = Math.ceil(left) + "s";
     }
 
     function showQuestionHud() {
@@ -1651,6 +1679,7 @@
       if (qWrap) qWrap.classList.remove("hidden-phase");
       const q = state.currentQuestion;
       if (q && q.isDictation && q.word) setTimeout(() => speakText(q.word), 120);
+      updateReadTimeRing();
     }
 
     function gradeWindow(dist) {
@@ -1810,9 +1839,10 @@
         if (!stage.questionShown && stage.questionAt != null && stage.songTime >= stage.questionAt) {
           showQuestionHud();
         }
-        if (stage.questionShown && !stage.specialResolved && stage.specialAt != null && stage.songTime >= stage.specialAt - stage.travel * 0.85) {
+        if (stage.questionShown && !stage.specialResolved && stage.specialAt != null && stage.songTime >= stage.specialAt - stage.travel) {
           if (stage.phase === "question") stage.phase = "special";
         }
+        updateReadTimeRing();
 
         if (!state.answerLocked && !stage.specialResolved) {
           // Missed normal notes (combo break only — mics are spent on special-note answers).
@@ -1841,7 +1871,7 @@
       if (state.screen === "PLAY" || state.screen === "PAUSED" || state.screen === "START") drawHighway(ctx, w, h, now);
     }
 
-    // Shared question timer stays held; special notes are the answer window, not a paused countdown.
+    // Shared question timer stays held so it never auto-resolves. The HUD ring counts down only during the post-question Read Time; special notes remain the answer window.
 
   </script>
 </body>
