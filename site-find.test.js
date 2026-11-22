@@ -427,7 +427,7 @@ test("English home cards each have one job, in order", () => {
   assert.match(home, /What was added or changed on this site\./);
   assert.match(home, /Open Materials →/);
   assert.match(home, /Open Practice →/);
-  assert.match(home, /Open Self-study →/);
+  assert.match(home, /Open Self-Directed Learning →/);
   assert.match(home, /Open Fun Projects →/);
   assert.match(home, /Open Activities →/);
   assert.match(home, /Open Classroom →/);
@@ -556,6 +556,8 @@ test("Self-Directed Learning hub lists Prompt Builder and stays off the Fun Proj
   const titleCss = pb.split(".app-title-group h1")[1].split(".app-subtitle")[0];
   assert.equal(titleCss.includes("text-overflow: ellipsis"), false);
   assert.equal(titleCss.includes("white-space: nowrap"), false);
+  assert.match(pb, /\.studio-preview-bar \{\s*display: none;/);
+  assert.equal((pb.match(/\.studio-preview-bar\s*\{[^}]*display:\s*flex/g) || []).length, 0);
   assert.match(redir, /location\.replace\("\.\.\/self-directed-learning\/prompt-builder\/"\+location\.search\+location\.hash\)/);
   assert.match(redir, /href="\.\.\/self-directed-learning\/prompt-builder\/"/);
 });
