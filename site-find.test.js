@@ -427,7 +427,7 @@ test("English home cards each have one job, in order", () => {
   assert.match(home, /What was added or changed on this site\./);
   assert.match(home, /Open Materials →/);
   assert.match(home, /Open Practice →/);
-  assert.match(home, /Open Self-study →/);
+  assert.match(home, /Open Self-Directed Learning →/);
   assert.match(home, /Open Fun Projects →/);
   assert.match(home, /Open Activities →/);
   assert.match(home, /Open Classroom →/);
