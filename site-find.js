@@ -441,7 +441,7 @@
     },
     {
       "title": "Prompt Builder",
-      "path": "prompt-builder/",
+      "path": "self-directed-learning/prompt-builder/",
       "aliases": [
         "prompt builder",
         "ai",
