@@ -1,7 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
  * Tess 2026-10-29, plus Practice, Fun Projects, Activities & Competitions,
- * Classroom, HCS Live Class, and Paper 3 / Paper 4 exam skills (43 entries).
+ * Classroom, HCS Live Class, Self-Directed Learning, and Paper 3 / Paper 4 exam skills (44 entries).
  * Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
@@ -426,12 +426,25 @@
       ]
     },
     {
+      "title": "Self-Directed Learning",
+      "path": "self-directed-learning/",
+      "aliases": [
+        "self-directed learning",
+        "self-directed",
+        "self directed learning",
+        "sdl",
+        "self-study",
+        "self study",
+        "自學",
+        "自主學習"
+      ]
+    },
+    {
       "title": "Prompt Builder",
-      "path": "prompt-builder/",
+      "path": "self-directed-learning/prompt-builder/",
       "aliases": [
         "prompt builder",
         "ai",
-        "self-study",
         "dse",
         "doubao",
         "deepseek"
