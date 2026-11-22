@@ -89,6 +89,7 @@
     .how-to-play-card { background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
     .how-to-title { font-weight: 800; color: var(--accent); margin-bottom: 6px; }
     .how-to-play-card ol { margin: 0 0 8px 1.15rem; font-size: 0.8rem; line-height: 1.45; }
+    .how-to-setup { margin: 0 0 8px; font-size: 0.8rem; line-height: 1.45; }
     .how-to-zh { font-size: 0.76rem; color: #fde68a; margin-bottom: 6px; }
     .how-to-keys { font-size: 0.72rem; color: var(--muted); }
     .word-pool-bar, .mode-enter { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -132,6 +133,7 @@
     }
     @media (max-height: 700px) {
       .how-to-play-card ol { font-size: 0.72rem; }
+      .how-to-setup { font-size: 0.72rem; }
       .start-center-card { padding: 12px; }
     }
 
@@ -249,13 +251,14 @@
     </div>
     <div class="how-to-play-card">
               <div class="how-to-title">How to play</div>
+        <div class="how-to-setup">Pick a Soundtrack in Setlist &amp; soundcheck before you start — Pulse, Neon, or Night&nbsp;Set.</div>
         <ol>
           <li>Play a stretch of notes first, like a usual music game — hit lane A, B or C as each note crosses the white line (tap the lane or card, or press 1 / 2 / 3).</li>
           <li>A lyric, setlist line, or cue card then appears while the song keeps going. You have your chosen Read Time to read it, and normal notes still come — keep hitting them.</li>
           <li>When that time is up, the special notes appear. Answer on the special notes — one in each lane for A, B and C. Only the correct special note scores as the answer.</li>
           <li>Perfect and Good keep the combo. A miss or a wrong special note costs a mic. No mics left and the crowd goes quiet.</li>
         </ol>
-        <div class="how-to-zh">先按普通音符。題目出現後，你有所選的閱讀時間讀題，其間普通音符仍會出現，需繼續擊打。時間結束後，再按特殊音符作答（每軌一個特殊音符，A／B／C）。時機準確可得 Perfect／Good；答錯或錯過特殊音符會失去一支麥克風。</div>
+        <div class="how-to-zh">先按普通音符。題目出現後，你有所選的閱讀時間讀題，其間普通音符仍會出現，需繼續擊打。時間結束後，再按特殊音符作答（每軌一個特殊音符，A／B／C）。時機準確可得 Perfect／Good；答錯或錯過特殊音符會失去一支麥克風。開始前可在 Setlist &amp; soundcheck 選擇 Soundtrack（Pulse、Neon 或 Night&nbsp;Set）。</div>
         <div class="how-to-keys">1 / 2 / 3 or A / S / D hit a lane · Esc pause</div>
     </div>
   </div>
@@ -304,6 +307,14 @@
           <button type="button" class="choice-pill active" data-hearts="3">3</button>
           <button type="button" class="choice-pill" data-hearts="5">5</button>
         </div>
+      </div>
+    </div>
+    <div class="field-group" style="margin-bottom:12px;">
+      <span class="field-label">Soundtrack</span>
+      <div class="pill-choice-row" id="setup-soundtrack-pills">
+        <button type="button" class="choice-pill active" data-soundtrack="pulse">Pulse</button>
+        <button type="button" class="choice-pill" data-soundtrack="neon">Neon</button>
+        <button type="button" class="choice-pill" data-soundtrack="night">Night Set</button>
       </div>
     </div>
     <div class="field-group" style="margin-bottom:12px;">
@@ -415,6 +426,13 @@
     let isMuted = false;
     let currentAccent = "UK";
     let audioCtx = null;
+    let selectedSoundtrack = "pulse";
+    let soundtrackTimer = null;
+    let soundtrackGain = null;
+    let soundtrackPlaying = false;
+    let soundtrackStep = 0;
+    let soundtrackNextTime = 0;
+    let soundtrackNoiseBuf = null;
 
     const CURATED_QUESTIONS = [
       { mode: "VOCAB", word: "resilient", zh: "堅韌的", prompt: "Choose the word that means \"able to recover quickly from difficulties\":", options: ["fragile", "resilient", "hesitant"], answer: 1, expEn: "\"Resilient\" means strong and able to bounce back after a setback.", expZh: "「resilient」指堅韌的、能從挫折中迅速恢復。" },
@@ -752,6 +770,160 @@
       osc.stop(now + dur + 0.02);
     }
 
+    function soundtrackBpm() {
+      if (selectedSoundtrack === "neon") return 128;
+      if (selectedSoundtrack === "night") return 86;
+      return 110;
+    }
+
+    function getSoundtrackNoiseBuffer(ctx) {
+      if (soundtrackNoiseBuf && soundtrackNoiseBuf.sampleRate === ctx.sampleRate) return soundtrackNoiseBuf;
+      const len = Math.floor(ctx.sampleRate * 0.45);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      soundtrackNoiseBuf = buf;
+      return buf;
+    }
+
+    function soundtrackVoiceGain(time, peak, dur, attack) {
+      const ctx = audioCtx;
+      const gain = ctx.createGain();
+      const a = attack == null ? 0.008 : attack;
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), time + a);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+      return gain;
+    }
+
+    function playKick(time, peak, startHz, endHz, dur) {
+      const ctx = audioCtx;
+      const osc = ctx.createOscillator();
+      const gain = soundtrackVoiceGain(time, peak, dur, 0.004);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(startHz, time);
+      osc.frequency.exponentialRampToValueAtTime(endHz, time + dur);
+      osc.connect(gain);
+      gain.connect(soundtrackGain);
+      osc.start(time);
+      osc.stop(time + dur + 0.02);
+    }
+
+    function playHat(time, peak, dur, freq) {
+      const ctx = audioCtx;
+      const src = ctx.createBufferSource();
+      src.buffer = getSoundtrackNoiseBuffer(ctx);
+      const filter = ctx.createBiquadFilter();
+      filter.type = "highpass";
+      filter.frequency.setValueAtTime(freq || 7000, time);
+      const gain = soundtrackVoiceGain(time, peak, dur, 0.002);
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(soundtrackGain);
+      src.start(time);
+      src.stop(time + dur + 0.02);
+    }
+
+    function playTone(time, type, freq, peak, dur, attack) {
+      const ctx = audioCtx;
+      const osc = ctx.createOscillator();
+      const gain = soundtrackVoiceGain(time, peak, dur, attack);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, time);
+      osc.connect(gain);
+      gain.connect(soundtrackGain);
+      osc.start(time);
+      osc.stop(time + dur + 0.02);
+    }
+
+    function playPad(time, freqs, peak, dur) {
+      freqs.forEach((freq, i) => {
+        playTone(time, "sine", freq, peak, dur, 0.18 + i * 0.04);
+        playTone(time, "triangle", freq * 0.5, peak * 0.45, dur, 0.22);
+      });
+    }
+
+    function scheduleSoundtrackStep(step, time) {
+      if (!audioCtx || !soundtrackGain) return;
+      const track = selectedSoundtrack;
+      if (track === "neon") {
+        // Brighter, faster arcade bed — syncopated kick and a square arpeggio.
+        if (step === 0 || step === 6 || step === 8 || step === 14) playKick(time, 0.08, 150, 48, 0.12);
+        if (step % 2 === 0) playHat(time, step % 4 === 0 ? 0.012 : 0.02, 0.035, 9000);
+        const arp = [880, 1046.5, 1318.5, 1568, 1318.5, 1174.7, 1046.5, 783.99];
+        playTone(time, "square", arp[step % arp.length], 0.018, 0.09, 0.004);
+        if (step === 0 || step === 8) playTone(time, "sawtooth", 392, 0.02, 0.22, 0.01);
+      } else if (track === "night") {
+        // Slower, darker lounge bed — warm pad and sparse plucks.
+        if (step === 0) playPad(time, [146.83, 220, 349.23], 0.022, 1.85);
+        if (step === 0 || step === 8) playKick(time, 0.055, 90, 38, 0.22);
+        if (step === 0 || step === 6 || step === 10 || step === 14) {
+          const pluck = [220, 174.61, 196, 146.83];
+          playTone(time, "triangle", pluck[(step / 2) % pluck.length], 0.03, 0.38, 0.01);
+        }
+        if (step === 4 || step === 12) playHat(time, 0.01, 0.05, 5000);
+      } else {
+        // Pulse (default): steady four-on-the-floor with a soft bass pulse.
+        if (step % 4 === 0) playKick(time, 0.1, 120, 42, 0.16);
+        if (step === 4 || step === 12) playHat(time, 0.028, 0.06, 1800);
+        if (step % 4 === 2) playHat(time, 0.022, 0.04, 8000);
+        if (step === 0 || step === 3 || step === 6 || step === 8 || step === 11 || step === 14) {
+          playTone(time, "triangle", step % 8 === 0 ? 55 : 82.41, 0.045, 0.18, 0.006);
+        }
+        if (step === 0) playTone(time, "sine", 220, 0.016, 0.5, 0.04);
+      }
+    }
+
+    function soundtrackScheduler() {
+      if (!soundtrackPlaying || !audioCtx || !soundtrackGain) return;
+      const stepSec = (60 / soundtrackBpm()) / 4;
+      while (soundtrackNextTime < audioCtx.currentTime + 0.18) {
+        scheduleSoundtrackStep(soundtrackStep, soundtrackNextTime);
+        soundtrackNextTime += stepSec;
+        soundtrackStep = (soundtrackStep + 1) % 16;
+      }
+    }
+
+    function stopSoundtrack() {
+      soundtrackPlaying = false;
+      if (soundtrackTimer) {
+        clearInterval(soundtrackTimer);
+        soundtrackTimer = null;
+      }
+      if (soundtrackGain && audioCtx) {
+        try {
+          const now = audioCtx.currentTime;
+          soundtrackGain.gain.cancelScheduledValues(now);
+          soundtrackGain.gain.setTargetAtTime(0.0001, now, 0.03);
+        } catch (e) {}
+      }
+      soundtrackGain = null;
+    }
+
+    function startSoundtrack() {
+      stopSoundtrack();
+      if (isMuted) return;
+      const ctx = ensureAudioCtx();
+      if (!ctx) return;
+      if (ctx.state === "suspended") ctx.resume();
+      soundtrackGain = ctx.createGain();
+      soundtrackGain.gain.setValueAtTime(0.85, ctx.currentTime);
+      soundtrackGain.connect(ctx.destination);
+      soundtrackPlaying = true;
+      soundtrackStep = 0;
+      soundtrackNextTime = ctx.currentTime + 0.05;
+      soundtrackScheduler();
+      soundtrackTimer = setInterval(soundtrackScheduler, 25);
+    }
+
+    function syncSoundtrackForMute() {
+      if (isMuted) {
+        if (soundtrackPlaying) stopSoundtrack();
+        return;
+      }
+      if (state.screen === "PLAY" && !soundtrackPlaying) startSoundtrack();
+    }
+
     function speakText(text) {
       if (isMuted || !("speechSynthesis" in window) || !text) return;
       window.speechSynthesis.cancel();
@@ -857,6 +1029,7 @@
 
     function startNewRun() {
       ensureAudioCtx();
+      stopSoundtrack();
       const nameInput = document.getElementById("input-player-name");
       state.travelerName = ((nameInput && nameInput.value) || GAME.defaultName || "Student").trim() || "Student";
       const customRounds = parseInt((document.getElementById("input-custom-rounds") || {}).value, 10);
@@ -950,6 +1123,7 @@
     }
 
     function finishRun(isWin) {
+      stopSoundtrack();
       state.screen = "END";
       if (isWin) playSynthSfx("fanfare");
       document.getElementById("hud-layer").classList.add("hidden");
@@ -1025,6 +1199,7 @@
     }
 
     function returnToStartMenu() {
+      stopSoundtrack();
       state.screen = "START";
       document.getElementById("hud-layer").classList.add("hidden");
       document.getElementById("pause-modal").classList.add("hidden");
@@ -1040,9 +1215,11 @@
         state.prevScreen = "PLAY";
         state.screen = "PAUSED";
         pauseModal.classList.remove("hidden");
+        stopSoundtrack();
       } else if (state.screen === "PAUSED") {
         state.screen = "PLAY";
         pauseModal.classList.add("hidden");
+        if (!isMuted) startSoundtrack();
       }
     }
 
@@ -1177,6 +1354,12 @@
           if (hudAcc) hudAcc.textContent = "🗣️ " + currentAccent;
         });
       });
+      document.querySelectorAll("#setup-soundtrack-pills .choice-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selectedSoundtrack = btn.getAttribute("data-soundtrack") || "pulse";
+          document.querySelectorAll("#setup-soundtrack-pills .choice-pill").forEach((b) => b.classList.toggle("active", b === btn));
+        });
+      });
 
       document.getElementById("btn-hud-accent").addEventListener("click", () => {
         const order = ["UK", "US", "AU"];
@@ -1187,11 +1370,13 @@
         isMuted = !isMuted;
         e.currentTarget.textContent = isMuted ? "🔇" : "🔊";
         if (isMuted && "speechSynthesis" in window) window.speechSynthesis.cancel();
+        syncSoundtrackForMute();
       });
       document.getElementById("btn-hud-pause").addEventListener("click", togglePauseModal);
       document.getElementById("btn-resume").addEventListener("click", togglePauseModal);
       document.getElementById("btn-pause-restart").addEventListener("click", startNewRun);
       document.getElementById("btn-pause-setup").addEventListener("click", () => {
+        stopSoundtrack();
         document.getElementById("pause-modal").classList.add("hidden");
         document.getElementById("hud-layer").classList.add("hidden");
         state.screen = "SETUP";
@@ -1621,16 +1806,31 @@
       }
     }
 
+    function pickRandomNormalLane(prevLanes) {
+      const allowed = [0, 1, 2].filter((lane) => {
+        const n = prevLanes.length;
+        if (n >= 2 && prevLanes[n - 1] === lane && prevLanes[n - 2] === lane) return false;
+        if (n >= 4) {
+          const windowLanes = prevLanes.slice(n - 4).concat([lane]);
+          if (new Set(windowLanes).size < 3) return false;
+        }
+        return true;
+      });
+      const pool = allowed.length ? allowed : [0, 1, 2];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
     function buildRoundChart() {
       const notes = [];
       let t = 1.15;
       const travel = 1.45;
       const cadence = 0.58;
       const specialGap = 0.32;
-      const round = Math.max(1, state.currentRound || 1);
       const openingCount = 5;
+      const normalLanes = [];
       for (let i = 0; i < openingCount; i++) {
-        const lane = (i + round) % 3;
+        const lane = pickRandomNormalLane(normalLanes);
+        normalLanes.push(lane);
         notes.push({ hitAt: t, lane: lane, kind: "normal", letter: LANE_LETTERS[lane], judged: false, hit: false });
         t += cadence;
       }
@@ -1641,12 +1841,11 @@
       // Off: no extra window; a tiny gap keeps the opening beat clean.
       const specialSpawn = questionAt + readWindow + (readWindow > 0 ? 0 : specialGap);
       const specialAt = specialSpawn + travel;
-      let i = openingCount;
       while (t <= specialAt - specialGap + 1e-6) {
-        const lane = (i + round) % 3;
+        const lane = pickRandomNormalLane(normalLanes);
+        normalLanes.push(lane);
         notes.push({ hitAt: t, lane: lane, kind: "normal", letter: LANE_LETTERS[lane], judged: false, hit: false });
         t += cadence;
-        i += 1;
       }
       for (let lane = 0; lane < 3; lane++) {
         notes.push({ hitAt: specialAt, lane: lane, kind: "special", letter: LANE_LETTERS[lane], judged: false, hit: false });
@@ -1799,7 +1998,7 @@
       requestAnimationFrame(loop);
     };
 
-    GAME.onRunStart = function () { stage.phase = "idle"; stage.notes = []; GAME.holdQuestionTimer = true; };
+    GAME.onRunStart = function () { stage.phase = "idle"; stage.notes = []; GAME.holdQuestionTimer = true; startSoundtrack(); };
 
     GAME.onRoundStart = function () {
       GAME.holdQuestionTimer = true;

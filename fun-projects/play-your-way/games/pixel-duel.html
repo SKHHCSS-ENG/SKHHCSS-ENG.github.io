@@ -1549,7 +1549,7 @@
           <div class="stat-chip boss-hp-wrap" title="Boss health">
             <span class="label">Boss</span>
             <div class="boss-hp-track"><div id="boss-hp-fill"></div></div>
-            <span class="val" id="boss-hp-val">100%</span>
+            <span class="val" id="boss-hp-val">200 / 200</span>
           </div>
         </div>
 
@@ -3054,8 +3054,8 @@
       bossX: 780,
       bossY: 420,
       bossTargetX: 780,
-      bossHp: 100,
-      bossMaxHp: 100,
+      bossHp: 200,
+      bossMaxHp: 200,
       bossMode: 'GUARD', // GUARD (running fight, with or without a question on top), STUNNED (Break combo), SPECIAL (wrong-answer special attack)
       bossAttackTimer: 1.8,
       questionAppearTimer: 4.2,
@@ -3233,9 +3233,7 @@
           const pts = state.isBoosting ? 45 : 25;
           state.score += pts;
           state.bp = Math.min(3, state.bp + (state.comboHits % 3 === 0 ? 1 : 0));
-          const remainingAfterThis = state.pendingEnd === 'WIN' ? 0 : Math.max(0, state.targetLaps - state.currentLap);
-          const floorHp = remainingAfterThis <= 0 ? 0 : Math.ceil(remainingAfterThis * (100 / Math.max(1, state.targetLaps)) * 0.35);
-          state.bossHp = Math.max(floorHp, state.bossHp - (state.isBoosting ? 10 : 5));
+          damageBoss(state.isBoosting ? 12 : 6);
           state.screenShake = 0.15;
           // Pogo bounce if slashing in mid-air!
           if (state.heroVy > 0) state.heroVy = -420;
@@ -3456,7 +3454,7 @@
         const bonus = state.isBoosting ? 150 : 100;
         state.score += bonus;
         state.bp = Math.min(3, state.bp + 1);
-        state.bossHp = Math.max(0, state.bossHp - Math.ceil(100 / state.targetLaps));
+        damageBoss(15);
         state.screenShake = 0.42;
         playSynthSfx('break');
 
@@ -4435,6 +4433,19 @@
       ctx.fillText(`RUNE [${LANE_LETTERS[state.currentLane]}]`, cx, cy + 42);
     }
 
+    function syncBossMaxHp() {
+      state.bossMaxHp = 25 * Math.max(1, state.targetLaps);
+    }
+
+    function bossHpFloor() {
+      const remainingAfterThis = state.pendingEnd === 'WIN' ? 0 : Math.max(0, state.targetLaps - state.currentLap);
+      return remainingAfterThis <= 0 ? 0 : remainingAfterThis * 8;
+    }
+
+    function damageBoss(amount) {
+      state.bossHp = Math.max(bossHpFloor(), state.bossHp - amount);
+    }
+
     function updateHudReadouts() {
       const hero = HERO_ROSTER[state.selectedHeroIdx] || HERO_ROSTER[0];
       document.getElementById('hud-hero-class').textContent = hero.shortClass;
@@ -4447,7 +4458,7 @@
       const hpVal = document.getElementById('boss-hp-val');
       const frac = Math.max(0, Math.min(1, state.bossHp / Math.max(1, state.bossMaxHp)));
       if (hpFill) hpFill.style.width = `${Math.round(frac * 100)}%`;
-      if (hpVal) hpVal.textContent = `${Math.ceil(Math.max(0, state.bossHp))}%`;
+      if (hpVal) hpVal.textContent = `${Math.ceil(Math.max(0, state.bossHp))} / ${state.bossMaxHp}`;
 
       for (let i = 0; i < 3; i++) {
         const orb = document.getElementById(`bp-orb-${i}`);
@@ -4740,8 +4751,8 @@
       state.heroVy = 0;
       state.bossX = w * 0.80;
       state.bossY = floorY - 120;
-      state.bossHp = 100;
-      state.bossMaxHp = 100;
+      syncBossMaxHp();
+      state.bossHp = state.bossMaxHp;
       state.answeredLog = [];
       state.pendingEnd = null;
       state.answerLocked = false;
@@ -5067,6 +5078,7 @@
           document.getElementById('input-custom-laps').value = '';
           const raw = btn.getAttribute('data-laps');
           state.targetLaps = raw === 'ALL' ? (CURATED_QUESTIONS.length + customQuestionPool.length) : (parseInt(raw, 10) || 8);
+          syncBossMaxHp();
         });
       });
 
