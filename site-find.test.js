@@ -23,9 +23,9 @@ function loadSiteFind(document, location) {
 }
 
 test("alias index is Tess’s list, and paths are unique", () => {
-  assert.equal(SiteFind.entries.length, 42);
+  assert.equal(SiteFind.entries.length, 43);
   const paths = SiteFind.entries.map((entry) => entry.path);
-  assert.equal(new Set(paths).size, 42);
+  assert.equal(new Set(paths).size, 43);
   assert.equal(SiteFind.entries[0].title, "English Home");
   assert.equal(SiteFind.entries[0].path, "/");
   assert.equal(SiteFind.entries[28].title, "Paper 1 - Meaning from Context");
@@ -45,10 +45,12 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(fs.existsSync(new URL("./site-notes/index.html", import.meta.url)), true);
   assert.equal(SiteFind.entries[33].title, "Practice");
   assert.equal(SiteFind.entries[33].path, "practice/");
-  assert.equal(SiteFind.entries[34].title, "Fun Projects");
-  assert.equal(SiteFind.entries[34].path, "fun-projects/");
-  assert.equal(SiteFind.entries[35].title, "Activities & Competitions");
-  assert.equal(SiteFind.entries[35].path, "activities-and-competitions/");
+  assert.equal(SiteFind.entries[34].title, "Prompt Builder");
+  assert.equal(SiteFind.entries[34].path, "prompt-builder/");
+  assert.equal(SiteFind.entries[35].title, "Fun Projects");
+  assert.equal(SiteFind.entries[35].path, "fun-projects/");
+  assert.equal(SiteFind.entries[36].title, "Activities & Competitions");
+  assert.equal(SiteFind.entries[36].path, "activities-and-competitions/");
   const pastPaperVocab = SiteFind.search("past paper vocabulary");
   assert.equal(pastPaperVocab.length, 1);
   assert.equal(pastPaperVocab[0].title, "Paper 1 - Meaning from Context");
@@ -66,6 +68,10 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(practice[0].title, "Practice");
   assert.equal(practice[0].path, "practice/");
   assert.equal(SiteFind.search("quest hub")[0].title, "Practice");
+  assert.equal(SiteFind.search("prompt builder")[0].title, "Prompt Builder");
+  assert.equal(SiteFind.search("prompt builder")[0].path, "prompt-builder/");
+  assert.ok(SiteFind.search("doubao").some((entry) => entry.path === "prompt-builder/"));
+  assert.ok(SiteFind.search("deepseek").some((entry) => entry.path === "prompt-builder/"));
   assert.equal(SiteFind.search("say it louder")[0].path, "fun-projects/");
   assert.equal(SiteFind.search("朗誦節")[0].path, "activities-and-competitions/");
   assert.equal(SiteFind.search("roaming mic")[0].path, "activities-and-competitions/");
@@ -74,23 +80,23 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.search("lost bag").length, 0);
   assert.equal(SiteFind.search("club fair").length, 0);
 
-  assert.equal(SiteFind.entries[36].title, "Paper 3 - Exam Skills");
-  assert.equal(SiteFind.entries[36].path, "learning-materials/paper-3-exam-skills/");
-  assert.equal(SiteFind.entries[37].title, "Paper 4 - Exam Skills");
-  assert.equal(SiteFind.entries[37].path, "learning-materials/paper-4-exam-skills/");
-  assert.equal(SiteFind.entries[38].title, "Classroom");
-  assert.equal(SiteFind.entries[38].path, "classroom/");
-  assert.equal(SiteFind.entries[39].title, "HCS Live Class");
-  assert.equal(SiteFind.entries[39].path, "classroom/hcs-live-class/");
-  assert.equal(SiteFind.entries[40].title, "Play Your Way");
-  assert.equal(SiteFind.entries[40].path, "fun-projects/play-your-way/");
+  assert.equal(SiteFind.entries[37].title, "Paper 3 - Exam Skills");
+  assert.equal(SiteFind.entries[37].path, "learning-materials/paper-3-exam-skills/");
+  assert.equal(SiteFind.entries[38].title, "Paper 4 - Exam Skills");
+  assert.equal(SiteFind.entries[38].path, "learning-materials/paper-4-exam-skills/");
+  assert.equal(SiteFind.entries[39].title, "Classroom");
+  assert.equal(SiteFind.entries[39].path, "classroom/");
+  assert.equal(SiteFind.entries[40].title, "HCS Live Class");
+  assert.equal(SiteFind.entries[40].path, "classroom/hcs-live-class/");
+  assert.equal(SiteFind.entries[41].title, "Play Your Way");
+  assert.equal(SiteFind.entries[41].path, "fun-projects/play-your-way/");
   const playYourWay = SiteFind.entries.filter((entry) => entry.title === "Play Your Way");
   assert.equal(playYourWay.length, 1);
   assert.ok(SiteFind.search("play your way").some((entry) => entry.path === "fun-projects/play-your-way/"));
   assert.ok(SiteFind.search("f1 grand prix").some((entry) => entry.path === "fun-projects/play-your-way/"));
   assert.ok(SiteFind.search("自訂遊戲").some((entry) => entry.path === "fun-projects/play-your-way/"));
-  assert.equal(SiteFind.entries[41].title, "Voice It Out");
-  assert.equal(SiteFind.entries[41].path, "fun-projects/voice-it-out/");
+  assert.equal(SiteFind.entries[42].title, "Voice It Out");
+  assert.equal(SiteFind.entries[42].path, "fun-projects/voice-it-out/");
   const voiceItOut = SiteFind.entries.filter((entry) => entry.title === "Voice It Out");
   assert.equal(voiceItOut.length, 1);
   assert.ok(SiteFind.search("voice it out").some((entry) => entry.path === "fun-projects/voice-it-out/"));
@@ -404,6 +410,7 @@ test("English home cards each have one job, in order", () => {
   assert.deepEqual(titles, [
     "Learning Materials",
     "Practice",
+    "Prompt Builder",
     "Fun Projects",
     "Activities &amp; Competitions",
     "Classroom",
@@ -411,12 +418,14 @@ test("English home cards each have one job, in order", () => {
   ]);
   assert.match(home, /Study notes, skills, glossaries, and drills\./);
   assert.match(home, /Exam-style practice, starting with Paper 1\./);
+  assert.match(home, /Build better prompts for HKDSE Papers 1–4\./);
   assert.match(home, /Games and creative projects, such as Say It Louder\./);
   assert.match(home, /Speech Festival, Speak Up, and challenges like Roaming Mic\./);
   assert.match(home, /Live lesson tools — desks, roster, and points\./);
   assert.match(home, /What was added or changed on this site\./);
   assert.match(home, /Open Materials →/);
   assert.match(home, /Open Practice →/);
+  assert.match(home, /Open Prompt Builder →/);
   assert.match(home, /Open Fun Projects →/);
   assert.match(home, /Open Activities →/);
   assert.match(home, /Open Classroom →/);
@@ -426,6 +435,7 @@ test("English home cards each have one job, in order", () => {
   assert.equal(home.includes("Open activities →"), false);
   assert.match(home, /href="learning-materials\/"/);
   assert.match(home, /href="practice\/"/);
+  assert.match(home, /href="prompt-builder\/"/);
   assert.match(home, /href="fun-projects\/"/);
   assert.match(home, /href="activities-and-competitions\/"/);
   assert.match(home, /href="classroom\/"/);
@@ -441,6 +451,7 @@ test("English home cards each have one job, in order", () => {
   assert.equal(home.includes("網站更新"), false);
   assert.match(home, /M12 5\.2C9\.55 4\.35 7\.05 4\.2 5\.1 4\.55/);
   assert.match(home, /<circle cx="12" cy="12" r="8\.15"\/>/);
+  assert.match(home, /M7\.2 6\.4h9\.6a1\.8 1\.8 0 0 1 1\.8 1\.8v6\.1/);
   assert.match(home, /<rect x="3\.3" y="8\.15" width="17\.4" height="9\.2" rx="2\.8"\/>/);
   assert.match(home, /M7\.6 4\.85h8\.8/);
   assert.match(home, /<rect x="3\.85" y="4\.15" width="7\.15" height="6\.7" rx="1\.35"\/>/);
