@@ -2049,7 +2049,7 @@
                 <span class="band-btn-sub">Steady pass</span>
               </button>
               <button type="button" class="band-btn" data-band="lv45">
-                <span class="band-btn-top">DSE Lv 4–5**</span>
+                <span class="band-btn-top">DSE Lv 4–5</span>
                 <span class="band-btn-sub">High grade</span>
               </button>
             </div>
@@ -2460,9 +2460,9 @@
           promptRole: 'Act as a supportive HKDSE English teacher helping a student aiming for a solid DSE Level 3 pass. Use clear, natural British English. Focus on covering all task points, clear topic sentences, accurate tenses, and everyday linking words (however, therefore, for example).'
         },
         lv45: {
-          shortLabel: 'DSE Lv 4–5**',
+          shortLabel: 'DSE Lv 4–5',
           advice: 'Stronger vocab · varied sentences · sharp ideas & tone',
-          promptRole: 'Act as an experienced HKDSE English marker coaching a student aiming for DSE Level 4 to 5**. Push for precise vocabulary, varied sentence structures, natural cohesion, exact audience register, and deeper reasoning—without unnatural purple prose.'
+          promptRole: 'Act as an experienced HKDSE English marker coaching a student aiming for DSE Level 4 to 5. Push for precise vocabulary, varied sentence structures, natural cohesion, exact audience register, and deeper reasoning—without unnatural purple prose.'
         }
       };
 
@@ -2509,12 +2509,12 @@
                 'True / False / Not Given': {
                   lv2: 'Lv 2 Sample: Text: "The library closes at 7 p.m." → Q: "Closes at 9 p.m." = False | "Books are free." = Not Given.',
                   lv3: 'Lv 3 Sample: Text: "Cafés closed early due to staff shortages." → Q: "Closed because rent rose." = False vs "Prices rose." = Not Given.',
-                  lv45: 'Lv 4–5** Sample: Watch subtle quantifiers ("few", "rarely", "exclusively")—contradiction = False; unstated comparison = Not Given.'
+                  lv45: 'Lv 4–5 Sample: Watch subtle quantifiers ("few", "rarely", "exclusively")—contradiction = False; unstated comparison = Not Given.'
                 },
                 'Summary Cloze (Fill Blanks)': {
                   lv2: 'Lv 2 Sample: Text: "Students feel happy." → Blank: "The club brings ________ (happiness — noun needed)."',
                   lv3: 'Lv 3 Sample: Text: "Many teens feel exhausted." → Blank: "Teenagers suffer from ________ (exhaustion — adjective to noun)."',
-                  lv45: 'Lv 4–5** Sample: Check grammar slot + singular/plural + tense: "Shops reluctantly raised fees" → "were ________ (reluctant) to...".'
+                  lv45: 'Lv 4–5 Sample: Check grammar slot + singular/plural + tense: "Shops reluctantly raised fees" → "were ________ (reluctant) to...".'
                 },
                 'Multiple Choice (A/B/C/D)': 'Sample: What is the main purpose of paragraph 2?  A. To warn  B. To compare  C. To share a memory  D. To promote',
                 'Short Answer / Why & How': 'Sample: Why did the shop owner "sigh" in line 8? Give ONE reason from paragraph 2 in your own words.',
@@ -2602,7 +2602,7 @@
               { id: 'q_p1_3', title: '⚡ 5 Exam Words from Text', preview: 'Pick 5 useful DSE words + HK examples', prompt: 'From the reading passage in our chat, pick 5 useful DSE Level 3–4 words with meanings, word forms, and 1 Hong Kong example sentence each.' }
             ],
             lv45: [
-              { id: 'q_p1_1', title: '⚡ Load Passage (Marker Mode)', preview: 'Upload text once — coach me question by question', prompt: 'I am attaching my HKDSE Paper 1 text (+ questions). Store it in memory for DSE Level 4–5** coaching, and reply ONLY: "✅ Text ready—which question?" Do NOT reveal answers upfront.' },
+              { id: 'q_p1_1', title: '⚡ Load Passage (Marker Mode)', preview: 'Upload text once — coach me question by question', prompt: 'I am attaching my HKDSE Paper 1 text (+ questions). Store it in memory for DSE Level 4–5 coaching, and reply ONLY: "✅ Text ready—which question?" Do NOT reveal answers upfront.' },
               { id: 'q_p1_2', title: '⚡ Unpack Distractor / Nuance', preview: 'In same chat: why did the wrong option look right?', prompt: 'For this question on our passage above, identify the exact HKEAA skill tested, expose the distractor or qualifier trap, and point me to the lines to re-evaluate.' },
               { id: 'q_p1_3', title: '⚡ Steal 5 Phrases for Paper 2', preview: 'Turn good reading collocations into writing ammo', prompt: 'Extract 5 high-band collocations or sentence structures from today\'s passage and show how I can adapt them in Paper 2 Writing.' }
             ]
@@ -2736,7 +2736,7 @@
               { id: 'q_p2_3', title: '⚡ Better Linking Words', preview: 'Fix repetitive "and / also / so" in my paragraph', prompt: 'Look at my paragraph above. Suggest 3 natural linking words (however, therefore, in addition) to replace repetitive "and/so", and let me rewrite 2 lines.' }
             ],
             lv45: [
-              { id: 'q_p2_1', title: '⚡ Marker C·L·O Critique', preview: 'Pinpoint what stops my draft from reaching Lv 5', prompt: 'Assess my Paper 2 draft against DSE Level 4–5** Content, Language, and Organisation standards. Pinpoint the top 3 weaknesses holding me below Level 5 and coach my revision.' },
+              { id: 'q_p2_1', title: '⚡ Marker C·L·O Critique', preview: 'Pinpoint what stops my draft from reaching Lv 5', prompt: 'Assess my Paper 2 draft against DSE Level 4–5 Content, Language, and Organisation standards. Pinpoint the top 3 weaknesses holding me below Level 5 and coach my revision.' },
               { id: 'q_p2_2', title: '⚡ Sharpen Angle + Counter-View', preview: 'Deeper arguments + 1 concise rebuttal', prompt: 'Challenge my brainstormed ideas for this Paper 2 question so they avoid clichés, and coach me to add a sharp counter-argument + rebuttal.' },
               { id: 'q_p2_3', title: '⚡ Upgrade Clause Variety', preview: 'Lift 1 flat paragraph to natural Level 5 style', prompt: 'Coach me to elevate this paragraph to DSE Level 5 using stronger topic framing, varied clause structures, and precise British English collocations.' }
             ]
@@ -2851,7 +2851,7 @@
               { id: 'q_p3_3', title: '⚡ Missing Points & Tone Check', preview: 'Compare my draft with the Data File in our chat', prompt: 'Compare my Paper 3 draft against the Task and Data File in our chat. List any missed points/dates, copied phrases, or casual tone slips.' }
             ],
             lv45: [
-              { id: 'q_p3_1', title: '⚡ Load Data File (Lv 5 Mode)', preview: 'Upload once — map hidden constraints & tone rules', prompt: 'I am attaching my Paper 3 Task + Data File (DSE Lv 4–5**). Confirm you have read it without writing the response—ask me to list the required tone and key constraints first.' },
+              { id: 'q_p3_1', title: '⚡ Load Data File (Lv 5 Mode)', preview: 'Upload once — map hidden constraints & tone rules', prompt: 'I am attaching my Paper 3 Task + Data File (DSE Lv 4–5). Confirm you have read it without writing the response—ask me to list the required tone and key constraints first.' },
               { id: 'q_p3_2', title: '⚡ High-Band Register Shift', preview: 'Transform informal logs into crisp third-person prose', prompt: 'Challenge me to adapt these informal Data File notes into concise, formal third-person prose while preserving subtle conditions and qualifiers.' },
               { id: 'q_p3_3', title: '⚡ Full 4-Criteria Audit', preview: 'Audit Content, Language, Organisation & Appropriacy', prompt: 'Audit my Paper 3 Part B draft across Content, anti-lifting Language, Organisation, and Appropriacy against the Data File in our chat.' }
             ]
@@ -2959,8 +2959,8 @@
               { id: 'q_p4_3', title: '⚡ Switch to 1-Min Examiner Q', preview: 'In same chat: ask me 1 Individual Response question', prompt: 'Now act as the Paper 4 examiner on the same topic. Ask me ONE DSE Lv 3 1-minute Individual Response question, wait for my answer, and check my 2 reasons + HK example.' }
             ],
             lv45: [
-              { id: 'q_p4_1', title: '⚡ Load Topic Card (Lv 5 Prep)', preview: 'Upload once — full GI + challenging IR in 1 session', prompt: 'I am attaching my Paper 4 Speaking prompt card (target: DSE Lv 4–5**). Store it in memory and reply ONLY: "✅ Topic ready! Ready for angles, Group Interaction, or Examiner IR?"' },
-              { id: 'q_p4_2', title: '⚡ Dynamic Group Debate (1 Turn)', preview: 'Groupmates push back slightly & test turn-taking', prompt: 'Run a DSE Level 4–5** Group Interaction on our topic (strictly 1 short turn at a time) where one candidate politely disagrees and another hesitates so I can lead naturally.' },
+              { id: 'q_p4_1', title: '⚡ Load Topic Card (Lv 5 Prep)', preview: 'Upload once — full GI + challenging IR in 1 session', prompt: 'I am attaching my Paper 4 Speaking prompt card (target: DSE Lv 4–5). Store it in memory and reply ONLY: "✅ Topic ready! Ready for angles, Group Interaction, or Examiner IR?"' },
+              { id: 'q_p4_2', title: '⚡ Dynamic Group Debate (1 Turn)', preview: 'Groupmates push back slightly & test turn-taking', prompt: 'Run a DSE Level 4–5 Group Interaction on our topic (strictly 1 short turn at a time) where one candidate politely disagrees and another hesitates so I can lead naturally.' },
               { id: 'q_p4_3', title: '⚡ Harder Lv 5 Examiner IR', preview: 'Abstract follow-up + fluency & depth feedback', prompt: 'Ask me a challenging, higher-order 1-minute Individual Response question on our topic, wait for my response, and critique depth, spoken discourse markers, and vocabulary.' }
             ]
           }

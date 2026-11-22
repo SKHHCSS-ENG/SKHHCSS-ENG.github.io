@@ -410,6 +410,7 @@ test("English home cards each have one job, in order", () => {
   assert.deepEqual(titles, [
     "Learning Materials",
     "Practice",
+    "Prompt Builder",
     "Fun Projects",
     "Activities &amp; Competitions",
     "Classroom",
@@ -417,12 +418,14 @@ test("English home cards each have one job, in order", () => {
   ]);
   assert.match(home, /Study notes, skills, glossaries, and drills\./);
   assert.match(home, /Exam-style practice, starting with Paper 1\./);
+  assert.match(home, /Build better prompts for HKDSE Papers 1–4\./);
   assert.match(home, /Games and creative projects, such as Say It Louder\./);
   assert.match(home, /Speech Festival, Speak Up, and challenges like Roaming Mic\./);
   assert.match(home, /Live lesson tools — desks, roster, and points\./);
   assert.match(home, /What was added or changed on this site\./);
   assert.match(home, /Open Materials →/);
   assert.match(home, /Open Practice →/);
+  assert.match(home, /Open Prompt Builder →/);
   assert.match(home, /Open Fun Projects →/);
   assert.match(home, /Open Activities →/);
   assert.match(home, /Open Classroom →/);
@@ -432,6 +435,7 @@ test("English home cards each have one job, in order", () => {
   assert.equal(home.includes("Open activities →"), false);
   assert.match(home, /href="learning-materials\/"/);
   assert.match(home, /href="practice\/"/);
+  assert.match(home, /href="prompt-builder\/"/);
   assert.match(home, /href="fun-projects\/"/);
   assert.match(home, /href="activities-and-competitions\/"/);
   assert.match(home, /href="classroom\/"/);
@@ -447,6 +451,7 @@ test("English home cards each have one job, in order", () => {
   assert.equal(home.includes("網站更新"), false);
   assert.match(home, /M12 5\.2C9\.55 4\.35 7\.05 4\.2 5\.1 4\.55/);
   assert.match(home, /<circle cx="12" cy="12" r="8\.15"\/>/);
+  assert.match(home, /M7\.2 6\.4h9\.6a1\.8 1\.8 0 0 1 1\.8 1\.8v6\.1/);
   assert.match(home, /<rect x="3\.3" y="8\.15" width="17\.4" height="9\.2" rx="2\.8"\/>/);
   assert.match(home, /M7\.6 4\.85h8\.8/);
   assert.match(home, /<rect x="3\.85" y="4\.15" width="7\.15" height="6\.7" rx="1\.35"\/>/);
