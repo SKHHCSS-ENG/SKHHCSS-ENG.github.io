@@ -1,0 +1,4555 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#123a4d" />
+  <title>Prompt Builder · HKDSE AI Self-Study · SKH Holy Carpenter Secondary School</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    :root {
+      --accent: #5bbad5;
+      --accent-deep: #2a8fad;
+      --accent-ink: #0c5a70;
+      --accent-soft: #e8f7fb;
+      --mint-soft: #f0fdfa;
+      --mint-border: #99f6e4;
+      --mint-ink: #0f766e;
+      --navy: #123a4d;
+      --ink: #0f172a;
+      --body-ink: #1e293b;
+      --muted: #64748b;
+      --card: #ffffff;
+      --bg: #f5fafc;
+      --border: #d3e8ef;
+      --border-strong: #b6d8e4;
+      --phone-green: #2f6b3c;
+      --phone-soft: #e7f6ea;
+      --amber-ink: #8f3d00;
+      --amber-soft: #fff4e5;
+      --amber-border: #fed7aa;
+      --danger-soft: #fef2f2;
+      --danger-border: #fecaca;
+      --danger-ink: #b91c1c;
+      --shadow-sm: 0 2px 8px rgba(18, 58, 77, 0.05);
+      --shadow-card: 0 6px 20px rgba(18, 58, 77, 0.07);
+      --shadow-phone: 0 18px 48px rgba(18, 58, 77, 0.14);
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --font-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, "PingFang HK", "Noto Sans TC", sans-serif;
+      --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100dvh;
+      font-family: var(--font-sans);
+      color: var(--body-ink);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+
+    input, textarea, select {
+      font-size: 16px !important;
+      font-family: var(--font-sans);
+      color: var(--ink);
+    }
+
+    button {
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Signature SKHHCSS English site API mesh wash (from ask.css) */
+    @keyframes api-mesh-wash {
+      0% { background-position: 0% 40%; }
+      50% { background-position: 100% 60%; }
+      100% { background-position: 0% 40%; }
+    }
+
+    .api-mesh-cta {
+      background-color: #073646;
+      background-image: linear-gradient(
+        122deg,
+        #1a6f8c 0%,
+        #0a4f63 24%,
+        #073646 50%,
+        #0a4f63 76%,
+        #186887 100%
+      );
+      background-size: 280% 280%;
+      animation: api-mesh-wash 5s ease-in-out infinite;
+      color: #f4f0e8;
+    }
+
+    .api-mesh-cta.is-copied {
+      background-image: linear-gradient(122deg, #15803d 0%, #0f766e 55%, #115e59 100%);
+      animation: none;
+      color: #ffffff;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .api-mesh-cta {
+        animation: none !important;
+      }
+    }
+
+    body.mode-phone-frame {
+      background: linear-gradient(160deg, #e8f5fa 0%, #f5fafc 48%, #e4f3f8 100%);
+    }
+
+    .studio-outer {
+      width: 100%;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    .studio-preview-bar {
+      display: none;
+    }
+
+    @media (min-width: 880px) {
+      .studio-preview-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 0 auto 12px;
+      }
+      .preview-seg {
+        display: inline-flex;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        padding: 3px;
+        box-shadow: var(--shadow-sm);
+      }
+      .preview-seg-btn {
+        padding: 5px 13px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--muted);
+        transition: all 0.15s ease;
+      }
+      .preview-seg-btn.is-active {
+        background: var(--navy);
+        color: #ffffff;
+      }
+
+      body.mode-phone-frame .studio-outer {
+        padding: 18px 16px 36px;
+      }
+      body.mode-phone-frame .app-shell {
+        max-width: 460px;
+        margin: 0 auto;
+        border-radius: 28px;
+        border: 1.5px solid var(--border-strong);
+        box-shadow: var(--shadow-phone);
+        overflow: hidden;
+        background: var(--bg);
+      }
+      body.mode-split-view .studio-outer {
+        max-width: 1160px;
+        padding: 16px 20px 40px;
+      }
+      body.mode-split-view .app-shell {
+        border-radius: 22px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        background: var(--bg);
+      }
+      body.mode-split-view .workspace-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+        gap: 18px;
+        align-items: start;
+        padding: 16px 20px 26px;
+      }
+      body.mode-split-view .right-column {
+        position: sticky;
+        top: 16px;
+      }
+    }
+
+    /* App Shell Header */
+    .hero-accent {
+      height: 6px;
+      background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+    }
+
+    .app-topbar {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 10px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .topbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .eng-back-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      border: 1px solid var(--border-strong);
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: background 0.15s ease, transform 0.12s ease;
+    }
+
+    .eng-back-pill:hover {
+      background: #d5eff7;
+      transform: translateX(-1px);
+    }
+
+    .app-icon-tile {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--accent-deep) 100%);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(18, 58, 77, 0.18);
+    }
+
+    .app-icon-tile svg {
+      width: 19px;
+      height: 19px;
+    }
+
+    .app-title-group {
+      min-width: 0;
+    }
+
+    .app-title-group h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.18;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .app-subtitle {
+      margin: 1px 0 0;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .util-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 31px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--navy);
+      font-size: 0.73rem;
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .util-pill:hover {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+    }
+
+    /* Smart Detect Banner Bar */
+    .smart-banner-wrap {
+      background: var(--card);
+      padding: 8px 12px 0;
+    }
+
+    .smart-detect-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: linear-gradient(105deg, #e8f7fb 0%, #f0fdfa 60%, #e6f4f8 100%);
+      border: 1.5px solid #99e2f2;
+      text-align: left;
+      transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .smart-detect-bar:hover {
+      border-color: var(--accent-deep);
+      box-shadow: 0 4px 12px rgba(42, 143, 173, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .smart-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .smart-spark-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--accent-deep);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .smart-bar-title {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .smart-bar-sub {
+      display: block;
+      font-size: 0.69rem;
+      color: var(--accent-ink);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .smart-bar-cta {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #ffffff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .worker-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #38bdf8;
+      display: inline-block;
+    }
+
+    .worker-dot.is-live {
+      background: #4ade80;
+    }
+
+    /* 4-Paper Segmented Navigation Dock */
+    .paper-nav-wrap {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 12px 11px;
+    }
+
+    .paper-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      background: var(--bg);
+      padding: 5px;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+    }
+
+    .paper-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 7px 4px 6px;
+      border-radius: 11px;
+      color: var(--muted);
+      transition: all 0.16s ease;
+      min-height: 52px;
+    }
+
+    .paper-tab svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 1.9;
+    }
+
+    .paper-tab-code {
+      font-size: 0.75rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .paper-tab-meta {
+      font-size: 0.62rem;
+      font-weight: 700;
+      opacity: 0.85;
+      line-height: 1.1;
+    }
+
+    .paper-tab:hover {
+      color: var(--navy);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .paper-tab.is-active {
+      background: var(--card);
+      color: var(--accent-ink);
+      box-shadow: 0 3px 10px rgba(18, 58, 77, 0.1);
+      border: 1px solid var(--border-strong);
+    }
+
+    .paper-tab.is-active .paper-tab-code {
+      color: var(--navy);
+    }
+
+    .paper-tab.is-active svg {
+      color: var(--accent-deep);
+    }
+
+    .paper-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      font-size: 0.74rem;
+      color: var(--accent-ink);
+      flex-wrap: wrap;
+    }
+
+    .paper-strip-title {
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .notes-link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.69rem;
+      font-weight: 800;
+      color: var(--accent-ink);
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.14s ease, border-color 0.14s ease;
+    }
+
+    .notes-link-pill:hover {
+      background: #ffffff;
+      border-color: var(--accent-deep);
+      text-decoration: underline;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--accent-ink);
+      border: 1px solid var(--border-strong);
+      flex-shrink: 0;
+    }
+
+    .badge-pill.badge-green {
+      background: var(--phone-soft);
+      color: var(--phone-green);
+      border-color: #b7e2c1;
+    }
+
+    /* Main Workspace */
+    .workspace-grid {
+      padding: 12px 12px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .app-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+
+    .step-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .step-num {
+      width: 21px;
+      height: 21px;
+      border-radius: 999px;
+      background: var(--accent-deep);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .section-hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* Level Aim Buttons */
+    .band-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .band-btn {
+      padding: 8px 6px;
+      border-radius: 11px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .band-btn:hover {
+      border-color: var(--accent);
+      background: #ffffff;
+    }
+
+    .band-btn.is-active {
+      background: var(--accent-soft);
+      border-color: var(--accent-deep);
+      box-shadow: 0 2px 8px rgba(42, 143, 173, 0.14);
+    }
+
+    .band-btn-top {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .band-btn-sub {
+      display: block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .band-btn.is-active .band-btn-sub {
+      color: var(--accent-ink);
+    }
+
+    .band-advice {
+      margin: 7px 0 0;
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--accent-ink);
+      padding: 5px 9px;
+      background: var(--bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-deep);
+    }
+
+    /* Helper Toggles */
+    .helper-toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 11px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      text-align: left;
+      width: 100%;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .toggle-row:hover {
+      border-color: var(--accent);
+    }
+
+    .toggle-row.is-on {
+      background: var(--mint-soft);
+      border-color: var(--mint-border);
+    }
+
+    .toggle-copy {
+      min-width: 0;
+    }
+
+    .toggle-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.79rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .toggle-desc {
+      display: block;
+      font-size: 0.69rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .ios-switch {
+      width: 40px;
+      height: 23px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.18s ease;
+    }
+
+    .ios-switch::after {
+      content: "";
+      position: absolute;
+      top: 2.5px;
+      left: 2.5px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
+      transition: transform 0.18s ease;
+    }
+
+    .toggle-row.is-on .ios-switch {
+      background: var(--accent-deep);
+    }
+
+    .toggle-row.is-on .ios-switch::after {
+      transform: translateX(17px);
+    }
+
+    /* 3-Stage Session Stepper (+ 1-Shot Mode) */
+    .session-stepper {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 9px;
+    }
+
+    .stage-pill-btn {
+      padding: 7px 4px;
+      border-radius: 9px;
+      text-align: center;
+      color: var(--muted);
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .stage-pill-btn:hover {
+      color: var(--navy);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .stage-pill-btn.is-active {
+      background: var(--navy);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stage-pill-top {
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .stage-pill-sub {
+      font-size: 0.6rem;
+      font-weight: 600;
+      opacity: 0.85;
+      line-height: 1.1;
+    }
+
+    .stage-explainer {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      font-size: 0.74rem;
+      color: var(--accent-ink);
+      font-weight: 600;
+      margin-bottom: 10px;
+      line-height: 1.38;
+    }
+
+    .stage-explainer strong {
+      color: var(--navy);
+    }
+
+    /* Study Mode / Action Cards */
+    .goal-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .goal-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 10px 11px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      transition: all 0.15s ease;
+    }
+
+    .goal-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(91, 186, 213, 0.16);
+    }
+
+    .goal-card.is-active {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+      box-shadow: 0 4px 14px rgba(42, 143, 173, 0.14);
+    }
+
+    .goal-emoji {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.02rem;
+      flex-shrink: 0;
+    }
+
+    .goal-card.is-active .goal-emoji {
+      background: var(--card);
+      border-color: var(--accent);
+    }
+
+    .goal-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .goal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .goal-name {
+      font-size: 0.83rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .goal-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--card);
+      color: transparent;
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .goal-card.is-active .goal-check {
+      background: var(--accent-deep);
+      border-color: var(--accent-deep);
+      color: #ffffff;
+    }
+
+    .goal-blurb {
+      margin: 1px 0 0;
+      font-size: 0.71rem;
+      color: var(--muted);
+      line-height: 1.32;
+    }
+
+    .goal-card.is-active .goal-blurb {
+      color: var(--accent-ink);
+    }
+
+    /* Question Number Box + Chips + Sample Box */
+    .qnum-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      background: var(--mint-soft);
+      border: 1px solid var(--mint-border);
+    }
+
+    .qnum-label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--navy);
+      white-space: nowrap;
+    }
+
+    .qnum-input {
+      flex: 1;
+      min-width: 0;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--card);
+      padding: 6px 10px;
+    }
+
+    .sub-group {
+      margin-top: 11px;
+    }
+
+    .sub-group:first-of-type {
+      margin-top: 0;
+    }
+
+    .sub-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .chip-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .choice-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--body-ink);
+      font-size: 0.73rem;
+      font-weight: 700;
+      transition: all 0.14s ease;
+    }
+
+    .choice-chip:hover {
+      border-color: var(--accent);
+      background: var(--card);
+    }
+
+    .choice-chip.is-active {
+      background: var(--accent-deep);
+      border-color: var(--accent-deep);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(42, 143, 173, 0.24);
+    }
+
+    .chip-sample-box {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #f2f9fc;
+      border: 1px solid var(--border-strong);
+      border-left: 3.5px solid var(--accent-deep);
+    }
+
+    .chip-sample-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+
+    .chip-sample-tag {
+      font-size: 0.64rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent-ink);
+    }
+
+    .inline-note-link {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--accent-deep);
+      text-decoration: none;
+    }
+
+    .inline-note-link:hover {
+      text-decoration: underline;
+    }
+
+    .chip-sample-text {
+      margin: 0;
+      font-size: 0.73rem;
+      color: var(--ink);
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    /* Input Mode Switch (Photo vs Paste Text) */
+    .input-mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      margin-bottom: 9px;
+    }
+
+    .input-mode-btn {
+      padding: 7px 8px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--muted);
+      transition: all 0.15s ease;
+    }
+
+    .input-mode-btn.is-active {
+      background: var(--card);
+      color: var(--navy);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-strong);
+    }
+
+    .camera-guide-box {
+      background: var(--phone-soft);
+      border: 1px solid #b7e2c1;
+      border-radius: 11px;
+      padding: 9px 11px;
+      margin-bottom: 8px;
+    }
+
+    .camera-guide-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--phone-green);
+      margin: 0 0 2px;
+    }
+
+    .camera-guide-text {
+      margin: 0;
+      font-size: 0.72rem;
+      color: #1f4d29;
+      line-height: 1.36;
+    }
+
+    .field-input,
+    .field-textarea {
+      width: 100%;
+      border-radius: 11px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg);
+      padding: 8px 11px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .field-input:focus,
+    .field-textarea:focus {
+      background: var(--card);
+      border-color: var(--accent-deep);
+      outline: none;
+    }
+
+    .field-textarea {
+      min-height: 88px;
+      resize: vertical;
+      line-height: 1.42;
+    }
+
+    .textarea-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .sample-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      border: 1px solid var(--border-strong);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .sample-btn:hover {
+      background: #d5eff7;
+    }
+
+    .clear-link {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 3px 6px;
+    }
+
+    .clear-link:hover {
+      color: var(--navy);
+      text-decoration: underline;
+    }
+
+    /* Step 4: Output Prompt Card */
+    .xray-card {
+      background: var(--card);
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 13px 14px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .meal-mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .meal-mode-btn {
+      padding: 7px 8px;
+      border-radius: 9px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--muted);
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .meal-mode-btn span.meal-sub {
+      font-size: 0.63rem;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .meal-mode-btn.is-active {
+      background: var(--card);
+      color: var(--navy);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .meal-mode-btn.is-active span.meal-sub {
+      color: var(--accent-ink);
+    }
+
+    .quick-bite-note {
+      margin: 0 0 8px;
+      font-size: 0.72rem;
+      color: var(--accent-ink);
+      font-weight: 700;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+    }
+
+    .quick-card-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      width: 100%;
+      padding: 10px 11px;
+      border-radius: 11px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      text-align: left;
+      transition: all 0.14s ease;
+    }
+
+    .quick-card-btn:hover {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .quick-card-btn.is-copied {
+      background: var(--phone-soft);
+      border-color: #68b87a;
+    }
+
+    .quick-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 8px;
+    }
+
+    .quick-card-title {
+      font-size: 0.79rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .quick-copy-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      font-size: 0.64rem;
+      font-weight: 800;
+      color: var(--accent-ink);
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .quick-card-btn.is-copied .quick-copy-pill {
+      background: var(--phone-green);
+      border-color: var(--phone-green);
+      color: #ffffff;
+    }
+
+    .quick-card-preview {
+      font-size: 0.71rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    /* Full Prompt X-Ray Toolbar & Blocks */
+    .xray-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 9px;
+      flex-wrap: wrap;
+    }
+
+    .view-switch {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px;
+    }
+
+    .view-switch-btn {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .view-switch-btn.is-active {
+      background: var(--navy);
+      color: #ffffff;
+    }
+
+    .xray-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .p-block {
+      border-radius: 11px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .p-block-role {
+      background: #f2f9fc;
+      border-left: 4px solid var(--navy);
+    }
+
+    .p-block-task {
+      background: var(--accent-soft);
+      border-left: 4px solid var(--accent-deep);
+    }
+
+    .p-block-rules {
+      background: var(--mint-soft);
+      border-left: 4px solid var(--mint-ink);
+    }
+
+    .p-block-input {
+      background: var(--amber-soft);
+      border-left: 4px solid #d97706;
+      border-color: var(--amber-border);
+    }
+
+    .p-block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .p-block-tag {
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--navy);
+    }
+
+    .p-block-rules .p-block-tag { color: var(--mint-ink); }
+    .p-block-input .p-block-tag { color: var(--amber-ink); }
+
+    .p-block-why {
+      font-size: 0.63rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .p-block-body {
+      margin: 0;
+      font-size: 0.75rem;
+      color: var(--ink);
+      line-height: 1.4;
+      white-space: pre-wrap;
+      user-select: text;
+    }
+
+    .raw-prompt-box {
+      background: #f8fbfd;
+      border: 1px solid var(--border-strong);
+      border-radius: 11px;
+      padding: 10px 11px;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--ink);
+      line-height: 1.46;
+      white-space: pre-wrap;
+      max-height: 280px;
+      overflow-y: auto;
+      user-select: text;
+    }
+
+    .custom-note-wrap {
+      margin-top: 9px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .custom-note-toggle {
+      font-size: 0.73rem;
+      font-weight: 800;
+      color: var(--accent-ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .custom-note-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .custom-note-box {
+      margin-top: 6px;
+    }
+
+    .action-dock {
+      display: flex;
+      gap: 8px;
+      margin-top: 11px;
+    }
+
+    .copy-main-btn {
+      flex: 1;
+      min-height: 46px;
+      border-radius: 13px;
+      padding: 10px 14px;
+      font-size: 0.87rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 18px rgba(18, 58, 77, 0.22);
+      transition: transform 0.12s ease, box-shadow 0.15s ease;
+    }
+
+    .copy-main-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(18, 58, 77, 0.28);
+    }
+
+    .save-preset-btn {
+      min-width: 46px;
+      min-height: 46px;
+      padding: 0 12px;
+      border-radius: 13px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg);
+      color: var(--navy);
+      font-size: 0.77rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .save-preset-btn:hover {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+    }
+
+    /* Post-Copy AI Platform Launcher Tray (Doubao, DeepSeek, Kimi, Poe, ChatGPT, Gemini + Custom/App) */
+    .ai-launcher-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .ai-launcher-card.is-highlighted {
+      border-color: var(--phone-green);
+      background: linear-gradient(180deg, #f3fbf5 0%, #ffffff 100%);
+      box-shadow: 0 6px 20px rgba(47, 107, 60, 0.15);
+    }
+
+    .pinned-ai-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 11px;
+      background: var(--accent-soft);
+      border: 1.5px solid var(--accent-deep);
+      color: var(--navy);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      margin-bottom: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .pinned-ai-btn:hover {
+      background: #d5eff7;
+    }
+
+    .ai-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ai-launch-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      color: var(--navy);
+      font-size: 0.73rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.14s ease;
+    }
+
+    .ai-launch-chip:hover {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+    }
+
+    .ai-launch-chip.is-pinned {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #ffffff;
+    }
+
+    .custom-ai-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    /* Stage 3 / Reply Cards */
+    .turn2-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f2f9fc 100%);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .turn2-card.is-highlighted {
+      border-color: var(--accent-deep);
+      box-shadow: 0 6px 20px rgba(42, 143, 173, 0.18);
+    }
+
+    .turn2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    @media (max-width: 390px) {
+      .turn2-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .turn2-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      background: var(--card);
+      border: 1px solid var(--border-strong);
+      text-align: left;
+      transition: all 0.14s ease;
+    }
+
+    .turn2-btn:hover {
+      border-color: var(--accent-deep);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .turn2-btn.is-copied {
+      background: var(--phone-soft);
+      border-color: #68b87a;
+    }
+
+    .turn2-btn-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 4px;
+    }
+
+    .turn2-copy-tag {
+      font-size: 0.61rem;
+      font-weight: 800;
+      color: var(--accent-deep);
+      text-transform: uppercase;
+    }
+
+    .turn2-btn.is-copied .turn2-copy-tag {
+      color: var(--phone-green);
+    }
+
+    .turn2-btn-sub {
+      font-size: 0.67rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .app-footer {
+      padding: 12px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+
+    /* Modals & Sheets */
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 58, 77, 0.45);
+      backdrop-filter: blur(3px);
+      z-index: 60;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    @media (min-width: 640px) {
+      .sheet-backdrop {
+        align-items: center;
+      }
+    }
+
+    .sheet-panel {
+      width: 100%;
+      max-width: 480px;
+      max-height: 86dvh;
+      overflow-y: auto;
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 20px 50px rgba(18, 58, 77, 0.28);
+      padding: 17px;
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sheet-head h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .close-pill {
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    /* Smart Detect Drawer UI */
+    .smart-photo-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .photo-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--accent-ink);
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .demo-struggle-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 8px 0;
+    }
+
+    .demo-struggle-chip {
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.69rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .demo-struggle-chip:hover {
+      border-color: var(--accent-deep);
+      color: var(--navy);
+    }
+
+    .smart-result-box {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 13px;
+      background: var(--mint-soft);
+      border: 1.5px solid var(--mint-border);
+    }
+
+    .smart-result-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .smart-tip-line {
+      margin: 0 0 8px;
+      font-size: 0.76rem;
+      color: var(--navy);
+      font-weight: 700;
+      line-height: 1.38;
+    }
+
+    /* Bad vs Good AI Chat Visual Demo */
+    .demo-compare-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .chat-demo-box {
+      border-radius: 13px;
+      padding: 11px 12px;
+      border: 1.5px solid var(--border);
+    }
+
+    .chat-demo-bad {
+      background: var(--danger-soft);
+      border-color: var(--danger-border);
+    }
+
+    .chat-demo-good {
+      background: var(--phone-soft);
+      border-color: #b7e2c1;
+    }
+
+    .chat-demo-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+
+    .chat-demo-bad .chat-demo-label { color: var(--danger-ink); }
+    .chat-demo-good .chat-demo-label { color: var(--phone-green); }
+
+    .bubble-student,
+    .bubble-ai {
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 0.73rem;
+      line-height: 1.36;
+      margin-bottom: 5px;
+    }
+
+    .bubble-student {
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .bubble-ai {
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--body-ink);
+    }
+
+    .demo-outcome {
+      margin: 4px 0 0;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    /* QR Share Sheet */
+    .qr-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .qr-svg-box {
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 190px;
+      min-height: 190px;
+    }
+
+    .qr-svg-box svg {
+      width: 180px;
+      height: 180px;
+      display: block;
+    }
+
+    .qr-summary-pill {
+      margin-top: 9px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--navy);
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .saved-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .saved-item-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .saved-item-meta {
+      font-size: 0.69rem;
+      color: var(--muted);
+      margin: 2px 0 0;
+    }
+
+    .saved-item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .mini-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      border: 1px solid var(--border-strong);
+    }
+
+    .mini-btn.danger {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .toast-banner {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%) translateY(20px);
+      background: var(--navy);
+      color: #ffffff;
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(18, 58, 77, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 90;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast-banner.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="mode-phone-frame">
+  <div class="studio-outer">
+    <div class="studio-preview-bar" aria-label="Preview layout switcher">
+      <div class="preview-seg">
+        <button type="button" id="btnLayoutPhone" class="preview-seg-btn is-active">📱 Phone App View</button>
+        <button type="button" id="btnLayoutSplit" class="preview-seg-btn">🖥️ Wide View</button>
+      </div>
+    </div>
+
+    <div class="app-shell">
+      <div class="hero-accent" aria-hidden="true"></div>
+
+      <!-- Sticky App Topbar -->
+      <header class="app-topbar">
+        <div class="topbar-row">
+          <div class="brand-left">
+            <a href="../" id="btnHomeBack" class="eng-back-pill" title="English Department Home">←</a>
+            <div class="app-icon-tile" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/>
+                <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"/>
+              </svg>
+            </div>
+            <div class="app-title-group">
+              <h1>Prompt Builder</h1>
+              <p class="app-subtitle">HKDSE Self-Study · SKHHCSS</p>
+            </div>
+          </div>
+
+          <div class="topbar-actions">
+            <button type="button" id="btnOpenShareQr" class="util-pill" title="Teacher Share Link &amp; Classroom QR">
+              <span>🔗 QR</span>
+            </button>
+            <button type="button" id="btnOpenSaved" class="util-pill" title="Saved prompts">
+              <span>☆</span>
+              <span id="savedCountBadge">0</span>
+            </button>
+            <button type="button" id="btnOpenGuide" class="util-pill" title="Good vs Bad AI Chat Demo">👀 Tips</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Smart Detect & Build AI Helper Banner -->
+      <div class="smart-banner-wrap">
+        <button type="button" id="btnOpenSmartDetect" class="smart-detect-bar">
+          <span class="smart-bar-left">
+            <span class="smart-spark-badge" aria-hidden="true">✨</span>
+            <span>
+              <span class="smart-bar-title">Not sure what question type?</span>
+              <span class="smart-bar-sub">Snap 1 question or tell AI your struggle in 中文 / EN</span>
+            </span>
+          </span>
+          <span class="smart-bar-cta">
+            <span class="worker-dot" id="workerStatusDot"></span>
+            <span>Smart Build</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- 4-Paper Segmented Navigation -->
+      <nav class="paper-nav-wrap" aria-label="HKDSE English Language Papers">
+        <div class="paper-tabs" id="paperTabs">
+          <button type="button" class="paper-tab is-active" data-paper="p1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5.2C9.55 4.35 7.05 4.2 5.1 4.55c-.8.15-1.3.85-1.3 1.65v10.9c0 1 .85 1.65 1.85 1.5 1.9-.28 4.05-.12 6.35.65"/>
+              <path d="M12 5.2c2.45-.85 4.95-1 6.9-.65.8.15 1.3.85 1.3 1.65v10.9c0 1-.85 1.65-1.85 1.5-1.9-.28-4.05-.12-6.35.65"/>
+              <path d="M12 5.2v14.35"/>
+            </svg>
+            <span class="paper-tab-code">P1 Read</span>
+            <span class="paper-tab-meta">20% · 1h30m</span>
+          </button>
+
+          <button type="button" class="paper-tab" data-paper="p2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+            <span class="paper-tab-code">P2 Write</span>
+            <span class="paper-tab-meta">25% · 2h</span>
+          </button>
+
+          <button type="button" class="paper-tab" data-paper="p3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+              <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+            </svg>
+            <span class="paper-tab-code">P3 Listen</span>
+            <span class="paper-tab-meta">30% · ~2h</span>
+          </button>
+
+          <button type="button" class="paper-tab" data-paper="p4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M8 10h8M8 13h5"/>
+            </svg>
+            <span class="paper-tab-code">P4 Speak</span>
+            <span class="paper-tab-meta">10% · 20m</span>
+          </button>
+        </div>
+
+        <div class="paper-strip" id="paperInfoStrip">
+          <div>
+            <span class="paper-strip-title" id="paperStripTitle">Paper 1 · Reading</span>
+            <span id="paperStripSub"> · 1 hr 30 min</span>
+          </div>
+          <a href="https://skhhcss-eng.github.io/learning-materials/paper-1-exam-skills/" target="_blank" rel="noopener" class="notes-link-pill" id="paperNotesLink">📖 P1 Study Notes ↗</a>
+        </div>
+      </nav>
+
+      <!-- Main Builder + Prompt Workspace -->
+      <main class="workspace-grid">
+        <div class="left-column">
+          <!-- Step 1: Target Level & Helpers -->
+          <section class="app-card" aria-labelledby="stepBandHeading">
+            <div class="section-head">
+              <h2 class="step-label" id="stepBandHeading">
+                <span class="step-num">1</span>
+                <span>My Target &amp; Helpers</span>
+              </h2>
+              <span class="section-hint">Auto-saved</span>
+            </div>
+
+            <div class="band-grid" id="bandGrid">
+              <button type="button" class="band-btn" data-band="lv2">
+                <span class="band-btn-top">DSE Lv 2</span>
+                <span class="band-btn-sub">Basic steps</span>
+              </button>
+              <button type="button" class="band-btn is-active" data-band="lv3">
+                <span class="band-btn-top">DSE Lv 3</span>
+                <span class="band-btn-sub">Steady pass</span>
+              </button>
+              <button type="button" class="band-btn" data-band="lv45">
+                <span class="band-btn-top">DSE Lv 4–5</span>
+                <span class="band-btn-sub">High grade</span>
+              </button>
+            </div>
+            <p class="band-advice" id="bandAdviceText"></p>
+
+            <div class="helper-toggles">
+              <button type="button" class="toggle-row is-on" id="toggleSocratic">
+                <span class="toggle-copy">
+                  <span class="toggle-title">💡 Hints First (Don't Do It For Me)</span>
+                  <span class="toggle-desc">Spots mistakes &amp; gives clues · no full rewrite</span>
+                </span>
+                <span class="ios-switch" aria-hidden="true"></span>
+              </button>
+
+              <button type="button" class="toggle-row" id="toggleZh">
+                <span class="toggle-copy">
+                  <span class="toggle-title">漢 Chinese Help (中文解說)</span>
+                  <span class="toggle-desc">Chinese tips · English examples kept</span>
+                </span>
+                <span class="ios-switch" aria-hidden="true"></span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Step 2: 3-Stage Session Flow (+ 1-Shot) & Study Mode -->
+          <section class="app-card" aria-labelledby="stepGoalHeading">
+            <div class="section-head">
+              <h2 class="step-label" id="stepGoalHeading">
+                <span class="step-num">2</span>
+                <span>Where Are You in Your Chat?</span>
+              </h2>
+              <span class="section-hint" id="goalCountHint">No re-photo!</span>
+            </div>
+
+            <!-- 3-Stage Session Bar + 1-Shot -->
+            <div class="session-stepper" id="sessionStepper" role="tablist" aria-label="Chat session stage">
+              <button type="button" class="stage-pill-btn is-active" data-stage="s1">
+                <span class="stage-pill-top">① Start</span>
+                <span class="stage-pill-sub">Upload once</span>
+              </button>
+              <button type="button" class="stage-pill-btn" data-stage="s2">
+                <span class="stage-pill-top">② Same Chat</span>
+                <span class="stage-pill-sub">Next Q / task</span>
+              </button>
+              <button type="button" class="stage-pill-btn" data-stage="s3">
+                <span class="stage-pill-top">③ Reply</span>
+                <span class="stage-pill-sub">Clue / quiz</span>
+              </button>
+              <button type="button" class="stage-pill-btn" data-stage="oneshot">
+                <span class="stage-pill-top">⚡ 1-Shot</span>
+                <span class="stage-pill-sub">1 quick Q</span>
+              </button>
+            </div>
+
+            <div class="stage-explainer" id="stageExplainerBox"></div>
+
+            <div class="goal-list" id="goalList"></div>
+          </section>
+
+          <!-- Step 3: Question # + Auto-Detect Chips + Material -->
+          <section class="app-card" id="step3Card" aria-labelledby="stepFocusHeading">
+            <div class="section-head">
+              <h2 class="step-label" id="stepFocusHeading">
+                <span class="step-num">3</span>
+                <span>Question &amp; Focus</span>
+              </h2>
+              <span class="badge-pill badge-green" id="inputStatusBadge">Photo Mode</span>
+            </div>
+
+            <!-- Question / Paragraph Slot (highlighted in Stage 2 Same Chat & 1-Shot) -->
+            <div class="qnum-row" id="qnumRow">
+              <label class="qnum-label" for="qnumInput" id="qnumLabel">📌 Question / Part:</label>
+              <input
+                type="text"
+                id="qnumInput"
+                class="qnum-input"
+                placeholder="e.g. Q5, Q12(b), or Para 2"
+              />
+            </div>
+
+            <div id="dynamicChipsContainer"></div>
+
+            <div class="sub-group" id="materialInputWrap" style="margin-top: 12px;">
+              <span class="sub-label" id="materialSubLabel">How will you share your worksheet?</span>
+              <div class="input-mode-tabs">
+                <button type="button" class="input-mode-btn is-active" id="btnModePhoto">📷 Snap Photo</button>
+                <button type="button" class="input-mode-btn" id="btnModePaste">⌨️ Paste Text</button>
+              </div>
+
+              <!-- Photo Mode Panel -->
+              <div id="photoModePanel">
+                <div class="camera-guide-box">
+                  <p class="camera-guide-title" id="cameraGuideTitle">📸 Attach once in your AI app:</p>
+                  <p class="camera-guide-text" id="cameraGuideText"></p>
+                </div>
+                <input
+                  type="text"
+                  id="photoFocusInput"
+                  class="field-input"
+                  placeholder="Optional: my answer was 'False', or check tense..."
+                />
+              </div>
+
+              <!-- Paste Text Mode Panel -->
+              <div id="pasteModePanel" class="hidden">
+                <div class="textarea-toolbar">
+                  <button type="button" id="btnLoadSample" class="sample-btn">✨ Load DSE Lv 3 Sample</button>
+                  <button type="button" id="btnClearInput" class="clear-link">Clear</button>
+                </div>
+                <textarea
+                  id="studentTextInput"
+                  class="field-textarea"
+                  placeholder="Paste question, topic, or your draft..."
+                ></textarea>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="right-column">
+          <!-- Step 4: Output Prompt Card -->
+          <section class="xray-card" aria-labelledby="xrayHeading">
+            <div class="section-head" style="margin-bottom: 8px;">
+              <h2 class="step-label" id="xrayHeading">
+                <span class="step-num">4</span>
+                <span id="step4TitleText">Your Built Prompt</span>
+              </h2>
+              <span class="badge-pill badge-green" id="readinessBadge">Ready</span>
+            </div>
+
+            <!-- Fast Food vs Full Custom Switcher -->
+            <div class="meal-mode-tabs" id="mealModeTabs" role="tablist" aria-label="Prompt size">
+              <button type="button" class="meal-mode-btn" id="btnMealQuick">
+                <span>⚡ Quick Grab (1-Tap)</span>
+                <span class="meal-sub">Short &amp; fast cards</span>
+              </button>
+              <button type="button" class="meal-mode-btn is-active" id="btnMealFull">
+                <span>🍱 Built Prompt</span>
+                <span class="meal-sub">From Steps 1–3</span>
+              </button>
+            </div>
+
+            <!-- Quick Grab 1-Tap Panel -->
+            <div id="quickBitePanel" class="hidden">
+              <p class="quick-bite-note" id="quickBiteMetaNote"></p>
+              <div class="quick-grid" id="quickBiteGrid"></div>
+            </div>
+
+            <!-- Built Prompt Panel -->
+            <div id="fullPromptPanel">
+              <div class="xray-toolbar">
+                <span class="section-hint" id="fullBuilderMetaHint">Tuned for DSE Lv 3</span>
+                <div class="view-switch" role="tablist" aria-label="Prompt preview style">
+                  <button type="button" class="view-switch-btn is-active" id="btnViewBlocks">🧩 Parts</button>
+                  <button type="button" class="view-switch-btn" id="btnViewRaw">📄 Raw Text</button>
+                </div>
+              </div>
+
+              <!-- 4-Part Breakdown -->
+              <div class="xray-blocks" id="xrayBlocksView">
+                <div class="p-block p-block-role" id="blockRoleCard">
+                  <div class="p-block-head">
+                    <span class="p-block-tag" id="blockRoleHeader">1 · Session &amp; Target Level</span>
+                    <span class="p-block-why" id="blockRoleBadge">DSE Lv 3</span>
+                  </div>
+                  <p class="p-block-body" id="blockRoleText"></p>
+                </div>
+
+                <div class="p-block p-block-task">
+                  <div class="p-block-head">
+                    <span class="p-block-tag">2 · Task &amp; Safety Net</span>
+                    <span class="p-block-why" id="blockTaskBadge">Auto-detect safe</span>
+                  </div>
+                  <p class="p-block-body" id="blockTaskText"></p>
+                </div>
+
+                <div class="p-block p-block-rules">
+                  <div class="p-block-head">
+                    <span class="p-block-tag">3 · How AI Coaches Me</span>
+                    <span class="p-block-why">Clues first</span>
+                  </div>
+                  <p class="p-block-body" id="blockRulesText"></p>
+                </div>
+
+                <div class="p-block p-block-input">
+                  <div class="p-block-head">
+                    <span class="p-block-tag">4 · My Worksheet / Question</span>
+                    <span class="p-block-why" id="blockInputWhy">Upload once</span>
+                  </div>
+                  <p class="p-block-body" id="blockInputText"></p>
+                </div>
+              </div>
+
+              <!-- Raw Prompt View -->
+              <pre class="raw-prompt-box hidden" id="rawPromptView"></pre>
+
+              <!-- Optional Extra Note -->
+              <div class="custom-note-wrap">
+                <button type="button" class="custom-note-toggle" id="btnToggleCustomNote">
+                  <span id="customNoteChevron">＋</span>
+                  <span>Add extra note (optional)</span>
+                </button>
+                <div class="custom-note-box hidden" id="customNoteBox">
+                  <input
+                    type="text"
+                    id="customExtraInput"
+                    class="field-input"
+                    placeholder="e.g. Check my verb tenses &amp; linking words"
+                  />
+                </div>
+              </div>
+
+              <!-- Primary Copy CTA -->
+              <div class="action-dock">
+                <button type="button" id="btnCopyMain" class="copy-main-btn api-mesh-cta">
+                  <span id="copyMainLabel">📋 Copy Prompt</span>
+                </button>
+                <button type="button" id="btnSavePreset" class="save-preset-btn" title="Save setup">
+                  <span>☆ Save</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Post-Copy AI Platform Launcher (Doubao, DeepSeek, Kimi, Poe, ChatGPT, Gemini + Custom/App) -->
+          <section class="ai-launcher-card" id="aiLauncherCard" aria-labelledby="launcherHeading">
+            <div class="section-head" style="margin-bottom: 7px;">
+              <h2 class="step-label" id="launcherHeading">
+                <span>🚀 Open My AI &amp; Paste</span>
+              </h2>
+              <span class="section-hint" id="pinnedAiHint">Tap 1 to pin favourite</span>
+            </div>
+
+            <a href="https://www.doubao.com/chat/" target="_blank" rel="noopener" class="pinned-ai-btn hidden" id="pinnedPrimaryLink">
+              <span id="pinnedPrimaryText">★ Open 豆包 Doubao</span>
+              <span>Paste &amp; Go ↗</span>
+            </a>
+
+            <div class="ai-chip-grid" id="aiChipGrid"></div>
+
+            <div class="custom-ai-row hidden" id="customAiBox">
+              <input type="text" id="customAiUrlInput" class="field-input" placeholder="https://your-ai-site.com" />
+              <button type="button" id="btnSaveCustomAi" class="mini-btn">Save</button>
+            </div>
+          </section>
+
+          <!-- Stage 3 / Reply & Follow-Up Cards -->
+          <section class="turn2-card" id="turn2Card" aria-labelledby="turn2Heading">
+            <div class="section-head" style="margin-bottom: 7px;">
+              <h2 class="step-label" id="turn2Heading">
+                <span>💬 ③ Reply Cards (Same Chat)</span>
+              </h2>
+              <span class="section-hint">1-tap copy</span>
+            </div>
+            <div class="turn2-grid" id="turn2Grid"></div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        聖公會聖匠中學 SKH Holy Carpenter Secondary School · English Department<br />
+        Prompt Builder · S4–S6 HKDSE Self-Directed Learning
+      </footer>
+    </div>
+  </div>
+
+  <!-- Smart Detect & Build Modal (Cloudflare Worker + Instant Local Classifier) -->
+  <div class="sheet-backdrop hidden" id="smartModal" role="dialog" aria-modal="true" aria-labelledby="smartModalTitle">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h2 id="smartModalTitle">✨ Smart Detect &amp; Build</h2>
+        <button type="button" class="close-pill" id="btnCloseSmart">Close</button>
+      </div>
+      <p style="margin: 0 0 9px; font-size: 0.75rem; color: var(--muted);">
+        Don't know the question type or how to ask? Snap 1 question photo or type your worry in <strong>中文 / English</strong>—AI will spot the question type and build your prompt (without spoiling the answer!).
+      </p>
+
+      <div class="smart-photo-row">
+        <label class="photo-upload-btn" for="smartPhotoInput">
+          <span>📷 Snap / Pick Question Photo</span>
+        </label>
+        <input type="file" id="smartPhotoInput" accept="image/*" class="hidden" />
+        <span id="smartPhotoName" style="font-size: 0.72rem; color: var(--phone-green); font-weight: 700;"></span>
+      </div>
+
+      <textarea
+        id="smartStruggleInput"
+        class="field-textarea"
+        style="min-height: 76px;"
+        placeholder="Or paste question / type in 中文: e.g. 我唔知呢題 Q12 係咩題型: What does 'this trend' (line 14) refer to?"
+      ></textarea>
+
+      <div class="demo-struggle-wrap" id="smartDemoChips">
+        <button type="button" class="demo-struggle-chip" data-demo="我唔識呢題 Q14: Complete the summary below using ONE word from paragraph 3 for each blank.">Try: Summary blank Q</button>
+        <button type="button" class="demo-struggle-chip" data-demo="Write an article for the school magazine about dealing with exam stress — 我唔知點樣開頭同分段">Try: P2 Article worry</button>
+        <button type="button" class="demo-struggle-chip" data-demo="AI 解釋得太深太多生字，我想要簡單啲同埋出多題俾我練">Try: AI too hard (中文)</button>
+      </div>
+
+      <button type="button" id="btnRunSmartDetect" class="copy-main-btn api-mesh-cta" style="width: 100%; margin-top: 4px; min-height: 44px;">
+        <span id="runSmartLabel">✨ Detect Question Type &amp; Build Prompt</span>
+      </button>
+
+      <div class="smart-result-box hidden" id="smartResultBox">
+        <div class="smart-result-badges" id="smartResultBadges"></div>
+        <p class="smart-tip-line" id="smartResultTip"></p>
+        <pre class="raw-prompt-box" id="smartBuiltPromptText" style="max-height: 170px; margin: 0 0 9px;"></pre>
+        <div style="display: flex; gap: 7px;">
+          <button type="button" id="btnCopySmartPrompt" class="copy-main-btn api-mesh-cta" style="min-height: 42px; font-size: 0.82rem;">
+            <span>📋 Apply &amp; Copy Prompt</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Teacher Share Link & Classroom QR Modal -->
+  <div class="sheet-backdrop hidden" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h2 id="qrModalTitle">🔗 Teacher Link &amp; Classroom QR</h2>
+        <button type="button" class="close-pill" id="btnCloseQr">Done</button>
+      </div>
+      <p style="margin: 0 0 10px; font-size: 0.75rem; color: var(--muted);">
+        Students who scan this QR code or click this link open <strong>Prompt Builder</strong> pre-set to your exact Paper, Level, and Task:
+      </p>
+      <div class="qr-stage">
+        <div class="qr-svg-box" id="qrSvgContainer"></div>
+        <span class="qr-summary-pill" id="qrSummaryPill"></span>
+      </div>
+      <input type="text" id="shareUrlReadout" class="field-input" readonly style="font-size: 13px !important; margin-bottom: 9px;" />
+      <button type="button" id="btnCopyShareLink" class="copy-main-btn api-mesh-cta" style="width: 100%; min-height: 44px;">
+        <span id="copyShareLabel">📋 Copy Classroom Link</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Saved Prompts Sheet -->
+  <div class="sheet-backdrop hidden" id="savedModal" role="dialog" aria-modal="true" aria-labelledby="savedModalTitle">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h2 id="savedModalTitle">☆ Saved Prompts</h2>
+        <button type="button" class="close-pill" id="btnCloseSaved">Done</button>
+      </div>
+      <div class="saved-list" id="savedListContainer"></div>
+    </div>
+  </div>
+
+  <!-- 10-Second Bad vs Good AI Chat Visual Demo Sheet -->
+  <div class="sheet-backdrop hidden" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideModalTitle">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h2 id="guideModalTitle">👀 Lazy AI vs. Smart AI Study</h2>
+        <button type="button" class="close-pill" id="btnCloseGuide">Got it!</button>
+      </div>
+
+      <div class="demo-compare-grid">
+        <div class="chat-demo-box chat-demo-bad">
+          <p class="chat-demo-label">❌ Bad Way (Zero improvement in exams)</p>
+          <div class="bubble-student">🧑 "Write this 400-word essay / answer Q1–Q10 for me."</div>
+          <div class="bubble-ai">🤖 Writes difficult C2 sentences you can't remember or use in the real DSE exam.</div>
+          <p class="demo-outcome" style="color: var(--danger-ink);">Result: Still stuck on exam day.</p>
+        </div>
+
+        <div class="chat-demo-box chat-demo-good">
+          <p class="chat-demo-label">✅ Smart Way (Real DSE level-up!)</p>
+          <div class="bubble-student">🧑 ① Start Chat: "Remember my passage (don't answer yet)." → ② Same Chat: "Check Q5 — give 1 line clue first!"</div>
+          <div class="bubble-ai">🤖 "Q5 is False vs Not Given! Check paragraph 3, line 11 first—what reason does it give?"</div>
+          <p class="demo-outcome" style="color: var(--phone-green);">Result: Upload once · fix your own mistakes · remember it!</p>
+        </div>
+      </div>
+
+      <div style="padding: 9px 11px; border-radius: 11px; background: var(--accent-soft); font-size: 0.74rem; color: var(--navy);">
+        <strong>💡 Pro Tip:</strong> Use <strong>① Start</strong> to upload your passage or Data File <em>once</em>. Then stay in the <strong>same AI chat</strong> and use <strong>② Same Chat</strong> for Q2, Q5, Q9 without taking new photos!
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-banner" id="toastBanner" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      var DEFAULT_WORKER_URL = 'https://prompt-builder.skhhcss-eng.workers.dev';
+      var LIVE_SITE_BASE = 'https://skhhcss-eng.github.io/prompt-builder/';
+      var LEARNING_MATERIALS_BASE = 'https://skhhcss-eng.github.io/learning-materials/';
+
+      var STORAGE_PROFILE_KEY = 'skhhcss_eng_prompt_builder_profile_v3';
+      var STORAGE_SAVED_KEY = 'skhhcss_eng_prompt_builder_saved_v3';
+
+      var AI_PLATFORMS = [
+        { id: 'doubao', name: '豆包 Doubao', url: 'https://www.doubao.com/chat/' },
+        { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/' },
+        { id: 'kimi', name: 'Kimi', url: 'https://www.kimi.com/' },
+        { id: 'poe', name: 'Poe', url: 'https://poe.com/' },
+        { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/' },
+        { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/' }
+      ];
+
+      var BANDS = {
+        lv2: {
+          shortLabel: 'DSE Lv 2',
+          advice: 'Short sentences · basic everyday words · 1 small step at a time',
+          promptRole: 'Act as a patient, encouraging HKDSE English teacher helping a student aiming for DSE Level 2. Use short, simple sentences (under 15 words) and everyday words. Focus on basic grammar (verb tense, singular/plural, simple Subject-Verb-Object) one small step at a time.'
+        },
+        lv3: {
+          shortLabel: 'DSE Lv 3',
+          advice: 'Clear grammar · complete task points · steady linking words',
+          promptRole: 'Act as a supportive HKDSE English teacher helping a student aiming for a solid DSE Level 3 pass. Use clear, natural British English. Focus on covering all task points, clear topic sentences, accurate tenses, and everyday linking words (however, therefore, for example).'
+        },
+        lv45: {
+          shortLabel: 'DSE Lv 4–5',
+          advice: 'Stronger vocab · varied sentences · sharp ideas & tone',
+          promptRole: 'Act as an experienced HKDSE English marker coaching a student aiming for DSE Level 4 to 5. Push for precise vocabulary, varied sentence structures, natural cohesion, exact audience register, and deeper reasoning—without unnatural purple prose.'
+        }
+      };
+
+      var GENRE_NOTE_SLUGS = {
+        'Letter to the Editor': 'paper-2-writing-formats/letter-to-the-editor/',
+        'Formal Letter / Email': 'paper-2-writing-formats/formal-letter/',
+        'Article': 'paper-2-writing-formats/article/',
+        'Proposal': 'paper-2-writing-formats/proposal/',
+        'Report': 'paper-2-writing-formats/report/',
+        'Speech': 'paper-2-writing-formats/speech/',
+        'Blog Entry': 'paper-2-writing-formats/blog/',
+        'One-Sided / Two-Sided Essay': 'paper-2-writing-formats/essay/',
+        'Short Story': 'paper-2-writing-formats/story/',
+        'Review': 'paper-2-writing-formats/review/'
+      };
+
+      var PAPERS = {
+        p1: {
+          code: 'Paper 1',
+          title: 'Paper 1 · Reading',
+          subtitle: ' · 1 hr 30 min',
+          notesLabel: '📖 P1 Reading Notes ↗',
+          notesSlug: 'paper-1-exam-skills/',
+          qPlaceholder: 'e.g. Q5, Q12(b), or Para 3',
+          chipGroups: [
+            {
+              id: 'p1ItemType',
+              label: 'Question Type (Auto-Detect is safe if unsure!)',
+              options: [
+                '✨ Auto-Detect (Just Type Q#)',
+                'True / False / Not Given',
+                'Summary Cloze (Fill Blanks)',
+                'Multiple Choice (A/B/C/D)',
+                'Short Answer / Why & How',
+                'Pronoun ("it / they / this")',
+                'Writer\'s Tone & Attitude'
+              ],
+              noteLinks: {
+                'Summary Cloze (Fill Blanks)': 'paper-1-meaning-from-context/',
+                '✨ Auto-Detect (Just Type Q#)': 'paper-1-exam-skills/'
+              },
+              samples: {
+                '✨ Auto-Detect (Just Type Q#)': 'Not sure what type Q5 is? Just type "Q5" above! AI will tell you what kind of question Q5 is in 1 simple line, warn you of its trick, and point you to the line clue.',
+                'True / False / Not Given': {
+                  lv2: 'Lv 2 Sample: Text: "The library closes at 7 p.m." → Q: "Closes at 9 p.m." = False | "Books are free." = Not Given.',
+                  lv3: 'Lv 3 Sample: Text: "Cafés closed early due to staff shortages." → Q: "Closed because rent rose." = False vs "Prices rose." = Not Given.',
+                  lv45: 'Lv 4–5 Sample: Watch subtle quantifiers ("few", "rarely", "exclusively")—contradiction = False; unstated comparison = Not Given.'
+                },
+                'Summary Cloze (Fill Blanks)': {
+                  lv2: 'Lv 2 Sample: Text: "Students feel happy." → Blank: "The club brings ________ (happiness — noun needed)."',
+                  lv3: 'Lv 3 Sample: Text: "Many teens feel exhausted." → Blank: "Teenagers suffer from ________ (exhaustion — adjective to noun)."',
+                  lv45: 'Lv 4–5 Sample: Check grammar slot + singular/plural + tense: "Shops reluctantly raised fees" → "were ________ (reluctant) to...".'
+                },
+                'Multiple Choice (A/B/C/D)': 'Sample: What is the main purpose of paragraph 2?  A. To warn  B. To compare  C. To share a memory  D. To promote',
+                'Short Answer / Why & How': 'Sample: Why did the shop owner "sigh" in line 8? Give ONE reason from paragraph 2 in your own words.',
+                'Pronoun ("it / they / this")': 'Sample: What does "this problem" (line 14) refer to? (Check the sentence right before it!)',
+                'Writer\'s Tone & Attitude': 'Sample: Which word best describes the writer\'s attitude towards AI homework apps?  A. Doubtful  B. Supportive  C. Uninterested'
+              }
+            }
+          ],
+          stageGoals: {
+            s1: [
+              {
+                id: 'p1_s1_hold',
+                emoji: '📥',
+                name: 'Load Reading Text Once (Hold & Wait)',
+                blurb: 'Attach passage (+ questions) once · AI waits for your Q#',
+                cameraHint: 'Snap the Reading Passage pages (+ Question pages if ready). You won\'t need to snap the passage again!'
+              },
+              {
+                id: 'p1_s1_gist',
+                emoji: '🗺️',
+                name: 'Load Text + Quick Paragraph Map',
+                blurb: 'Upload passage once + get a 1-line summary per paragraph',
+                cameraHint: 'Snap the Reading Passage pages once'
+              }
+            ],
+            s2: [
+              {
+                id: 'p1_s2_checkq',
+                emoji: '🔍',
+                name: 'Help Me With Question # (Clue First)',
+                blurb: 'Uses passage from Step ① · tells Q type + line clue',
+                cameraHint: 'No photo needed if already uploaded! (Or snap just this 1 question box)'
+              },
+              {
+                id: 'p1_s2_vocab',
+                emoji: '📖',
+                name: 'Explain Hard Words in Paragraph #',
+                blurb: 'Break down tough sentences or unknown words in 1 paragraph',
+                cameraHint: 'No new photo needed — just type e.g. "Para 4" above!'
+              },
+              {
+                id: 'p1_s2_more',
+                emoji: '🧩',
+                name: 'Make 2 Similar Questions to Test Me',
+                blurb: 'Uses the same passage to drill this question type',
+                cameraHint: 'Uses the passage already in your AI chat'
+              }
+            ],
+            oneshot: [
+              {
+                id: 'p1_1s_clue',
+                emoji: '🔍',
+                name: 'Why Was I Wrong? (1 Question)',
+                blurb: 'Auto-detects Q type + points to line clue',
+                cameraHint: 'Snap the paragraph + the 1 question you got wrong',
+                samplesByBand: {
+                  lv2: 'Text: "The community kitchen gives free hot soup every Tuesday."\nQ: Neighbours pay $10 for soup on Tuesdays. (T/F/NG) — My answer: Not Given',
+                  lv3: 'Para 4: "Electricity bills forced three vertical farms to shut down."\nQ: Vertical farms failed because shoppers dislike indoor greens. (T/F/NG) — My answer: False',
+                  lv45: 'Para 6: "Critics hail the boardwalk as urban renewal, overlooking boatyards displaced overnight."\nQ: What is the writer\'s attitude towards the critics?'
+                }
+              },
+              {
+                id: 'p1_1s_drill',
+                emoji: '🧩',
+                name: 'Generate a New Reading Mini-Practice',
+                blurb: 'Creates a fresh level-matched passage + questions',
+                cameraHint: 'Snap a topic page or switch to Paste Text to name any topic',
+                samplesByBand: {
+                  lv2: 'Topic: Helping at a school Open Day food stall.',
+                  lv3: 'Topic: Hong Kong students working weekend part-time jobs at cha chaan tengs.',
+                  lv45: 'Topic: Will AI translation glasses replace language learning in Hong Kong?'
+                }
+              }
+            ]
+          },
+          quickCardsByBand: {
+            lv2: [
+              { id: 'q_p1_1', title: '⚡ Load Passage (Wait for My Q#)', preview: 'Upload reading text once — don\'t spoil answers!', prompt: 'I am attaching my HKDSE Paper 1 Reading passage. Read and remember it for DSE Lv 2, and reply ONLY: "✅ Passage ready! Which question number?" Do NOT give any answers yet.' },
+              { id: 'q_p1_2', title: '⚡ Check Q# (Auto-Detect Type)', preview: 'In same chat: tell me Q type + easy line clue', prompt: 'Look at this question from the passage above. First tell me in 1 simple line what kind of question it is, then tell me which line to read—don\'t give the answer yet.' },
+              { id: 'q_p1_3', title: '⚡ Break Down Hard Paragraph', preview: 'Explain 1 tough paragraph in short easy words', prompt: 'Explain the main idea of this paragraph in 2 short, easy sentences (DSE Lv 2), and list 4 important words with simple meanings.' }
+            ],
+            lv3: [
+              { id: 'q_p1_1', title: '⚡ Load Passage (Wait for My Q#)', preview: 'Upload reading text once — ask Qs one by one', prompt: 'I am attaching my HKDSE Paper 1 Reading passage (+ questions). Read and hold them in memory for DSE Lv 3, and reply ONLY: "✅ Passage ready! Which question number?" Do NOT answer yet.' },
+              { id: 'q_p1_2', title: '⚡ Check Q# (Clue + Trap)', preview: 'In same chat: auto-detect Q type & point to clue', prompt: 'Check the question I name from our passage above. State its question type + key exam trap in 1 short line, then point me to the paragraph clue so I can try first.' },
+              { id: 'q_p1_3', title: '⚡ 5 Exam Words from Text', preview: 'Pick 5 useful DSE words + HK examples', prompt: 'From the reading passage in our chat, pick 5 useful DSE Level 3–4 words with meanings, word forms, and 1 Hong Kong example sentence each.' }
+            ],
+            lv45: [
+              { id: 'q_p1_1', title: '⚡ Load Passage (Marker Mode)', preview: 'Upload text once — coach me question by question', prompt: 'I am attaching my HKDSE Paper 1 text (+ questions). Store it in memory for DSE Level 4–5 coaching, and reply ONLY: "✅ Text ready—which question?" Do NOT reveal answers upfront.' },
+              { id: 'q_p1_2', title: '⚡ Unpack Distractor / Nuance', preview: 'In same chat: why did the wrong option look right?', prompt: 'For this question on our passage above, identify the exact HKEAA skill tested, expose the distractor or qualifier trap, and point me to the lines to re-evaluate.' },
+              { id: 'q_p1_3', title: '⚡ Steal 5 Phrases for Paper 2', preview: 'Turn good reading collocations into writing ammo', prompt: 'Extract 5 high-band collocations or sentence structures from today\'s passage and show how I can adapt them in Paper 2 Writing.' }
+            ]
+          }
+        },
+
+        p2: {
+          code: 'Paper 2',
+          title: 'Paper 2 · Writing',
+          subtitle: ' · Short (~200w) + Long (~400w) · 2 hrs',
+          notesLabel: '📖 P2 Format Notes ↗',
+          notesSlug: 'paper-2-writing-formats/',
+          qPlaceholder: 'e.g. Para 2, Intro, or Q3',
+          chipGroups: [
+            {
+              id: 'p2Part',
+              label: 'Task Length',
+              options: ['Long Task (~400 words)', 'Short Task (~200 words)'],
+              samples: {
+                'Short Task (~200 words)': 'Compulsory guided task (10% of DSE) — cover every prompt bullet clearly in ~35 mins.',
+                'Long Task (~400 words)': 'Choose 1 of 4 questions (15% of DSE) — clear intro + 3 developed body points + ending.'
+              }
+            },
+            {
+              id: 'p2Genre',
+              label: 'Text Format (Auto-Check catches wrong format!)',
+              options: [
+                '✨ Auto-Check Format from Question',
+                'Letter to the Editor',
+                'Formal Letter / Email',
+                'Article',
+                'Proposal',
+                'Report',
+                'Speech',
+                'Blog Entry',
+                'One-Sided / Two-Sided Essay',
+                'Short Story',
+                'Review'
+              ],
+              samples: {
+                '✨ Auto-Check Format from Question': 'AI reads your question prompt first and tells you the exact format, tone, and greeting/sign-off rules so you never write the wrong text type!',
+                'Letter to the Editor': 'Layout: "Dear Editor," → state issue & stance → body arguments → "Yours faithfully, Chris Wong".',
+                'Formal Letter / Email': 'Layout: Polite tone to 1 reader (principal / manager) → clear purpose + polite sign-off.',
+                'Article': 'Layout: Catchy Headline + lively opening + paragraphs. (NO "Dear..." or letter sign-off!)',
+                'Proposal': 'Layout: Title + Headings (Introduction, Suggestions, Benefits) → persuade principal/committee.',
+                'Report': 'Layout: Title + Factual Headings (Introduction, Findings, Recommendations) → calm, objective tone.',
+                'Speech': 'Layout: "Good morning Principal, teachers and fellow students..." → end with "Thank you."',
+                'Blog Entry': 'Layout: Blog Title + friendly, personal voice sharing tips/experiences with readers.',
+                'One-Sided / Two-Sided Essay': 'Layout: Clear thesis in intro → topic sentences + examples → conclusion.',
+                'Short Story': 'Layout: Past tense story (beginning, problem, ending); copy any required line word-for-word.',
+                'Review': 'Layout: Title + brief overview + strengths & weaknesses + final recommendation.'
+              }
+            }
+          ],
+          stageGoals: {
+            s1: [
+              {
+                id: 'p2_s1_draft',
+                emoji: '📥',
+                name: 'Load Question + My Draft Once',
+                blurb: 'Upload essay once · check format, grammar & paragraphs step by step',
+                cameraHint: 'Snap (1) the writing question and (2) your essay draft once'
+              },
+              {
+                id: 'p2_s1_plan',
+                emoji: '🧭',
+                name: 'Start Pre-Writing Plan (Question Only)',
+                blurb: 'Check format, tone + 3 ideas before you start writing',
+                cameraHint: 'Snap just the Paper 2 writing question prompt'
+              }
+            ],
+            s2: [
+              {
+                id: 'p2_s2_grammar',
+                emoji: '✏️',
+                name: 'Spot My Top 3 Grammar Mistakes',
+                blurb: 'Uses draft in chat · quotes 3 errors for you to fix first',
+                cameraHint: 'Uses the essay draft already in your chat!'
+              },
+              {
+                id: 'p2_s2_para',
+                emoji: '🚀',
+                name: 'Level Up 1 Specific Paragraph',
+                blurb: 'Type e.g. "Para 2" above · join choppy lines & add linking words',
+                cameraHint: 'Uses your loaded draft (or snap 1 new rewritten paragraph)'
+              },
+              {
+                id: 'p2_s2_format',
+                emoji: '📋',
+                name: 'Check My Content Points & Format',
+                blurb: 'Did I miss any prompt bullets or use wrong tone/headings?',
+                cameraHint: 'Uses your loaded question & draft'
+              }
+            ],
+            oneshot: [
+              {
+                id: 'p2_1s_clo',
+                emoji: '✏️',
+                name: 'Check My Draft (All-in-One)',
+                blurb: 'Checks format, Content, grammar & paragraph flow',
+                cameraHint: 'Snap question + your draft together',
+                samplesByBand: {
+                  lv2: 'Dear Pat, Last week our school have announcement about Sports Day on Friday. Have running race. You want come?',
+                  lv3: 'Dear Editor, I am writing to express my view about students study in cafe for many hours because library is full.',
+                  lv45: 'Dear Principal, On behalf of the Student Union, I propose launching a Digital Detox Week to tackle screen fatigue.'
+                }
+              },
+              {
+                id: 'p2_1s_plan',
+                emoji: '🧭',
+                name: 'Plan 3 Ideas + Topic Words',
+                blurb: 'Format rules + paragraph outline + useful phrases',
+                cameraHint: 'Snap the writing question prompt',
+                samplesByBand: {
+                  lv2: 'Write an email inviting your friend Pat to your school Sports Day.',
+                  lv3: 'Write a Letter to the Editor on students studying in cafés and suggest better community study spaces.',
+                  lv45: 'Write a Proposal to the Principal suggesting a school Digital Detox Week.'
+                }
+              }
+            ]
+          },
+          quickCardsByBand: {
+            lv2: [
+              { id: 'q_p2_1', title: '⚡ Fix 3 Basic Sentences', preview: 'Check verb tense & missing words — 1 step at a time', prompt: 'Check my Paper 2 draft for DSE Lv 2. Praise 1 good point, then show ONLY 3 basic grammar mistakes (tense, plural, missing verb) and let me fix them one by one.' },
+              { id: 'q_p2_2', title: '⚡ 3 Easy Ideas + 6 Simple Words', preview: 'Easy points I can spell (don\'t write essay)', prompt: 'Read my Paper 2 question. Tell me the right opening/ending format, 3 easy ideas, and 6 simple English phrases for DSE Lv 2—do NOT write the essay.' },
+              { id: 'q_p2_3', title: '⚡ Help Me Say 1 Idea in English', preview: 'Turn my Chinese idea into 2 clean simple sentences', prompt: 'I know my point in Chinese but struggle in English. Ask me for my idea and teach me how to write it in 2 short, correct DSE Lv 2–3 sentences.' }
+            ],
+            lv3: [
+              { id: 'q_p2_1', title: '⚡ Load Essay (Step-by-Step Check)', preview: 'Upload once — check format & top 3 grammar habits', prompt: 'I am attaching my Paper 2 question + draft (target: DSE Lv 3). First check if my format & tone match the question, then spot my top 3 grammar error patterns and let me fix them.' },
+              { id: 'q_p2_2', title: '⚡ 3 Clear Points + 6 Phrases', preview: 'Outline + steady vocabulary (no ghostwriting)', prompt: 'Check the Paper 2 question format/tone, suggest a 4-paragraph plan, and give 6 useful DSE Level 3–4 phrases—do NOT write paragraphs for me.' },
+              { id: 'q_p2_3', title: '⚡ Better Linking Words', preview: 'Fix repetitive "and / also / so" in my paragraph', prompt: 'Look at my paragraph above. Suggest 3 natural linking words (however, therefore, in addition) to replace repetitive "and/so", and let me rewrite 2 lines.' }
+            ],
+            lv45: [
+              { id: 'q_p2_1', title: '⚡ Marker C·L·O Critique', preview: 'Pinpoint what stops my draft from reaching Lv 5', prompt: 'Assess my Paper 2 draft against DSE Level 4–5 Content, Language, and Organisation standards. Pinpoint the top 3 weaknesses holding me below Level 5 and coach my revision.' },
+              { id: 'q_p2_2', title: '⚡ Sharpen Angle + Counter-View', preview: 'Deeper arguments + 1 concise rebuttal', prompt: 'Challenge my brainstormed ideas for this Paper 2 question so they avoid clichés, and coach me to add a sharp counter-argument + rebuttal.' },
+              { id: 'q_p2_3', title: '⚡ Upgrade Clause Variety', preview: 'Lift 1 flat paragraph to natural Level 5 style', prompt: 'Coach me to elevate this paragraph to DSE Level 5 using stronger topic framing, varied clause structures, and precise British English collocations.' }
+            ]
+          }
+        },
+
+        p3: {
+          code: 'Paper 3',
+          title: 'Paper 3 · Listening & Integrated',
+          subtitle: ' · Part A Notes + Part B Data File (~2h)',
+          notesLabel: '📖 P3 Skills Notes ↗',
+          notesSlug: 'paper-3-exam-skills/',
+          qPlaceholder: 'e.g. Task B2, DF Page 3, or Para 2',
+          chipGroups: [
+            {
+              id: 'p3Register',
+              label: 'Task Tone & Type (Auto-Check prevents wrong tone!)',
+              options: [
+                '✨ Auto-Check Tone from Task Email',
+                'Formal Report / Proposal',
+                'Formal Letter / Public Reply',
+                'Polite Email (Teacher / Colleague)',
+                'Speech / School Article',
+                'Part A Note-Taking'
+              ],
+              samples: {
+                '✨ Auto-Check Tone from Task Email': 'AI checks the Situation & Task instruction email first to tell you who the reader is and whether your tone must be Formal or Semi-formal.',
+                'Formal Report / Proposal': 'DF WhatsApp: "Nobody saw poster!!" → Formal: "Few students knew about the event owing to weak publicity."',
+                'Formal Letter / Public Reply': 'Polite reply to parent/public using exact dates & conditions from the Data File (zero chat slang!).',
+                'Polite Email (Teacher / Colleague)': 'Clear Subject line + "Dear Ms Lam," → polite, helpful tone → "Best regards,".',
+                'Speech / School Article': 'Combine listening notes + Data File chart into an engaging talk or school magazine piece.',
+                'Part A Note-Taking': 'Fill short table blanks while listening — watch out for corrected times ("2:15—sorry, 2:30!") & spellings.'
+              }
+            }
+          ],
+          stageGoals: {
+            s1: [
+              {
+                id: 'p3_s1_df',
+                emoji: '📥',
+                name: 'Load Task Email + Data File Once',
+                blurb: 'Upload DF pages once · AI remembers facts & waits',
+                cameraHint: 'Snap the Situation/Task Instruction page + relevant Data File pages once'
+              },
+              {
+                id: 'p3_s1_listen',
+                emoji: '🎧',
+                name: 'Start a Part A Listening Note Drill',
+                blurb: 'Blank note card + 2-speaker script for Read-Aloud',
+                cameraHint: 'Snap a Part A note table (or switch to Paste Text to name any topic)'
+              }
+            ],
+            s2: [
+              {
+                id: 'p3_s2_pick',
+                emoji: '🗺️',
+                name: 'Which Data File Facts Do I Need?',
+                blurb: 'Uses loaded DF · guides you to spot key dates & traps',
+                cameraHint: 'Uses the Data File already in your chat!'
+              },
+              {
+                id: 'p3_s2_para',
+                emoji: '🔄',
+                name: 'Rewrite 1 Data File Note (No Copying)',
+                blurb: 'Practise turning casual WhatsApp/notes into right tone',
+                cameraHint: 'Just name the DF page/note above — no new photo needed!'
+              },
+              {
+                id: 'p3_s2_audit',
+                emoji: '📋',
+                name: 'Check My Written Draft Against DF',
+                blurb: 'Snap ONLY your draft now · checks missing points & tone',
+                cameraHint: 'Now snap just your written draft (AI already has the Data File!)'
+              }
+            ],
+            oneshot: [
+              {
+                id: 'p3_1s_para',
+                emoji: '🔄',
+                name: 'Rewrite Data File Notes (1-Shot)',
+                blurb: 'Own words + right tone without copying chunks',
+                cameraHint: 'Snap the Data File note + task instruction',
+                samplesByBand: {
+                  lv2: 'DF Note: "Meet Sat 9am Hung Hom Exit B1 -> bring water (rain = hall)". Put into simple email sentences.',
+                  lv3: 'DF WhatsApp: "OMG beach clean-up was a mess!! Only 8 kids came coz nobody saw the poster!" → Formal report.',
+                  lv45: 'DF Memo: "15% discount ONLY if booked before 30 Nov (min 25 students); coach fee $600 extra." → Formal reply.'
+                }
+              },
+              {
+                id: 'p3_1s_audit',
+                emoji: '📋',
+                name: 'Check My Part B Draft (1-Shot)',
+                blurb: 'Checks missing points, dates, copying & tone',
+                cameraHint: 'Snap Task instruction + DF page + your draft',
+                samplesByBand: {
+                  lv2: 'Task: Short email to club members — Room 304, Friday 4 p.m., bring $20.',
+                  lv3: 'Task: Email Ms Lam apologising for late leaflet, giving 2 reasons, confirming 50 copies by 14 Nov.',
+                  lv45: 'Task: Formal public reply addressing parent safety concerns using Principal\'s updated memo.'
+                }
+              }
+            ]
+          },
+          quickCardsByBand: {
+            lv2: [
+              { id: 'q_p3_1', title: '⚡ Load Data File (Wait for Me)', preview: 'Upload Task + DF pages once — don\'t write it for me', prompt: 'I am attaching my Paper 3 Task email + Data File pages (target: DSE Lv 2). Read them and reply ONLY: "✅ Data File ready! How can I help?" Do NOT write the task yet.' },
+              { id: 'q_p3_2', title: '⚡ Turn Notes into Simple Sentences', preview: 'Change short notes into clean full sentences (no slang)', prompt: 'Help me turn these Paper 3 notes into simple, complete DSE Lv 2 sentences without chat slang, keeping all dates and numbers exact.' },
+              { id: 'q_p3_3', title: '⚡ Easy 4-Gap Listening Script', preview: 'Clear 2-speaker script for Read-Aloud practice', prompt: 'Create a simple 4-gap Paper 3 Part A note card + clear 2-speaker script I can play aloud with Read-Aloud to test my listening.' }
+            ],
+            lv3: [
+              { id: 'q_p3_1', title: '⚡ Load Data File Once', preview: 'Upload Task + DF pages — check tone & facts together', prompt: 'I am attaching my Paper 3 Task + Data File (target: DSE Lv 3). Tell me the required format & tone in 1 line, then wait for me to ask about specific notes or upload my draft.' },
+              { id: 'q_p3_2', title: '⚡ Rewrite Without Copying', preview: 'Paraphrase casual WhatsApp/memo notes in right tone', prompt: 'Coach me to rewrite these Paper 3 Data File notes in my own words and right tone (no word-for-word copying), keeping every fact accurate.' },
+              { id: 'q_p3_3', title: '⚡ Missing Points & Tone Check', preview: 'Compare my draft with the Data File in our chat', prompt: 'Compare my Paper 3 draft against the Task and Data File in our chat. List any missed points/dates, copied phrases, or casual tone slips.' }
+            ],
+            lv45: [
+              { id: 'q_p3_1', title: '⚡ Load Data File (Lv 5 Mode)', preview: 'Upload once — map hidden constraints & tone rules', prompt: 'I am attaching my Paper 3 Task + Data File (DSE Lv 4–5). Confirm you have read it without writing the response—ask me to list the required tone and key constraints first.' },
+              { id: 'q_p3_2', title: '⚡ High-Band Register Shift', preview: 'Transform informal logs into crisp third-person prose', prompt: 'Challenge me to adapt these informal Data File notes into concise, formal third-person prose while preserving subtle conditions and qualifiers.' },
+              { id: 'q_p3_3', title: '⚡ Full 4-Criteria Audit', preview: 'Audit Content, Language, Organisation & Appropriacy', prompt: 'Audit my Paper 3 Part B draft across Content, anti-lifting Language, Organisation, and Appropriacy against the Data File in our chat.' }
+            ]
+          }
+        },
+
+        p4: {
+          code: 'Paper 4',
+          title: 'Paper 4 · Speaking',
+          subtitle: ' · 8m Group Discussion + 1m Individual',
+          notesLabel: '📖 P4 Speaking Phrases ↗',
+          notesSlug: 'paper-4-speaking-expressions/',
+          qPlaceholder: 'e.g. Bullet 2, Opening, or IR Q',
+          chipGroups: [
+            {
+              id: 'p4Skill',
+              label: 'Speaking Focus',
+              options: [
+                '✨ Coach All Speaking Skills Naturally',
+                'Agree & Add 1 Reason',
+                'Link to Others (Turn-Taking)',
+                'Disagree Politely',
+                'Invite Quiet Groupmates',
+                '1-Min Examiner Question'
+              ],
+              samples: {
+                '✨ Coach All Speaking Skills Naturally': 'AI practises natural spoken interaction with you (short turns, reasons + HK examples, and clear 1-minute answers).',
+                'Agree & Add 1 Reason': 'Sample: "I agree with Alex because a cooking class is hands-on and helps shy students talk."',
+                'Link to Others (Turn-Taking)': 'Sample: "Building on Wing\'s point about stress, a lunchtime music corner would also help..."',
+                'Disagree Politely': 'Sample: "I see your point, Alex, though hiking in July might be too hot—how about indoor climbing?"',
+                'Invite Quiet Groupmates': 'Sample: "Ken, we haven\'t heard your view yet—which activity do you think Form 4 students prefer?"',
+                '1-Min Examiner Question': 'Sample (1 min): Clear stance → 2 reasons with Hong Kong examples → short closing sentence.'
+              }
+            }
+          ],
+          stageGoals: {
+            s1: [
+              {
+                id: 'p4_s1_card',
+                emoji: '📥',
+                name: 'Load Speaking Topic Card Once',
+                blurb: 'Snap prompt card once · run Ideas → Group → 1-Min IR in 1 chat!',
+                cameraHint: 'Snap the Paper 4 prompt sheet (article clipping + 3 discussion bullets) once'
+              }
+            ],
+            s2: [
+              {
+                id: 'p4_s2_ideas',
+                emoji: '🌆',
+                name: 'Brainstorm HK Examples & Phrases First',
+                blurb: 'Uses loaded topic · local examples (no memorised speech)',
+                cameraHint: 'Uses the topic card already in your chat!'
+              },
+              {
+                id: 'p4_s2_gi',
+                emoji: '💬',
+                name: 'Start Group Discussion (1 Turn Each)',
+                blurb: 'AI plays groupmates 1 short turn at a time (text or Voice Mode)',
+                cameraHint: 'Uses the topic card already in your chat!'
+              },
+              {
+                id: 'p4_s2_ir',
+                emoji: '⏱️',
+                name: 'Switch to 1-Min Examiner Question',
+                blurb: 'Examiner asks 1 follow-up on the SAME topic & checks your answer',
+                cameraHint: 'Uses the same topic in your chat!'
+              }
+            ],
+            oneshot: [
+              {
+                id: 'p4_1s_gi',
+                emoji: '💬',
+                name: 'Group Discussion Role-Play (1-Shot)',
+                blurb: 'AI plays groupmates 1 short spoken turn at a time',
+                cameraHint: 'Snap the Paper 4 topic sheet',
+                samplesByBand: {
+                  lv2: 'Topic: Choosing a farewell gift for your class teacher — (1) what gift, (2) price, (3) when to give it.',
+                  lv3: 'Topic: School "Mental Wellness Week" — (1) activities, (2) time & venue, (3) attracting shy students.',
+                  lv45: 'Topic: Should Hong Kong malls introduce "quiet study zones" for secondary students on weekday afternoons?'
+                }
+              },
+              {
+                id: 'p4_1s_ir',
+                emoji: '⏱️',
+                name: '1-Min Examiner Question (1-Shot)',
+                blurb: '1 follow-up question · stance + 2 reasons + HK example',
+                cameraHint: 'Snap the Paper 4 topic sheet',
+                samplesByBand: {
+                  lv2: 'Topic: Keeping class plants at school. Ask me an easy 1-minute question.',
+                  lv3: 'Topic: Cashless payment at school tuck shops. Ask me a 1-minute examiner question.',
+                  lv45: 'Topic: Compulsory community service for senior students. Ask me a challenging 1-minute question.'
+                }
+              }
+            ]
+          },
+          quickCardsByBand: {
+            lv2: [
+              { id: 'q_p4_1', title: '⚡ Load Topic Card Once', preview: 'Upload Paper 4 sheet once for Ideas + Discussion + IR', prompt: 'I am attaching my HKDSE Paper 4 Speaking topic card (target: DSE Lv 2). Read it and reply ONLY: "✅ Topic ready! Want ideas, group discussion, or 1-min question first?"' },
+              { id: 'q_p4_2', title: '⚡ Help Me Say 3 Simple Sentences', preview: 'Turn my rough idea into 3 easy spoken lines', prompt: 'Using our speaking topic, help me express 1 point in 3 short, easy-to-pronounce DSE Lv 2 English sentences so I won\'t freeze.' },
+              { id: 'q_p4_3', title: '⚡ Slow 1-Turn Groupmate Practice', preview: 'AI says 1–2 easy sentences and waits for me', prompt: 'Practise Group Discussion on our topic at DSE Lv 2. Speak just 1–2 simple sentences as my groupmate Alex, then pause for my reply.' }
+            ],
+            lv3: [
+              { id: 'q_p4_1', title: '⚡ Load Topic Card Once', preview: 'Upload once — do Ideas, Group Role-Play & 1-Min IR in 1 chat', prompt: 'I am attaching my HKDSE Paper 4 Speaking prompt sheet (target: DSE Lv 3). Hold it in memory and reply ONLY: "✅ Topic ready! Shall we brainstorm HK examples or start Group Discussion?"' },
+              { id: 'q_p4_2', title: '⚡ Start Group Discussion (1 Turn)', preview: 'In same chat: AI speaks 2–3 sentences, then waits', prompt: 'Let\'s start Group Interaction on our topic above (DSE Lv 3). Play 2 groupmates, speaking strictly 1 short turn (2–3 natural sentences) at a time, then wait for me.' },
+              { id: 'q_p4_3', title: '⚡ Switch to 1-Min Examiner Q', preview: 'In same chat: ask me 1 Individual Response question', prompt: 'Now act as the Paper 4 examiner on the same topic. Ask me ONE DSE Lv 3 1-minute Individual Response question, wait for my answer, and check my 2 reasons + HK example.' }
+            ],
+            lv45: [
+              { id: 'q_p4_1', title: '⚡ Load Topic Card (Lv 5 Prep)', preview: 'Upload once — full GI + challenging IR in 1 session', prompt: 'I am attaching my Paper 4 Speaking prompt card (target: DSE Lv 4–5). Store it in memory and reply ONLY: "✅ Topic ready! Ready for angles, Group Interaction, or Examiner IR?"' },
+              { id: 'q_p4_2', title: '⚡ Dynamic Group Debate (1 Turn)', preview: 'Groupmates push back slightly & test turn-taking', prompt: 'Run a DSE Level 4–5 Group Interaction on our topic (strictly 1 short turn at a time) where one candidate politely disagrees and another hesitates so I can lead naturally.' },
+              { id: 'q_p4_3', title: '⚡ Harder Lv 5 Examiner IR', preview: 'Abstract follow-up + fluency & depth feedback', prompt: 'Ask me a challenging, higher-order 1-minute Individual Response question on our topic, wait for my response, and critique depth, spoken discourse markers, and vocabulary.' }
+            ]
+          }
+        }
+      };
+
+      var TURN2_TEMPLATES = [
+        {
+          id: 't2_hint',
+          title: '💡 1 Clue Only',
+          sub: 'Line/rule hint — don\'t spoil answer',
+          build: function (st) {
+            var easyNote = st.band === 'lv2' ? ' Keep the clue super short and easy.' : '';
+            var zhTail = st.zhExplain ? ' Give the hint in Chinese with English keywords.' : '';
+            return 'Don\'t give me the full answer yet. Give me ONE short clue (which line to check or which rule broke) so I can try first.' + easyNote + zhTail;
+          }
+        },
+        {
+          id: 't2_retry',
+          title: '✅ Check My New Try',
+          sub: 'Check the answer/sentence I just fixed',
+          build: function (st) {
+            return 'Here is my revised try—check if it is right now for ' + BANDS[st.band].shortLabel + ', and tell me why in 1–2 short lines:\n';
+          }
+        },
+        {
+          id: 't2_zh',
+          title: '漢 Explain Simpler (中文)',
+          sub: 'Simple Chinese tip + English examples',
+          build: function (st) {
+            return 'That explanation was too hard. Please explain it simply in clear Traditional Chinese (繁體書面語), keeping short English examples for ' + BANDS[st.band].shortLabel + '.';
+          }
+        },
+        {
+          id: 't2_quiz',
+          title: '🎯 Quiz My 3 Mistakes',
+          sub: '3 quick items on my weak spots',
+          build: function (st) {
+            return 'Test me with 3 short mini-questions (one at a time, at ' + BANDS[st.band].shortLabel + ') on the exact mistakes I made in this chat.';
+          }
+        },
+        {
+          id: 't2_more',
+          title: '🔁 1 More Like This',
+          sub: 'Fresh DSE item on the same skill',
+          build: function (st) {
+            return 'Give me 1 fresh HKDSE ' + PAPERS[st.paper].code + ' practice question (' + BANDS[st.band].shortLabel + ') on this exact skill, and wait for my try.';
+          }
+        },
+        {
+          id: 't2_vocab',
+          title: '📒 Save 5 Key Phrases',
+          sub: 'Summary list for my vocab book',
+          build: function (st) {
+            return 'Summarise the 5 most useful HKDSE words or phrases from our chat today (' + BANDS[st.band].shortLabel + ') with short meanings and 1 example each.';
+          }
+        }
+      ];
+
+      // State
+      var state = {
+        layoutMode: 'phone', // 'phone' | 'split'
+        mealMode: 'full', // 'quick' | 'full'
+        sessionStage: 's1', // 's1' | 's2' | 's3' | 'oneshot'
+        paper: 'p1',
+        band: 'lv3',
+        socratic: true,
+        zhExplain: false,
+        inputMode: 'photo',
+        qNum: '',
+        goalByPaperStage: {
+          p1: { s1: 'p1_s1_hold', s2: 'p1_s2_checkq', oneshot: 'p1_1s_clue' },
+          p2: { s1: 'p2_s1_draft', s2: 'p2_s2_grammar', oneshot: 'p2_1s_clo' },
+          p3: { s1: 'p3_s1_df', s2: 'p3_s2_para', oneshot: 'p3_1s_para' },
+          p4: { s1: 'p4_s1_card', s2: 'p4_s2_gi', oneshot: 'p4_1s_gi' }
+        },
+        chips: {
+          p1ItemType: '✨ Auto-Detect (Just Type Q#)',
+          p2Part: 'Long Task (~400 words)',
+          p2Genre: '✨ Auto-Check Format from Question',
+          p3Register: '✨ Auto-Check Tone from Task Email',
+          p4Skill: '✨ Coach All Speaking Skills Naturally'
+        },
+        photoFocusNote: '',
+        studentText: '',
+        customExtra: '',
+        customNoteOpen: false,
+        previewTab: 'blocks',
+        pinnedAiId: '', // e.g. 'doubao', 'deepseek', 'app_only', 'custom'
+        customAiUrl: '',
+        workerLive: false,
+        smartImageDataUrl: '',
+        savedPresets: []
+      };
+
+      function loadStoredState() {
+        try {
+          var rawProfile = localStorage.getItem(STORAGE_PROFILE_KEY);
+          if (rawProfile) {
+            var parsed = JSON.parse(rawProfile);
+            if (parsed.band && BANDS[parsed.band]) state.band = parsed.band;
+            if (typeof parsed.socratic === 'boolean') state.socratic = parsed.socratic;
+            if (typeof parsed.zhExplain === 'boolean') state.zhExplain = parsed.zhExplain;
+            if (parsed.layoutMode === 'split' || parsed.layoutMode === 'phone') state.layoutMode = parsed.layoutMode;
+            if (typeof parsed.pinnedAiId === 'string') state.pinnedAiId = parsed.pinnedAiId;
+            if (typeof parsed.customAiUrl === 'string') state.customAiUrl = parsed.customAiUrl;
+          }
+          var rawSaved = localStorage.getItem(STORAGE_SAVED_KEY);
+          if (rawSaved) {
+            var arr = JSON.parse(rawSaved);
+            if (Array.isArray(arr)) state.savedPresets = arr;
+          }
+        } catch (err) {}
+      }
+
+      function saveProfileState() {
+        try {
+          localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify({
+            band: state.band,
+            socratic: state.socratic,
+            zhExplain: state.zhExplain,
+            layoutMode: state.layoutMode,
+            pinnedAiId: state.pinnedAiId,
+            customAiUrl: state.customAiUrl
+          }));
+        } catch (err) {}
+      }
+
+      function savePresetsToStorage() {
+        try {
+          localStorage.setItem(STORAGE_SAVED_KEY, JSON.stringify(state.savedPresets));
+        } catch (err) {}
+      }
+
+      // URL Hash Parsing for Teacher Share Links & Study Note Deep-Links
+      function applyUrlHashIfPresent() {
+        var raw = (window.location.hash || '').replace(/^#/, '').trim();
+        if (!raw) return false;
+        var params = {};
+        var pairs = raw.split('&');
+        for (var i = 0; i < pairs.length; i++) {
+          var kv = pairs[i].split('=');
+          if (kv.length === 2) {
+            params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
+          }
+        }
+        var changed = false;
+        if (params.p && PAPERS[params.p]) {
+          state.paper = params.p;
+          changed = true;
+        }
+        if (params.lv && BANDS[params.lv]) {
+          state.band = params.lv;
+          changed = true;
+        }
+        if (params.s && (params.s === 's1' || params.s === 's2' || params.s === 's3' || params.s === 'oneshot')) {
+          state.sessionStage = params.s;
+          changed = true;
+        }
+        if (params.zh === '1' || params.zh === '0') {
+          state.zhExplain = params.zh === '1';
+          changed = true;
+        }
+        if (params.f) {
+          var pObj = PAPERS[state.paper];
+          for (var g = 0; g < pObj.chipGroups.length; g++) {
+            var grp = pObj.chipGroups[g];
+            for (var o = 0; o < grp.options.length; o++) {
+              if (grp.options[o].toLowerCase().indexOf(params.f.toLowerCase()) !== -1) {
+                state.chips[grp.id] = grp.options[o];
+                changed = true;
+              }
+            }
+          }
+        }
+        if (params.g && state.sessionStage !== 's3') {
+          var list = PAPERS[state.paper].stageGoals[state.sessionStage] || [];
+          for (var k = 0; k < list.length; k++) {
+            if (list[k].id === params.g) {
+              state.goalByPaperStage[state.paper][state.sessionStage] = params.g;
+              changed = true;
+            }
+          }
+        }
+        return changed;
+      }
+
+      function buildShareUrl() {
+        var stg = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+        var activeGoal = getActiveGoalObj();
+        var primaryChip = '';
+        if (state.paper === 'p1') primaryChip = state.chips.p1ItemType;
+        if (state.paper === 'p2') primaryChip = state.chips.p2Genre;
+        if (state.paper === 'p3') primaryChip = state.chips.p3Register;
+        if (state.paper === 'p4') primaryChip = state.chips.p4Skill;
+
+        var query = [
+          'p=' + encodeURIComponent(state.paper),
+          'lv=' + encodeURIComponent(state.band),
+          's=' + encodeURIComponent(stg),
+          'g=' + encodeURIComponent(activeGoal ? activeGoal.id : ''),
+          'zh=' + (state.zhExplain ? '1' : '0')
+        ];
+        if (primaryChip && primaryChip.indexOf('Auto-') === -1) {
+          query.push('f=' + encodeURIComponent(primaryChip));
+        }
+
+        var base = LIVE_SITE_BASE;
+        try {
+          if (window.location.href && window.location.href.indexOf('skhhcss-eng.github.io') !== -1) {
+            base = window.location.href.split('#')[0];
+          }
+        } catch (e) {}
+        return base + '#' + query.join('&');
+      }
+
+      // Clipboard helper
+      function copyTextToClipboard(text, onDone) {
+        var handled = false;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            if (!handled) {
+              handled = true;
+              onDone(true);
+            }
+          }).catch(function () {
+            if (!handled) {
+              handled = true;
+              fallbackCopy(text, onDone);
+            }
+          });
+        } else {
+          fallbackCopy(text, onDone);
+        }
+      }
+
+      function fallbackCopy(text, onDone) {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.top = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          onDone(ok);
+        } catch (e) {
+          onDone(false);
+        }
+      }
+
+      var toastTimer = null;
+      function showToast(msg) {
+        var el = document.getElementById('toastBanner');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('is-visible');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          el.classList.remove('is-visible');
+        }, 2300);
+      }
+
+      function getStageGoalsList() {
+        var stg = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+        return PAPERS[state.paper].stageGoals[stg] || PAPERS[state.paper].stageGoals.s1;
+      }
+
+      function getActiveGoalObj() {
+        var stg = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+        var list = getStageGoalsList();
+        var savedId = state.goalByPaperStage[state.paper][stg];
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].id === savedId) return list[i];
+        }
+        return list[0];
+      }
+
+      function getActiveQuickCards() {
+        var pObj = PAPERS[state.paper];
+        return pObj.quickCardsByBand[state.band] || pObj.quickCardsByBand.lv3;
+      }
+
+      function buildSafetyNetLine() {
+        if (state.paper === 'p1') {
+          var t = state.chips.p1ItemType || '';
+          if (t.indexOf('Auto-Detect') !== -1) {
+            return 'Auto-Detect Step: First tell me in 1 short, simple line what kind of Paper 1 question this is (e.g. True/False/Not Given, Summary Cloze word form, Pronoun reference, or Inference) and 1 key trap to watch out for.';
+          }
+          return 'Question Type Focus: [' + t + ']. (Safety rule: If the actual question on my worksheet is a different type, follow my actual worksheet question and gently tell me its real type in 1 short line.)';
+        }
+        if (state.paper === 'p2') {
+          var g = state.chips.p2Genre || '';
+          var pt = state.chips.p2Part || 'Long Task (~400 words)';
+          if (g.indexOf('Auto-Check') !== -1) {
+            return 'Section: [' + pt + ']. Auto-Format Check: Read the writing prompt first and confirm the exact HKDSE text format, target reader, tone, and greeting/heading/sign-off rules in 2 short lines so I don\'t write the wrong genre.';
+          }
+          return 'Section: [' + pt + '], Format: [' + g + ']. (Safety rule: If my question prompt actually asks for a different format or tone, warn me immediately first!)';
+        }
+        if (state.paper === 'p3') {
+          var r = state.chips.p3Register || '';
+          if (r.indexOf('Auto-Check') !== -1) {
+            return 'Auto-Tone Check: Check the Task instruction email first and tell me in 1 line who the reader is and whether my tone must be Formal or Semi-formal/Polite.';
+          }
+          return 'Task Focus: [' + r + ']. (Safety rule: If the Task email requires a different tone or format, alert me first.)';
+        }
+        var sk = state.chips.p4Skill || '';
+        if (sk.indexOf('Coach All') !== -1) {
+          return 'Speaking Focus: Natural turn-taking, clear reasons with Hong Kong examples, and spoken fluency.';
+        }
+        return 'Speaking Skill Focus: [' + sk + '].';
+      }
+
+      // Build Prompt across Stage 1 (Start Chat Once), Stage 2 (Same Chat Next Task), and 1-Shot!
+      function buildPromptParts() {
+        var bandObj = BANDS[state.band];
+        var goalObj = getActiveGoalObj();
+        var stg = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+        var qRef = state.qNum && state.qNum.trim() ? state.qNum.trim() : '';
+
+        var block1 = '';
+        var block2 = '';
+        var rules = [];
+        var block4 = '';
+
+        if (stg === 's1') {
+          // STAGE 1: Start Session (Upload Once, Hold & Wait!)
+          block1 = bandObj.promptRole + ' Use British English.';
+          if (goalObj.id === 'p1_s1_hold') {
+            block2 = 'We are starting an HKDSE Paper 1 Reading study session. Read and remember all paragraphs (and any questions) I attach. IMPORTANT: Do NOT answer any questions yet! Reply ONLY: "✅ Passage ready! Tell me which question number (e.g. Q1, Q5) you want help with."';
+          } else if (goalObj.id === 'p1_s1_gist') {
+            block2 = 'We are starting an HKDSE Paper 1 Reading session. Read my passage, give a super short 1-line topic map for each paragraph, and wait for me to name a question number—do NOT answer the questions yet.';
+          } else if (goalObj.id === 'p2_s1_draft') {
+            block2 = 'We are starting an HKDSE Paper 2 Writing session. ' + buildSafetyNetLine() + ' Read my writing question and essay draft, give a 2-line overview (1 strength + whether my format/tone fits), then wait for me to choose what to fix first—do NOT rewrite my essay.';
+          } else if (goalObj.id === 'p2_s1_plan') {
+            block2 = 'We are planning an HKDSE Paper 2 Writing task before I write. ' + buildSafetyNetLine() + ' Help me check Audience & Tone and brainstorm 3 short ideas + 6 useful words—do NOT write paragraphs for me.';
+          } else if (goalObj.id === 'p3_s1_df') {
+            block2 = 'We are starting an HKDSE Paper 3 Integrated Skills session. ' + buildSafetyNetLine() + ' Read and remember the Task email and Data File pages I attach. Reply with ONLY a 2-line summary of (1) my role/reader/format and (2) "✅ Data File ready—what shall we check first?" Do NOT write the task for me.';
+          } else if (goalObj.id === 'p3_s1_listen') {
+            block2 = 'Create an HKDSE Paper 3 Part A listening note-taking drill matched to ' + bandObj.shortLabel + ': show a blank note card first, followed by a realistic 2-speaker Hong Kong dialogue with time/spelling distractors for Read-Aloud practice (hide answers until I try).';
+          } else {
+            block2 = 'We are starting an HKDSE Paper 4 Speaking session. Read and remember the Speaking Topic Card I attach. Reply ONLY: "✅ Speaking topic ready! Shall we (1) brainstorm HK examples, (2) start Group Discussion, or (3) try a 1-Minute Examiner Question?"';
+          }
+        } else if (stg === 's2') {
+          // STAGE 2: Same Chat Follow-Up (No Re-Uploading!)
+          block1 = 'Continuing in our SAME chat (' + bandObj.shortLabel + ' level — use the passage / Data File / topic already shared above).';
+          var targetSpot = qRef ? ('Focus on **' + qRef + '**. ') : '';
+          var safety = buildSafetyNetLine();
+
+          if (goalObj.id === 'p1_s2_checkq') {
+            block2 = targetSpot + safety + ' Point me to the exact paragraph/line clue in our passage above and ask 1 guiding question so I can work out the answer myself.';
+          } else if (goalObj.id === 'p1_s2_vocab') {
+            block2 = targetSpot + 'Break down the tough sentence(s) and unfamiliar words in this part of our passage using simple clues and word forms (noun/verb/adj).';
+          } else if (goalObj.id === 'p1_s2_more') {
+            block2 = 'Using the same reading passage above, create 2 fresh practice questions matching ' + safety + ' Wait for my answers before marking.';
+          } else if (goalObj.id === 'p2_s2_grammar') {
+            block2 = targetSpot + 'Look at my essay draft above. Spot my top 3 repeated grammar or sentence mistakes (quote my exact lines) and let me try fixing them one by one.';
+          } else if (goalObj.id === 'p2_s2_para') {
+            block2 = (qRef ? ('Look at **' + qRef + '** of my draft above. ') : 'Look at one body paragraph of my draft above. ') + 'Coach me to join choppy sentences, improve linking words, and lift it by +1 DSE level naturally.';
+          } else if (goalObj.id === 'p2_s2_format') {
+            block2 = safety + ' Check my draft above to see if I missed any prompt points or made format/tone slips.';
+          } else if (goalObj.id === 'p3_s2_pick') {
+            block2 = targetSpot + 'Using the Task email and Data File above, guide me step-by-step to spot which relevant facts, dates, and conditions I need (and which distractors to ignore).';
+          } else if (goalObj.id === 'p3_s2_para') {
+            block2 = targetSpot + safety + ' Help me rewrite that informal Data File note in my own words and suitable tone without copying chunks verbatim.';
+          } else if (goalObj.id === 'p3_s2_audit') {
+            block2 = 'Compare my written Part B draft against the Task email and Data File already in our chat. Check missing points/dates, copied phrases, and tone.';
+          } else if (goalObj.id === 'p4_s2_ideas') {
+            block2 = targetSpot + 'On our speaking topic above, ask me for 1 rough idea first, then help me add 2 realistic Hong Kong examples and 4 natural spoken phrases.';
+          } else if (goalObj.id === 'p4_s2_gi') {
+            block2 = 'Let\'s start Group Interaction on our speaking topic above! ' + safety + ' Play fellow groupmate(s) speaking strictly ONE short turn (2–3 natural sentences) at a time, then pause and wait for my reply.';
+          } else {
+            block2 = 'Now act as the Paper 4 Examiner on our same speaking topic above. Ask me ONE 1-minute Individual Response question (' + bandObj.shortLabel + '), wait for my reply, and check my stance + 2 reasons + HK example.';
+          }
+        } else {
+          // 1-SHOT STANDALONE PROMPT
+          block1 = bandObj.promptRole + ' Use British English.';
+          var oneTarget = qRef ? ('Question / Section: **' + qRef + '**. ') : '';
+          block2 = 'HKDSE ' + PAPERS[state.paper].code + ' — ' + goalObj.name + '. ' + oneTarget + buildSafetyNetLine();
+        }
+
+        // Block 3: Coaching & Language Rules
+        if (state.socratic) {
+          rules.push(state.band === 'lv2'
+            ? '• Hints First: Give 1 short, easy clue at a time—do NOT write the full answer for me.'
+            : '• Hints First: Give clues or spot priority errors first—do NOT write the full answer/essay upfront. Let me try step by step.');
+        } else {
+          rules.push('• Direct Coach: Point out key errors clearly and show short model lines matched to ' + bandObj.shortLabel + '.');
+        }
+
+        if (state.zhExplain) {
+          rules.push('• Chinese Help: Explain tips and mistakes in clear Chinese (中文解說), while keeping all English examples and vocabulary in British English.');
+        } else if (stg !== 's2') {
+          rules.push('• Language: Clear, concise student-friendly English matched to ' + bandObj.shortLabel + '.');
+        }
+
+        if (state.customExtra && state.customExtra.trim()) {
+          rules.push('• Extra note: ' + state.customExtra.trim());
+        }
+        var block3 = rules.join('\n');
+
+        // Block 4: Material / Input Slot
+        if (stg === 's2') {
+          var extraS2 = state.inputMode === 'photo' ? state.photoFocusNote.trim() : state.studentText.trim();
+          if (goalObj.id === 'p3_s2_audit') {
+            block4 = 'I am attaching ONLY my written draft now (please compare it with the Data File we loaded earlier).' + (extraS2 ? ('\nMy note: ' + extraS2) : '');
+          } else if (extraS2) {
+            block4 = 'My question / attempt / note: ' + extraS2;
+          } else if (qRef) {
+            block4 = 'Please check ' + qRef + ' from the material already in our chat (or the 1 question box I attach if needed).';
+          } else {
+            block4 = 'Use the passage / Data File / topic already loaded in our chat.';
+          }
+        } else if (state.inputMode === 'photo') {
+          block4 = 'Please read the photo(s) / screenshot(s) I attach (' + goalObj.cameraHint + ').';
+          if (state.photoFocusNote && state.photoFocusNote.trim()) {
+            block4 += '\nMy note / attempt: ' + state.photoFocusNote.trim();
+          }
+        } else {
+          var txt = state.studentText ? state.studentText.trim() : '';
+          block4 = txt
+            ? ('My HKDSE material / draft:\n"""\n' + txt + '\n"""')
+            : 'My HKDSE material / draft:\n[Paste your text here before sending]';
+        }
+
+        var fullText = stg === 's2'
+          ? [block1, block2, block3, block4].join('\n\n')
+          : [
+              '[1. TARGET LEVEL — ' + bandObj.shortLabel + ']',
+              block1,
+              '',
+              '[2. TASK & FOCUS]',
+              block2,
+              '',
+              '[3. COACHING RULES]',
+              block3,
+              '',
+              '[4. MY WORKSHEET]',
+              block4
+            ].join('\n');
+
+        return {
+          role: block1,
+          task: block2,
+          rules: block3,
+          input: block4,
+          full: fullText,
+          stage: stg
+        };
+      }
+
+      function buildQuickCardFullPrompt(cardObj) {
+        var bandObj = BANDS[state.band];
+        var lines = [cardObj.prompt];
+        if (state.qNum && state.qNum.trim()) {
+          lines.push('Focus question/part: ' + state.qNum.trim() + '.');
+        }
+        lines.push('Target level: ' + bandObj.shortLabel + ' (' + bandObj.advice + ').');
+        if (state.zhExplain) {
+          lines.push('Explain tips in clear Chinese (中文解說), keeping English examples.');
+        }
+        return lines.join('\n');
+      }
+
+      // Smart Local Heuristic Classifier (instant fallback when Worker isn't live yet!)
+      function localSmartClassify(rawText, hasPhoto) {
+        var t = (rawText || '').trim();
+        var lower = t.toLowerCase();
+        var paper = state.paper;
+        var chip = '';
+        var stage = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+        var tipEn = '';
+        var tipZh = '';
+
+        if (/太深|唔明|唔識解|simpler|too hard|don't understand|再講/i.test(t)) {
+          tipEn = 'Detected: Follow-up clarification request — asking AI to simplify and give 1 step-by-step example.';
+          tipZh = '偵測到：跟進提問 — 要求 AI 用更淺白字眼拆解，並附 1 個例子。';
+          var simpPrompt = 'Your last explanation was too difficult for my current level (' + BANDS[state.band].shortLabel + '). Please explain it again using much simpler everyday words' + (state.zhExplain ? ' in Traditional Chinese (繁體書面語) with short English examples' : '') + ', and give me 1 easy check question.';
+          return {
+            paper: paper,
+            stage: 's2',
+            detectedLabel: 'Follow-Up · Simplify Explanation',
+            chip: '',
+            tip: state.zhExplain ? tipZh : tipEn,
+            builtPrompt: simpPrompt
+          };
+        }
+
+        if (/refer to|refers to|指什麼|代名詞|\b(it|they|this|that|these|those|such)\b.*line/i.test(t)) {
+          paper = 'p1';
+          chip = 'Pronoun ("it / they / this")';
+          tipEn = 'Pronoun Reference question! Read 1–2 sentences BEFORE the word and match singular vs plural.';
+          tipZh = '代名詞指代題（Pronoun Reference）！必讀前 1–2 句，並檢查單數／複數是否一致。';
+        } else if (/true.*false|not given|t\/f\/ng|無從判斷/i.test(t)) {
+          paper = 'p1';
+          chip = 'True / False / Not Given';
+          tipEn = 'True / False / Not Given! Opposite meaning = False; missing info = Not Given.';
+          tipZh = 'T/F/NG 判斷題！與原文矛盾＝False；原文完全沒提＝Not Given。';
+        } else if (/one word|summary|fill in|blank|cloze|填充|詞性/i.test(t)) {
+          paper = 'p1';
+          chip = 'Summary Cloze (Fill Blanks)';
+          tipEn = 'Summary Cloze! Check whether the gap needs a Noun, Verb, or Adjective—and check plural/tense.';
+          tipZh = '摘要填充題（Summary Cloze）！先判斷空格需要名詞、動詞定形容詞，再檢查時態及單複數。';
+        } else if (/tone|attitude|writer feel|語氣|態度|irony/i.test(t)) {
+          paper = 'p1';
+          chip = 'Writer\'s Tone & Attitude';
+          tipEn = 'Tone & Attitude question! Look for positive vs critical adjectives in that paragraph.';
+          tipZh = '作者語氣態度題！留意段落中褒義或批評字眼。';
+        } else if (/data file|whatsapp|part b|integrated|綜合|聆聽|listening/i.test(t)) {
+          paper = 'p3';
+          chip = '✨ Auto-Check Tone from Task Email';
+          tipEn = 'Paper 3 Integrated Skills! Never copy WhatsApp/notes word-for-word—adapt into polite sentences.';
+          tipZh = '卷三綜合能力！切勿照抄 Data File 口語字句，須改寫成合適語氣。';
+        } else if (/group interaction|group discussion|individual response|examiner|speaking|口試|小組討論/i.test(t)) {
+          paper = 'p4';
+          chip = '✨ Coach All Speaking Skills Naturally';
+          tipEn = 'Paper 4 Speaking! Practise short natural spoken turns with 1 reason + 1 Hong Kong example.';
+          tipZh = '卷四說話！練習簡短自然發言，每次包含「觀點＋原因＋香港例子」。';
+        } else if (/dear editor|letter to the editor/i.test(lower)) {
+          paper = 'p2';
+          chip = 'Letter to the Editor';
+          tipEn = 'Paper 2 Letter to the Editor! Use formal tone, "Dear Editor," and end with "Yours faithfully,".';
+          tipZh = '卷二給編輯的信！語氣須正式，以 Dear Editor 開頭、Yours faithfully 作結。';
+        } else if (/proposal|建議書/i.test(t)) {
+          paper = 'p2';
+          chip = 'Proposal';
+          tipEn = 'Paper 2 Proposal! Include a clear Title + Subheadings (Background, Suggestions, Benefits).';
+          tipZh = '卷二建議書（Proposal）！記得加上標題及小標題（背景、建議、好處）。';
+        } else if (/article|magazine|文章|開頭同分段/i.test(t)) {
+          paper = 'p2';
+          chip = 'Article';
+          tipEn = 'Paper 2 Article! Add a catchy Headline + engaging hook—never write "Dear..." or letter sign-offs.';
+          tipZh = '卷二文章（Article）！須寫吸引標題，切勿寫 Dear... 等書信格式。';
+        } else if (/essay|draft|writing|作文|寫作/i.test(t)) {
+          paper = 'p2';
+          chip = '✨ Auto-Check Format from Question';
+          tipEn = 'Paper 2 Writing! Let AI check format & top 3 grammar habits first instead of rewriting your essay.';
+          tipZh = '卷二寫作！讓 AI 先檢查格式及頭號 3 個文法錯誤，由你親手改寫。';
+        } else {
+          paper = state.paper;
+          chip = state.paper === 'p1' ? '✨ Auto-Detect (Just Type Q#)' : '';
+          tipEn = hasPhoto
+            ? 'Photo ready! Copy this prompt and attach your question photo in your AI app—it will auto-detect the exact question type first.'
+            : 'Auto-Detect prompt built! AI will identify the exact DSE skill and give you a step-by-step clue.';
+          tipZh = hasPhoto
+            ? '相片已就緒！複製以下提示詞並於 AI App 附上相片，AI 會先自動辨認題型再給提示。'
+            : '已建立自動辨認提示詞！AI 會先指出題型重點，再逐步引導你作答。';
+        }
+
+        // Temporarily build clean prompt
+        var bandLabel = BANDS[state.band].shortLabel;
+        var builtLines = [
+          'Act as a supportive HKDSE English teacher coaching a student aiming for ' + bandLabel + ' (British English).',
+          'Step 1: Identify the exact HKDSE Paper & question type / format in 1 simple line, and warn me of 1 common trap.',
+          'Step 2: Give me 1 clear clue or spot my top mistakes first—do NOT write the full answer for me so I can try.',
+          state.zhExplain
+            ? 'Language: Explain tips in clear Chinese (中文解說), keeping all English examples in British English.'
+            : 'Language: Use clear, concise English matched to ' + bandLabel + '.'
+        ];
+        if (t) {
+          builtLines.push('\nMy question / worry:\n"""\n' + t + '\n"""');
+        } else {
+          builtLines.push('\n(Please inspect the HKDSE question photo I attach.)');
+        }
+
+        return {
+          paper: paper,
+          stage: stage === 's1' ? 'oneshot' : stage,
+          detectedLabel: PAPERS[paper].code + (chip ? (' · ' + chip.replace(/^✨\s*/, '')) : ' · Smart Coach'),
+          chip: chip,
+          tip: state.zhExplain ? tipZh : tipEn,
+          builtPrompt: builtLines.join('\n')
+        };
+      }
+
+      // Check Cloudflare Worker health silently on init
+      function checkWorkerHealth() {
+        var dot = document.getElementById('workerStatusDot');
+        try {
+          fetch(DEFAULT_WORKER_URL + '/health', { method: 'GET' })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d && d.ok && d.hasApiKey) {
+                state.workerLive = true;
+                if (dot) dot.classList.add('is-live');
+              }
+            })
+            .catch(function () {});
+        } catch (e) {}
+      }
+
+      // Compress uploaded question photo for Worker Vision call
+      function compressImageFile(file, callback) {
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            var maxDim = 1100;
+            var w = img.width;
+            var h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w >= h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            var dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+            callback(dataUrl);
+          };
+          img.onerror = function () { callback(''); };
+          img.src = ev.target.result;
+        };
+        reader.onerror = function () { callback(''); };
+        reader.readAsDataURL(file);
+      }
+
+      // Render functions
+      function renderLayoutMode() {
+        var body = document.body;
+        var btnPhone = document.getElementById('btnLayoutPhone');
+        var btnSplit = document.getElementById('btnLayoutSplit');
+        if (state.layoutMode === 'split') {
+          body.classList.remove('mode-phone-frame');
+          body.classList.add('mode-split-view');
+          btnPhone.classList.remove('is-active');
+          btnSplit.classList.add('is-active');
+        } else {
+          body.classList.remove('mode-split-view');
+          body.classList.add('mode-phone-frame');
+          btnPhone.classList.add('is-active');
+          btnSplit.classList.remove('is-active');
+        }
+      }
+
+      function renderPaperNav() {
+        var tabs = document.querySelectorAll('#paperTabs .paper-tab');
+        for (var i = 0; i < tabs.length; i++) {
+          var p = tabs[i].getAttribute('data-paper');
+          tabs[i].classList.toggle('is-active', p === state.paper);
+        }
+        var pObj = PAPERS[state.paper];
+        document.getElementById('paperStripTitle').textContent = pObj.title;
+        document.getElementById('paperStripSub').textContent = pObj.subtitle;
+
+        var notesLink = document.getElementById('paperNotesLink');
+        notesLink.textContent = pObj.notesLabel;
+        notesLink.href = LEARNING_MATERIALS_BASE + pObj.notesSlug;
+
+        document.getElementById('qnumInput').placeholder = pObj.qPlaceholder;
+      }
+
+      function renderBandsAndHelpers() {
+        var btns = document.querySelectorAll('#bandGrid .band-btn');
+        for (var i = 0; i < btns.length; i++) {
+          var b = btns[i].getAttribute('data-band');
+          btns[i].classList.toggle('is-active', b === state.band);
+        }
+        document.getElementById('bandAdviceText').textContent = BANDS[state.band].advice;
+
+        var socBtn = document.getElementById('toggleSocratic');
+        socBtn.classList.toggle('is-on', state.socratic);
+        socBtn.setAttribute('aria-pressed', state.socratic ? 'true' : 'false');
+
+        var zhBtn = document.getElementById('toggleZh');
+        zhBtn.classList.toggle('is-on', state.zhExplain);
+        zhBtn.setAttribute('aria-pressed', state.zhExplain ? 'true' : 'false');
+      }
+
+      function renderSessionStageAndGoals() {
+        var stageBtns = document.querySelectorAll('#sessionStepper .stage-pill-btn');
+        for (var i = 0; i < stageBtns.length; i++) {
+          var st = stageBtns[i].getAttribute('data-stage');
+          stageBtns[i].classList.toggle('is-active', st === state.sessionStage);
+        }
+
+        var expBox = document.getElementById('stageExplainerBox');
+        var goalListEl = document.getElementById('goalList');
+        var step3Card = document.getElementById('step3Card');
+        var t2Card = document.getElementById('turn2Card');
+
+        if (state.sessionStage === 's1') {
+          expBox.innerHTML = '<strong>① Start a New Chat:</strong> Snap your Reading Text, Data File, Essay, or Speaking Card <strong>once</strong>. AI holds it in memory and waits for you!';
+          goalListEl.classList.remove('hidden');
+          step3Card.classList.remove('hidden');
+          t2Card.classList.remove('is-highlighted');
+        } else if (state.sessionStage === 's2') {
+          expBox.innerHTML = '<strong>② Stay in the SAME AI Chat:</strong> No need to snap the passage again! Just type the <strong>Question #</strong> (e.g. Q5) or pick your next task.';
+          goalListEl.classList.remove('hidden');
+          step3Card.classList.remove('hidden');
+          t2Card.classList.remove('is-highlighted');
+        } else if (state.sessionStage === 's3') {
+          expBox.innerHTML = '<strong>③ Reply to AI in the Same Chat:</strong> Tap any <strong>💬 Reply Card</strong> on the right (or below) to ask for 1 clue, check your rewrite, or get a 3-question quiz!';
+          goalListEl.classList.add('hidden');
+          step3Card.classList.add('hidden');
+          t2Card.classList.add('is-highlighted');
+        } else {
+          expBox.innerHTML = '<strong>⚡ 1-Shot Quick Ask:</strong> Only have <strong>1 standalone question</strong>? Combines your Level + Task + Photo/Text in one single paste.';
+          goalListEl.classList.remove('hidden');
+          step3Card.classList.remove('hidden');
+          t2Card.classList.remove('is-highlighted');
+        }
+
+        if (state.sessionStage !== 's3') {
+          var list = getStageGoalsList();
+          var activeObj = getActiveGoalObj();
+          var html = '';
+          for (var j = 0; j < list.length; j++) {
+            var g = list[j];
+            var isAct = activeObj && g.id === activeObj.id;
+            html +=
+              '<button type="button" class="goal-card' + (isAct ? ' is-active' : '') + '" data-goal-id="' + g.id + '">' +
+                '<span class="goal-emoji" aria-hidden="true">' + g.emoji + '</span>' +
+                '<span class="goal-body">' +
+                  '<span class="goal-top">' +
+                    '<span class="goal-name">' + escapeHtml(g.name) + '</span>' +
+                    '<span class="goal-check" aria-hidden="true">✓</span>' +
+                  '</span>' +
+                  '<span class="goal-blurb">' + escapeHtml(g.blurb) + '</span>' +
+                '</span>' +
+              '</button>';
+          }
+          goalListEl.innerHTML = html;
+        }
+      }
+
+      function resolveChipSample(samplesMap, selectedVal) {
+        if (!samplesMap || !samplesMap[selectedVal]) return '';
+        var entry = samplesMap[selectedVal];
+        if (typeof entry === 'string') return entry;
+        return entry[state.band] || entry.lv3 || '';
+      }
+
+      function resolveChipNoteUrl(grp, selectedVal) {
+        if (grp.id === 'p2Genre' && GENRE_NOTE_SLUGS[selectedVal]) {
+          return LEARNING_MATERIALS_BASE + GENRE_NOTE_SLUGS[selectedVal];
+        }
+        if (grp.noteLinks && grp.noteLinks[selectedVal]) {
+          return LEARNING_MATERIALS_BASE + grp.noteLinks[selectedVal];
+        }
+        return LEARNING_MATERIALS_BASE + PAPERS[state.paper].notesSlug;
+      }
+
+      function renderDynamicChips() {
+        var container = document.getElementById('dynamicChipsContainer');
+        var qRow = document.getElementById('qnumRow');
+
+        // Show Question # input in Same-Chat (s2) and 1-Shot modes
+        qRow.classList.toggle('hidden', state.sessionStage === 's1');
+
+        var pObj = PAPERS[state.paper];
+        var bandLabel = BANDS[state.band].shortLabel;
+        var html = '';
+        for (var i = 0; i < pObj.chipGroups.length; i++) {
+          var grp = pObj.chipGroups[i];
+          var selectedVal = state.chips[grp.id] || grp.options[0];
+          var sampleDesc = resolveChipSample(grp.samples, selectedVal);
+          var noteUrl = resolveChipNoteUrl(grp, selectedVal);
+
+          html += '<div class="sub-group">';
+          html += '<span class="sub-label">' + escapeHtml(grp.label) + '</span>';
+          html += '<div class="chip-wrap">';
+          for (var j = 0; j < grp.options.length; j++) {
+            var opt = grp.options[j];
+            var isAct = opt === selectedVal;
+            html +=
+              '<button type="button" class="choice-chip' + (isAct ? ' is-active' : '') + '" ' +
+              'data-chip-group="' + grp.id + '" data-chip-val="' + escapeAttr(opt) + '">' +
+              escapeHtml(opt) +
+              '</button>';
+          }
+          html += '</div>';
+          if (sampleDesc) {
+            html +=
+              '<div class="chip-sample-box">' +
+                '<div class="chip-sample-head">' +
+                  '<span class="chip-sample-tag">👀 ' + escapeHtml(bandLabel) + ' · ' + escapeHtml(selectedVal.replace(/^✨\s*/, '')) + '</span>' +
+                  '<a href="' + escapeAttr(noteUrl) + '" target="_blank" rel="noopener" class="inline-note-link">📖 Study Note ↗</a>' +
+                '</div>' +
+                '<p class="chip-sample-text">' + escapeHtml(sampleDesc) + '</p>' +
+              '</div>';
+          }
+          html += '</div>';
+        }
+        container.innerHTML = html;
+      }
+
+      function renderInputSection() {
+        var goalObj = getActiveGoalObj();
+        var isPhoto = state.inputMode === 'photo';
+        var isS2 = state.sessionStage === 's2';
+
+        document.getElementById('btnModePhoto').classList.toggle('is-active', isPhoto);
+        document.getElementById('btnModePaste').classList.toggle('is-active', !isPhoto);
+        document.getElementById('photoModePanel').classList.toggle('hidden', !isPhoto);
+        document.getElementById('pasteModePanel').classList.toggle('hidden', isPhoto);
+
+        document.getElementById('materialSubLabel').textContent = isS2
+          ? 'Optional extra note or photo (passage already in chat!)'
+          : 'How will you share your worksheet?';
+        document.getElementById('cameraGuideTitle').textContent = isS2
+          ? '💡 Same-Chat Tip:'
+          : '📸 Attach in your AI app:';
+        document.getElementById('cameraGuideText').textContent = goalObj ? goalObj.cameraHint : '';
+
+        var hasSamples = goalObj && goalObj.samplesByBand;
+        var sampleBtn = document.getElementById('btnLoadSample');
+        sampleBtn.classList.toggle('hidden', !hasSamples);
+        sampleBtn.textContent = '✨ Load ' + BANDS[state.band].shortLabel + ' Sample';
+
+        var badge = document.getElementById('inputStatusBadge');
+        if (isS2) {
+          badge.textContent = 'No Re-Photo';
+          badge.classList.add('badge-green');
+        } else if (isPhoto) {
+          badge.textContent = 'Photo Mode';
+          badge.classList.add('badge-green');
+        } else {
+          badge.textContent = 'Text Mode';
+          badge.classList.add('badge-green');
+        }
+      }
+
+      function renderQuickBiteCards() {
+        var pObj = PAPERS[state.paper];
+        var cards = getActiveQuickCards();
+        var grid = document.getElementById('quickBiteGrid');
+        var metaNote = document.getElementById('quickBiteMetaNote');
+        metaNote.textContent = pObj.code + ' 1-tap cards · ' + BANDS[state.band].shortLabel + (state.zhExplain ? ' + 中文解說' : '');
+
+        var html = '';
+        for (var i = 0; i < cards.length; i++) {
+          var qc = cards[i];
+          html +=
+            '<button type="button" class="quick-card-btn" data-quick-id="' + qc.id + '">' +
+              '<span class="quick-card-top">' +
+                '<span class="quick-card-title">' + escapeHtml(qc.title) + '</span>' +
+                '<span class="quick-copy-pill">Copy</span>' +
+              '</span>' +
+              '<span class="quick-card-preview">' + escapeHtml(qc.preview) + '</span>' +
+            '</button>';
+        }
+        grid.innerHTML = html;
+      }
+
+      function renderPromptXRay() {
+        var isQuick = state.mealMode === 'quick';
+        document.getElementById('btnMealQuick').classList.toggle('is-active', isQuick);
+        document.getElementById('btnMealFull').classList.toggle('is-active', !isQuick);
+        document.getElementById('quickBitePanel').classList.toggle('hidden', !isQuick);
+        document.getElementById('fullPromptPanel').classList.toggle('hidden', isQuick);
+
+        renderQuickBiteCards();
+
+        var parts = buildPromptParts();
+        var bandLabel = BANDS[state.band].shortLabel;
+
+        var stageLabels = {
+          s1: '① Start Chat (Upload Once)',
+          s2: '② Same Chat (No Re-Photo)',
+          oneshot: '⚡ 1-Shot Prompt'
+        };
+
+        document.getElementById('fullBuilderMetaHint').textContent = stageLabels[parts.stage] + ' · ' + bandLabel;
+        document.getElementById('blockRoleHeader').textContent = parts.stage === 's2' ? '1 · Same-Chat Link' : '1 · Target Level';
+        document.getElementById('blockRoleBadge').textContent = bandLabel;
+        document.getElementById('blockInputWhy').textContent = parts.stage === 's2' ? 'Uses chat memory' : 'Photo or text';
+
+        document.getElementById('blockRoleText').textContent = parts.role;
+        document.getElementById('blockTaskText').textContent = parts.task;
+        document.getElementById('blockRulesText').textContent = parts.rules;
+        document.getElementById('blockInputText').textContent = parts.input;
+        document.getElementById('rawPromptView').textContent = parts.full;
+
+        document.getElementById('readinessBadge').textContent = isQuick ? '1-Tap Cards' : (parts.stage === 's2' ? 'Same Chat' : 'Ready');
+
+        var isBlocks = state.previewTab === 'blocks';
+        document.getElementById('btnViewBlocks').classList.toggle('is-active', isBlocks);
+        document.getElementById('btnViewRaw').classList.toggle('is-active', !isBlocks);
+        document.getElementById('xrayBlocksView').classList.toggle('hidden', !isBlocks);
+        document.getElementById('rawPromptView').classList.toggle('hidden', isBlocks);
+
+        document.getElementById('customNoteBox').classList.toggle('hidden', !state.customNoteOpen);
+        document.getElementById('customNoteChevron').textContent = state.customNoteOpen ? '－' : '＋';
+
+        var copyMainLabel = document.getElementById('copyMainLabel');
+        if (!document.getElementById('btnCopyMain').classList.contains('is-copied')) {
+          copyMainLabel.textContent = parts.stage === 's1'
+            ? '📋 Copy Step ① Start Prompt'
+            : (parts.stage === 's2' ? '📋 Copy Step ② Next-Task Prompt' : '📋 Copy 1-Shot Prompt');
+        }
+      }
+
+      function renderAiLauncher() {
+        var grid = document.getElementById('aiChipGrid');
+        var primaryLink = document.getElementById('pinnedPrimaryLink');
+        var primaryText = document.getElementById('pinnedPrimaryText');
+        var hint = document.getElementById('pinnedAiHint');
+        var customBox = document.getElementById('customAiBox');
+
+        var pinnedObj = null;
+        for (var i = 0; i < AI_PLATFORMS.length; i++) {
+          if (AI_PLATFORMS[i].id === state.pinnedAiId) {
+            pinnedObj = AI_PLATFORMS[i];
+            break;
+          }
+        }
+        if (state.pinnedAiId === 'custom' && state.customAiUrl) {
+          pinnedObj = { id: 'custom', name: 'My Custom AI', url: state.customAiUrl };
+        }
+
+        if (pinnedObj) {
+          primaryLink.classList.remove('hidden');
+          primaryLink.href = pinnedObj.url;
+          primaryText.textContent = '★ Open ' + pinnedObj.name;
+          hint.textContent = 'Pinned: ' + pinnedObj.name;
+        } else if (state.pinnedAiId === 'app_only') {
+          primaryLink.classList.add('hidden');
+          hint.textContent = '📱 Using installed phone app';
+        } else {
+          primaryLink.classList.add('hidden');
+          hint.textContent = 'Tap 1 to pin your usual AI';
+        }
+
+        var html = '';
+        for (var j = 0; j < AI_PLATFORMS.length; j++) {
+          var p = AI_PLATFORMS[j];
+          var isPin = state.pinnedAiId === p.id;
+          html +=
+            '<a href="' + escapeAttr(p.url) + '" target="_blank" rel="noopener" ' +
+            'class="ai-launch-chip' + (isPin ? ' is-pinned' : '') + '" data-ai-id="' + p.id + '">' +
+            (isPin ? '★ ' : '') + escapeHtml(p.name) + ' ↗' +
+            '</a>';
+        }
+        html +=
+          '<button type="button" class="ai-launch-chip' + (state.pinnedAiId === 'app_only' ? ' is-pinned' : '') + '" data-ai-id="app_only">' +
+          '📱 Phone App Only' +
+          '</button>' +
+          '<button type="button" class="ai-launch-chip' + (state.pinnedAiId === 'custom' ? ' is-pinned' : '') + '" data-ai-id="custom_toggle">' +
+          '＋ Other Link' +
+          '</button>';
+
+        grid.innerHTML = html;
+        customBox.classList.toggle('hidden', state.pinnedAiId !== 'custom');
+      }
+
+      function renderTurn2Chips() {
+        var grid = document.getElementById('turn2Grid');
+        var html = '';
+        for (var i = 0; i < TURN2_TEMPLATES.length; i++) {
+          var t = TURN2_TEMPLATES[i];
+          html +=
+            '<button type="button" class="turn2-btn" data-t2-id="' + t.id + '">' +
+              '<span class="turn2-btn-title">' +
+                '<span>' + escapeHtml(t.title) + '</span>' +
+                '<span class="turn2-copy-tag">Copy</span>' +
+              '</span>' +
+              '<span class="turn2-btn-sub">' + escapeHtml(t.sub) + '</span>' +
+            '</button>';
+        }
+        grid.innerHTML = html;
+      }
+
+      function renderSavedBadgeAndList() {
+        document.getElementById('savedCountBadge').textContent = String(state.savedPresets.length);
+        var listEl = document.getElementById('savedListContainer');
+        if (!state.savedPresets.length) {
+          listEl.innerHTML = '<p style="margin: 8px 0; font-size: 0.78rem; color: var(--muted); text-align: center;">No saved prompts yet. Tap <strong>☆ Save</strong> next to Copy Prompt to bookmark favourites.</p>';
+          return;
+        }
+        var html = '';
+        for (var i = 0; i < state.savedPresets.length; i++) {
+          var item = state.savedPresets[i];
+          html +=
+            '<div class="saved-item">' +
+              '<div style="min-width: 0;">' +
+                '<p class="saved-item-title">' + escapeHtml(item.title) + '</p>' +
+                '<p class="saved-item-meta">' + escapeHtml(item.meta) + '</p>' +
+              '</div>' +
+              '<div class="saved-item-actions">' +
+                '<button type="button" class="mini-btn" data-load-idx="' + i + '">Load</button>' +
+                '<button type="button" class="mini-btn danger" data-del-idx="' + i + '">✕</button>' +
+              '</div>' +
+            '</div>';
+        }
+        listEl.innerHTML = html;
+      }
+
+      function renderQrModalContent() {
+        var url = buildShareUrl();
+        document.getElementById('shareUrlReadout').value = url;
+        var gObj = getActiveGoalObj();
+        var summary = PAPERS[state.paper].code + ' · ' + BANDS[state.band].shortLabel + (gObj ? (' · ' + gObj.name) : '') + (state.zhExplain ? ' · 中文' : '');
+        document.getElementById('qrSummaryPill').textContent = summary;
+
+        var box = document.getElementById('qrSvgContainer');
+        try {
+          if (typeof window.qrcode === 'function') {
+            var qr = window.qrcode(0, 'M');
+            qr.addData(url);
+            qr.make();
+            box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+          } else {
+            box.innerHTML = '<p style="font-size:0.75rem;color:var(--muted);padding:16px;">Copy the classroom link below to share this exact setup.</p>';
+          }
+        } catch (e) {
+          box.innerHTML = '<p style="font-size:0.75rem;color:var(--muted);padding:16px;">Copy the classroom link below to share this exact setup.</p>';
+        }
+      }
+
+      function renderAll() {
+        renderLayoutMode();
+        renderPaperNav();
+        renderBandsAndHelpers();
+        renderSessionStageAndGoals();
+        renderDynamicChips();
+        renderInputSection();
+        renderPromptXRay();
+        renderAiLauncher();
+        renderTurn2Chips();
+        renderSavedBadgeAndList();
+      }
+
+      function highlightPostCopy(msg) {
+        var launcher = document.getElementById('aiLauncherCard');
+        launcher.classList.add('is-highlighted');
+        showToast(msg);
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function escapeAttr(str) {
+        return escapeHtml(str).replace(/'/g, '&#39;');
+      }
+
+      function wireEvents() {
+        document.getElementById('btnLayoutPhone').addEventListener('click', function () {
+          state.layoutMode = 'phone';
+          saveProfileState();
+          renderLayoutMode();
+        });
+
+        document.getElementById('btnLayoutSplit').addEventListener('click', function () {
+          state.layoutMode = 'split';
+          saveProfileState();
+          renderLayoutMode();
+        });
+
+        document.getElementById('btnMealQuick').addEventListener('click', function () {
+          state.mealMode = 'quick';
+          renderPromptXRay();
+        });
+
+        document.getElementById('btnMealFull').addEventListener('click', function () {
+          state.mealMode = 'full';
+          renderPromptXRay();
+        });
+
+        document.getElementById('paperTabs').addEventListener('click', function (e) {
+          var tab = e.target.closest('.paper-tab');
+          if (!tab) return;
+          var p = tab.getAttribute('data-paper');
+          if (p && PAPERS[p]) {
+            state.paper = p;
+            renderPaperNav();
+            renderSessionStageAndGoals();
+            renderDynamicChips();
+            renderInputSection();
+            renderPromptXRay();
+            renderTurn2Chips();
+          }
+        });
+
+        document.getElementById('bandGrid').addEventListener('click', function (e) {
+          var btn = e.target.closest('.band-btn');
+          if (!btn) return;
+          var b = btn.getAttribute('data-band');
+          if (b && BANDS[b]) {
+            state.band = b;
+            saveProfileState();
+            renderBandsAndHelpers();
+            renderDynamicChips();
+            renderInputSection();
+            renderPromptXRay();
+          }
+        });
+
+        document.getElementById('toggleSocratic').addEventListener('click', function () {
+          state.socratic = !state.socratic;
+          saveProfileState();
+          renderBandsAndHelpers();
+          renderPromptXRay();
+        });
+
+        document.getElementById('toggleZh').addEventListener('click', function () {
+          state.zhExplain = !state.zhExplain;
+          saveProfileState();
+          renderBandsAndHelpers();
+          renderPromptXRay();
+        });
+
+        document.getElementById('sessionStepper').addEventListener('click', function (e) {
+          var btn = e.target.closest('.stage-pill-btn');
+          if (!btn) return;
+          var st = btn.getAttribute('data-stage');
+          if (st) {
+            state.sessionStage = st;
+            if (st !== 's3') state.mealMode = 'full';
+            renderSessionStageAndGoals();
+            renderDynamicChips();
+            renderInputSection();
+            renderPromptXRay();
+          }
+        });
+
+        document.getElementById('goalList').addEventListener('click', function (e) {
+          var card = e.target.closest('.goal-card');
+          if (!card) return;
+          var gid = card.getAttribute('data-goal-id');
+          var stg = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+          if (gid) {
+            state.goalByPaperStage[state.paper][stg] = gid;
+            state.mealMode = 'full';
+            renderSessionStageAndGoals();
+            renderInputSection();
+            renderPromptXRay();
+          }
+        });
+
+        document.getElementById('qnumInput').addEventListener('input', function (e) {
+          state.qNum = e.target.value;
+          renderPromptXRay();
+        });
+
+        document.getElementById('dynamicChipsContainer').addEventListener('click', function (e) {
+          var chip = e.target.closest('.choice-chip');
+          if (!chip) return;
+          var grp = chip.getAttribute('data-chip-group');
+          var val = chip.getAttribute('data-chip-val');
+          if (grp && val) {
+            state.chips[grp] = val;
+            state.mealMode = 'full';
+            renderDynamicChips();
+            renderPromptXRay();
+          }
+        });
+
+        document.getElementById('btnModePhoto').addEventListener('click', function () {
+          state.inputMode = 'photo';
+          renderInputSection();
+          renderPromptXRay();
+        });
+
+        document.getElementById('btnModePaste').addEventListener('click', function () {
+          state.inputMode = 'paste';
+          renderInputSection();
+          renderPromptXRay();
+        });
+
+        document.getElementById('photoFocusInput').addEventListener('input', function (e) {
+          state.photoFocusNote = e.target.value;
+          renderPromptXRay();
+        });
+
+        document.getElementById('studentTextInput').addEventListener('input', function (e) {
+          state.studentText = e.target.value;
+          renderInputSection();
+          renderPromptXRay();
+        });
+
+        document.getElementById('btnLoadSample').addEventListener('click', function () {
+          var g = getActiveGoalObj();
+          if (g && g.samplesByBand) {
+            var sample = g.samplesByBand[state.band] || g.samplesByBand.lv3;
+            state.studentText = sample;
+            document.getElementById('studentTextInput').value = sample;
+            renderInputSection();
+            renderPromptXRay();
+            showToast(BANDS[state.band].shortLabel + ' sample loaded');
+          }
+        });
+
+        document.getElementById('btnClearInput').addEventListener('click', function () {
+          state.studentText = '';
+          document.getElementById('studentTextInput').value = '';
+          renderInputSection();
+          renderPromptXRay();
+        });
+
+        document.getElementById('btnViewBlocks').addEventListener('click', function () {
+          state.previewTab = 'blocks';
+          renderPromptXRay();
+        });
+
+        document.getElementById('btnViewRaw').addEventListener('click', function () {
+          state.previewTab = 'raw';
+          renderPromptXRay();
+        });
+
+        document.getElementById('btnToggleCustomNote').addEventListener('click', function () {
+          state.customNoteOpen = !state.customNoteOpen;
+          renderPromptXRay();
+        });
+
+        document.getElementById('customExtraInput').addEventListener('input', function (e) {
+          state.customExtra = e.target.value;
+          renderPromptXRay();
+        });
+
+        // Quick Grab Copy
+        document.getElementById('quickBiteGrid').addEventListener('click', function (e) {
+          var btn = e.target.closest('.quick-card-btn');
+          if (!btn) return;
+          var qid = btn.getAttribute('data-quick-id');
+          var cards = getActiveQuickCards();
+          var chosen = null;
+          for (var i = 0; i < cards.length; i++) {
+            if (cards[i].id === qid) {
+              chosen = cards[i];
+              break;
+            }
+          }
+          if (!chosen) return;
+          var text = buildQuickCardFullPrompt(chosen);
+          copyTextToClipboard(text, function (ok) {
+            if (ok) {
+              btn.classList.add('is-copied');
+              var pill = btn.querySelector('.quick-copy-pill');
+              if (pill) pill.textContent = '✓ Copied';
+              highlightPostCopy('Copied! Pick your AI app below & paste');
+              setTimeout(function () {
+                btn.classList.remove('is-copied');
+                if (pill) pill.textContent = 'Copy';
+              }, 2000);
+            }
+          });
+        });
+
+        // Main Prompt Copy CTA
+        document.getElementById('btnCopyMain').addEventListener('click', function () {
+          var parts = buildPromptParts();
+          var mainBtn = document.getElementById('btnCopyMain');
+          var mainLabel = document.getElementById('copyMainLabel');
+
+          copyTextToClipboard(parts.full, function (ok) {
+            if (ok) {
+              mainBtn.classList.add('is-copied');
+              mainLabel.textContent = state.pinnedAiId === 'app_only'
+                ? '✓ Copied! Switch to Your AI App & Paste'
+                : '✓ Copied! Open Your AI Below & Paste';
+              highlightPostCopy(parts.stage === 's1'
+                ? 'Step ① copied! After sending, switch to ② Same Chat'
+                : 'Prompt copied! Paste into your AI chat');
+              setTimeout(function () {
+                mainBtn.classList.remove('is-copied');
+                renderPromptXRay();
+              }, 2400);
+            } else {
+              state.previewTab = 'raw';
+              renderPromptXRay();
+              showToast('Select text above to copy');
+            }
+          });
+        });
+
+        // AI Platform Launcher Pinning
+        document.getElementById('aiChipGrid').addEventListener('click', function (e) {
+          var chip = e.target.closest('.ai-launch-chip');
+          if (!chip) return;
+          var id = chip.getAttribute('data-ai-id');
+          if (id === 'custom_toggle') {
+            state.pinnedAiId = 'custom';
+            saveProfileState();
+            renderAiLauncher();
+            document.getElementById('customAiUrlInput').value = state.customAiUrl || '';
+            return;
+          }
+          if (id === 'app_only') {
+            state.pinnedAiId = 'app_only';
+            saveProfileState();
+            renderAiLauncher();
+            showToast('Phone App mode saved');
+            return;
+          }
+          if (id) {
+            state.pinnedAiId = id;
+            saveProfileState();
+            renderAiLauncher();
+          }
+        });
+
+        document.getElementById('btnSaveCustomAi').addEventListener('click', function () {
+          var rawUrl = document.getElementById('customAiUrlInput').value.trim();
+          if (rawUrl && !/^https?:\/\//i.test(rawUrl)) {
+            rawUrl = 'https://' + rawUrl;
+          }
+          state.customAiUrl = rawUrl;
+          state.pinnedAiId = rawUrl ? 'custom' : '';
+          saveProfileState();
+          renderAiLauncher();
+          showToast(rawUrl ? 'Pinned custom AI link!' : 'Cleared custom link');
+        });
+
+        // Stage 3 / Turn 2 Reply Copy Chips
+        document.getElementById('turn2Grid').addEventListener('click', function (e) {
+          var btn = e.target.closest('.turn2-btn');
+          if (!btn) return;
+          var id = btn.getAttribute('data-t2-id');
+          var chosen = null;
+          for (var i = 0; i < TURN2_TEMPLATES.length; i++) {
+            if (TURN2_TEMPLATES[i].id === id) {
+              chosen = TURN2_TEMPLATES[i];
+              break;
+            }
+          }
+          if (!chosen) return;
+          var replyText = chosen.build(state);
+          copyTextToClipboard(replyText, function (ok) {
+            if (ok) {
+              btn.classList.add('is-copied');
+              var tag = btn.querySelector('.turn2-copy-tag');
+              if (tag) tag.textContent = '✓ Copied';
+              highlightPostCopy('Reply copied! Paste into your same AI chat');
+              setTimeout(function () {
+                btn.classList.remove('is-copied');
+                if (tag) tag.textContent = 'Copy';
+              }, 2000);
+            }
+          });
+        });
+
+        // Save Preset
+        document.getElementById('btnSavePreset').addEventListener('click', function () {
+          var pObj = PAPERS[state.paper];
+          var gObj = getActiveGoalObj();
+          var stg = state.sessionStage === 's3' ? 's2' : state.sessionStage;
+          var preset = {
+            title: pObj.code + ' · ' + (gObj ? gObj.name : 'Prompt'),
+            meta: BANDS[state.band].shortLabel + ' · ' + stg.toUpperCase() + (state.zhExplain ? ' · 中文' : ''),
+            paper: state.paper,
+            band: state.band,
+            sessionStage: stg,
+            socratic: state.socratic,
+            zhExplain: state.zhExplain,
+            inputMode: state.inputMode,
+            goalId: gObj ? gObj.id : '',
+            chips: JSON.parse(JSON.stringify(state.chips)),
+            customExtra: state.customExtra
+          };
+          state.savedPresets.unshift(preset);
+          if (state.savedPresets.length > 12) state.savedPresets.pop();
+          savePresetsToStorage();
+          renderSavedBadgeAndList();
+          showToast('Saved to ☆');
+        });
+
+        // Smart Detect & Build Modal (Worker + Instant Local Classifier)
+        var smartModal = document.getElementById('smartModal');
+        var lastSmartResult = null;
+
+        document.getElementById('btnOpenSmartDetect').addEventListener('click', function () {
+          smartModal.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseSmart').addEventListener('click', function () {
+          smartModal.classList.add('hidden');
+        });
+        smartModal.addEventListener('click', function (e) {
+          if (e.target === smartModal) smartModal.classList.add('hidden');
+        });
+
+        document.getElementById('smartPhotoInput').addEventListener('change', function (e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          document.getElementById('smartPhotoName').textContent = '⏳ Reading photo...';
+          compressImageFile(file, function (dataUrl) {
+            state.smartImageDataUrl = dataUrl;
+            document.getElementById('smartPhotoName').textContent = dataUrl ? ('✓ ' + file.name) : 'Photo attached';
+          });
+        });
+
+        document.getElementById('smartDemoChips').addEventListener('click', function (e) {
+          var chip = e.target.closest('.demo-struggle-chip');
+          if (!chip) return;
+          document.getElementById('smartStruggleInput').value = chip.getAttribute('data-demo') || '';
+        });
+
+        document.getElementById('btnRunSmartDetect').addEventListener('click', function () {
+          var textVal = document.getElementById('smartStruggleInput').value.trim();
+          var hasImg = Boolean(state.smartImageDataUrl);
+          if (!textVal && !hasImg) {
+            showToast('Type a question/worry or pick a photo first');
+            return;
+          }
+
+          var runLabel = document.getElementById('runSmartLabel');
+          runLabel.textContent = '⏳ Detecting DSE question type...';
+
+          var payload = {
+            textInput: textVal,
+            imageDataUrl: state.smartImageDataUrl || '',
+            band: state.band,
+            sessionStage: state.sessionStage,
+            zhExplain: state.zhExplain,
+            currentPaper: state.paper
+          };
+
+          fetch(DEFAULT_WORKER_URL + '/api/smart-build', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+            .then(function (r) {
+              if (!r.ok) throw new Error('offline');
+              return r.json();
+            })
+            .then(function (data) {
+              if (!data || !data.ok) throw new Error('fallback');
+              showSmartResult({
+                paper: data.paper || state.paper,
+                stage: data.stage || 'oneshot',
+                detectedLabel: data.detectedLabel || 'Smart Detected',
+                chip: data.detectedChip || '',
+                tip: data.tip || '',
+                builtPrompt: data.builtPrompt || '',
+                source: 'Cloudflare AI Worker'
+              });
+            })
+            .catch(function () {
+              var localRes = localSmartClassify(textVal, hasImg);
+              localRes.source = 'Instant Smart Detector';
+              showSmartResult(localRes);
+            })
+            .finally(function () {
+              runLabel.textContent = '✨ Detect Question Type & Build Prompt';
+            });
+        });
+
+        function showSmartResult(res) {
+          lastSmartResult = res;
+          var box = document.getElementById('smartResultBox');
+          var badges = document.getElementById('smartResultBadges');
+          badges.innerHTML =
+            '<span class="badge-pill badge-green">✓ ' + escapeHtml(res.detectedLabel) + '</span>' +
+            '<span class="badge-pill">' + escapeHtml(BANDS[state.band].shortLabel) + '</span>';
+          document.getElementById('smartResultTip').textContent = '💡 ' + res.tip;
+          document.getElementById('smartBuiltPromptText').textContent = res.builtPrompt;
+          box.classList.remove('hidden');
+        }
+
+        document.getElementById('btnCopySmartPrompt').addEventListener('click', function () {
+          if (!lastSmartResult) return;
+          if (lastSmartResult.paper && PAPERS[lastSmartResult.paper]) {
+            state.paper = lastSmartResult.paper;
+          }
+          if (lastSmartResult.chip) {
+            var grpId = PAPERS[state.paper].chipGroups[0].id;
+            if (state.paper === 'p2' && GENRE_NOTE_SLUGS[lastSmartResult.chip]) grpId = 'p2Genre';
+            state.chips[grpId] = lastSmartResult.chip;
+          }
+          renderAll();
+
+          copyTextToClipboard(lastSmartResult.builtPrompt, function (ok) {
+            smartModal.classList.add('hidden');
+            if (ok) {
+              highlightPostCopy('Smart prompt copied! Open your AI below & paste');
+            }
+          });
+        });
+
+        // QR & Share Link Modal
+        var qrModal = document.getElementById('qrModal');
+        document.getElementById('btnOpenShareQr').addEventListener('click', function () {
+          renderQrModalContent();
+          qrModal.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseQr').addEventListener('click', function () {
+          qrModal.classList.add('hidden');
+        });
+        qrModal.addEventListener('click', function (e) {
+          if (e.target === qrModal) qrModal.classList.add('hidden');
+        });
+        document.getElementById('btnCopyShareLink').addEventListener('click', function () {
+          var url = buildShareUrl();
+          var lbl = document.getElementById('copyShareLabel');
+          copyTextToClipboard(url, function (ok) {
+            if (ok) {
+              lbl.textContent = '✓ Link Copied for Google Classroom!';
+              showToast('Classroom share link copied!');
+              setTimeout(function () {
+                lbl.textContent = '📋 Copy Classroom Link';
+              }, 2200);
+            }
+          });
+        });
+
+        // Saved & Guide Modals
+        var savedModal = document.getElementById('savedModal');
+        var guideModal = document.getElementById('guideModal');
+
+        document.getElementById('btnOpenSaved').addEventListener('click', function () {
+          renderSavedBadgeAndList();
+          savedModal.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseSaved').addEventListener('click', function () {
+          savedModal.classList.add('hidden');
+        });
+        savedModal.addEventListener('click', function (e) {
+          if (e.target === savedModal) savedModal.classList.add('hidden');
+        });
+
+        document.getElementById('savedListContainer').addEventListener('click', function (e) {
+          var loadBtn = e.target.closest('[data-load-idx]');
+          if (loadBtn) {
+            var idx = parseInt(loadBtn.getAttribute('data-load-idx'), 10);
+            var item = state.savedPresets[idx];
+            if (item && BANDS[item.band]) {
+              state.paper = item.paper;
+              state.band = item.band;
+              state.sessionStage = item.sessionStage || 's1';
+              state.socratic = item.socratic;
+              state.zhExplain = item.zhExplain;
+              state.inputMode = item.inputMode;
+              state.mealMode = 'full';
+              if (item.goalId && state.goalByPaperStage[item.paper]) {
+                state.goalByPaperStage[item.paper][state.sessionStage] = item.goalId;
+              }
+              state.chips = JSON.parse(JSON.stringify(item.chips || state.chips));
+              state.customExtra = item.customExtra || '';
+              document.getElementById('customExtraInput').value = state.customExtra;
+              state.customNoteOpen = Boolean(state.customExtra);
+              savedModal.classList.add('hidden');
+              renderAll();
+              showToast('Loaded: ' + item.title);
+            }
+            return;
+          }
+          var delBtn = e.target.closest('[data-del-idx]');
+          if (delBtn) {
+            var dIdx = parseInt(delBtn.getAttribute('data-del-idx'), 10);
+            state.savedPresets.splice(dIdx, 1);
+            savePresetsToStorage();
+            renderSavedBadgeAndList();
+          }
+        });
+
+        document.getElementById('btnOpenGuide').addEventListener('click', function () {
+          guideModal.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseGuide').addEventListener('click', function () {
+          guideModal.classList.add('hidden');
+        });
+        guideModal.addEventListener('click', function (e) {
+          if (e.target === guideModal) guideModal.classList.add('hidden');
+        });
+
+        window.addEventListener('hashchange', function () {
+          if (applyUrlHashIfPresent()) {
+            renderAll();
+            showToast('Loaded shared teacher setup');
+          }
+        });
+      }
+
+      loadStoredState();
+      var fromHash = applyUrlHashIfPresent();
+      renderAll();
+      wireEvents();
+      checkWorkerHealth();
+      if (fromHash) {
+        setTimeout(function () {
+          showToast('Loaded teacher setup: ' + PAPERS[state.paper].code + ' · ' + BANDS[state.band].shortLabel);
+        }, 300);
+      }
+    })();
+  </script>
+</body>
+</html>

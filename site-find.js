@@ -1,7 +1,7 @@
 /**
  * Site Find — one alias index for Ask and the Learning Materials hub.
  * Tess 2026-10-29, plus Practice, Fun Projects, Activities & Competitions,
- * Classroom, HCS Live Class, and Paper 3 / Paper 4 exam skills (41 entries).
+ * Classroom, HCS Live Class, and Paper 3 / Paper 4 exam skills (43 entries).
  * Matching uses the hub brain:
  * collapse whitespace, trim, lower-case, then indexOf.
  * Ask ranks exact, then prefix, then substring, and keeps 3 hits.
@@ -423,6 +423,18 @@
         "paper 1 - exam practice",
         "quest hub",
         "練習"
+      ]
+    },
+    {
+      "title": "Prompt Builder",
+      "path": "prompt-builder/",
+      "aliases": [
+        "prompt builder",
+        "ai",
+        "self-study",
+        "dse",
+        "doubao",
+        "deepseek"
       ]
     },
     {
