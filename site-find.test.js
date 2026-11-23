@@ -47,8 +47,8 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(SiteFind.entries[33].path, "practice/");
   assert.equal(SiteFind.entries[34].title, "Self-Directed Learning");
   assert.equal(SiteFind.entries[34].path, "self-directed-learning/");
-  assert.equal(SiteFind.entries[35].title, "Prompt Builder");
-  assert.equal(SiteFind.entries[35].path, "self-directed-learning/prompt-builder/");
+  assert.equal(SiteFind.entries[35].title, "DSE Smart");
+  assert.equal(SiteFind.entries[35].path, "https://skhhcss-eng.github.io/dse-smart/");
   assert.equal(SiteFind.entries[36].title, "Fun Projects");
   assert.equal(SiteFind.entries[36].path, "fun-projects/");
   assert.equal(SiteFind.entries[37].title, "Activities & Competitions");
@@ -70,10 +70,12 @@ test("alias index is Tess’s list, and paths are unique", () => {
   assert.equal(practice[0].title, "Practice");
   assert.equal(practice[0].path, "practice/");
   assert.equal(SiteFind.search("quest hub")[0].title, "Practice");
-  assert.equal(SiteFind.search("prompt builder")[0].title, "Prompt Builder");
-  assert.equal(SiteFind.search("prompt builder")[0].path, "self-directed-learning/prompt-builder/");
-  assert.ok(SiteFind.search("doubao").some((entry) => entry.path === "self-directed-learning/prompt-builder/"));
-  assert.ok(SiteFind.search("deepseek").some((entry) => entry.path === "self-directed-learning/prompt-builder/"));
+  assert.equal(SiteFind.search("prompt builder")[0].title, "DSE Smart");
+  assert.equal(SiteFind.search("prompt builder")[0].path, "https://skhhcss-eng.github.io/dse-smart/");
+  assert.equal(SiteFind.search("dse smart")[0].title, "DSE Smart");
+  assert.equal(SiteFind.search("dse smart")[0].path, "https://skhhcss-eng.github.io/dse-smart/");
+  assert.ok(SiteFind.search("doubao").some((entry) => entry.path === "https://skhhcss-eng.github.io/dse-smart/"));
+  assert.ok(SiteFind.search("deepseek").some((entry) => entry.path === "https://skhhcss-eng.github.io/dse-smart/"));
   assert.equal(SiteFind.search("say it louder")[0].path, "fun-projects/");
   assert.equal(SiteFind.search("朗誦節")[0].path, "activities-and-competitions/");
   assert.equal(SiteFind.search("roaming mic")[0].path, "activities-and-competitions/");
@@ -228,6 +230,18 @@ test("Find and Ask jump links stay at the origin root on GitHub Pages", () => {
 
   assert.equal(SiteFind.hrefFor("/"), "/");
   assert.equal(SiteFind.hrefFor("/", ""), "/");
+  assert.equal(
+    SiteFind.hrefFor("https://skhhcss-eng.github.io/dse-smart/", ""),
+    "https://skhhcss-eng.github.io/dse-smart/"
+  );
+  assert.equal(
+    SiteFind.hrefFor("https://skhhcss-eng.github.io/dse-smart/", "/english"),
+    "https://skhhcss-eng.github.io/dse-smart/"
+  );
+  assert.equal(
+    SiteFind.hrefFor("https://skhhcss-eng.github.io/dse-smart/#log", "/english"),
+    "https://skhhcss-eng.github.io/dse-smart/#log"
+  );
   assert.equal(
     SiteFind.hrefFor("learning-materials/paper-2-writing-formats/letter-to-the-editor/", ""),
     "/learning-materials/paper-2-writing-formats/letter-to-the-editor/"
@@ -420,7 +434,7 @@ test("English home cards each have one job, in order", () => {
   ]);
   assert.match(home, /Study notes, skills, glossaries, and drills\./);
   assert.match(home, /Exam-style practice, starting with Paper 1\./);
-  assert.match(home, /Prompt Builder and other self-study tools\./);
+  assert.match(home, /DSE Smart and other self-study tools\./);
   assert.match(home, /Games and creative projects, such as Say It Louder\./);
   assert.match(home, /Speech Festival, Speak Up, and challenges like Roaming Mic\./);
   assert.match(home, /Live lesson tools — desks, roster, and points\./);
@@ -536,16 +550,17 @@ test("rectsOverlap is a soft-fail check for the Ask circle and the dock", () => 
   assert.equal(SiteFind.rectsOverlap(lifted, bar), false);
 });
 
-test("Self-Directed Learning hub lists Prompt Builder and stays off the Fun Projects card", () => {
+test("Self-Directed Learning hub lists DSE Smart and stays off the Fun Projects card", () => {
   const hub = fs.readFileSync(new URL("./self-directed-learning/index.html", import.meta.url), "utf8");
   const home = fs.readFileSync(new URL("./index.html", import.meta.url), "utf8");
   const redir = fs.readFileSync(new URL("./self-directed-learning/prompt-builder/index.html", import.meta.url), "utf8");
   assert.match(hub, /<title>Self-Directed Learning ·/);
   assert.match(hub, /<h1>Self-Directed Learning<\/h1>/);
-  assert.match(hub, /href="https:\/\/skhhcss-eng\.github\.io\/prompt-builder\/"/);
+  assert.match(hub, /href="https:\/\/skhhcss-eng\.github\.io\/dse-smart\/"/);
   assert.equal(hub.includes('href="prompt-builder/"'), false);
-  assert.match(hub, /<h3>Prompt Builder<\/h3>/);
-  assert.match(hub, /Build better prompts for HKDSE Papers 1–4\./);
+  assert.equal(hub.includes("https://skhhcss-eng.github.io/prompt-builder/"), false);
+  assert.match(hub, /<h3>DSE Smart<\/h3>/);
+  assert.match(hub, /AI paper coach and error log for HKDSE Papers 1–4\./);
   assert.match(hub, /badge-phone">Phone</);
   assert.match(hub, /src="\.\.\/assets\/logo\.png"/);
   assert.match(hub, /site-find\.js\?v=20261122c/);

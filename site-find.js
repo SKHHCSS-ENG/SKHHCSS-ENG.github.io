@@ -440,10 +440,13 @@
       ]
     },
     {
-      "title": "Prompt Builder",
-      "path": "self-directed-learning/prompt-builder/",
+      "title": "DSE Smart",
+      "path": "https://skhhcss-eng.github.io/dse-smart/",
       "aliases": [
+        "dse smart",
+        "dse-smart",
         "prompt builder",
+        "prompt-builder",
         "ai",
         "dse",
         "doubao",
@@ -695,6 +698,8 @@
       raw = raw.slice(0, hashAt);
     }
     if (!raw || raw === "/") return (root ? root + "/" : "/") + hash;
+    // Absolute hosts (for example DSE Smart) must not pick up the /english/ LMS base.
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) return raw + hash;
     if (raw.charAt(0) !== "/") raw = "/" + raw;
     if (root && (raw === root || raw.indexOf(root + "/") === 0)) return raw + hash;
     return root + raw + hash;
