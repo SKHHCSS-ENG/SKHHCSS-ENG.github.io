@@ -567,7 +567,7 @@ test("Self-Directed Learning hub lists DSE Smart and stays off the Fun Projects 
   assert.match(home, /href="self-directed-learning\/"/);
   assert.equal(home.includes('href="prompt-builder/"'), false);
   assert.equal(home.includes("https://skhhcss-eng.github.io/prompt-builder/"), false);
-  assert.match(redir, /location\.replace\("https:\/\/skhhcss-eng\.github\.io\/prompt-builder\/"\+location\.search\+location\.hash\)/);
-  assert.match(redir, /href="https:\/\/skhhcss-eng\.github\.io\/prompt-builder\/"/);
+  assert.match(redir, /location\.replace\("https:\/\/skhhcss-eng\.github\.io\/dse-smart\/"\+location\.search\+location\.hash\)/);
+  assert.match(redir, /href="https:\/\/skhhcss-eng\.github\.io\/dse-smart\/"/);
   assert.equal(fs.existsSync(new URL("./prompt-builder/index.html", import.meta.url)), false);
 });
